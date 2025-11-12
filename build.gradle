@@ -3,24 +3,28 @@ plugins {
     id 'org.springframework.boot' version '3.5.7'
     id 'io.spring.dependency-management' version '1.1.7'
 }
+
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
+description = 'FitWorksApp'
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
 }
+
 repositories {
     mavenCentral()
 }
+
 dependencies {
-    // Spring Bootスターター
+    // --- Spring Boot ---
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
@@ -28,23 +32,55 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    
-    // データベース・Hibernate
+
+    // --- データベース ---
     implementation 'org.xerial:sqlite-jdbc:3.45.3.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.6.1.Final'
 
-    // JSON処理
+    // --- JSON処理 ---
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
-    // 開発用
+    // --- 開発用 ---
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    // テスト
+
+    // --- テスト ---
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
+
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+//
+// === React統合設定 ===
+//
+
+// Reactアプリをビルドするタスク
+task buildReact(type: Exec) {
+    workingDir 'frontend'
+    // OSによってコマンドを切り替え
+    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+        commandLine 'cmd', '/c', 'npm', 'run', 'build'
+    } else {
+        commandLine 'npm', 'run', 'build'
+    }
+}
+
+// Reactのビルド成果を Spring Boot の static フォルダへコピー
+task copyReactBuild(type: Copy) {
+    dependsOn buildReact
+    from 'frontend/build'
+    into 'src/main/resources/static'
+}
+
+// Gradle 8.x対応: リソース処理前に React をコピーする依存関係を追加
+processResources.dependsOn(copyReactBuild)
+// Spring Boot全体ビルド時にも React を含める
+build {
+    dependsOn copyReactBuild
+}
+
