@@ -6,10 +6,10 @@
     <title>ホーム | FitWorks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- CSS VARIABLES (青ベース) --- */
+        /* --- CSS VARIABLES --- */
         :root {
-            --primary-color: #4f8cff;
-            --secondary-color: #8cb3ff;
+            --primary-color: #4f8cff; /* 活発な青系 */
+            --secondary-color: #8cb3ff; /* 柔らかな青系 */
             --dark-text: #36454f;
             --light-bg: #f8fbff;
             --error-color: #ff4a4a;
@@ -20,8 +20,7 @@
         /* --- ANIMATIONS: POP & FLOAT --- */
         @keyframes floatingBackground {
             0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
         }
         @keyframes popIn {
             0% { opacity: 0; transform: translateY(20px) scale(0.95); }
@@ -30,20 +29,15 @@
         }
         @keyframes jumpOnHover {
             0% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-5px) scale(1.02); }
+            50% { transform: translateY(-4px) scale(1.02); }
             100% { transform: translateY(0) scale(1); }
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
+        
         /* --- BASE STYLE --- */
         body {
             background: linear-gradient(135deg, #e0f0ff, #b3d9ff);
-            background-size: 400% 400%; 
+            background-size: 400% 400%;
             animation: floatingBackground 15s ease infinite alternate;
-            
             font-family: 'Poppins', 'Noto Sans JP', sans-serif;
             display: flex;
             flex-direction: column;
@@ -66,11 +60,9 @@
             text-align: center;
             transition: all 0.5s cubic-bezier(.25,.8,.25,1);
             width: 100%;
-            max-width: 600px; /* ホーム画面の最大幅を維持 */
+            max-width: 600px;
             box-sizing: border-box;
-            
             animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
-            transform: rotateX(0deg) scale(1.0);
         }
 
         .main-container:hover {
@@ -93,7 +85,7 @@
             font-size: 16px;
             font-weight: 400;
         }
-
+        
         /* --- BUTTONS (共通スタイル) --- */
         .button, button.primary, button.secondary {
             text-decoration: none;
@@ -112,72 +104,62 @@
             text-align: center;
         }
 
-        /* プライマリボタン */
+        /* プライマリボタン (Dashboard, Logout) */
         .button.primary, button.primary {
-            background: linear-gradient(45deg, var(--primary-color), #4f63ff);
+            background: linear-gradient(45deg, var(--primary-color), #4f63ff); /* 鮮やかな青 */
             color: white;
             box-shadow: 0 8px 20px rgba(79, 140, 255, 0.4);
         }
-
         .button.primary:hover, button.primary:hover {
             animation: jumpOnHover 0.4s ease-out;
             box-shadow: 0 12px 30px rgba(79, 140, 255, 0.6);
             transform: translateY(-4px);
         }
 
-        /* セカンダリボタン */
+        /* セカンダリボタン (Settings) */
         .button.secondary, button.secondary {
             background: var(--light-bg);
             color: var(--dark-text);
             border: 2px solid var(--secondary-color);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
-
         .button.secondary:hover, button.secondary:hover {
             animation: jumpOnHover 0.4s ease-out;
             background: #eaf4ff;
             border-color: var(--primary-color);
+            transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(79, 140, 255, 0.1);
-            transform: translateY(-1px);
-        }
-        
-        /* 新しいAIコーチボタンのスタイル */
-        .button.ai-chat {
-            background: linear-gradient(45deg, #00c6ff, #0072ff); /* 鮮やかな青 */
-            color: white;
-            box-shadow: 0 8px 20px rgba(0, 150, 255, 0.4);
-            margin: 20px 10px 10px 10px; /* 他のボタンから少し離す */
-            padding: 16px 40px; /* 他のボタンより大きくする */
-        }
-        .button.ai-chat:hover {
-             animation: jumpOnHover 0.4s ease-out;
-             box-shadow: 0 12px 30px rgba(0, 150, 255, 0.6);
-             transform: translateY(-4px);
         }
 
-        .button-container {
-            margin-top: 30px;
-        }
-        
-        .dashboard-content {
-            margin-top: 20px;
+        /* AIチャットボタン（目立つ色） */
+        .button.ai-chat {
+            background: linear-gradient(45deg, #ff6347, #ff8c4f); /* オレンジグラデーション */
+            box-shadow: 0 8px 20px rgba(255, 99, 71, 0.4);
+            margin: 20px 10px 10px 10px; 
+            padding: 16px 40px; 
             font-size: 18px;
-            line-height: 1.8;
+        }
+        .button.ai-chat:hover {
+            animation: jumpOnHover 0.4s ease-out;
+            box-shadow: 0 12px 30px rgba(255, 99, 71, 0.6);
+            transform: translateY(-4px);
         }
 
         /* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
         @media (max-width: 600px) {
             .main-container {
                 max-width: 100%;
-                padding: 25px 20px;
+                padding: 30px 20px;
             }
             .button, button.primary, .button.secondary, button.secondary, .button.ai-chat {
                 display: block;
-                margin: 10px auto;
+                margin: 10px 0;
                 width: 100%;
                 min-width: unset;
-                font-size: 14px;
                 padding: 12px 20px;
+            }
+            h1 {
+                font-size: 30px;
             }
         }
     </style>
@@ -186,22 +168,40 @@
 <div class="main-container">
     <h1>FitWorksへようこそ 🎉</h1>
     <p class="sub-heading">あなたのフィットネス・ジャーニーをサポートします。</p>
-
+    
     <div class="dashboard-content">
         <p>現在の状態を確認し、AIコーチと連携して最適なトレーニングを計画しましょう！</p>
     </div>
-
+    
     <div class="button-container">
-        <a th:href="@{/ai-coach}" class="button ai-chat">
-            <span style="font-size: 18px;">AIコーチとチャット</span>
-        </a>
+        <a th:href="@{/dashboard}" class="button primary">ダッシュボードへ</a>
+        <a th:href="@{/training-log}" class="button primary">トレーニング記録</a>
+        
         <br>
-        <a th:href="@{/change-password}" class="button secondary">パスワードを変更</a>
-        <a th:href="@{/logout}" class="button primary">ログアウト</a>
+        
+        <a th:href="@{/ai-coach}" class="button ai-chat">
+            <span style="font-size: 18px;">AIコーチとチャット 🤖</span>
+        </a>
+        
+        <br>
+        
+        <a th:href="@{/settings}" class="button secondary">設定 ⚙️</a>
+
+        <a th:href="@{/logout}" class="button secondary">ログアウト</a>
     </div>
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
 
 
 

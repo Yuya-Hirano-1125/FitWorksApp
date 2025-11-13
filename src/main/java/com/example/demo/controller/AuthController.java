@@ -15,6 +15,8 @@ import com.example.demo.service.UserService;
 public class AuthController {
 
     private final UserService userService;
+    
+    // AuthControllerにAICoachServiceやExecutorは不要なため、元のコードから削除してシンプルに保ちます。
 
     public AuthController(UserService userService) {
         this.userService = userService;
@@ -38,7 +40,7 @@ public class AuthController {
             @RequestParam("username") String username,
             @RequestParam("password") String password,
             Model model) {
-        // 登録処理の成功を仮定し、ログイン画面へ遷移 (実際の登録ロジックはUserServiceに依存)
+        // 登録処理の成功を仮定し、ログイン画面へ遷移
         model.addAttribute("message", "登録が完了しました。ログインしてください。");
         return "login";
     }
@@ -68,20 +70,19 @@ public class AuthController {
         // リセットトークンを生成してメールを送信するロジックを実装します。
 
         boolean emailFoundAndSent = true; // ★ 仮の成功フラグ
-
+        
         if (emailFoundAndSent) {
             // 成功した場合、成功メッセージをリダイレクト先に渡します
             redirectAttributes.addFlashAttribute("successMessage",
-                "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");
+                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");
             return "redirect:/forgot-password";
         } else {
             // 失敗した場合、エラーメッセージをリダイレクト先に渡します
             redirectAttributes.addFlashAttribute("errorMessage",
-                "そのメールアドレスは登録されていません。");
+                    "そのメールアドレスは登録されていません。");
             return "redirect:/forgot-password";
         }
     }
-
 
     // ----------------------------------------------------
     // --- 認証後のパスワード変更（現在のパスワードが必要） ---
@@ -106,8 +107,9 @@ public class AuthController {
         }
 
         // 【サーバーサイド検証 2】 UserServiceによるパスワード変更処理
+        // 注: 実際のUserServiceの実装に依存します。
         boolean success = userService.changePassword(userDetails.getUsername(), oldPassword, newPassword);
-
+        
         if(success) {
             model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
         } else {
@@ -116,24 +118,21 @@ public class AuthController {
         return "change-password";
     }
 
-    // ----------------------------------------------------
-    // ★ 新規追加: AIコーチ・チャット画面
-    // ----------------------------------------------------
-
-    /**
-     * AIコーチ・チャット画面を表示
-     * URL: /ai-coach
-     */
-    @GetMapping("/ai-coach")
-    public String aiCoachChat() {
-        // Thymeleafテンプレート: ai-coach-chat.html を返します
-        return "ai-coach-chat"; 
-    }
-
-
     // --- ホーム画面 ---
     @GetMapping("/home")
     public String home() {
         return "home";
+    }
+
+    // ----------------------------------------------------
+    // ★ 新規追加: 設定画面
+    // ----------------------------------------------------
+    /**
+     * 設定画面を表示
+     * URL: /settings
+     */
+    @GetMapping("/settings")
+    public String settings() {
+        return "settings"; // settings.html を返します
     }
 }

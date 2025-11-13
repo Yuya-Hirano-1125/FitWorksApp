@@ -1,7 +1,9 @@
+// AICoachController.java
 package com.example.demo.controller;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor; // ★ 追加
+import java.util.concurrent.Executor;
+// ... (他のインポート) ...
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,28 +13,22 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.service.AICoachService;
 
 @RestController
-@RequestMapping("/api") 
+@RequestMapping("/api")
 public class AICoachController {
 
     private final AICoachService aiCoachService;
-    private final Executor taskExecutor; // ★ Executorを保持するフィールドを追加
+    private final Executor taskExecutor; 
 
-    // ★ コンストラクタでExecutorを注入
     public AICoachController(AICoachService aiCoachService, Executor taskExecutor) {
         this.aiCoachService = aiCoachService;
-        // AppConfigで定義された @Bean(name = "taskExecutor") が自動で注入される
-        this.taskExecutor = taskExecutor; 
+        this.taskExecutor = taskExecutor;
     }
 
-    /**
-     * AIコーチへの問い合わせを非同期で実行し、Webスレッドをブロックしないようにする。
-     * 初期アクセス時（メッセージが空または挨拶）に質問リストを返します。
-     */
     @PostMapping("/chat")
     public CompletableFuture<String> getAICoachResponse(@RequestParam("message") String message) {
-        
+
         String lowerMessage = message.trim().toLowerCase();
-        
+
         // ★ 質問ロジック (対話型)
         if (lowerMessage.isEmpty() || lowerMessage.contains("こんにちは") || lowerMessage.contains("目標") || lowerMessage.contains("体調") || lowerMessage.contains("トレーニング") || lowerMessage.contains("太くしたい") || lowerMessage.contains("鍛えたい")) {
             
@@ -59,7 +55,7 @@ public class AICoachController {
             // APIをコールせず、即座に質問を非同期で返す
             return CompletableFuture.completedFuture(initialResponse);
         }
-        
+
         // ★ 修正箇所: Executorを明示的に指定
         // ユーザーが質問に回答した場合、カスタムExecutor (taskExecutor) でAI処理を実行する
         return CompletableFuture.supplyAsync(() -> {
@@ -67,3 +63,6 @@ public class AICoachController {
         }, taskExecutor); // <-- ここでtaskExecutorを使用
     }
 }
+
+
+
