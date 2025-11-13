@@ -35,19 +35,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // CSRFを無効化（Thymeleafの_tokenを削除する前提）
             .csrf(csrf -> csrf.disable())
+
+            // ページごとのアクセス制御
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/register", "/login", "/css/**", "/js/**", "/images/**", "/change-password").permitAll()
+                .requestMatchers("/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
             )
+
+            // ログイン設定
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
-                // ★修正: ログイン成功時に常に /home へリダイレクト (true)
-                .defaultSuccessUrl("/home", true) 
+                .defaultSuccessUrl("/home", true)
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
+
+            // ログアウト設定
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
@@ -55,17 +61,11 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .permitAll()
             )
+
+            // 認証プロバイダ登録
             .authenticationProvider(authenticationProvider());
 
         return http.build();
     }
 }
-
-
-
-
-
-
-
-
 

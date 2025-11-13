@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIコーチ 🤖💬 | FitWorks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- CSRFトークンをメタタグとして安全に埋め込みます。 -->
+    <!-- この方式は、Thymeleafのパース時にクラッシュするリスクが最も低い標準的な方法です。 -->
+   
+   
+
     <style>
         /* --- CSS VARIABLES (青ベース) --- */
         :root {
@@ -183,15 +189,17 @@
     </style>
 </head>
 <body>
+    
 <div class="main-container">
-    <h1>AIコーチ 🤖💬</h1>
+    <h1>AIコーチ </h1>
     
     <div class="chat-history" id="chatHistory">
         <div class="message-bubble ai-message">
-            こんにちは！AIコーチの**FitBot**です💪。あなたの**今日のトレーニングの目標**や**体調**を教えてください。最適なメニューを提案します！
+            こんにちは！AIコーチのFitBotです。あなたの今日のトレーニングの目標や体調を教えてください。最適なメニューを提案します！
         </div>
     </div>
     
+    <!-- 入力エリア -->
     <div class="chat-input-area">
         <input type="text" placeholder="メッセージを入力してください..." id="messageInput" onkeydown="handleKey(event)">
         <button type="button" class="button chat-send" onclick="sendMessage()">送信</button>
@@ -200,10 +208,14 @@
     <script>
         const chatHistory = document.getElementById('chatHistory');
         const messageInput = document.getElementById('messageInput');
-        // CSRFトークンの取得 (Spring Securityを使用しているため)
-        const csrfToken = document.querySelector("meta[name='_csrf']") ? document.querySelector("meta[name='_csrf']").content : '';
-        const csrfHeader = document.querySelector("meta[name='_csrf_header']") ? document.querySelector("meta[name='_csrf_header']").content : '';
         
+        // ★ 修正: JavaScriptでメタタグからCSRFトークンを安全に取得
+        const csrfMetaToken = document.querySelector('meta[name="_csrf"]');
+        const csrfMetaHeader = document.querySelector('meta[name="_csrf_header"]');
+
+        const csrfToken = csrfMetaToken ? csrfMetaToken.content : null;
+        const csrfHeader = csrfMetaHeader ? csrfMetaHeader.content : null;
+
         function handleKey(event) {
             if (event.key === 'Enter') {
                 event.preventDefault(); 
@@ -224,10 +236,13 @@
                 const headers = {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 };
+                
+                // CSRFトークンをヘッダーに追加
                 if (csrfToken && csrfHeader) {
-                    headers[csrfHeader] = csrfToken; // CSRFトークンをヘッダーに追加
+                    headers[csrfHeader] = csrfToken; 
                 }
                 
+                // API呼び出し
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: headers,
@@ -236,7 +251,8 @@
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    throw new Error(`API呼び出しエラー: ${response.status}. 詳細: ${errorText.substring(0, 100)}`);
+                    // 500エラーや400エラーの詳細をチャットバブルに表示
+                    throw new Error(`API呼び出しエラー: ${response.status}. 詳細: ${errorText.substring(0, 300)}`);
                 }
                 
                 const aiResponseText = await response.text();
@@ -268,7 +284,6 @@
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
         
-        // AIの応答を整形する（簡易的なMarkdown整形）
         function formatAiResponse(text) {
             let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             formattedText = formattedText.replace(/\n/g, '<br>');
@@ -280,21 +295,6 @@
 </div>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

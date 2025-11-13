@@ -7,6 +7,7 @@ plugins {
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 description = 'FitWorksApp'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
@@ -17,6 +18,8 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
+    // GradleがCommons Loggingの競合を自動的に解決できない場合、以下の設定で強制的に除外することが可能です。す。
+    // all*.exclude group: 'commons-logging' 
 }
 
 repositories {
@@ -24,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    // --- Spring Boot Core ---
+    // --- Spring Boot Core (Web & Security) ---
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
@@ -33,15 +36,19 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     
-    // Spring Boot 3.x以降で非同期/APIクライアント処理を行う WebFlux
-    implementation 'org.springframework.boot:spring-boot-starter-webflux' 
-    
-    // JSON処理
+    // JSON処理 (HttpClientで使用)
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+    
+    // ★ 修正点 1: キャッシュ機能の有効化 (API負荷軽減)
+    // Spring Boot標準のキャッシュ機能（Caffeineなど）を使用可能にする
+    implementation 'org.springframework.boot:spring-boot-starter-cache' 
+    // インメモリキャッシュの実装としてCaffeineを推奨
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 
-    // ★ Google Gemini API (API Key認証) 用の公式 SDK
-    implementation 'com.google.genai:google-genai:1.0.0'
-
+    // ★ 修正点 2: 非同期処理の利用 (Webスレッド解放のため)
+    // CompletableFutureなどを使用する際に必要（starter-webに大部分は含まれるが、明示）
+    // implementation 'org.springframework.boot:spring-boot-starter-aop' 
+    
     // --- データベース ---
     implementation 'org.xerial:sqlite-jdbc:3.45.3.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.6.1.Final'
@@ -49,8 +56,8 @@ dependencies {
     // --- 開発用 ---
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
+    // developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    
     // --- テスト ---
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
@@ -60,13 +67,6 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-// ... React統合タスクは省略 ...
-
-
-
-
-
 
 
 
