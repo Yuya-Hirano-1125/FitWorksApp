@@ -1,10 +1,65 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>ホーム</title>
+    <meta charset="UTF-8">
+    <title>Home - FitWorks</title>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f3e7ff, #d9efff);
+            font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 40px 60px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #7a4fff;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        a.button {
+            background: linear-gradient(135deg, #7a4fff, #9e7bff);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        a.button:hover {
+            background: linear-gradient(135deg, #6a3fd9, #8a66ff);
+        }
+    </style>
 </head>
 <body>
-<h2>ようこそ、ログイン成功！</h2>
-<a th:href="@{/logout}">ログアウト</a>
+    <div class="container">
+        <h1>Welcome to FitWorks!</h1>
+        <p>あなたのトレーニングライフをもっと楽しく、もっと自由に。</p>
+        <a class="button" th:href="@{/logout}">ログアウト</a>
+    </div>
 </body>
 </html>
