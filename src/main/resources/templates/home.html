@@ -1,65 +1,109 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>Home - FitWorks</title>
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #f3e7ff, #d9efff);
-            font-family: 'Poppins', 'Noto Sans JP', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ホーム | FitWorks</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* --- BASE STYLE (Home Screen) --- */
+:root {
+    --primary-color: #7a4fff;
+    --secondary-color: #9e7bff;
+    --dark-text: #4a4a4a;
+}
+body {
+    background: linear-gradient(135deg, #f3e7ff, #d9efff);
+    font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    overflow: auto;
+}
+.main-container {
+    background: white;
+    padding: 50px 60px;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    text-align: center;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+}
+.main-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+h1 { color: var(--primary-color); margin-bottom: 20px; font-size: 32px; }
+p { color: var(--dark-text); margin-bottom: 40px; font-size: 18px; }
+a.button {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    text-decoration: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    transition: 0.3s;
+    font-weight: 600;
+    display: inline-block;
+    margin: 10px;
+    min-width: 150px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+a.button:hover {
+    background: linear-gradient(135deg, #6a3fd9, #8a66ff);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+/* ログアウトボタンを少し目立たなくするスタイル */
+a.logout-button {
+    background: #ccc;
+    color: var(--dark-text);
+    margin-top: 30px;
+    padding: 10px 25px;
+    font-weight: 400;
+}
+a.logout-button:hover {
+    background: #bbb;
+}
 
-        .container {
-            background: white;
-            padding: 40px 60px;
-            border-radius: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .container:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-        }
-
-        h1 {
-            color: #7a4fff;
-            margin-bottom: 20px;
-        }
-
-        p {
-            color: #555;
-            margin-bottom: 30px;
-        }
-
-        a.button {
-            background: linear-gradient(135deg, #7a4fff, #9e7bff);
-            color: white;
-            text-decoration: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            transition: 0.3s;
-            font-weight: bold;
-        }
-
-        a.button:hover {
-            background: linear-gradient(135deg, #6a3fd9, #8a66ff);
-        }
-    </style>
+/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+@media (max-width: 600px) {
+    body {
+        padding: 20px;
+        align-items: flex-start;
+    }
+    .main-container {
+        padding: 30px 20px;
+        max-width: 100%;
+        margin-top: 50px;
+    }
+    h1 {
+        font-size: 28px;
+    }
+    p {
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+    a.button {
+        display: block; /* モバイルではボタンを縦に並べる */
+        margin: 10px 0;
+    }
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to FitWorks!</h1>
-        <p>あなたのトレーニングライフをもっと楽しく、もっと自由に。</p>
-        <a class="button" th:href="@{/logout}">ログアウト</a>
-    </div>
+<div class="main-container">
+    <h1>Welcome to FitWorks!</h1>
+    <p>あなたのトレーニングライフをもっと楽しく、もっと自由に。</p>
+
+    <a class="button" th:href="@{/home}">ダッシュボード</a>
+    <a class="button" th:href="@{/change-password}">パスワード変更</a>
+
+    <a class="button logout-button" th:href="@{/logout}">ログアウト</a>
+</div>
 </body>
 </html>
+

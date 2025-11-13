@@ -19,13 +19,11 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-    // パスワードエンコーダーのBean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 認証プロバイダー
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -34,26 +32,19 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    // セキュリティ設定
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // 開発中は無効、本番は有効推奨
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/register",
-                    "/login",
-                    "/css/**",
-                    "/js/**",
-                    "/images/**",
-                    "/favicon.ico"
-                ).permitAll()
+                // ★修正: /change-password への認証なしでのアクセスを許可
+                .requestMatchers("/register", "/login", "/css/**", "/js/**", "/images/**", "/change-password").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/home", true)
+                .defaultSuccessUrl("/home", false)
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
@@ -69,3 +60,12 @@ public class SecurityConfig {
         return http.build();
     }
 }
+
+
+
+
+
+
+
+
+
