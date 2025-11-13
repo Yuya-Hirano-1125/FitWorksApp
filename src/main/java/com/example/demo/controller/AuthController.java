@@ -7,7 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes; // ★ 追加: リダイレクト先にメッセージを渡すために使用
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.service.UserService;
 
@@ -44,7 +44,7 @@ public class AuthController {
     }
 
     // ----------------------------------------------------
-    // ★ 追加機能: パスワード再設定（パスワードを忘れた方）
+    // ★ パスワード再設定（パスワードを忘れた方）
     // ----------------------------------------------------
 
     /**
@@ -59,10 +59,10 @@ public class AuthController {
 
     /**
      * パスワード再設定メール送信処理を実行
-     * URL: /forgot-password (POST)word);
+     * URL: /forgot-password (POST)
      */
     @PostMapping("/forgot-password")
-    public String processForgotPassword(@RequestParam("email") String email, 
+    public String processForgotPassword(@RequestParam("email") String email,
                                         RedirectAttributes redirectAttributes) {
         // 【実際の処理】: UserServiceを使ってメールアドレスからユーザーを検索し、
         // リセットトークンを生成してメールを送信するロジックを実装します。
@@ -71,12 +71,12 @@ public class AuthController {
 
         if (emailFoundAndSent) {
             // 成功した場合、成功メッセージをリダイレクト先に渡します
-            redirectAttributes.addFlashAttribute("successMessage", 
+            redirectAttributes.addFlashAttribute("successMessage",
                 "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");
             return "redirect:/forgot-password";
         } else {
             // 失敗した場合、エラーメッセージをリダイレクト先に渡します
-            redirectAttributes.addFlashAttribute("errorMessage", 
+            redirectAttributes.addFlashAttribute("errorMessage",
                 "そのメールアドレスは登録されていません。");
             return "redirect:/forgot-password";
         }
@@ -101,21 +101,35 @@ public class AuthController {
         
         // 【サーバーサイド検証 1】新しいパスワードと確認用パスワードの一致チェック
         if (!newPassword.equals(confirmPassword)) {
-            model.addAttribute("errorMessage", "新しいパスワードが一致しません"); // ★ errorからerrorMessageに修正
+            model.addAttribute("errorMessage", "新しいパスワードが一致しません");
             return "change-password";
         }
 
         // 【サーバーサイド検証 2】 UserServiceによるパスワード変更処理
-        // (confirmPassword の取得を修正しました)
         boolean success = userService.changePassword(userDetails.getUsername(), oldPassword, newPassword);
 
         if(success) {
-            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉"); // ★ messageからsuccessMessageに修正
+            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
         } else {
-            model.addAttribute("errorMessage", "現在のパスワードが正しくありません"); // ★ errorからerrorMessageに修正
+            model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
         }
         return "change-password";
     }
+
+    // ----------------------------------------------------
+    // ★ 新規追加: AIコーチ・チャット画面
+    // ----------------------------------------------------
+
+    /**
+     * AIコーチ・チャット画面を表示
+     * URL: /ai-coach
+     */
+    @GetMapping("/ai-coach")
+    public String aiCoachChat() {
+        // Thymeleafテンプレート: ai-coach-chat.html を返します
+        return "ai-coach-chat"; 
+    }
+
 
     // --- ホーム画面 ---
     @GetMapping("/home")

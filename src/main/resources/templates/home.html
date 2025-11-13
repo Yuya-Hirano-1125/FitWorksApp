@@ -66,7 +66,7 @@
             text-align: center;
             transition: all 0.5s cubic-bezier(.25,.8,.25,1);
             width: 100%;
-            max-width: 450px;
+            max-width: 600px; /* ホーム画面の最大幅を維持 */
             box-sizing: border-box;
             
             animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
@@ -94,36 +94,14 @@
             font-weight: 400;
         }
 
-        /* --- FORM ELEMENTS (ホーム画面では不要だが、共通CSSとして含める) --- */
-        .form-group input[type="text"],
-        .form-group input[type="password"],
-        .form-group input[type="email"] {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #ddeeff;
-            background-color: #f7fcff;
-            border-radius: 12px;
-            box-sizing: border-box;
-            font-size: 16px;
-            transition: all 0.3s cubic-bezier(.17,.67,.83,.67);
-            color: var(--dark-text);
-        }
-
-        .form-group input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 10px rgba(79, 140, 255, 0.6);
-            transform: scale(1.02);
-        }
-
-        /* --- BUTTONS --- */
+        /* --- BUTTONS (共通スタイル) --- */
         .button, button.primary, button.secondary {
             text-decoration: none;
             border-radius: 30px;
             transition: all 0.3s ease-in-out;
             font-weight: 700;
             display: inline-block;
-            margin: 8px 10px;
+            margin: 10px;
             min-width: 180px;
             border: none;
             cursor: pointer;
@@ -131,8 +109,10 @@
             padding: 14px 35px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            text-align: center;
         }
 
+        /* プライマリボタン */
         .button.primary, button.primary {
             background: linear-gradient(45deg, var(--primary-color), #4f63ff);
             color: white;
@@ -145,6 +125,7 @@
             transform: translateY(-4px);
         }
 
+        /* セカンダリボタン */
         .button.secondary, button.secondary {
             background: var(--light-bg);
             color: var(--dark-text);
@@ -159,32 +140,19 @@
             box-shadow: 0 6px 15px rgba(79, 140, 255, 0.1);
             transform: translateY(-1px);
         }
-
-        /* メッセージスタイル */
-        .error-message, .success-message, .info-message {
-            font-weight: 700;
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            animation: fadeIn 0.5s ease-out;
+        
+        /* 新しいAIコーチボタンのスタイル */
+        .button.ai-chat {
+            background: linear-gradient(45deg, #00c6ff, #0072ff); /* 鮮やかな青 */
+            color: white;
+            box-shadow: 0 8px 20px rgba(0, 150, 255, 0.4);
+            margin: 20px 10px 10px 10px; /* 他のボタンから少し離す */
+            padding: 16px 40px; /* 他のボタンより大きくする */
         }
-        .error-message {
-            color: var(--error-color);
-            border: 1px solid var(--error-color);
-            background-color: #ffeaea;
-        }
-        .success-message {
-            color: var(--success-color);
-            border: 1px solid var(--success-color);
-            background-color: #e8ffe8;
-        }
-        .info-message {
-            color: var(--dark-text);
-            font-weight: 400;
-            font-size: 16px;
-            line-height: 1.6;
-            background: #f7fcff; 
-            border: 1px solid var(--secondary-color);
+        .button.ai-chat:hover {
+             animation: jumpOnHover 0.4s ease-out;
+             box-shadow: 0 12px 30px rgba(0, 150, 255, 0.6);
+             transform: translateY(-4px);
         }
 
         .button-container {
@@ -196,62 +164,93 @@
             font-size: 18px;
             line-height: 1.8;
         }
-        .dashboard-content a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .dashboard-content a:hover {
-            text-decoration: underline;
-        }
 
-        /* --- RESPONSIVE MOBILE ADJUSTMENTS (600px以下で画面が変わる) --- */
+        /* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
         @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
             .main-container {
+                max-width: 100%;
                 padding: 25px 20px;
-                animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
-                transform: rotateX(0deg) scale(1.0);
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             }
-            .main-container:hover {
-                transform: translateY(0px) rotateX(0deg) scale(1.0);
-                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 0 0 5px var(--secondary-color);
-            }
-            h1 {
-                font-size: 28px;
-            }
-            .button, button.primary, .button.secondary, button.secondary {
+            .button, button.primary, .button.secondary, button.secondary, .button.ai-chat {
                 display: block;
                 margin: 10px auto;
                 width: 100%;
                 min-width: unset;
                 font-size: 14px;
-                padding: 10px 20px;
-            }
-            .button-container {
-                display: block;
-                width: 100%;
-                margin-top: 20px;
+                padding: 12px 20px;
             }
         }
     </style>
 </head>
 <body>
-<div class="main-container" style="max-width: 600px;">
+<div class="main-container">
     <h1>FitWorksへようこそ 🎉</h1>
-    <p class="sub-heading">トレーニング記録を管理し、目標を達成しましょう。</p>
+    <p class="sub-heading">あなたのフィットネス・ジャーニーをサポートします。</p>
 
     <div class="dashboard-content">
-        <p>あなたのフィットネス始まります！</p>
-      
-        <p style="margin-top: 20px;">
-            <a th:href="@{/change-password}" class="button secondary" style="min-width: 180px;">パスワードを変更</a>
-            <a th:href="@{/login}" class="button primary" style="min-width: 180px;">ログアウト</a>
-        </p>
+        <p>現在の状態を確認し、AIコーチと連携して最適なトレーニングを計画しましょう！</p>
+    </div>
+
+    <div class="button-container">
+        <a th:href="@{/ai-coach}" class="button ai-chat">
+            <span style="font-size: 18px;">AIコーチとチャット</span>
+        </a>
+        <br>
+        <a th:href="@{/change-password}" class="button secondary">パスワードを変更</a>
+        <a th:href="@{/logout}" class="button primary">ログアウト</a>
     </div>
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
