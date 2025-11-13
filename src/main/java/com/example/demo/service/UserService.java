@@ -1,4 +1,3 @@
-// UserService.java
 package com.example.demo.service;
 
 import java.util.Optional;
@@ -25,7 +24,9 @@ public class UserService {
         if (optionalUser.isEmpty()) return false;
 
         User user = optionalUser.get();
+        // 現在のパスワードが一致するか検証
         if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+            // パスワードをエンコードして更新
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
             return true;
@@ -33,4 +34,3 @@ public class UserService {
         return false;
     }
 }
-

@@ -37,14 +37,14 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // ★修正: /change-password への認証なしでのアクセスを許可
                 .requestMatchers("/register", "/login", "/css/**", "/js/**", "/images/**", "/change-password").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/home", false)
+                // ★修正: ログイン成功時に常に /home へリダイレクト (true)
+                .defaultSuccessUrl("/home", true) 
                 .failureUrl("/login?error=true")
                 .permitAll()
             )

@@ -1,137 +1,295 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ホーム | FitWorks</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-<style>
-/* --- BASE STYLE (Home Screen) --- */
-:root {
-    --primary-color: #7a4fff;
-    --secondary-color: #9e7bff;
-    --dark-text: #4a4a4a;
-}
-body {
-    background: linear-gradient(135deg, #f3e7ff, #d9efff);
-    font-family: 'Poppins', 'Noto Sans JP', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-    overflow: auto;
-}
-.main-container {
-    background: white;
-    padding: 50px 60px;
-    border-radius: 25px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    text-align: center;
-    transition: all 0.3s ease;
-    width: 100%;
-    max-width: 500px;
-    box-sizing: border-box;
-}
-.main-container:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-}
-h1 { color: var(--primary-color); margin-bottom: 20px; font-size: 32px; }
-p { color: var(--dark-text); margin-bottom: 40px; font-size: 18px; }
-a.button {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    text-decoration: none;
-    padding: 12px 30px;
-    border-radius: 25px;
-    transition: 0.3s;
-    font-weight: 600;
-    display: inline-block;
-    margin: 10px;
-    min-width: 150px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-a.button:hover {
-    background: linear-gradient(135deg, #6a3fd9, #8a66ff);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-}
-/* ログアウトボタンを少し目立たなくするスタイル */
-a.logout-button {
-    background: #ccc;
-    color: var(--dark-text);
-    margin-top: 30px;
-    padding: 10px 25px;
-    font-weight: 400;
-}
-a.logout-button:hover {
-    background: #bbb;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS VARIABLES (青ベース) --- */
+        :root {
+            --primary-color: #4f8cff;
+            --secondary-color: #8cb3ff;
+            --dark-text: #36454f;
+            --light-bg: #f8fbff;
+            --error-color: #ff4a4a;
+            --success-color: #4CAF50;
+            --container-bg: #ffffff;
+        }
 
-/* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
-@media (max-width: 600px) {
-    body {
-        padding: 20px;
-        align-items: flex-start;
-    }
-    .main-container {
-        padding: 30px 20px;
-        max-width: 100%;
-        margin-top: 50px;
-    }
-    h1 {
-        font-size: 28px;
-    }
-    p {
-        font-size: 16px;
-        margin-bottom: 30px;
-    }
-    a.button {
-        display: block; /* モバイルではボタンを縦に並べる */
-        margin: 10px 0;
-    }
-}
-</style>
+        /* --- ANIMATIONS: POP & FLOAT --- */
+        @keyframes floatingBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+            80% { opacity: 1; transform: translateY(-5px) scale(1.01); }
+            100% { opacity: 1; transform: translateY(0) scale(1.0); }
+        }
+        @keyframes jumpOnHover {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-5px) scale(1.02); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- BASE STYLE --- */
+        body {
+            background: linear-gradient(135deg, #e0f0ff, #b3d9ff);
+            background-size: 400% 400%; 
+            animation: floatingBackground 15s ease infinite alternate;
+            
+            font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            perspective: 1000px;
+            color: var(--dark-text);
+        }
+
+        /* --- MAIN CONTAINER (浮遊感のあるボックス) --- */
+        .main-container {
+            background: var(--container-bg);
+            padding: 40px 50px;
+            border-radius: 30px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1), 0 0 0 8px var(--light-bg);
+            text-align: center;
+            transition: all 0.5s cubic-bezier(.25,.8,.25,1);
+            width: 100%;
+            max-width: 450px;
+            box-sizing: border-box;
+            
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
+            transform: rotateX(0deg) scale(1.0);
+        }
+
+        .main-container:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2), 0 0 0 10px var(--primary-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(79, 140, 255, 0.2);
+        }
+
+        .sub-heading {
+            color: var(--dark-text);
+            margin-bottom: 30px;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        /* --- FORM ELEMENTS --- */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--dark-text);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"],
+        .form-group input[type="email"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #ddeeff;
+            background-color: #f7fcff;
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(.17,.67,.83,.67);
+            color: var(--dark-text);
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 10px rgba(79, 140, 255, 0.6);
+            transform: scale(1.02);
+        }
+
+        /* --- BUTTONS --- */
+        .button, button.primary, button.secondary {
+            text-decoration: none;
+            border-radius: 30px;
+            transition: all 0.3s ease-in-out;
+            font-weight: 700;
+            display: inline-block;
+            margin: 8px 10px;
+            min-width: 180px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 14px 35px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .button.primary, button.primary {
+            background: linear-gradient(45deg, var(--primary-color), #4f63ff);
+            color: white;
+            box-shadow: 0 8px 20px rgba(79, 140, 255, 0.4);
+        }
+
+        .button.primary:hover, button.primary:hover {
+            animation: jumpOnHover 0.4s ease-out;
+            box-shadow: 0 12px 30px rgba(79, 140, 255, 0.6);
+            transform: translateY(-4px);
+        }
+
+        .button.secondary, button.secondary {
+            background: var(--light-bg);
+            color: var(--dark-text);
+            border: 2px solid var(--secondary-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .button.secondary:hover, button.secondary:hover {
+            animation: jumpOnHover 0.4s ease-out;
+            background: #eaf4ff;
+            border-color: var(--primary-color);
+            box-shadow: 0 6px 15px rgba(79, 140, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* メッセージスタイル */
+        .error-message, .success-message, .info-message {
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .error-message {
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+            background-color: #ffeaea;
+        }
+        .success-message {
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+            background-color: #e8ffe8;
+        }
+        .info-message {
+            color: var(--dark-text);
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 1.6;
+            background: #f7fcff; 
+            border: 1px solid var(--secondary-color);
+        }
+        .forgot-password-link {
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .forgot-password-link a {
+            color: var(--dark-text);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 600;
+        }
+        .forgot-password-link a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        .button-container {
+            margin-top: 30px;
+        }
+
+        /* --- RESPONSIVE MOBILE ADJUSTMENTS (600px以下で画面が変わる) --- */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .main-container {
+                padding: 25px 20px;
+                animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
+                transform: rotateX(0deg) scale(1.0);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            }
+            .main-container:hover {
+                transform: translateY(0px) rotateX(0deg) scale(1.0);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15), 0 0 0 5px var(--secondary-color);
+            }
+            h1 {
+                font-size: 28px;
+            }
+            .button, button.primary, .button.secondary, button.secondary {
+                display: block;
+                margin: 10px auto;
+                width: 100%;
+                min-width: unset;
+                font-size: 14px;
+                padding: 10px 20px;
+            }
+            .button-container {
+                display: block;
+                width: 100%;
+                margin-top: 20px;
+            }
+            .forgot-password-link {
+                text-align: center;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
 <div class="main-container">
-    <h1>Welcome to FitWorks!</h1>
-    <p>あなたのトレーニングライフをもっと楽しく、もっと自由に。</p>
-
-    <a class="button" th:href="@{/home}">ダッシュボード</a>
-    <a class="button" th:href="@{/change-password}">パスワード変更</a>
-
-    <a class="button logout-button" th:href="@{/logout}">ログアウト</a>
+    <h1>ログイン 🔑</h1>
+    <p class="sub-heading">FitWorksへようこそ！アカウントにサインインしてください。</p>
+    
+    <p th:if="${param.error}" class="error-message">
+        ユーザー名またはパスワードが正しくありません。
+    </p>
+    
+    <form th:action="@{/login}" method="post">
+        <div class="form-group">
+            <label for="username">ユーザー名 / メールアドレス</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 5px;">
+            <label for="password">パスワード</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <div class="forgot-password-link">
+            <a th:href="@{/forgot-password}">パスワードを忘れた方</a>
+        </div>
+        
+        <div class="button-container" style="margin-top: 15px;">
+            <button type="submit" class="button primary">ログイン</button>
+        </div>
+    </form>
+    
+    <p style="margin-top: 30px; margin-bottom: 0; font-size: 14px;">
+        アカウントをお持ちではありませんか？
+        <a th:href="@{/register}" style="color: var(--primary-color); text-decoration: none; font-weight: 700;">新規登録はこちら</a>
+    </p>
 </div>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
