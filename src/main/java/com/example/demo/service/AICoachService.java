@@ -73,11 +73,12 @@ public class AICoachService {
             contents.add(userContent);
             requestBody.set("contents", contents);
 
-            // ★ 修正済み: maxOutputTokensを2048に増やし、応答不完全エラーを回避
+            // ★ 負荷軽減のための設定: maxOutputTokensとtemperatureを追加
             ObjectNode generationConfig = objectMapper.createObjectNode();
-            generationConfig.put("maxOutputTokens", 2048); // 👈 2048に増やす (92行目)
-            requestBody.set("generationConfig", generationConfig); // 正しいフィールド名を使用
-
+            generationConfig.put("maxOutputTokens", 2048); // 応答長を維持
+            generationConfig.put("temperature", 0.1); // ★ 新規追加: 創造性を抑え、計算負荷を軽減
+            requestBody.set("generationConfig", generationConfig); 
+            
             // --- API呼び出し設定 ---
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(GEMINI_API_URL + apiKey))
@@ -126,7 +127,6 @@ public class AICoachService {
                 if (response.statusCode() == 503) {
                     return "⚠️ 現在AIサーバーが混み合っています。数秒後にもう一度お試しください。";
                 }
-                // 400エラーなど、他のエラーは詳細を表示
                 return "API通信エラー (HTTP Status: " + response.statusCode() + ")\n詳細: " + responseJson;
             }
             
