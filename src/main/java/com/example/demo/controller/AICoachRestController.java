@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// ❗ 注: ユーザー入力用DTOとしてChatRequestが必要です (ご自身で作成)
+// ❗ DTOはご自身のプロジェクトのパスに合わせてください
 import com.example.demo.dto.ChatRequest;
 import com.example.demo.dto.Message;
 import com.example.demo.service.AICoachService;
@@ -35,7 +35,7 @@ public class AICoachRestController {
     public ResponseEntity<Message> getAICoachResponse(@RequestBody ChatRequest chatRequestDto) {
         
         String userMessage = chatRequestDto.getText();
-        String userName = chatRequestDto.getUserName(); // ★ ユーザー名を取得
+        String userName = chatRequestDto.getUserName();
         String aiResponseText;
         
         boolean hasUserName = userName != null && !userName.trim().isEmpty();
@@ -46,19 +46,15 @@ public class AICoachRestController {
             
             // 初回挨拶やヘルプ要求の場合
             if (trimmedMessage.isEmpty() || trimmedMessage.contains("こんにちは") || trimmedMessage.contains("ヘルプ") || trimmedMessage.contains("おはよう")) {
-                // ユーザー名を含めた挨拶文を生成
                 aiResponseText = "**" + greetingName + "AIコーチ FitBot です！**" + INITIAL_QUESTION_BODY;
             } else {
                 
-                // ----------------------------------------------------------------------
-                // ★ 修正点: AIへのプロンプトにユーザー名と200文字制限を組み込み
-                // ----------------------------------------------------------------------
+                // AIへのプロンプトにユーザー名と200文字制限を組み込む
                 String userReference = hasUserName ? "(" + userName + "さん向けに) " : "";
                 
                 String promptWithInstruction = 
                     userReference + "次の質問に、**回答をMarkdownの箇条書き形式で、200文字以内（簡潔に）**で整理して回答してください。回答の冒頭でユーザー(" + userName + "さん)に話しかけてください。質問: " + userMessage;
                 
-                // 実際の AI サービス呼び出し
                 aiResponseText = aiCoachService.getGeminiAdvice(promptWithInstruction);
             }
             
@@ -70,6 +66,10 @@ public class AICoachRestController {
         return ResponseEntity.ok(aiMessageDto);
     }
 }
+
+
+
+
 
 
 

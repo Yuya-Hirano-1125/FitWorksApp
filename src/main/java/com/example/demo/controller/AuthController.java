@@ -17,82 +17,57 @@ public class AuthController {
     private final UserService userService;
 
     public AuthController(UserService userService) {
-        this.userService = userService;
+        this.userService = userService; // 初期化済み
     }
 
-    // --- ログイン画面 ---
+    // --- ログイン/登録関連 ---
     @GetMapping("/login")
-    public String login() {
-        return "login";
-    }
+    public String login() { return "login"; }
 
-    // --- 新規登録画面（GET） ---
     @GetMapping("/register")
-    public String registerForm() {
-        return "register";
-    }
+    public String registerForm() { return "register"; }
 
-    // --- 新規登録処理（POST） ---
     @PostMapping("/register")
-    public String registerUser(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password,
-            Model model) {
-        // 登録処理の成功を仮定し、ログイン画面へ遷移
+    public String registerUser(@RequestParam("username") String username,
+                               @RequestParam("password") String password,
+                               Model model) {
         model.addAttribute("message", "登録が完了しました。ログインしてください。");
         return "login";
     }
 
-    // ----------------------------------------------------
-    // ★ パスワード再設定（パスワードを忘れた方）
-    // ----------------------------------------------------
+    // --- パスワードリセット ---
     @GetMapping("/forgot-password")
-    public String forgotPasswordForm() {
-        return "forgot-password";
-    }
+    public String forgotPasswordForm() { return "forgot-password"; }
 
     @PostMapping("/forgot-password")
     public String processForgotPassword(@RequestParam("email") String email,
                                         RedirectAttributes redirectAttributes) {
-        // 仮の処理ロジック 
         boolean emailFoundAndSent = true; 
-        
         if (emailFoundAndSent) {
             redirectAttributes.addFlashAttribute("successMessage",
                     "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");
-            return "redirect:/forgot-password";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "そのメールアドレスは登録されていません。");
-            return "redirect:/forgot-password";
         }
+        return "redirect:/forgot-password";
     }
 
-    // ----------------------------------------------------
-    // --- 認証後のパスワード変更（現在のパスワードが必要） ---
-    // ----------------------------------------------------
+    // --- パスワード変更 ---
     @GetMapping("/change-password")
-    public String changePasswordForm() {
-        return "change-password";
-    }
+    public String changePasswordForm() { return "change-password"; }
 
     @PostMapping("/change-password")
-    public String changePassword(
-            @RequestParam("currentPassword") String oldPassword,
-            @RequestParam("newPassword") String newPassword,
-            @RequestParam("confirmPassword") String confirmPassword,
-            @AuthenticationPrincipal UserDetails userDetails,
-            Model model) {
-        
-        // 新しいパスワードと確認用パスワードの一致チェック
+    public String changePassword(@RequestParam("currentPassword") String oldPassword,
+                               @RequestParam("newPassword") String newPassword,
+                               @RequestParam("confirmPassword") String confirmPassword,
+                               @AuthenticationPrincipal UserDetails userDetails,
+                               Model model) {
         if (!newPassword.equals(confirmPassword)) {
             model.addAttribute("errorMessage", "新しいパスワードが一致しません");
             return "change-password";
         }
-
-        // 仮の成功フラグ
-        boolean success = true; 
-        
+        boolean success = true; // 仮の成功フラグ
         if(success) {
             model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
         } else {
@@ -101,7 +76,7 @@ public class AuthController {
         return "change-password";
     }
 
-    // --- ホーム画面 (ユーザー名表示機能を追加) ---
+    // --- ホーム画面 (ユーザー名反映) ---
     @GetMapping("/home")
     public String home(
         @AuthenticationPrincipal UserDetails userDetails, 
@@ -115,31 +90,7 @@ public class AuthController {
         return "home";
     }
 
-    // ----------------------------------------------------
-    // ★ 設定画面 (新規追加)
-    // ----------------------------------------------------
+    // --- 設定画面遷移 ---
     @GetMapping("/settings")
-    public String settings() {
-        return "settings"; // settings.html を返します
-    }
+    public String settings() { return "settings"; }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
