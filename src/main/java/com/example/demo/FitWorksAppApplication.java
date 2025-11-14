@@ -17,9 +17,8 @@ public class FitWorksAppApplication {
     }
 
     /**
-     * ★ 修正点: アプリケーション起動時にデフォルトユーザーを作成するCommandLineRunnerを追加
-     * ユーザー名: test
-     * パスワード: test (BCryptでハッシュ化)
+     * アプリケーション起動時にデフォルトユーザーを作成するCommandLineRunner
+     * ユーザー名: test, パスワード: test (BCryptでハッシュ化)
      */
     @Bean
     public CommandLineRunner dataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -44,43 +43,6 @@ public class FitWorksAppApplication {
         };
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

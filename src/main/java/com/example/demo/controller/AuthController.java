@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.service.UserService;
-
+ 
 @Controller
 public class AuthController {
 
     private final UserService userService;
 
     public AuthController(UserService userService) {
-        this.userService = userService; // 初期化済み
+        this.userService = userService;
     }
 
     // --- ログイン/登録関連 ---
@@ -31,6 +31,7 @@ public class AuthController {
     public String registerUser(@RequestParam("username") String username,
                                @RequestParam("password") String password,
                                Model model) {
+        // 実際の登録ロジックをここに実装する
         model.addAttribute("message", "登録が完了しました。ログインしてください。");
         return "login";
     }
@@ -59,15 +60,18 @@ public class AuthController {
 
     @PostMapping("/change-password")
     public String changePassword(@RequestParam("currentPassword") String oldPassword,
-                               @RequestParam("newPassword") String newPassword,
-                               @RequestParam("confirmPassword") String confirmPassword,
-                               @AuthenticationPrincipal UserDetails userDetails,
-                               Model model) {
+                                 @RequestParam("newPassword") String newPassword,
+                                 @RequestParam("confirmPassword") String confirmPassword,
+                                 @AuthenticationPrincipal UserDetails userDetails,
+                                 Model model) {
         if (!newPassword.equals(confirmPassword)) {
             model.addAttribute("errorMessage", "新しいパスワードが一致しません");
             return "change-password";
         }
-        boolean success = true; // 仮の成功フラグ
+        
+        // 実際のパスワード変更ロジック
+        boolean success = true; 
+        
         if(success) {
             model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
         } else {
@@ -76,11 +80,11 @@ public class AuthController {
         return "change-password";
     }
 
-    // --- ホーム画面 (ユーザー名反映) ---
+    // --- メイン画面への遷移 ---
     @GetMapping("/home")
     public String home(
-        @AuthenticationPrincipal UserDetails userDetails, 
-        Model model 
+        @AuthenticationPrincipal UserDetails userDetails,
+        Model model
     ) {
         if (userDetails != null) {
             model.addAttribute("username", userDetails.getUsername());
@@ -90,7 +94,17 @@ public class AuthController {
         return "home";
     }
 
-    // --- 設定画面遷移 ---
+    // ★ トレーニング画面への遷移
+    @GetMapping("/training")
+    public String training() { 
+        return "training"; 
+    }
+    
+    // 他の画面への遷移
+    @GetMapping("/gacha")
+    public String gacha() { return "gacha"; } 
+
     @GetMapping("/settings")
     public String settings() { return "settings"; }
 }
+

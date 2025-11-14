@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    // --- Spring Boot Core (Web & Security) ---
+    // --- Spring Boot Core ---
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
@@ -33,27 +33,30 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    
-    // JSON処理 (HttpClientで使用)
+
+    // JSON
     implementation 'com.fasterxml.jackson.core:jackson-databind'
-    
-    // ★ 追加/修正: キャッシュ機能の有効化 (API負荷軽減)
+
+    // Cache
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
-    // --- データベース ---
+    // --- Database SQLite ---
     implementation 'org.xerial:sqlite-jdbc:3.45.3.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.6.1.Final'
 
-    // --- 開発用 ---
+    // --- Lombok ---
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    // developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    
-    // --- テスト ---
+
+    // --- Testing ---
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // ★ 修正点: Gemini AI SDKの依存関係を安定版(0.16.0)に統一
+    // 依存関係エラーを解消します。
+    implementation 'com.google.genai:google-genai:0.16.0'
 }
 
 tasks.named('test') {

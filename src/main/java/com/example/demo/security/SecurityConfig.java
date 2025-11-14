@@ -1,5 +1,5 @@
 package com.example.demo.security;
-
+ 
 import java.io.IOException;
 
 import jakarta.servlet.Filter;
@@ -22,23 +22,23 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.example.demo.service.CustomUserDetailsService;
-
+ 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
+ 
     private final CustomUserDetailsService userDetailsService;
-
+ 
     public SecurityConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
-
+ 
     @Bean
     public PasswordEncoder passwordEncoder() {
         // パスワードエンコーダーを定義
         return new BCryptPasswordEncoder();
     }
-
+ 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         // 認証プロバイダーを定義
@@ -47,21 +47,18 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-    
+ 
     /**
      * CSRFトークンをレスポンスヘッダーに含めるカスタムフィルターを定義します。
-     * これにより、React (JavaScript) がトークンを読み取ることが可能になります。
      */
     private Filter csrfCookieFilter() {
         return (request, response, chain) -> {
             CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
             
-            // ServletResponseをHttpServletResponseにキャスト
-            HttpServletResponse httpResponse = (HttpServletResponse) response; 
-
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
+            
             if (csrfToken != null) {
                 // クライアント側で読み取り可能なヘッダーとしてトークンを設定
-                // ReactはこのヘッダーまたはCookieからトークンを取得します
                 httpResponse.setHeader(csrfToken.getHeaderName(), csrfToken.getToken());
             }
             try {
@@ -71,7 +68,7 @@ public class SecurityConfig {
             }
         };
     }
-
+ 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -86,27 +83,28 @@ public class SecurityConfig {
             )
             // 3. CSRFトークンを全てのレスポンスヘッダーに含めるフィルターを追加
             .addFilterAfter(csrfCookieFilter(), BasicAuthenticationFilter.class)
-
+            
             // 4. ページごとのアクセス制御
             .authorizeHttpRequests(auth -> auth
-                // Reactのエントリポイント、静的ファイル、認証画面を認証なしで許可
+                // 認証不要なページと静的リソース
                 .requestMatchers(
-                    "/", 
-                    "/home", 
-                    "/ai-coach", 
-                    "/ai-coach/**", 
+                    "/",
+                    "/home",
+                    "/training", 
+                    "/gacha",
                     "/settings",
                     "/change-password",
-                    "/forgot-password", 
-                    "/register", 
-                    "/login", 
-                    "/css/**", 
-                    "/js/**", 
+                    "/forgot-password",
+                    "/register",
+                    "/login",
+                    "/css/**",
+                    "/js/**",
                     "/images/**",
-                    "/{path:[^\\.]*}" // 静的ファイルでないその他のルートパス
+                    "/{path:[^\\.]*}" 
                 ).permitAll()
                 // APIエンドポイント (/api/**) は認証が必要
-                .requestMatchers("/api/**").authenticated() 
+                .requestMatchers("/api/**").authenticated()
+                // その他のリクエストは認証が必要
                 .anyRequest().authenticated()
             )
             
@@ -121,6 +119,7 @@ public class SecurityConfig {
             
             // 6. ログアウト設定
             .logout(logout -> logout
+                // POST /logout に変更
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
                 .logoutSuccessUrl("/login?logout=true")
                 .invalidateHttpSession(true)
@@ -130,7 +129,9 @@ public class SecurityConfig {
             
             // 7. 認証プロバイダ登録
             .authenticationProvider(authenticationProvider());
-
+            
         return http.build();
     }
 }
+
+
