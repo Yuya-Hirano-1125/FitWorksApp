@@ -30,11 +30,11 @@ public class FitWorksAppApplication {
 	public CommandLineRunner run(UserRepository userRepository, PasswordEncoder passwordEncoder) {
 		return args -> {
 			// ユーザーが存在しない場合のみ登録
-			if (userRepository.findByUsername("test").isEmpty()) {
+			if (userRepository.findByUsername("testuser").isEmpty()) {
 				User user = new User();
-				user.setUsername("");
+				user.setUsername("testuser");
 				// パスワードをハッシュ化して保存
-				user.setPassword(passwordEncoder.encode("test"));
+				user.setPassword(passwordEncoder.encode("password"));
 				userRepository.save(user);
 				System.out.println("★テストユーザー 'testuser' を登録しました (初期パスワード: password)");
 			}
