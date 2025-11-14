@@ -11,7 +11,7 @@
             --primary-color: #ff8c4f; /* 活発なオレンジ系 */
             --secondary-color: #ffc8a5; /* 柔らかなピンク系 */
             --dark-text: #4a4a4a;
-            --light-bg: #fffbf8; 
+            --light-bg: #fffbf8;
             --error-color: #ff4a4a;
             --success-color: #4CAF50;
             --container-bg: #ffffff;
@@ -31,6 +31,10 @@
             0% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-4px) scale(1.02); }
             100% { transform: translateY(0) scale(1); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* --- BASE STYLE --- */
@@ -212,10 +216,6 @@
 </div>
 </body>
 </html>
-
-
-
-
 
 
 

@@ -32,6 +32,10 @@
             50% { transform: translateY(-4px) scale(1.02); }
             100% { transform: translateY(0) scale(1); }
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* --- BASE STYLE --- */
         body {
@@ -155,6 +159,12 @@
             margin-bottom: 15px;
             animation: fadeIn 0.5s ease-out;
         }
+        .success-message {
+            color: var(--success-color);
+            font-weight: 700;
+            margin-bottom: 15px;
+            animation: fadeIn 0.5s ease-out;
+        }
 
         .button-container {
             margin-top: 25px;
@@ -231,16 +241,6 @@
 </div>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
 
 
 

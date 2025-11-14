@@ -6,7 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.ChatRequest; // ユーザー側で作成が必要です
+// ❗ 注: ユーザー入力用DTOとしてChatRequestが必要です (ご自身で作成)
+import com.example.demo.dto.ChatRequest;
 import com.example.demo.dto.Message;
 import com.example.demo.service.AICoachService;
 
@@ -16,7 +17,7 @@ public class AICoachRestController {
 
     private final AICoachService aiCoachService;
     
-    // 初期質問メッセージのベース部分
+    // 初期質問メッセージのベース部分 (Markdown記法)
     private static final String INITIAL_QUESTION_BODY = 
         "💪 最高のトレーニングプランを作成するため、以下の4点をまとめて教えてください！"
         + "\n\n**🎯 トレーニング計画のための質問:**"
@@ -34,7 +35,7 @@ public class AICoachRestController {
     public ResponseEntity<Message> getAICoachResponse(@RequestBody ChatRequest chatRequestDto) {
         
         String userMessage = chatRequestDto.getText();
-        String userName = chatRequestDto.getUserName();
+        String userName = chatRequestDto.getUserName(); // ★ ユーザー名を取得
         String aiResponseText;
         
         boolean hasUserName = userName != null && !userName.trim().isEmpty();
@@ -49,7 +50,9 @@ public class AICoachRestController {
                 aiResponseText = "**" + greetingName + "AIコーチ FitBot です！**" + INITIAL_QUESTION_BODY;
             } else {
                 
-                // ★ 修正点: 回答を「200文字以内（簡潔に）」と強く指示
+                // ----------------------------------------------------------------------
+                // ★ 修正点: AIへのプロンプトにユーザー名と200文字制限を組み込み
+                // ----------------------------------------------------------------------
                 String userReference = hasUserName ? "(" + userName + "さん向けに) " : "";
                 
                 String promptWithInstruction = 
@@ -67,9 +70,6 @@ public class AICoachRestController {
         return ResponseEntity.ok(aiMessageDto);
     }
 }
-
-
-
 
 
 

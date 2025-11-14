@@ -106,7 +106,7 @@
 
         /* プライマリボタン (Dashboard, Training Log) */
         .button.primary, .button[th\:href*='/dashboard'], .button[th\:href*='/training-log'] {
-            background: linear-gradient(45deg, var(--primary-color), #ff6347); /* オレンジグラデーション */
+            background: linear-gradient(45deg, var(--primary-color), #ff6347);
             color: white;
             box-shadow: 0 8px 20px rgba(255, 140, 79, 0.4);
         }
@@ -131,9 +131,9 @@
             box-shadow: 0 6px 15px rgba(255, 140, 79, 0.1);
         }
 
-        /* AIチャットボタン（目立つ青） */
+        /* AIチャットボタン（目立つ色） */
         .button.ai-chat {
-            background: linear-gradient(45deg, #00c6ff, #0072ff); /* 鮮やかな青 */
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
             box-shadow: 0 8px 20px rgba(0, 150, 255, 0.4);
             margin: 20px 10px 10px 10px; 
             padding: 16px 40px; 
@@ -191,7 +191,7 @@
         
         <a th:href="@{/settings}" class="button secondary">設定 ⚙️</a>
 
-        <a th:href="@{/login}" class="button secondary">ログアウト</a>
+        <a th:href="@{/logout}" class="button secondary">ログアウト</a>
     </div>
 </div>
 </body>

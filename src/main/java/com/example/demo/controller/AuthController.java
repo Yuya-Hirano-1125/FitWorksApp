@@ -46,7 +46,6 @@ public class AuthController {
     // ----------------------------------------------------
     // ★ パスワード再設定（パスワードを忘れた方）
     // ----------------------------------------------------
-
     @GetMapping("/forgot-password")
     public String forgotPasswordForm() {
         return "forgot-password";
@@ -55,7 +54,7 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public String processForgotPassword(@RequestParam("email") String email,
                                         RedirectAttributes redirectAttributes) {
-        // ★ 仮の処理ロジック (成功を仮定)
+        // 仮の処理ロジック 
         boolean emailFoundAndSent = true; 
         
         if (emailFoundAndSent) {
@@ -91,9 +90,8 @@ public class AuthController {
             return "change-password";
         }
 
-        // UserServiceによるパスワード変更処理を実行 (成功/失敗)
-        // boolean success = userService.changePassword(userDetails.getUsername(), oldPassword, newPassword);
-        boolean success = true; // ★ 仮の成功フラグ
+        // 仮の成功フラグ
+        boolean success = true; 
         
         if(success) {
             model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
@@ -125,6 +123,8 @@ public class AuthController {
         return "settings"; // settings.html を返します
     }
 }
+
+
 
 
 
