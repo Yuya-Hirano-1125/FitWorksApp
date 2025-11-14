@@ -5,222 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>設定 | FitWorks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* --- CSS VARIABLES --- */
-        :root {
-            --primary-color: #ff8c4f; /* 活発なオレンジ系 */
-            --secondary-color: #ffc8a5; /* 柔らかなピンク系 */
-            --dark-text: #4a4a4a;
-            --light-bg: #fffbf8; 
-            --error-color: #ff4a4a;
-            --success-color: #4CAF50;
-            --container-bg: #ffffff;
-        }
-
-        /* --- BASE STYLE --- */
-        body {
-            background: linear-gradient(135deg, #ffe0b3, #ffb3b3);
-            font-family: 'Poppins', 'Noto Sans JP', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            padding: 30px 20px;
-            box-sizing: border-box;
-            color: var(--dark-text);
-        }
-
-        /* --- MAIN CONTAINER --- */
-        .main-container {
-            background: var(--container-bg);
-            padding: 40px;
-            border-radius: 30px; 
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-            width: 100%;
-            max-width: 600px;
-            box-sizing: border-box;
-            text-align: left;
-            transition: all 0.5s cubic-bezier(.25,.8,.25,1);
-        }
-
-        .main-container:hover {
-             transform: translateY(-3px);
-             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
-        }
-
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 25px;
-            font-size: 36px;
-            font-weight: 800;
-            text-align: center;
-            letter-spacing: 1px;
-            text-shadow: 1px 1px 2px rgba(255, 140, 79, 0.2);
-        }
-        
-        /* --- SETTINGS SECTIONS (Accordion Style) --- */
-        .setting-section {
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            padding: 10px 0;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--dark-text);
-            transition: color 0.2s;
-        }
-        
-        .section-header:hover {
-            color: var(--primary-color);
-        }
-
-        .section-icon {
-            font-size: 24px;
-            margin-right: 10px;
-            color: var(--primary-color);
-        }
-
-        .section-content {
-            padding: 15px 0 5px 0;
-            border-top: 1px solid #f0f0f0;
-            margin-top: 10px;
-            overflow: hidden;
-            display: none;
-        }
-        
-        /* Setting Item Layout */
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            font-size: 16px;
-            color: var(--dark-text);
-            transition: background-color 0.1s;
-        }
-        .setting-item:hover {
-            background-color: var(--light-bg);
-            border-radius: 5px;
-        }
-
-        .setting-item label {
-            font-weight: 400;
-        }
-
-        .setting-item a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-            transition: opacity 0.2s;
-        }
-        .setting-item a:hover {
-            opacity: 0.7;
-            text-decoration: underline;
-        }
-        
-        /* --- BUTTONS --- */
-        .button.primary {
-            background: linear-gradient(45deg, var(--primary-color), #ff6347); 
-            color: white;
-            padding: 12px 30px;
-            border-radius: 30px;
-            font-weight: 600;
-            display: inline-block;
-            text-decoration: none;
-            transition: all 0.3s ease-in-out;
-            box-shadow: 0 6px 15px rgba(255, 140, 79, 0.4);
-            margin-top: 25px;
-        }
-        .button.primary:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 8px 20px rgba(255, 140, 79, 0.6);
-        }
-
-        /* --- TOGGLE SWITCH (Custom) --- */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 45px;
-            height: 25px;
-        }
-        .switch input {opacity: 0; width: 0; height: 0;}
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 25px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: var(--primary-color);
-        }
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-
-        /* Footer and Back Button */
-        .footer-links {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            text-align: center;
-        }
-
-        /* --- Responsive Adjustments --- */
-        @media (max-width: 600px) {
-            .main-container {
-                padding: 30px 20px;
-            }
-            h1 {
-                font-size: 30px;
-            }
-            .setting-item {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 10px 5px;
-            }
-            .setting-item label, .setting-item span, .setting-item a {
-                width: 100%;
-                text-align: left;
-                margin-bottom: 5px;
-            }
-            .switch {
-                margin-top: 5px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/fitworks-dark-theme.css}">
 </head>
-<body>
+<body class="settings-page">
 <div class="main-container">
-    <h1>⚙️ 設定</h1>
+    <h1><i class="fa-solid fa-gear header-icon"></i>設定</h1>
     
     <div class="setting-section" onclick="toggleSection('account-content')">
         <div class="section-header">
-            <div><span class="section-icon">👤</span> アカウント管理</div>
+            <div><span class="section-icon"><i class="fa-solid fa-user"></i></span> アカウント管理</div>
             <span class="arrow">▼</span>
         </div>
         <div class="section-content" id="account-content">
@@ -241,7 +35,7 @@
 
     <div class="setting-section" onclick="toggleSection('notification-content')">
         <div class="section-header">
-            <div><span class="section-icon">🔔</span> 通知設定</div>
+            <div><span class="section-icon"><i class="fa-solid fa-bell"></i></span> 通知設定</div>
             <span class="arrow">▼</span>
         </div>
         <div class="section-content" id="notification-content">
@@ -264,20 +58,20 @@
 
     <div class="setting-section" onclick="toggleSection('general-content')">
         <div class="section-header">
-            <div><span class="section-icon">🌎</span> 一般設定</div>
+            <div><span class="section-icon"><i class="fa-solid fa-sliders"></i></span> 一般設定</div>
             <span class="arrow">▼</span>
         </div>
         <div class="section-content" id="general-content">
             <div class="setting-item">
                 <label>テーマ</label>
-                <select style="padding: 5px; border-radius: 5px;">
-                    <option>ライト</option>
+                <select>
                     <option>ダーク</option>
+                    <option>ライト</option>
                 </select>
             </div>
             <div class="setting-item">
                 <label>測定単位</label>
-                <select style="padding: 5px; border-radius: 5px;">
+                <select>
                     <option>メートル法 (kg/cm)</option>
                     <option>ヤード・ポンド法 (lb/in)</option>
                 </select>
@@ -287,7 +81,7 @@
 
     <div class="setting-section" onclick="toggleSection('info-content')">
         <div class="section-header">
-            <div><span class="section-icon">ℹ️</span> ヘルプと情報</div>
+            <div><span class="section-icon"><i class="fa-solid fa-circle-info"></i></span> ヘルプと情報</div>
             <span class="arrow">▼</span>
         </div>
         <div class="section-content" id="info-content">
@@ -317,35 +111,241 @@
         const header = content.previousElementSibling;
         const arrow = header.querySelector('.arrow');
         
-        if (content.style.display === "block") {
-            content.style.display = "none";
+        // アコーディオンの開閉
+        if (content.style.maxHeight !== '0px' && content.style.maxHeight !== '') {
+            // スライドアップ (簡単なアニメーション)
+            content.style.maxHeight = '0px';
+            content.style.paddingTop = '0px';
+            content.style.paddingBottom = '0px';
             arrow.innerHTML = '▼';
         } else {
-            // 他のすべてのアコーディオンを閉じる
-            document.querySelectorAll('.section-content').forEach(c => {
-                if (c.id !== contentId && c.style.display === "block") {
-                    c.style.display = "none";
-                    c.previousElementSibling.querySelector('.arrow').innerHTML = '▼';
-                }
-            });
-            content.style.display = "block";
+            // スライドダウン
+            content.style.maxHeight = content.scrollHeight + 30 + "px"; // 適切な高さに設定
+            content.style.paddingTop = '10px';
+            content.style.paddingBottom = '15px';
             arrow.innerHTML = '▲';
         }
     }
 
-    // 初期状態で矢印の向きを設定
+    // 初期状態で矢印の向きを設定 (CSSで初期状態を制御しているため、JSの処理は省略可)
     document.querySelectorAll('.setting-section').forEach(section => {
-        const content = section.querySelector('.section-content');
         const arrow = section.querySelector('.arrow');
-        if (content.style.display === "block") {
-            arrow.innerHTML = '▲';
-        } else {
-            arrow.innerHTML = '▼';
-        }
+        arrow.innerHTML = '▼';
     });
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
