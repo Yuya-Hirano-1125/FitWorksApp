@@ -13,126 +13,134 @@ import com.example.demo.service.UserService;
 
 @Controller
 public class AuthController {
-
+    
     private final UserService userService;
     
-    // AuthControllerにAICoachServiceやExecutorは不要なため、元のコードから削除してシンプルに保ちます。
-
     public AuthController(UserService userService) {
         this.userService = userService;
     }
-
+    
     // --- ログイン画面 ---
     @GetMapping("/login")
-    public String login() {
-        return "login";
+    public String login() { 
+        return "login"; 
     }
-
-    // --- 新規登録画面（GET） ---
+    
+    // --- 新規登録（GET） ---
     @GetMapping("/register")
-    public String registerForm() {
-        return "register";
+    public String registerForm() { 
+        return "register"; 
     }
-
-    // --- 新規登録処理（POST） ---
+    
+    // --- 新規登録（POST） ---
     @PostMapping("/register")
     public String registerUser(
             @RequestParam("username") String username,
             @RequestParam("password") String password,
             Model model) {
-        // 登録処理の成功を仮定し、ログイン画面へ遷移
+        
+        // 本来は userService.registerUser(username, password);
         model.addAttribute("message", "登録が完了しました。ログインしてください。");
         return "login";
     }
-
-    // ----------------------------------------------------
-    // ★ パスワード再設定（パスワードを忘れた方）
-    // ----------------------------------------------------
-
-    /**
-     * パスワード再設定フォーム（メールアドレス入力画面）を表示
-     * URL: /forgot-password
-     */
+    
+    // --- パスワード再設定（ページ表示） ---
     @GetMapping("/forgot-password")
-    public String forgotPasswordForm() {
-        // Thymeleafテンプレート: forgot-password.html を返します
-        return "forgot-password";
+    public String forgotPasswordForm() { 
+        return "forgot-password"; 
     }
-
-    /**
-     * パスワード再設定メール送信処理を実行
-     * URL: /forgot-password (POST)
-     */
+    
+    // --- パスワードリセット処理 ---
     @PostMapping("/forgot-password")
-    public String processForgotPassword(@RequestParam("email") String email,
-                                        RedirectAttributes redirectAttributes) {
-        // 【実際の処理】: UserServiceを使ってメールアドレスからユーザーを検索し、
-        // リセットトークンを生成してメールを送信するロジックを実装します。
-
-        boolean emailFoundAndSent = true; // ★ 仮の成功フラグ
+    public String processForgotPassword(
+            @RequestParam("email") String email,
+            RedirectAttributes redirectAttributes) {
+        
+        boolean emailFoundAndSent = true; // 仮のロジック
         
         if (emailFoundAndSent) {
-            // 成功した場合、成功メッセージをリダイレクト先に渡します
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");
-            return "redirect:/forgot-password";
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "パスワードリセット用リンクを " + email + " に送信しました。"
+            );
         } else {
-            // 失敗した場合、エラーメッセージをリダイレクト先に渡します
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "そのメールアドレスは登録されていません。");
-            return "redirect:/forgot-password";
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "このメールアドレスは登録されていません。"
+            );
         }
+        return "redirect:/forgot-password";
     }
 
-    // ----------------------------------------------------
-    // --- 認証後のパスワード変更（現在のパスワードが必要） ---
-    // ----------------------------------------------------
+    // --- パスワード変更（認証後表示） ---
     @GetMapping("/change-password")
     public String changePasswordForm() {
-        return "change-password";
+        return "change-password"; 
     }
-
+    
+    // --- パスワード変更（認証後処理） ---
     @PostMapping("/change-password")
     public String changePassword(
             @RequestParam("currentPassword") String oldPassword,
             @RequestParam("newPassword") String newPassword,
-            @RequestParam("confirmPassword") String confirmPassword, // 確認用パスワードの取得
+            @RequestParam("confirmPassword") String confirmPassword,
             @AuthenticationPrincipal UserDetails userDetails,
             Model model) {
         
-        // 【サーバーサイド検証 1】新しいパスワードと確認用パスワードの一致チェック
         if (!newPassword.equals(confirmPassword)) {
             model.addAttribute("errorMessage", "新しいパスワードが一致しません");
             return "change-password";
         }
-
-        // 【サーバーサイド検証 2】 UserServiceによるパスワード変更処理
-        // 注: 実際のUserServiceの実装に依存します。
-        boolean success = userService.changePassword(userDetails.getUsername(), oldPassword, newPassword);
         
-        if(success) {
-            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
+        boolean success = userService.changePassword(
+                userDetails.getUsername(),
+                oldPassword,
+                newPassword
+        );
+        
+        if (success) {
+            model.addAttribute("successMessage", "パスワードが変更されました！");
         } else {
-            model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
+            model.addAttribute("errorMessage", "現在のパスワードが違います");
         }
+        
         return "change-password";
     }
 
-    // --- ホーム画面 ---
+    // --- メイン画面と設定画面 ---
+    
     @GetMapping("/home")
-    public String home() {
-        return "home";
+    public String home() { 
+        return "home"; 
+    }
+    
+    @GetMapping("/settings")
+    public String settings() { 
+        return "settings"; 
+    } 
+    
+    // チャット画面のGETマッピングは ChatController.java に存在すると仮定します
+    
+    // ★ 設定メニューの遷移先ハンドラー (すべて settings.html に戻るように統一) ★
+    
+    @GetMapping("/profile/edit")
+    public String editProfile() {
+        return "settings"; 
     }
 
-    // ----------------------------------------------------
-    // ★ 新規追加: 設定画面
-    // ----------------------------------------------------
-    /**
-     * 設定画面を表示
-     * URL: /settings
-     */
-    @GetMapping("/settings")
-    public String settings() {
-        return "settings"; // settings.html を返します
+    @GetMapping("/settings/notifications")
+    public String notificationSettings() {
+        // ★ テンプレートエラー回避のため 'settings' に統一
+        return "settings"; 
+    }
+
+    @GetMapping("/settings/data-privacy")
+    public String dataPrivacy() {
+        return "settings"; 
+    }
+
+    @GetMapping("/subscription")
+    public String subscription() {
+        return "settings"; 
     }
 }

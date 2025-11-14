@@ -18,8 +18,6 @@ configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
-    // GradleがCommons Loggingの競合を自動的に解決できない場合、以下の設定で強制的に除外することが可能です。す。
-    // all*.exclude group: 'commons-logging' 
 }
 
 repositories {
@@ -39,16 +37,10 @@ dependencies {
     // JSON処理 (HttpClientで使用)
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     
-    // ★ 修正点 1: キャッシュ機能の有効化 (API負荷軽減)
-    // Spring Boot標準のキャッシュ機能（Caffeineなど）を使用可能にする
-    implementation 'org.springframework.boot:spring-boot-starter-cache' 
-    // インメモリキャッシュの実装としてCaffeineを推奨
+    // ★ 追加/修正: キャッシュ機能の有効化 (API負荷軽減)
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
-    // ★ 修正点 2: 非同期処理の利用 (Webスレッド解放のため)
-    // CompletableFutureなどを使用する際に必要（starter-webに大部分は含まれるが、明示）
-    // implementation 'org.springframework.boot:spring-boot-starter-aop' 
-    
     // --- データベース ---
     implementation 'org.xerial:sqlite-jdbc:3.45.3.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.6.1.Final'
@@ -67,35 +59,3 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
