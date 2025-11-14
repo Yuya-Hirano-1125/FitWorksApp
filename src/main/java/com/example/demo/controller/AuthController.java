@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+// ★ 修正点: java.util.List をインポート
+import java.util.List;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -55,9 +58,6 @@ public class AuthController {
     }
 
     // --- パスワード変更 ---
-    @GetMapping("/change-password")
-    public String changePasswordForm() { return "change-password"; }
-
     @PostMapping("/change-password")
     public String changePassword(@RequestParam("currentPassword") String oldPassword,
                                  @RequestParam("newPassword") String newPassword,
@@ -94,17 +94,51 @@ public class AuthController {
         return "home";
     }
 
-    // ★ トレーニング画面への遷移
     @GetMapping("/training")
-    public String training() { 
-        return "training"; 
-    }
+    public String training() { return "training"; }
     
-    // 他の画面への遷移
     @GetMapping("/gacha")
     public String gacha() { return "gacha"; } 
+    
+    // ★ トレーニング記録画面への遷移
+    @GetMapping("/training-log")
+    public String trainingLog(Model model) { 
+        // 仮のデータを作成
+        model.addAttribute("records", List.of(
+            new Record("2025/11/13", "ベンチプレス", "胸", 85, 5, 3),
+            new Record("2025/11/13", "AIおすすめ", "全身", 0, 40, 1),
+            new Record("2025/11/12", "デッドリフト", "背中・脚", 100, 3, 3)
+        ));
+        return "training-log"; 
+    }
 
     @GetMapping("/settings")
     public String settings() { return "settings"; }
 }
 
+// データを保持するためのインナークラス (Modelに渡すために使用)
+class Record {
+    public String date;
+    public String name;
+    public String part;
+    public int weight;
+    public int reps;
+    public int sets;
+
+    public Record(String date, String name, String part, int weight, int reps, int sets) {
+        this.date = date;
+        this.name = name;
+        this.part = part;
+        this.weight = weight;
+        this.reps = reps;
+        this.sets = sets;
+    }
+
+    // Thymeleafがプロパティにアクセスできるよう、getterが必要です
+    public String getDate() { return date; }
+    public String getName() { return name; }
+    public String getPart() { return part; }
+    public int getWeight() { return weight; }
+    public int getReps() { return reps; }
+    public int getSets() { return sets; }
+}
