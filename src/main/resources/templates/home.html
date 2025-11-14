@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ホーム | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* --- CSS VARIABLES (ネオン・ダークモードベース) --- */
+        :root {
+            --primary-color: #00e676;    /* ネオングリーン (メインアクション) */
+            --secondary-color: #00b860;  /* ディープグリーン (サブ) */
+            --ai-accent-color: #00ffff;  /* エレクトリックシアン (AI強調) */
+            --dark-text: #f0f0f0;        /* ライトテキスト */
+            --light-bg: #121212;         /* 超ダーク背景 */
+            --container-bg: #1e1e1e;     /* カード背景 */
+            --error-color: #ff4a4a;
+        }
+
+        /* --- ANIMATIONS: POP & FLOAT --- */
+        @keyframes floatingBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; } /* 100%から50%に変更 */
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+            80% { opacity: 1; transform: translateY(-5px) scale(1.01); }
+            100% { opacity: 1; transform: translateY(0) scale(1.0); }
+        }
+        @keyframes jumpOnHover {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-4px) scale(1.02); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        
+        /* --- BASE STYLE --- */
+        body {
+            /* 背景をダークグラデーションに統一 */
+            background: linear-gradient(135deg, #0f1218, #07090b); 
+            background-size: 400% 400%;
+            animation: floatingBackground 20s ease infinite alternate; /* 速度を少し遅く */
+            font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            perspective: 1000px;
+            color: var(--dark-text);
+        }
+
+        /* --- MAIN CONTAINER (統一されたダークカードスタイル) --- */
+        .main-container {
+            background: var(--container-bg);
+            padding: 45px 55px; /* パディングを増やす */
+            border-radius: 20px; /* 角をシャープに */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 3px var(--secondary-color);
+            border: 1px solid #333;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(.25,.8,.25,1);
+            width: 100%;
+            max-width: 550px; /* 適切な幅を維持 */
+            box-sizing: border-box;
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
+        }
+
+        .main-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 15px var(--primary-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            /* ネオングローを適用 */
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.5); 
+        }
+
+        .sub-heading {
+            color: #aaa; /* グレーアウト */
+            margin-bottom: 40px;
+            font-size: 15px;
+            font-weight: 400;
+        }
+        
+        .header-icon {
+            font-size: 30px;
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+
+        .dashboard-content {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #2a2a2a; /* 背景色を追加 */
+            border-radius: 12px;
+            color: #ddd;
+            font-weight: 600;
+            border: 1px solid var(--secondary-color);
+        }
+
+        /* --- BUTTONS (共通スタイル) --- */
+        .button, button.primary, button.secondary, .button.ai-chat {
+            text-decoration: none;
+            border-radius: 8px; /* 角をシャープに統一 */
+            transition: all 0.3s ease-in-out;
+            font-weight: 800;
+            display: inline-block;
+            margin: 10px;
+            min-width: 200px; /* 少し大きく */
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 16px 35px; /* 大きくする */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* プライマリボタン (Dashboard, Training Log) */
+        .button.primary, button.primary {
+            /* ネオングリーンのグラデーション */
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); 
+            color: #1e1e1e; /* テキストを濃い色にしてコントラストを出す */
+            box-shadow: 0 8px 25px rgba(0, 230, 118, 0.4); 
+        }
+        .button.primary:hover, button.primary:hover {
+            animation: jumpOnHover 0.4s ease-out;
+            box-shadow: 0 12px 35px rgba(0, 230, 118, 0.6), 0 0 15px var(--primary-color);
+            transform: translateY(-4px);
+        }
+
+        /* AIチャットボタン（エレクトリックシアンに変更） */
+        .button.ai-chat {
+            background: linear-gradient(45deg, var(--ai-accent-color), #00c8c8); /* シアングラデーション */
+            color: #1e1e1e;
+            box-shadow: 0 8px 20px rgba(0, 255, 255, 0.4);
+            margin: 20px 10px 10px 10px; 
+            padding: 18px 45px; /* さらに目立つように大きく */
+            font-size: 18px;
+        }
+        .button.ai-chat:hover {
+            animation: jumpOnHover 0.4s ease-out;
+            box-shadow: 0 12px 30px rgba(0, 255, 255, 0.6), 0 0 15px var(--ai-accent-color);
+            transform: translateY(-4px);
+        }
+        
+        /* セカンダリボタン (Settings, Logout) */
+        .button.secondary, button.secondary {
+            background: #333; /* 暗い背景 */
+            color: var(--dark-text);
+            border: 1px solid #555;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+        }
+        .button.secondary:hover, button.secondary:hover {
+            animation: jumpOnHover 0.4s ease-out;
+            background: #444;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
+        @media (max-width: 600px) {
+            .main-container {
+                max-width: 100%;
+                padding: 30px 20px;
+            }
+            .button, button.primary, .button.secondary, button.secondary, .button.ai-chat {
+                display: block;
+                margin: 10px 0;
+                width: 100%;
+                min-width: unset;
+                padding: 14px 20px; /* モバイルでのタッチを考慮 */
+                font-size: 16px;
+            }
+            .button.ai-chat {
+                padding: 16px 20px;
+            }
+            h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <h1><i class="fa-solid fa-dumbbell header-icon"></i>FitWorksへようこそ</h1>
+    <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！今日のトレーニングを始めましょう。'">
+        あなたのフィットネス・ジャーニーをサポートします。
+    </p>
+    
+    <div class="dashboard-content">
+        <p>現在の状態を確認し、AIコーチと連携して最適なトレーニングを計画しましょう！</p>
+    </div>
+    
+    <div class="button-container">
+        <a th:href="@{/dashboard}" class="button primary">ダッシュボード <i class="fa-solid fa-chart-line"></i></a>
+        <a th:href="@{/training-log}" class="button primary">トレーニング記録 <i class="fa-solid fa-calendar-days"></i></a>
+        
+        <a th:href="@{/ai-coach}" class="button ai-chat">
+            <span style="font-size: 18px;">AIコーチとチャット <i class="fa-solid fa-robot"></i></span>
+        </a>
+        
+        <div style="margin-top: 15px;">
+            <a th:href="@{/settings}" class="button secondary">設定 <i class="fa-solid fa-gear"></i></a>
+            <a th:href="@{/login}" class="button secondary">ログアウト <i class="fa-solid fa-right-from-bracket"></i></a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

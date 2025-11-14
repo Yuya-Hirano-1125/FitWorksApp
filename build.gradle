@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
+description = 'FitWorksApp'
 
 java {
     toolchain {
@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-    // Spring Bootスターター
+    // --- Spring Boot Core (Web & Security) ---
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
@@ -33,19 +33,24 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    
+    // JSON処理 (HttpClientで使用)
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    
+    // ★ 追加/修正: キャッシュ機能の有効化 (API負荷軽減)
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 
-    // データベース・Hibernate
+    // --- データベース ---
     implementation 'org.xerial:sqlite-jdbc:3.45.3.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.6.1.Final'
 
-    // JSON処理
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
-
-    // 開発用
+    // --- 開発用 ---
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    // テスト
+    // developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    
+    // --- テスト ---
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

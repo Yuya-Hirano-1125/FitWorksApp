@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>設定 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* --- CSS VARIABLES (ネオン・ダークモードベース) --- */
+        :root {
+            --primary-color: #00e676; /* ネオングリーン (メインアクセント) */
+            --secondary-color: #00b860; /* ディープグリーン (サブアクセント) */
+            --dark-text: #f0f0f0;    /* ライトテキスト */
+            --light-bg: #121212;     /* 超ダーク背景 */
+            --container-bg: #1e1e1e; /* カード背景 */
+            --error-color: #ff4a4a;
+            --success-color: #4CAF50;
+        }
+
+        /* --- BASE STYLE --- */
+        body {
+            /* 背景をダークモードのグラデーションに統一 */
+            background: linear-gradient(135deg, #0f1218, #07090b); 
+            font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; 
+            min-height: 100vh;
+            margin: 0;
+            padding: 30px 20px;
+            box-sizing: border-box;
+            color: var(--dark-text); /* 全体テキストを白に */
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .main-container {
+            /* ダークモードのカードスタイルに統一 */
+            background: var(--container-bg);
+            padding: 40px;
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+            text-align: left;
+            transition: all 0.3s;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-size: 36px;
+            font-weight: 800;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
+        }
+        
+        /* --- SETTINGS SECTIONS (Accordion Style) --- */
+        .setting-section {
+            margin-bottom: 0px; /* セクション間の余白を調整 */
+            border-bottom: 1px solid #333; /* 線の色を暗く */
+            padding-bottom: 0;
+            transition: background-color 0.2s;
+        }
+        .setting-section:last-of-type {
+             border-bottom: none;
+        }
+        .setting-section:hover {
+            background-color: #2a2a2a; /* ホバーで少し明るく */
+        }
+
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 15px 0; /* パディングを増やして押しやすく */
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark-text);
+            transition: color 0.2s;
+        }
+        
+        .section-header:hover {
+            color: var(--primary-color); /* アクセントカラーを適用 */
+        }
+
+        .section-icon {
+            font-size: 20px;
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+
+        .section-content {
+            padding: 10px 15px 15px 15px; 
+            border-top: 1px solid #2a2a2a; /* 境界線を暗く */
+            margin-top: 0px;
+            overflow: hidden;
+            display: none; 
+            background-color: #232323; /* コンテンツ背景をさらに暗く */
+            border-radius: 0 0 15px 15px;
+            margin-bottom: 10px;
+        }
+        
+        /* Setting Item Layout */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            font-size: 16px;
+            color: #ccc;
+            border-bottom: 1px dashed #333; /* 点線を使いデザイン性を向上 */
+        }
+        .setting-item:last-of-type {
+            border-bottom: none;
+        }
+
+        .setting-item label {
+            font-weight: 400;
+        }
+
+        .setting-item a {
+            color: var(--primary-color); /* アクセントカラーを適用 */
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .setting-item a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        
+        /* Select Box */
+        .setting-item select {
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: var(--dark-text);
+        }
+
+        /* --- BUTTONS --- */
+        /* ホームに戻るボタンにPrimaryボタンのスタイルを適用 */
+        .footer-links .button.primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); 
+            color: #1e1e1e;
+            padding: 14px 40px;
+            border-radius: 8px;
+            font-weight: 700;
+            display: inline-block;
+            text-decoration: none;
+            transition: all 0.2s ease-out;
+            box-shadow: 0 8px 20px rgba(0, 230, 118, 0.4);
+            min-width: 200px;
+        }
+        .footer-links .button.primary:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 10px 25px rgba(0, 230, 118, 0.6);
+        }
+        
+        /* --- TOGGLE SWITCH (Custom) --- */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 45px;
+            height: 25px;
+        }
+        .switch input {opacity: 0; width: 0; height: 0;}
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4a4a4a; /* トグルオフを暗い色に */
+            transition: .4s;
+            border-radius: 25px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 3.5px;
+            background-color: #ccc; /* スライダーの色を明るい色に */
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--primary-color); /* オンでネオングリーン */
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background-color: white;
+        }
+
+        /* Footer and Back Button */
+        .footer-links {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            text-align: center;
+        }
+        .footer-links a {
+            color: var(--dark-text);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 600px) {
+            .main-container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <h1><i class="fa-solid fa-gear header-icon"></i>設定</h1>
+    
+    <div class="setting-section" onclick="toggleSection('account-content')">
+        <div class="section-header">
+            <div><span class="section-icon"><i class="fa-solid fa-user"></i></span> アカウント管理</div>
+            <span class="arrow">▼</span>
+        </div>
+        <div class="section-content" id="account-content">
+            <div class="setting-item">
+                <label>ユーザー名</label>
+                <a th:href="@{/edit-username}">変更</a>
+            </div>
+            <div class="setting-item">
+                <label>パスワード</label>
+                <a th:href="@{/change-password}">変更</a>
+            </div>
+            <div class="setting-item">
+                <label>アカウントの削除</label>
+                <a th:href="@{/delete-account}" style="color: var(--error-color);">退会</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="setting-section" onclick="toggleSection('notification-content')">
+        <div class="section-header">
+            <div><span class="section-icon"><i class="fa-solid fa-bell"></i></span> 通知設定</div>
+            <span class="arrow">▼</span>
+        </div>
+        <div class="section-content" id="notification-content">
+            <div class="setting-item">
+                <label>トレーニングリマインダー</label>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <label>進捗レポートメール</label>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="setting-section" onclick="toggleSection('general-content')">
+        <div class="section-header">
+            <div><span class="section-icon"><i class="fa-solid fa-sliders"></i></span> 一般設定</div>
+            <span class="arrow">▼</span>
+        </div>
+        <div class="section-content" id="general-content">
+            <div class="setting-item">
+                <label>テーマ</label>
+                <select>
+                    <option>ダーク</option>
+                    <option>ライト</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label>測定単位</label>
+                <select>
+                    <option>メートル法 (kg/cm)</option>
+                    <option>ヤード・ポンド法 (lb/in)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="setting-section" onclick="toggleSection('info-content')">
+        <div class="section-header">
+            <div><span class="section-icon"><i class="fa-solid fa-circle-info"></i></span> ヘルプと情報</div>
+            <span class="arrow">▼</span>
+        </div>
+        <div class="section-content" id="info-content">
+            <div class="setting-item">
+                <label>利用規約</label>
+                <a th:href="@{/terms}">表示</a>
+            </div>
+            <div class="setting-item">
+                <label>プライバシーポリシー</label>
+                <a th:href="@{/privacy}">表示</a>
+            </div>
+            <div class="setting-item">
+                <label>バージョン</label>
+                <span>1.0.0 (FitBot-v3)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-links">
+        <a th:href="@{/home}" class="button primary">ホームに戻る</a>
+    </div>
+</div>
+
+<script>
+    function toggleSection(contentId) {
+        const content = document.getElementById(contentId);
+        const header = content.previousElementSibling;
+        const arrow = header.querySelector('.arrow');
+        
+        // アコーディオンの開閉
+        if (content.style.display === "block") {
+            // スライドアップ (簡単なアニメーション)
+            content.style.maxHeight = '0';
+            content.style.paddingTop = '0';
+            content.style.paddingBottom = '0';
+            setTimeout(() => {
+                content.style.display = "none";
+            }, 300);
+            arrow.innerHTML = '▼';
+        } else {
+            // スライドダウン
+            content.style.display = "block";
+            // max-heightを設定してアニメーションさせる（正確な高さ計算は省略）
+            content.style.maxHeight = content.scrollHeight + 30 + "px"; 
+            content.style.paddingTop = '10px';
+            content.style.paddingBottom = '15px';
+            arrow.innerHTML = '▲';
+        }
+    }
+
+    // 初期状態で矢印の向きとmax-heightを設定
+    document.querySelectorAll('.setting-section').forEach(section => {
+        const content = section.querySelector('.section-content');
+        const arrow = section.querySelector('.arrow');
+        // 初期状態をすべて閉じている状態に統一
+        content.style.display = "none";
+        content.style.transition = 'max-height 0.3s ease-out, padding 0.3s ease-out';
+        content.style.maxHeight = '0';
+        content.style.paddingTop = '0';
+        content.style.paddingBottom = '0';
+        arrow.innerHTML = '▼';
+    });
+</script>
+</body>
+</html>
