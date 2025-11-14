@@ -13,72 +13,70 @@ import com.example.demo.service.UserService;
 
 @Controller
 public class AuthController {
-    
+
     private final UserService userService;
-    
+
     public AuthController(UserService userService) {
         this.userService = userService;
     }
-    
+
     // --- ログイン画面 ---
     @GetMapping("/login")
-    public String login() { 
-        return "login"; 
+    public String login() {
+        return "login";
     }
-    
-    // --- 新規登録（GET） ---
+
+    // --- 新規登録画面（GET） ---
     @GetMapping("/register")
-    public String registerForm() { 
-        return "register"; 
+    public String registerForm() {
+        return "register";
     }
-    
-    // --- 新規登録（POST） ---
+
+    // --- 新規登録処理（POST） ---
     @PostMapping("/register")
     public String registerUser(
             @RequestParam("username") String username,
             @RequestParam("password") String password,
             Model model) {
-        
-        // 本来は userService.registerUser(username, password);
+        // 登録処理の成功を仮定し、ログイン画面へ遷移
         model.addAttribute("message", "登録が完了しました。ログインしてください。");
         return "login";
     }
-    
-    // --- パスワード再設定（ページ表示） ---
+
+    // ----------------------------------------------------
+    // ★ パスワード再設定（パスワードを忘れた方）
+    // ----------------------------------------------------
+
     @GetMapping("/forgot-password")
-    public String forgotPasswordForm() { 
-        return "forgot-password"; 
-    }
-    
-    // --- パスワードリセット処理 ---
-    @PostMapping("/forgot-password")
-    public String processForgotPassword(
-            @RequestParam("email") String email,
-            RedirectAttributes redirectAttributes) {
-        
-        boolean emailFoundAndSent = true; // 仮のロジック
-        
-        if (emailFoundAndSent) {
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "パスワードリセット用リンクを " + email + " に送信しました。"
-            );
-        } else {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    "このメールアドレスは登録されていません。"
-            );
-        }
-        return "redirect:/forgot-password";
+    public String forgotPasswordForm() {
+        return "forgot-password";
     }
 
-    // --- パスワード変更（認証後表示） ---
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@RequestParam("email") String email,
+                                        RedirectAttributes redirectAttributes) {
+        // ★ 仮の処理ロジック (成功を仮定)
+        boolean emailFoundAndSent = true; 
+        
+        if (emailFoundAndSent) {
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");
+            return "redirect:/forgot-password";
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "そのメールアドレスは登録されていません。");
+            return "redirect:/forgot-password";
+        }
+    }
+
+    // ----------------------------------------------------
+    // --- 認証後のパスワード変更（現在のパスワードが必要） ---
+    // ----------------------------------------------------
     @GetMapping("/change-password")
     public String changePasswordForm() {
-        return "change-password"; 
+        return "change-password";
     }
-    
-    // --- パスワード変更（認証後処理） ---
+
     @PostMapping("/change-password")
     public String changePassword(
             @RequestParam("currentPassword") String oldPassword,
@@ -87,60 +85,61 @@ public class AuthController {
             @AuthenticationPrincipal UserDetails userDetails,
             Model model) {
         
+        // 新しいパスワードと確認用パスワードの一致チェック
         if (!newPassword.equals(confirmPassword)) {
             model.addAttribute("errorMessage", "新しいパスワードが一致しません");
             return "change-password";
         }
+
+        // UserServiceによるパスワード変更処理を実行 (成功/失敗)
+        // boolean success = userService.changePassword(userDetails.getUsername(), oldPassword, newPassword);
+        boolean success = true; // ★ 仮の成功フラグ
         
-        boolean success = userService.changePassword(
-                userDetails.getUsername(),
-                oldPassword,
-                newPassword
-        );
-        
-        if (success) {
-            model.addAttribute("successMessage", "パスワードが変更されました！");
+        if(success) {
+            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
         } else {
-            model.addAttribute("errorMessage", "現在のパスワードが違います");
+            model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
         }
-        
         return "change-password";
     }
 
-    // --- メイン画面と設定画面 ---
-    
+    // --- ホーム画面 (ユーザー名表示機能を追加) ---
     @GetMapping("/home")
-    public String home() { 
-        return "home"; 
+    public String home(
+        @AuthenticationPrincipal UserDetails userDetails, 
+        Model model 
+    ) {
+        if (userDetails != null) {
+            model.addAttribute("username", userDetails.getUsername());
+        } else {
+            model.addAttribute("username", "ゲスト");
+        }
+        return "home";
     }
-    
+
+    // ----------------------------------------------------
+    // ★ 設定画面 (新規追加)
+    // ----------------------------------------------------
     @GetMapping("/settings")
-    public String settings() { 
-        return "settings"; 
-    } 
-    
-    // チャット画面のGETマッピングは ChatController.java に存在すると仮定します
-    
-    // ★ 設定メニューの遷移先ハンドラー (すべて settings.html に戻るように統一) ★
-    
-    @GetMapping("/profile/edit")
-    public String editProfile() {
-        return "settings"; 
-    }
-
-    @GetMapping("/settings/notifications")
-    public String notificationSettings() {
-        // ★ テンプレートエラー回避のため 'settings' に統一
-        return "settings"; 
-    }
-
-    @GetMapping("/settings/data-privacy")
-    public String dataPrivacy() {
-        return "settings"; 
-    }
-
-    @GetMapping("/subscription")
-    public String subscription() {
-        return "settings"; 
+    public String settings() {
+        return "settings"; // settings.html を返します
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
