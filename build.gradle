@@ -44,7 +44,9 @@ dependencies {
     // --- Database SQLite ---
     implementation 'org.xerial:sqlite-jdbc:3.45.3.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.6.1.Final'
-
+	implementation('org.springframework.boot:spring-boot-starter-web') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
     // --- Lombok ---
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
