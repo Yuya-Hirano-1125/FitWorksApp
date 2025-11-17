@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新規登録 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+<div class="main-container">
+    <h1><i class="fa-solid fa-running header-icon"></i>アカウント登録</h1>
+    <p class="sub-heading">あなたのフィットネスの目標達成へ向け、今すぐサインアップ！</p>
+    
+    <p th:if="${error}" class="error-message" th:text="${error}">
+        </p>
+    
+    <form th:action="@{/register}" method="post">
+        <div class="form-group">
+            <label for="new-username">ユーザー名</label>
+            <input type="text" id="new-username" name="username" required placeholder="半角英数字で8文字以上">
+        </div>
+        <div class="form-group">
+            <label for="email">メールアドレス</label>
+            <input type="email" id="email" name="email" required placeholder="contact@example.com">
+        </div>
+        <div class="form-group">
+            <label for="new-password">パスワード</label>
+            <input type="password" id="new-password" name="password" required placeholder="8文字以上のパスワード">
+        </div>
+        <div class="form-group">
+            <label for="confirm-password">パスワード（確認）</label>
+            <input type="password" id="confirm-password" name="confirmPassword" required placeholder="パスワードを再度入力">
+        </div>
+        
+        <div class="button-container">
+            <button type="submit" class="button primary">アカウントを作成</button>
+        </div>
+    </form>
+    
+    <p class="login-link">
+        アカウントをお持ちですか？
+        <a th:href="@{/login}">ログインはこちら</a>
+    </p>
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

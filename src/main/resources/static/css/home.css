@@ -1,0 +1,248 @@
+/* ========================================================= */
+/* HOME STYLE (home.css) - Home, Bottom Navigation */
+/* ========================================================= */
+
+.home-page .main-container {
+    /* キャラクターエリア分、幅を調整 */
+    max-width: 650px; 
+}
+
+/* --- TOP BAR ELEMENTS (XP Bar & Daily Mission) --- */
+
+.xp-daily-header {
+    width: 100%;
+    margin-bottom: 25px;
+    padding: 10px 0;
+    /* システムチックな上部境界線 */
+    border-bottom: 1px dashed #444; 
+}
+
+.xp-bar-container {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 15px;
+    /* 経験値ラベル */
+    font-size: 14px;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.xp-bar {
+    background-color: #333;
+    border-radius: 5px;
+    height: 15px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--secondary-color);
+}
+
+.xp-progress {
+    height: 100%;
+    width: 65%; /* 暫定値 */
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transition: width 0.5s ease-in-out;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-size: 10px;
+    color: #1e1e1e;
+    font-weight: 800;
+    padding-right: 5px;
+}
+
+.daily-mission-button {
+    /* プライマリボタンのスタイルをベースに、調整 */
+    display: block;
+    text-decoration: none;
+    border-radius: 5px; 
+    font-weight: 800; 
+    padding: 12px 20px;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    background: var(--ai-accent-color); /* シアンで目立たせる */
+    color: #1e1e1e;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.6);
+    transition: all 0.3s ease-in-out;
+    border: 1px solid var(--ai-accent-color);
+    margin-bottom: 15px;
+}
+.daily-mission-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.8);
+}
+
+
+/* --- CHARACTER DISPLAY --- */
+
+.character-display {
+    width: 100%;
+    height: 200px; /* 適切な高さ */
+    margin: 20px auto 30px auto;
+    background-color: #2a2a2a;
+    border-radius: 10px;
+    border: 2px solid var(--secondary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 230, 118, 0.2);
+    /* キャラクターエリアの微細なパルスアニメーション */
+    animation: pulseGlow 5s ease-in-out infinite alternate; 
+}
+.character-display::before {
+    /* キャラクターがない場合のプレースホルダ */
+    content: "キャラクター表示エリア (レベル 5)";
+    color: #555;
+    font-size: 18px;
+    font-weight: 600;
+}
+.character-display img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+
+/* --- TRAINING START BUTTON (ホーム専用) --- */
+.button.training-start {
+    margin: 20px auto 10px auto; 
+    padding: 18px 45px;
+    font-size: 18px;
+    width: auto;
+    min-width: 250px;
+    /* 最も遅延させて目立たせる */
+    animation: fadeIn 0.5s ease-out forwards;
+    animation-delay: 1.0s;
+    /* AIチャットと同じシアンの強調色を維持 */
+    background: linear-gradient(45deg, var(--ai-accent-color), #00c8c8);
+    color: #1e1e1e;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.8);
+    border: 1px solid var(--ai-accent-color);
+}
+.button.training-start:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 1.0);
+}
+
+/* Desktop Button Layout */
+.home-button-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.home-button-group .button {
+    width: 45%;
+    min-width: unset;
+    margin: 10px 0;
+    /* 登場アニメーション */
+    animation: fadeIn 0.5s ease-out forwards;
+    animation-delay: 0.6s;
+}
+.home-button-group:nth-child(2) .button {
+    animation-delay: 0.8s;
+}
+
+/* --- BOTTOM NAVIGATION BAR (Mobile Only) --- */
+
+.bottom-nav {
+    display: none; /* デスクトップでは非表示 */
+}
+
+/* Mobile Overrides */
+@media (max-width: 600px) {
+    .home-page body {
+        padding-bottom: 70px;
+        justify-content: flex-start;
+        min-height: auto; 
+    }
+    .home-page .main-container {
+        padding-bottom: 10px; 
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .bottom-nav {
+        display: flex; 
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background-color: #2a2a2a; 
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.8);
+        justify-content: space-around;
+        align-items: center;
+        z-index: 1000;
+        padding: 0 5px;
+        border-top: 1px solid var(--ai-accent-color); 
+        /* ナビバーの登場アニメーション */
+        animation: fadeIn 0.3s ease-out forwards;
+        transform: translateY(100%);
+        animation-fill-mode: forwards;
+    }
+    
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #aaa; 
+        font-size: 10px;
+        font-weight: 600;
+        padding: 5px 0;
+        width: 20%; 
+        transition: color 0.2s, transform 0.2s;
+        text-shadow: none;
+    }
+    
+    .nav-item:hover, .nav-item.active {
+        color: var(--primary-color);
+        /* Active item glow */
+        text-shadow: 0 0 5px rgba(0, 230, 118, 0.5);
+    }
+    
+    /* トレーニング開始ボタンを中央で浮かす */
+    .nav-item.training-start-nav {
+        position: relative;
+        top: -20px; 
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--ai-accent-color), #00c8c8);
+        box-shadow: 0 4px 15px rgba(0, 255, 255, 0.8); 
+        color: #1e1e1e;
+        padding: 0;
+        font-size: 11px;
+        transform: translateY(0);
+        border: 2px solid #1e1e1e; 
+        /* 微細なグローアニメーション */
+        animation: pulseGlow 3s ease-in-out infinite alternate;
+    }
+    .nav-item.training-start-nav i {
+        font-size: 28px; 
+        color: #1e1e1e;
+        margin-bottom: 0;
+    }
+    
+    .nav-item.training-start-nav:hover {
+        transform: translateY(-22px) scale(1.05);
+        box-shadow: 0 0 30px rgba(0, 255, 255, 1.0); 
+    }
+
+    /* デスクトップ用のボタンコンテナをモバイルで非表示に */
+    .button-container.home-desktop-buttons {
+        display: none;
+    }
+}
+
+/* デスクトップでボトムナビ非表示 */
+@media (min-width: 601px) {
+    .bottom-nav {
+        display: none;
+    }
+    .button-container.home-desktop-buttons {
+        display: block !important;
+    }
+}

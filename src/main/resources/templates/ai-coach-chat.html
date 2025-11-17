@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIコーチ 🤖💬 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/chat.css}">
+</head>
+<body class="chat-page">
+<div class="main-container">
+    <h1><i class="fa-solid fa-robot header-icon"></i>AIコーチ </h1>
+    
+    <div class="chat-history" id="chatHistory">
+        <div class="message-bubble ai-message">
+            こんにちは！AIコーチのFitBotです。あなたの今日のトレーニングに最適なメニューを提案します！
+			<br><strong>「今日のメニュー」</strong>や<strong>「ダイエット方法」</strong>など、何でも聞いてください。
+        </div>
+    </div>
+    
+    <div class="chat-input-area">
+        <input type="text" placeholder="メッセージを入力してください..." id="messageInput" onkeydown="handleKey(event)">
+        <button type="button" class="button chat-send" onclick="sendMessage()">送信 <i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+
+    <script>
+        const chatHistory = document.getElementById('chatHistory');
+        const messageInput = document.getElementById('messageInput');
+        
+        // ★ 修正: JavaScriptでメタタグからCSRFトークンを安全に取得
+        const csrfMetaToken = document.querySelector('meta[name="_csrf"]');
+        const csrfMetaHeader = document.querySelector('meta[name="_csrf_header"]');
+
+        const csrfToken = csrfMetaToken ? csrfMetaToken.content : null;
+        const csrfHeader = csrfMetaHeader ? csrfMetaHeader.content : null;
+
+        function handleKey(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); 
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            displayMessage(message, 'user');
+            messageInput.value = '';
+            
+            // ローディングメッセージをタイピングアニメーションとして表示
+            const loadingBubble = displayMessage('AIが回答を生成中です...', 'ai', true);
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                };
+                
+                // CSRFトークンをヘッダーに追加
+                if (csrfToken && csrfHeader) {
+                    headers[csrfHeader] = csrfToken; 
+                }
+                
+                // API呼び出し
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: headers,
+                    body: new URLSearchParams({ 'message': message })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    // 500エラーや400エラーの詳細をチャットバブルに表示
+                    throw new Error(`API呼び出しエラー: ${response.status}. 詳細: ${errorText.substring(0, 300)}`);
+                }
+                
+                const aiResponseText = await response.text();
+                
+                // GeminiのMarkdownをHTMLに整形する関数
+                const formattedResponse = formatAiResponse(aiResponseText);
+                
+                loadingBubble.innerHTML = formattedResponse;
+                loadingBubble.classList.remove('loading');
+                
+            } catch (error) {
+                // ❗ 修正点: ユーザーが要望したエラーメッセージとスタイルを適用
+                const errorMessage = 'AIフィットネスコーチ 🤖 FitBot<br>❗AI処理中にエラーが発生しました。時間を置いて再度お試しください。';
+                
+                loadingBubble.innerHTML = errorMessage;
+                loadingBubble.classList.remove('loading');
+                
+                // エラーバブルのスタイルを赤く変更して目立たせる
+                loadingBubble.style.backgroundColor = 'var(--error-color)';
+                loadingBubble.style.color = 'white'; 
+                loadingBubble.style.border = '1px solid var(--error-color)';
+                loadingBubble.style.boxShadow = '0 4px 10px rgba(255, 74, 74, 0.4)';
+                
+                console.error('API Error:', error);
+            }
+            
+            scrollToBottom();
+        }
+
+        function displayMessage(text, sender, isLoading = false) {
+            const bubble = document.createElement('div');
+            bubble.className = `message-bubble ${sender}-message ${isLoading ? 'loading' : ''}`;
+            bubble.innerHTML = text; 
+            chatHistory.appendChild(bubble);
+            scrollToBottom();
+            return bubble;
+        }
+
+        function scrollToBottom() {
+            // アニメーションを滑らかにする
+            chatHistory.scrollTo({
+                top: chatHistory.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+        
+        function formatAiResponse(text) {
+            // 1. 強調 (**太字**) を <strong> タグに変換
+            let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // 2. 箇条書き (* または - で始まる行) を <ul><li> に変換 (簡易版)
+            formattedText = formattedText.replace(/(\*|\-)\s(.*?)\n/g, '<li>$2</li>').replace(/(\*|\-)\s(.*?)$/g, '<li>$2</li>');
+            if (formattedText.includes('<li>')) {
+                // <li>タグがある場合、全体を<ul>で囲む
+                formattedText = '<ul>' + formattedText + '</ul>';
+                formattedText = formattedText.replace(/<\/ul>\s*<ul>/g, ''); 
+            }
+            
+            // 3. 改行コードを <br> に変換
+            formattedText = formattedText.replace(/\n/g, '<br>');
+            
+            return formattedText;
+        }
+
+        scrollToBottom();
+    </script>
+</div>
+</body>
+</html>
