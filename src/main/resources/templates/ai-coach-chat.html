@@ -5,224 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIコーチ 🤖💬 | FitWorks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
-    <meta name="_csrf" th:content="${_csrf != null ? _csrf.token : ''}"/>
-    <meta name="_csrf_header" th:content="${_csrf != null ? _csrf.headerName : ''}"/>
-    
-    <style>
-        /* --- CSS VARIABLES: スポーティーなダークブルーとアクアグリーン --- */
-        :root {
-            --primary-color: #0d47a1; --secondary-color: #26a69a; --dark-text: #212121;
-            --light-bg: #f8fbff; --container-bg: #ffffff; --ai-bubble: #e0f7fa; 
-            --user-bubble: #4f8cff; --warning-color: #ffb300;
-        }
-
-        /* --- ANIMATIONS --- */
-        @keyframes floatingBackground { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        @keyframes popIn { 0% { opacity: 0; transform: translateY(20px) scale(0.95); } 80% { opacity: 1; transform: translateY(-5px) scale(1.01); } 100% { opacity: 1; transform: translateY(0) scale(1.0); } }
-        @keyframes flashIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-        @keyframes pulse { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
-        @keyframes loading-dots { 0% { width: 0; } 33% { width: 0.5em; } 66% { width: 1em; } 100% { width: 1.5em; } }
-        
-        .loading-dots:after {
-            content: " . . ."; overflow: hidden; display: inline-block; vertical-align: bottom;
-            animation: loading-dots 1.5s steps(3) infinite; width: 1.5em;
-        }
-
-        /* --- BASE STYLE --- */
-        body {
-            background: linear-gradient(135deg, #a0d8f0, #0d47a1); animation: floatingBackground 15s ease infinite alternate;
-            font-family: 'Noto Sans JP', sans-serif; display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; padding: 20px; box-sizing: border-box; color: var(--dark-text);
-        }
-        .main-container {
-            background: var(--container-bg); padding: 30px; border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 0 0 0 4px var(--light-bg); width: 100%; max-width: 650px; height: 85vh; 
-            display: flex; flex-direction: column; box-sizing: border-box;
-            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
-            border: 2px solid var(--secondary-color);
-        }
-        h1 {
-            color: var(--primary-color); margin-bottom: 20px; font-size: 28px; font-weight: 800; text-align: center;
-            border-bottom: 3px solid var(--secondary-color); padding-bottom: 10px;
-        }
-        /* CHAT AREA */
-        .chat-history {
-            flex-grow: 1; overflow-y: auto; padding: 15px; margin-bottom: 20px; background-color: #f1f8f9;
-            border-radius: 10px; box-shadow: inset 0 3px 5px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth;
-        }
-        /* BUBBLE STYLES */
-        .message-bubble {
-            max-width: 90%; padding: 14px 20px; border-radius: 18px; line-height: 1.5; font-size: 14px;
-            animation: flashIn 0.5s ease-out; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .ai-message {
-            background-color: var(--ai-bubble); color: var(--dark-text); border-bottom-left-radius: 5px; align-self: flex-start;
-        }
-        .user-message {
-            background: linear-gradient(45deg, var(--user-bubble), #4f63ff); color: white; border-bottom-right-radius: 5px;
-            align-self: flex-end; margin-left: auto;
-        }
-        .ai-message strong { color: var(--primary-color); font-weight: 700; }
-        .user-message strong { color: white; font-weight: 700; }
-        .ai-message.warning { background-color: #fff8e1; color: var(--warning-color); border: 1px solid var(--warning-color); font-weight: 700; animation: none; }
-        .ai-message.warning strong { color: var(--warning-color); }
-        /* INPUT AREA */
-        .chat-input-area { display: flex; gap: 10px; flex-shrink: 0; }
-        .chat-input-area input[type="text"] {
-            flex-grow: 1; padding: 12px 20px; border: 2px solid #ccc; border-radius: 25px; font-size: 16px; transition: border-color 0.3s;
-        }
-        .button.chat-send {
-            border-radius: 30px; font-weight: 700; font-size: 16px; padding: 12px 25px; text-transform: uppercase;
-            background: linear-gradient(90deg, var(--secondary-color), #00c853); color: white; box-shadow: 0 4px 15px rgba(38, 166, 154, 0.4);
-            transition: all 0.2s ease-in-out; border: none; cursor: pointer;
-        }
-        .button.chat-send:hover {
-            box-shadow: 0 6px 20px rgba(38, 166, 154, 0.6); transform: translateY(-2px) scale(1.02);
-        }
-        @media (max-width: 768px) {
-            .main-container { height: 90vh; padding: 15px; }
-            .chat-input-area { flex-direction: column; gap: 8px; }
-            .button.chat-send { width: 100%; }
-        }
-    </style>
-    
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/chat.css}">
 </head>
-<body>
+<body class="chat-page">
 <div class="main-container">
-    <h1>AIコーチ 🤖💬</h1>
+    <h1><i class="fa-solid fa-robot header-icon"></i>AIコーチ </h1>
     
     <div class="chat-history" id="chatHistory">
+        <div class="message-bubble ai-message">
+            こんにちは！AIコーチのFitBotです。あなたの今日のトレーニングに最適なメニューを提案します！
+			<br><strong>「今日のメニュー」</strong>や<strong>「ダイエット方法」</strong>など、何でも聞いてください。
+        </div>
     </div>
-
+    
     <div class="chat-input-area">
-        <input type="text" 
-               placeholder="例: 胸、初級、30分、ジム" 
-               id="messageInput" 
-               autocomplete="off"
-               required
-               onkeydown="handleKey(event)"> <button type="button" class="button chat-send" onclick="sendMessage()">送信</button>
+        <input type="text" placeholder="メッセージを入力してください..." id="messageInput" onkeydown="handleKey(event)">
+        <button type="button" class="button chat-send" onclick="sendMessage()">送信 <i class="fa-solid fa-paper-plane"></i></button>
     </div>
-</div>
 
-<script>
-    const chatHistory = document.getElementById('chatHistory');
-    const messageInput = document.getElementById('messageInput');
-    
-    // CSRFトークンの取得
-    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-    const csrfHeaderName = document.querySelector('meta[name="_csrf_header"]').content;
-
-    // --- DOM操作ヘルパー関数 ---
-    
-    function scrollToBottom() {
-        chatHistory.scrollTop = chatHistory.scrollHeight;
-    }
-
-    /**
-     * 新しいメッセージをDOMに追加する (非同期通信用)
-     * @param {string} text - メッセージ内容（HTML/Markdownを含む）
-     * @param {string} sender - 送り手 ('user' or 'ai')
-     * @param {boolean} isWarning - 警告クラスを適用するか
-     * @param {boolean} isLoading - ローディングクラスとアニメーションを適用するか
-     * @returns {HTMLElement} - 作成されたバブル要素
-     */
-    function displayMessage(text, sender, isWarning = false, isLoading = false) {
-        const bubble = document.createElement('div');
-        let className = `message-bubble ${sender}-message`;
-        if (isWarning) className += ' warning';
-        if (isLoading) className += ' loading';
+    <script>
+        const chatHistory = document.getElementById('chatHistory');
+        const messageInput = document.getElementById('messageInput');
         
-        bubble.className = className;
-        
-        // ローディング中のドットアニメーションとテキストを結合
-        if (isLoading) {
-             bubble.innerHTML = `<span class="loading-dots">${text}</span>`;
-        } else {
-             bubble.innerHTML = text; // HTMLとして挿入 (Markdown風テキスト)
-        }
-        
-        chatHistory.appendChild(bubble);
-        scrollToBottom();
-        return bubble;
-    }
+        // ★ 修正: JavaScriptでメタタグからCSRFトークンを安全に取得
+        const csrfMetaToken = document.querySelector('meta[name="_csrf"]');
+        const csrfMetaHeader = document.querySelector('meta[name="_csrf_header"]');
 
-    // --- イベントハンドラ ---
+        const csrfToken = csrfMetaToken ? csrfMetaToken.content : null;
+        const csrfHeader = csrfMetaHeader ? csrfMetaHeader.content : null;
 
-    function handleKey(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            sendMessage();
-        }
-    }
-
-    async function sendMessage() {
-        const message = messageInput.value.trim();
-        if (!message) return;
-
-        // 1. ユーザーメッセージを即時表示
-        displayMessage(message, 'user');
-        messageInput.value = '';
-
-        // 2. ローディングメッセージを表示
-        const loadingBubble = displayMessage('AIがトレーニングプランを作成中です', 'ai', false, true);
-
-        try {
-            // 3. AJAX POSTリクエストの準備
-            const requestBody = JSON.stringify({ sender: 'user', text: message }); // Message DTOの形式
-            
-            const response = await fetch('/api/chat', { 
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeaderName]: csrfToken 
-                },
-                body: requestBody
-            });
-
-            if (!response.ok) {
-                const errorDetail = await response.text();
-                throw new Error(`API呼び出しエラー: HTTP ${response.status}`);
+        function handleKey(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); 
+                sendMessage();
             }
+        }
 
-            // 4. JSON応答（Message DTO）を解析
-            const data = await response.json(); 
-            const aiText = data.text; // Message.getText()から取得
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            displayMessage(message, 'user');
+            messageInput.value = '';
             
-            // 5. ローディングメッセージを回答に置き換える
-            loadingBubble.classList.remove('loading');
-            loadingBubble.innerHTML = aiText; 
+            // ローディングメッセージをタイピングアニメーションとして表示
+            const loadingBubble = displayMessage('AIが回答を生成中です...', 'ai', true);
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                };
+                
+                // CSRFトークンをヘッダーに追加
+                if (csrfToken && csrfHeader) {
+                    headers[csrfHeader] = csrfToken; 
+                }
+                
+                // API呼び出し
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: headers,
+                    body: new URLSearchParams({ 'message': message })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    // 500エラーや400エラーの詳細をチャットバブルに表示
+                    throw new Error(`API呼び出しエラー: ${response.status}. 詳細: ${errorText.substring(0, 300)}`);
+                }
+                
+                const aiResponseText = await response.text();
+                
+                // GeminiのMarkdownをHTMLに整形する関数
+                const formattedResponse = formatAiResponse(aiResponseText);
+                
+                loadingBubble.innerHTML = formattedResponse;
+                loadingBubble.classList.remove('loading');
+                
+            } catch (error) {
+                // ❗ 修正点: ユーザーが要望したエラーメッセージとスタイルを適用
+                const errorMessage = 'AIフィットネスコーチ 🤖 FitBot<br>❗AI処理中にエラーが発生しました。時間を置いて再度お試しください。';
+                
+                loadingBubble.innerHTML = errorMessage;
+                loadingBubble.classList.remove('loading');
+                
+                // エラーバブルのスタイルを赤く変更して目立たせる
+                loadingBubble.style.backgroundColor = 'var(--error-color)';
+                loadingBubble.style.color = 'white'; 
+                loadingBubble.style.border = '1px solid var(--error-color)';
+                loadingBubble.style.boxShadow = '0 4px 10px rgba(255, 74, 74, 0.4)';
+                
+                console.error('API Error:', error);
+            }
             
-        } catch (error) {
-            // 6. エラーが発生した場合
-            loadingBubble.classList.remove('loading');
-            loadingBubble.classList.add('warning');
-            loadingBubble.innerHTML = `<span style="color: var(--warning-color); font-weight: bold;">[エラー]</span> ${error.message}`;
+            scrollToBottom();
+        }
+
+        function displayMessage(text, sender, isLoading = false) {
+            const bubble = document.createElement('div');
+            bubble.className = `message-bubble ${sender}-message ${isLoading ? 'loading' : ''}`;
+            bubble.innerHTML = text; 
+            chatHistory.appendChild(bubble);
+            scrollToBottom();
+            return bubble;
+        }
+
+        function scrollToBottom() {
+            // アニメーションを滑らかにする
+            chatHistory.scrollTo({
+                top: chatHistory.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+        
+        function formatAiResponse(text) {
+            // 1. 強調 (**太字**) を <strong> タグに変換
+            let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // 2. 箇条書き (* または - で始まる行) を <ul><li> に変換 (簡易版)
+            formattedText = formattedText.replace(/(\*|\-)\s(.*?)\n/g, '<li>$2</li>').replace(/(\*|\-)\s(.*?)$/g, '<li>$2</li>');
+            if (formattedText.includes('<li>')) {
+                // <li>タグがある場合、全体を<ul>で囲む
+                formattedText = '<ul>' + formattedText + '</ul>';
+                formattedText = formattedText.replace(/<\/ul>\s*<ul>/g, ''); 
+            }
+            
+            // 3. 改行コードを <br> に変換
+            formattedText = formattedText.replace(/\n/g, '<br>');
+            
+            return formattedText;
         }
 
         scrollToBottom();
-    }
-    
-    // --- 初期表示処理 ---
-    document.addEventListener('DOMContentLoaded', function() {
-        // AIコーチの初期質問メッセージ
-        const initialQuestion = 
-            "**AIコーチ FitBot です！**💪 最高のトレーニングプランを作成するため、以下の4点をまとめて教えてください！"
-            + "<br><br>1. **経験レベル** (初級 / 中級 / 上級)"
-            + "<br>2. **可能時間** (1回あたりのトレーニング時間)"
-            + "<br>3. **鍛えたい部位** (胸、背中、脚、全身など)"
-            + "<br>4. **場所/器具** (家、ジム、ダンベル利用など)"
-            + "<br><br>例: **中級、45分、胸と腕、ジム**";
-            
-        // ページロード時にメッセージを挿入
-        displayMessage(initialQuestion, 'ai');
-        
-        scrollToBottom();
-    });
-</script>
+    </script>
+</div>
 </body>
 </html>
-
-
-

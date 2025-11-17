@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ガチャ | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <style>
+        .gacha-page .main-container {
+            max-width: 600px;
+        }
+        .gacha-display {
+            width: 100%;
+            height: 250px;
+            background-color: #2a2a2a;
+            border: 3px solid var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 230, 118, 0.5);
+            margin-bottom: 30px;
+            animation: pulseGlow 5s ease-in-out infinite alternate;
+        }
+        .gacha-display h2 {
+            color: var(--ai-accent-color);
+            margin-bottom: 10px;
+        }
+        .gacha-display i {
+            font-size: 60px;
+            color: var(--primary-color);
+            animation: fadeIn 1s;
+        }
+        .gacha-button-unit {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .gacha-button-unit a {
+            width: 45%;
+        }
+    </style>
+</head>
+<body class="gacha-page">
+<div class="main-container">
+    <h1><i class="fa-solid fa-box-open header-icon"></i>ガチャ</h1>
+    <p class="sub-heading">レアなトレーニングプログラムを手に入れよう！</p>
+
+    <div class="gacha-display">
+        <i class="fa-solid fa-gift"></i>
+        <h2>タップでスタート！</h2>
+        <p>消費コイン: 100C</p>
+    </div>
+
+    <div class="gacha-button-unit">
+        <a th:href="@{/gacha/roll?count=1}" class="button primary">1回引く</a>
+        <a th:href="@{/gacha/roll?count=10}" class="button primary">10連で引く</a>
+    </div>
+
+    <div class="button-container" style="margin-top: 40px;">
+        <a th:href="@{/home}" class="button secondary">
+            ホームに戻る <i class="fa-solid fa-house"></i>
+        </a>
+    </div>
+
+</div>
+</body>
+</html>

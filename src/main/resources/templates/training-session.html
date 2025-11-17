@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}"></title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <style>
+        .session-page .main-container { max-width: 650px; padding: 30px; }
+        .program-card {
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            background: #2a2a2a;
+            box-shadow: 0 0 15px rgba(0, 230, 118, 0.4);
+        }
+        .program-card h2 { color: var(--ai-accent-color); font-size: 24px; margin-top: 0; }
+        .program-list { list-style: none; padding: 0; text-align: left; }
+        .program-list li { 
+            padding: 10px 0; 
+            border-bottom: 1px dashed #444; 
+            color: #ddd; 
+            font-weight: 500;
+        }
+        .control-buttons { margin-top: 40px; display: flex; gap: 15px; }
+        .control-buttons a { flex-grow: 1; }
+    </style>
+</head>
+<body class="session-page">
+<div class="main-container">
+    <h1 th:text="${title}"><i class="fa-solid fa-star header-icon"></i>AIおすすめメニュー開始</h1>
+    <p class="sub-heading">FitBotが提案するプログラムで、レベリングを開始しましょう。</p>
+
+    <div class="program-card">
+        <h2 th:text="${programName}">腹筋をバキバキにするプログラム</h2>
+        <ul class="program-list">
+            <li><i class="fa-solid fa-circle-right" style="color:var(--primary-color);"></i> 1. ベンチプレス: 4セット x 10回 (70kg)</li>
+            <li><i class="fa-solid fa-circle-right" style="color:var(--primary-color);"></i> 2. インクラインダンベルプレス: 3セット x 12回 (20kg)</li>
+            <li><i class="fa-solid fa-circle-right" style="color:var(--primary-color);"></i> 3. トライセップスプッシュダウン: 3セット x 15回</li>
+            <li><i class="fa-solid fa-circle-right" style="color:var(--primary-color);"></i> 4. 腹筋ローラー: 3セット x 限界回数</li>
+        </ul>
+        <p style="margin-top: 20px; color: var(--primary-color);">目標時間: 45分 / 休憩時間: 60秒</p>
+    </div>
+
+    <div class="control-buttons">
+        <a href="#" class="button primary">セッション開始</a>
+        <a th:href="@{/training}" class="button secondary">戻る</a>
+    </div>
+
+    <div class="button-container" style="margin-top: 40px;">
+        <a th:href="@{/ai-coach}" class="button ai-coach-button">
+            プログラムについて相談 🤖
+        </a>
+    </div>
+
+</div>
+</body>
+</html>

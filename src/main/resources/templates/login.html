@@ -6,266 +6,13 @@
     <title>ログイン | FitWorks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <style>
-        /* --- CSS VARIABLES (ネオン・ダークモードベース) --- */
-        :root {
-            --primary-color: #00e676; /* ネオングリーン (メインアクセント) */
-            --secondary-color: #00b860; /* ディープグリーン (サブアクセント) */
-            --dark-text: #f0f0f0;    /* ライトテキスト */
-            --light-bg: #121212;     /* 超ダーク背景 */
-            --container-bg: #1e1e1e; /* カード背景 */
-            --error-color: #ff4a4a;
-            --success-color: #4CAF50;
-        }
-
-        /* --- ANIMATIONS: POP & GLOW (アニメーションはそのまま維持) --- */
-        @keyframes floatingBackground {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes popIn {
-            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
-            80% { opacity: 1; transform: translateY(-5px) scale(1.01); }
-            100% { opacity: 1; transform: translateY(0) scale(1.0); }
-        }
-        @keyframes jumpOnHover {
-            0% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-5px) scale(1.02); }
-            100% { transform: translateY(0) scale(1); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes neonGlow {
-            0%, 100% { box-shadow: 0 0 5px var(--primary-color), 0 0 10px var(--primary-color); }
-            50% { box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color); }
-        }
-
-        /* --- BASE STYLE --- */
-        body {
-            /* 背景を暗いグラデーションに変更し、力強い印象に */
-            background: linear-gradient(135deg, #0f1218, #07090b); 
-            background-size: 400% 400%; 
-            animation: floatingBackground 20s ease infinite alternate; /* 速度を少し遅く */
-            
-            font-family: 'Poppins', 'Noto Sans JP', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-            perspective: 1000px;
-            color: var(--dark-text); /* テキストを明るい色に */
-        }
-
-        /* --- MAIN CONTAINER (浮遊感のあるボックス) --- */
-        .main-container {
-            background: var(--container-bg);
-            padding: 45px 55px; /* 少し大きく */
-            border-radius: 20px; /* 角をシャープに */
-            /* シャドウを控えめにし、代わりにネオンボーダーを強調 */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 3px var(--secondary-color);
-            border: 1px solid #333; /* 境界線を追加 */
-            text-align: center;
-            transition: all 0.5s cubic-bezier(.25,.8,.25,1);
-            width: 100%;
-            max-width: 420px; /* 少し細くして集中感を出す */
-            box-sizing: border-box;
-            
-            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
-            transform: rotateX(0deg) scale(1.0);
-        }
-
-        .main-container:hover {
-            transform: translateY(-5px);
-            /* ホバー時にネオンに光る効果 */
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 15px var(--primary-color); 
-        }
-
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 5px;
-            font-size: 38px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(0, 230, 118, 0.5); /* ネオングロー */
-        }
-        
-        /* アイコンのスタイル */
-        .header-icon {
-            font-size: 30px;
-            color: var(--primary-color);
-            margin-right: 10px;
-        }
-
-        .sub-heading {
-            color: #aaa; /* グレーアウト */
-            margin-bottom: 40px;
-            font-size: 15px;
-            font-weight: 400;
-        }
-
-        /* --- FORM ELEMENTS --- */
-        .form-group {
-            margin-bottom: 25px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--dark-text);
-            font-weight: 700;
-            font-size: 14px;
-            opacity: 0.8;
-            transition: color 0.3s;
-        }
-
-        .form-group input[type="text"],
-        .form-group input[type="password"] {
-            width: 100%;
-            padding: 16px 18px; /* パディングを増やして押しやすく */
-            border: none;
-            /* ダークモードに合わせた入力欄のデザイン */
-            background-color: #2a2a2a; 
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
-            transition: all 0.3s cubic-bezier(.17,.67,.83,.67);
-            color: var(--dark-text);
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .form-group input:focus {
-            border: 1px solid var(--primary-color); /* 枠線でフォーカスを強調 */
-            outline: none;
-            /* フォーカス時にネオンシャドウ */
-            box-shadow: 0 0 15px rgba(0, 230, 118, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.5);
-            transform: scale(1.0); /* スケールアップはしない */
-            background-color: #333;
-        }
-        
-        .form-group input::placeholder {
-            color: #666;
-        }
-
-        /* --- BUTTONS --- */
-        .button, button.primary { /* secondaryボタンを削除し、primaryに統一 */
-            text-decoration: none;
-            border-radius: 8px; /* 角をシャープに */
-            transition: all 0.3s ease-in-out;
-            font-weight: 800; /* より太く */
-            display: block; /* 常にブロック要素 */
-            margin: 8px auto;
-            width: 100%;
-            border: none;
-            cursor: pointer;
-            font-size: 18px; /* 大きな文字 */
-            padding: 18px 35px; /* 大きなパディング */
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-sizing: border-box;
-        }
-
-        .button.primary, button.primary {
-            /* ネオングリーンのグラデーション */
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            color: #1e1e1e; /* テキストを濃い色にしてコントラストを出す */
-            box-shadow: 0 8px 25px rgba(0, 230, 118, 0.4); /* ネオングローシャドウ */
-        }
-
-        .button.primary:hover, button.primary:hover {
-            animation: jumpOnHover 0.4s ease-out;
-            /* ホバー時にさらに強いグロー */
-            box-shadow: 0 12px 35px rgba(0, 230, 118, 0.6), 0 0 15px var(--primary-color);
-            transform: translateY(-4px);
-            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
-        }
-
-        /* メッセージスタイル - ダークモードに対応 */
-        .error-message, .success-message, .info-message {
-            font-weight: 700;
-            margin-bottom: 25px;
-            padding: 15px;
-            border-radius: 8px;
-            animation: fadeIn 0.5s ease-out;
-        }
-        .error-message {
-            color: #ffcccc; /* 明るい赤 */
-            border: 1px solid var(--error-color);
-            background-color: #3d0a0a; /* 暗い赤背景 */
-        }
-        /* ... success/info messageも同様に調整 ... */
-        
-        .forgot-password-link {
-            text-align: right;
-            margin-top: -10px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .forgot-password-link a {
-            color: var(--primary-color); /* アクセントカラーに統一 */
-            text-decoration: none;
-            transition: color 0.3s;
-            font-weight: 600;
-        }
-        .forgot-password-link a:hover {
-            color: var(--primary-color);
-            text-decoration: underline;
-        }
-        
-        /* 新規登録リンクの調整 */
-        .register-link {
-            margin-top: 30px; 
-            margin-bottom: 0; 
-            font-size: 14px;
-            color: #aaa;
-        }
-        .register-link a {
-            color: var(--primary-color); 
-            text-decoration: none; 
-            font-weight: 700;
-            transition: all 0.3s;
-            text-shadow: 0 0 5px rgba(0, 230, 118, 0.2);
-        }
-        .register-link a:hover {
-            text-decoration: underline;
-            letter-spacing: 0.5px;
-        }
-
-
-        /* --- RESPONSIVE MOBILE ADJUSTMENTS --- */
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-            .main-container {
-                padding: 30px 25px;
-                max-width: 95%;
-                /* ... その他のモバイル調整 ... */
-            }
-            h1 {
-                font-size: 32px;
-            }
-            .header-icon {
-                font-size: 24px;
-            }
-            .button, button.primary {
-                padding: 14px 20px;
-                font-size: 16px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
 </head>
 <body>
 <div class="main-container">
     <h1><i class="fa-solid fa-bolt header-icon"></i>ログイン</h1>
-    <p class="sub-heading">あなたのフィットネスの旅を再開しましょう。</p>
+    <p class="sub-heading">アカウントにサインインしてください。</p>
     
     <p th:if="${param.error}" class="error-message">
         ユーザー名またはパスワードが正しくありません。
@@ -297,3 +44,17 @@
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
