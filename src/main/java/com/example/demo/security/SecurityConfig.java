@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher; // そのまま残す
 
 import com.example.demo.service.CustomUserDetailsService;
  
@@ -70,6 +70,7 @@ public class SecurityConfig {
     }
  
     @Bean
+    @SuppressWarnings("deprecation") // ★ 修正: 非推奨メソッドの警告を抑制
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             // 1. CORSを有効化
@@ -119,7 +120,7 @@ public class SecurityConfig {
             
             // 6. ログアウト設定
             .logout(logout -> logout
-                // POST /logout に変更
+                // POST /logout に変更 (AntPathRequestMatcherをそのまま使用し、警告を抑制)
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
                 .logoutSuccessUrl("/login?logout=true")
                 .invalidateHttpSession(true)
@@ -133,5 +134,4 @@ public class SecurityConfig {
         return http.build();
     }
 }
-
 

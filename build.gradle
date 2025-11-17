@@ -56,7 +56,7 @@ dependencies {
 
     // ★ 修正点: Gemini AI SDKの依存関係を安定版(0.16.0)に統一
     // 依存関係エラーを解消します。
-    implementation 'com.google.genai:google-genai:0.16.0'
+    implementation 'com.google.genai:google-genai:1.0.0'
 }
 
 tasks.named('test') {
