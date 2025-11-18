@@ -14,12 +14,6 @@ java {
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
-
 repositories {
     mavenCentral()
 }
@@ -41,12 +35,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
-    // --- Database SQLite ---
+    // --- SQLite ---
     implementation 'org.xerial:sqlite-jdbc:3.45.3.0'
     implementation 'org.hibernate.orm:hibernate-community-dialects:6.6.1.Final'
-	implementation('org.springframework.boot:spring-boot-starter-web') {
-        exclude group: 'commons-logging', module: 'commons-logging'
-    }
+
     // --- Lombok ---
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -56,11 +48,18 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // ★ 修正点: Gemini AI SDKの依存関係を安定版(0.16.0)に統一
-    // 依存関係エラーを解消します。
+    // --- Gemini AI SDK ---
     implementation 'com.google.genai:google-genai:1.0.0'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+
+
+
+
+
+
+
