@@ -4,128 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>トレーニング記録 | FitWorks</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-    <style>
-        .log-page .main-container {
-            max-width: 850px;
-            padding: 30px;
-        }
-        .log-list {
-            margin-top: 30px;
-        }
-        
-        /* データテーブルのグリッドヘッダー */
-        .log-header {
-            display: grid;
-            grid-template-columns: 120px 2fr 1.5fr 1fr 1fr;
-            gap: 10px;
-            padding: 15px 10px;
-            border-bottom: 2px solid var(--primary-color); /* ネオングリーンで強調 */
-            background-color: #2a2a2a;
-            font-weight: 800;
-            color: var(--ai-accent-color); /* シアンの文字 */
-            font-size: 14px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        /* データ行 */
-        .log-item {
-            display: grid;
-            grid-template-columns: 120px 2fr 1.5fr 1fr 1fr;
-            gap: 10px;
-            padding: 15px 10px;
-            border-bottom: 1px dashed #444; /* 点線でシステム感 */
-            align-items: center;
-            font-size: 15px;
-            transition: background-color 0.2s;
-        }
-        .log-item:hover {
-            background-color: #282828;
-        }
-
-        /* 列のスタイル */
-        .log-item-date {
-            color: #aaa;
-            font-size: 13px;
-        }
-        .log-item-name {
-            font-weight: 600;
-            color: var(--dark-text);
-        }
-        .log-item-metrics {
-            color: var(--primary-color);
-            font-weight: 700;
-        }
-        .log-item-set {
-            color: #ffcccc; /* セット数は赤っぽく */
-        }
-        
-        @media (max-width: 600px) {
-            .log-page .main-container {
-                padding: 20px 10px;
-            }
-            .log-header, .log-item {
-                grid-template-columns: 1fr 1fr; /* モバイルでは2列に集約 */
-                padding: 10px;
-                font-size: 14px;
-            }
-            .log-header > div:nth-child(3), .log-item > div:nth-child(3) {
-                display: none; /* 部位を非表示 */
-            }
-            .log-header > div:nth-child(4), .log-item > div:nth-child(4) {
-                grid-column: 2 / 3;
-            }
-            .log-item-date {
-                grid-row: 1;
-                grid-column: 1 / 2;
-                font-size: 12px;
-            }
-            .log-item-name {
-                grid-row: 2;
-                grid-column: 1 / 2;
-                font-size: 16px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/training-log.css}"> 
 </head>
-<body class="log-page">
+<body class="training-log-page">
 <div class="main-container">
-    <h1><i class="fa-solid fa-clock-rotate-left header-icon"></i>トレーニング記録</h1>
-    <p class="sub-heading">過去のログを分析し、次のレベルへ進みましょう。</p>
+    
+    <h1 style="margin-bottom: 5px;"><i class="header-icon fa-solid fa-calendar-days"></i>トレーニング記録</h1>
+    <p class="sub-heading" th:text="${username} + 'さんの頑張りをチェックしましょう。'">
+        トレーニング記録カレンダー
+    </p>
 
-    <div class="log-list">
+    <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
+    
+    <div class="calendar-nav-container">
+        <a th:href="@{/training-log(year=${prevYear}, month=${prevMonth})}" class="nav-arrow">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
         
-        <div class="log-header">
-            <div>日付</div>
-            <div>種目 / メニュー</div>
-            <div>部位</div>
-            <div>重量/時間</div>
-            <div>セット数</div>
-        </div>
-
-        <div th:each="record : ${records}" class="log-item">
-            <div class="log-item-date" th:text="${record.date}">2025/11/14</div>
-            <div class="log-item-name" th:text="${record.name}">ベンチプレス</div>
-            <div class="log-item-part" th:text="${record.part}">胸</div>
-            <div class="log-item-metrics" th:text="${record.weight} > 0 ? ${record.weight} + ' kg x ' + ${record.reps} + ' reps' : ${record.reps} + ' min'">85 kg x 5 reps</div>
-            <div class="log-item-set" th:text="${record.sets} + ' set'">3 sets</div>
-        </div>
+        <h2 class="calendar-title" th:text="${currentYearMonth.year} + '年 ' + ${currentYearMonth.monthValue} + '月'"></h2>
         
-        <div th:if="${#lists.isEmpty(records)}" class="info-message" style="margin-top: 20px;">
-             まだ記録がありません。トレーニングを開始しましょう。
-        </div>
-
-    </div>
-
-    <div class="button-container" style="margin-top: 40px;">
-        <a th:href="@{/home}" class="button secondary">
-            ホームに戻る <i class="fa-solid fa-house"></i>
+        <a th:href="@{/training-log(year=${nextYear}, month=${nextMonth})}" class="nav-arrow">
+            <i class="fa-solid fa-chevron-right"></i>
         </a>
     </div>
 
+    <div class="calendar-grid">
+        <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" 
+             th:classappend="${dayLabel == '土'} ? 'sat' : ((${dayLabel == '日'} ? 'sun' : ''))">
+             曜日
+        </div>
+        
+        <th:block th:each="date : ${calendarDays}">
+            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''},
+                          dayOfWeek=${date != null ? date.dayOfWeek.name() : ''},
+                          isToday=${date != null and date.isEqual(currentDate)},
+                          isLogged=${date != null and loggedDates.containsKey(date)}"
+                 class="calendar-day-cell"
+                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today' : '') + 
+                                                                    ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + 
+                                                                     ((${dayOfWeek == 'SUNDAY'} ? ' sun' : ''))))"
+                 th:attr="data-date=${date != null ? date.toString() : ''}"
+                 th:onclick="${date != null} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
+
+                <span class="day-number" th:text="${dateNumber}">1</span>
+                
+                <span th:if="${isLogged}" class="log-indicator">
+                    <i class="fa-solid fa-star"></i>
+                </span>
+            </div>
+        </th:block>
+    </div>
 </div>
+
+<div id="logModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeLogModal()">&times;</span>
+        <h2 id="modalDateTitle" class="modal-title"></h2>
+        
+        <div id="logViewArea">
+             </div>
+
+        <p class="modal-instruction">新しい記録を追加：</p>
+        
+        <div class="form-group">
+            <label for="trainingType">トレーニングの種類:</label>
+            <select id="trainingType" class="form-control" onchange="loadTrainingForm(this.value, document.getElementById('selectedDateInput').value)">
+                <option value="WEIGHT">フリーウェイト (筋トレ)</option>
+                <option value="CARDIO">有酸素運動 (ランニングなど)</option>
+            </select>
+        </div>
+        
+        <div id="formContainer">
+            <input type="hidden" id="selectedDateInput" name="date" value="">
+            <p>フォームを読み込んでいます...</p>
+        </div>
+
+        <button class="button secondary view-all-button" onclick="alert('全記録表示機能はまだ実装されていません。')">
+            全記録を見る
+        </button>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+    <a th:href="@{/home}" class="nav-item">
+        <i class="fa-solid fa-house"></i>
+        <span>ホーム</span>
+    </a>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+</nav>
+
+<script>
+    // トレーニングフォームを非同期で読み込む関数
+    function loadTrainingForm(type, date) {
+        const url = type === 'WEIGHT' 
+            ? /*[[@{/training-log/form/weight}]]*/ '/training-log/form/weight' + '?date=' + date
+            : /*[[@{/training-log/form/cardio}]]*/ '/training-log/form/cardio' + '?date=' + date;
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('formContainer').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('formContainer').innerHTML = '<p class="error-message">フォームの読み込みに失敗しました。</p>';
+                console.error('Form load error:', error);
+            });
+    }
+
+    // 記録モーダルを開く関数
+    function openLogModal(dateString, isLogged) {
+        // 日付のフォーマットを調整
+        const [year, month, day] = dateString.split('-');
+        const displayDate = `${year}年${month}月${day}日`;
+
+        document.getElementById('selectedDateInput').value = dateString;
+        document.getElementById('modalDateTitle').textContent = displayDate + ' の記録';
+        
+        // 初期フォームを読み込み (フリーウェイトから)
+        document.getElementById('trainingType').value = 'WEIGHT';
+        loadTrainingForm('WEIGHT', dateString); 
+        
+        // 記録済みメッセージの表示切り替え（簡易版）
+        const logViewArea = document.getElementById('logViewArea');
+        if (isLogged) {
+            logViewArea.innerHTML = '<p style="font-weight: 700; color: var(--primary-color); margin-bottom: 10px;">✅ この日は記録済みです。新しい記録を追加するか、全記録を確認してください。</p>';
+        } else {
+            logViewArea.innerHTML = '<p style="color: #999; margin-bottom: 10px;">この日はまだ記録がありません。</p>';
+        }
+
+        document.getElementById('logModal').style.display = 'block';
+    }
+
+    // 記録モーダルを閉じる関数
+    function closeLogModal() {
+        document.getElementById('logModal').style.display = 'none';
+        document.getElementById('formContainer').innerHTML = '<p>フォームを読み込んでいます...</p>';
+    }
+
+    // モーダル外クリックで閉じる処理
+    window.onclick = function(event) {
+        const modal = document.getElementById('logModal');
+        if (event.target === modal) {
+            closeLogModal();
+        }
+    }
+</script>
+
 </body>
 </html>
