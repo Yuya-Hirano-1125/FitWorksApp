@@ -1,7 +1,3 @@
-
-
-
-
 package com.example.demo.controller;
 
 import java.time.DayOfWeek;
@@ -46,6 +42,83 @@ public class TrainingController {
     private User getCurrentUser(Authentication authentication) {
         if (authentication == null) return null;
         return userService.findByUsername(authentication.getName());
+    }
+    
+    // 静的なトレーニング種目リストを定義
+    private static final Map<String, List<String>> TRAINING_EXERCISES = Map.of(
+        "free-weight", List.of("ベンチプレス", "スクワット", "デッドリフト", "ショルダープレス", "ラットプルダウン"),
+        "cardio", List.of("ランニング", "サイクリング", "エリプティカル", "水泳", "ウォーキング")
+    );
+    
+    /**
+     * トレーニング選択画面 (training.html) を表示
+     * @param authentication 認証ユーザー
+     * @param model Thymeleafモデル
+     * @return training.html
+     */
+    @GetMapping("/training")
+    public String showTrainingOptions(Authentication authentication, Model model) { 
+        if (getCurrentUser(authentication) == null) {
+            return "redirect:/login"; // ログインしていない場合はログイン画面へ
+        }
+        
+        // 種目リストをモデルに追加
+        model.addAttribute("freeWeightExercises", TRAINING_EXERCISES.get("free-weight"));
+        model.addAttribute("cardioExercises", TRAINING_EXERCISES.get("cardio"));
+        
+        return "training"; // src/main/resources/templates/training.htmlをレンダリング
+    }
+
+    /**
+     * トレーニングセッション開始 (training/start) を処理し、セッション画面へ遷移
+     * training.htmlからPOSTされたフォームデータを受け取ります。
+     * @param type 選択されたトレーニングタイプ
+     * @param exerciseName 選択または入力された種目名
+     * @param authentication 認証ユーザー
+     * @param model Thymeleafモデル
+     * @return training-session.html または リダイレクト
+     */
+    @PostMapping("/training/start") // HTTPメソッドをPOSTに変更
+    public String startTrainingSession(
+            @RequestParam("type") String type,
+            @RequestParam(value = "exerciseName", required = false) String exerciseName,
+            Authentication authentication,
+            Model model) {
+        
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) {
+            return "redirect:/login"; // ログインしていない場合はログイン画面へ
+        }
+        
+        String title = "";
+        String selectedExercise = "";
+
+        switch (type) {
+            case "ai-suggested":
+                title = "AIおすすめメニューセッション";
+                selectedExercise = "AIおすすめプログラム"; 
+                break;
+            case "free-weight":
+            case "cardio":
+                // 選択された種目名、または自由記入された種目名を使用
+                if (exerciseName != null && !exerciseName.trim().isEmpty()) {
+                    selectedExercise = exerciseName.trim();
+                } else {
+                    // 種目が選択/入力されていない場合はエラーとして扱う
+                    return "redirect:/training"; 
+                }
+                title = ("free-weight".equals(type) ? "フリーウェイト" : "有酸素運動") + "セッション";
+                break;
+            default:
+                return "redirect:/training"; 
+        }
+        
+        model.addAttribute("trainingType", type);
+        model.addAttribute("trainingTitle", title);
+        model.addAttribute("selectedExercise", selectedExercise); // 種目名をセッション画面へ渡す
+        
+        // 実際のトレーニングセッション画面へ遷移 (training-session.htmlが存在することを想定)
+        return "training-session"; 
     }
     
     /**
@@ -131,7 +204,6 @@ public class TrainingController {
             dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE));
         }
         model.addAttribute("dayLabels", dayLabels);
-
         return "training-log";
     }
 
@@ -197,10 +269,4 @@ public class TrainingController {
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
-    
-    // 既存のメソッドはそのまま残すか、必要に応じてリファクタリングしてください。
-    // 今回は他のルートとの衝突を避けるため、既存の /training/start などのメソッドは削除しています。
-    // (元のTrainingControllerが最小限だったため、ここではカレンダー機能に特化させました。)
 }
-
-

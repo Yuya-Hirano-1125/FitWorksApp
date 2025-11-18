@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${title}"></title>
+    <title th:text="${trainingTitle}"></title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
@@ -16,8 +16,14 @@
             margin-top: 20px;
             background: #2a2a2a;
             box-shadow: 0 0 15px rgba(0, 230, 118, 0.4);
+            text-align: center;
         }
-        .program-card h2 { color: var(--ai-accent-color); font-size: 24px; margin-top: 0; }
+        .program-card h2 { color: var(--primary-color); font-size: 28px; margin-top: 0; }
+        .program-card p.exercise-type {
+            color: #ccc;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
         .program-list { list-style: none; padding: 0; text-align: left; }
         .program-list li { 
             padding: 10px 0; 
@@ -25,34 +31,70 @@
             color: #ddd; 
             font-weight: 500;
         }
-        .control-buttons { margin-top: 40px; display: flex; gap: 15px; }
-        .control-buttons a { flex-grow: 1; }
+        .control-buttons { margin-top: 40px; display: flex; flex-direction: column; gap: 15px; }
+        .control-buttons a, .control-buttons button { flex-grow: 1; }
+        
+        .log-placeholder {
+            background-color: #1e1e1e;
+            border: 1px dashed #555;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: #888;
+        }
     </style>
 </head>
 <body class="session-page">
 <div class="main-container">
-    <h1 th:text="${title}"><i class="fa-solid fa-star header-icon"></i>AIおすすめメニュー開始</h1>
-    <p class="sub-heading">FitBotが提案するプログラムで、レベリングを開始しましょう。</p>
+    <h1 th:text="${trainingTitle}"><i class="fa-solid fa-bolt-lightning header-icon"></i>セッション開始</h1>
+    <p class="sub-heading">選択した種目でトレーニングを開始します。記録を取り始めましょう！</p>
 
     <div class="program-card">
-        <h2 th:text="${programName}">腹筋をバキバキにするプログラム</h2>
-        <ul class="program-list">
-            <li><i class="fa-solid fa-circle-right" style="color:var(--primary-color);"></i> 1. ベンチプレス: 4セット x 10回 (70kg)</li>
-            <li><i class="fa-solid fa-circle-right" style="color:var(--primary-color);"></i> 2. インクラインダンベルプレス: 3セット x 12回 (20kg)</li>
-            <li><i class="fa-solid fa-circle-right" style="color:var(--primary-color);"></i> 3. トライセップスプッシュダウン: 3セット x 15回</li>
-            <li><i class="fa-solid fa-circle-right" style="color:var(--primary-color);"></i> 4. 腹筋ローラー: 3セット x 限界回数</li>
-        </ul>
-        <p style="margin-top: 20px; color: var(--primary-color);">目標時間: 45分 / 休憩時間: 60秒</p>
+        <h2 th:text="${selectedExercise}">種目名</h2>
+
+        <p class="exercise-type" th:if="${trainingType == 'free-weight'}"><i class="fa-solid fa-weight-hanging"></i> フリーウェイト (重量・回数記録)</p>
+        <p class="exercise-type" th:if="${trainingType == 'cardio'}"><i class="fa-solid fa-running"></i> 有酸素運動 (時間・距離記録)</p>
+        <p class="exercise-type" th:if="${trainingType == 'ai-suggested'}"><i class="fa-solid fa-star"></i> AIおすすめプログラム</p>
+        
+        <div th:if="${trainingType == 'free-weight' or trainingType == 'cardio'}">
+            <div class="log-placeholder">
+                <p>⚠️ **ここに、選択された種目（<span th:text="${selectedExercise}"></span>）の実際の記録フォームが入ります。**</p>
+                <p th:if="${trainingType == 'free-weight'}">例：セット数、重量 (kg)、回数 (Reps) を入力して追加</p>
+                <p th:if="${trainingType == 'cardio'}">例：時間 (分) または 距離 (km) を入力して確定</p>
+                <i th:if="${trainingType == 'free-weight'}" class="fa-solid fa-cash-register" style="font-size: 30px; color: #00e676;"></i>
+                <i th:if="${trainingType == 'cardio'}" class="fa-solid fa-stopwatch" style="font-size: 30px; color: #00e676;"></i>
+            </div>
+            
+            <div class="control-buttons">
+                <a th:href="@{/training-log}" class="button primary">この記録でセッション完了</a>
+            </div>
+        </div>
+
+        <div th:if="${trainingType == 'ai-suggested'}">
+             <div class="log-placeholder" style="border-color: var(--ai-accent-color); box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);">
+                <p style="color: var(--ai-accent-color); font-weight: 600;">FitBotの提案内容:</p>
+                <ul class="program-list">
+                    <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 1. 種目A: 4セット x 10回 (70kg) (AIプログラムの例)</li>
+                    <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 2. 種目B: 3セット x 12回 (20kg)</li>
+                    <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 3. 種目C: 3セット x 15回</li>
+                </ul>
+                <p style="margin-top: 20px; color: var(--primary-color);">目標時間: 45分 / 休憩時間: 60秒</p>
+            </div>
+            <div class="control-buttons">
+                 <a th:href="@{/training-log}" class="button primary">セッション完了 (AIプログラム)</a>
+            </div>
+        </div>
     </div>
 
-    <div class="control-buttons">
-        <a href="#" class="button primary">セッション開始</a>
-        <a th:href="@{/training}" class="button secondary">戻る</a>
+    <div class="control-buttons" style="margin-top: 40px;">
+        <a th:href="@{/training}" class="button secondary">
+            中断してメニュー選択に戻る <i class="fa-solid fa-arrow-rotate-left"></i>
+        </a>
     </div>
 
-    <div class="button-container" style="margin-top: 40px;">
+    <div class="button-container" style="margin-top: 20px;">
         <a th:href="@{/ai-coach}" class="button ai-coach-button">
-            プログラムについて相談 🤖
+            トレーニング内容をAIコーチに相談 🤖
         </a>
     </div>
 
