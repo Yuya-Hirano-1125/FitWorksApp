@@ -1,0 +1,236 @@
+/* ========================================================= */           
+/* TRAINING LOG STYLE (training-log.css) - Calendar & Modal */            
+/* ========================================================= */           
+
+.training-log-page .main-container {                                      
+max-width: 800px; /* カレンダー表示のため幅を広げる */                               
+	}                                                                         
+
+	/* --- CALENDAR NAVIGATION --- */                                         
+
+	.calendar-nav-container {                                                 
+	display: flex;                                                        
+		justify-content: space-between;                                       
+	align-items: center;                                                  
+		margin: 25px 0;                                                       
+	padding: 10px 0;                                                      
+		border-bottom: 2px dashed var(--secondary-color);                     
+	border-top: 2px dashed var(--secondary-color);                        
+		}                                                                         
+
+		.calendar-title {                                                         
+		font-size: 24px;                                                      
+			color: var(--primary-color);                                          
+		font-weight: 900;                                                     
+			letter-spacing: 1px;                                                  
+		}                                                                         
+
+		.nav-arrow {                                                              
+		font-size: 18px;                                                      
+			color: var(--ai-accent-color);                                        
+		transition: transform 0.2s cubic-bezier(.68,-0.55,.26,1.55);          
+			padding: 10px;                                                        
+		text-decoration: none;                                                
+			}                                                                         
+	.nav-arrow:hover {                                                        
+			transform: scale(1.3) translateY(-2px); /* 弾む動き */                    
+		color: var(--primary-color);                                          
+			}                                                                         
+
+
+			/* --- CALENDAR GRID --- */                                               
+
+			.calendar-grid {                                                          
+			display: grid;                                                        
+				grid-template-columns: repeat(7, 1fr);                                
+			gap: 5px;                                                             
+				width: 100%;                                                          
+			}                                                                         
+
+			.calendar-day-header {                                                    
+			text-align: center;                                                   
+				font-weight: 800;                                                     
+			color: #ffffff;                                                       
+				padding: 8px 0;                                                       
+			background: var(--secondary-color);                                   
+				border-radius: 10px 10px 0 0;                                         
+			font-size: 14px;                                                      
+				box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);                             
+			}                                                                         
+			.calendar-day-header.sun {                                                
+			background-color: #ffb6c1; /* 日曜日を明るいピンクに */                          
+				}                                                                         
+		.calendar-day-header.sat {                                                
+				background-color: #87ceeb; /* 土曜日をスカイブルーに */                          
+			}                                                                         
+
+			.calendar-day-empty {                                                     
+			/* 空白セル */                                                            
+				background: #f0f0f0;                                                  
+			border: 2px solid #e0e0e0;                                            
+				border-radius: 10px;                                                  
+			opacity: 0.6;                                                         
+				height: 80px; /* セルの高さを合わせる */                                        
+			}                                                                         
+
+			.calendar-day-cell {                                                      
+			/* 日付セル */                                                            
+				background: #ffffff;                                                  
+			border: 2px solid #eee;                                               
+				border-radius: 10px;                                                  
+			padding: 8px;                                                         
+				text-align: right;                                                    
+			font-weight: 700;                                                     
+				color: var(--dark-text);                                              
+			cursor: pointer;                                                      
+				transition: all 0.3s cubic-bezier(.17,.67,.83,.67);                   
+			position: relative;                                                   
+				box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);                            
+			min-height: 80px;                                                     
+				}                                                                         
+
+				.calendar-day-cell:hover:not(.empty-day) {                                
+				background: #fffafa;                                                  
+					border-color: var(--primary-color);                                   
+				transform: translateY(-3px) scale(1.02); /* 軽く浮遊 */                   
+					box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);                      
+				}                                                                         
+
+				.calendar-day-cell.sun {                                                  
+				color: var(--error-color);                                            
+					}                                                                         
+			.calendar-day-cell.sat {                                                  
+					color: var(--ai-accent-color);                                        
+				}                                                                         
+				.calendar-day-cell.today {                                                
+				border-color: var(--primary-color);                                   
+					background: #ffe8f0; /* 薄いピンクで今日の強調 */                                
+				box-shadow: 0 0 10px rgba(255, 105, 180, 0.4);                        
+					}                                                                         
+
+					/* 記録ありの日のスタイル */                                                         
+					.calendar-day-cell.logged {                                               
+					border-color: var(--success-color);                                   
+						background: #edfff2;                                                  
+					box-shadow: 0 0 10px rgba(100, 233, 143, 0.4);                        
+						}                                                                         
+
+						.log-indicator {                                                          
+						position: absolute;                                                   
+							bottom: 5px;                                                          
+						left: 5px;                                                            
+							color: var(--success-color);                                          
+						font-size: 16px;                                                      
+							animation: softPulse 2s ease-in-out infinite alternate;               
+						}                                                                         
+
+						.day-number {                                                             
+						font-size: 16px;                                                      
+							display: block;                                                       
+						margin-bottom: 5px;                                                   
+							text-align: center;                                                   
+						}                                                                         
+
+						/* --- MODAL (記録フォーム) --- */                                              
+						.modal {                                                                  
+						display: none;                                                        
+							position: fixed;                                                      
+						z-index: 2000;                                                        
+							left: 0;                                                              
+						top: 0;                                                               
+							width: 100%;                                                          
+						height: 100%;                                                         
+							overflow: auto;                                                       
+						background-color: rgba(0, 0, 0, 0.4);                                 
+							backdrop-filter: blur(5px);                                           
+						}                                                                         
+
+						.modal-content {                                                          
+						background-color: var(--container-bg);                                
+							margin: 10% auto;                                                     
+						padding: 30px;                                                        
+							border: 5px solid var(--primary-color);                               
+						border-radius: 20px;                                                  
+							width: 80%;                                                           
+						max-width: 450px;                                                     
+							box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);                           
+						animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
+							text-align: center;                                                   
+						}                                                                         
+
+						.modal-title {                                                            
+						font-weight: 900;                                                     
+							color: var(--primary-color);                                          
+						font-size: 24px;                                                      
+							margin-bottom: 10px;                                                  
+						}                                                                         
+
+						.modal-instruction {                                                      
+						font-weight: 700;                                                     
+							color: var(--dark-text);                                              
+						margin-top: 20px;                                                     
+							padding-top: 10px;                                                    
+						border-top: 1px dashed var(--secondary-color);                        
+							}                                                                         
+
+							.close-button {                                                           
+							color: #aaa;                                                          
+								float: right;                                                         
+							font-size: 28px;                                                      
+								font-weight: bold;                                                    
+							cursor: pointer;                                                      
+								transition: color 0.3s;                                               
+							}                                                                         
+							.close-button:hover,                                                      
+							.close-button:focus {                                                     
+							color: var(--error-color);                                            
+								}                                                                         
+
+								.form-control {                                                           
+								width: 100%;                                                          
+									padding: 12px;                                                        
+								margin-top: 5px;                                                      
+									box-sizing: border-box;                                               
+								border: 2px solid var(--secondary-color);                             
+									border-radius: 10px;                                                  
+								background: #fffafa;                                                  
+									transition: border-color 0.3s, box-shadow 0.3s;                       
+								font-size: 16px;                                                      
+									}                                                                         
+							.form-control:focus {                                                     
+									border-color: var(--primary-color);                                   
+								box-shadow: 0 0 8px rgba(255, 105, 180, 0.4);                         
+									outline: none;                                                        
+								}                                                                         
+
+								#formContainer {                                                          
+								margin-top: 15px;                                                     
+									padding-bottom: 10px;                                                 
+								}                                                                         
+
+								.view-all-button {                                                        
+								margin-top: 20px !important;                                          
+									}                                                                         
+
+
+									/* Mobile Adjustments */                                                  
+									@media (max-width: 600px) {                                               
+									.calendar-day-cell {                                                  
+										min-height: 60px;                                                 
+										padding: 5px;                                                     
+										}                                                                     
+									.day-number {                                                         
+										font-size: 14px;                                                  
+										}                                                                     
+									.modal-content {                                                      
+										width: 90%;                                                       
+										margin: 5% auto;                                                  
+										padding: 20px;                                                    
+										}                                                                     
+									.calendar-title {                                                     
+										font-size: 20px;                                                  
+										}                                                                     
+									.calendar-day-header {                                                
+										font-size: 12px;                                                  
+										}                                                                     
+									}                                                                         
