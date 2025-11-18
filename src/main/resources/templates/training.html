@@ -25,6 +25,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             transition: border-color 0.2s, box-shadow 0.2s;
             text-align: left;
+            display: block; /* AIおすすめメニュー (aタグ) のデザイン修正のために追加 */
         }
         .training-option:hover {
             border-color: var(--primary-color);
@@ -147,14 +148,14 @@
                   onsubmit="return setFormExerciseName(this, 'free-weight-select', 'free-weight-custom-input');">
                 <input type="hidden" name="type" value="free-weight" />
                 
-                <h2><i class="fa-solid fa-weight-hanging"></i> フリーウェイト (自由記録)</h2>
+                <h2><i class="fa-solid fa-weight-hanging"></i> 筋力トレーニング</h2>
                 <p>自分で種目、重量、回数を設定して記録します。</p>
 
                 <div class="exercise-form-group">
                     <label for="free-weight-select">種目を選択</label>
                     <select id="free-weight-select" onchange="selectCustomExercise('free-weight')">
                         <option value="">-- 種目を選択してください --</option>
-                        <option th:each="exercise : ${freeWeightExercises}" th:value="${exercise}" th:text="${exercise}">ベンチプレス</option>
+                        <option th:each="exercise : ${freeWeightExercises}" th:value="{exercise}" th:text="${exercise}">ベンチプレス</option>
                         <option value="custom">その他 (自由記入)</option>
                     </select>
                     
@@ -175,7 +176,7 @@
                   onsubmit="return setFormExerciseName(this, 'cardio-select', 'cardio-custom-input');">
                 <input type="hidden" name="type" value="cardio" />
                 
-                <h2><i class="fa-solid fa-running"></i> 有酸素運動 (時間記録)</h2>
+                <h2><i class="fa-solid fa-running"></i> 有酸素運動 </h2>
                 <p>ランニング、サイクリングなどの時間を記録します。</p>
 
                 <div class="exercise-form-group">
