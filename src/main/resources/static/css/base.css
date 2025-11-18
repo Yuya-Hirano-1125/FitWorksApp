@@ -8,7 +8,7 @@
     --secondary-color: #ffb6c1;  /* ライトピンク (サブ) */
     --ai-accent-color: #87ceeb;  /* スカイブルー (AI強調/アクセント) */
     --dark-text: #4a4a4a;        /* 濃いテキスト */
-    --light-bg: #fce4ec;         /* 薄いピンクの背景 (メイン背景) - よりピンクに */
+    --light-bg: #fce4ec;         /* 薄いピンクの背景 (メイン背景) */
     --container-bg: #ffffff;     /* カード背景 (白) */
     --error-color: #ff6347;
     --success-color: #64e98f;
@@ -77,6 +77,8 @@ body {
     box-sizing: border-box;
     perspective: 1000px;
     color: var(--dark-text);
+    /* 背景グリッドを削除 */
+    background-image: none;
     overflow-x: hidden; /* 横スクロールバーを防ぐ */
 }
 
@@ -221,6 +223,9 @@ h1 {
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(255, 99, 71, 0.3);
 }
+.error-message::before {
+    content: none;
+}
 .success-message {
     font-weight: 800;
     margin-bottom: 30px;
@@ -255,7 +260,7 @@ h1 {
         max-width: 98%;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         border-radius: 20px;
-        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards; /* スマホでは浮遊アニメーションを無効に */
+        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards; /* モバイルでは浮遊アニメーションを無効に */
     }
     .main-container:hover {
         transform: translateY(0px) scale(1.0); /* ホバー時の動きも調整 */
