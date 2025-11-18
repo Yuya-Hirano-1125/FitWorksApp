@@ -25,7 +25,8 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             transition: border-color 0.2s, box-shadow 0.2s;
             text-align: left;
-            display: block; /* AIおすすめメニュー (aタグ) のデザイン修正のために追加 */
+            /* AIおすすめメニュー (aタグ) のデザイン崩れ修正 */
+            display: block; 
         }
         .training-option:hover {
             border-color: var(--primary-color);
@@ -143,19 +144,24 @@
             <p>今日の体調と目標に合わせた最適なプログラムです。</p>
         </a>
 
+        <a th:href="@{/training/exercises}" class="training-option" style="border-color: var(--ai-accent-color);">
+            <h2><i class="fa-solid fa-list-check"></i> 種目一覧・やり方を見る</h2>
+            <p>フリーウェイトと有酸素運動の種目と正しいやり方を説明付きで確認できます。</p>
+        </a>
+
         <div class="training-option">
             <form th:action="@{/training/start}" method="post" 
                   onsubmit="return setFormExerciseName(this, 'free-weight-select', 'free-weight-custom-input');">
                 <input type="hidden" name="type" value="free-weight" />
                 
-                <h2><i class="fa-solid fa-weight-hanging"></i> 筋力トレーニング</h2>
+                <h2><i class="fa-solid fa-weight-hanging"></i> フリーウェイト (自由記録)</h2>
                 <p>自分で種目、重量、回数を設定して記録します。</p>
 
                 <div class="exercise-form-group">
                     <label for="free-weight-select">種目を選択</label>
                     <select id="free-weight-select" onchange="selectCustomExercise('free-weight')">
                         <option value="">-- 種目を選択してください --</option>
-                        <option th:each="exercise : ${freeWeightExercises}" th:value="{exercise}" th:text="${exercise}">ベンチプレス</option>
+                        <option th:each="exercise : ${freeWeightExercises}" th:value="${exercise}" th:text="${exercise}">ベンチプレス</option>
                         <option value="custom">その他 (自由記入)</option>
                     </select>
                     
@@ -176,7 +182,7 @@
                   onsubmit="return setFormExerciseName(this, 'cardio-select', 'cardio-custom-input');">
                 <input type="hidden" name="type" value="cardio" />
                 
-                <h2><i class="fa-solid fa-running"></i> 有酸素運動 </h2>
+                <h2><i class="fa-solid fa-running"></i> 有酸素運動 (時間記録)</h2>
                 <p>ランニング、サイクリングなどの時間を記録します。</p>
 
                 <div class="exercise-form-group">
@@ -198,7 +204,7 @@
                 </div>
             </form>
         </div>
-    </div>
+        </div>
 
     <div class="ai-coach-button-container">
         <a th:href="@{/ai-coach}" class="button ai-coach-button">
@@ -215,3 +221,201 @@
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

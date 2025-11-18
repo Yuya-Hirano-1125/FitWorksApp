@@ -70,6 +70,19 @@ public class TrainingController {
     }
 
     /**
+     * トレーニング種目一覧画面 (exercise-list.html) を表示
+     * @param authentication 認証ユーザー
+     * @return exercise-list.html
+     */
+    @GetMapping("/training/exercises")
+    public String showExerciseList(Authentication authentication) {
+        if (getCurrentUser(authentication) == null) {
+            return "redirect:/login"; // ログインしていない場合はログイン画面へ
+        }
+        return "exercise-list"; // src/main/resources/templates/exercise-list.htmlをレンダリング
+    }
+
+    /**
      * トレーニングセッション開始 (training/start) を処理し、セッション画面へ遷移
      * training.htmlからPOSTされたフォームデータを受け取ります。
      * @param type 選択されたトレーニングタイプ
@@ -270,3 +283,4 @@ public class TrainingController {
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
 }
+
