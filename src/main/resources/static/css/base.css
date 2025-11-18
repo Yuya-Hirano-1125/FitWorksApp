@@ -8,7 +8,7 @@
     --secondary-color: #ffb6c1;  /* ライトピンク (サブ) */
     --ai-accent-color: #87ceeb;  /* スカイブルー (AI強調/アクセント) */
     --dark-text: #4a4a4a;        /* 濃いテキスト */
-    --light-bg: #f0f8ff;         /* アリスブルー背景 (メイン背景) */
+    --light-bg: #fce4ec;         /* 薄いピンクの背景 (メイン背景) - よりピンクに */
     --container-bg: #ffffff;     /* カード背景 (白) */
     --error-color: #ff6347;
     --success-color: #64e98f;
@@ -19,40 +19,53 @@
 }
 
 /* --- ANIMATIONS: MOVEMENT & GLOW --- */
-@keyframes floatingBackground {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+/* 背景をよりダイナミックに、複数の色を巡る */
+@keyframes dreamyBackground {
+    0% { background-position: 0% 50%; background-color: #fce4ec; } /* Light Pink */
+    25% { background-position: 50% 75%; background-color: #f8bbd0; } /* Slightly Deeper Pink */
+    50% { background-position: 100% 50%; background-color: #e1bee7; } /* Lavender */
+    75% { background-position: 50% 25%; background-color: #c5eff7; } /* Light Blue */
+    100% { background-position: 0% 50%; background-color: #fce4ec; } /* Back to Light Pink */
 }
+/* ポップインの動きをよりソフトに、弾む感じに */
 @keyframes popIn {
-    0% { opacity: 0; transform: translateY(20px) scale(0.95); }
-    80% { opacity: 1; transform: translateY(-5px) scale(1.01); }
+    0% { opacity: 0; transform: translateY(20px) scale(0.8); }
+    60% { opacity: 1; transform: translateY(-8px) scale(1.03); } /* 少し大きめに弾む */
     100% { opacity: 1; transform: translateY(0) scale(1.0); }
 }
-/* ホバー時の動きをソフトな浮遊に変更 */
-@keyframes softFloat {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-5px); }
-    100% { transform: translateY(0px); }
+/* ホバー時のソフトな浮遊アニメーションを常に適用 */
+@keyframes gentleFloat {
+    0% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-3px) rotate(-0.5deg); }
+    50% { transform: translateY(0px) rotate(0deg); }
+    75% { transform: translateY(3px) rotate(0.5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
 }
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
-/* ★ NEW: 継続的なソフトなパルスアニメーション */
+/* パルスアニメーションをより柔らかく、ふわふわに */
 @keyframes softPulse {
-    0% { box-shadow: 0 0 10px rgba(255, 105, 180, 0.4); }
-    50% { box-shadow: 0 0 15px rgba(255, 160, 190, 0.6); }
-    100% { box-shadow: 0 0 10px rgba(255, 105, 180, 0.4); }
+    0% { box-shadow: 0 0 10px rgba(255, 105, 180, 0.4), 0 0 0 0px var(--primary-color); }
+    50% { box-shadow: 0 0 20px rgba(255, 160, 190, 0.7), 0 0 0 5px rgba(255, 105, 180, 0.2); }
+    100% { box-shadow: 0 0 10px rgba(255, 105, 180, 0.4), 0 0 0 0px var(--primary-color); }
 }
-/* ノイズアニメーションは削除 */
+
+/* ★ NEW: アイコンの微細な揺れ動き */
+@keyframes iconWiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(5deg); }
+}
 
 /* --- CORE STRUCTURE --- */
 body {
-    /* ソフトなパステルカラーの背景 */
-    background: linear-gradient(135deg, var(--light-bg), #fffafa); 
+    /* よりドリーミーな背景グラデーションとアニメーション */
+    background: linear-gradient(135deg, #fce4ec, #f8bbd0, #e1bee7, #c5eff7); 
     background-size: 400% 400%;
-    animation: floatingBackground 20s ease infinite alternate;
+    animation: dreamyBackground 30s ease infinite alternate; /* アニメーションをより長く、ドリーミーに */
     font-family: 'Poppins', 'Noto Sans JP', sans-serif;
     display: flex;
     flex-direction: column;
@@ -64,16 +77,13 @@ body {
     box-sizing: border-box;
     perspective: 1000px;
     color: var(--dark-text);
-    /* システムチックな背景オーバーレイ (グリッド)を削除 */
-    background-image: none;
-    background-size: 40px 40px;
-    background-position: 0 0, 20px 20px;
+    overflow-x: hidden; /* 横スクロールバーを防ぐ */
 }
 
 .main-container {
     background: var(--container-bg);
     padding: 45px 55px;
-    border-radius: 20px; /* もっと丸く */
+    border-radius: 25px; /* もっと丸く */
     /* シャドウをソフトに、境界線をパステルカラーに */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 5px var(--secondary-color);
     border: none;
@@ -81,143 +91,158 @@ body {
     transition: all 0.5s cubic-bezier(.25,.8,.25,1);
     width: 100%;
     box-sizing: border-box;
-    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
-    transform: rotateX(0deg) scale(1.0);
+    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards, gentleFloat 5s ease-in-out infinite alternate; /* 常にふわふわ浮く */
+    transform-origin: center center; /* 中央を基準に浮遊 */
+    max-width: 700px; /* 最大幅を設定 */
 }
 
 .main-container:hover {
-    transform: translateY(-8px); /* 浮く高さを強調 */
-    /* ソフトなアクセントカラーのグローに変更 */
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), 0 0 20px var(--primary-color); 
+    transform: translateY(-10px) scale(1.02); /* 浮く高さを強調し、少し拡大 */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), 0 0 20px var(--primary-color), 0 0 0 8px var(--primary-color); /* ホバー時の境界線も強調 */
 }
 
 h1 {
     color: var(--primary-color);
     margin-bottom: 5px;
-    font-size: 40px; /* 少し大きく */
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-shadow: 0 0 15px rgba(255, 105, 180, 0.3); /* ソフトな影 */
+    font-size: 45px; /* さらに大きく */
+    font-weight: 900; /* より太く */
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(255, 105, 180, 0.4); /* ソフトな影を強調 */
+    animation: fadeIn 0.8s ease-out forwards;
 }
 
 .header-icon {
-    font-size: 32px;
+    font-size: 36px; /* アイコンを大きく */
     color: var(--primary-color);
-    margin-right: 10px;
+    margin-right: 12px;
+    animation: iconWiggle 2s ease-in-out infinite alternate; /* アイコンも揺れる */
+    display: inline-block; /* アニメーションのため */
 }
 
 .sub-heading {
-    color: var(--dark-text); /* テキスト色を暗い色に */
-    opacity: 0.7;
-    margin-bottom: 30px;
-    font-size: 16px;
-    font-weight: 400;
+    color: var(--dark-text); 
+    opacity: 0.8; /* 視認性UP */
+    margin-bottom: 35px; /* スペースを広げる */
+    font-size: 18px; /* 少し大きく */
+    font-weight: 500;
 }
 
 /* --- COMMON FORM STRUCTURE --- */
 .form-group {
-    margin-bottom: 25px;
+    margin-bottom: 30px; /* スペースを広げる */
     text-align: left;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 10px; /* スペースを広げる */
     color: var(--dark-text);
-    font-weight: 700;
-    font-size: 14px;
-    opacity: 0.8;
+    font-weight: 800; /* より太く */
+    font-size: 15px;
+    opacity: 0.9;
 }
 
 /* --- COMMON BUTTONS --- */
 .button, button.primary, .button.secondary, button.secondary { 
     text-decoration: none;
-    border-radius: 30px; /* 丸みを強く */
-    transition: all 0.3s cubic-bezier(.17,.67,.83,.67); /* 弾むようなトランジション */
-    font-weight: 700; 
+    border-radius: 35px; /* さらに丸く */
+    transition: all 0.4s cubic-bezier(.68,-0.55,.26,1.55); /* もっと弾むようなトランジション */
+    font-weight: 800; /* より太く */
     display: block; 
-    margin: 15px 0;
+    margin: 18px 0; /* マージンを調整 */
     width: 100%;
     border: none;
     cursor: pointer;
-    font-size: 18px; 
-    padding: 18px 35px; 
-    text-transform: none; /* 大文字を解除 */
-    letter-spacing: 0.5px;
+    font-size: 19px; /* 少し大きく */
+    padding: 20px 40px; /* パディングを増やす */
+    text-transform: none; 
+    letter-spacing: 1px; /* 文字間を広げる */
     box-sizing: border-box;
     text-align: center;
+    position: relative; /* アニメーションのため */
+    overflow: hidden;
+    z-index: 1; /* z-index追加 */
+    animation: gentleFloat 4s ease-in-out infinite alternate; /* ボタンも常に浮遊 */
+}
+
+/* ボタン内アイコンにも微細な動き */
+.button i {
+    margin-left: 8px;
+    transition: transform 0.3s ease-in-out;
+}
+.button:hover i {
+    transform: rotate(10deg) scale(1.1); /* ホバー時にアイコンが揺れる */
 }
 
 /* Primary Button (Sakura Pink) */
 .button.primary, button.primary {
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: #ffffff; 
-    box-shadow: 0 8px 20px rgba(255, 105, 180, 0.5); /* ソフトな影 */
+    box-shadow: 0 10px 25px rgba(255, 105, 180, 0.6); /* ソフトな影を強調 */
     border: none;
 }
 
 .button.primary:hover, button.primary:hover {
-    animation: softFloat 0.6s ease-out; /* 柔らかい浮き */
-    box-shadow: 0 12px 30px rgba(255, 105, 180, 0.7), 0 0 15px var(--primary-color);
-    transform: translateY(-6px) scale(1.02);
-    background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+    animation: none; /* ホバー中はgentleFloatを停止 */
+    transform: translateY(-12px) scale(1.04) rotate(-1deg); /* より大きく弾む、少し回転 */
+    box-shadow: 0 18px 45px rgba(255, 105, 180, 0.9), 0 0 25px var(--primary-color);
+    background: linear-gradient(45deg, var(--secondary-color), var(--primary-color)); /* グラデーションの向きを反転 */
 }
 
 /* Secondary Button (Light Gray/Accent) */
 .button.secondary, button.secondary {
-    background: var(--light-bg); /* 明るい背景 */
+    background: #ffffff; /* 白背景 */
     color: var(--dark-text);
-    border: 2px solid var(--secondary-color); /* ライトピンクの枠線 */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
-    font-size: 16px;
-    padding: 14px 35px;
-    font-weight: 600;
+    border: 3px solid var(--secondary-color); /* ライトピンクの枠線を太く */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); 
+    font-size: 17px;
+    padding: 16px 35px;
+    font-weight: 700;
 }
 .button.secondary:hover, button.secondary:hover {
-    background: #fff8f8;
+    animation: none; /* ホバー中はgentleFloatを停止 */
+    background: #fffafa; /* 薄いピンク */
     border-color: var(--primary-color); 
-    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3); 
-    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4); 
+    transform: translateY(-4px) scale(1.01) rotate(1deg); /* 少し弾んで回転 */
 }
 
 /* --- MESSAGE STYLES --- */
 .error-message {
-    font-weight: 700;
-    margin-bottom: 25px;
-    padding: 15px;
-    border-radius: 10px; 
-    animation: fadeIn 0.5s ease-out;
+    font-weight: 800; /* より太く */
+    margin-bottom: 30px;
+    padding: 18px;
+    border-radius: 12px; 
+    animation: fadeIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
     color: var(--error-color); 
-    border: 2px solid var(--error-color);
-    background-color: #ffe6e6; /* 薄い赤系の背景 */
-    /* ノイズアニメーションを削除 */
+    border: 3px solid var(--error-color);
+    background-color: #ffeded; /* もっと薄い赤系の背景 */
     position: relative;
     overflow: hidden;
-}
-.error-message::before {
-    content: none;
+    box-shadow: 0 4px 15px rgba(255, 99, 71, 0.3);
 }
 .success-message {
-    font-weight: 700;
-    margin-bottom: 25px;
-    padding: 15px;
-    border-radius: 10px; 
-    animation: fadeIn 0.5s ease-out;
+    font-weight: 800;
+    margin-bottom: 30px;
+    padding: 18px;
+    border-radius: 12px; 
+    animation: fadeIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
     color: var(--success-color); 
-    border: 2px solid var(--success-color);
-    background-color: #e6ffe6; /* 薄い緑系の背景 */
+    border: 3px solid var(--success-color);
+    background-color: #edfff2; /* もっと薄い緑系の背景 */
+    box-shadow: 0 4px 15px rgba(100, 233, 143, 0.3);
 }
 .info-message {
     color: var(--dark-text);
-    font-weight: 500;
-    line-height: 1.6;
+    font-weight: 600;
+    line-height: 1.7; /* 行の高さを広げる */
     background: #ffffff; 
-    border: 2px solid var(--ai-accent-color); /* スカイブルーの枠線 */
-    margin-bottom: 25px;
-    padding: 15px;
-    border-radius: 10px;
-    /* ★ NEW: 弱いソフトパルスアニメーション */
-    animation: softPulse 4s ease-in-out infinite alternate;
+    border: 3px solid var(--ai-accent-color); /* スカイブルーの枠線を太く */
+    margin-bottom: 30px;
+    padding: 18px;
+    border-radius: 12px;
+    animation: softPulse 4s ease-in-out infinite alternate, fadeIn 0.7s ease-out forwards; /* 浮遊感をプラス */
+    box-shadow: 0 6px 20px rgba(135, 206, 235, 0.3); /* ソフトな青い影 */
 }
 
 /* --- COMMON RESPONSIVE ADJUSTMENTS --- */
@@ -226,32 +251,56 @@ h1 {
         padding: 10px;
     }
     .main-container {
-        padding: 30px 25px;
-        max-width: 95%;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        padding: 35px 30px;
+        max-width: 98%;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 20px;
+        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards; /* スマホでは浮遊アニメーションを無効に */
     }
     .main-container:hover {
-        transform: translateY(0px) rotateX(0deg) scale(1.0);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2), 0 0 15px var(--primary-color);
+        transform: translateY(0px) scale(1.0); /* ホバー時の動きも調整 */
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15), 0 0 15px var(--primary-color);
     }
     h1 {
-        font-size: 32px;
+        font-size: 36px;
+        letter-spacing: 1px;
     }
     .header-icon {
-        font-size: 24px;
+        font-size: 28px;
+        margin-right: 8px;
+        animation: none; /* モバイルではアイコンの揺れを無効に */
+    }
+    .sub-heading {
+        font-size: 16px;
+        margin-bottom: 25px;
     }
     .button, button.primary, .button.secondary, button.secondary, .button.ai-chat {
         display: block;
-        margin: 10px auto;
+        margin: 12px auto;
         width: 100%;
         min-width: unset;
-        font-size: 16px;
-        padding: 14px 20px;
-        border-radius: 25px;
+        font-size: 17px;
+        padding: 16px 25px;
+        border-radius: 30px;
+        animation: fadeIn 0.5s ease-out forwards; /* モバイルでは浮遊アニメーションを無効に */
+    }
+    .button:hover i {
+        transform: rotate(0deg) scale(1.0); /* モバイルではアイコンのホバー揺れを無効に */
     }
     .button-container {
         display: block;
         width: 100%;
-        margin-top: 20px;
+        margin-top: 25px;
+    }
+    .form-group {
+        margin-bottom: 25px;
+    }
+    .form-group label {
+        margin-bottom: 8px;
+    }
+    .error-message, .success-message, .info-message {
+        padding: 15px;
+        margin-bottom: 25px;
+        font-size: 14px;
     }
 }
