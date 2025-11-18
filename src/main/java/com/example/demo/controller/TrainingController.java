@@ -1,3 +1,7 @@
+
+
+
+
 package com.example.demo.controller;
 
 import java.time.DayOfWeek;
@@ -39,18 +43,18 @@ public class TrainingController {
     @Autowired
     private TrainingRecordRepository trainingRecordRepository;
 
-    /**
-     * 認証情報から現在のユーザーを取得する（Null安全性を高めたバージョン）
-     */
     private User getCurrentUser(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated() || authentication.getName() == null) {
-            return null;
-        }
+        if (authentication == null) return null;
         return userService.findByUsername(authentication.getName());
     }
     
     /**
      * トレーニングログ（カレンダー）画面を表示
+     * @param authentication 認証ユーザー
+     * @param year 表示する年
+     * @param month 表示する月
+     * @param model Thymeleafモデル
+     * @return training-log.html
      */
     @GetMapping("/training-log")
     public String showTrainingLog(
@@ -61,7 +65,6 @@ public class TrainingController {
 
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) {
-            // ユーザーが取得できない場合はログイン画面へリダイレクト
             return "redirect:/login";
         }
         
@@ -89,17 +92,17 @@ public class TrainingController {
                 .collect(Collectors.toMap(
                     TrainingRecord::getRecordDate,
                     r -> true,
-                    (a, b) -> a 
+                    (a, b) -> a // 既にキーが存在する場合は上書きしない
                 ));
 
         // カレンダーグリッドの生成
         List<LocalDate> calendarDays = new ArrayList<>();
         
-        // 1週目の開始曜日までの空白（日曜日を週の始まりとする）
-        // SUNDAY(7) -> 0, MONDAY(1) -> 1, ... SATURDAY(6) -> 6
-        int firstDayOfWeekValue = firstOfMonth.getDayOfWeek().getValue();
-        int paddingDays = (firstDayOfWeekValue % 7); 
-        
+        // 1週目の開始曜日までの空白
+        int paddingDays = firstOfMonth.getDayOfWeek().getValue() % 7; 
+        if (paddingDays == 0) paddingDays = 7; // 日曜日を0ではなく7として扱う（カレンダー表示のため）
+        paddingDays = (paddingDays == 7) ? 0 : paddingDays; // 日曜日を0に戻す
+
         for (int i = 0; i < paddingDays; i++) {
             calendarDays.add(null); // nullで空白セルを表す
         }
@@ -122,10 +125,9 @@ public class TrainingController {
         model.addAttribute("nextYear", targetYearMonth.plusMonths(1).getYear());
         model.addAttribute("nextMonth", targetYearMonth.plusMonths(1).getMonthValue());
 
-        // 曜日ヘッダー (日曜日から土曜日)
+        // 曜日ヘッダー
         List<String> dayLabels = new ArrayList<>();
-        DayOfWeek[] days = {DayOfWeek.SUNDAY, DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY};
-        for (DayOfWeek day : days) {
+        for (DayOfWeek day : DayOfWeek.values()) {
             dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE));
         }
         model.addAttribute("dayLabels", dayLabels);
@@ -195,4 +197,8 @@ public class TrainingController {
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
+    
+    // 既存のメソッドはそのまま残すか、必要に応じてリファクタリングしてください。
+    // 今回は他のルートとの衝突を避けるため、既存の /training/start などのメソッドは削除しています。
+    // (元のTrainingControllerが最小限だったため、ここではカレンダー機能に特化させました。)
 }
