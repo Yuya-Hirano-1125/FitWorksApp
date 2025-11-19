@@ -144,7 +144,7 @@
     </div>
     
     <div class="button-container" style="margin-top: 40px;">
-        <a th:href="@{/login}" class="button primary" style="background: var(--error-color); border-color: var(--error-color); box-shadow: 0 8px 25px rgba(255, 74, 74, 0.6);">
+        <a th:href="@{/login}" onclick="return confirmLogout()" class="button primary" style="background: var(--error-color); border-color: var(--error-color); box-shadow: 0 8px 25px rgba(255, 74, 74, 0.6);">
             ログアウト <i class="fa-solid fa-right-from-bracket"></i>
         </a>
         
@@ -186,6 +186,13 @@
             content.style.paddingBottom = '15px';
             arrow.innerHTML = '▲';
         }
+    }
+
+    // 変更点: ログアウト確認ダイアログを表示する新しい関数
+    function confirmLogout() {
+        // window.confirm() を使用し、ユーザーが 'OK' をクリックした場合は true を返してリンク遷移を実行
+        // 'キャンセル' をクリックした場合は false を返してリンク遷移を阻止
+        return confirm("本当にログアウトしますか？");
     }
 
     // ページロード時の初期設定
