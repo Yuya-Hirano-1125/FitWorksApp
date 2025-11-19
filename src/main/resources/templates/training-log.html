@@ -19,50 +19,43 @@
 
     <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
     
-    <div th:if="${currentYearMonth}">
-        <div class="calendar-nav-container">
-            <a th:href="@{/training-log(year=${prevYear}, month=${prevMonth})}" class="nav-arrow">
-                <i class="fa-solid fa-chevron-left"></i>
-            </a>
-            
-            <h2 class="calendar-title" th:text="${currentYearMonth.year} + '年 ' + ${currentYearMonth.monthValue} + '月'"></h2>
-            
-            <a th:href="@{/training-log(year=${nextYear}, month=${nextMonth})}" class="nav-arrow">
-                <i class="fa-solid fa-chevron-right"></i>
-            </a>
-        </div>
-
-        <div class="calendar-grid">
-            <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" 
-                 th:classappend="${dayLabel == '土'} ? 'sat' : ((${dayLabel == '日'} ? 'sun' : ''))">
-                 曜日
-            </div>
-            
-            <th:block th:each="date : ${calendarDays}">
-                <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''},
-                              dayOfWeek=${date != null ? date.dayOfWeek.name() : ''},
-                              isToday=${date != null and date.isEqual(currentDate)},
-                              isLogged=${date != null and loggedDates.containsKey(date)}"
-                     class="calendar-day-cell"
-                     th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today' : '') + 
-                                                                        ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + 
-                                                                         ((${dayOfWeek == 'SUNDAY'} ? ' sun' : '')) + 
-                                                                         ((${isLogged} ? ' logged' : ''))))"
-                     th:attr="data-date=${date != null ? date.toString() : ''}"
-                     th:onclick="${date != null} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
-
-                    <span class="day-number" th:text="${dateNumber}">1</span>
-                    
-                    <span th:if="${isLogged}" class="log-indicator">
-                        <i class="fa-solid fa-star"></i>
-                    </span>
-                </div>
-            </th:block>
-        </div>
+    <div class="calendar-nav-container">
+        <a th:href="@{/training-log(year=${prevYear}, month=${prevMonth})}" class="nav-arrow">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        
+        <h2 class="calendar-title" th:text="${currentYearMonth.year} + '年 ' + ${currentYearMonth.monthValue} + '月'"></h2>
+        
+        <a th:href="@{/training-log(year=${nextYear}, month=${nextMonth})}" class="nav-arrow">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
     </div>
-    <div th:unless="${currentYearMonth}" class="error-message" style="margin-top: 30px;">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        カレンダーデータを読み込めませんでした。ログイン状態を確認し、再度お試しください。
+
+    <div class="calendar-grid">
+        <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" 
+             th:classappend="${dayLabel == '土'} ? 'sat' : ((${dayLabel == '日'} ? 'sun' : ''))">
+             曜日
+        </div>
+        
+        <th:block th:each="date : ${calendarDays}">
+            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''},
+                          dayOfWeek=${date != null ? date.dayOfWeek.name() : ''},
+                          isToday=${date != null and date.isEqual(currentDate)},
+                          isLogged=${date != null and loggedDates.containsKey(date)}"
+                 class="calendar-day-cell"
+                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today' : '') + 
+                                                                    ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + 
+                                                                     ((${dayOfWeek == 'SUNDAY'} ? ' sun' : ''))))"
+                 th:attr="data-date=${date != null ? date.toString() : ''}"
+                 th:onclick="${date != null} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
+
+                <span class="day-number" th:text="${dateNumber}">1</span>
+                
+                <span th:if="${isLogged}" class="log-indicator">
+                    <i class="fa-solid fa-star"></i>
+                </span>
+            </div>
+        </th:block>
     </div>
 </div>
 
@@ -125,17 +118,14 @@
 <script>
     // トレーニングフォームを非同期で読み込む関数
     function loadTrainingForm(type, date) {
-        // ThymeleafのURLをJavaScriptで動的に生成
         const url = type === 'WEIGHT' 
-            ? '/training-log/form/weight' + '?date=' + date
-            : '/training-log/form/cardio' + '?date=' + date;
+            ? /*[[@{/training-log/form/weight}]]*/ '/training-log/form/weight' + '?date=' + date
+            : /*[[@{/training-log/form/cardio}]]*/ '/training-log/form/cardio' + '?date=' + date;
 
         fetch(url)
             .then(response => response.text())
             .then(html => {
                 document.getElementById('formContainer').innerHTML = html;
-                // フォームが読み込まれたら隠しフィールドに日付を再設定
-                document.getElementById('formContainer').querySelector('input[name="recordDate"]').value = date;
             })
             .catch(error => {
                 document.getElementById('formContainer').innerHTML = '<p class="error-message">フォームの読み込みに失敗しました。</p>';
@@ -184,3 +174,12 @@
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+

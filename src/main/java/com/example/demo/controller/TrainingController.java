@@ -202,3 +202,5 @@ public class TrainingController {
     // 今回は他のルートとの衝突を避けるため、既存の /training/start などのメソッドは削除しています。
     // (元のTrainingControllerが最小限だったため、ここではカレンダー機能に特化させました。)
 }
+
+
