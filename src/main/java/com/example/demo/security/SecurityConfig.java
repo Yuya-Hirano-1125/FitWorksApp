@@ -101,7 +101,9 @@ public class SecurityConfig {
                     "/css/**",
                     "/js/**",
                     "/images/**",
+                    "/img/**",
                     "/{path:[^\\.]*}" 
+                    
                 ).permitAll()
                 // APIエンドポイント (/api/**) は認証が必要
                 .requestMatchers("/api/**").authenticated()

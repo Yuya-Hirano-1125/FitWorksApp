@@ -98,68 +98,30 @@
     animation: softPulse 5s ease-in-out infinite alternate, gentleFloat 6s ease-in-out infinite alternate-reverse; /* グローと浮遊の複合アニメーション */
     transform-origin: center bottom; /* 下部を中心に浮遊 */
 }
+
+/* テキスト表示用の擬似要素は画像表示のため無効化 */
+/*
 .character-display::before {
     content: "キャラクター表示エリア (レベル 5)";
-    color: #f0f0f0; /* 薄いグレーに */
+    color: #f0f0f0; 
     font-size: 20px;
     font-weight: 700;
     text-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+*/
+
+/* 追加: キャラクター画像のスタイル */
 .character-display img {
     max-width: 100%;
     max-height: 100%;
-    object-fit: contain;
+    object-fit: contain; /* アスペクト比を維持して収める */
     transition: transform 0.5s ease; /* 画像にもトランジション */
 }
+
 .character-display:hover img {
     transform: scale(1.05); /* ホバーでキャラクターがわずかに拡大 */
 }
 
-
-/* --- TRAINING START BUTTON (ホーム専用) --- */
-/* HTMLから削除されたため、このセクションは不要になりました。 */
-/*
-.button.training-start {
-    margin: 25px auto 15px auto; 
-    padding: 22px 55px; 
-    font-size: 22px; 
-    width: auto;
-    min-width: 300px;
-    animation: popIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards, gentleFloat 4s ease-in-out infinite alternate;
-    animation-delay: 1.0s;
-    background: linear-gradient(45deg, var(--primary-color), var(--ai-accent-color), #ffccf2); 
-    color: #ffffff;
-    box-shadow: 0 12px 35px rgba(255, 105, 180, 0.8);
-    border: none;
-}
-.button.training-start:hover {
-    animation: none;
-    transform: translateY(-15px) scale(1.06) rotate(-2deg);
-    box-shadow: 0 20px 50px rgba(255, 105, 180, 1.0), 0 0 30px var(--primary-color);
-}
-.button.training-start i {
-    animation: iconWiggle 2s ease-in-out infinite alternate;
-}
-
-/* Desktop Button Layout */
-/*
-.home-button-group {
-    display: flex;
-    justify-content: center;
-    gap: 25px; 
-    flex-wrap: wrap;
-}
-.home-button-group .button {
-    width: 48%; 
-    min-width: unset;
-    margin: 12px 0; 
-    animation: fadeIn 0.6s ease-out forwards, gentleFloat 4s ease-in-out infinite alternate;
-    animation-delay: 0.8s;
-}
-.home-button-group:nth-child(2) .button {
-    animation-delay: 1.0s;
-}
-*/
 
 /* --- BOTTOM NAVIGATION BAR (Mobile Only) --- */
 
