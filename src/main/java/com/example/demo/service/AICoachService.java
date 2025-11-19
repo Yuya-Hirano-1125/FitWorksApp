@@ -61,15 +61,6 @@ public class AICoachService {
                                                                                                                                                              
                                                                                                                                                              
                                                                                                                                                              
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                           
+                                                                                                                                                                                                                                                                                       
+                                                                                                                  
+                                                                                                                   
