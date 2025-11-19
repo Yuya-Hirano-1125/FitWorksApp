@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${trainingTitle}"></title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght!important(400);700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <style>
@@ -42,6 +42,77 @@
             border-radius: 8px;
             color: #888;
         }
+        
+        /* === NEW TIMER STYLES === */
+        .timer-section {
+            background-color: #1a1a1a;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+            border: 1px solid #333;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+        }
+        .timer-display {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #fff;
+            margin: 10px 0 20px;
+            font-family: 'Poppins', monospace;
+        }
+        .timer-interval {
+            color: var(--primary-color); /* インターバルタイマーはプライマリカラーを使用 */
+        }
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .timer-controls button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            border: none;
+            flex-grow: 1;
+        }
+        .timer-button-primary {
+            background-color: var(--primary-color);
+            color: #1a1a1a;
+        }
+        .timer-button-secondary {
+            background-color: #444;
+            color: #ddd;
+        }
+        .timer-button-tertiary {
+            background-color: #555;
+            color: #fff;
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+        .timer-controls button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .timer-settings {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+        .timer-settings input {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 5px;
+            text-align: center;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body class="session-page">
@@ -56,6 +127,37 @@
         <p class="exercise-type" th:if="${trainingType == 'cardio'}"><i class="fa-solid fa-running"></i> 有酸素運動 (時間・距離記録)</p>
         <p class="exercise-type" th:if="${trainingType == 'ai-suggested'}"><i class="fa-solid fa-star"></i> AIおすすめプログラム</p>
         
+        <div class="timer-section">
+            <div class="countdown-container">
+                <h3 style="color: #ffcc00; margin-bottom: 5px;">トレーニングタイマー</h3>
+                <div id="countdown-display" class="timer-display">05:00</div>
+                 <div class="timer-settings">
+                    <input type="number" id="countdown-minutes" value="5" min="0" max="99" style="width: 50px;"> 分
+                    <input type="number" id="countdown-seconds" value="0" min="0" max="59" style="width: 50px;"> 秒
+                    <button id="countdown-set" class="button timer-button-tertiary"><i class="fa-solid fa-clock"></i> 設定</button>
+                </div>
+                <div class="timer-controls">
+                    <button id="countdown-start-pause" class="button timer-button-primary"><i class="fa-solid fa-play"></i> 開始</button>
+                    <button id="countdown-reset" class="button timer-button-secondary"><i class="fa-solid fa-rotate-left"></i> リセット</button>
+                </div>
+            </div>
+
+            <hr style="border-top: 1px solid #333; margin: 30px 0;">
+
+            <div class="interval-container">
+                <h3 style="color: var(--primary-color); margin-bottom: 5px; margin-top: 20px;">インターバルタイマー</h3>
+                <div id="interval-display" class="timer-display timer-interval">01:00</div>
+                <div class="timer-settings">
+                    <input type="number" id="interval-minutes" value="1" min="0" max="59" style="width: 50px;"> 分
+                    <input type="number" id="interval-seconds" value="0" min="0" max="59" style="width: 50px;"> 秒
+                    <button id="interval-set" class="button timer-button-tertiary"><i class="fa-solid fa-clock"></i> 設定</button>
+                </div>
+                <div class="timer-controls">
+                    <button id="interval-start-pause" class="button timer-button-primary"><i class="fa-solid fa-play"></i> 開始</button>
+                    <button id="interval-reset" class="button timer-button-secondary"><i class="fa-solid fa-rotate-left"></i> リセット</button>
+                </div>
+            </div>
+        </div>
         <div th:if="${trainingType == 'free-weight' or trainingType == 'cardio'}">
             <div class="log-placeholder">
                 <p>⚠️ **ここに、選択された種目（<span th:text="${selectedExercise}"></span>）の実際の記録フォームが入ります。**</p>
@@ -99,5 +201,247 @@
     </div>
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Utility function for formatting time (Minutes:Seconds) ---
+        const formatTime = (ms) => {
+            const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const pad = (num) => String(num).padStart(2, '0');
+            return `${pad(minutes)}:${pad(seconds)}`;
+        };
+
+        // =======================================================
+        // 1. トレーニングタイマー機能 (Countdown Timer)
+        // =======================================================
+        const cdDisplay = document.getElementById('countdown-display');
+        const cdMinInput = document.getElementById('countdown-minutes');
+        const cdSecInput = document.getElementById('countdown-seconds');
+        const cdSetBtn = document.getElementById('countdown-set');
+        const cdStartPauseBtn = document.getElementById('countdown-start-pause');
+        const cdResetBtn = document.getElementById('countdown-reset');
+
+        let cdInitialTime = 300000; // 初期値: 5分 (5 * 60000ms)
+        let cdRemainingTime = cdInitialTime;
+        let cdTimer = null;
+        let isCdRunning = false;
+        
+        const updateCdDisplay = () => {
+            cdDisplay.textContent = formatTime(cdRemainingTime);
+
+            // 残り10秒以下で赤くする
+            if (cdRemainingTime <= 10000 && cdRemainingTime > 0) {
+                 cdDisplay.style.color = '#ff0000'; 
+            } else {
+                 cdDisplay.style.color = '#ffcc00'; // 黄色に戻す
+            }
+        };
+
+        const handleCdFinish = () => {
+            clearInterval(cdTimer);
+            isCdRunning = false;
+            cdStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 開始';
+            cdStartPauseBtn.classList.remove('timer-button-secondary');
+            cdStartPauseBtn.classList.add('timer-button-primary');
+
+            alert('トレーニングタイマー終了！');
+        };
+
+        const startCountdown = () => {
+            if (cdRemainingTime <= 0) {
+                // タイマーがゼロの場合はリセットしてから開始
+                resetCountdown();
+                return;
+            }
+            
+            if (!isCdRunning) {
+                isCdRunning = true;
+                cdStartPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 停止';
+                cdStartPauseBtn.classList.remove('timer-button-primary');
+                cdStartPauseBtn.classList.add('timer-button-secondary');
+
+                // 経過時間を計算して、再開時に正確な時間からスタートできるようにする
+                const startTime = Date.now() - (cdInitialTime - cdRemainingTime);
+                
+                cdTimer = setInterval(() => {
+                    const elapsedTime = Date.now() - startTime;
+                    cdRemainingTime = cdInitialTime - elapsedTime;
+                    
+                    if (cdRemainingTime <= 0) {
+                        cdRemainingTime = 0;
+                        updateCdDisplay();
+                        handleCdFinish();
+                        return;
+                    }
+                    updateCdDisplay();
+                }, 100);
+            } else {
+                // 一時停止
+                clearInterval(cdTimer);
+                isCdRunning = false;
+                
+                // 再開時に使用するため、現在の残り時間を新しい初期時間として設定
+                cdInitialTime = cdRemainingTime; 
+
+                cdStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 再開';
+                cdStartPauseBtn.classList.remove('timer-button-secondary');
+                cdStartPauseBtn.classList.add('timer-button-primary');
+            }
+        };
+
+        const resetCountdown = () => {
+            clearInterval(cdTimer);
+            isCdRunning = false;
+            
+            const minutes = parseInt(cdMinInput.value) || 0;
+            const seconds = parseInt(cdSecInput.value) || 0;
+            
+            const newInitialTime = (minutes * 60000) + (seconds * 1000);
+
+            // 00:00 設定を防ぐ (最低1秒)
+            if (newInitialTime < 1000) {
+                cdInitialTime = 300000; // 5分にリセット
+                cdMinInput.value = 5;
+                cdSecInput.value = 0;
+            } else {
+                cdInitialTime = newInitialTime;
+            }
+
+            cdRemainingTime = cdInitialTime;
+            
+            updateCdDisplay();
+            cdStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 開始';
+            cdStartPauseBtn.classList.remove('timer-button-secondary');
+            cdStartPauseBtn.classList.add('timer-button-primary');
+        };
+        
+        cdSetBtn.addEventListener('click', resetCountdown); // 設定ボタンはリセットを兼ねる
+        cdStartPauseBtn.addEventListener('click', startCountdown);
+        cdResetBtn.addEventListener('click', resetCountdown);
+        
+        // 初期ロード
+        resetCountdown(); 
+
+
+        // =======================================================
+        // 2. インターバルタイマー機能 (Interval Timer)
+        // =======================================================
+        // ※この機能はカウントダウンタイマーとして前回のコードから引き継がれています。
+
+        const ivDisplay = document.getElementById('interval-display');
+        const ivMinInput = document.getElementById('interval-minutes');
+        const ivSecInput = document.getElementById('interval-seconds');
+        const ivSetBtn = document.getElementById('interval-set');
+        const ivStartPauseBtn = document.getElementById('interval-start-pause');
+        const ivResetBtn = document.getElementById('interval-reset');
+
+        let ivInitialTime = 60000; // 初期値: 1分 (1000ms * 60s)
+        let ivRemainingTime = ivInitialTime;
+        let ivTimer = null;
+        let isIvRunning = false;
+
+        const updateIvDisplay = () => {
+            ivDisplay.textContent = formatTime(ivRemainingTime);
+
+            if (ivRemainingTime <= 10000 && ivRemainingTime > 0) {
+                 ivDisplay.style.color = '#ff0000'; // 残り10秒で赤くする
+            } else {
+                 ivDisplay.style.color = 'var(--primary-color)';
+            }
+        };
+        
+        // 初期表示を更新
+        updateIvDisplay();
+
+
+        const handleIvFinish = () => {
+            clearInterval(ivTimer);
+            isIvRunning = false;
+            ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 開始';
+            ivStartPauseBtn.classList.remove('timer-button-secondary');
+            ivStartPauseBtn.classList.add('timer-button-primary');
+
+            alert('インターバル終了！次のセットに移りましょう！');
+        };
+
+        const startInterval = () => {
+            if (ivRemainingTime <= 0) {
+                // タイマーがゼロの場合はリセットしてから開始
+                resetInterval();
+                return;
+            }
+            
+            if (!isIvRunning) {
+                isIvRunning = true;
+                ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 停止';
+                ivStartPauseBtn.classList.remove('timer-button-primary');
+                ivStartPauseBtn.classList.add('timer-button-secondary');
+
+                // 経過時間を計算して、再開時に正確な時間からスタートできるようにする
+                const startTime = Date.now() - (ivInitialTime - ivRemainingTime);
+
+                ivTimer = setInterval(() => {
+                    const elapsedTime = Date.now() - startTime;
+                    ivRemainingTime = ivInitialTime - elapsedTime;
+                    
+                    if (ivRemainingTime <= 0) {           
+                        ivRemainingTime = 0;
+                        updateIvDisplay();
+                        handleIvFinish();
+                        return;
+                    }
+                    updateIvDisplay();
+                }, 100);
+            } else {
+                // 一時停止
+                clearInterval(ivTimer);
+                isIvRunning = false;
+
+                // 再開時に使用するため、現在の残り時間を新しい初期時間として設定     
+                ivInitialTime = ivRemainingTime;
+                
+                ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 再開';
+                ivStartPauseBtn.classList.remove('timer-button-secondary');
+                ivStartPauseBtn.classList.add('timer-button-primary');
+            }
+        };
+
+        // 設定ボタンとリセットボタンで同じリセット処理を実行
+        const resetInterval = () => {
+            clearInterval(ivTimer);
+            isIvRunning = false;
+
+            const minutes = parseInt(ivMinInput.value) || 0;
+            const seconds = parseInt(ivSecInput.value) || 0;
+            
+            const newInitialTime = (minutes * 60000) + (seconds * 1000);
+            
+            // 00:00 設定を防ぐ (最低1秒)
+            if (newInitialTime < 1000) {
+                ivInitialTime = 60000; // 1分にリセット
+                ivMinInput.value = 1;
+                ivSecInput.value = 0;
+            } else {
+                ivInitialTime = newInitialTime;
+            }
+
+            ivRemainingTime = ivInitialTime;
+            
+            updateIvDisplay();
+            ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 開始';
+            ivStartPauseBtn.classList.remove('timer-button-secondary');
+            ivStartPauseBtn.classList.add('timer-button-primary');
+        };
+
+        ivSetBtn.addEventListener('click', resetInterval);
+        ivStartPauseBtn.addEventListener('click', startInterval);
+        ivResetBtn.addEventListener('click', resetInterval);
+
+        // 初期ロード
+        resetInterval();
+    });
+</script>
 </body>
 </html>
