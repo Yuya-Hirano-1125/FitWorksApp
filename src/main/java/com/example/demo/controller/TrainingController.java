@@ -44,10 +44,22 @@ public class TrainingController {
         return userService.findByUsername(authentication.getName());
     }
     
-  private static final Map<String, List<String>> TRAINING_EXERCISES = Map.of( 
-          "free-weight", List.of("ベンチプレス", "スクワット", "デッドリフト", "ショルダープレス", "ラットプルダウン", "オーバーヘッドプレス", "ベントオーバーロー", "レッグプレス"), 
-          "cardio", List.of("ランニング", "サイクリング", "エリプティカル", "水泳", "ウォーキング", "トレッドミルインターバル", "ローイング") 
-      ); 
+    // 【修正箇所: 部位ごとのフリーウェイト種目を定義】
+    private static final Map<String, List<String>> FREE_WEIGHT_EXERCISES_BY_PART = Map.of(
+        "胸", List.of("ベンチプレス", "ダンベルプレス", "インクラインプレス", "チェストフライ"),
+        "背中", List.of("デッドリフト", "ラットプルダウン", "ベントオーバーロー", "シーテッドロー"),
+        "脚", List.of("スクワット", "レッグプレス", "レッグエクステンション", "レッグカール"),
+        "肩", List.of("ショルダープレス", "オーバーヘッドプレス", "サイドレイズ", "フロントレイズ"),
+        "腕", List.of("アームカール", "トライセプスエクステンション", "ハンマーカール"),
+        "腹筋", List.of("クランチ", "レッグレイズ", "ロシアンツイスト"),
+        "その他", List.of("カーフレイズ", "ヒップスラスト")
+    );
+    
+    // 【新規: 有酸素運動リストを定義】
+    private static final List<String> CARDIO_EXERCISES = List.of(
+        "ランニング", "サイクリング", "エリプティカル", "水泳", "ウォーキング", "トレッドミルインターバル", "ローイング"
+    );
+
    
     
     /**
@@ -62,9 +74,10 @@ public class TrainingController {
             return "redirect:/login"; // ログインしていない場合はログイン画面へ
         }
         
-        // 種目リストをモデルに追加
-        model.addAttribute("freeWeightExercises", TRAINING_EXERCISES.get("free-weight"));
-        model.addAttribute("cardioExercises", TRAINING_EXERCISES.get("cardio"));
+        // 【修正箇所: 部位ごとの種目マップと部位リストをモデルに追加】
+        model.addAttribute("freeWeightExercisesByPart", FREE_WEIGHT_EXERCISES_BY_PART);
+        model.addAttribute("freeWeightParts", FREE_WEIGHT_EXERCISES_BY_PART.keySet());
+        model.addAttribute("cardioExercises", CARDIO_EXERCISES);
         
         return "training"; // src/main/resources/templates/training.htmlをレンダリング
     }
@@ -283,4 +296,3 @@ public class TrainingController {
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
 }
-
