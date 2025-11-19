@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,9 +11,10 @@ import com.example.demo.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
+
+    // ★追加: レベルが高い順、同じならXPが多い順に上位20件を取得
+    List<User> findTop20ByOrderByLevelDescExperiencePointsDesc();
 }
-
-
 
 
 
