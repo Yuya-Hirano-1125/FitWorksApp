@@ -44,11 +44,11 @@ public class TrainingController {
         return userService.findByUsername(authentication.getName());
     }
     
-    // 静的なトレーニング種目リストを定義
-    private static final Map<String, List<String>> TRAINING_EXERCISES = Map.of(
-        "free-weight", List.of("ベンチプレス", "スクワット", "デッドリフト", "ショルダープレス", "ラットプルダウン"),
-        "cardio", List.of("ランニング", "サイクリング", "エリプティカル", "水泳", "ウォーキング")
-    );
+  private static final Map<String, List<String>> TRAINING_EXERCISES = Map.of( 
+          "free-weight", List.of("ベンチプレス", "スクワット", "デッドリフト", "ショルダープレス", "ラットプルダウン", "オーバーヘッドプレス", "ベントオーバーロー", "レッグプレス"), 
+          "cardio", List.of("ランニング", "サイクリング", "エリプティカル", "水泳", "ウォーキング", "トレッドミルインターバル", "ローイング") 
+      ); 
+   
     
     /**
      * トレーニング選択画面 (training.html) を表示
