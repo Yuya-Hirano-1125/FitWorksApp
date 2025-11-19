@@ -32,6 +32,10 @@
     <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！今日のトレーニングを始めましょう。'">
         あなたのフィットネス・ジャーニーをサポートします。
     </p>
+
+    <a th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
+        トレーニングを開始 <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i>
+    </a>
     
 </div>
 
@@ -40,10 +44,12 @@
         <i class="fa-solid fa-box-open"></i>
         <span>ガチャ</span>
     </a>
-    <a th:href="@{/training}" class="nav-item training-start-nav">
-        <i class="fa-solid fa-dumbbell"></i>
-        <span>トレーニング</span>
+    
+    <a th:href="@{/community}" class="nav-item">
+        <i class="fa-solid fa-comments"></i>
+        <span>掲示板</span>
     </a>
+
     <a th:href="@{/training-log}" class="nav-item">
         <i class="fa-solid fa-calendar-days"></i>
         <span>記録</span>
@@ -56,8 +62,6 @@
 
 </body>
 </html>
-
-
 
 
 
