@@ -1,13 +1,15 @@
 package com.example.demo.controller;
 
-import java.util.List; // java.util.List をインポート
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List; // java.util.List をインポート
 import com.example.demo.service.UserService;
  
 @Controller
