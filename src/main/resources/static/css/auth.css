@@ -12,14 +12,17 @@
 .form-group input[type="email"] {
     width: 100%;
     padding: 16px 18px; 
-    border: none;
-    background-color: #2a2a2a; 
+    /* 変更: border: none; -> 枠線を追加 */
+    border: 1px solid var(--secondary-color); /* ライトピンクの枠線を追加 */
+    /* 変更: background-color: #2a2a2a; -> 白に変更 */
+    background-color: #ffffff; 
     border-radius: 5px; 
     box-sizing: border-box;
     font-size: 16px;
     transition: all 0.3s cubic-bezier(.17,.67,.83,.67);
     color: var(--dark-text);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+    /* 変更: box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5); -> 影をソフトに調整 */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); 
     /* ★ NEW: 入力フィールドの登場アニメーション */
     opacity: 0;
     transform: translateY(10px);
@@ -34,11 +37,14 @@
 
 .form-group input:focus {
     /* システムチックなフォーカス: シアンのグロー */
-    border: 1px solid var(--ai-accent-color); 
+    /* 変更: border: 1px solid var(--ai-accent-color); -> 2pxに太く */
+    border: 2px solid var(--ai-accent-color); 
     outline: none;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.8);
+    /* 変更: box-shadowの影を調整 */
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.2);
     transform: scale(1.0); 
-    background-color: #333;
+    /* 変更: background-color: #333; -> ごく薄いピンクに変更 */
+    background-color: #fffafa;
 }
 
 /* Links below forms */

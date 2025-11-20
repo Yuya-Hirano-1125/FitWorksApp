@@ -31,7 +31,8 @@
      border-bottom: none;
 }
 .setting-section:hover {
-    background-color: #2a2a2a;
+    /* 変更: background-color: #2a2a2a; -> 薄いピンクのホバーカラーに変更 */
+    background-color: #fcf4f7;
     border-color: var(--primary-color); 
 }
 
@@ -95,8 +96,10 @@
 .setting-item select {
     width: auto;
     padding: 8px;
-    border: 1px solid #444;
-    background-color: #333;
+    /* 変更: border: 1px solid #444; -> ライトピンクの枠線に変更 */
+    border: 1px solid var(--secondary-color);
+    /* 変更: background-color: #333; -> 白に変更 */
+    background-color: #ffffff;
     color: var(--dark-text);
     border-radius: 5px;
     box-sizing: border-box;
@@ -104,11 +107,13 @@
 }
 
 .setting-item select:focus {
+    /* 変更: box-shadow: 0 0 10px rgba(0, 230, 118, 0.5); -> Primaryカラーの影に変更 */
     border: 1px solid var(--primary-color);
     outline: none;
-    box-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
     transform: scale(1.0);
-    background-color: #333;
+    /* 変更: background-color: #333; -> ごく薄いピンクに変更 */
+    background-color: #fffafa;
 }
 
 

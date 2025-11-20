@@ -308,4 +308,24 @@ h1 {
         margin-bottom: 25px;
         font-size: 14px;
     }
+	/* コメントを見るボタンのデザイン */
+	.btn-comment {
+	    display: inline-block;
+	    padding: 10px 20px;       /* ボタンの内側の余白 */
+	    background-color: #28a745;/* 背景色（緑） */
+	    color: white;             /* 文字色（白） */
+	    text-decoration: none;    /* 下線を消す */
+	    border-radius: 5px;       /* 角を少し丸くする */
+	    font-weight: bold;        /* 文字を太く */
+	    transition: background-color 0.3s; /* ホバー時の変化を滑らかに */
+	    border: none;
+	    cursor: pointer;
+	    margin-top: 10px;         /* 上の要素との間隔 */
+	}
+
+	/* マウスを乗せた時の色 */
+	.btn-comment:hover {
+	    background-color: #218838; /* 少し濃い緑に変化 */
+	    color: white;
+	}
 }
