@@ -15,21 +15,20 @@
         .training-options-list {
             padding: 20px 0;
         }
-        .training-option {
+        /* フォームとして使用するため、要素名を div に変更 */
+        .training-option { 
             background-color: #2a2a2a;
             border: 1px solid var(--secondary-color);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
+            transition: border-color 0.2s, box-shadow 0.2s;
             text-align: left;
+            /* AIおすすめメニュー (aタグ) のデザイン崩れ修正 */
+            display: block; 
         }
         .training-option:hover {
-            transform: translateY(-3px);
             border-color: var(--primary-color);
             box-shadow: 0 6px 15px rgba(0, 230, 118, 0.4);
         }
@@ -41,7 +40,7 @@
         }
         .training-option p {
             color: #ccc;
-            margin-bottom: 0;
+            margin-bottom: 15px;
             font-size: 14px;
         }
         .ai-coach-button-container {
@@ -65,7 +64,73 @@
             transform: translateY(-2px);
             box-shadow: 0 0 25px rgba(0, 255, 255, 1.0);
         }
+
+        /* 新しいフォーム要素のスタイル */
+        .exercise-form-group {
+            margin-top: 15px;
+            border-top: 1px dashed #444;
+            padding-top: 15px;
+        }
+        .exercise-form-group label {
+            display: block;
+            color: #fff;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .exercise-form-group select, .exercise-form-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #1e1e1e;
+            color: #fff;
+        }
+        .exercise-form-group .button {
+            margin-top: 10px;
+            width: 100%;
+        }
     </style>
+    <script>
+        // 「その他 (自由記入)」が選択された場合に自由記入欄を表示/非表示にする
+        function selectCustomExercise(type) {
+            const selectId = type + '-select';
+            const inputId = type + '-custom-input';
+            
+            const selectElement = document.getElementById(selectId);
+            const inputElement = document.getElementById(inputId);
+
+            if (selectElement.value === 'custom') {
+                inputElement.style.display = 'block';
+                inputElement.focus();
+            } else {
+                inputElement.style.display = 'none';
+                inputElement.value = ''; // 隠すときは値をリセット
+            }
+        }
+
+        // フォーム送信時に、選択/記入された種目名を hidden input に設定する
+        function setFormExerciseName(formElement, selectId, inputId) {
+            const selectElement = document.getElementById(selectId);
+            const inputElement = document.getElementById(inputId);
+            const hiddenInput = formElement.querySelector('input[name="exerciseName"]');
+            
+            let selectedValue = '';
+            if (selectElement.value === 'custom') {
+                selectedValue = inputElement.value;
+            } else {
+                selectedValue = selectElement.value;
+            }
+            
+            if (selectedValue === null || selectedValue.trim() === '') {
+                 alert('種目を選択するか、自由記入欄に種目名を入力してください。');
+                 return false; 
+            }
+            
+            hiddenInput.value = selectedValue.trim();
+            return true;
+        }
+    </script>
 </head>
 <body class="training-page">
 <div class="main-container">
@@ -75,20 +140,71 @@
     <div class="training-options-list">
         
         <a th:href="@{/training/start?type=ai-suggested}" class="training-option" style="border-color: var(--primary-color);">
-            <h2><i class="fa-solid fa-star"></i> AIおすすめメニュ-</h2>
+            <h2><i class="fa-solid fa-star"></i> AIおすすめメニュー</h2>
             <p>今日の体調と目標に合わせた最適なプログラムです。</p>
         </a>
 
-        <a th:href="@{/training/start?type=free-weight}" class="training-option">
-            <h2><i class="fa-solid fa-weight-hanging"></i> フリーウェイト (自由記録)</h2>
-            <p>自分で種目、重量、回数を設定して記録します。</p>
+        <a th:href="@{/training/exercises}" class="training-option" style="border-color: var(--ai-accent-color);">
+            <h2><i class="fa-solid fa-list-check"></i> 種目一覧・やり方を見る</h2>
+            <p>フリーウェイトと有酸素運動の種目と正しいやり方を説明付きで確認できます。</p>
         </a>
+
+        <div class="training-option">
+            <form th:action="@{/training/start}" method="post" 
+                  onsubmit="return setFormExerciseName(this, 'free-weight-select', 'free-weight-custom-input');">
+                <input type="hidden" name="type" value="free-weight" />
+                
+                <h2><i class="fa-solid fa-weight-hanging"></i> フリーウェイト (自由記録)</h2>
+                <p>自分で種目、重量、回数を設定して記録します。</p>
+
+                <div class="exercise-form-group">
+                    <label for="free-weight-select">種目を選択</label>
+                    <select id="free-weight-select" onchange="selectCustomExercise('free-weight')">
+                        <option value="">-- 種目を選択してください --</option>
+                        <option th:each="exercise : ${freeWeightExercises}" th:value="${exercise}" th:text="${exercise}">ベンチプレス</option>
+                        <option value="custom">その他 (自由記入)</option>
+                    </select>
+                    
+                    <input type="text" id="free-weight-custom-input" 
+                           placeholder="カスタム種目名を入力してください" 
+                           style="display:none;" />
+                    
+                    <input type="hidden" name="exerciseName" value="" />
+                    <button type="submit" class="button primary">
+                        セッションを開始
+                    </button>
+                </div>
+            </form>
+        </div>
         
-        <a th:href="@{/training/start?type=cardio}" class="training-option">
-            <h2><i class="fa-solid fa-running"></i> 有酸素運動 (時間記録)</h2>
-            <p>ランニング、サイクリングなどの時間を記録します。</p>
-        </a>
-    </div>
+        <div class="training-option">
+            <form th:action="@{/training/start}" method="post" 
+                  onsubmit="return setFormExerciseName(this, 'cardio-select', 'cardio-custom-input');">
+                <input type="hidden" name="type" value="cardio" />
+                
+                <h2><i class="fa-solid fa-running"></i> 有酸素運動 (時間記録)</h2>
+                <p>ランニング、サイクリングなどの時間を記録します。</p>
+
+                <div class="exercise-form-group">
+                    <label for="cardio-select">種目を選択</label>
+                    <select id="cardio-select" onchange="selectCustomExercise('cardio')">
+                        <option value="">-- 種目を選択してください --</option>
+                        <option th:each="exercise : ${cardioExercises}" th:value="${exercise}" th:text="${exercise}">ランニング</option>
+                        <option value="custom">その他 (自由記入)</option>
+                    </select>
+                    
+                    <input type="text" id="cardio-custom-input" 
+                           placeholder="カスタム種目名を入力してください" 
+                           style="display:none;" />
+                           
+                    <input type="hidden" name="exerciseName" value="" />
+                    <button type="submit" class="button primary">
+                        セッションを開始
+                    </button>
+                </div>
+            </form>
+        </div>
+        </div>
 
     <div class="ai-coach-button-container">
         <a th:href="@{/ai-coach}" class="button ai-coach-button">
@@ -105,3 +221,201 @@
 </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
