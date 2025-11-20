@@ -44,15 +44,7 @@ public class TrainingController {
         if (authentication == null) return null;
         return userService.findByUsername(authentication.getName());
     }
-    
-<<<<<<< HEAD
-    // 【修正箇所: 部位ごとのフリーウェイト種目を難易度順・ラベル付きで定義】
-    // Map.of は順序を保証しないため、LinkedHashMap を使用するか、表示側で制御しますが、
-    // ここでは部位内のリスト順序（難易度順）を定義します。
- // 【修正箇所: 部位ごとのフリーウェイト種目を難易度順・ラベル付きで定義】
-=======
-    // 【部位ごとのフリーウェイト種目を難易度順・ラベル付きで定義】
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
+
     private static final Map<String, List<String>> FREE_WEIGHT_EXERCISES_BY_PART = new LinkedHashMap<>() {{
         // 初級: チェストフライ
         // 中級: ベンチプレス, ダンベルプレス, インクラインプレス
