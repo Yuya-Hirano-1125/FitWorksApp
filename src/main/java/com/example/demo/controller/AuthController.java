@@ -1,15 +1,13 @@
 package com.example.demo.controller;
 
+import java.util.List; // java.util.List をインポート
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List; // java.util.List をインポート
 import com.example.demo.service.UserService;
  
 @Controller
@@ -27,7 +25,6 @@ public class AuthController {
 
     // ... (他の認証メソッド省略) ...
 
-    // --- メイン画面への遷移 ---
     @GetMapping("/home")
     public String home(
         @AuthenticationPrincipal UserDetails userDetails,
@@ -44,10 +41,10 @@ public class AuthController {
     @GetMapping("/training")
     public String training() { return "training"; }
     
-    @GetMapping("/gacha")
-    public String gacha() { return "gacha"; } 
+    // 【削除済み】GachaControllerに処理を移譲するため、このメソッドは削除します。
+    // @GetMapping("/gacha")
+    // public String gacha() { return "gacha"; } 
     
-    // ★ トレーニング記録画面への遷移
     @GetMapping("/training-log")
     public String trainingLog(Model model) { 
         // 仮のデータを作成
@@ -59,7 +56,7 @@ public class AuthController {
         return "training-log"; 
     }
 
-    // ★ キャラクター一覧画面への遷移と仮データの追加
+    // ★ キャラクター一覧画面への遷移
     @GetMapping("/characters")
     public String characterList(Model model) {
         // 仮のキャラクターデータ
@@ -78,11 +75,11 @@ public class AuthController {
 // データを保持するためのインナークラス (Recordクラス)
 class Record {
     public String date;
-    public String name; // ★ 修正: public public を public に変更
-    public String part; // ★ 修正: public public を public に変更
-    public int weight;  // ★ 修正: public public を public に変更
-    public int reps;    // ★ 修正: public public を public に変更
-    public int sets;    // ★ 修正: public public を public に変更
+    public String name;  // ★ 修正: public public を public に変更
+    public String part;  // ★ 修正: public public を public に変更
+    public int weight;   // ★ 修正: public public を public に変更
+    public int reps;     // ★ 修正: public public を public に変更
+    public int sets;     // ★ 修正: public public を public に変更
 
     public Record(String date, String name, String part, int weight, int reps, int sets) {
         this.date = date;
