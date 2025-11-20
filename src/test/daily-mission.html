@@ -89,26 +89,27 @@
     
 </div>
 
-<div style="max-width: 450px; margin: 30px auto 70px auto; padding: 0 10px;">
-    <a th:href="@{/home}" class="button secondary">
+<nav class="bottom-nav">
+    <a th:href="@{/home}" class="nav-item">
         <i class="fa-solid fa-house"></i>
-        <span>ホームに戻る</span>
+        <span>ホーム</span>
     </a>
-</div>
+    <a th:href="@{/daily-mission}" class="nav-item active"> <i class="fa-solid fa-list-check"></i>
+        <span>ミッション</span>
+    </a>
+    <a th:href="@{/training}" class="nav-item training-start-nav">
+        <i class="fa-solid fa-dumbbell"></i>
+        <span>トレーニング</span>
+    </a>
+    <a th:href="@{/training-log}" class="nav-item">
+        <i class="fa-solid fa-calendar-days"></i>
+        <span>記録</span>
+    </a>
+    <a th:href="@{/settings}" class="nav-item">
+        <i class="fa-solid fa-gear"></i>
+        <span>設定</span>
+    </a>
+</nav>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
