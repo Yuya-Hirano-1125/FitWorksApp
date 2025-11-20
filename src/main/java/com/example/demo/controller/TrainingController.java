@@ -44,7 +44,33 @@ public class TrainingController {
         if (authentication == null) return null;
         return userService.findByUsername(authentication.getName());
     }
+// ★★★ ここにメソッドと定数を追加する ★★★
+    
+    // 経験値(XP)の定義
+    private static final int XP_BEGINNER = 300;  // 初級: 300 XP
+    private static final int XP_INTERMEDIATE = 500; // 中級: 500 XP
+    private static final int XP_ADVANCED = 1000; // 上級: 1000 XP
+    private static final int XP_PER_LEVEL = 5000; // レベルアップに必要なXP
 
+    /**
+     * 種目名から難易度（XP）を取得するヘルパーメソッド
+     */
+    private int getExperiencePoints(String exerciseName) {
+        if (exerciseName == null || exerciseName.trim().isEmpty()) {
+            return 0; 
+        }
+        
+        // 種目名に難易度ラベルが含まれているかチェックする
+        if (exerciseName.contains("(上級)")) {
+            return XP_ADVANCED;
+        } else if (exerciseName.contains("(中級)")) {
+            return XP_INTERMEDIATE;
+        } else if (exerciseName.contains("(初級)")) {
+            return XP_BEGINNER;
+        }
+        // ラベルが見つからない場合は0を返す
+        return 0; 
+    }
     private static final Map<String, List<String>> FREE_WEIGHT_EXERCISES_BY_PART = new LinkedHashMap<>() {{
         // 初級: チェストフライ
         // 中級: ベンチプレス, ダンベルプレス, インクラインプレス
@@ -116,7 +142,7 @@ public class TrainingController {
             "ローイング (中級)", 
             "トレッドミルインターバル (上級)"
         );
-
+    
     /**
      * トレーニング選択画面 (training.html) を表示
      */
@@ -313,20 +339,41 @@ public class TrainingController {
         record.setRecordDate(form.getRecordDate());
         record.setType(form.getType());
         
+        String exerciseIdentifier = null;
+
         if ("WEIGHT".equals(form.getType())) {
             record.setExerciseName(form.getExerciseName());
             record.setSets(form.getSets());
             record.setReps(form.getReps());
             record.setWeight(form.getWeight());
+            exerciseIdentifier = form.getExerciseName();
         } else if ("CARDIO".equals(form.getType())) {
             record.setCardioType(form.getCardioType());
             record.setDurationMinutes(form.getDurationMinutes());
             record.setDistanceKm(form.getDistanceKm());
+            exerciseIdentifier = form.getCardioType();
         }
 
         trainingRecordRepository.save(record);
         
-        redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " のトレーニングを記録しました！");
+        // ★★★ ここからXP更新ロジックの追加 ★★★
+        int earnedXP = 0;
+        
+        if (exerciseIdentifier != null) {
+            earnedXP = getExperiencePoints(exerciseIdentifier);
+        }
+        
+        if (earnedXP > 0) {
+            int newTotalXp = currentUser.getXp() + earnedXP;
+            currentUser.setXp(newTotalXp);
+            userRepository.save(currentUser); // DBにユーザーXPを保存
+            
+            redirectAttributes.addFlashAttribute("successMessage", 
+                form.getRecordDate().toString() + " のトレーニングを記録し、" + earnedXP + " XPを獲得しました！");
+        } else {
+            redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " のトレーニングを記録しました！");
+        }
+        // ★★★ ここまでXP更新ロジックの追加 ★★★
         
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
