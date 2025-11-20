@@ -1,3 +1,4 @@
+// src/main/java/com/example/demo/controller/AICoachRestController.java
 package com.example.demo.controller;
  
 import org.springframework.http.ResponseEntity;
@@ -6,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// DTOのインポートパスはご自身のプロジェクトに合わせてください
 import com.example.demo.dto.ChatRequest;
 import com.example.demo.dto.Message;
 import com.example.demo.service.AICoachService;
@@ -17,7 +17,6 @@ public class AICoachRestController {
  
     private final AICoachService aiCoachService;
  
-    // 初期質問メッセージのベース部分 (Markdown記法)
     private static final String INITIAL_QUESTION_BODY =
         "💪 最高のトレーニングプランを作成するため、以下の4点をまとめて教えてください！"
         + "\n\n**🎯 トレーニング計画のための質問:**"
@@ -36,8 +35,10 @@ public class AICoachRestController {
         String userMessage = chatRequestDto.getText();
         String userName = chatRequestDto.getUserName();
         String aiResponseText;
- 
-        // 修正点: hasUserName 変数の定義をメソッド内に統合
+        
+        // ★ 修正1: userNameがnull/空の場合に備えて、デフォルトのユーザー名を定義
+        String safeUserName = (userName != null && !userName.trim().isEmpty()) ? userName : "ユーザー"; 
+        
         boolean hasUserName = userName != null && !userName.trim().isEmpty(); 
         String greetingName = hasUserName ? userName + "さん、" : "";
  
@@ -50,10 +51,11 @@ public class AICoachRestController {
                 
                 String userReference = hasUserName ? "(" + userName + "さん向けに) " : "";
                 
+                // ★ 修正2: プロンプト内で safeUserName を使用し、nullを避けるe;
                 String promptWithInstruction = 
-                    userReference + "次の質問に、**回答をMarkdownの箇条書き形式で、200文字以内（簡潔に）**で整理して回答してください。回答の冒頭でユーザー(" + userName + "さん)に話しかけてください。質問: " + userMessage;
+                    userReference + "次の質問に、**回答をMarkdownの箇条書き形式で、200文字以内（簡潔に）**で整理して回答してください。回答の冒頭でユーザー(" + safeUserName + "さん)に話しかけてください。質問: " + userMessage;
                 
-                // 修正箇所: aiCoachService.generateResponse() を呼び出す
+                // aiCoachService.generateResponse() を呼び出す
                 aiResponseText = aiCoachService.generateResponse(promptWithInstruction);
             }
  

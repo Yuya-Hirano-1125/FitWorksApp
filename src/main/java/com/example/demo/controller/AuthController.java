@@ -46,7 +46,7 @@ public class AuthController {
         boolean emailFoundAndSent = true; 
         if (emailFoundAndSent) {
             redirectAttributes.addFlashAttribute("successMessage",
-                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");
+                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");;
         } else {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "そのメールアドレスは登録されていません。");
@@ -90,9 +90,9 @@ public class AuthController {
         }
         return "home";
     }
-
-    @GetMapping("/training")
-    public String training() { return "training"; }
+    
+    // @GetMapping("/training") // <--- 削除しました。TrainingControllerに一任されます。
+    // public String training() { return "training"; } 
     
     @GetMapping("/gacha")
     public String gacha() { return "gacha"; } 
@@ -103,7 +103,7 @@ public class AuthController {
     public String settings() { return "settings"; }
 }
 
-// NOTE: 仮のデータクラス (Record) も削除。
+
 
 
 

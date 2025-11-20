@@ -1,107 +1,230 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>トレーニング | FitWorks</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <title>トレーニング選択</title>
     <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> 
+    
     <style>
-        /* CSSファイルを分離していないため、一時的にここにスタイルを記述します。 */
-        .training-page .main-container {
-            max-width: 650px;
+        /* ----------------------------------- */
+        /* ★ デザイン強化用カスタムスタイル ★ */
+        /* ----------------------------------- */
+        body {
+            background-color: #f8f9fa; /* 背景色を薄いグレーに */
         }
-        .training-options-list {
-            padding: 20px 0;
+        
+        .page-title {
+            color: #343a40; 
+            margin-bottom: 30px;
+            font-size: 2rem;
+            border-bottom: 3px solid #007bff; 
+            padding-bottom: 10px;
         }
-        .training-option {
-            background-color: #2a2a2a;
-            border: 1px solid var(--secondary-color);
-            border-radius: 8px;
-            padding: 20px;
+
+        /* Home画面風のカードデザインを強化 */
+        .card { 
+            margin-bottom: 25px; 
+            padding: 25px; 
+            border: 1px solid #dcdcdc; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background-color: #ffffff;
+            /* pointer-events: none; /* デフォルトではクリックイベントを無効にする（フォーム内ボタンで有効化） */
+        }
+        
+        .card:hover {
+            transform: translateY(-3px); 
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #007bff; 
+        }
+        
+        #free-weight-option {
+            background-color: #e6f0ff; 
+            border-color: #007bff;
+        }
+
+        .form-group {
             margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-            text-align: left;
         }
-        .training-option:hover {
-            transform: translateY(-3px);
-            border-color: var(--primary-color);
-            box-shadow: 0 6px 15px rgba(0, 230, 118, 0.4);
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+            font-size: 1rem;
         }
-        .training-option h2 {
-            margin-top: 0;
-            color: var(--primary-color);
-            font-size: 20px;
-            font-weight: 800;
-        }
-        .training-option p {
-            color: #ccc;
-            margin-bottom: 0;
-            font-size: 14px;
-        }
-        .ai-coach-button-container {
-            margin-top: 30px;
-        }
-        /* AIコーチボタンのスタイルをベースに適用 */
-        .ai-coach-button {
-            background: linear-gradient(45deg, var(--ai-accent-color), #00c8c8);
-            color: #1e1e1e;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
-            font-weight: 800;
-            padding: 15px 30px;
+
+        .button {
+            width: 100%; 
+            padding: 12px; 
+            font-size: 1.1rem;
+            font-weight: bold;
             border-radius: 8px;
-            text-decoration: none;
-            display: block;
-            text-align: center;
-            border: 1px solid var(--ai-accent-color);
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: background-color 0.2s;
         }
-        .ai-coach-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 25px rgba(0, 255, 255, 1.0);
+
+        .button.primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
         }
+        
+        .button.primary:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+        
+        .button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            color: #666666;
+        }
+        
+        .text-secondary {
+            color: #6c757d;
+        }
+
+        /* 画面下部の固定ボタン用スタイル */
+        .fixed-footer-button {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 0;
+            background-color: #ffffff; 
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .fixed-footer-button .container {
+            max-width: 600px; /* PC/タブレット表示時の幅を制限 (ベースCSSのcontainerに依存) */
+            margin: auto;
+            padding: 0 15px;
+        }
+
+        /* 固定フッター分の余白を確保 */
+        .main-content {
+            padding-bottom: 100px; 
+        }
+
     </style>
 </head>
-<body class="training-page">
-<div class="main-container">
-    <h1><i class="fa-solid fa-dumbbell header-icon"></i>トレーニング</h1>
-    <p class="sub-heading">今日の目標を選択し、キャラクターを育成しましょう。</p>
+<body>
 
-    <div class="training-options-list">
-        
-        <a th:href="@{/training/start?type=ai-suggested}" class="training-option" style="border-color: var(--primary-color);">
-            <h2><i class="fa-solid fa-star"></i> AIおすすめメニュ-</h2>
-            <p>今日の体調と目標に合わせた最適なプログラムです。</p>
-        </a>
+<div class="container main-content">
+    <h1 class="page-title">🏋️ トレーニングメニュー選択</h1>
+    
+    <div th:if="${param.logout}" class="alert alert-success">ログアウトしました。</div>
 
-        <a th:href="@{/training/start?type=free-weight}" class="training-option">
-            <h2><i class="fa-solid fa-weight-hanging"></i> フリーウェイト (自由記録)</h2>
-            <p>自分で種目、重量、回数を設定して記録します。</p>
-        </a>
-        
-        <a th:href="@{/training/start?type=cardio}" class="training-option">
-            <h2><i class="fa-solid fa-running"></i> 有酸素運動 (時間記録)</h2>
-            <p>ランニング、サイクリングなどの時間を記録します。</p>
-        </a>
+    <div class="card training-option">
+        <form th:action="@{/training/start}" method="post">
+            <input type="hidden" name="type" value="ai-suggested"/>
+            <input type="hidden" name="exerciseName" value="AIおすすめプログラム"/>
+            <h2 class="card-title">AIおすすめメニュー</h2>
+            <p class="text-secondary">AIが目標や過去の履歴に基づいた最適なトレーニングプログラムを提案します。</p>
+            <button type="submit" class="button primary mt-3">AIおすすめセッション開始 <i class="fa-solid fa-robot"></i></button>
+        </form>
     </div>
 
-    <div class="ai-coach-button-container">
-        <a th:href="@{/ai-coach}" class="button ai-coach-button">
-            AIコーチに相談する 🤖
-        </a>
+    <div class="card training-option" id="free-weight-option">
+        <form th:action="@{/training/start}" method="post">
+            <input type="hidden" name="type" value="free-weight"/>
+            <h2 class="card-title">フリーウェイト</h2>
+            
+            <div class="form-group">
+                <label for="musclePart">鍛えたい部位:</label>
+                <select id="musclePart" class="form-control" required>
+                    <option value="">部位を選択してください</option>
+                    <option th:each="part : ${freeWeightParts}" th:value="${part}" th:text="${part}"></option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="exerciseName">種目名:</label>
+                <select id="exerciseName" name="exerciseName" class="form-control" required disabled>
+                    <option value="">部位を選択してから種目を選んでください</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="button primary mt-3" id="startFreeWeightSessionButton" disabled>セッション開始 <i class="fa-solid fa-dumbbell"></i></button>
+        </form>
+    </div>
+    <div class="card training-option">
+        <form th:action="@{/training/start}" method="post">
+            <input type="hidden" name="type" value="cardio"/>
+            <h2 class="card-title">有酸素運動</h2>
+            
+            <div class="form-group">
+                <label for="cardioExerciseName">種目名:</label>
+                <select id="cardioExerciseName" name="exerciseName" class="form-control" required>
+                    <option value="">種目を選択してください</option>
+                    <option th:each="exercise : ${cardioExercises}" th:value="${exercise}" th:text="${exercise}"></option>
+                </select>
+            </div>
+            
+            <button type="submit" class="button primary mt-3">セッション開始 <i class="fa-solid fa-running"></i></button>
+        </form>
     </div>
     
-    <div class="button-container" style="margin-top: 30px;">
-        <a th:href="@{/home}" class="button secondary">
-            ホームに戻る <i class="fa-solid fa-house"></i>
+</div>
+
+<div class="fixed-footer-button">
+    <div class="container">
+        <a th:href="@{/home}" class="button" style="background-color: #6c757d; color: white;">
+            <i class="fa-solid fa-house"></i> ホームに戻る
         </a>
     </div>
-
 </div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const freeWeightExercisesByPart = /*[[${freeWeightExercisesByPart}]]*/ {};
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const musclePartSelect = document.getElementById('musclePart');
+        const exerciseNameSelect = document.getElementById('exerciseName');
+        const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
+        
+        if (musclePartSelect && exerciseNameSelect) {
+            
+            musclePartSelect.addEventListener('change', function() {
+                const selectedPart = this.value;
+                
+                exerciseNameSelect.innerHTML = '<option value="">種目を選択してください</option>';
+                exerciseNameSelect.disabled = true;
+                startFreeWeightSessionButton.disabled = true;
+
+                if (selectedPart && freeWeightExercisesByPart[selectedPart]) {
+                    const exercises = freeWeightExercisesByPart[selectedPart];
+                    
+                    exercises.forEach(exercise => {
+                        const option = document.createElement('option');
+                        option.value = exercise;
+                        option.textContent = exercise;
+                        exerciseNameSelect.appendChild(option);
+                    });
+                    exerciseNameSelect.disabled = false;
+                } else {
+                    exerciseNameSelect.innerHTML = '<option value="">部位を選択してから種目を選んでください</option>';
+                }
+            });
+            
+            exerciseNameSelect.addEventListener('change', function() {
+                startFreeWeightSessionButton.disabled = !this.value;
+            });
+        }
+    });
+    /*]]>*/
+</script>
+
 </body>
 </html>

@@ -34,5 +34,15 @@ public class User {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    
+ 
+    private int level;
+    private int experiencePoints;
+
+    // Getter / Setter
+    public int getLevel() { return level; }
+    public void setLevel(int level) { this.level = level; }
+    public int getExperiencePoints() { return experiencePoints; }
+    public void setExperiencePoints(int experiencePoints) { this.experiencePoints = experiencePoints; }
 }
 
