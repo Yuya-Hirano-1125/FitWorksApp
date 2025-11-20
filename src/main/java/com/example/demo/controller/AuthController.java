@@ -23,10 +23,10 @@ public class AuthController {
 
     // --- ログイン/登録関連 ---
     @GetMapping("/login")
-    public String login() { return "auth/login"; } // 修正
+    public String login() { return "auth/login"; } // 修正済み
 
     @GetMapping("/register")
-    public String registerForm() { return "auth/register"; } // 修正
+    public String registerForm() { return "auth/register"; } // 修正済み
 
     @PostMapping("/register")
     public String registerUser(@RequestParam("username") String username,
@@ -34,12 +34,12 @@ public class AuthController {
                                Model model) {
         // 実際の登録ロジックをここに実装する
         model.addAttribute("message", "登録が完了しました。ログインしてください。");
-        return "auth/login"; // 修正
+        return "auth/login"; // 修正済み
     }
 
     // --- パスワードリセット ---
     @GetMapping("/forgot-password")
-    public String forgotPasswordForm() { return "auth/forgot-password"; } // 修正
+    public String forgotPasswordForm() { return "auth/forgot-password"; } // 修正済み
 
     @PostMapping("/forgot-password")
     public String processForgotPassword(@RequestParam("email") String email,
@@ -71,7 +71,7 @@ public class AuthController {
         boolean success = true; 
         
         if(success) {
-            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
+            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉"););
         } else {
             model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
         }
@@ -99,7 +99,7 @@ public class AuthController {
         } else {
             model.addAttribute("username", "ゲスト");
         }
-        return "home";
+        return "misc/home"; // ★ 修正: "home" -> "misc/home"
     }
 
     // @GetMapping("/training") // <--- 削除しました。TrainingControllerに一任されます。
@@ -111,43 +111,8 @@ public class AuthController {
     // NOTE: /training-log のマッピングは TrainingController に移管されたため、削除。
 
     @GetMapping("/settings")
-    public String settings() { return "settings/settings"; } // 修正
+    public String settings() { return "settings/settings"; } // 修正済み
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

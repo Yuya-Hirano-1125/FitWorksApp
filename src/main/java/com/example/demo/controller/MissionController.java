@@ -12,7 +12,7 @@ public class MissionController {
     @GetMapping("/daily-mission")
     public String showDailyMission() {
         // src/main/resources/templates/daily-mission.html を返す
-        return "daily-mission";
+        return "misc/daily-mission"; // ★ 修正: "daily-mission" -> "misc/daily-mission"
     }
 
 }
