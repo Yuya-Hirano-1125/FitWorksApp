@@ -50,9 +50,9 @@ public class TrainingController {
         put("胸", List.of("チェストフライ (初級)", "ベンチプレス (中級)", "ダンベルプレス (中級)", "インクラインプレス (中級)"));
         put("背中", List.of("ラットプルダウン (初級)", "シーテッドロー (初級)", "ベントオーバーロー (中級)", "デッドリフト (上級)"));
         put("脚", List.of("レッグプレス (初級)", "レッグエクステンション (初級)", "レッグカール (初級)", "スクワット (中級)"));
-        put("肩", List.of("サイドレイズ (初級)", "フロントレイズ (初級)", "ショルダープレス (中級)", "オーバーヘッドプレス (中級)"));;
+        put("肩", List.of("サイドレイズ (初級)", "フロントレイズ (初級)", "ショルダープレス (中級)", "オーバーヘッドプレス (中級)"));
         put("腕", List.of("アームカール (初級)", "ハンマーカール (初級)", "トライセプスエクステンション (初級)"));
-        put("腹筋", List.of("クランチ (初級)", "レッグレイズ (中級)", "ロシアンツイスト (中級)"));;
+        put("腹筋", List.of("クランチ (初級)", "レッグレイズ (中級)", "ロシアンツイスト (中級)"));
         put("その他", List.of("カーフレイズ (初級)", "ヒップスラスト (中級)"));
     }};
     
@@ -213,6 +213,23 @@ public class TrainingController {
         return "training-log";
     }
 
+    /**
+     * ★ 追加: 全トレーニング記録一覧画面を表示
+     */
+    @GetMapping("/training-log/all")
+    public String showAllTrainingLog(Authentication authentication, Model model) {
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        // 全記録を取得してモデルに追加
+        List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
+        model.addAttribute("records", allRecords);
+        
+        return "training-log-all";
+    }
+
     @GetMapping("/training-log/form/weight")
     public String showWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
@@ -265,6 +282,3 @@ public class TrainingController {
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
 }
-
-
-
