@@ -53,3 +53,4 @@ public class SettingController {
         return "redirect:/settings?updated=password";
     }
 }
+

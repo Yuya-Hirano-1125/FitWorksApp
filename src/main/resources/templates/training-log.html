@@ -57,6 +57,13 @@
             </div>
         </th:block>
     </div>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <a th:href="@{/training-log/all}" class="button" style="background-color: #555; color: white; width: 100%; display: block; text-align: center;">
+            <i class="fa-solid fa-list"></i> 全記録をリストで見る
+        </a>
+    </div>
+
 </div>
 
 <div id="logModal" class="modal">
@@ -82,9 +89,9 @@
             <p>フォームを読み込んでいます...</p>
         </div>
 
-        <button class="button secondary view-all-button" onclick="alert('全記録表示機能はまだ実装されていません。')">
+        <a th:href="@{/training-log/all}" class="button secondary view-all-button">
             全記録を見る
-        </button>
+        </a>
     </div>
 </div>
 
@@ -122,7 +129,7 @@
         document.getElementById('selectedDateInput').value = dateString;
         document.getElementById('modalDateTitle').textContent = displayDate + ' の記録';
         
-        // 初期フォームを読み込み (フリーウェイトから)
+        // 初期フォームを読み込み (フリーウェイトから)録を確認してください。</p>';
         document.getElementById('trainingType').value = 'WEIGHT';
         loadTrainingForm('WEIGHT', dateString); 
         
@@ -154,32 +161,4 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

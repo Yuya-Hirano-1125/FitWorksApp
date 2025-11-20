@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ガチャ結果 | FitWorks</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+
+    <style>
+        .gacha-page .main-container {
+            max-width: 600px;
+        }
+        .result-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .result-card {
+            background: #2a2a2a;
+            padding: 15px;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 230, 118, 0.4);
+            animation: fadeIn 0.8s;
+        }
+        .result-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        .result-rarity {
+            font-size: 14px;
+            color: var(--ai-accent-color);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body class="gacha-page">
+
+<div class="main-container">
+    <h1><i class="fa-solid fa-gift"></i> ガチャ結果</h1>
+    <p class="sub-heading">おめでとう！以下のアイテムを獲得しました！</p>
+
+    <!-- ▼ ガチャ結果一覧（Thymeleaf） -->
+    <div class="result-list">
+        <div class="result-card" th:each="item : ${results}">
+            <img th:src="@{${item.imagePath}}" alt="result">
+            <div class="result-name" th:text="${item.name}">サンプル名</div>
+            <div class="result-rarity" th:text="${item.rarity}">レア度</div>
+        </div>
+    </div>
+
+    <!-- ▼ ボタン -->
+    <div class="button-container" style="margin-top: 40px;">
+        <a th:href="@{/gacha}" class="button primary">
+            もう一度引く <i class="fa-solid fa-rotate-right"></i>
+        </a>
+
+        <a th:href="@{/home}" class="button secondary" style="margin-top: 20px;">
+            ホームに戻る <i class="fa-solid fa-house"></i>
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

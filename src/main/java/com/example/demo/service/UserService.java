@@ -19,14 +19,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
     
-    /**
-     * ユーザー名でユーザーを検索し、Userエンティティを返す。（★追加★）
-     * TrainingControllerから認証ユーザーを取得するために必要です。
-     * @param username ユーザー名
-     * @return Userエンティティ (見つからなかった場合はnull)
-     */
     public User findByUsername(String username) {
-        // UserRepositoryがOptional<User>を返すため、orElse(null)でUserエンティティを取り出す
         return userRepository.findByUsername(username).orElse(null); 
     }
 
@@ -35,14 +28,21 @@ public class UserService {
         if (optionalUser.isEmpty()) return false;
         
         User user = optionalUser.get();
-        // 現在のパスワードが一致するか検証
         if (passwordEncoder.matches(oldPassword, user.getPassword())) {
-            // パスワードをエンコードして更新
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
             return true;
         }
         return false;
     }
-    
+
+    // --- ★追加: 経験値加算処理 ---
+    public void addExperience(String username, int xp) {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.addXp(xp); // ← Userエンティティに実装した addXp() を呼ぶ
+            userRepository.save(user); // DBに保存
+        }
+    }
 }
