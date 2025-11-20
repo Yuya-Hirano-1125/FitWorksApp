@@ -1,0 +1,74 @@
+@charset "UTF-8";/*
+ * FAQページ専用のCSSスタイル
+ * settings.css も併せて読み込まれることを前提とします。
+ */
+
+/* ========================================================== */
+/* アコーディオン機能のためのコアCSS */
+/* ========================================================== */
+
+/* チェックボックスの非表示を確実に適用 */
+.section-toggle {
+    display: none !important; /* !important を追加 */
+}
+
+/* ヘッダー全体をラベルとして機能させる */
+.section-header {
+    cursor: pointer;
+    position: relative;
+    /* settings.css のスタイルを継承しつつ、pointerを設定 */
+}
+
+/* 矢印 (▼/▲) のスタイル調整 */
+.section-header .arrow {
+    transition: transform 0.3s ease;
+    /* 矢印の初期状態は「下向き」 */
+    transform: rotate(0deg); 
+}
+
+/* コンテンツ部分の初期状態（閉じている状態） */
+.section-content {
+    max-height: 0;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    display: block; /* max-height transitionのためにblockにしておく */
+}
+
+/* チェックボックス（.section-toggle）がチェックされたとき、
+   その後の兄弟要素である .section-content にスタイルを適用 */
+.section-toggle:checked ~ .section-content {
+    /* 実際のコンテンツの高さより十分大きい値（例: 500px）を設定 */
+    max-height: 500px; 
+    padding-top: 10px;
+    padding-bottom: 15px;
+}
+
+/* チェックされたとき、矢印を回転させる（上向き ▲） */
+/* チェックボックスの直前の兄弟である .section-header 内の .arrow にスタイルを適用 */
+.section-toggle:checked + .section-header .arrow {
+    transform: rotate(-180deg); /* 180度回転で上向きに見せる */
+}
+
+/* ========================================================== */
+/* FAQアイテムの基本スタイル（前回と同じ） */
+/* ========================================================== */
+
+.faq-item {
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border-color, #333333);
+    padding-bottom: 10px;
+}
+
+.faq-question {
+    font-weight: 600;
+    color: var(--primary-color, #4a90e2);
+    margin-bottom: 5px;
+}
+
+.faq-answer {
+    color: var(--text-color-secondary, #aaaaaa);
+    font-size: 0.95em;
+    padding-left: 15px;
+}
