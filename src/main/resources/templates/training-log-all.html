@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全記録一覧 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <style>
+        .log-list-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .record-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 5px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        /* 種類ごとの色分け */
+        .record-card.type-weight { border-left-color: var(--primary-color); }
+        .record-card.type-cardio { border-left-color: var(--secondary-color); }
+        
+        .record-date {
+            font-family: 'Poppins', sans-serif;
+            font-weight: bold;
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        .record-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .record-details {
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 3px;
+        }
+        .no-records {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        .back-btn-container {
+            margin-bottom: 20px;
+        }
+        .badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: white;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .badge-weight { background-color: var(--primary-color); color: #000;}
+        .badge-cardio { background-color: var(--secondary-color); }
+        
+        @media (max-width: 600px) {
+            .record-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .record-right {
+                margin-top: 10px;
+                width: 100%;
+                text-align: right;
+                font-size: 0.8rem;
+                color: #aaa;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="log-list-container">
+    <div class="back-btn-container">
+        <a th:href="@{/training-log}" class="button secondary" style="padding: 8px 15px; font-size: 0.9rem;">
+            <i class="fa-solid fa-calendar-days"></i> カレンダーに戻る
+        </a>
+    </div>
+
+    <h1><i class="fa-solid fa-list-ul header-icon"></i>全トレーニング記録</h1>
+    
+    <div th:if="${records.empty}" class="no-records">
+        <p>まだ記録がありません。<br>トレーニングを行って記録してみましょう！</p>
+        <a th:href="@{/training}" class="button primary" style="margin-top:15px;">トレーニングを始める</a>
+    </div>
+
+    <div th:each="record : ${records}">
+        
+        <div th:if="${record.type == 'WEIGHT'}" class="record-card type-weight">
+            <div>
+                <div class="record-date">
+                    <i class="fa-regular fa-clock"></i> <span th:text="${record.recordDate}">2023-01-01</span>
+                </div>
+                <div class="record-title">
+                    <i class="fa-solid fa-dumbbell"></i> <span th:text="${record.exerciseName}">ベンチプレス</span>
+                    <span class="badge badge-weight">筋トレ</span>
+                </div>
+                <div class="record-details">
+                    <span th:text="${record.weight}">0</span>kg × 
+                    <span th:text="${record.reps}">0</span>回 × 
+                    <span th:text="${record.sets}">0</span>セット
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${record.type == 'CARDIO'}" class="record-card type-cardio">
+            <div>
+                <div class="record-date">
+                    <i class="fa-regular fa-clock"></i> <span th:text="${record.recordDate}">2023-01-01</span>
+                </div>
+                <div class="record-title">
+                    <i class="fa-solid fa-person-running"></i> <span th:text="${record.cardioType}">ランニング</span>
+                    <span class="badge badge-cardio">有酸素</span>
+                </div>
+                <div class="record-details">
+                    <span th:text="${record.durationMinutes}">0</span>分
+                    <span th:if="${record.distanceKm != null}"> / <span th:text="${record.distanceKm}">0</span>km</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

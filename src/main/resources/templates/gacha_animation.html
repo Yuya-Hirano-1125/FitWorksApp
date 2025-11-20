@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ガチャ演出中…</title>
+    <style>
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <img th:src="@{/img/gacha_animation.gif}" alt="演出中GIF">
+        <p>ガチャ結果を生成中…</p>
+    </div>
+
+    <!-- 数秒後に自動で結果ページへ -->
+    <script>
+        setTimeout(() => {
+            location.href = "/gacha/roll?count=[[${count}]]";
+        }, 3000);
+    </script>
+</body>
+</html>
