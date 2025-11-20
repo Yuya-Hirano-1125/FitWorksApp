@@ -11,8 +11,16 @@ public class MissionController {
      */
     @GetMapping("/daily-mission")
     public String showDailyMission() {
-        // src/main/resources/templates/daily-mission.html を返す
-        return "misc/daily-mission"; // ★ 修正: "daily-mission" -> "misc/daily-mission"
+        // src/main/resources/templates/misc/daily-mission.html を返す
+        return "misc/daily-mission";
     }
 
+    /**
+     * FAQ画面を表示する (★ このメソッドを追加・修正 ★)
+     */
+    @GetMapping("/faq")
+    public String showFaq() {
+        // テンプレートパスをフォルダ移動に合わせて修正
+        return "misc/faq"; 
+    }
 }
