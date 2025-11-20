@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
-import java.util.LinkedHashMap; // 順序保持のために変更
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -45,10 +45,14 @@ public class TrainingController {
         return userService.findByUsername(authentication.getName());
     }
     
+<<<<<<< HEAD
     // 【修正箇所: 部位ごとのフリーウェイト種目を難易度順・ラベル付きで定義】
     // Map.of は順序を保証しないため、LinkedHashMap を使用するか、表示側で制御しますが、
     // ここでは部位内のリスト順序（難易度順）を定義します。
  // 【修正箇所: 部位ごとのフリーウェイト種目を難易度順・ラベル付きで定義】
+=======
+    // 【部位ごとのフリーウェイト種目を難易度順・ラベル付きで定義】
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
     private static final Map<String, List<String>> FREE_WEIGHT_EXERCISES_BY_PART = new LinkedHashMap<>() {{
         // 初級: チェストフライ
         // 中級: ベンチプレス, ダンベルプレス, インクラインプレス
@@ -109,8 +113,8 @@ public class TrainingController {
             "ヒップスラスト (中級)"
         ));
     }};
-   
-    // 【修正: 有酸素運動リストを難易度順・ラベル付きで定義】
+    
+    // 【有酸素運動リストを難易度順・ラベル付きで定義】
     private static final List<String> CARDIO_EXERCISES = List.of(
             "ウォーキング (初級)", 
             "サイクリング (初級)", 
@@ -174,9 +178,6 @@ public class TrainingController {
             case "free-weight":
             case "cardio":
                 if (exerciseName != null && !exerciseName.trim().isEmpty()) {
-                    // 難易度表示「 (初級)」などを取り除いて種目名だけにする場合はここで加工できますが、
-                    // 記録として残すならそのまま保存しても分かりやすいです。
-                    // ここではそのまま使用します。
                     selectedExercise = exerciseName.trim();
                 } else {
                     return "redirect:/training"; 
@@ -189,13 +190,17 @@ public class TrainingController {
         
         model.addAttribute("trainingType", type);
         model.addAttribute("trainingTitle", title);
-        model.addAttribute("selectedExercise", selectedExercise); 
+        model.addAttribute("selectedExercise", selectedExercise);
+        
+        // ★ 記録用フォームのために今日の日付を渡す
+        model.addAttribute("today", LocalDate.now());
         
         return "training-session"; 
     }
     
-    // --- (以下の training-log 関連のメソッドは変更なし) ---
-    
+    /**
+     * トレーニングログ（カレンダー）画面を表示
+     */
     @GetMapping("/training-log")
     public String showTrainingLog(
             Authentication authentication,
@@ -266,6 +271,23 @@ public class TrainingController {
         return "training-log";
     }
 
+    /**
+     * ★ 追加: 全トレーニング記録一覧画面を表示
+     */
+    @GetMapping("/training-log/all")
+    public String showAllTrainingLog(Authentication authentication, Model model) {
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        // 全記録を取得してモデルに追加
+        List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
+        model.addAttribute("records", allRecords);
+        
+        return "training-log-all";
+    }
+
     @GetMapping("/training-log/form/weight")
     public String showWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
@@ -318,5 +340,3 @@ public class TrainingController {
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
 }
-
-
