@@ -57,17 +57,20 @@
         </div>
 
         <div th:each="post : ${posts}">
-            <a th:href="@{/community/{id}(id=${post.id})}" class="post-card">
-                <div class="post-title" th:text="${post.title}">タイトル</div>
-                <div class="post-meta">
-                    <span th:text="'👤 ' + ${post.author.username}">ユーザー名</span>
-                    <span th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd HH:mm')}">日時</span>
-                </div>
-                <div style="margin-top:10px; font-size:0.9rem;" th:text="${#strings.abbreviate(post.content, 50)}">内容の抜粋...</div>
-                <div style="margin-top:8px; font-size:0.8rem; color:var(--ai-accent-color);">
-                    <i class="fa-regular fa-comment-dots"></i> コメントを見る
-                </div>
-            </a>
+			<a th:href="@{/community/{id}(id=${post.id})}" class="post-card">
+			    <div class="post-title" th:text="${post.title}">タイトル</div>
+			    <div class="post-meta">
+			        <span th:text="'👤 ' + ${post.author.username}">ユーザー名</span>
+			        <span th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd HH:mm')}">日時</span>
+			    </div>
+			    <div style="margin-top:10px; font-size:0.9rem;" th:text="${#strings.abbreviate(post.content, 50)}">内容の抜粋...</div>
+			    
+			    <div style="margin-top:8px; font-size:0.8rem; color:var(--ai-accent-color);">
+			        <span class="btn-comment">
+			            コメントを見る
+			        </span>
+			    </div>
+			</a>
         </div>
 
         <div class="btn-home-container">
