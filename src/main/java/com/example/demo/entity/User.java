@@ -1,4 +1,3 @@
-// User.java
 package com.example.demo.entity;
 
 import jakarta.persistence.Column;
@@ -22,7 +21,10 @@ public class User {
     @Column(unique = true)
     private String email; 
 
-    // Getter/Setter
+    private int level = 1; // 初期レベル
+    private int experiencePoints = 0; // 初期XP
+
+    // --- Getter / Setter ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -34,15 +36,27 @@ public class User {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-    
- 
-    private int level;
-    private int experiencePoints;
 
-    // Getter / Setter
     public int getLevel() { return level; }
     public void setLevel(int level) { this.level = level; }
+
     public int getExperiencePoints() { return experiencePoints; }
     public void setExperiencePoints(int experiencePoints) { this.experiencePoints = experiencePoints; }
-}
 
+    // --- レベルアップ関連 ---
+    public int calculateRequiredXp() {
+        return 1000 + (level - 1) * 200;
+    }
+
+    public void addXp(int xp) {
+        this.experiencePoints += xp;
+        while (this.experiencePoints >= calculateRequiredXp()) {
+            this.experiencePoints -= calculateRequiredXp();
+            this.level++;
+        }
+    }
+
+    public int getProgressPercent() {
+        return (int)((double) this.experiencePoints / calculateRequiredXp() * 100);
+    }
+}
