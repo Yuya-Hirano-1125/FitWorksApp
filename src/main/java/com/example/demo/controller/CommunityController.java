@@ -28,7 +28,7 @@ public class CommunityController {
     private final UserRepository userRepository;
 
     // ★ 追加: NGワードのリスト（必要に応じて単語を追加・変更してください）
-    private static final List<String> NG_WORDS = List.of("死ね", "バカ", "アホ", "殺す", "暴力","消");
+    private static final List<String> NG_WORDS = List.of("死ね", "バカ", "アホ", "殺す", "暴力","消えろ");
 
     public CommunityController(PostRepository postRepository, CommentRepository commentRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
