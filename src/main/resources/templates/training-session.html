@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${trainingTitle}"></title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght!important(400);700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <style>
@@ -43,7 +43,7 @@
             color: #888;
         }
         
-        /* === NEW TIMER STYLES === */
+        /* === TIMER STYLES === */
         .timer-section {
             background-color: #1a1a1a;
             padding: 25px;
@@ -62,7 +62,7 @@
             font-family: 'Poppins', monospace;
         }
         .timer-interval {
-            color: var(--primary-color); /* インターバルタイマーはプライマリカラーを使用 */
+            color: var(--primary-color);
         }
         .timer-controls {
             display: flex;
@@ -113,18 +113,81 @@
             text-align: center;
             font-size: 16px;
         }
+
+        /* === RECORD FORM STYLES === */
+        .record-form-container {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .form-label {
+            display: block;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            flex: 1;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background-color: #333;
+            border: 1px solid #555;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .form-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        .unit {
+            color: #888;
+            font-size: 0.8rem;
+            text-align: center;
+            display: block;
+            margin-top: 3px;
+        }
+        .btn-finish {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: #1a1a1a;
+            font-weight: 800;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: block;
+            text-decoration: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .btn-finish:hover {
+            transform: scale(1.02);
+            background-color: #00c853;
+        }
     </style>
 </head>
 <body class="session-page">
 <div class="main-container">
     <h1 th:text="${trainingTitle}"><i class="fa-solid fa-bolt-lightning header-icon"></i>セッション開始</h1>
-    <p class="sub-heading">選択した種目でトレーニングを開始します。記録を取り始めましょう！</p>
 
     <div class="program-card">
         <h2 th:text="${selectedExercise}">種目名</h2>
 
-        <p class="exercise-type" th:if="${trainingType == 'free-weight'}"><i class="fa-solid fa-weight-hanging"></i> フリーウェイト (重量・回数記録)</p>
-        <p class="exercise-type" th:if="${trainingType == 'cardio'}"><i class="fa-solid fa-running"></i> 有酸素運動 (時間・距離記録)</p>
+        <p class="exercise-type" th:if="${trainingType == 'free-weight'}"><i class="fa-solid fa-weight-hanging"></i> フリーウェイト</p>
+        <p class="exercise-type" th:if="${trainingType == 'cardio'}"><i class="fa-solid fa-running"></i> 有酸素運動</p>
         <p class="exercise-type" th:if="${trainingType == 'ai-suggested'}"><i class="fa-solid fa-star"></i> AIおすすめプログラム</p>
         
         <div class="timer-section">
@@ -158,18 +221,66 @@
                 </div>
             </div>
         </div>
-        <div th:if="${trainingType == 'free-weight' or trainingType == 'cardio'}">
-            <div class="log-placeholder">
-                <p>⚠️ **ここに、選択された種目（<span th:text="${selectedExercise}"></span>）の実際の記録フォームが入ります。**</p>
-                <p th:if="${trainingType == 'free-weight'}">例：セット数、重量 (kg)、回数 (Reps) を入力して追加</p>
-                <p th:if="${trainingType == 'cardio'}">例：時間 (分) または 距離 (km) を入力して確定</p>
-                <i th:if="${trainingType == 'free-weight'}" class="fa-solid fa-cash-register" style="font-size: 30px; color: #00e676;"></i>
-                <i th:if="${trainingType == 'cardio'}" class="fa-solid fa-stopwatch" style="font-size: 30px; color: #00e676;"></i>
-            </div>
-            
-            <div class="control-buttons">
-                <a th:href="@{/training-log}" class="button primary">この記録でセッション完了</a>
-            </div>
+
+        <div th:if="${trainingType == 'free-weight'}" class="record-form-container">
+            <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px;">
+                <i class="fa-solid fa-pen-to-square"></i> 実績を記録
+            </h3>
+            <form th:action="@{/training-log/save}" method="post">
+                <input type="hidden" name="recordDate" th:value="${today}">
+                <input type="hidden" name="type" value="WEIGHT">
+                <input type="hidden" name="exerciseName" th:value="${selectedExercise}">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">重量</label>
+                        <input type="number" name="weight" class="form-input" step="0.5" placeholder="0" required>
+                        <span class="unit">kg</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">回数</label>
+                        <input type="number" name="reps" class="form-input" placeholder="0" required>
+                        <span class="unit">回 (Reps)</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">セット数</label>
+                        <input type="number" name="sets" class="form-input" value="1" required>
+                        <span class="unit">セット</span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-finish">
+                    記録して終了 <i class="fa-solid fa-check"></i>
+                </button>
+            </form>
+        </div>
+
+        <div th:if="${trainingType == 'cardio'}" class="record-form-container">
+            <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px;">
+                <i class="fa-solid fa-pen-to-square"></i> 実績を記録
+            </h3>
+            <form th:action="@{/training-log/save}" method="post">
+                <input type="hidden" name="recordDate" th:value="${today}">
+                <input type="hidden" name="type" value="CARDIO">
+                <input type="hidden" name="cardioType" th:value="${selectedExercise}">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">時間</label>
+                        <input type="number" name="durationMinutes" class="form-input" placeholder="0" required>
+                        <span class="unit">分 (Minutes)</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">距離</label>
+                        <input type="number" name="distanceKm" class="form-input" step="0.1" placeholder="0.0">
+                        <span class="unit">km (任意)</span>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-finish">
+                    記録して終了 <i class="fa-solid fa-check"></i>
+                </button>
+            </form>
         </div>
 
         <div th:if="${trainingType == 'ai-suggested'}">
@@ -183,7 +294,7 @@
                 <p style="margin-top: 20px; color: var(--primary-color);">目標時間: 45分 / 休憩時間: 60秒</p>
             </div>
             <div class="control-buttons">
-                 <a th:href="@{/training-log}" class="button primary">セッション完了 (AIプログラム)</a>
+                 <a th:href="@{/training-log}" class="button primary">セッション完了 (カレンダーに戻る)</a>
             </div>
         </div>
     </div>
@@ -223,19 +334,19 @@
         const cdStartPauseBtn = document.getElementById('countdown-start-pause');
         const cdResetBtn = document.getElementById('countdown-reset');
 
-        let cdInitialTime = 300000; // 初期値: 5分 (5 * 60000ms)
+        let cdInitialTime = 300000; // 初期値: 5分
         let cdRemainingTime = cdInitialTime;
         let cdTimer = null;
         let isCdRunning = false;
         
         const updateCdDisplay = () => {
+            if(!cdDisplay) return;
             cdDisplay.textContent = formatTime(cdRemainingTime);
 
-            // 残り10秒以下で赤くする
             if (cdRemainingTime <= 10000 && cdRemainingTime > 0) {
                  cdDisplay.style.color = '#ff0000'; 
             } else {
-                 cdDisplay.style.color = '#ffcc00'; // 黄色に戻す
+                 cdDisplay.style.color = '#ffcc00'; 
             }
         };
 
@@ -251,7 +362,6 @@
 
         const startCountdown = () => {
             if (cdRemainingTime <= 0) {
-                // タイマーがゼロの場合はリセットしてから開始
                 resetCountdown();
                 return;
             }
@@ -262,7 +372,6 @@
                 cdStartPauseBtn.classList.remove('timer-button-primary');
                 cdStartPauseBtn.classList.add('timer-button-secondary');
 
-                // 経過時間を計算して、再開時に正確な時間からスタートできるようにする
                 const startTime = Date.now() - (cdInitialTime - cdRemainingTime);
                 
                 cdTimer = setInterval(() => {
@@ -278,13 +387,9 @@
                     updateCdDisplay();
                 }, 100);
             } else {
-                // 一時停止
                 clearInterval(cdTimer);
                 isCdRunning = false;
-                
-                // 再開時に使用するため、現在の残り時間を新しい初期時間として設定
                 cdInitialTime = cdRemainingTime; 
-
                 cdStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 再開';
                 cdStartPauseBtn.classList.remove('timer-button-secondary');
                 cdStartPauseBtn.classList.add('timer-button-primary');
@@ -300,9 +405,8 @@
             
             const newInitialTime = (minutes * 60000) + (seconds * 1000);
 
-            // 00:00 設定を防ぐ (最低1秒)
             if (newInitialTime < 1000) {
-                cdInitialTime = 300000; // 5分にリセット
+                cdInitialTime = 300000; 
                 cdMinInput.value = 5;
                 cdSecInput.value = 0;
             } else {
@@ -317,19 +421,16 @@
             cdStartPauseBtn.classList.add('timer-button-primary');
         };
         
-        cdSetBtn.addEventListener('click', resetCountdown); // 設定ボタンはリセットを兼ねる
-        cdStartPauseBtn.addEventListener('click', startCountdown);
-        cdResetBtn.addEventListener('click', resetCountdown);
-        
-        // 初期ロード
-        resetCountdown(); 
-
+        if(cdSetBtn && cdStartPauseBtn && cdResetBtn) {
+            cdSetBtn.addEventListener('click', resetCountdown);
+            cdStartPauseBtn.addEventListener('click', startCountdown);
+            cdResetBtn.addEventListener('click', resetCountdown);
+            resetCountdown(); 
+        }
 
         // =======================================================
         // 2. インターバルタイマー機能 (Interval Timer)
         // =======================================================
-        // ※この機能はカウントダウンタイマーとして前回のコードから引き継がれています。
-
         const ivDisplay = document.getElementById('interval-display');
         const ivMinInput = document.getElementById('interval-minutes');
         const ivSecInput = document.getElementById('interval-seconds');
@@ -337,24 +438,21 @@
         const ivStartPauseBtn = document.getElementById('interval-start-pause');
         const ivResetBtn = document.getElementById('interval-reset');
 
-        let ivInitialTime = 60000; // 初期値: 1分 (1000ms * 60s)
+        let ivInitialTime = 60000; // 初期値: 1分
         let ivRemainingTime = ivInitialTime;
         let ivTimer = null;
         let isIvRunning = false;
 
         const updateIvDisplay = () => {
+            if(!ivDisplay) return;
             ivDisplay.textContent = formatTime(ivRemainingTime);
 
             if (ivRemainingTime <= 10000 && ivRemainingTime > 0) {
-                 ivDisplay.style.color = '#ff0000'; // 残り10秒で赤くする
+                 ivDisplay.style.color = '#ff0000'; 
             } else {
                  ivDisplay.style.color = 'var(--primary-color)';
             }
         };
-        
-        // 初期表示を更新
-        updateIvDisplay();
-
 
         const handleIvFinish = () => {
             clearInterval(ivTimer);
@@ -368,7 +466,6 @@
 
         const startInterval = () => {
             if (ivRemainingTime <= 0) {
-                // タイマーがゼロの場合はリセットしてから開始
                 resetInterval();
                 return;
             }
@@ -379,7 +476,6 @@
                 ivStartPauseBtn.classList.remove('timer-button-primary');
                 ivStartPauseBtn.classList.add('timer-button-secondary');
 
-                // 経過時間を計算して、再開時に正確な時間からスタートできるようにする
                 const startTime = Date.now() - (ivInitialTime - ivRemainingTime);
 
                 ivTimer = setInterval(() => {
@@ -395,20 +491,15 @@
                     updateIvDisplay();
                 }, 100);
             } else {
-                // 一時停止
                 clearInterval(ivTimer);
                 isIvRunning = false;
-
-                // 再開時に使用するため、現在の残り時間を新しい初期時間として設定     
                 ivInitialTime = ivRemainingTime;
-                
                 ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 再開';
                 ivStartPauseBtn.classList.remove('timer-button-secondary');
                 ivStartPauseBtn.classList.add('timer-button-primary');
             }
         };
 
-        // 設定ボタンとリセットボタンで同じリセット処理を実行
         const resetInterval = () => {
             clearInterval(ivTimer);
             isIvRunning = false;
@@ -418,9 +509,8 @@
             
             const newInitialTime = (minutes * 60000) + (seconds * 1000);
             
-            // 00:00 設定を防ぐ (最低1秒)
             if (newInitialTime < 1000) {
-                ivInitialTime = 60000; // 1分にリセット
+                ivInitialTime = 60000;
                 ivMinInput.value = 1;
                 ivSecInput.value = 0;
             } else {
@@ -435,12 +525,12 @@
             ivStartPauseBtn.classList.add('timer-button-primary');
         };
 
-        ivSetBtn.addEventListener('click', resetInterval);
-        ivStartPauseBtn.addEventListener('click', startInterval);
-        ivResetBtn.addEventListener('click', resetInterval);
-
-        // 初期ロード
-        resetInterval();
+        if(ivSetBtn && ivStartPauseBtn && ivResetBtn) {
+            ivSetBtn.addEventListener('click', resetInterval);
+            ivStartPauseBtn.addEventListener('click', startInterval);
+            ivResetBtn.addEventListener('click', resetInterval);
+            resetInterval();
+        }
     });
 </script>
 </body>
