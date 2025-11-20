@@ -94,8 +94,8 @@ public class AuthController {
     // @GetMapping("/training") // <--- 削除しました。TrainingControllerに一任されます。
     // public String training() { return "training"; } 
     
-    @GetMapping("/gacha")
-    public String gacha() { return "gacha"; } 
+    // NOTE: /gacha のマッピングは GachaController に移管されたため、削除。
+    
     
     // NOTE: /training-log のマッピングは TrainingController に移管されたため、削除。
 
