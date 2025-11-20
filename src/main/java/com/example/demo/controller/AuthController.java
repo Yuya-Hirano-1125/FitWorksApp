@@ -56,7 +56,7 @@ public class AuthController {
     }
 
     // --- パスワード変更 ---
-    @PostMapping("/change-password")
+    /*@PostMapping("/change-password")
     public String changePassword(@RequestParam("currentPassword") String oldPassword,
                                  @RequestParam("newPassword") String newPassword,
                                  @RequestParam("confirmPassword") String confirmPassword,
@@ -76,7 +76,7 @@ public class AuthController {
             model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
         }
         return "change-password";
-    }
+    }*/
 
     @GetMapping("/home")
     public String home(
