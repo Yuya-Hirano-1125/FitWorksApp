@@ -130,7 +130,7 @@ public class TrainingController {
         model.addAttribute("freeWeightParts", FREE_WEIGHT_EXERCISES_BY_PART.keySet());
         model.addAttribute("cardioExercises", CARDIO_EXERCISES);
         
-        return "training"; 
+        return "training/training"; // 修正
     }
 
     /**
@@ -141,7 +141,7 @@ public class TrainingController {
         if (getCurrentUser(authentication) == null) {
             return "redirect:/login"; 
         }
-        return "exercise-list"; 
+        return "training/exercise-list"; // 修正
     }
 
     /**
@@ -187,7 +187,7 @@ public class TrainingController {
         // ★ 記録用フォームのために今日の日付を渡す
         model.addAttribute("today", LocalDate.now());
         
-        return "training-session"; 
+        return "training/training-session"; // 修正
     }
     
     /**
@@ -260,7 +260,7 @@ public class TrainingController {
             dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE));
         }
         model.addAttribute("dayLabels", dayLabels);
-        return "training-log";
+        return "log/training-log"; // 修正
     }
 
     /**
@@ -277,7 +277,7 @@ public class TrainingController {
         List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
         model.addAttribute("records", allRecords);
         
-        return "training-log-all";
+        return "log/training-log-all"; // 修正
     }
 
     @GetMapping("/training-log/form/weight")
@@ -286,7 +286,7 @@ public class TrainingController {
         form.setRecordDate(date);
         form.setType("WEIGHT");
         model.addAttribute("trainingLogForm", form);
-        return "training-log-form-weight"; 
+        return "log/training-log-form-weight"; // 修正
     }
 
     @GetMapping("/training-log/form/cardio")
@@ -295,7 +295,7 @@ public class TrainingController {
         form.setRecordDate(date);
         form.setType("CARDIO");
         model.addAttribute("trainingLogForm", form);
-        return "training-log-form-cardio";
+        return "log/training-log-form-cardio"; // 修正
     }
     
     @PostMapping("/training-log/save")

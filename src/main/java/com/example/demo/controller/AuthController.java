@@ -23,10 +23,10 @@ public class AuthController {
 
     // --- ログイン/登録関連 ---
     @GetMapping("/login")
-    public String login() { return "login"; }
+    public String login() { return "auth/login"; } // 修正
 
     @GetMapping("/register")
-    public String registerForm() { return "register"; }
+    public String registerForm() { return "auth/register"; } // 修正
 
     @PostMapping("/register")
     public String registerUser(@RequestParam("username") String username,
@@ -34,12 +34,12 @@ public class AuthController {
                                Model model) {
         // 実際の登録ロジックをここに実装する
         model.addAttribute("message", "登録が完了しました。ログインしてください。");
-        return "login";
+        return "auth/login"; // 修正
     }
 
     // --- パスワードリセット ---
     @GetMapping("/forgot-password")
-    public String forgotPasswordForm() { return "forgot-password"; }
+    public String forgotPasswordForm() { return "auth/forgot-password"; } // 修正
 
     @PostMapping("/forgot-password")
     public String processForgotPassword(@RequestParam("email") String email,
@@ -47,7 +47,7 @@ public class AuthController {
         boolean emailFoundAndSent = true; 
         if (emailFoundAndSent) {
             redirectAttributes.addFlashAttribute("successMessage",
-                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");;
+                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");;;
         } else {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "そのメールアドレスは登録されていません。");
@@ -111,7 +111,7 @@ public class AuthController {
     // NOTE: /training-log のマッピングは TrainingController に移管されたため、削除。
 
     @GetMapping("/settings")
-    public String settings() { return "settings"; }
+    public String settings() { return "settings/settings"; } // 修正
 }
 
 
