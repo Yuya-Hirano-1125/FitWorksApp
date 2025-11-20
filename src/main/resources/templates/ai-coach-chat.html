@@ -32,7 +32,7 @@
         const chatHistory = document.getElementById('chatHistory');
         const messageInput = document.getElementById('messageInput');
         
-        // ★ 修正: JavaScriptでメタタグからCSRFトークンを安全に取得
+        // CSRFトークンを安全に取得
         const csrfMetaToken = document.querySelector('meta[name="_csrf"]');
         const csrfMetaHeader = document.querySelector('meta[name="_csrf_header"]');
 
@@ -58,7 +58,8 @@
 
             try {
                 const headers = {
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    // ★ 修正1: Content-TypeをJSONに変更
+                    'Content-Type': 'application/json' 
                 };
                 
                 // CSRFトークンをヘッダーに追加
@@ -70,7 +71,9 @@
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: headers,
-                    body: new URLSearchParams({ 'message': message })
+                    
+                    // ★ 修正2: bodyをJSON文字列に変更し、DTOのフィールド名 ('text') を使用
+                    body: JSON.stringify({ 'text': message })
                 });
 
                 if (!response.ok) {
@@ -79,8 +82,11 @@
                     throw new Error(`API呼び出しエラー: ${response.status}. 詳細: ${errorText.substring(0, 300)}`);
                 }
                 
-                const aiResponseText = await response.text();
-                
+                // レスポンスボディを取得
+                // ※サーバー側AICoachRestController.javaはMessageオブジェクトを返します
+                const jsonResponse = await response.json(); 
+                const aiResponseText = jsonResponse.text || "応答がありませんでした。"; 
+
                 // GeminiのMarkdownをHTMLに整形する関数
                 const formattedResponse = formatAiResponse(aiResponseText);
                 

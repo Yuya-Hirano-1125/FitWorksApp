@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>種目一覧 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <style>
+        .exercise-list-page .main-container {
+            max-width: 800px; /* Wider container for content */
+        }
+        .exercise-section h2 {
+            color: var(--ai-accent-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 5px;
+            margin-top: 40px;
+            text-align: left;
+            font-size: 30px;
+        }
+        .exercise-detail-card {
+            background-color: #ffffff;
+            border: 2px solid #ddd;
+            border-left: 8px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .exercise-detail-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.2);
+        }
+        .exercise-detail-card h3 {
+            color: var(--dark-text);
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .exercise-detail-card .category {
+            font-size: 12px;
+            color: var(--secondary-color);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .exercise-detail-card p {
+            color: var(--dark-text);
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+        .exercise-detail-card strong {
+            color: var(--primary-color);
+        }
+        .exercise-detail-card ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 15px;
+            border-top: 1px dashed var(--secondary-color);
+            padding-top: 15px;
+        }
+        .exercise-detail-card ul li {
+            color: #777;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        .exercise-detail-card ul li i {
+            color: var(--primary-color);
+            margin-right: 8px;
+        }
+        /* Mobile adjustments */
+        @media (max-width: 600px) {
+            .exercise-list-page .main-container {
+                max-width: 98%;
+            }
+            .exercise-detail-card {
+                padding: 15px;
+                border-left: 6px solid var(--primary-color);
+            }
+            .exercise-detail-card h3 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="exercise-list-page">
+<div class="main-container">
+    <h1><i class="fa-solid fa-book-open header-icon"></i>種目ライブラリ</h1>
+    <p class="sub-heading">フリーウェイトと有酸素運動のやり方とポイントを確認しましょう。</p>
+
+    <div class="exercise-section">
+        <h2><i class="fa-solid fa-weight-hanging"></i> フリーウェイト</h2>
+        
+        <div class="exercise-detail-card">
+            <h3>ベンチプレス</h3>
+            <span class="category">胸, 肩 (前部), 上腕三頭筋</span>
+            <p><strong>大胸筋を鍛える代表的な種目です。</strong>フォームを意識することで、より効果的に筋肉に負荷をかけられます。</p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> ベンチに仰向けになり、肩甲骨を寄せて胸を張り、バーを下ろします。バーが大胸筋の真ん中あたりに来るように意識しましょう。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> バーを押し上げる際も肩甲骨を寄せた状態をキープし、お尻がベンチから浮かないように腹筋に力を入れます。</li>
+            </ul>
+        </div>
+        
+        <div class="exercise-detail-card">
+            <h3>スクワット</h3>
+            <span class="category">大腿四頭筋, ハムストリングス, 大臀筋</span>
+            <p><strong>「キング・オブ・エクササイズ」と呼ばれる、下半身全体の筋力向上に不可欠な種目です。</strong>正しいフォームはケガの予防にもつながります。</p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> 足を肩幅程度に開き、胸を張って立ちます。股関節から曲げ始め、太ももが地面と平行になるまでゆっくりと腰を落とします。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> 膝がつま先より前に出過ぎないように意識し、背中を丸めず、常に正面を向くようにしましょう。</li>
+            </ul>
+        </div>
+        
+        <div class="exercise-detail-card">
+            <h3>デッドリフト</h3>
+            <span class="category">背筋群, ハムストリングス, 大臀筋</span>
+            <p><strong>全身の筋力を効率よく高める、非常に効果的なコンパウンド（複合）種目です。</strong>多くの筋肉を同時に使うため、高い集中力が必要です。</p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> バーを握り、背筋をまっすぐに伸ばしたまま、お尻を突き出すようにしてバーを持ち上げます。立ち上がったとき、肩、腰、膝が一直線になるようにします。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> バーを床から引き離す際、背中が丸まらないように細心の注意を払い、常に腹圧を意識しましょう。</li>
+            </ul>
+        </div>
+
+        <div class="exercise-detail-card">
+            <h3>ショルダープレス</h3>
+            <span class="category">三角筋 (肩), 上腕三頭筋</span>
+            <p><strong>肩全体、特に前部と中部の三角筋を鍛えるのに効果的な種目です。</strong>肩の力強さと安定性を向上させます。</p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> バーベルまたはダンベルを鎖骨の高さで構え、肘を伸ばしきらない程度に真上へ押し上げます。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> 体幹を固め、腰を反らさないように注意します。バーを押し上げる際、頭を少し前に出すとスムーズに行えます。</li>
+            </ul>
+        </div>
+        
+        <div class="exercise-detail-card">
+            <h3>ラットプルダウン</h3>
+            <span class="category">広背筋, 上腕二頭筋</span>
+            <p><strong>広背筋を効果的に鍛えるマシン種目です。</strong>逆三角形の体型を作るのに役立ちます。</p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> マシンのシートに座り、バーを肩幅よりやや広めに握ります。胸を張り、バーを鎖骨付近まで引き下ろします。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> バーを引き下ろす際は、腕の力ではなく、背中の筋肉（広背筋）を意識して収縮させます。</li>
+            </ul>
+        </div>
+        
+        <div class="exercise-detail-card">
+            <h3>オーバーヘッドプレス</h3>
+            <span class="category">三角筋 (肩), 上腕三頭筋, 僧帽筋</span>
+            <p><strong>全身を使って高重量を扱う、肩の筋力・パワー向上に最適な種目です。</strong>立って行うことで体幹の安定性も鍛えられます。</p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> バーベルを肩の高さで持ち、全身の力を利用して頭上へ押し上げます。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> バーを上げる際、頭がバーの軌道に邪魔されないよう、顎を引き、頭を軽く後ろへ移動させます。</li>
+            </ul>
+        </div>
+        
+        <div class="exercise-detail-card">
+            <h3>ベントオーバーロー</h3>
+            <span class="category">広背筋, 僧帽筋, 脊柱起立筋</span>
+            <p><strong>背中の厚みと広がりを両方鍛えられる、背中の複合トレーニングの基本です。</strong></p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> バーベルを握り、上半身を床と平行に近い角度まで倒します。この姿勢を保ったまま、バーを腹部に向かって引き上げます。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> 動作中、背中が丸まらないように常に胸を張り続けます。引くときは肩甲骨を寄せることを意識しましょう。</li>
+            </ul>
+        </div>
+        
+        <div class="exercise-detail-card">
+            <h3>レッグプレス</h3>
+            <span class="category">大腿四頭筋, 大臀筋, ハムストリングス</span>
+            <p><strong>スクワットに比べて腰への負担が少なく、高重量で集中的に下半身を鍛えられるマシン種目です。</strong></p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> マシンに座り、足をフットプレートに置き、膝が90度になるまでプレートをゆっくりと引き寄せ、その後押し返します。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> 膝を伸ばしきらず、常に筋肉に負荷がかかっている状態を維持します。腰がシートから浮かないように注意しましょう。</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="exercise-section">
+        <h2><i class="fa-solid fa-running"></i> 有酸素運動</h2>
+        
+        <div class="exercise-detail-card">
+            <h3>ランニング (ジョギング)</h3>
+            <span class="category">全身持久力, 心肺機能の向上</span>
+            <p><strong>手軽に始められる最も基本的な有酸素運動です。</strong>心臓と肺の機能を高め、脂肪燃焼を促進します。</p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> 背筋を伸ばし、視線は前方に。かかとから着地し、スムーズに重心を移動させます。無理のないペースで30分以上続けると効果的です。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> 会話ができる程度のペース（ニコニコペース）を保ち、水分補給を欠かさないようにしましょう。</li>
+            </ul>
+        </div>
+        
+        <div class="exercise-detail-card">
+            <h3>サイクリング (エアロバイク)</h3>
+            <span class="category">大腿四頭筋, ハムストリングス, 膝への負担軽減</span>
+            <p><strong>膝への負担が少なく、長時間続けやすい有酸素運動です。</strong>主に下半身の持久力向上に役立ちます。</p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> サドルの高さを適切に調整し（ペダルが一番下に来た時に膝がわずかに曲がる程度）、一定の負荷と回転数（ケイデンス）を保ちながら漕ぎ続けます。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> 背中を丸めず、体幹を意識して安定させましょう。定期的に立って漕ぐ動作（ダンシング）を取り入れるのも効果的です。</li>
+            </ul>
+        </div>
+
+        <div class="exercise-detail-card">
+            <h3>エリプティカル (クロストレーナー)</h3>
+            <span class="category">全身持久力, 膝への負担軽減, 運動連鎖</span>
+            <p><strong>ランニングに近い効果を、膝関節にほとんど負担をかけずに得られる全身運動です。</strong>上半身と下半身を同時に動かします。</p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> ハンドルを握り、ペダルを前後へ円を描くように動かします。設定された負荷とケイデンス（回転数）を一定に保ちます。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> ペダルにかかとまで体重を乗せ、できるだけ大きなストライド（歩幅）で動かすことで、より高い運動効果が得られます。</li>
+            </ul>
+        </div>
+
+        <div class="exercise-detail-card">
+            <h3>水泳</h3>
+            <span class="category">全身持久力, 筋力, 抵抗運動</span>
+            <p><strong>水による抵抗を利用して全身の筋力と持久力を高める、非常に低負荷な全身運動です。</strong>関節への負担がほぼゼロです。</p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> 自分の得意な泳法（クロール、平泳ぎなど）で、フォームを意識しながら一定時間または一定距離を泳ぎます。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> 呼吸法を意識し、長距離を疲れずに泳ぎきれるペースを保つことが大切です。</li>
+            </ul>
+        </div>
+        
+        <div class="exercise-detail-card">
+            <h3>ウォーキング (早歩き)</h3>
+            <span class="category">基礎代謝向上, 脂肪燃焼促進, リフレッシュ</span>
+            <p><strong>誰でも手軽に始められ、日々の健康維持に最適な有酸素運動です。</strong>意識して早歩きすることで運動効果が高まります。</p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> 背筋を伸ばし、大股でテンポよく歩きます。腕を大きく振り、やや早めのペースを意識します。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> 30分以上継続することを目指しましょう。正しい姿勢を維持することが、腰や膝への負担軽減につながります。</li>
+            </ul>
+        </div>
+
+        <div class="exercise-detail-card">
+            <h3>トレッドミルインターバル</h3>
+            <span class="category">心肺機能の最大化, 脂肪燃焼効率の向上</span>
+            <p><strong>高強度と低強度を交互に繰り返すことで、短時間で高い運動効果を得られるトレーニングです。</strong></p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> 全力に近いスピードで30秒走り、その後ゆっくりとしたペースで60秒歩く（回復）。これを1セットとして繰り返します。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> 高強度のパートでは怪我に注意し、回復パートでしっかりと呼吸を整えましょう。</li>
+            </ul>
+        </div>
+        
+        <div class="exercise-detail-card">
+            <h3>ローイング (ボート漕ぎ)</h3>
+            <span class="category">全身持久力, 背中, 脚, 体幹</span>
+            <p><strong>脚、体幹、上半身の9つの主要な筋肉群を同時に使う、全身の効率的な有酸素運動です。</strong></p>
+            <ul>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> ローイングマシンを使用し、脚で押し出し（ドライブ）、次に体幹を傾け、最後に腕で引きます。復路はこの逆の順序で行います。</li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> 力を入れる比率は「脚(60%) > 体幹(20%) > 腕(20%)」を意識し、スムーズで連続的な動作を心がけます。</li>
+            </ul>
+        </div>
+    </div>
+    <div class="button-container" style="margin-top: 30px;">
+        <a th:href="@{/training}" class="button secondary">
+            <i class="fa-solid fa-chevron-left"></i> トレーニング選択に戻る
+        </a>
+    </div>
+
+</div>
+</body>
+</html>
