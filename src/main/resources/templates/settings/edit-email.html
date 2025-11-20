@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>メールアドレス変更</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+</head>
+<body>
+<div class="form-container">
+    <h2>メールアドレスの変更</h2>
+
+    <form th:action="@{/edit-email}" th:object="${form}" method="post">
+        <label>新しいメールアドレス</label>
+        <input type="email" th:field="*{email}" required>
+
+        <button type="submit" class="button primary">保存</button>
+        <a th:href="@{/settings}" class="button secondary">戻る</a>
+    </form>
+</div>
+</body>
+</html>
