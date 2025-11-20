@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import java.util.List; // java.util.List をインポート
+import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +19,7 @@ public class AuthController {
         this.userService = userService;
     }
 
-    // --- ログイン/登録関連 ---
+    // --- ログイン/認証関連 ---
     @GetMapping("/login")
     public String login() { return "login"; }
 
@@ -41,7 +41,7 @@ public class AuthController {
     @GetMapping("/training")
     public String training() { return "training"; }
     
-    // 【削除済み】GachaControllerに処理を移譲するため、このメソッドは削除します。
+    // 【削除済み】ルーティング競合を避けるため、/gacha ルーティングを削除します。
     // @GetMapping("/gacha")
     // public String gacha() { return "gacha"; } 
     
