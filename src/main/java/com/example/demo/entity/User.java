@@ -21,8 +21,15 @@ public class User {
     @Column(unique = true)
     private String email; 
 
-    private int level = 1; // 初期レベル
-    private int experiencePoints = 0; // 初期XP
+    // ★ 修正1: int型からInteger型に変更し、DBのNULL値に対応
+    private Integer level = 1; // 初期レベル
+    private Integer experiencePoints = 0; // 初期XP
+
+    // JPAの要件: 引数なしのコンストラクタ (初期値設定の安全性を高めるため)
+    public User() {
+        if (this.level == null) this.level = 1;
+        if (this.experiencePoints == null) this.experiencePoints = 0;
+    }
 
     // --- Getter / Setter ---
     public Long getId() { return id; }
@@ -37,26 +44,41 @@ public class User {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public int getLevel() { return level; }
-    public void setLevel(int level) { this.level = level; }
+    // ★ 修正2: 戻り値を Integer に変更し、null安全性を確保 (nullの場合は1を返す)
+    public Integer getLevel() { 
+        return level != null ? level : 1; 
+    }
+    public void setLevel(Integer level) { this.level = level; }
 
-    public int getExperiencePoints() { return experiencePoints; }
-    public void setExperiencePoints(int experiencePoints) { this.experiencePoints = experiencePoints; }
+    // ★ 修正3: 戻り値を Integer に変更し、null安全性を確保 (nullの場合は0を返す)
+    public Integer getExperiencePoints() { 
+        return experiencePoints != null ? experiencePoints : 0; 
+    }
+    public void setExperiencePoints(Integer experiencePoints) { this.experiencePoints = experiencePoints; }
 
     // --- レベルアップ関連 ---
+    // null安全なGetter (getLevel()) を使用するため修正
     public int calculateRequiredXp() {
-        return 1000 + (level - 1) * 200;
+        int currentLevel = getLevel();
+        return 1000 + (currentLevel - 1) * 200;
     }
 
     public void addXp(int xp) {
-        this.experiencePoints += xp;
+        // null安全なGetter (getExperiencePoints()) を使用
+        int currentXp = getExperiencePoints(); 
+        this.experiencePoints = currentXp + xp;
+        
         while (this.experiencePoints >= calculateRequiredXp()) {
             this.experiencePoints -= calculateRequiredXp();
             this.level++;
         }
     }
 
+    // null安全なGetter (getExperiencePoints()) を使用するため修正
     public int getProgressPercent() {
-        return (int)((double) this.experiencePoints / calculateRequiredXp() * 100);
+        int currentXp = getExperiencePoints();
+        int requiredXp = calculateRequiredXp();
+        if (requiredXp == 0) return 0; // ゼロ除算防止
+        return (int)(((double) currentXp / requiredXp) * 100);
     }
 }

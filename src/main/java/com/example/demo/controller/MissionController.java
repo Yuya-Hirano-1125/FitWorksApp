@@ -23,4 +23,4 @@ public class MissionController {
         // テンプレートパスをフォルダ移動に合わせて修正
         return "misc/faq"; 
     }
-}
+} 
