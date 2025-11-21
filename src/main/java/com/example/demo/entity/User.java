@@ -1,5 +1,7 @@
 package com.example.demo.entity;
 
+import java.time.LocalDate; // ★ 新規インポート
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,14 +23,19 @@ public class User {
     @Column(unique = true)
     private String email; 
 
-    // ★ 修正1: int型からInteger型に変更し、DBのNULL値に対応
+    // ★ 修正: プリミティブ型 (int) からラッパー型 (Integer) に変更し、DBのNULLに対応
     private Integer level = 1; // 初期レベル
     private Integer experiencePoints = 0; // 初期XP
+
+    // ★ 新規追加: デイリーミッション追跡用
+    private LocalDate lastMissionCompletionDate;
+    private Boolean isRewardClaimedToday = false; // デフォルトは未クレーム
 
     // JPAの要件: 引数なしのコンストラクタ (初期値設定の安全性を高めるため)
     public User() {
         if (this.level == null) this.level = 1;
         if (this.experiencePoints == null) this.experiencePoints = 0;
+        if (this.isRewardClaimedToday == null) this.isRewardClaimedToday = false;
     }
 
     // --- Getter / Setter ---
@@ -44,17 +51,24 @@ public class User {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    // ★ 修正2: 戻り値を Integer に変更し、null安全性を確保 (nullの場合は1を返す)
+    // ★ 修正: null安全なGetter (nullの場合は1を返す)
     public Integer getLevel() { 
         return level != null ? level : 1; 
     }
     public void setLevel(Integer level) { this.level = level; }
 
-    // ★ 修正3: 戻り値を Integer に変更し、null安全性を確保 (nullの場合は0を返す)
+    // ★ 修正: null安全なGetter (nullの場合は0を返す)
     public Integer getExperiencePoints() { 
         return experiencePoints != null ? experiencePoints : 0; 
     }
     public void setExperiencePoints(Integer experiencePoints) { this.experiencePoints = experiencePoints; }
+
+    // ★ 新規Getter/Setter
+    public LocalDate getLastMissionCompletionDate() { return lastMissionCompletionDate; }
+    public void setLastMissionCompletionDate(LocalDate lastMissionCompletionDate) { this.lastMissionCompletionDate = lastMissionCompletionDate; }
+    
+    public Boolean getIsRewardClaimedToday() { return isRewardClaimedToday; }
+    public void setIsRewardClaimedToday(Boolean isRewardClaimedToday) { this.isRewardClaimedToday = isRewardClaimedToday; }
 
     // --- レベルアップ関連 ---
     // null安全なGetter (getLevel()) を使用するため修正

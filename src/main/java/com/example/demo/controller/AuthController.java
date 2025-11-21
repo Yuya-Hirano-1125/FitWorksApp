@@ -47,7 +47,7 @@ public class AuthController {
         boolean emailFoundAndSent = true; 
         if (emailFoundAndSent) {
             redirectAttributes.addFlashAttribute("successMessage",
-                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");;;
+                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");;;;
         } else {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "そのメールアドレスは登録されていません。");
@@ -71,7 +71,7 @@ public class AuthController {
         boolean success = true; 
         
         if(success) {
-            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉"););
+            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
         } else {
             model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
         }

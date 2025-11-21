@@ -42,6 +42,7 @@ public class TrainingController {
 
     private User getCurrentUser(Authentication authentication) {
         if (authentication == null) return null;
+        // NOTE: UserServiceにfindByUsername(String username)がある前提
         return userService.findByUsername(authentication.getName());
     }
 
@@ -130,7 +131,7 @@ public class TrainingController {
         model.addAttribute("freeWeightParts", FREE_WEIGHT_EXERCISES_BY_PART.keySet());
         model.addAttribute("cardioExercises", CARDIO_EXERCISES);
         
-        return "training/training"; // 修正
+        return "training/training"; // ★ 修正: training.htmlをtraining/フォルダに移動
     }
 
     /**
@@ -141,7 +142,7 @@ public class TrainingController {
         if (getCurrentUser(authentication) == null) {
             return "redirect:/login"; 
         }
-        return "training/exercise-list"; // 修正
+        return "training/exercise-list"; // ★ 修正: exercise-list.htmlをtraining/フォルダに移動
     }
 
     /**
@@ -187,7 +188,7 @@ public class TrainingController {
         // ★ 記録用フォームのために今日の日付を渡す
         model.addAttribute("today", LocalDate.now());
         
-        return "training/training-session"; // 修正
+        return "training/training-session"; // ★ 修正: training-session.htmlをtraining/フォルダに移動 (これがエラーの原因)
     }
     
     /**
@@ -260,7 +261,7 @@ public class TrainingController {
             dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE));
         }
         model.addAttribute("dayLabels", dayLabels);
-        return "log/training-log"; // 修正
+        return "log/training-log"; // ★ 修正: training-log.htmlをlog/フォルダに移動
     }
 
     /**
@@ -273,11 +274,11 @@ public class TrainingController {
             return "redirect:/login";
         }
 
-        // 全記録を取得してモデルに追加
+        // 全記録を取得してモデルに追加());
         List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
         model.addAttribute("records", allRecords);
         
-        return "log/training-log-all"; // 修正
+        return "log/training-log-all"; // ★ 修正: training-log-all.htmlをlog/フォルダに移動
     }
 
     @GetMapping("/training-log/form/weight")
@@ -286,7 +287,7 @@ public class TrainingController {
         form.setRecordDate(date);
         form.setType("WEIGHT");
         model.addAttribute("trainingLogForm", form);
-        return "log/training-log-form-weight"; // 修正
+        return "log/training-log-form-weight"; // ★ 修正: training-log-form-weight.htmlをlog/フォルダに移動
     }
 
     @GetMapping("/training-log/form/cardio")
@@ -295,7 +296,7 @@ public class TrainingController {
         form.setRecordDate(date);
         form.setType("CARDIO");
         model.addAttribute("trainingLogForm", form);
-        return "log/training-log-form-cardio"; // 修正
+        return "log/training-log-form-cardio"; // ★ 修正: training-log-form-cardio.htmlをlog/フォルダに移動
     }
     
     @PostMapping("/training-log/save")
