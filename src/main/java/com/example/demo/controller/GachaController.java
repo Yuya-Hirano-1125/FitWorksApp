@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class GachaController {
 
-    // ★ このメソッドが /gacha を処理します。
+    // ★ AuthControllerから /gacha の処理を引き継ぎます。
     @GetMapping("/gacha")
     public String index() {
         return "gacha";
@@ -21,39 +21,5 @@ public class GachaController {
         return "gacha_animation";
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import java.util.List; // java.util.List をインポート
+import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,11 +19,7 @@ public class AuthController {
         this.userService = userService;
     }
 
-    // --- ログイン/登録関連 ---
-    @GetMapping("/login")
-    public String login() { return "login"; }
-
-    // ... (他の認証メソッド省略) ...
+    // ... (認証関連のメソッド省略) ...
 
     @GetMapping("/home")
     public String home(
@@ -38,10 +34,11 @@ public class AuthController {
         return "home";
     }
 
-    @GetMapping("/training")
-    public String training() { return "training"; }
+    // 【削除済み】TrainingControllerに処理を移譲するため、AuthControllerから削除
+    // @GetMapping("/training")
+    // public String training() { return "training"; }
     
-    // 【削除済み】GachaControllerに処理を移譲するため、このメソッドは削除します。
+    // 【削除済み】GachaControllerに処理を移譲するため、AuthControllerから削除
     // @GetMapping("/gacha")
     // public String gacha() { return "gacha"; } 
     
@@ -75,11 +72,11 @@ public class AuthController {
 // データを保持するためのインナークラス (Recordクラス)
 class Record {
     public String date;
-    public String name;  // ★ 修正: public public を public に変更
-    public String part;  // ★ 修正: public public を public に変更
-    public int weight;   // ★ 修正: public public を public に変更
-    public int reps;     // ★ 修正: public public を public に変更
-    public int sets;     // ★ 修正: public public を public に変更
+    public String name;
+    public String part;
+    public int weight;
+    public int reps;
+    public int sets;
 
     public Record(String date, String name, String part, int weight, int reps, int sets) {
         this.date = date;
