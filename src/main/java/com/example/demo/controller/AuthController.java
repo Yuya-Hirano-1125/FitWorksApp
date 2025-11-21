@@ -23,10 +23,10 @@ public class AuthController {
 
     // --- ログイン/登録関連 ---
     @GetMapping("/login")
-    public String login() { return "login"; }
+    public String login() { return "auth/login"; } 
 
     @GetMapping("/register")
-    public String registerForm() { return "register"; }
+    public String registerForm() { return "auth/register"; } 
 
     @PostMapping("/register")
     public String registerUser(@RequestParam("username") String username,
@@ -34,12 +34,12 @@ public class AuthController {
                                Model model) {
         // 実際の登録ロジックをここに実装する
         model.addAttribute("message", "登録が完了しました。ログインしてください。");
-        return "login";
+        return "auth/login"; 
     }
 
     // --- パスワードリセット ---
     @GetMapping("/forgot-password")
-    public String forgotPasswordForm() { return "forgot-password"; }
+    public String forgotPasswordForm() { return "auth/forgot-password"; } 
 
     @PostMapping("/forgot-password")
     public String processForgotPassword(@RequestParam("email") String email,
@@ -47,7 +47,7 @@ public class AuthController {
         boolean emailFoundAndSent = true; 
         if (emailFoundAndSent) {
             redirectAttributes.addFlashAttribute("successMessage",
-                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");;
+                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");;;;
         } else {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "そのメールアドレスは登録されていません。");
@@ -55,28 +55,7 @@ public class AuthController {
         return "redirect:/forgot-password";
     }
 
-    // --- パスワード変更 ---
-    /*@PostMapping("/change-password")
-    public String changePassword(@RequestParam("currentPassword") String oldPassword,
-                                 @RequestParam("newPassword") String newPassword,
-                                 @RequestParam("confirmPassword") String confirmPassword,
-                                 @AuthenticationPrincipal UserDetails userDetails,
-                                 Model model) {
-        if (!newPassword.equals(confirmPassword)) {
-            model.addAttribute("errorMessage", "新しいパスワードが一致しません");
-            return "change-password";
-        }
-        
-        // 実際のパスワード変更ロジック
-        boolean success = true; 
-        
-        if(success) {
-            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
-        } else {
-            model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
-        }
-        return "change-password";
-    }*/
+    // --- パスワード変更 --- (省略)
 
     @GetMapping("/home")
     public String home(
@@ -99,56 +78,12 @@ public class AuthController {
         } else {
             model.addAttribute("username", "ゲスト");
         }
-        return "home";
+        return "misc/home"; // ★ 修正
     }
 
-    // @GetMapping("/training") // <--- 削除しました。TrainingControllerに一任されます。
-    // public String training() { return "training"; } 
-    
-    // NOTE: /gacha のマッピングは GachaController に移管されたため、削除。
-    
-    
-    // NOTE: /training-log のマッピングは TrainingController に移管されたため、削除。
-
     @GetMapping("/settings")
-    public String settings() { return "settings"; }
+    public String settings() { return "settings/settings"; } 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

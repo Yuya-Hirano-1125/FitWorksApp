@@ -22,7 +22,7 @@ public class GachaController {
     // 1. ガチャトップ画面
     @GetMapping("/gacha")
     public String index() {
-        return "gacha";
+        return "gacha/gacha"; // 修正
     }
 
     // 2. アニメーション画面へ遷移（回数を保持）
@@ -30,7 +30,7 @@ public class GachaController {
     public String animation(@RequestParam("count") int count, Model model) {
         // 次の画面（結果取得）に渡すために回数をModelに入れる
         model.addAttribute("count", count);
-        return "gacha_animation";
+        return "gacha/gacha_animation"; // 修正
     }
 
     // 3. ガチャ結果処理（アニメーション後に呼ばれる）
@@ -42,7 +42,7 @@ public class GachaController {
         // 結果画面（result.html）に渡す
         model.addAttribute("results", results);
         
-        return "result";
+        return "gacha/result"; // 修正
     }
 }
 

@@ -11,9 +11,10 @@
 </head>
 <body class="home-page">
 <div class="main-container">
-    
-    <div class="xp-daily-header">
-        <div class="xp-bar-container">
+	<div class="app-logo-display">
+            <img th:src="@{/img/applogo.jpg}" alt="App Logo" />
+		<div class="xp-daily-header">
+        </div>    <div class="xp-bar-container">
             <!-- 動的表示 -->
             <span th:text="'レベル ' + ${level} + ' (XP: ' + ${experiencePoints} + '/' + ${requiredXp} + ')'"></span>
             <div class="xp-bar">
