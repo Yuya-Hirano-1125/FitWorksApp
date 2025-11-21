@@ -1,47 +1,50 @@
 package com.example.demo.controller;
 
-import java.util.List;
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import com.example.demo.model.GachaItem;
-import com.example.demo.service.GachaService;
 
 @Controller
 public class GachaController {
 
-    private final GachaService gachaService;
-
-    public GachaController(GachaService gachaService) {
-        this.gachaService = gachaService;
-    }
-
-    // ▼ ガチャ画面
+    // ★ AuthControllerから /gacha の処理を引き継ぎます。
     @GetMapping("/gacha")
-    public String gacha() {
-        return "gacha";
+    public String index() {
+        return "gacha/gacha"; // 修正
     }
-
-    // ▼ ガチャ演出GIF
-    @GetMapping("/gacha/animation")
-    public String gachaAnimation(@RequestParam("count") int count, Model model) {
-        model.addAttribute("count", count);
-        return "gacha_animation";  // GIFページ（animation.html）
-    }
-
-    // ▼ ガチャ結果ページ（← これが今回必要！）
+<<<<<<< HEAD
+    
+    // TODO: ガチャ実行ロジック
     @GetMapping("/gacha/roll")
-    public String rollGacha(@RequestParam("count") int count, Model model) {
+    public String rollGacha(Model model) {
+        // 仮の結果表示
+        model.addAttribute("gachaResult", "レアなトレーニングアイテム: 腕立て伏せ Lv.3");
+        return "gacha_animation";
+=======
 
-        // ガチャロジックで結果を生成
-        List<GachaItem> results = gachaService.roll(count);
-
-        // HTML（result.html）に渡す
-        model.addAttribute("results", results);
-
-        return "result"; // ← 作った gacha結果ページ
+    // 2. アニメーション画面へ遷移（回数を保持）
+    @GetMapping("/gacha/animation")
+    public String animation(@RequestParam("count") int count, Model model) {
+        // 次の画面（結果取得）に渡すために回数をModelに入れる
+        model.addAttribute("count", count);
+        return "gacha/gacha_animation"; // 修正
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
     }
+<<<<<<< HEAD
+=======
+
+    // 3. ガチャ結果処理（アニメーション後に呼ばれる）
+    @GetMapping("/gacha/roll")
+    public String roll(@RequestParam("count") int count, Model model) {
+        // Serviceのメソッド名 'roll' を使用し、リストを受け取る
+        List<GachaItem> results = gachaService.roll(count);
+        
+        // 結果画面（result.html）に渡す
+        model.addAttribute("results", results);
+        
+        return "gacha/result"; // 修正
+    }
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
 }
+
+

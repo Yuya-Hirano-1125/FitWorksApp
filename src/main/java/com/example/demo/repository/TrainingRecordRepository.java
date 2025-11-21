@@ -19,4 +19,6 @@ public interface TrainingRecordRepository extends JpaRepository<TrainingRecord, 
 
     // ★ 追加: ユーザーの全記録を日付の新しい順に取得するメソッド
     List<TrainingRecord> findByUser_IdOrderByRecordDateDesc(Long userId);
+    
+    long countByUser_IdAndRecordDate(Long userId, LocalDate date);
 }

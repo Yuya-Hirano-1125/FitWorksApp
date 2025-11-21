@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ホーム | FitWorks</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
@@ -14,55 +14,64 @@
     
     <div class="xp-daily-header">
         <div class="xp-bar-container">
-            <!-- 動的表示 -->
-            <span th:text="'レベル ' + ${level} + ' (XP: ' + ${experiencePoints} + '/' + ${requiredXp} + ')'"></span>
+            <span>レベル 5 (XP: 650/1000)</span>
             <div class="xp-bar">
-                <div class="xp-progress"
-                     th:style="'width:' + ${progressPercent} + '%;'"
-                     th:text="${progressPercent} + '%'"></div>
+                <div class="xp-progress" style="width: 65%;">65%</div>
             </div>
         </div>
+
         <a th:href="@{/daily-mission}" class="daily-mission-button">
-            デイリーミッション(ガチャ報酬）<i class="fa-solid fa-list-check"></i>
+            デイリーミッション <i class="fa-solid fa-list-check"></i>
         </a>
     </div>
 
     <div class="character-display">
-        <img th:src="@{/img/mizu3.png}" alt="Character Image" />
-    </div>
+        </div>
     
     <h1>FitWorksへようこそ</h1>
     <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！今日のトレーニングを始めましょう。'">
         あなたのフィットネス・ジャーニーをサポートします。
     </p>
-
-    <a th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
-        トレーニングを開始 <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i>
-    </a>
-    <a th:href="@{/ranking}" class="daily-mission-button" style="background: linear-gradient(45deg, #f1c40f, #f39c12); box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4); margin-top: 15px;">
-        ランキングを見る <i class="fa-solid fa-trophy" style="margin-left: 5px;"></i>
-    </a>
     
+    <div class="button-container home-desktop-buttons">
+        <div class="home-button-group">
+            <a th:href="@{/gacha}" class="button primary">ガチャを回す <i class="fa-solid fa-box-open"></i></a>
+            gin-top: 20px;">
+            <a th:href="@{/training-log}" class="button primary">トレーニング記録 <i class="fa-solid fa-calendar-days"></i></a>
+        </div>
+        gin-top: 15px;">
+        <a th:href="@{/training}" class="button training-start">
+            <span>トレーニング開始 💪</span>
+        </a>
+        
+        <div class="home-button-group" style="margin-top: 15px;">
+            <a th:href="@{/characters}" class="button secondary">キャラクター一覧 <i class="fa-solid fa-users"></i></a>
+            <a th:href="@{/settings}" class="button secondary">設定 <i class="fa-solid fa-gear"></i></a>
+            <a th:href="@{/logout}" class="button secondary">ログアウト <i class="fa-solid fa-right-from-bracket"></i></a>
+        </div>
+    </div>
 </div>
 
 <nav class="bottom-nav">
+    <a th:href="@{/home}" class="nav-item active">
+        <i class="fa-solid fa-house"></i>
+        <span>ホーム</span>
+    </a>
     <a th:href="@{/gacha}" class="nav-item">
         <i class="fa-solid fa-box-open"></i>
         <span>ガチャ</span>
     </a>
-    
-    <a th:href="@{/community}" class="nav-item">
-        <i class="fa-solid fa-comments"></i>
-        <span>掲示板</span>
+    <a th:href="@{/training}" class="nav-item training-start-nav">
+        <i class="fa-solid fa-dumbbell"></i>
+        <span>トレーニング</span>
     </a>
-
     <a th:href="@{/training-log}" class="nav-item">
         <i class="fa-solid fa-calendar-days"></i>
         <span>記録</span>
     </a>
-    <a th:href="@{/settings}" class="nav-item">
-        <i class="fa-solid fa-gear"></i>
-        <span>設定</span>
+    <a th:href="@{/characters}" class="nav-item">
+        <i class="fa-solid fa-users"></i>
+        <span>仲間</span>
     </a>
 </nav>
 

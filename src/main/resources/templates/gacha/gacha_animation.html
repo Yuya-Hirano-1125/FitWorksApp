@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ガチャ演出中…</title>
+    <style>
+        body {
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+            font-size: 24px;
+            flex-direction: column; /* 画像と文字を縦に並べる */
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <img th:src="@{/img/gacha_animation.gif}" alt="演出中GIF">
+    </div>
+    <p>ガチャ結果を生成中…</p>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // Controllerから渡された count を取得
+        const count = /*[[${count}]]*/ 1; 
+        
+        setTimeout(() => {
+            // 結果判定のURLへ遷移 (回数をパラメータとして渡す)
+            window.location.href = '/gacha/roll?count=' + count;
+        }, 3000); // 3秒待機（GIFの長さに合わせて調整してください）
+        /*]]>*/
+    </script>
+</body>
+</html>
+
+
+

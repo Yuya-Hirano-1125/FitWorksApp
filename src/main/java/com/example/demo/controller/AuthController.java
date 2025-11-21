@@ -1,15 +1,13 @@
 package com.example.demo.controller;
 
+import java.util.List;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
  
 @Controller
@@ -21,12 +19,15 @@ public class AuthController {
         this.userService = userService;
     }
 
+<<<<<<< HEAD
+    // ... (認証関連のメソッド省略) ...
+=======
     // --- ログイン/登録関連 ---
     @GetMapping("/login")
-    public String login() { return "login"; }
+    public String login() { return "auth/login"; } 
 
     @GetMapping("/register")
-    public String registerForm() { return "register"; }
+    public String registerForm() { return "auth/register"; } 
 
     @PostMapping("/register")
     public String registerUser(@RequestParam("username") String username,
@@ -34,12 +35,12 @@ public class AuthController {
                                Model model) {
         // 実際の登録ロジックをここに実装する
         model.addAttribute("message", "登録が完了しました。ログインしてください。");
-        return "login";
+        return "auth/login"; 
     }
 
     // --- パスワードリセット ---
     @GetMapping("/forgot-password")
-    public String forgotPasswordForm() { return "forgot-password"; }
+    public String forgotPasswordForm() { return "auth/forgot-password"; } 
 
     @PostMapping("/forgot-password")
     public String processForgotPassword(@RequestParam("email") String email,
@@ -47,7 +48,7 @@ public class AuthController {
         boolean emailFoundAndSent = true; 
         if (emailFoundAndSent) {
             redirectAttributes.addFlashAttribute("successMessage",
-                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");;
+                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");;;;
         } else {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "そのメールアドレスは登録されていません。");
@@ -55,28 +56,8 @@ public class AuthController {
         return "redirect:/forgot-password";
     }
 
-    // --- パスワード変更 ---
-    /*@PostMapping("/change-password")
-    public String changePassword(@RequestParam("currentPassword") String oldPassword,
-                                 @RequestParam("newPassword") String newPassword,
-                                 @RequestParam("confirmPassword") String confirmPassword,
-                                 @AuthenticationPrincipal UserDetails userDetails,
-                                 Model model) {
-        if (!newPassword.equals(confirmPassword)) {
-            model.addAttribute("errorMessage", "新しいパスワードが一致しません");
-            return "change-password";
-        }
-        
-        // 実際のパスワード変更ロジック
-        boolean success = true; 
-        
-        if(success) {
-            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
-        } else {
-            model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
-        }
-        return "change-password";
-    }*/
+    // --- パスワード変更 --- (省略)
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
 
     @GetMapping("/home")
     public String home(
@@ -84,71 +65,108 @@ public class AuthController {
         Model model
     ) {
         if (userDetails != null) {
-            // ユーザー情報を取得
-            User user = userService.findByUsername(userDetails.getUsername());
-            
-            if (user != null) {
-                model.addAttribute("username", user.getUsername());
-                model.addAttribute("level", user.getLevel());
-                model.addAttribute("experiencePoints", user.getExperiencePoints());
-                model.addAttribute("requiredXp", user.calculateRequiredXp());
-                model.addAttribute("progressPercent", user.getProgressPercent());
-            } else {
-                model.addAttribute("username", userDetails.getUsername());
-            }
+            model.addAttribute("username", userDetails.getUsername());
         } else {
             model.addAttribute("username", "ゲスト");
         }
-        return "home";
+        return "misc/home"; // ★ 修正
     }
 
-    // @GetMapping("/training") // <--- 削除しました。TrainingControllerに一任されます。
-    // public String training() { return "training"; } 
+<<<<<<< HEAD
+    // 【削除済み】TrainingControllerに処理を移譲するため、AuthControllerから削除
+    // @GetMapping("/training")
+    // public String training() { return "training"; }
     
-    // NOTE: /gacha のマッピングは GachaController に移管されたため、削除。
+    // 【削除済み】GachaControllerに処理を移譲するため、AuthControllerから削除
+    // @GetMapping("/gacha")
+    // public String gacha() { return "gacha"; } 
     
-    
-    // NOTE: /training-log のマッピングは TrainingController に移管されたため、削除。
+    @GetMapping("/training-log")
+    public String trainingLog(Model model) { 
+        // 仮のデータを作成
+        model.addAttribute("records", List.of(
+            new Record("2025/11/13", "ベンチプレス", "胸", 85, 5, 3),
+            new Record("2025/11/13", "AIおすすめ", "全身", 0, 40, 1),
+            new Record("2025/11/12", "デッドリフト", "背中・脚", 100, 3, 3)
+        ));
+        return "training-log"; 
+    }
 
+    // ★ キャラクター一覧画面への遷移
+    @GetMapping("/characters")
+    public String characterList(Model model) {
+        // 仮のキャラクターデータ
+        model.addAttribute("characters", List.of(
+            new Character("バルクモン", "水の種族", 15, 950, 1200, "水色のマッチョなモンスター", "active", "hi1.png"),
+            new Character("ヒカリモン", "光の種族", 8, 400, 600, "光を放つ翼を持つ天使", "rest", "hikari1.png"),
+            new Character("クサモン", "木の種族", 3, 120, 300, "草木の蔓を持つ優しい妖精", "rest", "kusa1.png")
+        ));
+        return "character-list";
+    }
+
+=======
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
     @GetMapping("/settings")
-    public String settings() { return "settings"; }
+    public String settings() { return "settings/settings"; } 
 }
 
+// データを保持するためのインナークラス (Recordクラス)
+class Record {
+    public String date;
+    public String name;
+    public String part;
+    public int weight;
+    public int reps;
+    public int sets;
 
+    public Record(String date, String name, String part, int weight, int reps, int sets) {
+        this.date = date;
+        this.name = name;
+        this.part = part;
+        this.weight = weight;
+        this.reps = reps;
+        this.sets = sets;
+    }
+    public String getDate() { return date; }
+    public String getName() { return name; }
+    public String getPart() { return part; }
+    public int getWeight() { return weight; }
+    public int getReps() { return reps; }
+    public int getSets() { return sets; }
+}
 
+<<<<<<< HEAD
+// キャラクター情報を保持するインナークラス
+class Character {
+    public String name;
+    public String species;
+    public int level;
+    public int currentExp;
+    public int requiredExp;
+    public String description;
+    public String status;
+    public String image;
 
+    public Character(String name, String species, int level, int currentExp, int requiredExp, String description, String status, String image) {
+        this.name = name;
+        this.species = species;
+        this.level = level;
+        this.currentExp = currentExp;
+        this.requiredExp = requiredExp;
+        this.description = description;
+        this.status = status;
+        this.image = image;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    public String getName() { return name; }
+    public String getSpecies() { return species; }
+    public int getLevel() { return level; }
+    public int getCurrentExp() { return currentExp; }
+    public int getRequiredExp() { return requiredExp; }
+    public String getDescription() { return description; }
+    public String getStatus() { return status; }
+    public String getImage() { return image; }
+    public int getExpPercent() { return (int) (((double) currentExp / requiredExp) * 100); }
+}
+=======
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git

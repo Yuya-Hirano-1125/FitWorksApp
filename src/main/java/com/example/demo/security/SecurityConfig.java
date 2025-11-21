@@ -88,11 +88,10 @@ public class SecurityConfig {
             
             // 4. ページごとのアクセス制御
             .authorizeHttpRequests(auth -> auth
-                // 認証不要なページと静的リソース
                 .requestMatchers(
                     "/",
                     "/home",
-                    "/training", 
+                    "/training",
                     "/gacha",
                     "/settings",
                     "/change-password",
@@ -102,15 +101,16 @@ public class SecurityConfig {
                     "/css/**",
                     "/js/**",
                     "/images/**",
-                    "/img/**",
-                    "/{path:[^\\.]*}" 
-                    
+                    "/img/**"
+                    // ★ ここにあった "/{path:[^\\.]*}" を削除！
                 ).permitAll()
-                // APIエンドポイント (/api/**) は認証が必要
                 .requestMatchers("/api/**").authenticated()
-                // その他のリクエストは認証が必要
                 .anyRequest().authenticated()
             )
+            
+            
+            
+            
             
             // 5. フォームログイン
             .formLogin(form -> form
