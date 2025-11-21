@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
  
 @Controller
@@ -55,7 +56,7 @@ public class AuthController {
     }
 
     // --- パスワード変更 ---
-    @PostMapping("/change-password")
+    /*@PostMapping("/change-password")
     public String changePassword(@RequestParam("currentPassword") String oldPassword,
                                  @RequestParam("newPassword") String newPassword,
                                  @RequestParam("confirmPassword") String confirmPassword,
@@ -75,27 +76,37 @@ public class AuthController {
             model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
         }
         return "change-password";
-    }
+    }*/
 
-    // --- メイン画面への遷移 ---
     @GetMapping("/home")
     public String home(
         @AuthenticationPrincipal UserDetails userDetails,
         Model model
     ) {
         if (userDetails != null) {
-            model.addAttribute("username", userDetails.getUsername());
+            // ユーザー情報を取得
+            User user = userService.findByUsername(userDetails.getUsername());
+            
+            if (user != null) {
+                model.addAttribute("username", user.getUsername());
+                model.addAttribute("level", user.getLevel());
+                model.addAttribute("experiencePoints", user.getExperiencePoints());
+                model.addAttribute("requiredXp", user.calculateRequiredXp());
+                model.addAttribute("progressPercent", user.getProgressPercent());
+            } else {
+                model.addAttribute("username", userDetails.getUsername());
+            }
         } else {
             model.addAttribute("username", "ゲスト");
         }
         return "home";
     }
-    
+
     // @GetMapping("/training") // <--- 削除しました。TrainingControllerに一任されます。
     // public String training() { return "training"; } 
     
-    @GetMapping("/gacha")
-    public String gacha() { return "gacha"; } 
+    // NOTE: /gacha のマッピングは GachaController に移管されたため、削除。
+    
     
     // NOTE: /training-log のマッピングは TrainingController に移管されたため、削除。
 
