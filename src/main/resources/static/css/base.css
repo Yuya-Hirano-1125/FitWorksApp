@@ -322,7 +322,18 @@ h1 {
 	    cursor: pointer;
 	    margin-top: 10px;         /* 上の要素との間隔 */
 	}
+	/* home.css または base.css に追加 */
+	.app-logo-display {
+	    text-align: center; /* 中央寄せ */
+	    margin-bottom: 20px; /* 経験値バーとの間に余白 */
+	}
 
+	.app-logo-display img {
+	    max-width: 150px; /* ロゴの最大幅を設定 */
+	    height: auto;
+	}
+
+	/* 既存のキャラクター表示部分に影響が出ないか確認してください */
 	/* マウスを乗せた時の色 */
 	.btn-comment:hover {
 	    background-color: #218838; /* 少し濃い緑に変化 */

@@ -19,7 +19,45 @@ public class AuthController {
         this.userService = userService;
     }
 
+<<<<<<< HEAD
     // ... (認証関連のメソッド省略) ...
+=======
+    // --- ログイン/登録関連 ---
+    @GetMapping("/login")
+    public String login() { return "auth/login"; } 
+
+    @GetMapping("/register")
+    public String registerForm() { return "auth/register"; } 
+
+    @PostMapping("/register")
+    public String registerUser(@RequestParam("username") String username,
+                               @RequestParam("password") String password,
+                               Model model) {
+        // 実際の登録ロジックをここに実装する
+        model.addAttribute("message", "登録が完了しました。ログインしてください。");
+        return "auth/login"; 
+    }
+
+    // --- パスワードリセット ---
+    @GetMapping("/forgot-password")
+    public String forgotPasswordForm() { return "auth/forgot-password"; } 
+
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@RequestParam("email") String email,
+                                        RedirectAttributes redirectAttributes) {
+        boolean emailFoundAndSent = true; 
+        if (emailFoundAndSent) {
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");;;;
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "そのメールアドレスは登録されていません。");
+        }
+        return "redirect:/forgot-password";
+    }
+
+    // --- パスワード変更 --- (省略)
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
 
     @GetMapping("/home")
     public String home(
@@ -31,9 +69,10 @@ public class AuthController {
         } else {
             model.addAttribute("username", "ゲスト");
         }
-        return "home";
+        return "misc/home"; // ★ 修正
     }
 
+<<<<<<< HEAD
     // 【削除済み】TrainingControllerに処理を移譲するため、AuthControllerから削除
     // @GetMapping("/training")
     // public String training() { return "training"; }
@@ -65,8 +104,10 @@ public class AuthController {
         return "character-list";
     }
 
+=======
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
     @GetMapping("/settings")
-    public String settings() { return "settings"; }
+    public String settings() { return "settings/settings"; } 
 }
 
 // データを保持するためのインナークラス (Recordクラス)
@@ -94,6 +135,7 @@ class Record {
     public int getSets() { return sets; }
 }
 
+<<<<<<< HEAD
 // キャラクター情報を保持するインナークラス
 class Character {
     public String name;
@@ -126,3 +168,5 @@ class Character {
     public String getImage() { return image; }
     public int getExpPercent() { return (int) (((double) currentExp / requiredExp) * 100); }
 }
+=======
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
