@@ -1,12 +1,12 @@
 package com.example.demo.entity;
 
-import java.time.LocalDate; // ★ 新規インポート
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.Id; 
 
 @Entity
 public class User {
@@ -23,15 +23,13 @@ public class User {
     @Column(unique = true)
     private String email; 
 
-    // ★ 修正: プリミティブ型 (int) からラッパー型 (Integer) に変更し、DBのNULLに対応
-    private Integer level = 1; // 初期レベル
-    private Integer experiencePoints = 0; // 初期XP
+    private Integer level = 1; 
+    private Integer experiencePoints = 0; 
 
     // ★ 新規追加: デイリーミッション追跡用
     private LocalDate lastMissionCompletionDate;
-    private Boolean isRewardClaimedToday = false; // デフォルトは未クレーム
+    private Boolean isRewardClaimedToday = false; 
 
-    // JPAの要件: 引数なしのコンストラクタ (初期値設定の安全性を高めるため)
     public User() {
         if (this.level == null) this.level = 1;
         if (this.experiencePoints == null) this.experiencePoints = 0;
@@ -51,19 +49,16 @@ public class User {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    // ★ 修正: null安全なGetter (nullの場合は1を返す)
     public Integer getLevel() { 
         return level != null ? level : 1; 
     }
     public void setLevel(Integer level) { this.level = level; }
 
-    // ★ 修正: null安全なGetter (nullの場合は0を返す)
     public Integer getExperiencePoints() { 
         return experiencePoints != null ? experiencePoints : 0; 
     }
     public void setExperiencePoints(Integer experiencePoints) { this.experiencePoints = experiencePoints; }
 
-    // ★ 新規Getter/Setter
     public LocalDate getLastMissionCompletionDate() { return lastMissionCompletionDate; }
     public void setLastMissionCompletionDate(LocalDate lastMissionCompletionDate) { this.lastMissionCompletionDate = lastMissionCompletionDate; }
     
@@ -71,14 +66,12 @@ public class User {
     public void setIsRewardClaimedToday(Boolean isRewardClaimedToday) { this.isRewardClaimedToday = isRewardClaimedToday; }
 
     // --- レベルアップ関連 ---
-    // null安全なGetter (getLevel()) を使用するため修正
     public int calculateRequiredXp() {
-        int currentLevel = getLevel();
+        int currentLevel = getLevel(); 
         return 1000 + (currentLevel - 1) * 200;
     }
 
     public void addXp(int xp) {
-        // null安全なGetter (getExperiencePoints()) を使用
         int currentXp = getExperiencePoints(); 
         this.experiencePoints = currentXp + xp;
         
@@ -88,11 +81,18 @@ public class User {
         }
     }
 
-    // null安全なGetter (getExperiencePoints()) を使用するため修正
     public int getProgressPercent() {
-        int currentXp = getExperiencePoints();
+        int currentXp = getExperiencePoints(); 
         int requiredXp = calculateRequiredXp();
-        if (requiredXp == 0) return 0; // ゼロ除算防止
+        if (requiredXp == 0) return 0; 
         return (int)(((double) currentXp / requiredXp) * 100);
     }
 }
+
+
+
+
+
+
+
+

@@ -1,21 +1,21 @@
 package com.example.demo.service;
 
-import java.time.LocalDate; // ★ 追加
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.MissionStatusDto; // ★ 追加
+import com.example.demo.dto.MissionStatusDto;
 import com.example.demo.entity.User;
-import com.example.demo.repository.TrainingRecordRepository; // ★ 追加
+import com.example.demo.repository.TrainingRecordRepository;
 import com.example.demo.repository.UserRepository;
 
 @Service
 public class UserService {
     
     private final UserRepository userRepository;
-    private final TrainingRecordRepository trainingRecordRepository; // ★ 追加
+    private final TrainingRecordRepository trainingRecordRepository; 
     private final PasswordEncoder passwordEncoder; 
 
     // ★ 修正: TrainingRecordRepositoryとPasswordEncoderを含むコンストラクタ
@@ -79,7 +79,7 @@ public class UserService {
 
         return new MissionStatusDto(
             isCompleted,
-            user.getIsRewardClaimedToday() != null ? user.getIsRewardClaimedToday() : false, // 最新のクレームステータス
+            user.getIsRewardClaimedToday() != null ? user.getIsRewardClaimedToday() : false, 
             MISSION_REWARD_XP,
             MISSION_TEXT
         );
@@ -104,3 +104,4 @@ public class UserService {
         return false;
     }
 }
+
