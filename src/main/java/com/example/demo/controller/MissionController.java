@@ -1,91 +1,63 @@
 package com.example.demo.controller;
 
+import java.util.List;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.demo.dto.MissionStatusDto;
+import com.example.demo.entity.DailyMissionStatus;
 import com.example.demo.entity.User;
-import com.example.demo.service.UserService; 
+import com.example.demo.service.MissionService;
 
 @Controller
+@RequestMapping("/mission")
 public class MissionController {
-    
-    private final UserService userService;
-    
-    public MissionController(UserService userService) {
-        this.userService = userService;
+
+    private final MissionService missionService;
+
+    public MissionController(MissionService missionService) {
+        this.missionService = missionService;
     }
 
-    /**
-     * デイリーミッション画面を表示する
-     */
-    @GetMapping("/daily-mission")
-    public String showDailyMission(
-        @AuthenticationPrincipal UserDetails userDetails,
-        Model model
-    ) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-
-        User user = userService.findByUsername(userDetails.getUsername());
+    // デイリーミッション画面の表示
+    @GetMapping("/daily")
+    public String showDailyMissions(@AuthenticationPrincipal User user, Model model) {
+        // 現在ログインしているUserエンティティを取得 (SecurityConfigでPrincipalがUser型に設定されている前提)
+        // もしPrincipalがUserDetails型であれば、UserService.findByUsernameなどでUserを取得してください
+        
         if (user == null) {
-            return "redirect:/login";
-        }
-        
-        // ★ 修正: ミッションステータスを取得してモデルに追加
-        MissionStatusDto missionStatus = userService.getDailyMissionStatus(user);
-        model.addAttribute("missionStatus", missionStatus);
-        
-        // 経験値に関する属性もモデルに追加
-        model.addAttribute("level", user.getLevel());
-        model.addAttribute("experiencePoints", user.getExperiencePoints());
-        model.addAttribute("requiredXp", user.calculateRequiredXp());
-        model.addAttribute("progressPercent", user.getProgressPercent());
-
-        // src/main/resources/templates/misc/daily-mission.html を返す
-        return "misc/daily-mission";
-    }
-    
-    /**
-     * FAQ画面を表示する
-     */
-    @GetMapping("/faq")
-    public String showFaq() {
-        return "misc/faq"; 
-    }
-    
-    // ★ 新規追加: 報酬受け取り処理
-    @PostMapping("/daily-mission/claim")
-    public String claimReward(
-        @AuthenticationPrincipal UserDetails userDetails,
-        RedirectAttributes redirectAttributes
-    ) {
-        if (userDetails == null) {
-            return "redirect:/login";
+            return "redirect:/login"; // ログインしていない場合はリダイレクト
         }
 
-        User user = userService.findByUsername(userDetails.getUsername());
+        // ミッション進捗を「一から始める」処理を含む、今日のミッションリストを取得
+        List<DailyMissionStatus> missions = missionService.getTodayMissions(user);
+        
+        model.addAttribute("missions", missions);
+        model.addAttribute("user", user); // ユーザー情報も表示に利用可能
+        
+        return "misc/daily-mission"; // src/main/resources/templates/misc/daily-mission.html をレンダリング
+    }
+
+    // (例) 運動記録を保存するControllerからの連携
+    // 運動記録Controllerなどからこのメソッドを呼び出すことで、ミッション進捗が更新されます。
+    // 例として、MissionControllerにダミーの進捗更新エンドポイントを追加します。
+    @PostMapping("/progress")
+    public String updateMissionProgress(@AuthenticationPrincipal User user, @RequestParam String missionType) {
         if (user == null) {
             return "redirect:/login";
         }
 
-        boolean success = userService.claimMissionReward(user);
-        
-        if (success) {
-            // 成功メッセージに獲得XPを表示
-            redirectAttributes.addFlashAttribute("successMessage", 
-                "ミッション報酬 " + userService.getDailyMissionStatus(user).getRewardXp() + " XPを受け取りました！");
-        } else {
-            redirectAttributes.addFlashAttribute("errorMessage", 
-                "報酬を受け取れませんでした。ミッションを完了しているか、または既に受け取り済みか確認してください。");
-        }
-        
-        return "redirect:/daily-mission";
+        // MissionServiceに進捗更新を依頼
+        missionService.updateMissionProgressAndCheckCompletion(user.getId(), missionType);
+
+        return "redirect:/mission/daily";
     }
 }
+
+
+
