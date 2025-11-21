@@ -189,23 +189,6 @@
         <p class="exercise-type" th:if="${trainingType == 'free-weight'}"><i class="fa-solid fa-weight-hanging"></i> フリーウェイト</p>
         <p class="exercise-type" th:if="${trainingType == 'cardio'}"><i class="fa-solid fa-running"></i> 有酸素運動</p>
         <p class="exercise-type" th:if="${trainingType == 'ai-suggested'}"><i class="fa-solid fa-star"></i> AIおすすめプログラム</p>
-        
-        <div class="timer-section">
-            <div class="countdown-container">
-                <h3 style="color: #ffcc00; margin-bottom: 5px;">トレーニングタイマー</h3>
-                <div id="countdown-display" class="timer-display">05:00</div>
-                 <div class="timer-settings">
-                    <input type="number" id="countdown-minutes" value="5" min="0" max="99" style="width: 50px;"> 分
-                    <input type="number" id="countdown-seconds" value="0" min="0" max="59" style="width: 50px;"> 秒
-                    <button id="countdown-set" class="button timer-button-tertiary"><i class="fa-solid fa-clock"></i> 設定</button>
-                </div>
-                <div class="timer-controls">
-                    <button id="countdown-start-pause" class="button timer-button-primary"><i class="fa-solid fa-play"></i> 開始</button>
-                    <button id="countdown-reset" class="button timer-button-secondary"><i class="fa-solid fa-rotate-left"></i> リセット</button>
-                </div>
-            </div>
-
-            <hr style="border-top: 1px solid #333; margin: 30px 0;">
 
             <div class="interval-container">
                 <h3 style="color: var(--primary-color); margin-bottom: 5px; margin-top: 20px;">インターバルタイマー</h3>
