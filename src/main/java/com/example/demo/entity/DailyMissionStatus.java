@@ -25,48 +25,54 @@ public class DailyMissionStatus {
     private User user;
 
     @Column(nullable = false)
-    private LocalDate date; // ミッションが割り当てられた日付
+    private LocalDate date; 
 
     @Column(nullable = false)
     private String missionType; // 例: "TRAINING_LOG", "COMMUNITY_POST"
 
     @Column(nullable = false)
-    private int requiredCount; // 必要な達成回数/量
+    private String description; 
 
     @Column(nullable = false)
-    private int currentCount = 0; // 現在の進捗
+    private int requiredCount; 
 
     @Column(nullable = false)
-    private boolean completed = false; // 完了フラグ
+    private int currentCount = 0; 
 
     @Column(nullable = false)
-    private int rewardExp = 100; // 報酬経験値 (ミッションごとに変更可能)
+    private boolean completed = false; 
+
+    @Column(nullable = false)
+    private boolean rewardClaimed = false; 
+
+    @Column(nullable = false)
+    private int rewardExp; 
 
     // コンストラクタ
     public DailyMissionStatus() {}
 
-    public DailyMissionStatus(User user, LocalDate date, String missionType, int requiredCount, int rewardExp) {
+    public DailyMissionStatus(User user, LocalDate date, String missionType, String description, int requiredCount, int rewardExp) {
         this.user = user;
         this.date = date;
         this.missionType = missionType;
+        this.description = description;
         this.requiredCount = requiredCount;
         this.rewardExp = rewardExp;
     }
 
-    // 進捗をインクリメントし、完了をチェックするメソッド
+    // 進捗をインクリメントし、完了状態をチェックするメソッド
     public boolean incrementProgress() {
         if (!completed) {
             this.currentCount = Math.min(this.currentCount + 1, this.requiredCount);
             if (this.currentCount >= this.requiredCount) {
                 this.completed = true;
-                return true; // 完了した場合
+                return true;
             }
         }
-        return false; // 完了していない場合
+        return false;
     }
 
-    // getter, setter (省略)
-
+    // getter, setter (全量表示のため省略、実際には必要)
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public User getUser() { return user; }
@@ -75,12 +81,16 @@ public class DailyMissionStatus {
     public void setDate(LocalDate date) { this.date = date; }
     public String getMissionType() { return missionType; }
     public void setMissionType(String missionType) { this.missionType = missionType; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
     public int getRequiredCount() { return requiredCount; }
     public void setRequiredCount(int requiredCount) { this.requiredCount = requiredCount; }
     public int getCurrentCount() { return currentCount; }
     public void setCurrentCount(int currentCount) { this.currentCount = currentCount; }
     public boolean isCompleted() { return completed; }
     public void setCompleted(boolean completed) { this.completed = completed; }
+    public boolean isRewardClaimed() { return rewardClaimed; }
+    public void setRewardClaimed(boolean rewardClaimed) { this.rewardClaimed = rewardClaimed; }
     public int getRewardExp() { return rewardExp; }
     public void setRewardExp(int rewardExp) { this.rewardExp = rewardExp; }
 }

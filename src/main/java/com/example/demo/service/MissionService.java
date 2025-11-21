@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +15,7 @@ import com.example.demo.repository.DailyMissionStatusRepository;
 public class MissionService {
 
     private final DailyMissionStatusRepository missionStatusRepository;
-    private final UserService userService; // EXP付与のためにUserServiceを使用
+    private final UserService userService; 
 
     public MissionService(DailyMissionStatusRepository missionStatusRepository, UserService userService) {
         this.missionStatusRepository = missionStatusRepository;
@@ -23,18 +24,14 @@ public class MissionService {
 
     /**
      * ユーザーの今日のデイリーミッションを取得します。
-     * ミッションがない場合は新しく生成します。
-     *
-     * @param user 対象ユーザー
-     * @return 今日のミッションリスト
+     * ミッションがない場合は新しく生成します (進捗を一から始める)。
      */
+    @Transactional
     public List<DailyMissionStatus> getOrCreateTodayMissions(User user) {
         LocalDate today = LocalDate.now();
         List<DailyMissionStatus> missions = missionStatusRepository.findByUserAndDate(user, today);
 
-        // ミッション進捗を一から始める (日付チェック)
         if (missions.isEmpty()) {
-            // 今日のミッションがないため、新しく生成
             return generateDailyMissions(user, today);
         }
 
@@ -43,28 +40,25 @@ public class MissionService {
 
     /**
      * デイリーミッションを生成します。
-     * この部分は、ミッションの内容を定義するロジックに置き換えてください。
      */
     private List<DailyMissionStatus> generateDailyMissions(User user, LocalDate date) {
-        // 例: 運動記録を1回行うミッション
-        DailyMissionStatus mission1 = new DailyMissionStatus(user, date, "TRAINING_LOG", 1, 150);
-        // 例: コミュニティに1回投稿するミッション
-        DailyMissionStatus mission2 = new DailyMissionStatus(user, date, "COMMUNITY_POST", 1, 100);
+        DailyMissionStatus mission1 = new DailyMissionStatus(
+            user, date, "TRAINING_LOG", "トレーニングを1回記録する", 1, 300
+        );
+        DailyMissionStatus mission2 = new DailyMissionStatus(
+            user, date, "COMMUNITY_POST", "コミュニティに1回投稿する", 1, 200
+        );
 
-        missionStatusRepository.save(mission1);
-        missionStatusRepository.save(mission2);
+        missionStatusRepository.saveAll(List.of(mission1, mission2));
 
         return List.of(mission1, mission2);
     }
 
     /**
-     * ミッションの進捗を更新し、完了していれば経験値を付与します。
-     *
-     * @param userId ユーザーID
-     * @param missionType 更新対象のミッションタイプ (例: "TRAINING_LOG")
+     * ミッションの進捗を更新します。
      */
     @Transactional
-    public void updateMissionProgressAndCheckCompletion(Long userId, String missionType) {
+    public void updateMissionProgress(Long userId, String missionType) {
         User user = userService.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
@@ -72,22 +66,43 @@ public class MissionService {
         
         missionStatusRepository.findByUserAndDateAndMissionType(user, today, missionType)
                 .ifPresent(missionStatus -> {
-                    boolean completedNow = missionStatus.incrementProgress();
-                    
-                    // ミッションの進捗を保存
+                    missionStatus.incrementProgress();
                     missionStatusRepository.save(missionStatus);
-                    
-                    // ミッションクリアで経験値を獲得
-                    if (completedNow) {
-                        userService.addExp(user, missionStatus.getRewardExp());
-                    }
                 });
     }
 
     /**
-     * MissionControllerなどに返すためのDto変換メソッド（任意）
+     * 完了したミッションの報酬を獲得します (経験値を付与します)。
+     * ★ 修正: このメソッドシグネチャがMissionControllerの呼び出しと一致しています。
      */
-    public List<DailyMissionStatus> getTodayMissions(User user) {
-        return getOrCreateTodayMissions(user);
+    @Transactional
+    public boolean claimMissionReward(Long userId, Long missionId) {
+        Optional<DailyMissionStatus> optionalStatus = missionStatusRepository.findById(missionId);
+
+        if (optionalStatus.isEmpty()) return false;
+        DailyMissionStatus missionStatus = optionalStatus.get();
+        
+        // ユーザーと今日のミッションであることの確認
+        if (!missionStatus.getUser().getId().equals(userId) || !missionStatus.getDate().equals(LocalDate.now())) {
+             return false;
+        }
+
+        // ミッションが完了しており、まだ報酬を獲得していないこと
+        if (missionStatus.isCompleted() && !missionStatus.isRewardClaimed()) {
+            // Userを再度フェッチして、Detached Objectエラーを回避する（Optional）
+            User user = userService.findById(userId).orElseThrow(() -> new IllegalStateException("User not found in claim process."));
+            int rewardExp = missionStatus.getRewardExp();
+
+            // UserServiceの addExp を呼び出し、経験値を付与しレベルアップを処理
+            userService.addExp(user, rewardExp); 
+
+            // 報酬をクレーム済みに更新
+            missionStatus.setRewardClaimed(true);
+            missionStatusRepository.save(missionStatus);
+            
+            return true;
+        }
+        
+        return false;
     }
 }
