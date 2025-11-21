@@ -113,6 +113,7 @@ public class TrainingController {
     
     /**
      * トレーニング選択画面 (training.html) を表示
+     * ★ 修正: return "training" から "training/training" に変更
      */
 =======
     // ★ 修正点: /training のメイン画面ルーティングをAuthControllerから引き継ぐ
@@ -132,7 +133,11 @@ public class TrainingController {
         model.addAttribute("freeWeightParts", FREE_WEIGHT_EXERCISES_BY_PART.keySet());
         model.addAttribute("cardioExercises", CARDIO_EXERCISES);
         
+<<<<<<< HEAD
         return "training/training"; // ★ 修正
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
+=======
+        return "training/training"; 
 >>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
     }
 
@@ -270,6 +275,9 @@ public class TrainingController {
         }
         model.addAttribute("dayLabels", dayLabels);
         return "log/training-log"; // ★ 修正
+<<<<<<< HEAD
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
+=======
 >>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
     }
 
@@ -364,12 +372,35 @@ public class TrainingController {
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     // TODO: @PostMapping("/training/save") で記録をDBに保存するメソッドを後で追加する
 >>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
 }
 =======
 }
+
+
+
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
+=======
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
