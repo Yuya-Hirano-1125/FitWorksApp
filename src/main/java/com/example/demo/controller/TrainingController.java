@@ -46,67 +46,46 @@ public class TrainingController {
     }
 
     private static final Map<String, List<String>> FREE_WEIGHT_EXERCISES_BY_PART = new LinkedHashMap<>() {{
-        // 初級: チェストフライ
-        // 中級: ベンチプレス, ダンベルプレス, インクラインプレス
         put("胸", List.of(
             "チェストフライ (初級)", 
             "ベンチプレス (中級)", 
             "ダンベルプレス (中級)", 
             "インクラインプレス (中級)"
         ));
-        
-        // 初級: ラットプルダウン, シーテッドロー
-        // 中級: ベントオーバーロー
-        // 上級: デッドリフト
         put("背中", List.of(
             "ラットプルダウン (初級)", 
             "シーテッドロー (初級)", 
             "ベントオーバーロー (中級)", 
             "デッドリフト (上級)"
         ));
-        
-        // 初級: レッグプレス, レッグエクステンション, レッグカール
-        // 中級: スクワット
         put("脚", List.of(
             "レッグプレス (初級)", 
             "レッグエクステンション (初級)", 
             "レッグカール (初級)", 
             "スクワット (中級)"
         ));
-        
-        // 初級: サイドレイズ, フロントレイズ
-        // 中級: ショルダープレス, オーバーヘッドプレス
         put("肩", List.of(
             "サイドレイズ (初級)", 
             "フロントレイズ (初級)", 
             "ショルダープレス (中級)", 
             "オーバーヘッドプレス (中級)"
         ));
-        
-        // 初級: アームカール, ハンマーカール, トライセプスエクステンション
         put("腕", List.of(
             "アームカール (初級)", 
             "ハンマーカール (初級)", 
             "トライセプスエクステンション (初級)"
         ));
-        
-        // 初級: クランチ
-        // 中級: レッグレイズ, ロシアンツイスト
         put("腹筋", List.of(
             "クランチ (初級)", 
             "レッグレイズ (中級)", 
             "ロシアンツイスト (中級)"
         ));
-        
-        // 初級: カーフレイズ
-        // 中級: ヒップスラスト
         put("その他", List.of(
             "カーフレイズ (初級)", 
             "ヒップスラスト (中級)"
         ));
     }};
     
-    // 【有酸素運動リストを難易度順・ラベル付きで定義】
     private static final List<String> CARDIO_EXERCISES = List.of(
             "ウォーキング (初級)", 
             "サイクリング (初級)", 
@@ -130,7 +109,7 @@ public class TrainingController {
         model.addAttribute("freeWeightParts", FREE_WEIGHT_EXERCISES_BY_PART.keySet());
         model.addAttribute("cardioExercises", CARDIO_EXERCISES);
         
-        return "training"; 
+        return "training/training"; // ★ 修正
     }
 
     /**
@@ -141,7 +120,7 @@ public class TrainingController {
         if (getCurrentUser(authentication) == null) {
             return "redirect:/login"; 
         }
-        return "exercise-list"; 
+        return "training/exercise-list"; // ★ 修正
     }
 
     /**
@@ -187,7 +166,7 @@ public class TrainingController {
         // ★ 記録用フォームのために今日の日付を渡す
         model.addAttribute("today", LocalDate.now());
         
-        return "training-session"; 
+        return "training/training-session"; // ★ 修正
     }
     
     /**
@@ -260,7 +239,7 @@ public class TrainingController {
             dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE));
         }
         model.addAttribute("dayLabels", dayLabels);
-        return "training-log";
+        return "log/training-log"; // ★ 修正
     }
 
     /**
@@ -277,7 +256,7 @@ public class TrainingController {
         List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
         model.addAttribute("records", allRecords);
         
-        return "training-log-all";
+        return "log/training-log-all"; // ★ 修正
     }
 
     @GetMapping("/training-log/form/weight")
@@ -286,7 +265,7 @@ public class TrainingController {
         form.setRecordDate(date);
         form.setType("WEIGHT");
         model.addAttribute("trainingLogForm", form);
-        return "training-log-form-weight"; 
+        return "log/training-log-form-weight"; // ★ 修正
     }
 
     @GetMapping("/training-log/form/cardio")
@@ -295,7 +274,7 @@ public class TrainingController {
         form.setRecordDate(date);
         form.setType("CARDIO");
         model.addAttribute("trainingLogForm", form);
-        return "training-log-form-cardio";
+        return "log/training-log-form-cardio"; // ★ 修正
     }
     
     @PostMapping("/training-log/save")
@@ -332,3 +311,4 @@ public class TrainingController {
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
 }
+
