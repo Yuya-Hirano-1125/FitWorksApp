@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -43,68 +44,89 @@ public class TrainingController {
         if (authentication == null) return null;
         return userService.findByUsername(authentication.getName());
     }
-    
-    // 【修正箇所: 部位ごとのフリーウェイト種目を定義】
-    private static final Map<String, List<String>> FREE_WEIGHT_EXERCISES_BY_PART = Map.of(
-        "胸", List.of("ベンチプレス", "ダンベルプレス", "インクラインプレス", "チェストフライ"),
-        "背中", List.of("デッドリフト", "ラットプルダウン", "ベントオーバーロー", "シーテッドロー"),
-        "脚", List.of("スクワット", "レッグプレス", "レッグエクステンション", "レッグカール"),
-        "肩", List.of("ショルダープレス", "オーバーヘッドプレス", "サイドレイズ", "フロントレイズ"),
-        "腕", List.of("アームカール", "トライセプスエクステンション", "ハンマーカール"),
-        "腹筋", List.of("クランチ", "レッグレイズ", "ロシアンツイスト"),
-        "その他", List.of("カーフレイズ", "ヒップスラスト")
-    );
-    
-    // 【新規: 有酸素運動リストを定義】
-    private static final List<String> CARDIO_EXERCISES = List.of(
-        "ランニング", "サイクリング", "エリプティカル", "水泳", "ウォーキング", "トレッドミルインターバル", "ローイング"
-    );
 
-   
+    private static final Map<String, List<String>> FREE_WEIGHT_EXERCISES_BY_PART = new LinkedHashMap<>() {{
+        put("胸", List.of(
+            "チェストフライ (初級)", 
+            "ベンチプレス (中級)", 
+            "ダンベルプレス (中級)", 
+            "インクラインプレス (中級)"
+        ));
+        put("背中", List.of(
+            "ラットプルダウン (初級)", 
+            "シーテッドロー (初級)", 
+            "ベントオーバーロー (中級)", 
+            "デッドリフト (上級)"
+        ));
+        put("脚", List.of(
+            "レッグプレス (初級)", 
+            "レッグエクステンション (初級)", 
+            "レッグカール (初級)", 
+            "スクワット (中級)"
+        ));
+        put("肩", List.of(
+            "サイドレイズ (初級)", 
+            "フロントレイズ (初級)", 
+            "ショルダープレス (中級)", 
+            "オーバーヘッドプレス (中級)"
+        ));
+        put("腕", List.of(
+            "アームカール (初級)", 
+            "ハンマーカール (初級)", 
+            "トライセプスエクステンション (初級)"
+        ));
+        put("腹筋", List.of(
+            "クランチ (初級)", 
+            "レッグレイズ (中級)", 
+            "ロシアンツイスト (中級)"
+        ));
+        put("その他", List.of(
+            "カーフレイズ (初級)", 
+            "ヒップスラスト (中級)"
+        ));
+    }};
     
+    private static final List<String> CARDIO_EXERCISES = List.of(
+            "ウォーキング (初級)", 
+            "サイクリング (初級)", 
+            "エリプティカル (初級)", 
+            "ランニング (中級)", 
+            "水泳 (中級)", 
+            "ローイング (中級)", 
+            "トレッドミルインターバル (上級)"
+        );
+
     /**
      * トレーニング選択画面 (training.html) を表示
-     * @param authentication 認証ユーザー
-     * @param model Thymeleafモデル
-     * @return training.html
      */
     @GetMapping("/training")
     public String showTrainingOptions(Authentication authentication, Model model) { 
         if (getCurrentUser(authentication) == null) {
-            return "redirect:/login"; // ログインしていない場合はログイン画面へ
+            return "redirect:/login"; 
         }
         
-        // 【修正箇所: 部位ごとの種目マップと部位リストをモデルに追加】
         model.addAttribute("freeWeightExercisesByPart", FREE_WEIGHT_EXERCISES_BY_PART);
         model.addAttribute("freeWeightParts", FREE_WEIGHT_EXERCISES_BY_PART.keySet());
         model.addAttribute("cardioExercises", CARDIO_EXERCISES);
         
-        return "training"; // src/main/resources/templates/training.htmlをレンダリング
+        return "training/training"; // ★ 修正
     }
 
     /**
      * トレーニング種目一覧画面 (exercise-list.html) を表示
-     * @param authentication 認証ユーザー
-     * @return exercise-list.html
      */
     @GetMapping("/training/exercises")
     public String showExerciseList(Authentication authentication) {
         if (getCurrentUser(authentication) == null) {
-            return "redirect:/login"; // ログインしていない場合はログイン画面へ
+            return "redirect:/login"; 
         }
-        return "exercise-list"; // src/main/resources/templates/exercise-list.htmlをレンダリング
+        return "training/exercise-list"; // ★ 修正
     }
 
     /**
-     * トレーニングセッション開始 (training/start) を処理し、セッション画面へ遷移
-     * training.htmlからPOSTされたフォームデータを受け取ります。
-     * @param type 選択されたトレーニングタイプ
-     * @param exerciseName 選択または入力された種目名
-     * @param authentication 認証ユーザー
-     * @param model Thymeleafモデル
-     * @return training-session.html または リダイレクト
+     * トレーニングセッション開始
      */
-    @PostMapping("/training/start") // HTTPメソッドをPOSTに変更
+    @PostMapping("/training/start")
     public String startTrainingSession(
             @RequestParam("type") String type,
             @RequestParam(value = "exerciseName", required = false) String exerciseName,
@@ -113,7 +135,7 @@ public class TrainingController {
         
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) {
-            return "redirect:/login"; // ログインしていない場合はログイン画面へ
+            return "redirect:/login"; 
         }
         
         String title = "";
@@ -126,11 +148,9 @@ public class TrainingController {
                 break;
             case "free-weight":
             case "cardio":
-                // 選択された種目名、または自由記入された種目名を使用
                 if (exerciseName != null && !exerciseName.trim().isEmpty()) {
                     selectedExercise = exerciseName.trim();
                 } else {
-                    // 種目が選択/入力されていない場合はエラーとして扱う
                     return "redirect:/training"; 
                 }
                 title = ("free-weight".equals(type) ? "フリーウェイト" : "有酸素運動") + "セッション";
@@ -141,19 +161,16 @@ public class TrainingController {
         
         model.addAttribute("trainingType", type);
         model.addAttribute("trainingTitle", title);
-        model.addAttribute("selectedExercise", selectedExercise); // 種目名をセッション画面へ渡す
+        model.addAttribute("selectedExercise", selectedExercise);
         
-        // 実際のトレーニングセッション画面へ遷移 (training-session.htmlが存在することを想定)
-        return "training-session"; 
+        // ★ 記録用フォームのために今日の日付を渡す
+        model.addAttribute("today", LocalDate.now());
+        
+        return "training/training-session"; // ★ 修正
     }
     
     /**
      * トレーニングログ（カレンダー）画面を表示
-     * @param authentication 認証ユーザー
-     * @param year 表示する年
-     * @param month 表示する月
-     * @param model Thymeleafモデル
-     * @return training-log.html
      */
     @GetMapping("/training-log")
     public String showTrainingLog(
@@ -183,7 +200,6 @@ public class TrainingController {
         LocalDate firstOfMonth = targetYearMonth.atDay(1);
         LocalDate lastOfMonth = targetYearMonth.atEndOfMonth();
 
-        // データベースから該当月の記録を取得し、日付と記録の有無をMapに変換
         List<TrainingRecord> records = trainingRecordRepository.findByUser_IdAndRecordDateBetween(
                 currentUser.getId(), firstOfMonth, lastOfMonth);
         
@@ -191,75 +207,76 @@ public class TrainingController {
                 .collect(Collectors.toMap(
                     TrainingRecord::getRecordDate,
                     r -> true,
-                    (a, b) -> a // 既にキーが存在する場合は上書きしない
+                    (a, b) -> a 
                 ));
 
-        // カレンダーグリッドの生成
         List<LocalDate> calendarDays = new ArrayList<>();
-        
-        // 1週目の開始曜日までの空白
         int paddingDays = firstOfMonth.getDayOfWeek().getValue() % 7; 
-        if (paddingDays == 0) paddingDays = 7; // 日曜日を0ではなく7として扱う（カレンダー表示のため）
-        paddingDays = (paddingDays == 7) ? 0 : paddingDays; // 日曜日を0に戻す
+        if (paddingDays == 0) paddingDays = 7; 
+        paddingDays = (paddingDays == 7) ? 0 : paddingDays; 
 
         for (int i = 0; i < paddingDays; i++) {
-            calendarDays.add(null); // nullで空白セルを表す
+            calendarDays.add(null); 
         }
 
-        // 今月の日付
         for (int i = 1; i <= targetYearMonth.lengthOfMonth(); i++) {
             calendarDays.add(targetYearMonth.atDay(i));
         }
         
-        // モデルにデータを格納
         model.addAttribute("currentDate", today);
         model.addAttribute("currentYearMonth", targetYearMonth);
         model.addAttribute("calendarDays", calendarDays);
         model.addAttribute("loggedDates", loggedDates);
         model.addAttribute("username", currentUser.getUsername());
         
-        // 月のナビゲーションデータ
         model.addAttribute("prevYear", targetYearMonth.minusMonths(1).getYear());
         model.addAttribute("prevMonth", targetYearMonth.minusMonths(1).getMonthValue());
         model.addAttribute("nextYear", targetYearMonth.plusMonths(1).getYear());
         model.addAttribute("nextMonth", targetYearMonth.plusMonths(1).getMonthValue());
 
-        // 曜日ヘッダー
         List<String> dayLabels = new ArrayList<>();
         for (DayOfWeek day : DayOfWeek.values()) {
             dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE));
         }
         model.addAttribute("dayLabels", dayLabels);
-        return "training-log";
+        return "log/training-log"; // ★ 修正
     }
 
     /**
-     * フリーウェイトの記録フォームを返す (モーダル内で使用)
+     * ★ 追加: 全トレーニング記録一覧画面を表示
      */
+    @GetMapping("/training-log/all")
+    public String showAllTrainingLog(Authentication authentication, Model model) {
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        // 全記録を取得してモデルに追加
+        List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
+        model.addAttribute("records", allRecords);
+        
+        return "log/training-log-all"; // ★ 修正
+    }
+
     @GetMapping("/training-log/form/weight")
     public String showWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
         form.setRecordDate(date);
         form.setType("WEIGHT");
         model.addAttribute("trainingLogForm", form);
-        return "training-log-form-weight"; 
+        return "log/training-log-form-weight"; // ★ 修正
     }
 
-    /**
-     * 有酸素運動の記録フォームを返す (モーダル内で使用)
-     */
     @GetMapping("/training-log/form/cardio")
     public String showCardioLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
         form.setRecordDate(date);
         form.setType("CARDIO");
         model.addAttribute("trainingLogForm", form);
-        return "training-log-form-cardio";
+        return "log/training-log-form-cardio"; // ★ 修正
     }
     
-    /**
-     * トレーニング記録を保存する
-     */
     @PostMapping("/training-log/save")
     public String saveTrainingRecord(@ModelAttribute("trainingLogForm") TrainingLogForm form, 
                                      Authentication authentication,
@@ -270,7 +287,6 @@ public class TrainingController {
             return "redirect:/login";
         }
         
-        // DTOをEntityにマッピング
         TrainingRecord record = new TrainingRecord();
         record.setUser(currentUser);
         record.setRecordDate(form.getRecordDate());
@@ -291,8 +307,10 @@ public class TrainingController {
         
         redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " のトレーニングを記録しました！");
         
-        // 記録した日付を含む月へリダイレクト
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
 }
+
+
+

@@ -47,6 +47,7 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
+    
  
     /**
      * CSRFトークンをレスポンスヘッダーに含めるカスタムフィルターを定義します。
@@ -136,4 +137,5 @@ public class SecurityConfig {
         return http.build();
     }
 }
+
 

@@ -18,32 +18,42 @@ public class FitWorksAppApplication {
 
     /**
      * アプリケーション起動時にデフォルトユーザーを作成するCommandLineRunner
-     * ユーザー名: test, パスワード: test (BCryptでハッシュ化)
      */
     @Bean
     public CommandLineRunner dataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
-            // ユーザー名 'test' が存在するかチェック
-            if (userRepository.findByUsername("test").isEmpty()) {
+            // --- 1. ユーザー 'test' の作成 ---
+            final String USERNAME_TEST = "test";
+            if (userRepository.findByUsername(USERNAME_TEST).isEmpty()) {
                 
-                // パスワード 'test' をBCryptでエンコード
-                String encodedPassword = passwordEncoder.encode("test");
+                String encodedPassword = passwordEncoder.encode(USERNAME_TEST);
                 
-                // 新しいユーザーを作成
                 User defaultUser = new User();
-                defaultUser.setUsername("test");
+                defaultUser.setUsername(USERNAME_TEST);
                 defaultUser.setPassword(encodedPassword);
-                defaultUser.setEmail("test@fitworks.com"); // 仮のメールアドレス
+                defaultUser.setEmail("test@fitworks.com"); 
                 
-                // データベースに保存
                 userRepository.save(defaultUser);
                 
-                System.out.println("✅ Default user 'test' created successfully. (Password: test)");
+                System.out.println("✅ Default user '" + USERNAME_TEST + "' created successfully. (Password: test)");
+            }
+
+            // --- 2. ユーザー 'user2' の追加 (★ 新規追加ブロック ★) ---
+            final String USERNAME_USER2 = "user";
+            if (userRepository.findByUsername(USERNAME_USER2).isEmpty()) {
+                
+                // パスワード 'user2' をBCryptでエンコード
+                String encodedPassword = passwordEncoder.encode(USERNAME_USER2); 
+                
+                User secondUser = new User();
+                secondUser.setUsername(USERNAME_USER2);
+                secondUser.setPassword(encodedPassword);
+                secondUser.setEmail("user@fitworks.com"); // 仮のメールアドレス
+                
+                userRepository.save(secondUser);
+                
+                System.out.println("✅ Second default user '" + USERNAME_USER2 + "' created successfully. (Password: user)");
             }
         };
     }
 }
-
-
-
-

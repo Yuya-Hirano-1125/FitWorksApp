@@ -16,4 +16,9 @@ public interface TrainingRecordRepository extends JpaRepository<TrainingRecord, 
     
     // 特定のユーザーの特定月の記録を取得 (カレンダー表示用)
     List<TrainingRecord> findByUser_IdAndRecordDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
+
+    // ★ 追加: ユーザーの全記録を日付の新しい順に取得するメソッド
+    List<TrainingRecord> findByUser_IdOrderByRecordDateDesc(Long userId);
+    
+    long countByUser_IdAndRecordDate(Long userId, LocalDate date);
 }

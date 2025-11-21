@@ -11,12 +11,16 @@
 </head>
 <body class="home-page">
 <div class="main-container">
-    
-    <div class="xp-daily-header">
-        <div class="xp-bar-container">
-            <span>レベル 5 (XP: 650/1000)</span>
+	<div class="app-logo-display">
+            <img th:src="@{/img/applogo.jpg}" alt="App Logo" />
+		<div class="xp-daily-header">
+        </div>    <div class="xp-bar-container">
+            <!-- 動的表示 -->
+            <span th:text="'レベル ' + ${level} + ' (XP: ' + ${experiencePoints} + '/' + ${requiredXp} + ')'"></span>
             <div class="xp-bar">
-                <div class="xp-progress">65%</div>
+                <div class="xp-progress"
+                     th:style="'width:' + ${progressPercent} + '%;'"
+                     th:text="${progressPercent} + '%'"></div>
             </div>
         </div>
         <a th:href="@{/daily-mission}" class="daily-mission-button">
@@ -36,9 +40,9 @@
     <a th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
         トレーニングを開始 <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i>
     </a>
-	<a th:href="@{/ranking}" class="daily-mission-button" style="background: linear-gradient(45deg, #f1c40f, #f39c12); box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4); margin-top: 15px;">
-	        ランキングを見る <i class="fa-solid fa-trophy" style="margin-left: 5px;"></i>
-	    </a>
+    <a th:href="@{/ranking}" class="daily-mission-button" style="background: linear-gradient(45deg, #f1c40f, #f39c12); box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4); margin-top: 15px;">
+        ランキングを見る <i class="fa-solid fa-trophy" style="margin-left: 5px;"></i>
+    </a>
     
 </div>
 
@@ -65,21 +69,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

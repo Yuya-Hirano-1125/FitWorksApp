@@ -26,6 +26,6 @@ public class RankingController {
         List<User> rankingList = userRepository.findTop20ByOrderByLevelDescExperiencePointsDesc();
         
         model.addAttribute("rankingList", rankingList);
-        return "ranking"; // templates/ranking.html を表示
+        return "misc/ranking"; // ★ 修正: "ranking" -> "misc/ranking"
     }
 }
