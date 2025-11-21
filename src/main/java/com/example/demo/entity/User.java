@@ -1,10 +1,12 @@
 package com.example.demo.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.Id; 
 
 @Entity
 public class User {
@@ -21,8 +23,18 @@ public class User {
     @Column(unique = true)
     private String email; 
 
-    private int level = 1; // 初期レベル
-    private int experiencePoints = 0; // 初期XP
+    private Integer level = 1; 
+    private Integer experiencePoints = 0; 
+
+    // ★ 新規追加: デイリーミッション追跡用
+    private LocalDate lastMissionCompletionDate;
+    private Boolean isRewardClaimedToday = false; 
+
+    public User() {
+        if (this.level == null) this.level = 1;
+        if (this.experiencePoints == null) this.experiencePoints = 0;
+        if (this.isRewardClaimedToday == null) this.isRewardClaimedToday = false;
+    }
 
     // --- Getter / Setter ---
     public Long getId() { return id; }
@@ -37,19 +49,32 @@ public class User {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public int getLevel() { return level; }
-    public void setLevel(int level) { this.level = level; }
+    public Integer getLevel() { 
+        return level != null ? level : 1; 
+    }
+    public void setLevel(Integer level) { this.level = level; }
 
-    public int getExperiencePoints() { return experiencePoints; }
-    public void setExperiencePoints(int experiencePoints) { this.experiencePoints = experiencePoints; }
+    public Integer getExperiencePoints() { 
+        return experiencePoints != null ? experiencePoints : 0; 
+    }
+    public void setExperiencePoints(Integer experiencePoints) { this.experiencePoints = experiencePoints; }
+
+    public LocalDate getLastMissionCompletionDate() { return lastMissionCompletionDate; }
+    public void setLastMissionCompletionDate(LocalDate lastMissionCompletionDate) { this.lastMissionCompletionDate = lastMissionCompletionDate; }
+    
+    public Boolean getIsRewardClaimedToday() { return isRewardClaimedToday; }
+    public void setIsRewardClaimedToday(Boolean isRewardClaimedToday) { this.isRewardClaimedToday = isRewardClaimedToday; }
 
     // --- レベルアップ関連 ---
     public int calculateRequiredXp() {
-        return 1000 + (level - 1) * 200;
+        int currentLevel = getLevel(); 
+        return 1000 + (currentLevel - 1) * 200;
     }
 
     public void addXp(int xp) {
-        this.experiencePoints += xp;
+        int currentXp = getExperiencePoints(); 
+        this.experiencePoints = currentXp + xp;
+        
         while (this.experiencePoints >= calculateRequiredXp()) {
             this.experiencePoints -= calculateRequiredXp();
             this.level++;
@@ -57,6 +82,17 @@ public class User {
     }
 
     public int getProgressPercent() {
-        return (int)((double) this.experiencePoints / calculateRequiredXp() * 100);
+        int currentXp = getExperiencePoints(); 
+        int requiredXp = calculateRequiredXp();
+        if (requiredXp == 0) return 0; 
+        return (int)(((double) currentXp / requiredXp) * 100);
     }
 }
+
+
+
+
+
+
+
+
