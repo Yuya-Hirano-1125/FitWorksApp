@@ -14,8 +14,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
- // ★★★ ここに経験値(XP)フィールドを追加 ★★★
-    private int xp = 0; // 初期値は0
+
     @Column(unique = true)
     private String username;
 
@@ -87,15 +86,6 @@ public class User {
         int requiredXp = calculateRequiredXp();
         if (requiredXp == 0) return 0; 
         return (int)(((double) currentXp / requiredXp) * 100);
-    }
- // ★★★ XPのゲッターとセッターを追加 ★★★
-
-    public int getXp() {
-        return xp;
-    }
-
-    public void setXp(int xp) {
-        this.xp = xp;
     }
 }
 
