@@ -1,25 +1,36 @@
-
-
-
-
-
-
-
-
-
 package com.example.demo.controller;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam; 
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.example.demo.dto.TrainingLogForm;
+import com.example.demo.entity.TrainingRecord;
+import com.example.demo.entity.User;
+import com.example.demo.repository.TrainingRecordRepository;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.service.UserService;
 
 @Controller
 public class TrainingController {
 
-<<<<<<< HEAD
     @Autowired
     private UserService userService; 
 
@@ -33,33 +44,7 @@ public class TrainingController {
         if (authentication == null) return null;
         return userService.findByUsername(authentication.getName());
     }
-// ★★★ ここにメソッドと定数を追加する ★★★
-    
-    // 経験値(XP)の定義
-    private static final int XP_BEGINNER = 300;  // 初級: 300 XP
-    private static final int XP_INTERMEDIATE = 500; // 中級: 500 XP
-    private static final int XP_ADVANCED = 1000; // 上級: 1000 XP
-    private static final int XP_PER_LEVEL = 5000; // レベルアップに必要なXP
 
-    /**
-     * 種目名から難易度（XP）を取得するヘルパーメソッド
-     */
-    private int getExperiencePoints(String exerciseName) {
-        if (exerciseName == null || exerciseName.trim().isEmpty()) {
-            return 0; 
-        }
-        
-        // 種目名に難易度ラベルが含まれているかチェックする
-        if (exerciseName.contains("(上級)")) {
-            return XP_ADVANCED;
-        } else if (exerciseName.contains("(中級)")) {
-            return XP_INTERMEDIATE;
-        } else if (exerciseName.contains("(初級)")) {
-            return XP_BEGINNER;
-        }
-        // ラベルが見つからない場合は0を返す
-        return 0; 
-    }
     private static final Map<String, List<String>> FREE_WEIGHT_EXERCISES_BY_PART = new LinkedHashMap<>() {{
         put("胸", List.of(
             "チェストフライ (初級)", 
@@ -110,20 +95,12 @@ public class TrainingController {
             "ローイング (中級)", 
             "トレッドミルインターバル (上級)"
         );
-    
+
     /**
      * トレーニング選択画面 (training.html) を表示
-     * ★ 修正: return "training" から "training/training" に変更
+     * ★ 修正済み: return "training" -> "training/training"
      */
-=======
-    // ★ 修正点: /training のメイン画面ルーティングをAuthControllerから引き継ぐ
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
     @GetMapping("/training")
-<<<<<<< HEAD
-    public String showTrainingOptions(Model model) {
-        // training.html は特別なモデルデータなしでレンダリングされます
-        return "training";
-=======
     public String showTrainingOptions(Authentication authentication, Model model) { 
         if (getCurrentUser(authentication) == null) {
             return "redirect:/login"; 
@@ -133,32 +110,24 @@ public class TrainingController {
         model.addAttribute("freeWeightParts", FREE_WEIGHT_EXERCISES_BY_PART.keySet());
         model.addAttribute("cardioExercises", CARDIO_EXERCISES);
         
-<<<<<<< HEAD
-        return "training/training"; // ★ 修正
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
-=======
         return "training/training"; 
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
     }
 
     /**
-     * トレーニング開始時の各オプションを処理し、入力画面に遷移します。
-     * @param type 選択されたトレーニングタイプ (ai-suggested, free-weight, cardio)
+     * トレーニング種目一覧画面 (exercise-list.html) を表示
+     * ★ 修正済み: return "exercise-list" -> "training/exercise-list"
      */
-<<<<<<< HEAD
-    @GetMapping("/training/start")
-    public String startTraining(@RequestParam("type") String type, Model model) {
-=======
     @GetMapping("/training/exercises")
     public String showExerciseList(Authentication authentication) {
         if (getCurrentUser(authentication) == null) {
             return "redirect:/login"; 
         }
-        return "training/exercise-list"; // ★ 修正
+        return "training/exercise-list"; 
     }
 
     /**
      * トレーニングセッション開始
+     * ★ 修正済み: return "training-session" -> "training/training-session"
      */
     @PostMapping("/training/start")
     public String startTrainingSession(
@@ -166,30 +135,46 @@ public class TrainingController {
             @RequestParam(value = "exerciseName", required = false) String exerciseName,
             Authentication authentication,
             Model model) {
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
         
-        // 仮の種目データ（選択肢用）をモデルに追加
-        if (type.equals("free-weight")) {
-             model.addAttribute("freeWeightExercises", List.of("ベンチプレス", "スクワット", "デッドリフト"));
-        } else if (type.equals("cardio")) {
-             model.addAttribute("cardioExercises", List.of("ランニング", "サイクリング", "水泳"));
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) {
+            return "redirect:/login"; 
+        }
+        
+        String title = "";
+        String selectedExercise = "";
+
+        switch (type) {
+            case "ai-suggested":
+                title = "AIおすすめメニューセッション";
+                selectedExercise = "AIおすすめプログラム"; 
+                break;
+            case "free-weight":
+            case "cardio":
+                if (exerciseName != null && !exerciseName.trim().isEmpty()) {
+                    selectedExercise = exerciseName.trim();
+                } else {
+                    return "redirect:/training"; 
+                }
+                title = ("free-weight".equals(type) ? "フリーウェイト" : "有酸素運動") + "セッション";
+                break;
+            default:
+                return "redirect:/training"; 
         }
         
         model.addAttribute("trainingType", type);
-<<<<<<< HEAD
-        model.addAttribute("trainingTitle", "トレーニング記録");
-=======
         model.addAttribute("trainingTitle", title);
         model.addAttribute("selectedExercise", selectedExercise);
         
         // ★ 記録用フォームのために今日の日付を渡す
         model.addAttribute("today", LocalDate.now());
         
-        return "training/training-session"; // ★ 修正
+        return "training/training-session"; 
     }
     
     /**
      * トレーニングログ（カレンダー）画面を表示
+     * ★ 修正済み: return "training-log" -> "log/training-log"
      */
     @GetMapping("/training-log")
     public String showTrainingLog(
@@ -197,27 +182,11 @@ public class TrainingController {
             @RequestParam(value = "year", required = false) Integer year,
             @RequestParam(value = "month", required = false) Integer month,
             Model model) {
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
 
-        switch (type) {
-            case "ai-suggested":
-                model.addAttribute("selectedExercise", "AIおすすめメニュー");
-                model.addAttribute("programName", "腹筋をバキバキにするプログラム");
-                return "training-session";
-                
-            case "free-weight":
-                model.addAttribute("selectedExercise", "フリーウェイト");
-                return "training-form-weight";
-                
-            case "cardio":
-                model.addAttribute("selectedExercise", "有酸素運動");
-                return "training-form-cardio";
-
-            default:
-                return "redirect:/training"; 
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) {
+            return "redirect:/login";
         }
-<<<<<<< HEAD
-=======
         
         LocalDate today = LocalDate.now();
         YearMonth targetYearMonth;
@@ -274,16 +243,12 @@ public class TrainingController {
             dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE));
         }
         model.addAttribute("dayLabels", dayLabels);
-        return "log/training-log"; // ★ 修正
-<<<<<<< HEAD
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
-=======
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
+        return "log/training-log"; 
     }
 
-<<<<<<< HEAD
     /**
      * ★ 追加: 全トレーニング記録一覧画面を表示
+     * ★ 修正済み: return "training-log-all" -> "log/training-log-all"
      */
     @GetMapping("/training-log/all")
     public String showAllTrainingLog(Authentication authentication, Model model) {
@@ -296,25 +261,33 @@ public class TrainingController {
         List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
         model.addAttribute("records", allRecords);
         
-        return "log/training-log-all"; // ★ 修正
+        return "log/training-log-all"; 
     }
 
+    /**
+     * ウェイトログ入力フォーム
+     * ★ 修正済み: return "training-log-form-weight" -> "log/training-log-form-weight"
+     */
     @GetMapping("/training-log/form/weight")
     public String showWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
         form.setRecordDate(date);
         form.setType("WEIGHT");
         model.addAttribute("trainingLogForm", form);
-        return "log/training-log-form-weight"; // ★ 修正
+        return "log/training-log-form-weight"; 
     }
 
+    /**
+     * 有酸素運動ログ入力フォーム
+     * ★ 修正済み: return "training-log-form-cardio" -> "log/training-log-form-cardio"
+     */
     @GetMapping("/training-log/form/cardio")
     public String showCardioLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
         form.setRecordDate(date);
         form.setType("CARDIO");
         model.addAttribute("trainingLogForm", form);
-        return "log/training-log-form-cardio"; // ★ 修正
+        return "log/training-log-form-cardio"; 
     }
     
     @PostMapping("/training-log/save")
@@ -332,76 +305,28 @@ public class TrainingController {
         record.setRecordDate(form.getRecordDate());
         record.setType(form.getType());
         
-        String exerciseIdentifier = null;
-
         if ("WEIGHT".equals(form.getType())) {
             record.setExerciseName(form.getExerciseName());
             record.setSets(form.getSets());
             record.setReps(form.getReps());
             record.setWeight(form.getWeight());
-            exerciseIdentifier = form.getExerciseName();
         } else if ("CARDIO".equals(form.getType())) {
             record.setCardioType(form.getCardioType());
             record.setDurationMinutes(form.getDurationMinutes());
             record.setDistanceKm(form.getDistanceKm());
-            exerciseIdentifier = form.getCardioType();
         }
 
         trainingRecordRepository.save(record);
         
-        // ★★★ ここからXP更新ロジックの追加 ★★★
-        int earnedXP = 0;
-        
-        if (exerciseIdentifier != null) {
-            earnedXP = getExperiencePoints(exerciseIdentifier);
-        }
-        
-        if (earnedXP > 0) {
-            int newTotalXp = currentUser.getXp() + earnedXP;
-            currentUser.setXp(newTotalXp);
-            userRepository.save(currentUser); // DBにユーザーXPを保存
-            
-            redirectAttributes.addFlashAttribute("successMessage", 
-                form.getRecordDate().toString() + " のトレーニングを記録し、" + earnedXP + " XPを獲得しました！");
-        } else {
-            redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " のトレーニングを記録しました！");
-        }
-        // ★★★ ここまでXP更新ロジックの追加 ★★★
+        redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " のトレーニングを記録しました！");
         
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    // TODO: @PostMapping("/training/save") で記録をDBに保存するメソッドを後で追加する
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
-}
-=======
-}
 
 
-
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
-=======
 }
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
