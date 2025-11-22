@@ -11,7 +11,7 @@
             border: 2px solid #ccc;
             margin: 20px auto;
             position: relative;
-            background-size: cover; /* 背景画像用 */
+            background-size: cover;
             background-position: center;
         }
         .character-costume {
@@ -20,7 +20,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-size: contain; /* コスチューム画像用 */
+            background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
         }
@@ -29,12 +29,15 @@
             flex-wrap: wrap;
             gap: 15px;
             padding: 20px;
+            justify-content: center;
         }
         .item-card {
             border: 1px solid #ddd;
             padding: 10px;
             width: 150px;
             text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .item-card img {
             max-width: 100px;
@@ -48,26 +51,27 @@
     <main class="main-content">
         <h1>キャラクターカスタマイズ</h1>
 
-        <p th:if="${message}" th:text="${message}" style="color: green;"></p>
-        <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red;"></p>
+        <p th:if="${message}" th:text="${message}" style="color: green; font-weight: bold;"></p>
+        <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red; font-weight: bold;"></p>
 
         <h2>キャラクター表示</h2>
-        <div class="character-view" th:style="${equippedBackground != null} ? 'background-image: url(' + ${equippedBackground.imagePath} + ');' : 'background-color: #f0f0f0;'">
+        <div class="character-view" th:style="${equippedBackground != null} ? 'background-image: url(' + ${equippedBackground.item.imagePath} + ');' : 'background-color: #f0f0f0;'">
             <img th:src="@{/img/mizu1.png}" alt="ベースキャラクター" style="width: 100%; height: auto; position: absolute; bottom: 0;">
             
             <div class="character-costume" th:if="${equippedCostume != null}" 
-                 th:style="'background-image: url(' + ${equippedCostume.imagePath} + ');'">
+                 th:style="'background-image: url(' + ${equippedCostume.item.imagePath} + ');'">
             </div>
             
-            <p style="position: absolute; top: 10px; left: 10px; background: white; padding: 5px;" th:text="'現在の背景: ' + (${equippedBackground} != null ? ${equippedBackground.name} : 'なし')"></p>
+            <p style="position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.8); padding: 5px; border-radius: 5px;" 
+               th:text="'現在の背景: ' + (${equippedBackground} != null ? ${equippedBackground.item.name} : 'なし')"></p>
         </div>
 
         <div style="text-align: center; margin-top: 10px;">
             <form th:action="@{/gacha/customize/unequip/background}" method="post" style="display: inline;">
-                <button type="submit" class="button" th:disabled="${equippedBackground == null}">背景を解除</button>
+                <button type="submit" class="button button-secondary" th:disabled="${equippedBackground == null}">背景を解除</button>
             </form>
             <form th:action="@{/gacha/customize/unequip/costume}" method="post" style="display: inline; margin-left: 10px;">
-                <button type="submit" class="button" th:disabled="${equippedCostume == null}">衣装を解除</button>
+                <button type="submit" class="button button-secondary" th:disabled="${equippedCostume == null}">衣装を解除</button>
             </form>
         </div>
 
@@ -80,17 +84,17 @@
                 <h4 th:text="${userItem.item.name}">アイテム名</h4>
                 <p th:text="${'種別: ' + userItem.item.type}"></p>
 
-                <form th:if="${userItem.item.type == 'BACKGROUND' and equippedBackground?.id != userItem.item.id}"
+                <form th:if="${userItem.item.type == 'BACKGROUND' and equippedBackground?.item.id != userItem.item.id}"
                       th:action="@{/gacha/customize/equip/{itemId}(itemId=${userItem.item.id})}" method="post">
                     <button type="submit" class="button">背景に装備</button>
                 </form>
-                <span th:if="${userItem.item.type == 'BACKGROUND' and equippedBackground?.id == userItem.item.id}" style="color: green; font-weight: bold;">装備中</span>
+                <span th:if="${userItem.item.type == 'BACKGROUND' and equippedBackground?.item.id == userItem.item.id}" style="color: green; font-weight: bold;">装備中</span>
 
-                <form th:if="${userItem.item.type == 'COSTUME' and equippedCostume?.id != userItem.item.id}"
+                <form th:if="${userItem.item.type == 'COSTUME' and equippedCostume?.item.id != userItem.item.id}"
                       th:action="@{/gacha/customize/equip/{itemId}(itemId=${userItem.item.id})}" method="post">
                     <button type="submit" class="button">衣装に装備</button>
                 </form>
-                <span th:if="${userItem.item.type == 'COSTUME' and equippedCostume?.id == userItem.item.id}" style="color: green; font-weight: bold;">装備中</span>
+                <span th:if="${userItem.item.type == 'COSTUME' and equippedCostume?.item.id == userItem.item.id}" style="color: green; font-weight: bold;">装備中</span>
             </div>
         </div>
     </main>
