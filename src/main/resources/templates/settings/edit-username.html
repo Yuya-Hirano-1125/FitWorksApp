@@ -15,11 +15,15 @@
     <h1><i class="fa-solid fa-user-pen header-icon"></i>ユーザー名変更</h1>
     <p class="sub-heading">新しいユーザー名を入力してください。</p>
 
+    <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}">
+        エラーが発生しました。
+    </p>
+
     <form th:action="@{/edit-username}" th:object="${form}" method="post">
 
         <div class="form-group">
             <label for="username">新しいユーザー名</label>
-            <input type="text" id="username" th:field="*{username}" required placeholder="新しいユーザー名">
+            <input type="text" id="username" th:field="*{username}" required placeholder="新しいユーザー名" th:classappend="${#fields.hasErrors('username')} ? 'error-input' : ''">
         </div>
 
         <div class="button-container">
