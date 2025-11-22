@@ -4,9 +4,12 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType; // 新規追加
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id; 
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn; // 新規追加
+import jakarta.persistence.ManyToOne; // 新規追加
 
 @Entity
 public class User {
@@ -26,9 +29,19 @@ public class User {
     private Integer level = 1; 
     private Integer experiencePoints = 0; 
 
-    // ★ 新規追加: デイリーミッション追跡用
+    // ★ 既存: デイリーミッション追跡用
     private LocalDate lastMissionCompletionDate;
     private Boolean isRewardClaimedToday = false; 
+
+    // ★ 新規追加: キャラクター装備アイテム
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "equipped_background_item_id")
+    private Item equippedBackgroundItem;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "equipped_costume_item_id")
+    private Item equippedCostumeItem;
+
 
     public User() {
         if (this.level == null) this.level = 1;
@@ -36,7 +49,7 @@ public class User {
         if (this.isRewardClaimedToday == null) this.isRewardClaimedToday = false;
     }
 
-    // --- Getter / Setter ---
+    // --- Getter / Setter (既存) ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -65,7 +78,14 @@ public class User {
     public Boolean getIsRewardClaimedToday() { return isRewardClaimedToday; }
     public void setIsRewardClaimedToday(Boolean isRewardClaimedToday) { this.isRewardClaimedToday = isRewardClaimedToday; }
 
-    // --- レベルアップ関連 ---
+    // --- Getter / Setter (新規追加: キャラクター装備アイテム) ---
+    public Item getEquippedBackgroundItem() { return equippedBackgroundItem; }
+    public void setEquippedBackgroundItem(Item equippedBackgroundItem) { this.equippedBackgroundItem = equippedBackgroundItem; }
+
+    public Item getEquippedCostumeItem() { return equippedCostumeItem; }
+    public void setEquippedCostumeItem(Item equippedCostumeItem) { this.equippedCostumeItem = equippedCostumeItem; }
+    
+    // --- レベルアップ関連 (既存) ---
     public int calculateRequiredXp() {
         int currentLevel = getLevel(); 
         return 1000 + (currentLevel - 1) * 200;
@@ -88,11 +108,4 @@ public class User {
         return (int)(((double) currentXp / requiredXp) * 100);
     }
 }
-
-
-
-
-
-
-
 
