@@ -7,7 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/training-log.css}">
 </head>
 <body>
-    <div th:insert="~{fragments/header :: header}"></div> 
+    <div th:insert="~{../fragments/header :: header}"></div> 
 
     <main class="log-form-container">
         <h1>食事記録の入力</h1>
@@ -71,6 +71,6 @@
         <a th:href="@{/log/meal/all}" class="back-link">食事記録一覧へ</a>
     </main>
 
-    <div th:insert="~{fragments/footer :: footer}"></div>
+    <div th:insert="~{../fragments/footer :: footer}"></div>
 </body>
 </html>
