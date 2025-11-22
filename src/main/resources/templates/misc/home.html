@@ -1,133 +1,121 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ホーム | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
     <style>
-        /* 新規追加: キャラクターとボタンを配置するためのスタイル */
-        .character-flex-container {
+        /* 新規追加: キャラクターと着せ替えボタンの配置用スタイル */
+        .character-section {
+            position: relative; /* ボタンの絶対配置の基準 */
             display: flex;
             justify-content: center;
-            align-items: flex-end; /* キャラクター画像を下に揃える */
-            position: relative;
-            width: 100%;
-            margin-bottom: 20px;
+            margin-top: 20px;
         }
-        /* 新規追加: キャラクター着せ替えボタンの位置 */
-        .customize-button-area {
-            position: absolute; /* キャラクターエリアを基準に配置 */
-            top: 10px;
-            right: 10px;
+        .customize-button {
+            position: absolute;
+            top: 0;
+            right: 20px; /* 右上の位置に調整 */
+            background-color: #ffb300;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s;
             z-index: 10;
         }
-        .customize-button-area .btn {
-            background-color: #ffb300; /* 目立つ色 */
-            color: white;
-            padding: 8px 15px;
-            font-weight: bold;
-            text-decoration: none;
-            border-radius: 5px;
+        .customize-button:hover {
+            transform: scale(1.05);
         }
-        /* 新規追加: 食事記録ボタンのスタイル */
-        .bottom-action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-            padding-bottom: 50px; /* フッターとの間隔 */
+        .customize-button i {
+            margin-right: 5px;
         }
-        .bottom-action-buttons .btn-meal {
-            background-color: #4CAF50; /* 緑系 */
-            color: white;
-        }
-        .bottom-action-buttons .btn {
-            padding: 15px 25px;
-            font-size: 1.1em;
-            text-align: center;
+        /* 新規追加: bottom-navのレイアウト調整 (既存のhome.cssがないため、ここでは最小限の変更) */
+        .bottom-nav .nav-item {
             flex-grow: 1;
-        }
-        /* キャラクター画像のコンテナと背景 */
-        .character-container {
-            position: relative;
-            width: 300px; /* キャラクターの最大幅に合わせて調整 */
-            height: 300px; /* キャラクターの最大高さに合わせて調整 */
-            overflow: hidden;
-            background-size: cover;
-            background-position: center;
-        }
-        .character-background {
-             position: absolute;
-             width: 100%;
-             height: 100%;
-             background-size: cover;
-             background-position: center;
-        }
-        .character-costume-overlay {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            object-fit: contain;
+            text-align: center;
         }
     </style>
 </head>
-<body>
-    <div th:insert="~{fragments/header :: header}"></div>
-
-    <main class="main-content">
-
-        <div class="user-info-bar">
-            <div class="level-info">
-                <span th:text="'Lv.' + ${user.level}">Lv.1</span>
-                <div class="xp-bar-container">
-                    <div class="xp-bar" th:style="'width: ' + ${user.progressPercent} + '%;'"></div>
-                </div>
-            </div>
-            <p th:text="${user.username}"></p>
+<body class="home-page">
+<div class="main-container">
+    
+    <div class="app-logo-display">
+        <img th:src="@{/img/applogo.jpg}" alt="App Logo" />
+        
+        <div class="xp-daily-header">
         </div>
         
-        <div class="character-flex-container">
-            <div class="character-container" 
-                 th:style="${user.equippedBackgroundItem != null} ? 'background-image: url(' + ${user.equippedBackgroundItem.imagePath} + ');' : 'background-color: #e0f7fa;'">
-                
-                <img th:src="@{/img/mizu1.png}" alt="キャラクター" style="width: 100%; height: auto; position: absolute; bottom: 0;">
-                
-                <img th:if="${user.equippedCostumeItem != null}" 
-                     th:src="${user.equippedCostumeItem.imagePath}" 
-                     alt="コスチューム" 
-                     class="character-costume-overlay">
-            </div>
-
-            <div class="customize-button-area">
-                <a th:href="@{/gacha/customize}" class="btn">👗 着せ替え</a>
+        <div class="xp-bar-container">
+            <span th:text="'レベル ' + ${level} + ' (XP: ' + ${experiencePoints} + '/' + ${requiredXp} + ')'"></span>
+            <div class="xp-bar">
+                <div class="xp-progress"
+                     th:style="'width:' + ${progressPercent} + '%;'"
+                     th:text="${progressPercent} + '%'"></div>
             </div>
         </div>
-
-        <div class="home-section">
-            <h2>✨デイリーミッション</h2>
-            <p th:if="${missionStatus.isCompletedToday and !user.isRewardClaimedToday}" style="color: green; font-weight: bold;">今日のミッション達成！報酬を受け取りましょう！</p>
-            <p th:unless="${missionStatus.isCompletedToday}" th:text="'今日のミッション: ' + ${missionStatus.missionText}">ミッション内容</p>
-            <a th:href="@{/mission/daily}" class="link-button">詳細を見る &gt;</a>
-        </div>
-
-        <div class="home-section">
-            <h2>💡 AIコーチからの提案</h2>
-            <div class="ai-suggestion-card">
-                <p th:text="${aiSuggestion.suggestion}">今日の最適なトレーニング内容</p>
-                <a th:href="@{/ai-coach/chat}" class="link-button">チャットで相談 &gt;</a>
-            </div>
+    </div>
+    
+    <a th:href="@{/daily-mission}" class="daily-mission-button">
+        デイリーミッション(ガチャ報酬）<i class="fa-solid fa-list-check"></i>
+    </a>
+    
+    <div class="character-section">
+        <div class="character-display">
+            <img th:src="@{/img/mizu3.png}" alt="Character Image" />
         </div>
         
-        <div class="bottom-action-buttons">
-            <a th:href="@{/log/training}" class="btn btn-primary">🏃 トレーニング記録</a>
-            <a th:href="@{/log/meal/form}" class="btn btn-meal">🍽️ 食事記録</a>
-        </div>
+        <a th:href="@{/gacha/customize}" class="customize-button">
+            <i class="fa-solid fa-shirt"></i> 着せ替え
+        </a>
+    </div>
+    
+    <h1>FitWorksへようこそ</h1>
+    <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！今日のトレーニングを始めましょう。'">
+        あなたのフィットネス・ジャーニーをサポートします。
+    </p>
+    
+    <a th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
+        トレーニングを開始 <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i>
+    </a>
+    <a th:href="@{/ranking}" class="daily-mission-button" style="background: linear-gradient(45deg, #f1c40f, #f39c12); box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4); margin-top: 15px;">
+        ランキングを見る <i class="fa-solid fa-trophy" style="margin-left: 5px;"></i>
+    </a>
+</div>
 
-    </main>
-
-    <div th:insert="~{fragments/footer :: footer}"></div>
+<nav class="bottom-nav">
+    <a th:href="@{/gacha}" class="nav-item">
+        <i class="fa-solid fa-box-open"></i>
+        <span>ガチャ</span>
+    </a>
+    
+    <a th:href="@{/community}" class="nav-item">
+        <i class="fa-solid fa-comments"></i>
+        <span>掲示板</span>
+    </a>
+    
+    <a th:href="@{/training-log}" class="nav-item">
+        <i class="fa-solid fa-calendar-days"></i>
+        <span>トレーニング記録</span>
+    </a>
+    
+    <a th:href="@{/log/meal/form}" class="nav-item">
+        <i class="fa-solid fa-utensils"></i>
+        <span>食事記録</span>
+    </a>
+    
+    <a th:href="@{/settings}" class="nav-item">
+        <i class="fa-solid fa-gear"></i>
+        <span>設定</span>
+    </a>
+</nav>
+    
 </body>
 </html>
