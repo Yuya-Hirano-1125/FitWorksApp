@@ -5,7 +5,76 @@
     <title>食事記録</title>
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/training-log.css}">
-</head>
+	<style>
+	    /* フォームのコンテナを中央に配置 */
+	    .log-form-container {
+	        max-width: 600px;
+	        margin: 40px auto;
+	        padding: 20px;
+	        background-color: #ffffff;
+	        border-radius: 10px;
+	        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	    }
+	    /* フォームカードのスタイル */
+	    .form-card {
+	        padding: 20px;
+	    }
+	    /* グループごとの間隔 */
+	    .form-group {
+	        margin-bottom: 15px;
+	    }
+	    /* ラベルのスタイル */
+	    .form-group label {
+	        display: block;
+	        margin-bottom: 5px;
+	        font-weight: bold;
+	        color: #333;
+	    }
+	    /* 入力フィールドの共通スタイル */
+	    .form-group input[type="date"],
+	    .form-group input[type="time"],
+	    .form-group input[type="number"],
+	    .form-group textarea,
+	    .form-group select {
+	        width: 100%;
+	        padding: 10px;
+	        border: 1px solid #ccc;
+	        border-radius: 5px;
+	        box-sizing: border-box; /* paddingをwidthに含める */
+	        font-size: 1em;
+	        transition: border-color 0.2s;
+	    }
+	    .form-group input:focus,
+	    .form-group select:focus,
+	    .form-group textarea:focus {
+	        border-color: #4CAF50; /* 焦点が当たったときの色 */
+	        outline: none;
+	    }
+	    /* 送信ボタンのスタイル */
+	    .submit-button {
+	        width: 100%;
+	        padding: 12px;
+	        background-color: #4CAF50; /* 食事記録に合わせた緑色 */
+	        color: white;
+	        border: none;
+	        border-radius: 5px;
+	        font-size: 1.1em;
+	        cursor: pointer;
+	        margin-top: 20px;
+	        transition: background-color 0.2s, transform 0.2s;
+	    }
+	    .submit-button:hover {
+	        background-color: #45a049;
+	        transform: translateY(-1px);
+	    }
+	    /* エラーメッセージ */
+	    .error-message {
+	        color: red;
+	        font-size: 0.9em;
+	        margin-top: 5px;
+	    }
+	</style>
+	</head>
 <body>
     <div th:insert="~{fragments/header :: header}"></div> 
 
