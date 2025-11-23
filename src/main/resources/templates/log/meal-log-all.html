@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>食事記録一覧 | FitWorks</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/training-log.css}">
+    <style>
+        /* ページ全体とコンテナの調整 */
+        .log-form-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        /* 記録がない場合のメッセージ */
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            color: #4CAF50;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        /* 新しい食事記録へのボタン */
+        .back-to-form {
+            display: block;
+            text-align: center;
+            margin: 20px auto 30px auto;
+            padding: 12px 20px;
+            background-color: #4CAF50; /* 緑 */
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s;
+        }
+        .back-to-form:hover {
+            background-color: #45a049;
+        }
+
+        /* 食事カードのスタイル */
+        .meal-record-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 0;
+        }
+        .meal-card {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-left: 5px solid #4CAF50; /* 左側のラインで強調 */
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.2s;
+        }
+        .meal-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .meal-card h3 {
+            margin-top: 0;
+            padding-bottom: 5px;
+            color: #4CAF50;
+            font-size: 1.2em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .meal-card .meal-time {
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        /* マクロ栄養素の表示 (PFC) */
+        .macro-data {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        .macro-item {
+            text-align: center;
+            flex: 1;
+            padding: 0 5px;
+            font-size: 0.9em;
+        }
+        .macro-item span {
+            color: #777;
+        }
+        .macro-item strong {
+            display: block;
+            font-size: 1.3em;
+            margin-top: 2px;
+        }
+        /* カロリー強調 */
+        .total-calories {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 5px 0;
+            color: #E67E22; /* 目立つオレンジ */
+            text-align: center;
+            background-color: #fff3e0;
+            border-radius: 4px;
+        }
+        /* P F C の色分け */
+        .protein-value { color: #3498db; }
+        .fat-value { color: #e74c3c; }
+        .carb-value { color: #f1c40f; }
+    </style>
+</head>
+<body>
+    <div th:insert="~{fragments/header :: header}"></div>
+
+    <main class="log-form-container">
+        <h1>🍽️ 食事記録一覧</h1>
+
+        <a th:href="@{/log/meal/form}" class="back-to-form">新しい食事を記録する</a>
+
+        <div th:if="${#lists.isEmpty(mealRecords)}" class="empty-message">
+            <p>まだ食事の記録がありません。記録を開始して健康管理を始めましょう！</p>
+        </div>
+        
+        <ul th:unless="${#lists.isEmpty(mealRecords)}" class="meal-record-list">
+            <li th:each="record : ${mealRecords}" class="meal-card">
+                
+                <h3>
+                    <span th:text="${record.mealType}">朝食</span>
+                    <span class="meal-time" th:text="${#temporals.format(record.mealDateTime, 'yyyy年MM月dd日 HH:mm')}"></span>
+                </h3>
+                
+                <div class="total-calories">
+                    総カロリー: <span th:text="${record.calories ?: 0}">0</span> kcal
+                </div>
+
+                <p style="margin-top: 15px;">内容: <span th:text="${record.content}"></span></p>
+
+                <div class="macro-data">
+                    <div class="macro-item">
+                        <span>タンパク質 (P)</span>
+                        <strong class="protein-value" th:text="${#numbers.formatDecimal(record.protein ?: 0, 1, 1)} + 'g'">0.0g</strong>
+                    </div>
+                    <div class="macro-item">
+                        <span>脂質 (F)</span>
+                        <strong class="fat-value" th:text="${#numbers.formatDecimal(record.fat ?: 0, 1, 1)} + 'g'">0.0g</strong>
+                    </div>
+                    <div class="macro-item">
+                        <span>炭水化物 (C)</span>
+                        <strong class="carb-value" th:text="${#numbers.formatDecimal(record.carbohydrate ?: 0, 1, 1)} + 'g'">0.0g</strong>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+    </main>
+
+    <div th:insert="~{fragments/footer :: footer}"></div>
+</body>
+</html>
