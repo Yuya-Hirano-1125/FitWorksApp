@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>近くのトレーニング施設</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <style>
+        /* 地図を表示するためのスタイル */
+        #map {
+            height: 500px; /* 地図の高さは適宜調整してください */
+            width: 100%;
+            margin-top: 20px;
+        }
+        .map-container {
+            padding: 20px;
+        }
+        .search-status {
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header th:replace="fragments/header :: header"></header>
+
+    <main>
+        <div class="container map-container">
+            <h1>近くのトレーニング施設を探す</h1>
+
+            <p class="search-status" id="status-message">現在地を取得中です...</p>
+
+            <div id="map"></div>
+        </div>
+    </main>
+
+    <footer th:replace="fragments/footer :: footer"></footer>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDgRmpnY4uXBsJJxn7csvq-4f7Rc2khd0&libraries=places" defer></script>
+
+    <script>
+        // 🌟 修正点 2: 不要になったAPI_KEYの定義とコメントを削除 🌟
+
+        let map;
+        let infoWindow;
+        const statusMessage = document.getElementById('status-message');
+
+        /**
+         * 地図を初期化
+         * @param {Object} position - {lat: number, lng: number} 現在地の緯度経度
+         */
+        function initMap(position) {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: position,
+                zoom: 15, // 初期ズームレベル
+            });
+
+            // 現在地のマーカー
+            new google.maps.Marker({
+                position: position,
+                map: map,
+                title: "あなたの現在地",
+                icon: { // 現在地であることを示すカスタムアイコン
+                    url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                    scaledSize: new google.maps.Size(40, 40)
+                }
+            });
+
+            // 近くのトレーニング施設を検索
+            searchNearbyPlaces(position);
+        }
+
+        /**
+         * Places API を使用して近くのトレーニング施設を検索
+         * @param {Object} location - {lat: number, lng: number} 検索中心の緯度経度
+         */
+        function searchNearbyPlaces(location) {
+            const request = {
+                location: location,
+                radius: '2000', // 検索範囲 (メートル), 例: 2km
+                type: ['gym'], // 体育館やジムなどのタイプ
+                keyword: 'トレーニング施設 | ジム | フィットネス', // 検索キーワード
+            };
+
+            infoWindow = new google.maps.InfoWindow();
+            const service = new google.maps.places.PlacesService(map);
+
+            service.nearbySearch(request, (results, status) => {
+                if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+                    statusMessage.textContent = `${results.length}件の近くのトレーニング施設が見つかりました。`;
+                    for (let i = 0; i < results.length; i++) {
+                        createMarker(results[i]);
+                    }
+                } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+                    statusMessage.textContent = "近くにトレーニング施設が見つかりませんでした。";
+                } else {
+                    statusMessage.textContent = `施設検索エラー: ${status}`;
+                    console.error('Nearby search failed:', status);
+                }
+            });
+        }
+
+        /**
+         * 地図上に施設マーカーを作成
+         * @param {Object} place - Places API の検索結果オブジェクト
+         */
+        function createMarker(place) {
+            if (!place.geometry || !place.geometry.location) return;
+
+            const marker = new google.maps.Marker({
+                map: map,
+                position: place.geometry.location,
+                title: place.name
+            });
+
+            google.maps.event.addListener(marker, "click", () => {
+                const content = `
+                    <strong>${place.name}</strong><br>
+                    ${place.vicinity || '住所不明'}<br>
+                    ${place.rating ? '評価: ' + place.rating : ''}
+                `;
+                infoWindow.setContent(content);
+                infoWindow.open(map, marker);
+            });
+        }
+
+        /**
+         * ブラウザのGeolocation API を使用して現在地を取得
+         */
+        function getLocationAndInitMap() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+                        statusMessage.textContent = "現在地を取得しました。施設を検索中...";
+                        initMap(pos);
+                    },
+                    () => {
+                        // ユーザーが位置情報の取得を拒否した場合やエラーが発生した場合
+                        handleLocationError(true);
+                    }
+                );
+            } else {
+                // ブラウザがGeolocationをサポートしていない場合
+                handleLocationError(false);
+            }
+        }
+
+        /**
+         * 位置情報取得時のエラー処理
+         * @param {boolean} browserHasGeolocation - ブラウザがGeolocationをサポートしているか
+         */
+        function handleLocationError(browserHasGeolocation) {
+            statusMessage.textContent = browserHasGeolocation
+                ? "エラー: 現在地の取得が許可されませんでした。"
+                : "エラー: お使いのブラウザは位置情報をサポートしていません。";
+
+            // エラー時、代わりにデフォルトの場所（例: 東京駅）を表示
+            const defaultPos = { lat: 35.681236, lng: 139.767125 };
+            initMap(defaultPos);
+        }
+
+        // Google Maps APIのロード完了を待ってからマップを初期化
+        window.onload = getLocationAndInitMap;
+    </script>
+</body>
+</html>

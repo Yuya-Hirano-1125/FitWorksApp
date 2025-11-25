@@ -102,6 +102,7 @@ public class TrainingController {
 
     /**
      * トレーニング選択画面 (training.html) を表示
+     * ★ 修正済み: return "training" -> "training/training"
      */
     @GetMapping("/training")
     public String showTrainingOptions(Authentication authentication, Model model) { 
@@ -113,22 +114,25 @@ public class TrainingController {
         model.addAttribute("freeWeightParts", FREE_WEIGHT_EXERCISES_BY_PART.keySet());
         model.addAttribute("cardioExercises", CARDIO_EXERCISES);
         
-        return "training/training"; // ★ 修正
+        return "training/training"; 
     }
+    
 
     /**
      * トレーニング種目一覧画面 (exercise-list.html) を表示
+     * ★ 修正済み: return "exercise-list" -> "training/exercise-list"
      */
     @GetMapping("/training/exercises")
     public String showExerciseList(Authentication authentication) {
         if (getCurrentUser(authentication) == null) {
             return "redirect:/login"; 
         }
-        return "training/exercise-list"; // ★ 修正
+        return "training/exercise-list"; 
     }
 
     /**
      * トレーニングセッション開始
+     * ★ 修正済み: return "training-session" -> "training/training-session"
      */
     @PostMapping("/training/start")
     public String startTrainingSession(
@@ -170,11 +174,12 @@ public class TrainingController {
         // ★ 記録用フォームのために今日の日付を渡す
         model.addAttribute("today", LocalDate.now());
         
-        return "training/training-session"; // ★ 修正
+        return "training/training-session"; 
     }
     
     /**
      * トレーニングログ（カレンダー）画面を表示
+     * ★ 修正済み: return "training-log" -> "log/training-log"
      */
     @GetMapping("/training-log")
     public String showTrainingLog(
@@ -243,11 +248,12 @@ public class TrainingController {
             dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE));
         }
         model.addAttribute("dayLabels", dayLabels);
-        return "log/training-log"; // ★ 修正
+        return "log/training-log"; 
     }
 
     /**
      * ★ 追加: 全トレーニング記録一覧画面を表示
+     * ★ 修正済み: return "training-log-all" -> "log/training-log-all"
      */
     @GetMapping("/training-log/all")
     public String showAllTrainingLog(Authentication authentication, Model model) {
@@ -260,25 +266,38 @@ public class TrainingController {
         List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
         model.addAttribute("records", allRecords);
         
-        return "log/training-log-all"; // ★ 修正
+        return "log/training-log-all"; 
     }
 
+    /**
+     * ウェイトログ入力フォーム
+     * ★ 修正済み: return "training-log-form-weight" -> "log/training-log-form-weight"
+     */
     @GetMapping("/training-log/form/weight")
     public String showWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
         form.setRecordDate(date);
         form.setType("WEIGHT");
         model.addAttribute("trainingLogForm", form);
-        return "log/training-log-form-weight"; // ★ 修正
+        return "log/training-log-form-weight"; 
     }
 
+    /**
+     * 有酸素運動ログ入力フォーム
+     * ★ 修正済み: return "training-log-form-cardio" -> "log/training-log-form-cardio"
+     */
     @GetMapping("/training-log/form/cardio")
     public String showCardioLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
         form.setRecordDate(date);
         form.setType("CARDIO");
         model.addAttribute("trainingLogForm", form);
-        return "log/training-log-form-cardio"; // ★ 修正
+        return "log/training-log-form-cardio"; 
+    }
+    
+    @GetMapping("/training/map")
+    public String showTrainingMap() {
+        return "training/training-map";  // templates/training/training-map.html
     }
     
     @PostMapping("/training-log/save")
@@ -319,4 +338,9 @@ public class TrainingController {
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
+
+
+
 }
+
+
