@@ -37,8 +37,8 @@
 <footer th:replace="fragments/footer :: footer"></footer>
 
 <script>
-    const MAPTILER_KEY = "M0FirV3EG8W59d1VRG9d";
-    const FOURSQUARE_API_KEY = "EHWM4ACD1NTQ25SGACPQIB3NOK0QXNDX5TBDYUGZO5MAB0CU";
+    const MAPTILER_KEY = "0885a429c02d4b11b66f23cebd50b365";
+    const FOURSQUARE_API_KEY = "IX5YRVRKSRYTHZSOYKB3DUXDZ0O3Y0GPFPU5GHTNWE1T2EV0";
 
     let map;
 
@@ -81,7 +81,7 @@
 
     // Foursquare Places API を使ってジム検索
     function searchGyms(position) {
-        const radius = 10000; // 半径10km
+        const radius = 10000; // 半径1-km
         const url = `https://api.foursquare.com/v3/places/search?ll=${position.lat},${position.lon}&radius=${radius}&categories=18018&limit=50`;
 
         fetch(url, {
