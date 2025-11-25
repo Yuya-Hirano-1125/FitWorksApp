@@ -305,7 +305,13 @@ public class TrainingController {
         model.addAttribute("trainingLogForm", form);
         return "log/training-log-form-weight"; 
     }
+    @GetMapping("/map")
+    public String showNearbyGymsMap() {
+        // templates/training/nearby_gyms.html を返す
+        return "training/nearby_gyms"; 
+    }
 
+  
     /**
      * 有酸素運動ログ入力フォーム
      * ★ 修正済み: return "training-log-form-cardio" -> "log/training-log-form-cardio"

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>近くのトレーニング施設 (Mapbox Search API)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
+
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        #map-container {
+            width: 100%;
+            height: 600px; /* 地図の表示領域 */
+            position: relative;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        #status-message {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="status-message">現在地を取得中です...</div>
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+
+    <script>
+        // ⚠️ ここをあなたのMapbox公開アクセストークンに置き換えてください
+        const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoieXV5YTExMjUiLCJhIjoiY21pZTRsYnpkMGR1eDJtcXQ3dXoyMGp2diJ9.FPEY65NssfVtKspl2alUjg";
+        
+        mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
+        let map;
+        const statusMessage = document.getElementById('status-message');
+        
+        // ジムの場所を示すためのマーカーを保持する配列
+        const gymMarkers = [];
+
+        /**
+         * 1. 現在地を取得し、地図とジム検索を開始する
+         */
+        function getLocationAndInitMap() {
+            if (!MAPBOX_ACCESS_TOKEN || MAPBOX_ACCESS_TOKEN === "YOUR_MAPBOX_ACCESS_TOKEN") {
+                 statusMessage.textContent = "Mapboxアクセストークンを設定してください。";
+                 return;
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        statusMessage.textContent = "現在地を取得しました。ジムを検索中...";
+                        initMap({ lat: latitude, lon: longitude });
+                        searchNearbyGyms({ lat: latitude, lon: longitude });
+                    },
+                    (error) => handleLocationError(error)
+                );
+            } else {
+                handleLocationError(null);
+            }
+        }
+
+        /**
+         * 現在地取得に失敗した場合の処理（デフォルト位置として東京駅を使用）
+         */
+        function handleLocationError(error) {
+            statusMessage.textContent = "現在地を取得できませんでした。デフォルト位置（東京駅）で表示します。";
+            const defaultPos = { lat: 35.681236, lon: 139.767125 }; // 東京駅
+            initMap(defaultPos);
+            searchNearbyGyms(defaultPos);
+        }
+
+        /**
+         * 2. Mapbox GL JS 地図の初期化
+         */
+        function initMap(position) {
+            map = new mapboxgl.Map({
+                container: 'map',
+                // Mapboxのストリートスタイルを使用
+                style: 'mapbox://styles/mapbox/streets-v12', 
+                center: [position.lon, position.lat], // [経度, 緯度]
+                zoom: 14 // ズームレベル
+            });
+
+            // 現在地マーカー (青)
+            new mapboxgl.Marker({ color: 'blue' })
+                .setLngLat([position.lon, position.lat])
+                .setPopup(new mapboxgl.Popup().setHTML("<b>あなたの現在地 (推定)</b>"))
+                .addTo(map);
+        }
+
+        /**
+         * 3. Mapbox Search API を使って近くのジムを検索
+         */
+        async function searchNearbyGyms(position) {
+            // Mapbox Search APIのCategory Searchエンドポイント
+            const searchUrl = `https://api.mapbox.com/search/v1/category/gym?` +
+                              `proximity=${position.lon},${position.lat}` + // 検索の中心座標
+                              `&language=ja` +
+                              `&limit=20` + // 最大20件
+                              `&access_token=${MAPBOX_ACCESS_TOKEN}`;
+
+            try {
+                const response = await fetch(searchUrl);
+                const data = await response.json();
+
+                if (data.features && data.features.length > 0) {
+                    addGymMarkersToMap(data.features, position);
+                    statusMessage.textContent = `${data.features.length} 件のジムが近くで見つかりました。`;
+                } else {
+                    statusMessage.textContent = "近くにジムが見つかりませんでした。";
+                }
+            } catch (error) {
+                console.error("ジム検索中にエラーが発生:", error);
+                statusMessage.textContent = "ジム検索中にエラーが発生しました。";
+            }
+        }
+
+        /**
+         * 4. 検索結果のジムを地図にマーカーとして追加
+         */
+        function addGymMarkersToMap(features, userPosition) {
+            // 既存のマーカーを削除
+            gymMarkers.forEach(marker => marker.remove());
+            gymMarkers.length = 0;
+
+            features.forEach(feature => {
+                const coordinates = feature.geometry.coordinates; // [経度, 緯度]
+                const name = feature.properties.name;
+                const address = feature.properties.address || "住所不明";
+
+                // ポップアップの内容
+                const popupContent = `
+                    <h3>${name}</h3>
+                    <p>${address}</p>
+                    <p><a href="https://www.google.com/maps/dir/?api=1&origin=${userPosition.lat},${userPosition.lon}&destination=${coordinates[1]},${coordinates[0]}" target="_blank">Google Mapでルートを検索</a></p>
+                `;
+
+                // マーカー (赤)
+                const marker = new mapboxgl.Marker({ color: 'red' })
+                    .setLngLat(coordinates)
+                    .setPopup(new mapboxgl.Popup().setHTML(popupContent))
+                    .addTo(map);
+
+                gymMarkers.push(marker);
+            });
+        }
+
+        // ページロード時に処理を開始
+        window.onload = getLocationAndInitMap;
+    </script>
+
+</body>
+</html>
