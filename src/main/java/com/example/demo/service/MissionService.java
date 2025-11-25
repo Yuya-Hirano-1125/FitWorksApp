@@ -40,14 +40,13 @@ public class MissionService {
 
     /**
      * デイリーミッションを生成します。
-     * ★ 報酬を一律1000XPに変更
      */
     private List<DailyMissionStatus> generateDailyMissions(User user, LocalDate date) {
         DailyMissionStatus mission1 = new DailyMissionStatus(
-            user, date, "TRAINING_LOG", "トレーニングを1回記録する", 1, 1000
+            user, date, "TRAINING_LOG", "トレーニングを1回記録する", 1, 300
         );
         DailyMissionStatus mission2 = new DailyMissionStatus(
-            user, date, "COMMUNITY_POST", "コミュニティに1回投稿する", 1, 1000
+            user, date, "COMMUNITY_POST", "コミュニティに1回投稿する", 1, 200
         );
 
         missionStatusRepository.saveAll(List.of(mission1, mission2));
@@ -74,7 +73,7 @@ public class MissionService {
 
     /**
      * 完了したミッションの報酬を獲得します (経験値を付与します)。
-     * ★ 報酬を一律1000XPに変更
+     * ★ 修正: このメソッドシグネチャがMissionControllerの呼び出しと一致しています。
      */
     @Transactional
     public boolean claimMissionReward(Long userId, Long missionId) {
@@ -90,11 +89,12 @@ public class MissionService {
 
         // ミッションが完了しており、まだ報酬を獲得していないこと
         if (missionStatus.isCompleted() && !missionStatus.isRewardClaimed()) {
-            User user = userService.findById(userId)
-                    .orElseThrow(() -> new IllegalStateException("User not found in claim process."));
+            // Userを再度フェッチして、Detached Objectエラーを回避する（Optional）
+            User user = userService.findById(userId).orElseThrow(() -> new IllegalStateException("User not found in claim process."));
+            int rewardExp = missionStatus.getRewardExp();
 
-            // ★ 一律1000XPを付与
-            userService.addExp(user, 1000);
+            // UserServiceの addExp を呼び出し、経験値を付与しレベルアップを処理
+            userService.addExp(user, rewardExp); 
 
             // 報酬をクレーム済みに更新
             missionStatus.setRewardClaimed(true);

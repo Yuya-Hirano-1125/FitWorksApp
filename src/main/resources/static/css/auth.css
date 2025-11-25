@@ -50,7 +50,7 @@
 /* Links below forms */
 .forgot-password-link {
     text-align: right;
-    margin-top: -10px;
+    margin-top: 10px;
     margin-bottom: 20px;
     font-size: 14px;
 }
@@ -80,4 +80,67 @@
 .register-link a:hover, .login-link a:hover {
     text-decoration: underline;
     letter-spacing: 0.5px;
+}
+/* auth.css に追加するスタイル */
+
+.strength-indicator {
+    margin-top: 5px;
+    font-size: 0.8em;
+}
+
+#strength-text {
+    font-weight: 600;
+}
+
+.bar-container {
+    height: 6px;
+    background-color: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 3px;
+}
+
+.strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+/* 強度ごとの色 */
+.strength-bar.weak {
+    background-color: #ff4d4f; /* 赤 */
+}
+
+.strength-bar.medium {
+    background-color: #faad14; /* オレンジ */
+}
+
+.strength-bar.strong {
+    background-color: #52c41a; /* 緑 */
+}
+.criteria-list {
+    list-style: none; /* リストの標準の点を削除 */
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+.criterion {
+    font-size: 0.9em;
+    color: #999; /* 未達成時は薄い灰色 */
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.criterion i {
+    margin-right: 8px;
+    width: 15px; /* アイコンの幅を統一 */
+    text-align: center;
+}
+
+/* 条件達成時のスタイル */
+.criterion.met {
+    color: #52c41a; /* 緑色 */
+    font-weight: 600;
 }
