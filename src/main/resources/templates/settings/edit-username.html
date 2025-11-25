@@ -23,7 +23,7 @@
 
         <div class="form-group">
             <label for="username">新しいユーザー名</label>
-            <input type="text" id="username" th:field="*{username}" required placeholder="新しいユーザー名" th:classappend="${#fields.hasErrors('username')} ? 'error-input' : ''">
+            <input type="text" id="username" th:field="*{username}" required placeholder="新しいユーザー名" th:classappend="${#fields.hasErrors('username')} ? 'error-input' : ''" autocomplete="off">
         </div>
 
         <div class="button-container">
