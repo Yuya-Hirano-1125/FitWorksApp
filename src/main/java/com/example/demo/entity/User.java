@@ -106,4 +106,11 @@ public class User {
         if (requiredXp == 0) return 0; 
         return (int)(((double) currentXp / requiredXp) * 100);
     }
+
+	public void setXp(int newTotalXp) {
+	}
+
+	public int getXp() {
+		return 0;
+	}
 }
