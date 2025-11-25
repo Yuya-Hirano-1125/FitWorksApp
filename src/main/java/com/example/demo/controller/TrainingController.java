@@ -295,7 +295,7 @@ public class TrainingController {
         return "log/training-log-form-cardio"; 
     }
     
-    @GetMapping("/map")
+    @GetMapping("/training/map")
     public String showTrainingMap() {
         return "training/training-map";  // templates/training/training-map.html
     }
