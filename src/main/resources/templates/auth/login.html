@@ -21,11 +21,11 @@
     <form th:action="@{/login}" method="post">
         <div class="form-group">
             <label for="username">ユーザー名 / メールアドレス</label>
-            <input type="text" id="username" name="username" required placeholder="ユーザー名またはメールアドレス">
+            <input type="text" id="username" name="username" required placeholder="ユーザー名またはメールアドレス"autocomplete="off">
         </div>
         <div class="form-group" style="margin-bottom: 5px;">
             <label for="password">パスワード</label>
-            <input type="password" id="password" name="password" required placeholder="パスワード">
+            <input type="password" id="password" name="password" required placeholder="パスワード"autocomplete="off">
         </div>
         
         <div class="forgot-password-link">
