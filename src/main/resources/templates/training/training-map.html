@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>近くのトレーニング施設</title>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obhY5PjS4=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20n69z7+J9iRjVlU4c7E/s8pT+jL7lJp/XWf+T/S/eY=" crossorigin=""></script>
-    
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
-        /* CSSはそのまま */
         #map {
             height: 500px;
             width: 100%;
@@ -26,121 +23,123 @@
     </style>
 </head>
 <body>
-    
+
 <header th:replace="fragments/header :: header"></header>
-    
+
 <main>
     <div class="container map-container">
         <h1>近くのトレーニング施設を探す</h1>
-        
         <p class="search-status" id="status-message">現在地を取得中です...</p>
-        
         <div id="map"></div>
     </div>
 </main>
-    
+
 <footer th:replace="fragments/footer :: footer"></footer>
-    
+
 <script>
-    // 🌟 修正点: 2つのAPIキーを正しい用途で定義・使用
-    const MAP_KEY = "0885a429c02d4b11b66f23cebd50b365";     // Map Tiles API用
-    const PLACES_KEY = "1b287cca41c24370a70eec923dc99ab9";   // Places API用
-    
+    // MapTiler APIキー（クレカ不要で取得可能）
+    const MAPTILER_KEY = "M0FirV3EG8W59d1VRG9d";
+
     let map;
-    
-    // 現在地取得
-    function getLocationAndInitMap() {
+
+    /** ページ読み込みで現在地取得 */
+    window.onload = getLocationAndInit;
+
+    function getLocationAndInit() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const pos = {
-                        lat: position.coords.latitude,
-                        lon: position.coords.longitude
+                (pos) => {
+                    const position = {
+                        lat: pos.coords.latitude,
+                        lon: pos.coords.longitude
                     };
-                    document.getElementById("status-message").textContent = "現在地を取得しました。施設を検索中...";
-                    initMap(pos);
-                    searchNearbyPlaces(pos);
+                    document.getElementById("status-message").textContent =
+                        "現在地を取得しました。施設を検索中...";
+                    initMap(position);
+                    searchGyms(position);
                 },
-                () => handleLocationError()
+                () => initFallback()
             );
         } else {
-            handleLocationError();
+            initFallback();
         }
     }
-    
-    // エラー時：東京駅をデフォルトに
-    function handleLocationError() {
-        document.getElementById("status-message").textContent =
-            "現在地を取得できませんでした。デフォルト位置（東京）で表示します。";
-        const defaultPos = { lat: 35.681236, lon: 139.767125 };
-        initMap(defaultPos);
-        searchNearbyPlaces(defaultPos);
-    }
-    
-    // 地図初期化（Leaflet + Map Tiles API）
-    function initMap(position) {
-        // マップがすでに存在する場合は削除して再初期化（エラー処理のため）
-        if (map) {
-            map.remove();
-        }
 
-        // [緯度, 経度]の順で地図の中心を設定
-        map = L.map('map').setView([position.lat, position.lon], 15);
-        
-        // Geoapify の地図タイルを設定
-        L.tileLayer(`https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey=${MAP_KEY}`, {
-            maxZoom: 19,
-            // 🌟 修正点: Map Tiles APIにはMAP_KEYを使用
-            attribution: 'Powered by <a href="https://www.geoapify.com/" target="_blank">Geoapify</a> | © OpenStreetMap contributors' // 著作権表示ontributors' // 著作権表示
-        }).addTo(map);
-        
+    /** 現在地取得失敗 → 東京駅 */
+    function initFallback() {
+        document.getElementById("status-message").textContent =
+            "現在地を取得できませんでした。デフォルト位置で表示します。";
+        const tokyo = { lat: 35.681236, lon: 139.767125 };
+        initMap(tokyo);
+        searchGyms(tokyo);
+    }
+
+    /** Leaflet + MapTiler で地図表示 */
+    function initMap(position) {
+        map = L.map("map").setView([position.lat, position.lon], 15);
+
+        L.tileLayer(
+            `https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${MAPTILER_KEY}`,
+            {
+                maxZoom: 19,
+                attribution: "© MapTiler © OpenStreetMap contributors"
+            }
+        ).addTo(map);
+
         // 現在地マーカー
         L.marker([position.lat, position.lon], {
             title: "あなたの現在地"
-        }).addTo(map).bindPopup("現在地").openPopup();
+        }).addTo(map);
     }
-    
-    // 近隣のジム検索（Places API）
-    function searchNearbyPlaces(position) {
-        // Geoapify Places APIへのリクエストを構築
-        // categories=sport.fitness は一般的なフィットネス/ジム施設に対応
-        const url =
-            `https://api.geoapify.com/v2/places?categories=sport.fitness` +
-            `&filter=circle:${position.lon},${position.lat},2000` + // [経度, 緯度, 半径(メートル)]
-            `&bias=proximity:${position.lon},${position.lat}` +
-            `&apiKey=${PLACES_KEY}`; // 🌟 修正点: Places APIにはPLACES_KEYを使用
-        
-        fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                if (!data.features || data.features.length === 0) {
-                    document.getElementById("status-message").textContent =
-                        "近くにトレーニング施設が見つかりませんでした。";
-                    return;
-                }
-                
+
+    /** Overpass API を使ってジムを検索 */
+    function searchGyms(position) {
+        const radius = 3000; // 半径3km（必要なら拡大可）
+
+        // Overpass クエリ
+        const query = `
+            [out:json][timeout:25];
+            (
+              node["leisure"="fitness_centre"](around:${radius}, ${position.lat}, ${position.lon});
+              node["leisure"="sports_centre"](around:${radius}, ${position.lat}, ${position.lon});
+              node["sport"="fitness"](around:${radius}, ${position.lat}, ${position.lon});
+              node["sport"="gymnastics"](around:${radius}, ${position.lat}, ${position.lon});
+              node["sport"="dance"](around:${radius}, ${position.lat}, ${position.lon});
+              node["sport"="martial_arts"](around:${radius}, ${position.lat}, ${position.lon});
+            );
+            out body;
+        `;
+
+        fetch("https://overpass-api.de/api/interpreter", {
+            method: "POST",
+            body: query
+        })
+            .then((res) => res.json())
+            .then((data) => {
                 document.getElementById("status-message").textContent =
-                    `${data.features.length}件の近くのトレーニング施設が見つかりました。`;
-                
-                data.features.forEach(place => {
-                    // Geoapifyの座標 [経度(lon), 緯度(lat)]
-                    const [lon, lat] = place.geometry.coordinates;
-                    const name = place.properties.name || place.properties.address_line1 || "名称不明";
-                    const address = place.properties.address_line2 || "住所不明";
-                    
-                    // Leafletマーカーは [緯度, 経度] の順
-                    L.marker([lat, lon]) 
-                        .addTo(map)
-                        .bindPopup(`<strong>${name}</strong><br>${address}`);
-                });
+                    `${data.elements.length} 件のトレーニング施設が見つかりました`;
+                addGymsToMap(data.elements);
             })
-            .catch(error => {
-                document.getElementById("status-message").textContent = "施設検索中にエラーが発生しました。";
-                console.error("Geoapify Places API Error:", error);
+            .catch(() => {
+                document.getElementById("status-message").textContent =
+                    "施設検索中にエラーが発生しました。";
             });
     }
-    
-    window.onload = getLocationAndInitMap;
+
+    /** 取得したジムを地図に追加 */
+    function addGymsToMap(gyms) {
+        gyms.forEach((gym) => {
+            const lat = gym.lat;
+            const lon = gym.lon;
+            const name = gym.tags?.name || "名称不明の施設";
+
+            L.marker([lat, lon]).addTo(map).bindPopup(`<b>${name}</b>`);
+        });
+    }
 </script>
+
 </body>
 </html>
+
+
+
