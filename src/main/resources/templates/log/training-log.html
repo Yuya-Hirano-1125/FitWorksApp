@@ -122,17 +122,18 @@
 
     // 記録モーダルを開く関数
     function openLogModal(dateString, isLogged) {
-        // 日付のフォーマットを調整
         const [year, month, day] = dateString.split('-');
         const displayDate = `${year}年${month}月${day}日`;
+        
+        const modal = document.getElementById('logModal');
+        const trainingTypeSelect = document.getElementById('trainingType');
+        const formContainer = document.getElementById('formContainer');
 
-        document.getElementById('selectedDateInput').value = dateString;
-        document.getElementById('modalDateTitle').textContent = displayDate + ' の記録';
-        
-        // 初期フォームを読み込み (フリーウェイトから)録を確認してください。</p>';
-        document.getElementById('trainingType').value = 'WEIGHT';
-        loadTrainingForm('WEIGHT', dateString); 
-        
+        // フォームの状態をリセット
+        trainingTypeSelect.value = 'WEIGHT';
+        formContainer.innerHTML = '<p>フォームを読み込んでいます...</p>';
+        loadTrainingForm('WEIGHT', dateString);
+
         // 記録済みメッセージの表示切り替え（簡易版）
         const logViewArea = document.getElementById('logViewArea');
         if (isLogged) {
@@ -141,22 +142,32 @@
             logViewArea.innerHTML = '<p style="color: #999; margin-bottom: 10px;">この日はまだ記録がありません。</p>';
         }
 
-        document.getElementById('logModal').style.display = 'block';
+        // ★★★ 修正点: クラスを追加するだけで表示をCSSに任せる ★★★
+        modal.classList.add('is-active');
     }
 
     // 記録モーダルを閉じる関数
     function closeLogModal() {
-        document.getElementById('logModal').style.display = 'none';
+        const modal = document.getElementById('logModal');
+        
+        // 1. モーダルを非表示 (CSSクラスを使用)
+        modal.classList.remove('is-active');
+        
+        // 2. フォームの状態をリセット
         document.getElementById('formContainer').innerHTML = '<p>フォームを読み込んでいます...</p>';
+        document.getElementById('trainingType').value = 'WEIGHT'; 
     }
 
     // モーダル外クリックで閉じる処理
     window.onclick = function(event) {
         const modal = document.getElementById('logModal');
-        if (event.target === modal) {
+        // モーダルが表示中かつクリック対象が背景の場合に閉じる
+        if (modal.classList.contains('is-active') && event.target === modal) {
             closeLogModal();
         }
     }
+    
+    // ★★★ 修正点: 初期化のためのリスナーは不要、すべて削除 ★★★
 </script>
 
 </body>
