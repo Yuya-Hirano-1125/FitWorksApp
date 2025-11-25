@@ -332,7 +332,7 @@ public class TrainingController {
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
-<<<<<<< HEAD
+
 
 
 }
@@ -340,6 +340,3 @@ public class TrainingController {
 
 
 
-=======
-}
->>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
