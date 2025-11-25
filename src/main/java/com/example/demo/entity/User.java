@@ -77,6 +77,23 @@ public class User {
     public Boolean getIsRewardClaimedToday() { return isRewardClaimedToday; }
     public void setIsRewardClaimedToday(Boolean isRewardClaimedToday) { this.isRewardClaimedToday = isRewardClaimedToday; }
 
+    // --- エラー解消のための追加メソッド (既存のロジックに委譲) ---
+    // 新たに追加: getXp() (引数なし) - 今回のエラーを解消します。
+    public Integer getXp() {
+        return getExperiencePoints();
+    }
+    
+    // 前回追加: getXp(int) (引数あり) - 前々回のエラーを解消するために残します。
+    public Integer getXp(int ignored) {
+        return getExperiencePoints();
+    }
+
+    // 前回追加: setXp(int)
+    public void setXp(int xpToAdd) {
+        addXp(xpToAdd); 
+    }
+    // ----------------------------------------------------
+    
     // --- Getter / Setter (新規追加: キャラクター装備アイテム) ---
     public Item getEquippedBackgroundItem() { return equippedBackgroundItem; }
     public void setEquippedBackgroundItem(Item equippedBackgroundItem) { this.equippedBackgroundItem = equippedBackgroundItem; }
