@@ -1,61 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>近くのトレーニング施設 (Mapbox Search API)</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>近くのトレーニング施設を探す | Mapbox</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
-
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
     <style>
-        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        /* Mapbox用のコンテナスタイルとアプリデザインの統合 */
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Noto Sans JP', Arial, sans-serif; 
+            background-color: #f4f4f4; 
+        }
+        /* main-containerのパディングをリセットし、ヘッダー直下にマップが来るように調整 */
+        .main-container { 
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            position: absolute; /* 全画面利用のため */
+            top: 0;
+            left: 0;
+        } 
+        
         #map-container {
             width: 100%;
-            height: 600px; /* 地図の表示領域 */
-            position: relative;
+            /* 画面全体からヘッダーとフッター（ナビ）の高さを引いた高さに設定 */
+            height: calc(100vh - 100px); 
+            position: absolute;
+            top: 50px; /* ヘッダーの高さに応じて調整 */
         }
         #map {
             width: 100%;
             height: 100%;
         }
+        
+        /* 検索ステータスメッセージのデザイン強調 */
         #status-message {
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #f0f0f0, #ffffff);
+            border: 1px solid #ddd;
+            border-radius: 20px;
             position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 10;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000; 
+            font-weight: 700;
+            font-size: 0.9em;
+            color: #2c3e50;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 80%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* カスタムマーカーのスタイル（赤いダンベルアイコン） */
+        .marker-gym .fa-dumbbell {
+            color: #d9534f; /* 濃い赤 */
+            font-size: 30px;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s;
+        }
+        
+        /* ポップアップ内のデザイン */
+        .mapboxgl-popup-content h4 {
+            margin: 0 0 5px; 
+            font-size: 1.1em; 
+            color: #2c3e50;
+        }
+        .mapboxgl-popup-content p {
+            margin: 0 0 10px; 
+            font-size: 0.9em; 
+            color: #7f8c8d;
+        }
+        .mapboxgl-popup-content a {
+            color: #4CAF50; 
+            text-decoration: none; 
             font-weight: bold;
         }
     </style>
 </head>
-<body>
+<body class="map-page">
 
-    <div id="status-message">現在地を取得中です...</div>
-    <div id="map-container">
-        <div id="map"></div>
+    <header th:replace="fragments/header :: header"></header>
+
+    <div class="main-container">
+        <div id="status-message">現在地を取得中です...</div>
+        <div id="map-container">
+            <div id="map"></div>
+        </div>
     </div>
+    
+    <footer th:replace="fragments/footer :: footer"></footer>
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js"></script>
 
     <script>
         // ⚠️ ここをあなたのMapbox公開アクセストークンに置き換えてください
-        const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoieXV5YTExMjUiLCJhIjoiY21pZTRsYnpkMGR1eDJtcXQ3dXoyMGp2diJ9.FPEY65NssfVtKspl2alUjg";
+        // ユーザーが提供したトークンを初期値として使用
+        const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoieXV5YTExMjUiLCJhIjoiY21pZTRsYnpkMGR1eDJtcXQ3dXoyMGp2diJ9.FPEY65NssfVtKspl2alUjg"; 
         
         mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
         let map;
         const statusMessage = document.getElementById('status-message');
-        
-        // ジムの場所を示すためのマーカーを保持する配列
         const gymMarkers = [];
 
-        /**
-         * 1. 現在地を取得し、地図とジム検索を開始する
-         */
         function getLocationAndInitMap() {
-            if (!MAPBOX_ACCESS_TOKEN || MAPBOX_ACCESS_TOKEN === "YOUR_MAPBOX_ACCESS_TOKEN") {
-                 statusMessage.textContent = "Mapboxアクセストークンを設定してください。";
+            if (!MAPBOX_ACCESS_TOKEN || MAPBOX_ACCESS_TOKEN.length < 5) { // 簡易チェック
+                 statusMessage.textContent = "Mapboxアクセストークンが設定されていません。";
                  return;
             }
 
@@ -67,51 +126,43 @@
                         initMap({ lat: latitude, lon: longitude });
                         searchNearbyGyms({ lat: latitude, lon: longitude });
                     },
-                    (error) => handleLocationError(error)
+                    (error) => handleLocationError(error),
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                 );
             } else {
                 handleLocationError(null);
             }
         }
 
-        /**
-         * 現在地取得に失敗した場合の処理（デフォルト位置として東京駅を使用）
-         */
         function handleLocationError(error) {
+            console.error("Geolocation Error:", error);
             statusMessage.textContent = "現在地を取得できませんでした。デフォルト位置（東京駅）で表示します。";
             const defaultPos = { lat: 35.681236, lon: 139.767125 }; // 東京駅
             initMap(defaultPos);
             searchNearbyGyms(defaultPos);
         }
 
-        /**
-         * 2. Mapbox GL JS 地図の初期化
-         */
         function initMap(position) {
+            // Mapbox GL JSの地図を初期化
             map = new mapboxgl.Map({
                 container: 'map',
-                // Mapboxのストリートスタイルを使用
                 style: 'mapbox://styles/mapbox/streets-v12', 
-                center: [position.lon, position.lat], // [経度, 緯度]
-                zoom: 14 // ズームレベル
+                center: [position.lon, position.lat], 
+                zoom: 14 
             });
 
-            // 現在地マーカー (青)
-            new mapboxgl.Marker({ color: 'blue' })
+            // 現在地マーカー (青) - Mapboxのデフォルトマーカーを使用
+            new mapboxgl.Marker({ color: '#007bff' }) 
                 .setLngLat([position.lon, position.lat])
                 .setPopup(new mapboxgl.Popup().setHTML("<b>あなたの現在地 (推定)</b>"))
                 .addTo(map);
         }
 
-        /**
-         * 3. Mapbox Search API を使って近くのジムを検索
-         */
         async function searchNearbyGyms(position) {
-            // Mapbox Search APIのCategory Searchエンドポイント
             const searchUrl = `https://api.mapbox.com/search/v1/category/gym?` +
-                              `proximity=${position.lon},${position.lat}` + // 検索の中心座標
+                              `proximity=${position.lon},${position.lat}` + 
                               `&language=ja` +
-                              `&limit=20` + // 最大20件
+                              `&limit=20` + 
                               `&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
             try {
@@ -120,7 +171,7 @@
 
                 if (data.features && data.features.length > 0) {
                     addGymMarkersToMap(data.features, position);
-                    statusMessage.textContent = `${data.features.length} 件のジムが近くで見つかりました。`;
+                    statusMessage.textContent = `${data.features.length} 件のジムが近くで見つかりました。マーカーをクリックしてください。`;
                 } else {
                     statusMessage.textContent = "近くにジムが見つかりませんでした。";
                 }
@@ -130,39 +181,44 @@
             }
         }
 
-        /**
-         * 4. 検索結果のジムを地図にマーカーとして追加
-         */
         function addGymMarkersToMap(features, userPosition) {
-            // 既存のマーカーを削除
             gymMarkers.forEach(marker => marker.remove());
             gymMarkers.length = 0;
 
             features.forEach(feature => {
-                const coordinates = feature.geometry.coordinates; // [経度, 緯度]
+                const coordinates = feature.geometry.coordinates;
                 const name = feature.properties.name;
                 const address = feature.properties.address || "住所不明";
 
-                // ポップアップの内容
+                // Google MapへのルーティングURL
+                const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userPosition.lat},${userPosition.lon}&destination=${coordinates[1]},${coordinates[0]}`;
+
+                // ポップアップの内容 (スタイリングを適用)
                 const popupContent = `
-                    <h3>${name}</h3>
-                    <p>${address}</p>
-                    <p><a href="https://www.google.com/maps/dir/?api=1&origin=${userPosition.lat},${userPosition.lon}&destination=${coordinates[1]},${coordinates[0]}" target="_blank">Google Mapでルートを検索</a></p>
+                    <div style="max-width: 200px; padding: 5px;">
+                        <h4 style="margin: 0 0 5px; font-size: 1.1em; color: #2c3e50;">${name}</h4>
+                        <p style="margin: 0 0 10px; font-size: 0.9em; color: #7f8c8d;">${address}</p>
+                        <a href="${googleMapsUrl}" target="_blank" style="color: #4CAF50; text-decoration: none; font-weight: bold;">
+                            <i class="fa-solid fa-route"></i> ルート案内
+                        </a>
+                    </div>
                 `;
 
-                // マーカー (赤)
-                const marker = new mapboxgl.Marker({ color: 'red' })
+                // カスタムマーカー要素 (Font Awesomeのダンベルアイコン)
+                const markerElement = document.createElement('div');
+                markerElement.className = 'marker-gym'; // CSSクラスを適用
+                markerElement.innerHTML = '<i class="fa-solid fa-dumbbell" style="color: #d9534f; font-size: 28px; text-shadow: 0 0 2px #fff;"></i>';
+                
+                const marker = new mapboxgl.Marker({ element: markerElement })
                     .setLngLat(coordinates)
-                    .setPopup(new mapboxgl.Popup().setHTML(popupContent))
+                    .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent))
                     .addTo(map);
 
                 gymMarkers.push(marker);
             });
         }
 
-        // ページロード時に処理を開始
         window.onload = getLocationAndInitMap;
     </script>
-
 </body>
 </html>
