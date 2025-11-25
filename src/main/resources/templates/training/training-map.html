@@ -2,24 +2,21 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>近くのトレーニング施設</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>近くのトレーニング施設 | FitWorks</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        #map {
-            height: 500px;
-            width: 100%;
-            margin-top: 20px;
-        }
-        .map-container {
-            padding: 20px;
-        }
-        .search-status {
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
+        .map-container { padding: 0; }
+        #map { height: 500px; width: 100%; margin-top: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .search-status { margin-bottom: 15px; font-weight: bold; color: var(--dark-text); }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip { border-radius: 15px; background: var(--light-bg); color: var(--dark-text); }
     </style>
 </head>
 <body>
@@ -27,8 +24,11 @@
 <header th:replace="fragments/header :: header"></header>
 
 <main>
-    <div class="container map-container">
-        <h1>近くのトレーニング施設を探す</h1>
+    <div class="main-container map-container">
+        <h1>
+            <i class="fa-solid fa-map-location-dot header-icon"></i> 近くのトレーニング施設を探す
+        </h1>
+
         <p class="search-status" id="status-message">現在地を取得中です...</p>
         <div id="map"></div>
     </div>
@@ -37,24 +37,20 @@
 <footer th:replace="fragments/footer :: footer"></footer>
 
 <script>
-    // MapTiler APIキー（クレカ不要で取得可能）
     const MAPTILER_KEY = "M0FirV3EG8W59d1VRG9d";
+    const FOURSQUARE_API_KEY = "EHWM4ACD1NTQ25SGACPQIB3NOK0QXNDX5TBDYUGZO5MAB0CU";
 
     let map;
 
-    /** ページ読み込みで現在地取得 */
+    // ページ読み込みで現在地取得
     window.onload = getLocationAndInit;
 
     function getLocationAndInit() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
-                    const position = {
-                        lat: pos.coords.latitude,
-                        lon: pos.coords.longitude
-                    };
-                    document.getElementById("status-message").textContent =
-                        "現在地を取得しました。施設を検索中...";
+                    const position = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+                    document.getElementById("status-message").textContent = "現在地を取得しました。施設を検索中...";
                     initMap(position);
                     searchGyms(position);
                 },
@@ -65,74 +61,51 @@
         }
     }
 
-    /** 現在地取得失敗 → 東京駅 */
     function initFallback() {
-        document.getElementById("status-message").textContent =
-            "現在地を取得できませんでした。デフォルト位置で表示します。";
+        document.getElementById("status-message").textContent = "現在地を取得できませんでした。デフォルト位置で表示します。";
         const tokyo = { lat: 35.681236, lon: 139.767125 };
         initMap(tokyo);
         searchGyms(tokyo);
     }
 
-    /** Leaflet + MapTiler で地図表示 */
     function initMap(position) {
         map = L.map("map").setView([position.lat, position.lon], 15);
 
         L.tileLayer(
             `https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=${MAPTILER_KEY}`,
-            {
-                maxZoom: 19,
-                attribution: "© MapTiler © OpenStreetMap contributors"
-            }
+            { maxZoom: 19, attribution: "© MapTiler © OpenStreetMap contributors" }
         ).addTo(map);
 
-        // 現在地マーカー
-        L.marker([position.lat, position.lon], {
-            title: "あなたの現在地"
-        }).addTo(map);
+        L.marker([position.lat, position.lon], { title: "あなたの現在地" }).addTo(map);
     }
 
-    /** Overpass API を使ってジムを検索 */
+    // Foursquare Places API を使ってジム検索
     function searchGyms(position) {
-        const radius = 3000; // 半径3km（必要なら拡大可）
+        const radius = 10000; // 半径10km
+        const url = `https://api.foursquare.com/v3/places/search?ll=${position.lat},${position.lon}&radius=${radius}&categories=18018&limit=50`;
 
-        // Overpass クエリ
-        const query = `
-            [out:json][timeout:25];
-            (
-              node["leisure"="fitness_centre"](around:${radius}, ${position.lat}, ${position.lon});
-              node["leisure"="sports_centre"](around:${radius}, ${position.lat}, ${position.lon});
-              node["sport"="fitness"](around:${radius}, ${position.lat}, ${position.lon});
-              node["sport"="gymnastics"](around:${radius}, ${position.lat}, ${position.lon});
-              node["sport"="dance"](around:${radius}, ${position.lat}, ${position.lon});
-              node["sport"="martial_arts"](around:${radius}, ${position.lat}, ${position.lon});
-            );
-            out body;
-        `;
-
-        fetch("https://overpass-api.de/api/interpreter", {
-            method: "POST",
-            body: query
+        fetch(url, {
+            headers: {
+                "Accept": "application/json",
+                "Authorization": FOURSQUARE_API_KEY
+            }
         })
-            .then((res) => res.json())
-            .then((data) => {
-                document.getElementById("status-message").textContent =
-                    `${data.elements.length} 件のトレーニング施設が見つかりました`;
-                addGymsToMap(data.elements);
-            })
-            .catch(() => {
-                document.getElementById("status-message").textContent =
-                    "施設検索中にエラーが発生しました。";
-            });
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("status-message").textContent =
+                `${data.results.length} 件のトレーニング施設が見つかりました`;
+            addGymsToMap(data.results);
+        })
+        .catch(() => {
+            document.getElementById("status-message").textContent = "施設検索中にエラーが発生しました。";
+        });
     }
 
-    /** 取得したジムを地図に追加 */
     function addGymsToMap(gyms) {
-        gyms.forEach((gym) => {
-            const lat = gym.lat;
-            const lon = gym.lon;
-            const name = gym.tags?.name || "名称不明の施設";
-
+        gyms.forEach(gym => {
+            const lat = gym.geocodes.main.latitude;
+            const lon = gym.geocodes.main.longitude;
+            const name = gym.name || "名称不明の施設";
             L.marker([lat, lon]).addTo(map).bindPopup(`<b>${name}</b>`);
         });
     }
@@ -140,6 +113,46 @@
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
