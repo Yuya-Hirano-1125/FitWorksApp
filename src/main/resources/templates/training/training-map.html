@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>近くのトレーニング施設</title>
-
-    <!-- Leaflet（地図ライブラリ） -->
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+    
     <style>
+        /* CSSはそのまま */
         #map {
             height: 500px;
             width: 100%;
@@ -23,33 +23,34 @@
         }
     </style>
 </head>
-
 <body>
-
+    
 <header th:replace="fragments/header :: header"></header>
-
+    
 <main>
     <div class="container map-container">
         <h1>近くのトレーニング施設を探す</h1>
-
+        
         <p class="search-status" id="status-message">現在地を取得中です...</p>
-
+        
         <div id="map"></div>
     </div>
 </main>
-
+    
 <footer th:replace="fragments/footer :: footer"></footer>
-
+    
 <script>
-    const MAP_KEY = "0885a429c02d4b11b66f23cebd50b365"; 
-	const PLACES_KEY = "1b287cca41c24370a70eec923dc99ab9"; // ← Geoapify のキーをここに置く
+    // 🌟 Geoapify APIキーの定義 (ユーザー提供の値を使用)
+    const MAP_KEY = "0885a429c02d4b11b66f23cebd50b365";
+    const PLACES_KEY = "1b287cca41c24370a70eec923dc99ab9";
     let map;
-
+    
     // 現在地取得
     function getLocationAndInitMap() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+                    // Geoapifyは経度(lon)を先に、緯度(lat)を後に扱うことが多い
                     const pos = {
                         lat: position.coords.latitude,
                         lon: position.coords.longitude
@@ -64,7 +65,7 @@
             handleLocationError();
         }
     }
-
+    
     // エラー時：東京駅をデフォルトに
     function handleLocationError() {
         document.getElementById("status-message").textContent =
@@ -73,30 +74,35 @@
         initMap(defaultPos);
         searchNearbyPlaces(defaultPos);
     }
-
+    
     // 地図初期化（Leaflet）
     function initMap(position) {
+        // [緯度, 経度]の順で地図の中心を設定
         map = L.map('map').setView([position.lat, position.lon], 15);
-
-        // Geoapify の地図タイル
-        L.tileLayer(`https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey=${API_KEY}`, {
-            maxZoom: 19
+        
+        // Geoapify の地図タイルを設定 (Geoapify Map Tiles API URL)
+        // 🌟 修正点 1: API_KEY -> MAP_KEY に変更
+        L.tileLayer(`https://maps.geoapify.com/v1/tile/osm-carto/{z}/{x}/{y}.png?apiKey=${MAP_KEY}`, {
+            maxZoom: 19,
+            attribution: 'Powered by Geoapify | © OpenStreetMap contributors' // 著作権表示は必須
         }).addTo(map);
-
+        
         // 現在地マーカー
         L.marker([position.lat, position.lon], {
             title: "あなたの現在地"
         }).addTo(map);
     }
-
+    
     // 近隣のジム検索（Places API）
     function searchNearbyPlaces(position) {
+        // Geoapify Places APIへのリクエストを構築
+        // categories=sport.fitness はジム/フィットネスに対応するカテゴリコード
         const url =
             `https://api.geoapify.com/v2/places?categories=sport.fitness` +
-            `&filter=circle:${position.lon},${position.lat},2000` +
+            `&filter=circle:${position.lon},${position.lat},2000` + // [経度, 緯度, 半径(メートル)]
             `&bias=proximity:${position.lon},${position.lat}` +
-            `&apiKey=${API_KEY}`;
-
+            `&apiKey=${PLACES_KEY}`; // 🌟 修正点 2: API_KEY -> PLACES_KEY に変更
+        
         fetch(url)
             .then(res => res.json())
             .then(data => {
@@ -105,66 +111,27 @@
                         "近くにトレーニング施設が見つかりませんでした。";
                     return;
                 }
-
+                
                 document.getElementById("status-message").textContent =
                     `${data.features.length}件の近くのトレーニング施設が見つかりました。`;
-
+                
                 data.features.forEach(place => {
+                    // Geoapifyの座標は [経度(lon), 緯度(lat)] の順で格納されている
                     const [lon, lat] = place.geometry.coordinates;
                     const name = place.properties.name || "名称不明";
+                    // address_line2は通常、地名や番地を含む住所の2行目にあたる
                     const address = place.properties.address_line2 || "住所不明";
-
-                    L.marker([lat, lon])
+                    
+                    L.marker([lat, lon]) // Leafletマーカーは [緯度, 経度] の順
                         .addTo(map)
                         .bindPopup(`<strong>${name}</strong><br>${address}`);
                 });
             });
     }
-
+    
     window.onload = getLocationAndInitMap;
 </script>
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
