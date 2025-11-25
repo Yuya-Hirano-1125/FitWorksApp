@@ -121,7 +121,11 @@
         <h1>🍽️ 食事記録一覧</h1>
 
         <a th:href="@{/log/meal/form}" class="back-to-form">新しい食事を記録する</a>
-
+		<div style="text-align: center; margin-top: 30px;">
+				        <a th:href="@{/home}" class="button button-primary">
+				            🏠 ホームに戻る
+				        </a>
+		</div>
         <div th:if="${#lists.isEmpty(mealRecords)}" class="empty-message">
             <p>まだ食事の記録がありません。記録を開始して健康管理を始めましょう！</p>
         </div>

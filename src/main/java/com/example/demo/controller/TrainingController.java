@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.demo.controller; 
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -27,28 +27,53 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.TrainingRecordRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.MissionService; // ★ 追加
-import com.example.demo.service.UserService;
+import com.example.demo.service.UserService; 
 
-@Controller
-public class TrainingController {
+@Controller 
+public class TrainingController { 
 
-    @Autowired
+    @Autowired 
     private UserService userService; 
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired 
+    private UserRepository userRepository; 
     
-    @Autowired
-    private TrainingRecordRepository trainingRecordRepository;
+    @Autowired 
+    private TrainingRecordRepository trainingRecordRepository; 
     
-    @Autowired
+    @Autowired 
     private MissionService missionService; // ★ 追加: MissionServiceを注入
 
-    private User getCurrentUser(Authentication authentication) {
-        if (authentication == null) return null;
-        return userService.findByUsername(authentication.getName());
-    }
+    private User getCurrentUser(Authentication authentication) { 
+        if (authentication == null) return null; 
+        return userService.findByUsername(authentication.getName()); 
+    } 
+ // ★★★ 経験値(XP)定数と計算ロジックの追加 ★★★
+    private static final int XP_BEGINNER = 300;  // 初級: 300 XP
+    private static final int XP_INTERMEDIATE = 500; // 中級: 500 XP
+    private static final int XP_ADVANCED = 1000; // 上級: 1000 XP
+    // レベルアップに必要なXP（ホーム画面表示用。ここでは5000とする）
+    private static final int XP_PER_LEVEL = 5000; 
 
+    /**
+     * 種目名から難易度（XP）を取得するヘルパーメソッド
+     */
+    private int getExperiencePoints(String exerciseName) {
+        if (exerciseName == null || exerciseName.trim().isEmpty()) {
+            return 0; 
+        }
+        
+        // 種目名に難易度ラベルが含まれているかチェックする
+        if (exerciseName.contains("(上級)")) {
+            return XP_ADVANCED;
+        } else if (exerciseName.contains("(中級)")) {
+            return XP_INTERMEDIATE;
+        } else if (exerciseName.contains("(初級)")) {
+            return XP_BEGINNER;
+        }
+        // ラベルが見つからない場合は0を返す
+        return 0; 
+    }
     private static final Map<String, List<String>> FREE_WEIGHT_EXERCISES_BY_PART = new LinkedHashMap<>() {{
         put("胸", List.of(
             "チェストフライ (初級)", 
@@ -102,6 +127,7 @@ public class TrainingController {
 
     /**
      * トレーニング選択画面 (training.html) を表示
+     * ★ 修正済み: return "training" -> "training/training"
      */
     @GetMapping("/training")
     public String showTrainingOptions(Authentication authentication, Model model) { 
@@ -113,22 +139,37 @@ public class TrainingController {
         model.addAttribute("freeWeightParts", FREE_WEIGHT_EXERCISES_BY_PART.keySet());
         model.addAttribute("cardioExercises", CARDIO_EXERCISES);
         
-        return "training/training"; // ★ 修正
+        return "training/training"; 
+    }
+    
+    /**
+     * Mapbox/Geoapifyで近くのトレーニング施設検索画面 (nearby_gyms.html) を表示
+     * ★ 404エラー解消のため追加 ★
+     */
+    @GetMapping("/training/map")
+    public String showNearbyGymsMap(Authentication authentication) {
+        if (getCurrentUser(authentication) == null) {
+            return "redirect:/login"; 
+        }
+        // templates/training/nearby_gyms.html を返す
+        return "training/nearby_gyms"; 
     }
 
     /**
      * トレーニング種目一覧画面 (exercise-list.html) を表示
+     * ★ 修正済み: return "exercise-list" -> "training/exercise-list"
      */
     @GetMapping("/training/exercises")
     public String showExerciseList(Authentication authentication) {
         if (getCurrentUser(authentication) == null) {
             return "redirect:/login"; 
         }
-        return "training/exercise-list"; // ★ 修正
+        return "training/exercise-list"; 
     }
 
     /**
      * トレーニングセッション開始
+     * ★ 修正済み: return "training-session" -> "training/training-session"
      */
     @PostMapping("/training/start")
     public String startTrainingSession(
@@ -170,11 +211,12 @@ public class TrainingController {
         // ★ 記録用フォームのために今日の日付を渡す
         model.addAttribute("today", LocalDate.now());
         
-        return "training/training-session"; // ★ 修正
+        return "training/training-session"; 
     }
     
     /**
      * トレーニングログ（カレンダー）画面を表示
+     * ★ 修正済み: return "training-log" -> "log/training-log"
      */
     @GetMapping("/training-log")
     public String showTrainingLog(
@@ -243,11 +285,12 @@ public class TrainingController {
             dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE));
         }
         model.addAttribute("dayLabels", dayLabels);
-        return "log/training-log"; // ★ 修正
+        return "log/training-log"; 
     }
 
     /**
      * ★ 追加: 全トレーニング記録一覧画面を表示
+     * ★ 修正済み: return "training-log-all" -> "log/training-log-all"
      */
     @GetMapping("/training-log/all")
     public String showAllTrainingLog(Authentication authentication, Model model) {
@@ -260,25 +303,33 @@ public class TrainingController {
         List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
         model.addAttribute("records", allRecords);
         
-        return "log/training-log-all"; // ★ 修正
+        return "log/training-log-all"; 
     }
 
+    /**
+     * ウェイトログ入力フォーム
+     * ★ 修正済み: return "training-log-form-weight" -> "log/training-log-form-weight"
+     */
     @GetMapping("/training-log/form/weight")
     public String showWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
         form.setRecordDate(date);
         form.setType("WEIGHT");
         model.addAttribute("trainingLogForm", form);
-        return "log/training-log-form-weight"; // ★ 修正
+        return "log/training-log-form-weight"; 
     }
 
+    /**
+     * 有酸素運動ログ入力フォーム
+     * ★ 修正済み: return "training-log-form-cardio" -> "log/training-log-form-cardio"
+     */
     @GetMapping("/training-log/form/cardio")
     public String showCardioLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
         form.setRecordDate(date);
         form.setType("CARDIO");
         model.addAttribute("trainingLogForm", form);
-        return "log/training-log-form-cardio"; // ★ 修正
+        return "log/training-log-form-cardio"; 
     }
     
     @PostMapping("/training-log/save")
@@ -296,25 +347,50 @@ public class TrainingController {
         record.setRecordDate(form.getRecordDate());
         record.setType(form.getType());
         
+        String exerciseIdentifier = null; // XP計算に使う種目名を格納
+
         if ("WEIGHT".equals(form.getType())) {
             record.setExerciseName(form.getExerciseName());
             record.setSets(form.getSets());
             record.setReps(form.getReps());
             record.setWeight(form.getWeight());
+            exerciseIdentifier = form.getExerciseName(); // ウェイトの種目名を使用
         } else if ("CARDIO".equals(form.getType())) {
             record.setCardioType(form.getCardioType());
             record.setDurationMinutes(form.getDurationMinutes());
             record.setDistanceKm(form.getDistanceKm());
+            exerciseIdentifier = form.getCardioType(); // 有酸素運動の種目名を使用
         }
 
         // 1. トレーニング記録を保存
         trainingRecordRepository.save(record);
         
-        // 2. ★ 新規追加: デイリーミッションの進捗を更新
-        // ミッションタイプ "TRAINING_LOG" の進捗を1進める
-        missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
+        // ★★★ XP計算とユーザー情報更新ロジック ★★★
+        int earnedXP = 0;
+        if (exerciseIdentifier != null) {
+            earnedXP = getExperiencePoints(exerciseIdentifier);
+        }
+
+        if (earnedXP > 0) {
+            // ユーザーの合計XPを更新
+            // Note: getXp()とsetXp()は以前の修正で追加されました
+            int newTotalXp = currentUser.getXp() + earnedXP;
+            currentUser.setXp(newTotalXp);
+            
+            // データベースにユーザー情報を保存（XPの永続化）
+            userRepository.save(currentUser); 
+
+            // 成功メッセージに獲得XPを追加
+            redirectAttributes.addFlashAttribute("successMessage", 
+                form.getRecordDate().toString() + " のトレーニングを記録し、" + earnedXP + " XPを獲得しました！");
+        } else {
+            // 元のメッセージを保持
+            redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " のトレーニングを記録しました！");
+        }
+        // ★★★ XP計算とユーザー情報更新ロジックここまで ★★★
         
-        redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " のトレーニングを記録しました！");
+        // 2. デイリーミッションの進捗を更新
+        missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
         
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
