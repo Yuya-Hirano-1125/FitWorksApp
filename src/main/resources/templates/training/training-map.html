@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>近くのトレーニング施設</title>
-    <link rel="stylesheet" th:href="@{/css/base.css}"> 
+    <link rel="stylesheet" th:href="@{/css/base.css}">
     <style>
         /* 地図を表示するためのスタイル */
         #map {
@@ -27,17 +27,20 @@
     <main>
         <div class="container map-container">
             <h1>近くのトレーニング施設を探す</h1>
-            
+
             <p class="search-status" id="status-message">現在地を取得中です...</p>
-            
+
             <div id="map"></div>
         </div>
     </main>
 
     <footer th:replace="fragments/footer :: footer"></footer>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDgRmpnY4uXBsJJxn7csvq-4f7Rc2khd0&libraries=places" defer></script>  
- 
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDgRmpnY4uXBsJJxn7csvq-4f7Rc2khd0&libraries=places" defer></script>
+
+    <script>
+        // 🌟 修正点 2: 不要になったAPI_KEYの定義とコメントを削除 🌟
+
         let map;
         let infoWindow;
         const statusMessage = document.getElementById('status-message');
