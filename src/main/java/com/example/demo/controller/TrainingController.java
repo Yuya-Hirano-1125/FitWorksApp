@@ -26,6 +26,7 @@ import com.example.demo.entity.TrainingRecord;
 import com.example.demo.entity.User;
 import com.example.demo.repository.TrainingRecordRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.MissionService; // ★ 追加
 import com.example.demo.service.UserService;
 
 @Controller
@@ -39,6 +40,9 @@ public class TrainingController {
     
     @Autowired
     private TrainingRecordRepository trainingRecordRepository;
+    
+    @Autowired
+    private MissionService missionService; // ★ 追加: MissionServiceを注入
 
     private User getCurrentUser(Authentication authentication) {
         if (authentication == null) return null;
@@ -316,13 +320,19 @@ public class TrainingController {
             record.setDistanceKm(form.getDistanceKm());
         }
 
+        // 1. トレーニング記録を保存
         trainingRecordRepository.save(record);
+        
+        // 2. ★ 新規追加: デイリーミッションの進捗を更新
+        // ミッションタイプ "TRAINING_LOG" の進捗を1進める
+        missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
         
         redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " のトレーニングを記録しました！");
         
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
+<<<<<<< HEAD
 
 
 }
@@ -330,3 +340,6 @@ public class TrainingController {
 
 
 
+=======
+}
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
