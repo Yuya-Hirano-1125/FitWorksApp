@@ -10,40 +10,29 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     
     <style>
-        /* ======================================================= */
-        /* ★ 画面中央寄せの修正箇所 ★ */
-        /* ======================================================= */
-        
-        /* 1. bodyに中央寄せのフレックスボックスを適用 */
+        /* 基本スタイル */
         body { 
             margin: 0; 
             padding: 0; 
             font-family: 'Noto Sans JP', Arial, sans-serif; 
             background-color: #f4f4f4; 
-            
-            /* ★ 修正: コンテンツを中央に寄せる */
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
         }
-        
-        /* 2. main-containerに最大幅を設定し、画面幅いっぱいの表示を制限 */
         .main-container { 
             padding: 0;
             width: 100%;
             height: 100%;
-            position: relative; 
-            
-            /* ★ 修正: コンテンツの最大幅をスマートフォンサイズに設定 */
-            max-width: 600px; /* デスクトップでの表示幅を制限 */
+            position: absolute; 
+            top: 0;
+            left: 0;
         } 
         
-        /* 3. 地図コンテナ */
+        /* 地図コンテナの高さ調整 */
         #map-container {
             width: 100%;
             height: calc(100vh - 350px);
-            position: relative; 
+            position: absolute;
             top: 50px; 
+            left: 0; 
             margin-bottom: 5px; 
         }
         #map {
@@ -51,7 +40,7 @@
             height: 100%;
         }
         
-        /* 4. ステータスメッセージを main-container 内で中央に配置 */
+        /* ステータスメッセージのデザイン */
         #status-message {
             padding: 8px 15px;
             background: linear-gradient(135deg, #f0f0f0, #ffffff);
@@ -73,17 +62,12 @@
             text-overflow: ellipsis;
         }
 
-        /* 5. 検索結果リストを画面下部、かつ main-container の中央に固定 */
+        /* 検索結果リストのデザイン */
         #places-list {
             position: fixed; 
             bottom: 50px;
-            
-            /* ★ 修正: body の中央に固定し、max-width に合わせる */
+            left: 0;
             width: 100%;
-            max-width: 600px; 
-            left: 50%;
-            transform: translateX(-50%);
-            
             height: 250px; 
             background: #fff;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
@@ -136,8 +120,7 @@
         
         <div id="places-list">
             <h2>近くで見つかった施設</h2>
-            <ul id="gym-results-ul">
-                </ul>
+            <ul id="gym-results-ul"></ul>
         </div>
     </div>
     
@@ -146,26 +129,27 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // 🚨 ユーザー提供のキーに一本化して定義
-        const GEOAPIFY_API_KEY = "0885a429c02d4b11b66f23cebd50b365"; 
+        // ---- APIキー ----
+        const GEOAPIFY_MAP_KEY = "0885a429c02d4b11b66f23cebd50b365"; 
+        const GEOAPIFY_PLACES_KEY = "1b287cca41c24370a70eec923dc99ab9"; 
         
         let map;
         const statusMessage = document.getElementById('status-message');
         const gymMarkers = [];
         
-        // Leaflet用のマーカーアイコン (APIキーを一本化し、安全にエンコード)
+        // ---- アイコン ----
         const gymIcon = L.icon({
-            iconUrl: `https://api.geoapify.com/v1/icon/?type=awesome&color=%23d9534f&icon=dumbbell&apiKey=${encodeURIComponent(GEOAPIFY_API_KEY)}`,
+            iconUrl: `https://api.geoapify.com/v1/icon/?type=awesome&color=%23d9534f&icon=dumbbell&apiKey=${GEOAPIFY_MAP_KEY}`,
             iconSize: [31, 46], 
             iconAnchor: [15, 46], 
             popupAnchor: [0, -46] 
         });
 
-
+        // ---- 現在地取得 ----
         function getLocationAndInitMap() {
-            if (!GEOAPIFY_API_KEY) { 
-                 statusMessage.textContent = "Geoapify APIキーが設定されていません。";
-                 return;
+            if (!GEOAPIFY_MAP_KEY || !GEOAPIFY_PLACES_KEY) { 
+                statusMessage.textContent = "Geoapify APIキーが設定されていません。";
+                return;
             }
 
             if (navigator.geolocation) {
@@ -187,87 +171,81 @@
         function handleLocationError(error) {
             console.error("Geolocation Error:", error);
             statusMessage.textContent = "現在地を取得できませんでした。デフォルト位置（東京駅）で表示します。";
-            const defaultPos = { lat: 35.681236, lon: 139.767125 }; // 東京駅
+            const defaultPos = { lat: 35.681236, lon: 139.767125 };
             initMap(defaultPos);
             searchNearbyPlaces(defaultPos);
         }
 
+        // ---- マップ初期化 ----
         function initMap(position) {
-            // Leafletの地図を初期化
             map = L.map('map').setView([position.lat, position.lon], 14);
 
-            // Tile URLのスタイル 'carto' を使用
             L.tileLayer(
-                `https://maps.geoapify.com/v1/tile/carto/{z}/{x}/{y}.png?&apiKey=${GEOAPIFY_API_KEY}`,
+                `https://maps.geoapify.com/v1/tile/carto/{z}/{x}/{y}.png?&apiKey=${GEOAPIFY_MAP_KEY}`,
                 {
                     maxZoom: 20,
                     attribution: 'Powered by Geoapify | © OpenStreetMap contributors'
                 }
             ).addTo(map);
 
-            // 現在地マーカー (青)
-            L.marker([position.lat, position.lon], { icon: L.divIcon({
-                className: 'current-location-marker',
-                html: '<div style="background-color:#007bff; width:12px; height:12px; border-radius:50%; border: 2px solid white;"></div>',
-                iconSize: [16, 16],
-                iconAnchor: [8, 8]
-            }) }) 
-                .bindPopup("<b>あなたの現在地 (推定)</b>")
-                .addTo(map);
+            L.marker([position.lat, position.lon], { 
+                icon: L.divIcon({
+                    className: 'current-location-marker',
+                    html: '<div style="background-color:#007bff; width:12px; height:12px; border-radius:50%; border: 2px solid white;"></div>',
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8]
+                }) 
+            }) 
+            .bindPopup("<b>あなたの現在地 (推定)</b>")
+            .addTo(map);
         }
 
-        async function searchNearbyPlaces(position) {
-            
-            const radiusMeters = 15000; // 15km
-            
-            // カテゴリはカンマ区切りで修正済み
-            const categories = "service.fitness,sport.fitness"; 
-            
-            const searchUrl = `https://api.geoapify.com/v2/places?` +
-                              `categories=${categories}` + 
-                              // 緯度経度をtoFixed(6)で丸めてURLの構文エラーを回避
-                              `&filter=circle:${position.lon.toFixed(6)},${position.lat.toFixed(6)},${radiusMeters}` + 
-                              `&limit=50` + 
-                              `&apiKey=${GEOAPIFY_API_KEY}`; // 統一したAPIキーを使用
+        // ---- 施設検索（★今回追加） ----
+		async function searchNearbyPlaces(position) {
+		    const radius = 1000; // 1km
+		    const categories = "sport.gym,sport.centre,leisure.sports_centre,sport.studio,service.yoga,sport.climbing";
 
-            console.log("Geoapify Search URL:", searchUrl);
-            console.log("Searching within 15km radius (Categories: fitness).");
+		    const url = `https://api.geoapify.com/v2/places?` +
+		                `categories=${categories}` +
+		                `&filter=circle:${position.lon},${position.lat},${radius}` +
+		                `&limit=20` +
+		                `&apiKey=${GEOAPIFY_PLACES_KEY}`;
 
-            try {
-                const response = await fetch(searchUrl);
-                
-                if (!response.ok) {
-                    console.error("Geoapify API Error:", response.status, response.statusText);
-                    const errorText = await response.text();
-                    console.error("Error Detail:", errorText);
-                    statusMessage.textContent = `施設検索中にAPIエラーが発生しました (コード: ${response.status})。コンソールを確認してください。`;
-                    return;
-                }
-                
-                const data = await response.json();
-                
-                console.log("Geoapify Search API Response Data:", data); 
+		    console.log("Geoapify Search URL:", url);
 
-                if (data.features && data.features.length > 0) {
-                    addPlacesToMap(data.features, position);
-                    statusMessage.textContent = `${data.features.length} 件のジム/フィットネス施設が近くで見つかりました。リストから場所を選択できます。`;
-                } else {
-                    statusMessage.textContent = "近くにジム/フィットネス施設が見つかりませんでした。(Geoapify結果0件)"; 
-                }
+		    try {
+		        const response = await fetch(url);
+		        if (!response.ok) {
+		            console.error("Geoapify API Error:", response.status, response.statusText);
+		            statusMessage.textContent = `施設検索中にAPIエラー(${response.status})`;
+		            return;
+		        }
 
-            } catch (error) {
-                console.error("施設検索中にネットワークエラーが発生:", error);
-                statusMessage.textContent = "施設検索中にネットワークエラーが発生しました。コンソールを確認してください。";
-            }
-        }
+		        const data = await response.json();
+		        if (!data.features || data.features.length === 0) {
+		            statusMessage.textContent = "近くに施設が見つかりませんでした。";
+		            return;
+		        }
 
+		        statusMessage.textContent = `近くで ${data.features.length} 件の施設が見つかりました！`;
+		        addPlacesToMap(data.features, position);
+
+		    } catch (error) {
+		        statusMessage.textContent = "施設検索中に通信エラーが発生しました。";
+		        console.error(error);
+		    }
+		}
+		
+		
+
+
+        // ---- マップ & リスト描画 ----
         function addPlacesToMap(features, userPosition) {
-            // 既存マーカーを削除
             gymMarkers.forEach(marker => map.removeLayer(marker));
             gymMarkers.length = 0;
 
             const resultsList = document.getElementById('gym-results-ul');
-            resultsList.innerHTML = ''; 
+            resultsList.innerHTML = '';
 
             features.forEach((feature, index) => {
                 const coordinates = feature.geometry.coordinates;
@@ -275,29 +253,35 @@
                 const lon = coordinates[0];
 
                 const name = feature.properties.name || "名称不明";
-                const address = feature.properties.formatted || feature.properties.address_line2 || "住所不明";
-                
-                const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userPosition.lat},${userPosition.lon}&destination=${lat},${lon}`;
+                const address =
+                    feature.properties.formatted ||
+                    feature.properties.address_line2 ||
+                    "住所不明";
+
+                const googleMapsUrl =
+                    `https://www.google.com/maps/dir/?api=1&origin=` +
+                    `${userPosition.lat},${userPosition.lon}` +
+                    `&destination=${lat},${lon}`;
 
                 const popupContent = `
                     <div style="max-width: 200px; padding: 5px;">
                         <h4 style="margin: 0 0 5px; font-size: 1.1em; color: #2c3e50;">${name}</h4>
-                        <p style="margin: 0 0 10px; font-size: 0.9em; color: #7f8c8d;">${address}</p>
-                        <a href="${googleMapsUrl}" target="_blank" style="color: #4CAF50; text-decoration: none; font-weight: bold;">
-                            <i class="fa-solid fa-route"></i> ルート案内
+                        <p style="margin: 0 0 10px; font-size: 0.9em; color: #7f8c8d;">
+                            ${address}
+                        </p>
+                        <a href="${googleMapsUrl}" target="_blank"
+                           style="color: #4CAF50; text-decoration: none; font-weight: bold;">
+                           <i class="fa-solid fa-route"></i> ルート案内
                         </a>
                     </div>
                 `;
 
-                // Leaflet マーカーを生成
                 const marker = L.marker([lat, lon], { icon: gymIcon })
                     .bindPopup(popupContent);
-                
-                marker.addTo(map);
 
+                marker.addTo(map);
                 gymMarkers.push(marker);
 
-                // リスト要素を生成
                 const listItem = document.createElement('li');
                 listItem.innerHTML = `
                     <strong>${index + 1}. ${name}</strong><br>
@@ -305,10 +289,9 @@
                     (<a href="${googleMapsUrl}" target="_blank">ルート</a>)
                 `;
                 resultsList.appendChild(listItem);
-                
-                // リスト項目クリックで地図の中心を移動
+
                 listItem.addEventListener('click', () => {
-                    map.flyTo([lat, lon], 15); 
+                    map.flyTo([lat, lon], 15);
                     marker.openPopup();
                 });
             });
@@ -318,4 +301,12 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
 
