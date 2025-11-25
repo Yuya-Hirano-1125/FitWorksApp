@@ -104,7 +104,6 @@
 
     <script>
         // ⚠️ ここをあなたのMapbox公開アクセストークンに置き換えてください
-        // ユーザーが提供したトークンを初期値として使用
         const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoieXV5YTExMjUiLCJhIjoiY21pZTRsYnpkMGR1eDJtcXQ3dXoyMGp2diJ9.FPEY65NssfVtKspl2alUjg"; 
         
         mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN;
@@ -113,7 +112,7 @@
         const gymMarkers = [];
 
         function getLocationAndInitMap() {
-            if (!MAPBOX_ACCESS_TOKEN || MAPBOX_ACCESS_TOKEN.length < 5) { // 簡易チェック
+            if (!MAPBOX_ACCESS_TOKEN || MAPBOX_ACCESS_TOKEN.length < 5) { 
                  statusMessage.textContent = "Mapboxアクセストークンが設定されていません。";
                  return;
             }
@@ -143,7 +142,6 @@
         }
 
         function initMap(position) {
-            // Mapbox GL JSの地図を初期化
             map = new mapboxgl.Map({
                 container: 'map',
                 style: 'mapbox://styles/mapbox/streets-v12', 
@@ -151,7 +149,6 @@
                 zoom: 14 
             });
 
-            // 現在地マーカー (青) - Mapboxのデフォルトマーカーを使用
             new mapboxgl.Marker({ color: '#007bff' }) 
                 .setLngLat([position.lon, position.lat])
                 .setPopup(new mapboxgl.Popup().setHTML("<b>あなたの現在地 (推定)</b>"))
@@ -159,10 +156,25 @@
         }
 
         async function searchNearbyGyms(position) {
+            
+            // 検索範囲の拡大: 緯度・経度1度あたりの距離を利用して約5km範囲を計算
+            const searchRadiusKm = 5;
+            const degDistance = searchRadiusKm / 111.0; 
+            
+            // Bounding Box (bbox) を計算 [minLon, minLat, maxLon, maxLat]
+            const bbox = [
+                position.lon - degDistance, // minLon
+                position.lat - degDistance, // minLat
+                position.lon + degDistance, // maxLon
+                position.lat + degDistance  // maxLon
+            ].join(',');
+            
+            // Mapbox Search APIのCategory Searchエンドポイント
             const searchUrl = `https://api.mapbox.com/search/v1/category/gym?` +
-                              `proximity=${position.lon},${position.lat}` + 
+                              `bbox=${bbox}` + // ★ 検索範囲をbboxで指定
+                              `&proximity=${position.lon},${position.lat}` + // 検索の中心座標（ランキングの基準）
                               `&language=ja` +
-                              `&limit=20` + 
+                              `&limit=50` + // ★ 検索件数を増やし、より多く見つける
                               `&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
             try {
@@ -206,7 +218,7 @@
 
                 // カスタムマーカー要素 (Font Awesomeのダンベルアイコン)
                 const markerElement = document.createElement('div');
-                markerElement.className = 'marker-gym'; // CSSクラスを適用
+                markerElement.className = 'marker-gym'; 
                 markerElement.innerHTML = '<i class="fa-solid fa-dumbbell" style="color: #d9534f; font-size: 28px; text-shadow: 0 0 2px #fff;"></i>';
                 
                 const marker = new mapboxgl.Marker({ element: markerElement })
