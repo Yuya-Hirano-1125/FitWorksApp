@@ -36,21 +36,8 @@
 
     <footer th:replace="fragments/footer :: footer"></footer>
 
-    <script th:src="@{https://maps.googleapis.com/maps/api/js(key={apiKey},libraries=places)}"
-            th:attr="data-api-key=${@environment.getProperty('google.maps.api.key')}" 
-            defer>
-    </script>
-    
-    <script>
-        const API_KEY = "YOUR_API_KEY"; // 本番環境では環境変数やThymeleafの変数で渡すことを推奨
-
-        // 環境変数からAPIキーを取得している場合の処理（Thymeleaf側で実装していない場合は直接記述するか、APIキーを埋め込む）
-        // const scriptElement = document.querySelector('script[th\\:src*="maps.googleapis.com"]');
-        // if (scriptElement && scriptElement.getAttribute('data-api-key')) {
-        //     API_KEY = scriptElement.getAttribute('data-api-key');
-        // }
-
-
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDgRmpnY4uXBsJJxn7csvq-4f7Rc2khd0&libraries=places" defer></script>  
+ 
         let map;
         let infoWindow;
         const statusMessage = document.getElementById('status-message');
