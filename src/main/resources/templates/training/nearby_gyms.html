@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
     
     <style>
         /* 基本スタイル */
@@ -17,7 +17,6 @@
             font-family: 'Noto Sans JP', Arial, sans-serif; 
             background-color: #f4f4f4; 
         }
-        /* メインコンテナの調整 */
         .main-container { 
             padding: 0;
             width: 100%;
@@ -30,8 +29,7 @@
         /* 地図コンテナの高さ調整 */
         #map-container {
             width: 100%;
-            /* 50px(Header) + 250px(List) + 50px(Footer) = 350px を引いた残り */
-            height: calc(100vh - 350px); 
+            height: calc(100vh - 350px);
             position: absolute;
             top: 50px; 
             left: 0; 
@@ -67,7 +65,7 @@
         /* 検索結果リストのデザイン */
         #places-list {
             position: fixed; 
-            bottom: 50px; /* 下部ナビ（フッター）の高さに合わせる */
+            bottom: 50px;
             left: 0;
             width: 100%;
             height: 250px; 
@@ -107,13 +105,6 @@
 
         #gym-results-ul li:last-child {
             border-bottom: none;
-        }
-        
-        /* カスタムマーカーのスタイル */
-        .marker-gym .fa-dumbbell {
-            color: #d9534f;
-            font-size: 28px;
-            text-shadow: 0 0 2px #fff;
         }
     </style>
 </head>
@@ -192,7 +183,6 @@
 
             // ユーザー提供のTile URLとMAP_KEYを使用
             L.tileLayer(
-                // ユーザー提供のTile URLのスタイル 'carto' を使用
                 `https://maps.geoapify.com/v1/tile/carto/{z}/{x}/{y}.png?&apiKey=${GEOAPIFY_MAP_KEY}`,
                 {
                     maxZoom: 20,
@@ -215,8 +205,8 @@
             
             const radiusMeters = 15000; // 15km
             
-            // 400エラー解消のため、有効なフィットネスカテゴリに戻す
-            const categories = "service.fitness;sport.fitness"; 
+            // ★ 400エラー解消のため、有効なフィットネスカテゴリに戻す
+            const categories = "service.fitness,sport.fitness"; 
             
             const searchUrl = `https://api.geoapify.com/v2/places?` +
                               `categories=${categories}` + 
@@ -224,8 +214,8 @@
                               `&limit=50` + 
                               `&apiKey=${GEOAPIFY_PLACES_KEY}`; // PLACES_KEYを使用
 
-            console.log("Geoapify Search URL:", searchUrl); // ★ デバッグログ
-            console.log("Searching within 15km radius (Categories: fitness)."); // ★ デバッグログ
+            console.log("Geoapify Search URL:", searchUrl);
+            console.log("Searching within 15km radius (Categories: fitness).");
 
             try {
                 const response = await fetch(searchUrl);
@@ -240,7 +230,7 @@
                 
                 const data = await response.json();
                 
-                console.log("Geoapify Search API Response Data:", data); // ★ デバッグログ
+                console.log("Geoapify Search API Response Data:", data); 
 
                 if (data.features && data.features.length > 0) {
                     addPlacesToMap(data.features, position);
@@ -256,6 +246,7 @@
         }
 
         function addPlacesToMap(features, userPosition) {
+            // 既存マーカーを削除
             gymMarkers.forEach(marker => map.removeLayer(marker));
             gymMarkers.length = 0;
 
@@ -268,6 +259,7 @@
                 const lon = coordinates[0];
 
                 const name = feature.properties.name || "名称不明";
+                // Geoapifyのformattedアドレスを優先
                 const address = feature.properties.formatted || feature.properties.address_line2 || "住所不明";
                 
                 const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userPosition.lat},${userPosition.lon}&destination=${lat},${lon}`;
@@ -311,4 +303,12 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
 
