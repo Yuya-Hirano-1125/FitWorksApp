@@ -47,7 +47,7 @@ public class AuthController {
         boolean emailFoundAndSent = true; 
         if (emailFoundAndSent) {
             redirectAttributes.addFlashAttribute("successMessage",
-                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");;;;
+                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。"); // ★ セミコロンを修正
         } else {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "そのメールアドレスは登録されていません。");
@@ -55,7 +55,28 @@ public class AuthController {
         return "redirect:/forgot-password";
     }
 
-    // --- パスワード変更 --- (省略)
+    // --- パスワード変更 ---
+    /*@PostMapping("/change-password")
+    public String changePassword(@RequestParam("currentPassword") String oldPassword,
+                                 @RequestParam("newPassword") String newPassword,
+                                 @RequestParam("confirmPassword") String confirmPassword,
+                                 @AuthenticationPrincipal UserDetails userDetails,
+                                 Model model) {
+        if (!newPassword.equals(confirmPassword)) {
+            model.addAttribute("errorMessage", "新しいパスワードが一致しません");
+            return "change-password";
+        }
+        
+        // 実際のパスワード変更ロジック
+        boolean success = true; 
+        
+        if(success) {
+            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
+        } else {
+            model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
+        }
+        return "change-password";
+    }*/
 
     @GetMapping("/home")
     public String home(
@@ -78,12 +99,74 @@ public class AuthController {
         } else {
             model.addAttribute("username", "ゲスト");
         }
-        return "misc/home"; // ★ 修正
+        return "misc/home"; // 修正済み
     }
 
+    // @GetMapping("/training") // <--- 削除しました。TrainingControllerに一任されます。
+    // public String training() { return "training"; } 
+    
+    // NOTE: /gacha のマッピングは GachaController に移管されたため、削除。
+    
+    
+    // NOTE: /training-log のマッピングは TrainingController に移管されたため、削除。
+
     @GetMapping("/settings")
-    public String settings() { return "settings/settings"; } 
+    public String settings() { return "settings/settings"; } // 修正済み
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

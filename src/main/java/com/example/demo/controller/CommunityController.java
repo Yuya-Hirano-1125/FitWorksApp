@@ -28,7 +28,7 @@ public class CommunityController {
     private final UserRepository userRepository;
     
     // NGワードのリスト
-    private static final List<String> NG_WORDS = List.of("死ね", "バカ", "アホ", "殺す", "暴力","");
+    private static final List<String> NG_WORDS = List.of("死ね", "バカ", "アホ", "殺す", "暴力");
 
     public CommunityController(PostRepository postRepository, CommentRepository commentRepository, UserRepository userRepository) {
         this.postRepository = postRepository;
