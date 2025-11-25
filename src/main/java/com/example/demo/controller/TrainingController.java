@@ -116,6 +116,7 @@ public class TrainingController {
         
         return "training/training"; 
     }
+    
 
     /**
      * トレーニング種目一覧画面 (exercise-list.html) を表示
@@ -292,6 +293,11 @@ public class TrainingController {
         form.setType("CARDIO");
         model.addAttribute("trainingLogForm", form);
         return "log/training-log-form-cardio"; 
+    }
+    
+    @GetMapping("/training/map")
+    public String showTrainingMap() {
+        return "training/training-map";  // templates/training/training-map.html
     }
     
     @PostMapping("/training-log/save")
