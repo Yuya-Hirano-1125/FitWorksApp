@@ -61,41 +61,10 @@ public class UserService {
      */
     @Transactional
     public void addExp(User user, int expToAdd) {
-        // Userエンティティの addXp(xp) メソッド（経験値加算とレベルアップロジックを含む）を呼び出す
-        // user.addXp(xp)は、User.java内でレベルアップ処理まで完了させます。
+        // ★ 修正: Userエンティティの addXp メソッドで experiencePoints を更新するように統一
         user.addXp(expToAdd); 
         
         // 変更をDBに保存
         userRepository.save(user);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
