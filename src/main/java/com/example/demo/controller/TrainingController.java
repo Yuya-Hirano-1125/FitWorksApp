@@ -116,6 +116,12 @@ public class TrainingController {
         
         return "training/training"; 
     }
+ // TrainingController.java 内に必要
+    @GetMapping("/training/map")
+    public String showNearbyGymsMap(Authentication authentication) {
+        // ...
+        return "training/nearby_gyms"; 
+    }
 
     /**
      * トレーニング種目一覧画面 (exercise-list.html) を表示
