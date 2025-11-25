@@ -4,12 +4,12 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.FetchType; // 新規追加
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne; 
+import jakarta.persistence.JoinColumn; // 新規追加
+import jakarta.persistence.ManyToOne; // 新規追加
 
 @Entity
 public class User {
@@ -17,7 +17,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+ // ★★★ ここに経験値(XP)フィールドを追加 ★★★
+    private int xp = 0; // 初期値は0
     @Column(unique = true)
     private String username;
 
@@ -41,6 +42,7 @@ public class User {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "equipped_costume_item_id")
     private Item equippedCostumeItem;
+
 
     public User() {
         if (this.level == null) this.level = 1;
@@ -77,23 +79,6 @@ public class User {
     public Boolean getIsRewardClaimedToday() { return isRewardClaimedToday; }
     public void setIsRewardClaimedToday(Boolean isRewardClaimedToday) { this.isRewardClaimedToday = isRewardClaimedToday; }
 
-    // --- エラー解消のための追加メソッド (既存のロジックに委譲) ---
-    // 新たに追加: getXp() (引数なし) - 今回のエラーを解消します。
-    public Integer getXp() {
-        return getExperiencePoints();
-    }
-    
-    // 前回追加: getXp(int) (引数あり) - 前々回のエラーを解消するために残します。
-    public Integer getXp(int ignored) {
-        return getExperiencePoints();
-    }
-
-    // 前回追加: setXp(int)
-    public void setXp(int xpToAdd) {
-        addXp(xpToAdd); 
-    }
-    // ----------------------------------------------------
-    
     // --- Getter / Setter (新規追加: キャラクター装備アイテム) ---
     public Item getEquippedBackgroundItem() { return equippedBackgroundItem; }
     public void setEquippedBackgroundItem(Item equippedBackgroundItem) { this.equippedBackgroundItem = equippedBackgroundItem; }
@@ -123,4 +108,14 @@ public class User {
         if (requiredXp == 0) return 0; 
         return (int)(((double) currentXp / requiredXp) * 100);
     }
+ // ★★★ XPのゲッターとセッターを追加 ★★★
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void setXp(int xp) {
+        this.xp = xp;
+    }
 }
+

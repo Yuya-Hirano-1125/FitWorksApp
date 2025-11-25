@@ -133,7 +133,7 @@
 
 /* --- MODAL (記録フォーム) --- */
 .modal {
-    /* 既存のスタイル */
+    display: none;
     position: fixed;
     z-index: 2000; 
     left: 0;
@@ -143,20 +143,8 @@
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(5px);
-    
-    /* ★★★ ここからが重要: 完全に無効化する初期設定 ★★★ */
-    display: none; /* 要素を非表示 */
-    opacity: 0;    /* 透明度をゼロに */
-    visibility: hidden; /* 要素を隠す */
-    pointer-events: none; /* クリックイベントを完全に無視 */
 }
-/* モーダル表示用クラス: これが適用されたら、すべて有効に戻す */
-.modal.is-active {
-    display: block;
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-}
+
 .modal-content {
     background-color: var(--container-bg);
     margin: 10% auto;

@@ -7,7 +7,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody; // ★ 追加
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.entity.User;
@@ -48,7 +47,7 @@ public class AuthController {
         boolean emailFoundAndSent = true; 
         if (emailFoundAndSent) {
             redirectAttributes.addFlashAttribute("successMessage",
-                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。");
+                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。"); // ★ セミコロンを修正
         } else {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "そのメールアドレスは登録されていません。");
@@ -56,56 +55,7 @@ public class AuthController {
         return "redirect:/forgot-password";
     }
 
-    // --- ホーム画面 ---
-    @GetMapping("/home")
-    public String home(
-        @AuthenticationPrincipal UserDetails userDetails,
-        Model model
-    ) {
-        if (userDetails != null) {
-            // ユーザー情報を取得
-            User user = userService.findByUsername(userDetails.getUsername());
-            
-            if (user != null) {
-                model.addAttribute("username", user.getUsername());
-                model.addAttribute("level", user.getLevel());
-                model.addAttribute("experiencePoints", user.getExperiencePoints());
-                model.addAttribute("requiredXp", user.calculateRequiredXp());
-                model.addAttribute("progressPercent", user.getProgressPercent());
-            } else {
-                model.addAttribute("username", userDetails.getUsername());
-            }
-        } else {
-            model.addAttribute("username", "ゲスト");
-        }
-        return "misc/home";
-    }
-
-    // --- 経験値取得API (JSONで返す) ---
-    @GetMapping("/api/experience")
-    @ResponseBody
-    public String getExperience(
-        @AuthenticationPrincipal UserDetails userDetails
-    ) {
-        if (userDetails == null) {
-            return "{\"error\":\"ログインしてください\"}";
-        }
-        User user = userService.findByUsername(userDetails.getUsername());
-        if (user == null) {
-            return "{\"error\":\"ユーザーが見つかりません\"}";
-        }
-        return String.format(
-            "{\"level\":%d,\"experiencePoints\":%d,\"requiredXp\":%d,\"progressPercent\":%d}",
-            user.getLevel(),
-            user.getExperiencePoints(),
-            user.calculateRequiredXp(),
-            user.getProgressPercent()
-        );
-    }
-
-    @GetMapping("/settings")
-    public String settings() { return "settings/settings"; }
- // --- パスワード変更 ---
+    // --- パスワード変更 ---
     /*@PostMapping("/change-password")
     public String changePassword(@RequestParam("currentPassword") String oldPassword,
                                  @RequestParam("newPassword") String newPassword,
@@ -128,6 +78,30 @@ public class AuthController {
         return "change-password";
     }*/
 
+    @GetMapping("/home")
+    public String home(
+        @AuthenticationPrincipal UserDetails userDetails,
+        Model model
+    ) {
+        if (userDetails != null) {
+            // ユーザー情報を取得
+            User user = userService.findByUsername(userDetails.getUsername());
+            
+            if (user != null) {
+                model.addAttribute("username", user.getUsername());
+                model.addAttribute("level", user.getLevel());
+                model.addAttribute("experiencePoints", user.getExperiencePoints());
+                model.addAttribute("requiredXp", user.calculateRequiredXp());
+                model.addAttribute("progressPercent", user.getProgressPercent());
+            } else {
+                model.addAttribute("username", userDetails.getUsername());
+            }
+        } else {
+            model.addAttribute("username", "ゲスト");
+        }
+        return "misc/home"; // 修正済み
+    }
+
     // @GetMapping("/training") // <--- 削除しました。TrainingControllerに一任されます。
     // public String training() { return "training"; } 
     
@@ -135,4 +109,64 @@ public class AuthController {
     
     
     // NOTE: /training-log のマッピングは TrainingController に移管されたため、削除。
+
+    @GetMapping("/settings")
+    public String settings() { return "settings/settings"; } // 修正済み
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
