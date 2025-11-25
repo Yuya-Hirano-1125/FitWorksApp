@@ -38,7 +38,7 @@ public class MissionController {
             return "redirect:/login";
         }
         
-        // ★ 修正: ミッションステータスを取得してモデルに追加
+        // ミッションステータスを取得してモデルに追加
         MissionStatusDto missionStatus = userService.getDailyMissionStatus(user);
         model.addAttribute("missionStatus", missionStatus);
         
@@ -60,7 +60,9 @@ public class MissionController {
         return "misc/faq"; 
     }
     
-    // ★ 新規追加: 報酬受け取り処理
+    /**
+     * 報酬受け取り処理 → みんなの広場へ遷移
+     */
     @PostMapping("/daily-mission/claim")
     public String claimReward(
         @AuthenticationPrincipal UserDetails userDetails,
@@ -78,14 +80,18 @@ public class MissionController {
         boolean success = userService.claimMissionReward(user);
         
         if (success) {
-            // 成功メッセージに獲得XPを表示
+            MissionStatusDto status = userService.getDailyMissionStatus(user);
+            // 成功メッセージに獲得XPと現在のレベル・経験値を表示
             redirectAttributes.addFlashAttribute("successMessage", 
-                "ミッション報酬 " + userService.getDailyMissionStatus(user).getRewardXp() + " XPを受け取りました！");
+                "ミッション報酬 " + status.getRewardXp() + " XPを受け取りました！ " +
+                "現在のレベル: " + user.getLevel() + 
+                " (経験値: " + user.getExperiencePoints() + "/" + user.calculateRequiredXp() + ")");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", 
                 "報酬を受け取れませんでした。ミッションを完了しているか、または既に受け取り済みか確認してください。");
         }
         
-        return "redirect:/daily-mission";
+        // 報酬受け取り後はコミュニティへ遷移
+        return "redirect:/community";
     }
 }

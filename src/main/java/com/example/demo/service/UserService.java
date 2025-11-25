@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.MissionStatusDto;
 import com.example.demo.entity.User;
@@ -18,7 +19,7 @@ public class UserService {
     private final TrainingRecordRepository trainingRecordRepository; 
     private final PasswordEncoder passwordEncoder; 
 
-    // ★ 修正: TrainingRecordRepositoryとPasswordEncoderを含むコンストラクタ
+    // コンストラクタ
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TrainingRecordRepository trainingRecordRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -46,36 +47,32 @@ public class UserService {
         return false;
     }
     
-    // --- 経験値加算処理（既存の処理をそのまま残し、User.addXpを呼び出す）---
+    // 経験値加算処理（任意の場面で利用可能）
     public void addExperience(String username, int xp) {
          Optional<User> optionalUser = userRepository.findByUsername(username);
          if (optionalUser.isPresent()) {
              User user = optionalUser.get();
-             user.addXp(xp); 
+             user.addXp(xp); // Userエンティティ側でレベルアップ処理も行う
              userRepository.save(user); 
          }
     }
     
-    // ★ 新規追加: デイリーミッションのステータスを取得するメソッド
+    // デイリーミッションのステータスを取得
     public MissionStatusDto getDailyMissionStatus(User user) {
-        // ミッション定義
-        final int MISSION_REWARD_XP = 500;
-        final String MISSION_TEXT = "今日のトレーニングを1回記録する";
+        final int MISSION_REWARD_XP = 300; // 筋トレ投稿報酬XP
+        final String MISSION_TEXT = "筋トレ記録を1回投稿する";
         
         LocalDate today = LocalDate.now();
         
-        // 1. 報酬クレームのリセットロジック (日付が変わっていた場合)
+        // 報酬クレームのリセットロジック（日付が変わったらリセット）
         if (user.getIsRewardClaimedToday() != null && user.getIsRewardClaimedToday() && 
             (user.getLastMissionCompletionDate() == null || !today.equals(user.getLastMissionCompletionDate()))) {
-             // 報酬クレーム済みだが、日付が変わっている場合はリセット
              user.setIsRewardClaimedToday(false);
-             userRepository.save(user); // データベースにリセット状態を保存
+             userRepository.save(user);
         }
         
-        // 2. トレーニング完了チェック (今日のトレーニング記録が1件以上あるか)
-        long todayRecordsCount = trainingRecordRepository.countByUser_IdAndRecordDate(user.getId(), today);
-        
-        boolean isCompleted = todayRecordsCount > 0;
+        // 今日投稿したかどうかでクリア判定
+        boolean isCompleted = (user.getLastMissionCompletionDate() != null && today.equals(user.getLastMissionCompletionDate()));
 
         return new MissionStatusDto(
             isCompleted,
@@ -85,23 +82,44 @@ public class UserService {
         );
     }
     
-    // ★ 新規追加: 経験値を付与し、ミッション報酬をクレーム済みにするメソッド
+    // 報酬受け取り処理（XP加算とレベルアップ）
+    @Transactional
     public boolean claimMissionReward(User user) {
         MissionStatusDto status = getDailyMissionStatus(user);
         LocalDate today = LocalDate.now();
 
         if (status.isMissionCompleted() && !status.isRewardClaimed()) {
-            // 経験値を付与 (この中でレベルアップも処理される)
+            // 経験値加算（User.addXpでレベルアップも処理）
             user.addXp(status.getRewardXp());
-            
-            // 報酬をクレーム済みにする
             user.setLastMissionCompletionDate(today);
             user.setIsRewardClaimedToday(true);
-            
             userRepository.save(user);
             return true;
         }
         return false;
     }
-}
 
+    // トレーニング記録基準の進捗更新（必要なら残す）
+    @Transactional
+    public void incrementTrainingMissionProgress(User user) {
+        LocalDate today = LocalDate.now();
+
+        long todayRecordsCount = trainingRecordRepository.countByUser_IdAndRecordDate(user.getId(), today);
+        if (todayRecordsCount > 0) {
+            user.setLastMissionCompletionDate(today);
+            if (user.getIsRewardClaimedToday() == null) {
+                user.setIsRewardClaimedToday(false);
+            }
+            userRepository.save(user);
+        }
+    }
+
+    // ★ 投稿したらミッションをクリア扱いにするメソッド
+    @Transactional
+    public void markMissionCompletedByPost(User user) {
+        LocalDate today = LocalDate.now();
+        user.setLastMissionCompletionDate(today);
+        user.setIsRewardClaimedToday(false); // まだ報酬は受け取っていない
+        userRepository.save(user);
+    }
+}
