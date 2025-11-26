@@ -160,7 +160,7 @@
         border-radius: 15px 15px 0 0; /* 上部を丸く */
     }
     
-    /* 🌟 【修正】ナビゲーションアイテムを色付きボタンに変更 🌟 */
+    /* 🌟 全ナビゲーションアイテムの共通ベーススタイル（色付き） 🌟 */
     .nav-item {
         display: flex;
         flex-direction: column;
@@ -171,13 +171,9 @@
         font-size: 12px;
         font-weight: 800;
         
-        /* デザイン調整 */
         padding: 8px 4px;
         margin: 4px;
         border-radius: 12px; /* 角を丸く */
-        
-        /* 立体感と色の土台 */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 影を付けて浮き上がらせる */
         
         /* Flexboxで均等配置を維持 */
         flex-grow: 1;
@@ -186,6 +182,11 @@
         
         transition: all 0.3s cubic-bezier(.42, 0, .58, 1.2); /* 弾むトランジション */
         text-shadow: none;
+    }
+
+    .nav-item i {
+        font-size: 1.6em; /* アイコンを少し大きく */
+        margin-bottom: 2px;
     }
 
     /* 🌟 個別ボタンの色設定 (グラデーションを適用) 🌟 */
@@ -226,17 +227,14 @@
         box-shadow: 0 4px 10px rgba(117, 117, 117, 0.6);
     }
     /* ---------------------------------------------------- */
-
-
-    /* 🌟 【修正】テキスト折り返しを防ぎ、色を統一 🌟 */
+    
     .nav-item span {
         white-space: nowrap; 
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%; 
-        color: #ffffff; /* テキストも白に統一 */
+        color: #ffffff;
     }
-    /* ---------------------------------------------------- */
     
     .nav-item:hover, .nav-item.active {
         color: #ffffff; /* ホバー時も白を維持 */
@@ -309,38 +307,79 @@
         animation: fadeIn 0.7s ease-out forwards;
     }
     
-    /* ナビアイテムを横並びのボタン風に調整 */
-    /* 🌟 デスクトップでも色付きボタン風に統一 🌟 */
+    /* 🌟 全ナビゲーションアイテムの共通ベーススタイル（色付き） 🌟 */
     .nav-item {
         flex-direction: row; /* アイコンとテキストを横並びに */
         padding: 15px 25px;
         border-radius: 35px;
         width: auto;
         
-        background-color: var(--container-bg);
-        border: 3px solid var(--secondary-color); /* 枠線で可愛らしさを出す */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        color: var(--dark-text); /* 文字色は濃い色を維持 */
+        /* デスクトップでもグラデーションと白文字・アイコンを適用 */
+        background-color: transparent !important;
+        border: none !important; 
+        color: #ffffff; /* テキスト/アイコンを白に統一 */
         
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); /* 影を強調 */
         margin: 0 12px;
-        transform: none;
-        animation: none;
+        animation: gentleFloat 4s ease-in-out infinite alternate; /* 浮遊アニメーション再適用 */
         font-size: 16px;
         font-weight: 700;
         text-shadow: none;
-        transition: all 0.3s ease-in-out;
+        transition: all 0.4s cubic-bezier(.25,.8,.25,1); /* 応答性向上 */
     }
+
+    /* 🌟 個別ボタンの色設定 (グラデーションを適用) 🌟 */
+    
+    /* 1. ガチャ (Gacha) - Primary Pink Gradient */
+    .bottom-nav a:nth-child(1).nav-item {
+        background: linear-gradient(45deg, var(--primary-color), #ff99c8);
+        box-shadow: 0 8px 15px rgba(255, 105, 180, 0.6);
+    }
+
+    /* 2. 掲示板 (Community) - Blue Gradient (AI Accent) */
+    .bottom-nav a:nth-child(2).nav-item {
+        background: linear-gradient(45deg, var(--ai-accent-color), #4dd0e1);
+        box-shadow: 0 8px 15px rgba(135, 206, 235, 0.6);
+    }
+    
+    /* 3. トレーニング記録 (Training Log) - Green Gradient */
+    .bottom-nav a:nth-child(3).nav-item {
+        background: linear-gradient(45deg, #4CAF50, #8BC34A);
+        box-shadow: 0 8px 15px rgba(76, 175, 80, 0.6);
+    }
+    
+    /* 4. キャラクター (Character) - Gold/Orange Gradient (ランキングに近い色) */
+    .bottom-nav a:nth-child(4).nav-item {
+        background: linear-gradient(45deg, #f1c40f, #f39c12);
+        box-shadow: 0 8px 15px rgba(241, 196, 15, 0.6);
+    }
+    
+    /* 5. 食事記録 (Meal Log) - Purple Gradient */
+    .bottom-nav a:nth-child(5).nav-item {
+        background: linear-gradient(45deg, #9c27b0, #ba68c8);
+        box-shadow: 0 8px 15px rgba(156, 39, 176, 0.6);
+    }
+    
+    /* 6. 設定 (Settings) - Gray/Neutral Gradient */
+    .bottom-nav a:nth-child(6).nav-item {
+        background: linear-gradient(45deg, #bdbdbd, #757575);
+        box-shadow: 0 8px 15px rgba(117, 117, 117, 0.6);
+    }
+    /* ---------------------------------------------------- */
+
+
     .nav-item i {
         font-size: 18px;
+        color: #ffffff !important; /* アイコンの色を白に固定 */
         margin-right: 8px;
         margin-bottom: 0;
         animation: none;
     }
     .nav-item:hover, .nav-item.active {
-        transform: translateY(-4px) scale(1.01) !important;
-        box-shadow: 0 6px 15px rgba(255, 105, 180, 0.4);
-        color: var(--primary-color);
-        background-color: #fffafa; /* ホバーで薄いピンクに */
+        transform: translateY(-8px) scale(1.03) !important;
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 255, 255, 0.5); /* ホバー時の浮きと光を強調 */
+        color: #ffffff;
+        filter: brightness(1.1); /* 色を少し明るく */
     }
     
     /* トレーニング開始ボタンをプライマリーボタン風に調整 */
