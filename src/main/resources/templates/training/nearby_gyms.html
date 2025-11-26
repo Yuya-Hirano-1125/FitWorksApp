@@ -23,16 +23,25 @@
             position: relative; 
         } 
         /* 地図コンテナを中央寄せ */ 
-        #map-container { 
-            width: 90%; 
-            max-width: 1200px; 
-            height: calc(100vh - 350px); 
-            position: absolute; 
-            top: 50px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            margin-bottom: 5px; 
-        } 
+		#map-container { 
+		    width: 90%; 
+		    max-width: 1200px; 
+		    height: calc(100vh - 350px); /* 高さはそのままでOK */
+		    min-height: 300px; /* 必要なら最小高さを指定 */
+		    
+		    /* ✅ 修正: 通常の配置に戻し、マージンで中央寄せにする */
+		    position: relative; 
+		    margin: 20px auto; /* 上下20px、左右中央 */
+		    
+		    /* ❌ 削除またはコメントアウトするプロパティ */
+		    /* top: 280px; */
+		    /* left: 50%; */
+		    /* transform: translateX(-50%); */
+
+		    border-radius: 15px; 
+		    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+		    z-index: 1; 
+		}
         #map { 
             width: 100%; 
             height: 100%; 
@@ -84,13 +93,13 @@
         } 
         /* 検索結果リストの中央寄せ */ 
         #places-list { 
-            position: fixed; 
-            bottom: 50px; 
-            width: 90%; 
+            position: relative; 
+            bottom: 0px; 
+            width: 80%; 
             max-width: 1200px; 
             left: 50%; 
             transform: translateX(-50%); 
-            height: 250px; 
+            height: 300px; 
             background: #fff; 
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); 
             padding: 10px; 
@@ -105,6 +114,40 @@
             padding-bottom: 5px; 
             margin: 0 0 10px; 
         } 
+		#places-list li {
+		        display: flex;               /* 横並びにする */
+		        justify-content: space-between; /* 文字を左、ボタンを右に配置 */
+		        align-items: center;         /* 上下中央揃え */
+		        border-bottom: 1px solid #eee; /* 区切り線 */
+		        padding: 12px 5px;           /* 余白を広げる */
+		        list-style: none;            /* 点を消す */
+		    }
+
+		    /* ✅ 追加: 施設情報のテキストエリア */
+		    .place-info {
+		        padding-right: 10px;
+		        line-height: 1.4;
+		    }
+
+		    /* ✅ 追加: 「ルート」ボタンのデザイン */
+		    .route-btn {
+		        background-color: #4CAF50;    /* 地図に合う緑色 */
+		        color: #fff;
+		        padding: 8px 16px;            /* ボタンの大きさ */
+		        border-radius: 20px;          /* 丸みをつける */
+		        font-size: 0.85rem;
+		        font-weight: bold;
+		        text-decoration: none;        /* 下線を消す */
+		        white-space: nowrap;          /* 改行させない */
+		        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		        display: inline-flex;
+		        align-items: center;
+		        gap: 5px;                     /* アイコンと文字の間隔 */
+		    }
+
+		    .route-btn:active {
+		        transform: scale(0.98);       /* 押した時に少し凹む演出 */
+		    }
         #gym-results-ul { 
             list-style: none; 
             padding: 0; 
@@ -130,9 +173,6 @@
     <header th:replace="fragments/header :: header"></header>
 
     <div class="main-container">
-        <a th:href="@{/home}" class="back-home-button">
-            <i class="fa-solid fa-arrow-left"></i> ホームに戻る
-        </a>
         
         <div id="status-message">現在地を取得中です...</div>
         <div id="map-container">
@@ -305,11 +345,15 @@
                 gymMarkers.push(marker);
 
                 const listItem = document.createElement('li');
-                listItem.innerHTML = `
-                    <strong>${index + 1}. ${name}</strong><br>
-                    <small>${address}</small>
-                    (<a href="${googleMapsUrl}" target="_blank">ルート</a>)
-                `;
+				listItem.innerHTML = `
+				    <div class="place-info">
+				        <strong>${index + 1}. ${name}</strong><br>
+				        <small style="color: #7f8c8d;">${address}</small>
+				    </div>
+				    <a href="${googleMapsUrl}" target="_blank" class="route-btn">
+				        <i class="fa-solid fa-location-arrow"></i> ルート
+				    </a>
+				`;
                 resultsList.appendChild(listItem);
 
                 listItem.addEventListener('click', () => {
@@ -321,5 +365,10 @@
 
         window.onload = getLocationAndInitMap;
     </script>
+	<div class="container" style="margin-bottom: 30px;">
+			        <a th:href="@{/home}" class="button secondary">
+			            <i class="fa-solid fa-house"></i> ホームに戻る
+			        </a>
+			    </div>
 </body>
 </html>
