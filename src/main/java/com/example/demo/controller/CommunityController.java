@@ -18,6 +18,7 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.UserService;
 
 @Controller
 @RequestMapping("/community")
@@ -26,14 +27,19 @@ public class CommunityController {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final UserService userService; // ★ 追加: ミッション更新用サービス
     
     // NGワードのリスト
     private static final List<String> NG_WORDS = List.of("死ね", "バカ", "アホ", "殺す", "暴力");
 
-    public CommunityController(PostRepository postRepository, CommentRepository commentRepository, UserRepository userRepository) {
+    public CommunityController(PostRepository postRepository,
+                               CommentRepository commentRepository,
+                               UserRepository userRepository,
+                               UserService userService) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     // 掲示板トップ（一覧表示）
@@ -45,7 +51,9 @@ public class CommunityController {
 
     // 新規投稿処理
     @PostMapping("/post")
-    public String createPost(@RequestParam String title, @RequestParam String content, @AuthenticationPrincipal UserDetails userDetails) {
+    public String createPost(@RequestParam String title,
+                             @RequestParam String content,
+                             @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
         
         String cleanTitle = filterNgWords(title);
@@ -56,13 +64,17 @@ public class CommunityController {
         post.setContent(cleanContent);
         post.setAuthor(user);
         postRepository.save(post);
+
+        // ★ 投稿したらミッションをクリア扱いにする
+        userService.markMissionCompletedByPost(user);
+
         return "redirect:/community";
     }
 
     // 投稿詳細＆コメント表示
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        // ★ 修正: コメントも一緒に取得するメソッドに変更
+        // コメントも一緒に取得するメソッドに変更
         Post post = postRepository.findByIdWithComments(id).orElseThrow();
         model.addAttribute("post", post);
         return "community/detail";
@@ -70,7 +82,9 @@ public class CommunityController {
 
     // コメント投稿処理
     @PostMapping("/{id}/comment")
-    public String createComment(@PathVariable Long id, @RequestParam String content, @AuthenticationPrincipal UserDetails userDetails) {
+    public String createComment(@PathVariable Long id,
+                                @RequestParam String content,
+                                @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
         
         Post post = postRepository.findById(id).orElseThrow();
