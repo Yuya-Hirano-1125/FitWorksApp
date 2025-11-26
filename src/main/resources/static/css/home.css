@@ -1,189 +1,252 @@
-/* ========================================================= */
-/* HOME STYLE (home.css) - Home, Bottom Navigation */
-/* ========================================================= */
-
-.home-page .main-container {
-    max-width: 700px;
-}
-
-/* --- TOP BAR ELEMENTS (XP Bar & Daily Mission) --- */
-
-.xp-daily-header {
-    width: 100%;
-    margin-bottom: 30px; /* スペースを広げる */
-    padding: 12px 0;
-    border-bottom: 2px dashed var(--secondary-color); /* 枠線を太く */
-}
-
-.xp-bar-container {
-    width: 100%;
-    text-align: left;
-    margin-bottom: 18px; /* スペースを広げる */
-    font-size: 15px; /* 少し大きく */
-    color: var(--primary-color);
-    font-weight: 800; /* より太く */
-    letter-spacing: 0.5px;
-}
-
-.xp-bar {
-    background-color: #ffe8f0; /* もっと明るいピンクの背景 */
-    border-radius: 12px; /* さらに丸く */
-    height: 20px; /* 太く */
-    overflow: hidden;
-    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15); /* ソフトな影を強調 */
-    border: 3px solid var(--secondary-color); /* 枠線を太く */
-}
-
-.xp-progress {
-    height: 100%;
-    width: 65%; /* 暫定値 */
-    background: linear-gradient(90deg, #ffc8dd, var(--primary-color), #ff99c8); /* グラデーションに中央色を追加 */
-    transition: width 0.6s ease-in-out;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    font-size: 13px; /* 少し大きく */
+/* ========================================================= */ 
+/* HOME STYLE (home.css) - Home, Bottom Navigation */ 
+/* ========================================================= */ 
+ 
+.home-page .main-container { 
+    max-width: 700px; 
+} 
+ 
+/* --- TOP BAR ELEMENTS (XP Bar & Daily Mission) --- */ 
+ 
+.xp-daily-header { 
+    width: 100%; 
+    margin-bottom: 30px; /* スペースを広げる */ 
+    padding: 12px 0; 
+    border-bottom: 2px dashed var(--secondary-color); /* 枠線を太く */ 
+} 
+ 
+.xp-bar-container { 
+    width: 100%; 
+    text-align: left; 
+    margin-bottom: 18px; /* スペースを広げる */ 
+    font-size: 15px; /* 少し大きく */ 
+    color: var(--primary-color); 
+    font-weight: 800; /* より太く */ 
+    letter-spacing: 0.5px; 
+} 
+ 
+.xp-bar { 
+    background-color: #ffe8f0; /* もっと明るいピンクの背景 */ 
+    border-radius: 12px; /* さらに丸く */ 
+    height: 20px; /* 太く */ 
+    overflow: hidden; 
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.15); /* ソフトな影を強調 */ 
+    border: 3px solid var(--secondary-color); /* 枠線を太く */ 
+} 
+ 
+.xp-progress { 
+    height: 100%; 
+    width: 65%; /* 暫定値 */ 
+    background: linear-gradient(90deg, #ffc8dd, var(--primary-color), #ff99c8); /* グラデーションに中央色を追加 */ 
+    transition: width 0.6s ease-in-out; 
+    display: flex; 
+    justify-content: flex-end; 
+    align-items: center; 
+    font-size: 13px; /* 少し大きく */ 
     color: #ffffff; 
-    font-weight: 900; /* より太く */
-    padding-right: 10px;
+    font-weight: 900; /* より太く */ 
+    padding-right: 10px; 
     border-radius: 12px; 
-    /* NEW: プログレスバーの微細なパルス */
-    animation: xpPulse 2s ease-out infinite alternate;
-}
-@keyframes xpPulse {
-    0% { transform: scaleX(1); }
-    100% { transform: scaleX(1.005); }
-}
-
-.daily-mission-button {
-    display: block;
-    text-decoration: none;
-    border-radius: 35px; /* 丸く */
-    font-weight: 800; /* より太く */
-    padding: 14px 25px;
-    font-size: 17px;
-    letter-spacing: 0.8px;
-    background: var(--ai-accent-color); /* スカイブルーで目立たせる */
-    color: #ffffff;
-    box-shadow: 0 6px 20px rgba(135, 206, 235, 0.7); /* ソフトな影を強調 */
-    transition: all 0.4s cubic-bezier(.68,-0.55,.26,1.55);
-    border: none;
-    margin-bottom: 20px;
-    animation: gentleFloat 4s ease-in-out infinite alternate, fadeIn 0.7s ease-out forwards; /* 常に浮遊＆フェードイン */
-}
-.daily-mission-button:hover {
-    animation: none; /* ホバー中は浮遊を停止 */
-    transform: translateY(-6px) scale(1.03) rotate(1deg); /* より大きく弾む、少し回転 */
-    box-shadow: 0 8px 25px rgba(135, 206, 235, 0.9), 0 0 15px var(--ai-accent-color);
-}
-.daily-mission-button i {
-    animation: iconWiggle 1.5s ease-in-out infinite alternate; /* デイリーミッションアイコンも揺れる */
-}
-
-
-/* --- CHARACTER DISPLAY --- */
-
-.character-display {
-    width: 100%;
-    height: 250px; /* さらに高く */
-    margin: 25px auto 35px auto; /* マージン調整 */
-    background-color: #ffffff; /* 白背景 */
-    border-radius: 20px; /* さらに丸く */
-    border: 5px solid var(--primary-color); /* メインカラーのさらに太い枠 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    box-shadow: 0 6px 25px rgba(255, 105, 180, 0.4); /* ソフトなピンクの影を強調 */
-    animation: softPulse 5s ease-in-out infinite alternate, gentleFloat 6s ease-in-out infinite alternate-reverse; /* グローと浮遊の複合アニメーション */
-    transform-origin: center bottom; /* 下部を中心に浮遊 */
-}
-
-/* テキスト表示用の擬似要素は画像表示のため無効化 */
-/*
-.character-display::before {
-    content: "キャラクター表示エリア (レベル 5)";
+    /* NEW: プログレスバーの微細なパルス */ 
+    animation: xpPulse 2s ease-out infinite alternate; 
+} 
+@keyframes xpPulse { 
+    0% { transform: scaleX(1); } 
+    100% { transform: scaleX(1.005); } 
+} 
+ 
+.daily-mission-button { 
+    display: block; 
+    text-decoration: none; 
+    border-radius: 35px; /* 丸く */ 
+    font-weight: 800; /* より太く */ 
+    padding: 14px 25px; 
+    font-size: 17px; 
+    letter-spacing: 0.8px; 
+    background: var(--ai-accent-color); /* スカイブルーで目立たせる */ 
+    color: #ffffff; 
+    box-shadow: 0 6px 20px rgba(135, 206, 235, 0.7); /* ソフトな影を強調 */ 
+    transition: all 0.4s cubic-bezier(.68,-0.55,.26,1.55); 
+    border: none; 
+    margin-bottom: 20px; 
+    animation: gentleFloat 4s ease-in-out infinite alternate, fadeIn 0.7s ease-out forwards; /* 常に浮遊＆フェードイン */ 
+} 
+.daily-mission-button:hover { 
+    animation: none; /* ホバー中は浮遊を停止 */ 
+    transform: translateY(-6px) scale(1.03) rotate(1deg); /* より大きく弾む、少し回転 */ 
+    box-shadow: 0 8px 25px rgba(135, 206, 235, 0.9), 0 0 15px var(--ai-accent-color); 
+} 
+.daily-mission-button i { 
+    animation: iconWiggle 1.5s ease-in-out infinite alternate; /* デイリーミッションアイコンも揺れる */ 
+} 
+ 
+ 
+/* --- CHARACTER DISPLAY --- */ 
+ 
+.character-display { 
+    width: 100%; 
+    height: 250px; /* さらに高く */ 
+    margin: 25px auto 35px auto; /* マージン調整 */ 
+    background-color: #ffffff; /* 白背景 */ 
+    border-radius: 20px; /* さらに丸く */ 
+    border: 5px solid var(--primary-color); /* メインカラーのさらに太い枠 */ 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    overflow: hidden; 
+    box-shadow: 0 6px 25px rgba(255, 105, 180, 0.4); /* ソフトなピンクの影を強調 */ 
+    animation: softPulse 5s ease-in-out infinite alternate, gentleFloat 6s ease-in-out infinite alternate-reverse; /* グローと浮遊の複合アニメーション */ 
+    transform-origin: center bottom; /* 下部を中心に浮遊 */ 
+} 
+ 
+/* テキスト表示用の擬似要素は画像表示のため無効化 */ 
+/* .character-display::before { 
+    content: "キャラクター表示エリア (レベル 5)"; 
     color: #f0f0f0; 
-    font-size: 20px;
-    font-weight: 700;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-*/
-
-/* 追加: キャラクター画像のスタイル */
-.character-display img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* アスペクト比を維持して収める */
-    transition: transform 0.5s ease; /* 画像にもトランジション */
-}
-
-.character-display:hover img {
-    transform: scale(1.05); /* ホバーでキャラクターがわずかに拡大 */
-}
-
-
-/* --- BOTTOM NAVIGATION BAR (Mobile Only) --- */
-
-.bottom-nav {
+    font-size: 20px; 
+    font-weight: 700; 
+    text-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+} 
+*/ 
+ 
+/* 追加: キャラクター画像のスタイル */ 
+.character-display img { 
+    max-width: 100%; 
+    max-height: 100%; 
+    object-fit: contain; /* アスペクト比を維持して収める */ 
+    transition: transform 0.5s ease; /* 画像にもトランジション */ 
+} 
+.character-display:hover img { 
+    transform: scale(1.05); /* ホバーでキャラクターがわずかに拡大 */ 
+} 
+ 
+ 
+/* --- BOTTOM NAVIGATION BAR (Mobile Only) --- */ 
+ 
+.bottom-nav { 
     display: none; 
-}
-
-/* Mobile Overrides */
-@media (max-width: 600px) {
-    .home-page body {
-        padding-bottom: 85px; /* ナビバーの高さ＋余白 */
+} 
+ 
+/* Mobile Overrides */ 
+@media (max-width: 600px) { 
+    .home-page body { 
+        padding-bottom: 85px; /* ナビバーの高さ＋余白 (80px + 5px) */ 
         min-height: auto; 
-    }
-    .home-page .main-container {
+    } 
+    .home-page .main-container { 
         padding-bottom: 15px; 
-        margin-top: 15px;
-        margin-bottom: 15px;
-        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards; /* モバイルでは浮遊を無効に */
-    }
+        margin-top: 15px; 
+        margin-bottom: 15px; 
+        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards; /* モバイルでは浮遊を無効に */ 
+    } 
     
     .bottom-nav {
-        display: flex; 
+        display: flex;
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
         height: 80px; /* 高さ確保 */
-        background-color: #ffffff; 
-        box-shadow: 0 -6px 15px rgba(0, 0, 0, 0.15); /* ソフトな影を強調 */
+        background-color: #ffffff;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1), 0 -8px 0 0 var(--secondary-color); /* 上部に太いピンクの境界線風シャドウを追加 */
         justify-content: space-around;
         align-items: center;
         z-index: 1000;
-        padding: 0 8px;
-        border-top: 5px solid var(--secondary-color); /* ライトピンクの太い枠 */
+        padding: 0 8px; 
+        border-top: none; /* 境界線をシャドウで代用するため削除 */
         animation: fadeIn 0.4s ease-out forwards;
-        transform: translateY(100%);
+        transform: translateY(0);
         animation-fill-mode: forwards;
         border-radius: 15px 15px 0 0; /* 上部を丸く */
     }
     
+    /* 🌟 【修正】ナビゲーションアイテムを色付きボタンに変更 🌟 */
     .nav-item {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-decoration: none;
-        color: var(--dark-text); 
-        font-size: 12px; /* 少し大きく */
-        font-weight: 800; /* より太く */
-        padding: 8px 0;
-        width: 20%; 
-        transition: color 0.3s, transform 0.3s cubic-bezier(.68,-0.55,.26,1.55); /* 弾むようなトランジション */
+        color: #ffffff; /* テキスト/アイコンを白に */
+        font-size: 12px;
+        font-weight: 800;
+        
+        /* デザイン調整 */
+        padding: 8px 4px;
+        margin: 4px;
+        border-radius: 12px; /* 角を丸く */
+        
+        /* 立体感と色の土台 */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 影を付けて浮き上がらせる */
+        
+        /* Flexboxで均等配置を維持 */
+        flex-grow: 1;
+        flex-basis: 0;
+        min-width: 0;
+        
+        transition: all 0.3s cubic-bezier(.42, 0, .58, 1.2); /* 弾むトランジション */
         text-shadow: none;
     }
+
+    /* 🌟 個別ボタンの色設定 (グラデーションを適用) 🌟 */
     
-    .nav-item:hover, .nav-item.active {
-        color: var(--primary-color);
-        text-shadow: 0 0 8px rgba(255, 105, 180, 0.6);
-        transform: translateY(-4px) scale(1.05); /* 少し浮いて拡大 */
+    /* 1. ガチャ (Gacha) - Primary Pink Gradient */
+    .bottom-nav a:nth-child(1).nav-item {
+        background: linear-gradient(135deg, var(--primary-color), #ff99c8);
+        box-shadow: 0 4px 10px rgba(255, 105, 180, 0.6);
+    }
+
+    /* 2. 掲示板 (Community) - Blue Gradient (AI Accent) */
+    .bottom-nav a:nth-child(2).nav-item {
+        background: linear-gradient(135deg, var(--ai-accent-color), #4dd0e1);
+        box-shadow: 0 4px 10px rgba(135, 206, 235, 0.6);
     }
     
-    /* トレーニング開始ボタンを中央で浮かす (Primary Accent) */
+    /* 3. トレーニング記録 (Training Log) - Green Gradient */
+    .bottom-nav a:nth-child(3).nav-item {
+        background: linear-gradient(135deg, #4CAF50, #8BC34A);
+        box-shadow: 0 4px 10px rgba(76, 175, 80, 0.6);
+    }
+    
+    /* 4. キャラクター (Character) - Gold/Orange Gradient (ランキングに近い色) */
+    .bottom-nav a:nth-child(4).nav-item {
+        background: linear-gradient(135deg, #f1c40f, #f39c12);
+        box-shadow: 0 4px 10px rgba(241, 196, 15, 0.6);
+    }
+    
+    /* 5. 食事記録 (Meal Log) - Purple Gradient */
+    .bottom-nav a:nth-child(5).nav-item {
+        background: linear-gradient(135deg, #9c27b0, #ba68c8);
+        box-shadow: 0 4px 10px rgba(156, 39, 176, 0.6);
+    }
+    
+    /* 6. 設定 (Settings) - Gray/Neutral Gradient */
+    .bottom-nav a:nth-child(6).nav-item {
+        background: linear-gradient(135deg, #bdbdbd, #757575);
+        box-shadow: 0 4px 10px rgba(117, 117, 117, 0.6);
+    }
+    /* ---------------------------------------------------- */
+
+
+    /* 🌟 【修正】テキスト折り返しを防ぎ、色を統一 🌟 */
+    .nav-item span {
+        white-space: nowrap; 
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%; 
+        color: #ffffff; /* テキストも白に統一 */
+    }
+    /* ---------------------------------------------------- */
+    
+    .nav-item:hover, .nav-item.active {
+        color: #ffffff; /* ホバー時も白を維持 */
+        text-shadow: none; 
+        transform: translateY(-4px) scale(1.08); /* 少し浮いて拡大 */
+        /* ホバー時の影をより目立たせる */
+        box-shadow: 0 0 20px rgba(255, 105, 180, 0.5), 0 8px 15px rgba(0, 0, 0, 0.2); 
+    }
+    
+    /* トレーニング開始ボタン（中央の大きなボタン）は独自のスタイルを維持 */
     .nav-item.training-start-nav {
         position: relative;
         top: -40px; /* さらに浮かす */
@@ -198,6 +261,8 @@
         transform: translateY(0);
         border: 5px solid #ffffff; /* 白い枠線でさらに強調 */
         animation: gentleFloat 3s ease-in-out infinite alternate, softPulse 4s ease-in-out infinite alternate; /* 浮遊とパルス */
+        flex-grow: 0; /* 中央ボタンのサイズを固定 */
+        flex-basis: auto;
     }
     .nav-item.training-start-nav i {
         font-size: 38px; /* アイコンを大きく */
@@ -223,7 +288,7 @@
     .button-container.home-desktop-buttons {
         display: none !important;
     }
-
+    
     /* ボトムナビゲーションをデスクトップで表示し、メインコンテンツ直下に中央配置するスタイルを適用 */
     .bottom-nav {
         display: flex !important; /* L148の display: none; を上書きして表示 */
@@ -245,19 +310,25 @@
     }
     
     /* ナビアイテムを横並びのボタン風に調整 */
+    /* 🌟 デスクトップでも色付きボタン風に統一 🌟 */
     .nav-item {
         flex-direction: row; /* アイコンとテキストを横並びに */
         padding: 15px 25px;
         border-radius: 35px;
         width: auto;
+        
         background-color: var(--container-bg);
+        border: 3px solid var(--secondary-color); /* 枠線で可愛らしさを出す */
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        color: var(--dark-text); /* 文字色は濃い色を維持 */
+        
         margin: 0 12px;
         transform: none;
         animation: none;
         font-size: 16px;
         font-weight: 700;
         text-shadow: none;
+        transition: all 0.3s ease-in-out;
     }
     .nav-item i {
         font-size: 18px;
@@ -269,6 +340,7 @@
         transform: translateY(-4px) scale(1.01) !important;
         box-shadow: 0 6px 15px rgba(255, 105, 180, 0.4);
         color: var(--primary-color);
+        background-color: #fffafa; /* ホバーで薄いピンクに */
     }
     
     /* トレーニング開始ボタンをプライマリーボタン風に調整 */
