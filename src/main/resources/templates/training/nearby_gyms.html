@@ -8,14 +8,132 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-	<style> /* 基本スタイル */ body { margin: 0; padding: 0; font-family: 'Noto Sans JP', Arial, sans-serif; background-color: #f4f4f4; } .main-container { padding: 0; width: 100%; height: 100%; position: relative; } /* 地図コンテナを中央寄せ */ #map-container { width: 90%; max-width: 1200px; height: calc(100vh - 350px); position: absolute; top: 50px; left: 50%; transform: translateX(-50%); margin-bottom: 5px; } #map { width: 100%; height: 100%; } /* ステータスメッセージの中央寄せ */ #status-message { padding: 8px 15px; background: linear-gradient(135deg, #f0f0f0, #ffffff); border: 1px solid #ddd; border-radius: 20px; position: absolute; top: 15px; left: 50%; transform: translateX(-50%); z-index: 1000; font-weight: 700; font-size: 0.9em; color: #2c3e50; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); text-align: center; max-width: 80%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* 検索結果リストの中央寄せ */ #places-list { position: fixed; bottom: 50px; width: 90%; max-width: 1200px; left: 50%; transform: translateX(-50%); height: 250px; background: #fff; box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); padding: 10px; box-sizing: border-box; overflow-y: auto; z-index: 999; } #places-list h2 { font-size: 1.1em; color: #4CAF50; border-bottom: 2px solid #eee; padding-bottom: 5px; margin: 0 0 10px; } #gym-results-ul { list-style: none; padding: 0; margin: 0; } #gym-results-ul li { padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 0.95em; color: #333; cursor: pointer; } #gym-results-ul li:hover { background-color: #f9f9f9; } #gym-results-ul li:last-child { border-bottom: none; } </style>  
+	<style> 
+        /* 基本スタイル */ 
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Noto Sans JP', Arial, sans-serif; 
+            background-color: #f4f4f4; 
+        } 
+        .main-container { 
+            padding: 0; 
+            width: 100%; 
+            height: 100%; 
+            position: relative; 
+        } 
+        /* 地図コンテナを中央寄せ */ 
+        #map-container { 
+            width: 90%; 
+            max-width: 1200px; 
+            height: calc(100vh - 350px); 
+            position: absolute; 
+            top: 50px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            margin-bottom: 5px; 
+        } 
+        #map { 
+            width: 100%; 
+            height: 100%; 
+        } 
+        
+        /* 🌟 【追加】ホームに戻るボタンのスタイル 🌟 */
+        .back-home-button {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            z-index: 1001; /* 最前面に配置 */
+            padding: 8px 15px;
+            background-color: #3498db; /* 青系統 */
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+        .back-home-button:hover {
+            background-color: #2980b9;
+        }
+        .back-home-button i {
+            margin-right: 5px;
+        }
+        /* -------------------------------------- */
+
+        /* ステータスメッセージの中央寄せ */ 
+        #status-message { 
+            padding: 8px 15px; 
+            background: linear-gradient(135deg, #f0f0f0, #ffffff); 
+            border: 1px solid #ddd; 
+            border-radius: 20px; 
+            position: absolute; 
+            top: 15px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 1000; 
+            font-weight: 700; 
+            font-size: 0.9em; 
+            color: #2c3e50; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
+            text-align: center; 
+            max-width: 80%; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        } 
+        /* 検索結果リストの中央寄せ */ 
+        #places-list { 
+            position: fixed; 
+            bottom: 50px; 
+            width: 90%; 
+            max-width: 1200px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            height: 250px; 
+            background: #fff; 
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); 
+            padding: 10px; 
+            box-sizing: border-box; 
+            overflow-y: auto; 
+            z-index: 999; 
+        } 
+        #places-list h2 { 
+            font-size: 1.1em; 
+            color: #4CAF50; 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 5px; 
+            margin: 0 0 10px; 
+        } 
+        #gym-results-ul { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0; 
+        } 
+        #gym-results-ul li { 
+            padding: 8px 0; 
+            border-bottom: 1px dashed #eee; 
+            font-size: 0.95em; 
+            color: #333; 
+            cursor: pointer; 
+        } 
+        #gym-results-ul li:hover { 
+            background-color: #f9f9f9; 
+        } 
+        #gym-results-ul li:last-child { 
+            border-bottom: none; 
+        } 
+    </style>  
  </head>
- 	
 <body class="map-page">
 
     <header th:replace="fragments/header :: header"></header>
-		    
+
     <div class="main-container">
+        <a th:href="@{/home}" class="back-home-button">
+            <i class="fa-solid fa-arrow-left"></i> ホームに戻る
+        </a>
+        
         <div id="status-message">現在地を取得中です...</div>
         <div id="map-container">
             <div id="map"></div>
@@ -82,7 +200,7 @@
         // ---- マップ初期化 ----
         function initMap(position) {
             map = L.map('map').setView([position.lat, position.lon], 14);
-
+	
             L.tileLayer(
                 `https://maps.geoapify.com/v1/tile/carto/{z}/{x}/{y}.png?&apiKey=${GEOAPIFY_MAP_KEY}`,
                 {
@@ -200,18 +318,8 @@
                 });
             });
         }
-	
+
         window.onload = getLocationAndInitMap;
-		
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
