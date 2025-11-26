@@ -125,7 +125,7 @@ public class SecurityConfig {
             .logout(logout -> logout
                 // POST /logout に変更 (AntPathRequestMatcherをそのまま使用し、警告を抑制)
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
-                .logoutSuccessUrl("/login?logout=true")
+                .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID", "XSRF-TOKEN") // CSRF Cookieも削除
                 .permitAll()

@@ -21,6 +21,11 @@ public class AuthController {
         this.userService = userService;
     }
 
+ // --- スタート画面（ここを追加） ---
+    @GetMapping("/")
+    public String showStartPage() {
+        return "start"; // templates/start.html を表示
+    }
     // --- ログイン/登録関連 ---
     @GetMapping("/login")
     public String login() { return "auth/login"; } 
