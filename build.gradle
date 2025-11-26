@@ -49,7 +49,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // --- Gemini AI SDK ---
-    implementation 'com.google.genai:google-genai:1.0.0'
+    implementation 'com.google.genai:google-genai:1.28.0'
 }
 
 tasks.named('test') {
