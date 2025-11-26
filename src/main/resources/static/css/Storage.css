@@ -1,209 +1,263 @@
 /* --- リセットと基本設定 --- */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Montserrat', 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #1a1a2e; /* 暗い背景色 */
+    background-color: #0d001a; /* 非常に暗い紫 */
     color: #fff;
+    min-height: 100vh;
 }
 
 header {
     text-align: center;
     padding: 20px;
-    background-color: #162447;
+    background-color: #1a0033;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    border-bottom: 2px solid #5a189a;
 }
 
 h1 {
     margin: 0;
-    font-size: 1.8em;
+    font-size: 2em;
+    color: #e0fbfc; /* 明るいシアン */
+    text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff; /* ネオンスタイル */
 }
 
 .user-level {
     font-size: 1.2em;
-    color: #ffc107; 
+    color: #ffd700; /* ゴールド */
     margin-top: 10px;
+    font-weight: bold;
 }
 
-/* --- バトルパス風 横スクロールコンテナ (デフォルト: PC/Tablet用) --- */
+/* --- スクロールボタン --- */
+#scroll-to-start-button {
+    background: linear-gradient(45deg, #ff00ff, #00ffff); 
+    color: #0d001a;
+    border: none;
+    padding: 8px 15px;
+    margin-top: 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+    transition: all 0.3s;
+}
+
+#scroll-to-start-button:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.9);
+    transform: scale(1.05);
+}
+
+
+/* --- バトルパス風 スクロールコンテナ --- */
 .character-list-wrapper {
     overflow-x: auto;
-    overflow-y: hidden; /* 横スクロールを主とする */
-    padding: 40px 0;
-    background-color: #0b0c10;
-    box-shadow: inset 0 8px 15px rgba(0, 0, 0, 0.7), inset 0 -8px 15px rgba(0, 0, 0, 0.7);
+    overflow-y: hidden;
+    padding: 50px 0;
+    background-color: #0d001a;
+    border-top: 5px solid #ff00ff;
+    border-bottom: 5px solid #00ffff;
+    position: relative; 
 }
 
 .character-list-container {
     display: flex;
     min-width: max-content; 
-    
-    height: 250px; 
+    height: 280px; 
     align-items: center; 
-    padding: 0 50px; 
+    padding: 0 80px; 
     position: relative; 
     
-    /* ベースラインの点線 (暗い色) - 全体に描画 */
+    /* ベースラインの点線 (暗い色) */
     background: 
         repeating-linear-gradient(
             90deg, 
-            #444466 0, 
-            #444466 10px, 
-            transparent 10px, 
-            transparent 20px
+            #5a189a 0, 
+            #5a189a 15px, 
+            transparent 15px, 
+            transparent 30px
         );
-    background-size: 20px 4px; /* 点線のサイズ */
+    background-size: 30px 4px;
     background-repeat: repeat-x;
-    background-position: 0 50%; /* 垂直方向の中央に配置 */
+    background-position: 0 50%;
 }
 
 
 /* --- キャラクターカード (共通スタイル) --- */
 .character-card {
     position: relative;
-    width: 150px;
-    height: 220px; 
-    /* 背景色で点線を上書きし、カード内を見えなくする */
-    background-color: #2c3e50; 
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
-    margin: 0 25px; 
+    width: 180px; 
+    height: 250px; 
+    background-color: #2c004d; 
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+    margin: 0 35px; 
     flex-shrink: 0; 
     text-align: center;
     padding: 10px;
-    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; 
-    border: 3px solid #2c3e50; 
+    transition: transform 0.4s, box-shadow 0.4s; 
+    border: 3px solid transparent; 
     cursor: pointer;
-    z-index: 5; /* カードは常に手前に */
+    z-index: 5;
+    overflow: hidden; 
 }
 
 .character-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-8px) scale(1.02);
+    z-index: 10;
 }
 
-.character-card img {
-    width: 90px;
-    height: 90px;
-    object-fit: contain;
-    margin-top: 10px;
+.card-content {
+    transition: opacity 0.3s;
+}
+
+.character-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-top: 15px;
     border-radius: 50%;
-    background-color: #1b1b2f;
+    background-color: #0d001a;
+    border: 3px solid #ffd700;
 }
 
 .evolution-tag {
     position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: #ffc107;
-    color: #1a1a2e;
-    padding: 3px 8px;
-    border-radius: 50%;
+    top: 5px;
+    right: 5px;
+    background: #ff00ff; 
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
     font-weight: bold;
-    font-size: 0.8em;
+    font-size: 0.9em;
+    box-shadow: 0 0 8px rgba(255, 0, 255, 0.7);
     z-index: 10;
 }
 
 .character-name {
-    font-size: 1.1em;
+    font-size: 1.2em;
     font-weight: bold;
-    margin: 10px 0 5px 0;
+    margin: 15px 0 5px 0;
+    color: #e0fbfc;
 }
 
-.attribute-name {
+.required-level {
     font-size: 0.9em;
-    color: #bdc3c7;
+    color: #bdbdbd;
 }
 
 /* --- 解放・未解放のスタイル --- */
-.character-card.locked {
-    filter: grayscale(100%) brightness(30%);
-    pointer-events: none;
-    opacity: 0.6;
-    background-color: #2c3e50;
-    border-color: #7f8c8d !important;
+
+/* 未解放 (LOCKED) スタイル */
+.character-card.locked .card-content {
+    opacity: 0 !important; 
 }
 
-.character-card.locked img {
-    filter: blur(2px);
+/* 解放 (UNLOCKED) スタイル */
+.character-card.unlocked .lock-overlay {
+    display: none !important; 
 }
-
-.character-card.locked::after {
-    content: '🔒 LOCKED';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-weight: bold;
-    font-size: 1.2em;
-    z-index: 10;
+.character-card.unlocked .card-content {
+    opacity: 1 !important; 
+}
+.character-card.unlocked img {
+    filter: none;
 }
 .character-card.unlocked {
     filter: none;
     opacity: 1;
 }
 
-.character-card.unlocked::after {
-    content: none;
+/* ロック時のオーバーレイ */
+.lock-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(13, 0, 26, 0.95); 
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    transition: opacity 0.3s;
+    z-index: 20; 
 }
+
+.lock-icon {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+.lock-text {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #ff00ff; 
+    text-shadow: 0 0 10px #ff00ff;
+}
+
+/* ★修正点: Lv.Lv.問題の解決 - 疑似要素を削除しました。HTMLの "Lv." の文字が正しく表示されます。★ */
+.lock-required-level { 
+    font-size: 1.1em;
+    margin-top: 10px;
+    color: #ffd700;
+    font-weight: bold;
+}
+/* 削除されたコード: 以前、ここで content: 'Lv.'; の疑似要素がありました */
 
 
 /* ===================================== */
 /* --- 属性ごとのスタイル強調 (PC/Tablet用) --- */
 /* ===================================== */
 
-/* --- 属性ごとのカードスタイル --- */
+/* --- 属性ごとのカードボーダー --- */
 .character-card.fire { border-color: #e74c3c; }
-.character-card.fire:hover { box-shadow: 0 10px 20px rgba(231, 76, 60, 0.8); }
-.character-card.fire .attribute-name { color: #f1c40f; }
-
 .character-card.water { border-color: #3498db; }
-.character-card.water:hover { box-shadow: 0 10px 20px rgba(52, 152, 219, 0.8); }
-.character-card.water .attribute-name { color: #9bd4ff; }
-
 .character-card.grass { border-color: #2ecc71; }
-.character-card.grass:hover { box-shadow: 0 10px 20px rgba(46, 204, 113, 0.8); }
-.character-card.grass .attribute-name { color: #ccff99; }
-
 .character-card.light { border-color: #ffd700; }
-.character-card.light:hover { box-shadow: 0 10px 20px rgba(255, 215, 0, 0.8); }
-.character-card.light .attribute-name { color: #ffeb3b; }
-
 .character-card.dark { border-color: #9b59b6; }
-.character-card.dark:hover { box-shadow: 0 10px 20px rgba(155, 89, 182, 0.8); }
-.character-card.dark .attribute-name { color: #cfd8dc; }
+
+/* ホバー時のシャドウを強化 */
+.character-card.fire:hover { box-shadow: 0 0 40px rgba(231, 76, 60, 1); }
+.character-card.water:hover { box-shadow: 0 0 40px rgba(52, 152, 219, 1); }
+.character-card.grass:hover { box-shadow: 0 0 40px rgba(46, 204, 113, 1); }
+.character-card.light:hover { box-shadow: 0 0 40px rgba(255, 215, 0, 1); }
+.character-card.dark:hover { box-shadow: 0 0 40px rgba(155, 89, 182, 1); }
+
 
 /* ------------------------------------- */
 /* 属性変化の点線 (PC/Tablet用) */
 /* ------------------------------------- */
 
-/* --- 炎属性の道筋 (カードの左側の空間に描画) --- */
+/* PC版の横の線は ::before を使用 */
 .character-card.fire::before {
     content: ''; 
     position: absolute;
-    left: calc(-75px); 
+    left: calc(-85px); 
     top: 50%; 
     transform: translateY(-50%); 
     
-    width: 100px; 
-    height: 4px; 
+    width: 120px; 
+    height: 6px; 
     
-    /* 炎属性テーマの点線背景を設定 */
     background: repeating-linear-gradient(
         90deg, 
-        #e74c3c 0, 
-        #e74c3c 10px, 
-        transparent 10px, 
-        transparent 20px
+        #ff6b6b 0, 
+        #ff6b6b 15px, 
+        transparent 15px, 
+        transparent 30px
     );
-    background-size: 20px 4px;
+    background-size: 30px 6px;
     background-repeat: repeat-x;
     background-position: 0 50%;
-
+    
     z-index: 4; 
-    box-shadow: none; 
+    box-shadow: 0 0 5px #ff6b6b; 
 }
 
 
@@ -219,57 +273,41 @@ h1 {
     transform: translateY(-50%); 
     
     width: 50px; 
-    height: 4px; 
+    height: 6px; 
     
-    background-size: 20px 4px;
+    background-size: 30px 6px;
     background-repeat: repeat-x;
     background-position: 0 50%;
     
     z-index: 4; 
-    box-shadow: none; 
 }
 
 .character-card.water::before {
-    background: repeating-linear-gradient(90deg, #3498db 0, #3498db 10px, transparent 10px, transparent 20px);
+    background: repeating-linear-gradient(90deg, #6ec6ff 0, #6ec6ff 15px, transparent 15px, transparent 30px);
+    box-shadow: 0 0 5px #6ec6ff;
 }
 
 .character-card.grass::before {
-    background: repeating-linear-gradient(90deg, #2ecc71 0, #2ecc71 10px, transparent 10px, transparent 20px);
+    background: repeating-linear-gradient(90deg, #69f0ae 0, #69f0ae 15px, transparent 15px, transparent 30px);
+    box-shadow: 0 0 5px #69f0ae;
 }
 
 .character-card.light::before {
-    background: repeating-linear-gradient(90deg, #ffd700 0, #ffd700 10px, transparent 10px, transparent 20px);
+    background: repeating-linear-gradient(90deg, #ffee58 0, #ffee58 15px, transparent 15px, transparent 30px);
+    box-shadow: 0 0 5px #ffee58;
 }
 
 .character-card.dark::before {
-    background: repeating-linear-gradient(90deg, #9b59b6 0, #9b59b6 10px, transparent 10px, transparent 20px);
+    background: repeating-linear-gradient(90deg, #c593d8 0, #c593d8 15px, transparent 15px, transparent 30px);
+    box-shadow: 0 0 5px #c593d8;
 }
 
-/* --- フッター --- */
-footer {
-    text-align: center;
-    padding: 10px;
-    background-color: #162447;
-    font-size: 0.8em;
-    margin-top: 20px;
+/* ロックされたカードの場合、道筋を暗くする */
+.character-card.locked::before {
+    opacity: 0.3;
+    box-shadow: none !important;
 }
 
-/* ボタンのスタイル */
-#scroll-to-start-button {
-    background-color: #e74c3c; 
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-#scroll-to-start-button:hover {
-    background-color: #c0392b;
-}
 
 /* ===================================== */
 /* ★★★ メディアクエリ (スマートフォン対応 - 縦リスト化) ★★★ */
@@ -280,38 +318,30 @@ footer {
     .character-list-wrapper {
         overflow-x: hidden; 
         overflow-y: auto; 
-        padding: 20px 0; 
+        padding: 30px 0; 
         height: auto; 
-        max-height: 80vh; 
-        position: relative; 
+        max-height: 85vh; 
+        border: none; 
     }
 
     /* 2. カードコンテナを縦積みレイアウトに変更 */
     .character-list-container {
         flex-direction: column; 
-        min-width: auto; 
         height: auto; 
         padding: 0; 
-        align-items: center; 
-        
-        /* 横の点線は非表示 */
         background: none; 
     }
     
     /* 3. カードのスタイルを縦リスト用に調整 */
     .character-card {
-        width: 90%; 
-        max-width: 300px; 
-        height: 220px; /* 高さを維持 */
-        margin: 15px auto; /* 縦マージンを確保 */
-        flex-shrink: 1;
+        width: 85%; 
+        max-width: 320px; 
+        margin: 20px auto; 
         
-        /* スマホでホバーは不要 */
         transition: none; 
         transform: none;
         
-        /* 縦線と重ならないように、背景を暗い単色に固定してカード間の線のみ見せる */
-        background-color: #2c3e50; 
+        background-color: #2c004d; 
     }
     
     /* 4. 縦のベースラインを設定 (Wrapperの中央に縦の点線) */
@@ -320,68 +350,83 @@ footer {
         position: absolute;
         top: 0;
         bottom: 0;
-        left: 50%; /* 中央に配置 */
+        left: 50%; 
         transform: translateX(-50%);
-        width: 4px; /* 縦線の太さ */
-        
-        /* 暗いベースラインの縦点線 */
-        background: 
-            repeating-linear-gradient(
-                0deg, /* 縦向きの点線 */
-                #444466 0, 
-                #444466 10px, 
-                transparent 10px, 
-                transparent 20px
-            );
-        background-size: 4px 20px;
-        z-index: 1; 
-    }
-    
-    /* 5. 属性変化の縦点線 (::before) をカードの下側に追加 */
-    .character-card.unlocked::after {
-        content: '';
-        position: absolute;
-        left: 50%; /* 中央に配置 */
-        bottom: -15px; /* カードの下のマージン部分に配置 */
-        transform: translateX(-50%);
-        
-        width: 4px; 
-        height: 30px; /* カード間のマージン(30px)を埋める */
+        width: 6px; 
         
         /* 暗いベースラインの縦点線 */
         background: 
             repeating-linear-gradient(
                 0deg, 
-                #444466 0, 
-                #444466 10px, 
-                transparent 10px, 
-                transparent 20px
+                #5a189a 0, 
+                #5a189a 15px, 
+                transparent 15px, 
+                transparent 30px
             );
-        background-size: 4px 20px;
-        z-index: 3;
+        background-size: 6px 30px;
+        z-index: 1; 
     }
     
-    /* ロックされているカードのロックアイコン表示をモバイルで修正 */
-    .character-card.locked::after {
-        content: '🔒 LOCKED';
-        z-index: 10;
-        /* ロック状態のスタイルを再適用 */
-        background-color: rgba(0, 0, 0, 0.8);
-    }
-    
-    /* 6. 属性ごとの縦点線に色を適用 (次のカードが解放されている場合) */
-    .character-card.fire.unlocked::after { background: repeating-linear-gradient(0deg, #e74c3c 0, #e74c3c 10px, transparent 10px, transparent 20px); }
-    .character-card.water.unlocked::after { background: repeating-linear-gradient(0deg, #3498db 0, #3498db 10px, transparent 10px, transparent 20px); }
-    .character-card.grass.unlocked::after { background: repeating-linear-gradient(0deg, #2ecc71 0, #2ecc71 10px, transparent 10px, transparent 20px); }
-    .character-card.light.unlocked::after { background: repeating-linear-gradient(0deg, #ffd700 0, #ffd700 10px, transparent 10px, transparent 20px); }
-    .character-card.dark.unlocked::after { background: repeating-linear-gradient(0deg, #9b59b6 0, #9b59b6 10px, transparent 10px, transparent 20px); }
-    
-    /* 7. 横スクロール時の属性線 (::before) は削除 */
-    .character-card.fire::before,
-    .character-card.water::before,
-    .character-card.grass::before,
-    .character-card.light::before,
-    .character-card.dark::before {
+    /* 7. PC版の横スクロール時の属性線 (::before) は完全に無効化する */
+    .character-card::before {
         content: none; 
+    }
+    
+    /* 5. 属性変化の縦点線 (::after) をカードの下側に追加 */
+    .character-card::after {
+        content: '';
+        position: absolute;
+        left: 50%; 
+        bottom: -20px; 
+        transform: translateX(-50%);
+        
+        width: 6px; 
+        height: 40px; 
+        
+        /* デフォルトの暗いベースライン */
+        background: 
+            repeating-linear-gradient(
+                0deg, 
+                #5a189a 0, 
+                #5a189a 15px, 
+                transparent 15px, 
+                transparent 30px
+            );
+        background-size: 6px 30px;
+        z-index: 3;
+        box-shadow: none;
+    }
+    
+    /* ロックされたカードの縦線は暗いまま */
+    .character-card.locked::after {
+        opacity: 0.5;
+        box-shadow: none;
+    }
+    
+    /* 6. 属性ごとの縦点線に色を適用 (解放されたカード) */
+    .character-card.fire.unlocked::after { 
+        background: repeating-linear-gradient(0deg, #ff6b6b 0, #ff6b6b 15px, transparent 15px, transparent 30px);
+        box-shadow: 0 0 5px #ff6b6b;
+    }
+    .character-card.water.unlocked::after { 
+        background: repeating-linear-gradient(0deg, #6ec6ff 0, #6ec6ff 15px, transparent 15px, transparent 30px);
+        box-shadow: 0 0 5px #6ec6ff;
+    }
+    .character-card.grass.unlocked::after { 
+        background: repeating-linear-gradient(0deg, #69f0ae 0, #69f0ae 15px, transparent 15px, transparent 30px);
+        box-shadow: 0 0 5px #69f0ae;
+    }
+    .character-card.light.unlocked::after { 
+        background: repeating-linear-gradient(0deg, #ffee58 0, #ffee58 15px, transparent 15px, transparent 30px);
+        box-shadow: 0 0 5px #ffee58;
+    }
+    .character-card.dark.unlocked::after { 
+        background: repeating-linear-gradient(0deg, #c593d8 0, #c593d8 15px, transparent 15px, transparent 30px);
+        box-shadow: 0 0 5px #c593d8;
+    }
+    
+    /* 最後のカードの下の線は削除 */
+    .character-list-container .character-card:last-child::after {
+        content: none;
     }
 }
