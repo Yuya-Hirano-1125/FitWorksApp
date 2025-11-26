@@ -200,14 +200,19 @@
             .addTo(map);
         }
 
-        // ---- 施設検索（★今回追加） ----
+        // ---- 施設検索（★今回追加） ---
 		async function searchNearbyPlaces(position) {
-		    const radius = 1000; // 1km
-		    const categories = "sport.gym,sport.centre,leisure.sports_centre,sport.studio,service.yoga,sport.climbing";
+		    const radius = 1000;
+		    //const categories = "sport.gym,leisure.sports_centre";
+			const categories = "sport.fitness,sport.fitness.fitness_centre,sport.sports_centre";
+
+		    const lat = Number(position.lat.toFixed(6));
+		    const lon = Number(position.lon.toFixed(6));
 
 		    const url = `https://api.geoapify.com/v2/places?` +
 		                `categories=${categories}` +
-		                `&filter=circle:${position.lon},${position.lat},${radius}` +
+		                `&filter=circle:${lon},${lat},${radius}` +
+		                `&bias=proximity:${lon},${lat}` +
 		                `&limit=20` +
 		                `&apiKey=${GEOAPIFY_PLACES_KEY}`;
 
@@ -216,7 +221,6 @@
 		    try {
 		        const response = await fetch(url);
 		        if (!response.ok) {
-		            console.error("Geoapify API Error:", response.status, response.statusText);
 		            statusMessage.textContent = `施設検索中にAPIエラー(${response.status})`;
 		            return;
 		        }
@@ -231,13 +235,10 @@
 		        addPlacesToMap(data.features, position);
 
 		    } catch (error) {
-		        statusMessage.textContent = "施設検索中に通信エラーが発生しました。";
+		        statusMessage.textContent = "通信エラーが発生しました。";
 		        console.error(error);
 		    }
 		}
-		
-		
-
 
         // ---- マップ & リスト描画 ----
         function addPlacesToMap(features, userPosition) {
