@@ -141,7 +141,7 @@ public class TrainingController {
         
         return "training/training"; 
     }
-    
+
     /**
      * Mapbox/Geoapifyで近くのトレーニング施設検索画面 (nearby_gyms.html) を表示
      * ★ 404エラー解消のため追加 ★
