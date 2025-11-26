@@ -1,22 +1,50 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // スクロール対象の要素を取得 
     const scrollContainer = document.querySelector('.character-list-wrapper');
     const scrollToStartButton = document.getElementById('scroll-to-start-button');
     
+    // currentLevel の初期値は 1 です
     let currentLevel = 1;
     const currentLevelSpan = document.getElementById('current-level');
     const cards = document.querySelectorAll('.character-card');
 
+    // 1. 初期化：ロックオーバーレイ内のレベル表示の数字のみを更新
+    cards.forEach(card => {
+        const requiredLevelString = card.dataset.unlockedLevel || '1'; 
+        const requiredLevel = parseInt(requiredLevelString, 10);
+        
+        const lockRequiredLevelDisplay = card.querySelector('.required-level-display'); 
+        if (lockRequiredLevelDisplay) {
+            lockRequiredLevelDisplay.textContent = requiredLevel;
+        }
+    });
+
+    // 2. カードのロック状態を更新するメイン関数
     function updateCardLockStatus() {
         cards.forEach(card => {
-            const requiredLevel = parseInt(card.dataset.unlockedLevel);
+            const requiredLevel = parseInt(card.dataset.unlockedLevel || '1', 10);
+            const characterImg = card.querySelector('.character-img');
             
             if (currentLevel >= requiredLevel) {
-                card.classList.remove('locked');
-                card.classList.add('unlocked');
+                // **解放時 (UNLOCKED)**
+                // locked クラスを削除し、unlocked クラスを付与
+                card.classList.remove('locked'); 
+                card.classList.add('unlocked'); 
+
+                // 画像をデータ属性からロード（img.srcがプレースホルダーの場合のみ更新）
+                if (characterImg && characterImg.dataset.src && characterImg.src.startsWith('data:image')) {
+                    characterImg.src = characterImg.dataset.src;
+                }
+                
             } else {
-                card.classList.add('locked');
+                // **未解放時 (LOCKED)**
+                // locked クラスを付与し、unlocked クラスを削除
+                card.classList.add('locked'); 
                 card.classList.remove('unlocked');
+                
+                // 画像をプレースホルダーに戻す
+                if (characterImg) {
+                    characterImg.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; 
+                }
             }
         });
     }
@@ -24,17 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ボタンの機能 (PC: 横スクロール, スマホ: 縦スクロール) ---
     scrollToStartButton.addEventListener('click', () => {
         if (window.innerWidth > 768) {
-            // PC/Tablet: 横スクロール
-            scrollContainer.scrollTo({
-                left: 0,
-                behavior: 'smooth'
-            });
+            scrollContainer.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-            // Mobile: 縦スクロール
-            scrollContainer.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+            scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
         }
     });
 
@@ -49,7 +69,9 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCardLockStatus();
     }
     
+    // 5秒ごとにレベルアップ
     setInterval(levelUpDemo, 5000); 
 
+    // 3. 初期ロード時にカードの状態を更新 (currentLevel=1のカードが解放されます)
     updateCardLockStatus();
 });
