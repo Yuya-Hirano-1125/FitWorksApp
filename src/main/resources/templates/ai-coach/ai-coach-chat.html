@@ -15,7 +15,7 @@
 <body class="chat-page">
 <div class="main-container">
     <h1><i class="fa-solid fa-robot header-icon"></i>AIコーチ </h1>
-    
+	
     <div class="chat-history" id="chatHistory">
         <div class="message-bubble ai-message">
             こんにちは！AIコーチのFitBotです。あなたの今日のトレーニングに最適なメニューを提案します！
@@ -150,5 +150,11 @@
         scrollToBottom();
     </script>
 </div>
+<div class="control-buttons-top" style="margin-bottom: 15px;">
+        <a th:href="@{/training}" class="button secondary" 
+           style="display: block; width: 100%; text-align: center; text-decoration: none;">
+            <i class="fa-solid fa-dumbbell"></i> トレーニング選択に戻る
+        </a>
+    </div>
 </body>
 </html>
