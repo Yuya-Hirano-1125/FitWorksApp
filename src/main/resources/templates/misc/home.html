@@ -9,9 +9,31 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
     <style>
+        /* ✅ 経験値バーのスタイル修正 */
+        .xp-bar {
+            width: 100%;
+            height: 25px;
+            background: #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 8px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .xp-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 25px;
+            border-radius: 12px;
+            transition: width 1s ease-in-out; /* ★ 増加アニメーション */
+			}
         /* 新規追加: キャラクターと着せ替えボタンの配置用スタイル */
+        /* キャラクターと着せ替えボタンの配置用スタイル */
         .character-section {
-            position: relative; /* ボタンの絶対配置の基準 */
+            position: relative;
             display: flex;
             justify-content: center;
             margin-top: 20px;
@@ -19,7 +41,7 @@
         .customize-button {
             position: absolute;
             top: 0;
-            right: 20px; /* 右上の位置に調整 */
+            right: 20px;
             background-color: #ffb300;
             color: white;
             padding: 8px 12px;
@@ -37,7 +59,6 @@
         .customize-button i {
             margin-right: 5px;
         }
-        /* 新規追加: bottom-navのレイアウト調整 (既存のhome.cssがないため、ここでは最小限の変更) */
         .bottom-nav .nav-item {
             flex-grow: 1;
             text-align: center;
@@ -45,20 +66,19 @@
     </style>
 </head>
 <body class="home-page">
-<div class="main-container">
-    
+<div class="main-container"> 
     <div class="app-logo-display">
         <img th:src="@{/img/applogo.jpg}" alt="App Logo" />
         
-        <div class="xp-daily-header">
-        </div>
+        <div class="xp-daily-header"></div>
         
         <div class="xp-bar-container">
             <span th:text="'レベル ' + ${level} + ' (XP: ' + ${experiencePoints} + '/' + ${requiredXp} + ')'"></span>
             <div class="xp-bar">
                 <div class="xp-progress"
                      th:style="'width:' + ${progressPercent} + '%;'"
-                     th:text="${progressPercent} + '%'"></div>
+                     th:text="${progressPercent} + '%'">
+                </div>
             </div>
         </div>
     </div>
@@ -68,9 +88,9 @@
     </a>
     
     <div class="character-section">
-        <div class="character-display">
+        <a th:href="@{/character}" class="character-display">
             <img th:src="@{/img/mizu3.png}" alt="Character Image" />
-        </div>
+        </a>
         
         <a th:href="@{/gacha/customize}" class="customize-button">
             <i class="fa-solid fa-shirt"></i> 着せ替え
@@ -88,9 +108,9 @@
     <a th:href="@{/ranking}" class="daily-mission-button" style="background: linear-gradient(45deg, #f1c40f, #f39c12); box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4); margin-top: 15px;">
         ランキングを見る <i class="fa-solid fa-trophy" style="margin-left: 5px;"></i>
     </a>
-	<a th:href="@{/training/map}" class="daily-mission-button" style="background: linear-gradient(45deg, #4CAF50, #8BC34A); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); margin-top: 15px;">
-	    近くのトレーニング施設を探す <i class="fa-solid fa-map-location-dot" style="margin-left: 5px;"></i>
-	</a>
+    <a th:href="@{/training/map}" class="daily-mission-button" style="background: linear-gradient(45deg, #4CAF50, #8BC34A); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); margin-top: 15px;">
+        近くのトレーニング施設を探す <i class="fa-solid fa-map-location-dot" style="margin-left: 5px;"></i>
+    </a>
 </div>
 
 <nav class="bottom-nav">
@@ -107,6 +127,11 @@
     <a th:href="@{/training-log}" class="nav-item">
         <i class="fa-solid fa-calendar-days"></i>
         <span>トレーニング記録</span>
+    </a>
+    
+    <a th:href="@{/character}" class="nav-item">
+        <i class="fa-solid fa-user-astronaut"></i>
+        <span>キャラクター</span>
     </a>
     
     <a th:href="@{/log/meal/form}" class="nav-item">

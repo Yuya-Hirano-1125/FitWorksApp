@@ -17,7 +17,8 @@
     
     <div class="mission-list">
         
-        <div class="mission-card" th:classappend="${false} ? '' : 'is-active'">
+        <!-- ミッション1: ランニング（未クリア） -->
+        <div class="mission-card">
             <div class="mission-icon">
                 <i class="fa-solid fa-running"></i>
             </div>
@@ -28,16 +29,15 @@
                 </div>
                 <div class="mission-progress-container">
                     <div class="progress-bar-wrap">
-                        <div class="progress-bar" style="width: 75%;"></div>
+                        <div class="progress-bar" style="width: 0%;"></div>
                     </div>
-                    <span class="progress-text">75% (22/30分)</span>
+                    <span class="progress-text">0% (0/30分)</span>
                 </div>
             </div>
-            <button class="complete-button">
-                受け取る <i class="fa-solid fa-check"></i>
-            </button>
+            <a th:href="@{/running}" class="button mission-cta-button">挑戦する</a>
         </div>
 
+        <!-- ミッション2: 筋トレ記録（未クリア → みんなの広場へ遷移） -->
         <div class="mission-card">
             <div class="mission-icon">
                 <i class="fa-solid fa-dumbbell"></i>
@@ -54,35 +54,28 @@
                     <span class="progress-text">0% (0/1回)</span>
                 </div>
             </div>
-            <a th:href="@{/training}" class="button mission-cta-button">
-                挑戦する
-            </a>
+            <!-- 修正: 投稿画面ではなくコミュニティ一覧へ遷移 -->
+            <a th:href="@{/community}" class="button mission-cta-button">挑戦する</a>
         </div>
 
-        <div class="mission-card completed">
+        <!-- ミッション3: AIコーチ（未クリア） -->
+        <div class="mission-card">
             <div class="mission-icon">
                 <i class="fa-solid fa-apple-whole"></i>
             </div>
             <div class="mission-details">
                 <div class="mission-header">
                     <span class="mission-title">AIコーチを使ってみよう</span>
-                    <span class="mission-reward">🎉 完了済み</span>
+                    <span class="mission-reward">🎁 200 XP</span>
                 </div>
                 <div class="mission-progress-container">
                     <div class="progress-bar-wrap">
-                        <div class="progress-bar" style="width: 100%;"></div>
+                        <div class="progress-bar" style="width: 0%;"></div>
                     </div>
-                    <span class="progress-text">100% (1/1回)</span>
+                    <span class="progress-text">0% (0/1回)</span>
                 </div>
             </div>
-            <div class="completed-stamp">
-                <i class="fa-solid fa-award"></i>
-            </div>
-        </div>
-
-        <div class="info-message" style="margin-top: 30px; border-color: var(--primary-color);">
-            <i class="fa-solid fa-heart-circle-check" style="color: var(--primary-color);"></i>
-            今日のデイリーミッションは全てクリアしました！また明日もお楽しみに！
+            <a th:href="@{/community}" class="button mission-cta-button">挑戦する</a>
         </div>
 
     </div>
@@ -97,4 +90,3 @@
 </div>
 </body>
 </html>
-
