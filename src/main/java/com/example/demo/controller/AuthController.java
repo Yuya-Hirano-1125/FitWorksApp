@@ -54,6 +54,30 @@ public class AuthController {
         }
         return "redirect:/forgot-password";
     }
+
+    // --- パスワード変更 ---
+    /*@PostMapping("/change-password")
+    public String changePassword(@RequestParam("currentPassword") String oldPassword,
+                                 @RequestParam("newPassword") String newPassword,
+                                 @RequestParam("confirmPassword") String confirmPassword,
+                                 @AuthenticationPrincipal UserDetails userDetails,
+                                 Model model) {
+        if (!newPassword.equals(confirmPassword)) {
+            model.addAttribute("errorMessage", "新しいパスワードが一致しません");
+            return "change-password";
+        }
+        
+        // 実際のパスワード変更ロジック
+        boolean success = true; 
+        
+        if(success) {
+            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
+        } else {
+            model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
+        }
+        return "change-password";
+    }*/
+
     @GetMapping("/home")
     public String home(
         @AuthenticationPrincipal UserDetails userDetails,
@@ -77,6 +101,72 @@ public class AuthController {
         }
         return "misc/home"; // 修正済み
     }
+
+    // @GetMapping("/training") // <--- 削除しました。TrainingControllerに一任されます。
+    // public String training() { return "training"; } 
+    
+    // NOTE: /gacha のマッピングは GachaController に移管されたため、削除。
+    
+    
+    // NOTE: /training-log のマッピングは TrainingController に移管されたため、削除。
+
     @GetMapping("/settings")
     public String settings() { return "settings/settings"; } // 修正済み
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

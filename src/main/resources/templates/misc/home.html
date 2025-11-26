@@ -29,6 +29,39 @@
             line-height: 25px;
             border-radius: 12px;
             transition: width 1s ease-in-out; /* ★ 増加アニメーション */
+			}
+        /* 新規追加: キャラクターと着せ替えボタンの配置用スタイル */
+        .character-section {
+            position: relative; /* ボタンの絶対配置の基準 */
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .customize-button {
+            position: absolute;
+            top: 0;
+            right: 20px; /* 右上の位置に調整 */
+            background-color: #ffb300;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s;
+            z-index: 10;
+        }
+        .customize-button:hover {
+            transform: scale(1.05);
+        }
+        .customize-button i {
+            margin-right: 5px;
+        }
+        /* 新規追加: bottom-navのレイアウト調整 (既存のhome.cssがないため、ここでは最小限の変更) */
+        .bottom-nav .nav-item {
+            flex-grow: 1;
+            text-align: center;
         }
     </style>
 </head>
@@ -39,6 +72,14 @@
         <div class="xp-daily-header"></div>
         <div class="xp-bar-container">
             <!-- 動的表示 -->
+    
+    <div class="app-logo-display">
+        <img th:src="@{/img/applogo.jpg}" alt="App Logo" />
+        
+        <div class="xp-daily-header">
+        </div>
+        
+        <div class="xp-bar-container">
             <span th:text="'レベル ' + ${level} + ' (XP: ' + ${experiencePoints} + '/' + ${requiredXp} + ')'"></span>
             <div class="xp-bar">
                 <div class="xp-progress"
@@ -47,27 +88,36 @@
                 </div>
             </div>
         </div>
-        <a th:href="@{/daily-mission}" class="daily-mission-button">
-            デイリーミッション(ガチャ報酬）<i class="fa-solid fa-list-check"></i>
-        </a>
     </div>
-
-    <div class="character-display">
-        <img th:src="@{/img/mizu3.png}" alt="Character Image" />
+    
+    <a th:href="@{/daily-mission}" class="daily-mission-button">
+        デイリーミッション(ガチャ報酬）<i class="fa-solid fa-list-check"></i>
+    </a>
+    
+    <div class="character-section">
+        <div class="character-display">
+            <img th:src="@{/img/mizu3.png}" alt="Character Image" />
+        </div>
+        
+        <a th:href="@{/gacha/customize}" class="customize-button">
+            <i class="fa-solid fa-shirt"></i> 着せ替え
+        </a>
     </div>
     
     <h1>FitWorksへようこそ</h1>
     <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！今日のトレーニングを始めましょう。'">
         あなたのフィットネス・ジャーニーをサポートします。
     </p>
-
+    
     <a th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
         トレーニングを開始 <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i>
     </a>
     <a th:href="@{/ranking}" class="daily-mission-button" style="background: linear-gradient(45deg, #f1c40f, #f39c12); box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4); margin-top: 15px;">
         ランキングを見る <i class="fa-solid fa-trophy" style="margin-left: 5px;"></i>
     </a>
-    
+	<a th:href="@{/training/map}" class="daily-mission-button" style="background: linear-gradient(45deg, #4CAF50, #8BC34A); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); margin-top: 15px;">
+	    近くのトレーニング施設を探す <i class="fa-solid fa-map-location-dot" style="margin-left: 5px;"></i>
+	</a>
 </div>
 
 <nav class="bottom-nav">
@@ -80,16 +130,22 @@
         <i class="fa-solid fa-comments"></i>
         <span>掲示板</span>
     </a>
-
+    
     <a th:href="@{/training-log}" class="nav-item">
         <i class="fa-solid fa-calendar-days"></i>
-        <span>記録</span>
+        <span>トレーニング記録</span>
     </a>
+    
+    <a th:href="@{/log/meal/form}" class="nav-item">
+        <i class="fa-solid fa-utensils"></i>
+        <span>食事記録</span>
+    </a>
+    
     <a th:href="@{/settings}" class="nav-item">
         <i class="fa-solid fa-gear"></i>
         <span>設定</span>
     </a>
 </nav>
-
+    
 </body>
 </html>

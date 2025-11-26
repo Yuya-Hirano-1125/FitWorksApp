@@ -29,6 +29,11 @@ public class UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username).orElse(null);
     }
+
+    // ★追加: IDでユーザーを検索するメソッド (MissionServiceで使用)
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
     
     public void save(User user) {
         userRepository.save(user);
@@ -47,31 +52,35 @@ public class UserService {
         return false;
     }
     
-    // 経験値加算処理（任意の場面で利用可能）
+    // 既存の経験値加算（ユーザー名指定）
     public void addExperience(String username, int xp) {
          Optional<User> optionalUser = userRepository.findByUsername(username);
          if (optionalUser.isPresent()) {
              User user = optionalUser.get();
-             user.addXp(xp); // Userエンティティ側でレベルアップ処理も行う
+             user.addXp(xp); 
              userRepository.save(user); 
          }
+    }
+
+    // ★追加: Userオブジェクトを直接受け取って経験値を加算するメソッド (MissionServiceで使用)
+    public void addExp(User user, int xp) {
+        user.addXp(xp); // UserエンティティのaddXpメソッドを呼び出す
+        userRepository.save(user);
     }
     
     // デイリーミッションのステータスを取得
     public MissionStatusDto getDailyMissionStatus(User user) {
-        final int MISSION_REWARD_XP = 300; // 筋トレ投稿報酬XP
+        final int MISSION_REWARD_XP = 300; 
         final String MISSION_TEXT = "筋トレ記録を1回投稿する";
         
         LocalDate today = LocalDate.now();
         
-        // 報酬クレームのリセットロジック（日付が変わったらリセット）
         if (user.getIsRewardClaimedToday() != null && user.getIsRewardClaimedToday() && 
             (user.getLastMissionCompletionDate() == null || !today.equals(user.getLastMissionCompletionDate()))) {
              user.setIsRewardClaimedToday(false);
              userRepository.save(user);
         }
         
-        // 今日投稿したかどうかでクリア判定
         boolean isCompleted = (user.getLastMissionCompletionDate() != null && today.equals(user.getLastMissionCompletionDate()));
 
         return new MissionStatusDto(
@@ -82,14 +91,12 @@ public class UserService {
         );
     }
     
-    // 報酬受け取り処理（XP加算とレベルアップ）
     @Transactional
     public boolean claimMissionReward(User user) {
         MissionStatusDto status = getDailyMissionStatus(user);
         LocalDate today = LocalDate.now();
 
         if (status.isMissionCompleted() && !status.isRewardClaimed()) {
-            // 経験値加算（User.addXpでレベルアップも処理）
             user.addXp(status.getRewardXp());
             user.setLastMissionCompletionDate(today);
             user.setIsRewardClaimedToday(true);
@@ -99,7 +106,6 @@ public class UserService {
         return false;
     }
 
-    // トレーニング記録基準の進捗更新（必要なら残す）
     @Transactional
     public void incrementTrainingMissionProgress(User user) {
         LocalDate today = LocalDate.now();
@@ -114,12 +120,11 @@ public class UserService {
         }
     }
 
-    // ★ 投稿したらミッションをクリア扱いにするメソッド
     @Transactional
     public void markMissionCompletedByPost(User user) {
         LocalDate today = LocalDate.now();
         user.setLastMissionCompletionDate(today);
-        user.setIsRewardClaimedToday(false); // まだ報酬は受け取っていない
+        user.setIsRewardClaimedToday(false); 
         userRepository.save(user);
     }
 }
