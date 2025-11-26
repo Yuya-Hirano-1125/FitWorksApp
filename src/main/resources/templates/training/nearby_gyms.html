@@ -202,19 +202,19 @@
 
         // ---- 施設検索（★今回追加） ---
 		async function searchNearbyPlaces(position) {
-		    const radius = 1000;
-		    //const categories = "sport.gym,leisure.sports_centre";
-			const categories = "sport.fitness,sport.fitness.fitness_centre,sport.sports_centre";
+		    const radius = 1500;
 
 		    const lat = Number(position.lat.toFixed(6));
 		    const lon = Number(position.lon.toFixed(6));
 
-		    const url = `https://api.geoapify.com/v2/places?` +
-		                `categories=${categories}` +
-		                `&filter=circle:${lon},${lat},${radius}` +
-		                `&bias=proximity:${lon},${lat}` +
-		                `&limit=20` +
-		                `&apiKey=${GEOAPIFY_PLACES_KEY}`;
+			const categories = "sport.fitness,sport.fitness.fitness_centre,sport.sports_centre";
+			const url =
+			    `https://api.geoapify.com/v2/places?` +
+			    `categories=${categories}` +
+			    `&filter=circle:${lon},${lat},${radius}` +
+			    `&bias=proximity:${lon},${lat}` +
+			    `&limit=20` +
+			    `&apiKey=${GEOAPIFY_PLACES_KEY}`;
 
 		    console.log("Geoapify Search URL:", url);
 
@@ -227,11 +227,11 @@
 
 		        const data = await response.json();
 		        if (!data.features || data.features.length === 0) {
-		            statusMessage.textContent = "近くに施設が見つかりませんでした。";
+		            statusMessage.textContent = "近くにトレーニング施設が見つかりませんでした。";
 		            return;
 		        }
 
-		        statusMessage.textContent = `近くで ${data.features.length} 件の施設が見つかりました！`;
+		        statusMessage.textContent = `近くで ${data.features.length} 件見つかりました！`;
 		        addPlacesToMap(data.features, position);
 
 		    } catch (error) {
