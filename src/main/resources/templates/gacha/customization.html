@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>キャラクターカスタマイズ</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+	<style>
+	    /* 既存のスタイルを維持しつつ、デザインを強化 */
+	    .character-view {
+	        width: 300px;
+	        height: 300px;
+	        border: 4px solid #4CAF50; /* 緑の枠で強調 */
+	        border-radius: 12px;
+	        margin: 20px auto;
+	        position: relative;
+	        background-size: cover;
+	        background-position: center;
+	        overflow: hidden; /* 画像がはみ出さないように */
+	        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* 浮き出るような影 */
+	    }
+	    .character-view img {
+	        display: block;
+	    }
+	    .character-costume {
+	        position: absolute;
+	        top: 0;
+	        left: 0;
+	        width: 100%;
+	        height: 100%;
+	        background-size: contain;
+	        background-repeat: no-repeat;
+	        background-position: center;
+	    }
+	    .item-grid {
+	        display: flex;
+	        flex-wrap: wrap;
+	        gap: 15px;
+	        padding: 20px 0;
+	        justify-content: center; /* 中央寄せ */
+	    }
+	    .item-card {
+	        border: 2px solid #ddd;
+	        padding: 10px;
+	        width: 150px;
+	        text-align: center;
+	        border-radius: 10px;
+	        transition: transform 0.2s, box-shadow 0.2s;
+	        cursor: pointer;
+	        background-color: #f9f9f9;
+	    }
+	    .item-card:hover {
+	        transform: translateY(-3px);
+	        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+	    }
+	    .item-card h4 {
+	        margin: 5px 0;
+	        font-size: 1em;
+	        color: #333;
+	    }
+	    .item-card p {
+	        font-size: 0.8em;
+	        color: #777;
+	    }
+	    .item-card img {
+	        max-width: 100px;
+	        height: auto;
+	        border-radius: 5px;
+	    }
+	    /* ボタンのスタイル調整 */
+	    .button-secondary {
+	        background-color: #95a5a6; /* 灰色の落ち着いた色 */
+	        color: white;
+	        border: none;
+	        padding: 8px 15px;
+	        border-radius: 5px;
+	        cursor: pointer;
+	    }
+	</style>
+</head>
+<body>
+    <div th:insert="~{fragments/header :: header}"></div>
+
+    <main class="main-content">
+        <h1>キャラクターカスタマイズ</h1>
+
+        <p th:if="${message}" th:text="${message}" style="color: green; font-weight: bold;"></p>
+        <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red; font-weight: bold;"></p>
+
+        <h2>キャラクター表示</h2>
+        <div class="character-view" th:style="${equippedBackground != null} ? 'background-image: url(' + ${equippedBackground.item.imagePath} + ');' : 'background-color: #f0f0f0;'">
+            <img th:src="@{/img/mizu1.png}" alt="ベースキャラクター" style="width: 100%; height: auto; position: absolute; bottom: 0;">
+            
+            <div class="character-costume" th:if="${equippedCostume != null}" 
+                 th:style="'background-image: url(' + ${equippedCostume.item.imagePath} + ');'">
+            </div>
+            
+            <p style="position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.8); padding: 5px; border-radius: 5px;" 
+               th:text="'現在の背景: ' + (${equippedBackground} != null ? ${equippedBackground.item.name} : 'なし')"></p>
+        </div>
+
+        <div style="text-align: center; margin-top: 10px;">
+            <form th:action="@{/gacha/customize/unequip/background}" method="post" style="display: inline;">
+                <button type="submit" class="button button-secondary" th:disabled="${equippedBackground == null}">背景を解除</button>
+            </form>
+            <form th:action="@{/gacha/customize/unequip/costume}" method="post" style="display: inline; margin-left: 10px;">
+                <button type="submit" class="button button-secondary" th:disabled="${equippedCostume == null}">衣装を解除</button>
+            </form>
+        </div>
+		<div style="text-align: center; margin-top: 30px;">
+		        <a th:href="@{/home}" class="button button-primary">
+		            🏠 ホームに戻る
+		        </a>
+		</div>
+
+        <hr>
+
+        <h2>所有アイテム一覧</h2>
+        <div class="item-grid">
+            <div th:each="userItem : ${ownedItems}" class="item-card">
+                <img th:src="${userItem.item.imagePath}" th:alt="${userItem.item.name}">
+                <h4 th:text="${userItem.item.name}">アイテム名</h4>
+                <p th:text="${'種別: ' + userItem.item.type}"></p>
+
+                <form th:if="${userItem.item.type == 'BACKGROUND' and equippedBackground?.item.id != userItem.item.id}"
+                      th:action="@{/gacha/customize/equip/{itemId}(itemId=${userItem.item.id})}" method="post">
+                    <button type="submit" class="button">背景に装備</button>
+                </form>
+                <span th:if="${userItem.item.type == 'BACKGROUND' and equippedBackground?.item.id == userItem.item.id}" style="color: green; font-weight: bold;">装備中</span>
+
+                <form th:if="${userItem.item.type == 'COSTUME' and equippedCostume?.item.id != userItem.item.id}"
+                      th:action="@{/gacha/customize/equip/{itemId}(itemId=${userItem.item.id})}" method="post">
+                    <button type="submit" class="button">衣装に装備</button>
+                </form>
+                <span th:if="${userItem.item.type == 'COSTUME' and equippedCostume?.item.id == userItem.item.id}" style="color: green; font-weight: bold;">装備中</span>
+            </div>
+        </div>
+    </main>
+
+    <div th:insert="~{fragments/footer :: footer}"></div>
+</body>
+</html>
