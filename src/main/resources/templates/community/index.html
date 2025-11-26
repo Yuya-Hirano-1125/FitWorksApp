@@ -22,7 +22,14 @@
         
         /* 投稿フォームのデザイン */
         .new-post-form { background: #fff0f5; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 2px dashed var(--primary-color);}
-        .form-input, .form-textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; }
+        
+        /* ★★★ 手動リサイズを無効化し、自動拡張に対応するために修正 ★★★ */
+        .form-input, .form-textarea { 
+            width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd;
+            resize: none; /* 手動リサイズを無効化 */
+            overflow: hidden; /* 不要なスクロールバーを非表示 */
+        }
+        
         .btn-submit { background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; }
         
         /* 追加: ホームに戻るボタンのデザイン */
@@ -52,7 +59,7 @@
             <h3>質問や成果を投稿しよう！</h3>
             <form th:action="@{/community/post}" method="post">
                 <input type="text" name="title" class="form-input" placeholder="タイトル (例: プロテインのおすすめは？)" required>
-                <textarea name="content" class="form-textarea" rows="3" placeholder="本文" required></textarea>
+                <textarea name="content" class="form-textarea" id="auto-expand-textarea" rows="3" placeholder="本文" required></textarea>
                 <button type="submit" class="btn-submit">投稿する</button>
             </form>
         </div>
@@ -81,5 +88,26 @@
         </div>
         
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('auto-expand-textarea');
+            
+            if (!textarea) return;
+
+            function autoExpand() {
+                // まず高さをリセットして、内容に応じて正しい scrollHeight を取得できるようにする
+                textarea.style.height = 'auto';
+                // scrollHeight に基づいて高さを設定
+                textarea.style.height = (textarea.scrollHeight + 2) + 'px';
+            }
+
+            // ページロード時にも一度実行 (初期表示で内容が入っている場合や、最小高さを確保するため)
+            autoExpand(); 
+
+            // 入力 (input) イベントが発生するたびに高さを調整
+            textarea.addEventListener('input', autoExpand);
+        });
+    </script>
 </body>
 </html>
