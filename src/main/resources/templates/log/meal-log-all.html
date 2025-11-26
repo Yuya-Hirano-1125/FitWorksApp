@@ -5,6 +5,7 @@
     <title>食事記録一覧 | FitWorks</title>
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/training-log.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         /* ページ全体とコンテナの調整 */
         .log-form-container {
@@ -120,11 +121,11 @@
     <main class="log-form-container">
         <h1>🍽️ 食事記録一覧</h1>
 
-        <a th:href="@{/log/meal/form}" class="back-to-form">新しい食事を記録する</a>
+        <a th:href="@{/log/meal/form}" class="button primary">新しい食事を記録する</a>
 		<div style="text-align: center; margin-top: 30px;">
-				        <a th:href="@{/home}" class="button button-primary">
-				            🏠 ホームに戻る
-				        </a>
+			<a th:href="@{/home}" class="button secondary">
+						<i class="fa-solid fa-house"></i> ホームに戻る
+				</a>
 		</div>
         <div th:if="${#lists.isEmpty(mealRecords)}" class="empty-message">
             <p>まだ食事の記録がありません。記録を開始して健康管理を始めましょう！</p>

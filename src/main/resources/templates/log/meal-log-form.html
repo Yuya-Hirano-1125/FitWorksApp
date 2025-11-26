@@ -5,6 +5,7 @@
     <title>食事記録</title>
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/training-log.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 	<style>
 	    /* フォームのコンテナを中央に配置 */
 	    .log-form-container {
@@ -134,13 +135,13 @@
                 <input type="number" id="carbohydrate" th:field="*{carbohydrate}" min="0" step="0.1">
             </div>
 
-            <button type="submit" class="submit-button">記録を保存</button>
+            <button type="submit" class="button primary">記録を保存</button>
         </form>
 
-        <a th:href="@{/log/meal/all}" class="back-link">食事記録一覧へ</a>
+        <a th:href="@{/log/meal/all}" class="button primary">食事記録一覧へ</a>
 		<div style="text-align: center; margin-top: 30px;">
-				        <a th:href="@{/home}" class="button button-primary">
-				            🏠 ホームに戻る
+				        <a th:href="@{/home}" class="button secondary">
+				            <i class="fa-solid fa-house"></i> ホームに戻る
 				        </a>
 		</div>
     </main>
