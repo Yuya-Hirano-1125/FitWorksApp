@@ -1,66 +1,67 @@
-package com.example.demo.service;                                                                                                                            
-                                                                                                                                                             
+package com.example.demo.service;
+
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;                                                                                                               
-                                                                                                                                                             
-// ★ 修正点: 依存関係エラーを避けるため、インポートを最小化                                                                                                                            
-// 以前のcom.google.genaiやcom.google.ai.clientのインポートはすべて削除しました。                                                                                                 
-                                                                                                                                                             
-@Service                                                                                                                                                     
-public class AICoachService {                                                                                                                                
-                                                                                                                                                             
-    @Value("${gemini.api.key}")                                                                                                                              
-    private String geminiApiKey;                                                                                                                             
-                                                                                                                                                             
-    public String generateResponse(String userMessage) {                                                                                                     
-                                                                                                                                                             
-        // 依存関係エラー回避のため、ダミーロジックを再配置す。";                                                                                                                      
-        try {                                                                                                                                                
-            String systemInstructionText = "あなたは専門のAIフィットネスコーチ 'FitBot' です。"                                                                                 
-                                         + "ユーザーの目標や体調に基づいて、具体的でモチベーションが上がるトレーニング提案を日本語で、箇条書きを含めて行います。";                                                     
-                                                                                                                                                             
-            String response = "";                                                                                                                            
-                                                                                                                                                             
-            if (userMessage == null || userMessage.trim().isEmpty()) {                                                                                       
-                response = "メッセージが空です。AIコーチに話しかけてください。";                                                                                                     
-            } else if (userMessage.toLowerCase().contains("こんにちは")) {                                                                                        
-                 response = "AIコーチのFitBotです。何に関するトレーニングの相談ですか？";                                                                                             
-            } else {                                                                                                                                         
-                 response = "AIコーチからのダミー応答です: ユーザーの要求 '" + userMessage + "' を処理しました。 "                                                                       
-                            + "現在の目標達成のため、次の**トレーニングを開始**することを推奨します。";                                                                                       
-            }                                                                                                                                                
-                                                                                                                                                             
-            return response;                                                                                                                                 
-                                                                                                                                                      
-        } catch (Exception e) {                                                                                                                              
-            System.err.println("Gemini API処理中にエラーが発生しました: " + e.getMessage());                                                                               
-            return "AI処理中に致命的なエラーが発生しました。システムログを確認してください。";                                                                                                  
-        }                                                                                                                                                    
-    }                                                                                                                                                        
-}                                                                                                                                                            
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                             
-                                                                                                                                                                                                                                                                                       
-                                                                                                                  
-                                                                                                                   
+import org.springframework.stereotype.Service;
+
+import com.google.genai.Client;
+import com.google.genai.types.GenerateContentResponse;
+
+@Service
+public class AICoachService {
+
+    @Value("${gemini.api.key}")
+    private String geminiApiKey;
+
+    private Client client;
+
+    // アプリケーション起動時にクライアントを初期化
+    @PostConstruct
+    public void init() {
+        if (geminiApiKey != null && !geminiApiKey.isBlank()) {            
+            // APIキーを使用してGeminiクライアントを作成
+            this.client = Client.builder()
+                .apiKey(geminiApiKey)
+                .build();
+        } else {
+            System.err.println("Warning: gemini.api.key is not set in application.properties");
+        }
+    }
+
+    public String generateResponse(String prompt) {
+        // クライアントが初期化されていない場合のエラーハンドリング
+        if (client == null) {
+            return "エラー: APIキーが設定されていないため、AI機能を利用できません。管理者にお問い合わせください。";
+        }
+
+        try {
+            // Geminiモデルを指定 (高速でチャット向きな gemini-1.5-flash を推奨)
+            String modelId = "gemini-2.5-flash";
+
+            // APIを呼び出してコンテンツを生成
+            // 第3引数のconfigはnullの場合、デフォルト設定が使用されます
+            GenerateContentResponse response = client.models.generateContent(modelId, prompt, null);
+
+            // 生成されたテキストを返す
+            return response.text();
+
+        } catch (Exception e) {
+            // エラー発生時のログ出力とユーザーへの通知
+            e.printStackTrace();
+            return "申し訳ありません。AIの処理中にエラーが発生しました (" + e.getMessage() + ")。しばらく待ってから再度お試しください。";
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+                                                                            
+
