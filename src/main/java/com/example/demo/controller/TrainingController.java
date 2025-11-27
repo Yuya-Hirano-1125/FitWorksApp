@@ -26,7 +26,7 @@ import com.example.demo.entity.TrainingRecord;
 import com.example.demo.entity.User;
 import com.example.demo.repository.TrainingRecordRepository;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.service.MissionService; // ★ 追加
+import com.example.demo.service.MissionService;
 import com.example.demo.service.UserService; 
 
 @Controller 
@@ -42,17 +42,17 @@ public class TrainingController {
     private TrainingRecordRepository trainingRecordRepository; 
     
     @Autowired 
-    private MissionService missionService; // ★ 追加: MissionServiceを注入
+    private MissionService missionService; 
 
     private User getCurrentUser(Authentication authentication) { 
         if (authentication == null) return null; 
         return userService.findByUsername(authentication.getName()); 
     } 
- // ★★★ 経験値(XP)定数と計算ロジックの追加 ★★★
+    
+    // ★★★ 経験値(XP)定数と計算ロジック ★★★
     private static final int XP_BEGINNER = 300;  // 初級: 300 XP
     private static final int XP_INTERMEDIATE = 500; // 中級: 500 XP
     private static final int XP_ADVANCED = 1000; // 上級: 1000 XP
-    // レベルアップに必要なXP（ホーム画面表示用。ここでは5000とする）
     private static final int XP_PER_LEVEL = 5000; 
 
     /**
@@ -63,7 +63,6 @@ public class TrainingController {
             return 0; 
         }
         
-        // 種目名に難易度ラベルが含まれているかチェックする
         if (exerciseName.contains("(上級)")) {
             return XP_ADVANCED;
         } else if (exerciseName.contains("(中級)")) {
@@ -71,9 +70,9 @@ public class TrainingController {
         } else if (exerciseName.contains("(初級)")) {
             return XP_BEGINNER;
         }
-        // ラベルが見つからない場合は0を返す
         return 0; 
     }
+
     private static final Map<String, List<String>> FREE_WEIGHT_EXERCISES_BY_PART = new LinkedHashMap<>() {{
         put("胸", List.of(
             "チェストフライ (初級)", 
@@ -125,10 +124,6 @@ public class TrainingController {
             "トレッドミルインターバル (上級)"
         );
 
-    /**
-     * トレーニング選択画面 (training.html) を表示
-     * ★ 修正済み: return "training" -> "training/training"
-     */
     @GetMapping("/training")
     public String showTrainingOptions(Authentication authentication, Model model) { 
         if (getCurrentUser(authentication) == null) {
@@ -142,23 +137,14 @@ public class TrainingController {
         return "training/training"; 
     }
 
-    /**
-     * Mapbox/Geoapifyで近くのトレーニング施設検索画面 (nearby_gyms.html) を表示
-     * ★ 404エラー解消のため追加 ★
-     */
     @GetMapping("/training/map")
     public String showNearbyGymsMap(Authentication authentication) {
         if (getCurrentUser(authentication) == null) {
             return "redirect:/login"; 
         }
-        // templates/training/nearby_gyms.html を返す
         return "training/nearby_gyms"; 
     }
 
-    /**
-     * トレーニング種目一覧画面 (exercise-list.html) を表示
-     * ★ 修正済み: return "exercise-list" -> "training/exercise-list"
-     */
     @GetMapping("/training/exercises")
     public String showExerciseList(Authentication authentication) {
         if (getCurrentUser(authentication) == null) {
@@ -167,10 +153,6 @@ public class TrainingController {
         return "training/exercise-list"; 
     }
 
-    /**
-     * トレーニングセッション開始
-     * ★ 修正済み: return "training-session" -> "training/training-session"
-     */
     @PostMapping("/training/start")
     public String startTrainingSession(
             @RequestParam("type") String type,
@@ -208,16 +190,11 @@ public class TrainingController {
         model.addAttribute("trainingTitle", title);
         model.addAttribute("selectedExercise", selectedExercise);
         
-        // ★ 記録用フォームのために今日の日付を渡す
         model.addAttribute("today", LocalDate.now());
         
         return "training/training-session"; 
     }
     
-    /**
-     * トレーニングログ（カレンダー）画面を表示
-     * ★ 修正済み: return "training-log" -> "log/training-log"
-     */
     @GetMapping("/training-log")
     public String showTrainingLog(
             Authentication authentication,
@@ -288,10 +265,6 @@ public class TrainingController {
         return "log/training-log"; 
     }
 
-    /**
-     * ★ 追加: 全トレーニング記録一覧画面を表示
-     * ★ 修正済み: return "training-log-all" -> "log/training-log-all"
-     */
     @GetMapping("/training-log/all")
     public String showAllTrainingLog(Authentication authentication, Model model) {
         User currentUser = getCurrentUser(authentication);
@@ -299,17 +272,12 @@ public class TrainingController {
             return "redirect:/login";
         }
 
-        // 全記録を取得してモデルに追加
         List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
         model.addAttribute("records", allRecords);
         
         return "log/training-log-all"; 
     }
 
-    /**
-     * ウェイトログ入力フォーム
-     * ★ 修正済み: return "training-log-form-weight" -> "log/training-log-form-weight"
-     */
     @GetMapping("/training-log/form/weight")
     public String showWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
@@ -319,10 +287,6 @@ public class TrainingController {
         return "log/training-log-form-weight"; 
     }
 
-    /**
-     * 有酸素運動ログ入力フォーム
-     * ★ 修正済み: return "training-log-form-cardio" -> "log/training-log-form-cardio"
-     */
     @GetMapping("/training-log/form/cardio")
     public String showCardioLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
@@ -342,57 +306,92 @@ public class TrainingController {
             return "redirect:/login";
         }
         
-        TrainingRecord record = new TrainingRecord();
-        record.setUser(currentUser);
-        record.setRecordDate(form.getRecordDate());
-        record.setType(form.getType());
-        
-        String exerciseIdentifier = null; // XP計算に使う種目名を格納
+        String exerciseIdentifier = null; // XP計算用
+        int savedCount = 0;
 
+        // ▼▼▼ ロジック変更：セットごとの記録に対応 ▼▼▼
         if ("WEIGHT".equals(form.getType())) {
-            record.setExerciseName(form.getExerciseName());
-            record.setSets(form.getSets());
-            record.setReps(form.getReps());
-            record.setWeight(form.getWeight());
-            exerciseIdentifier = form.getExerciseName(); // ウェイトの種目名を使用
+            exerciseIdentifier = form.getExerciseName();
+
+            // setListがある場合（セッション画面からの複数セット登録）
+            if (form.getSetList() != null && !form.getSetList().isEmpty()) {
+                for (TrainingLogForm.SetDetail detail : form.getSetList()) {
+                    // 重量または回数が入力されている場合のみ保存
+                    if (detail.getWeight() != null || detail.getReps() != null) {
+                        TrainingRecord record = new TrainingRecord();
+                        record.setUser(currentUser);
+                        record.setRecordDate(form.getRecordDate());
+                        record.setType("WEIGHT");
+                        record.setExerciseName(form.getExerciseName());
+                        
+                        // 1行＝1セットとして記録
+                        record.setSets(1); 
+                        record.setWeight(detail.getWeight());
+                        record.setReps(detail.getReps());
+                        
+                        trainingRecordRepository.save(record);
+                        savedCount++;
+                    }
+                }
+            } else {
+                // 既存ロジック（単一レコード/フォームからの登録）
+                TrainingRecord record = new TrainingRecord();
+                record.setUser(currentUser);
+                record.setRecordDate(form.getRecordDate());
+                record.setType(form.getType());
+                record.setExerciseName(form.getExerciseName());
+                record.setSets(form.getSets());
+                record.setReps(form.getReps());
+                record.setWeight(form.getWeight());
+                
+                trainingRecordRepository.save(record);
+                savedCount = 1;
+            }
         } else if ("CARDIO".equals(form.getType())) {
+            // 有酸素運動（変更なし）
+            TrainingRecord record = new TrainingRecord();
+            record.setUser(currentUser);
+            record.setRecordDate(form.getRecordDate());
+            record.setType(form.getType());
             record.setCardioType(form.getCardioType());
             record.setDurationMinutes(form.getDurationMinutes());
             record.setDistanceKm(form.getDistanceKm());
-            exerciseIdentifier = form.getCardioType(); // 有酸素運動の種目名を使用
+            exerciseIdentifier = form.getCardioType();
+            
+            trainingRecordRepository.save(record);
+            savedCount = 1;
         }
-
-        // 1. トレーニング記録を保存
-        trainingRecordRepository.save(record);
+        // ▲▲▲ ロジック変更ここまで ▲▲▲
         
         // ★★★ XP計算とユーザー情報更新ロジック ★★★
         int earnedXP = 0;
-        if (exerciseIdentifier != null) {
+        if (savedCount > 0 && exerciseIdentifier != null) {
+            // セット数に関わらず、1種目あたりのXPを一回付与する（過剰付与防止のため）
             earnedXP = getExperiencePoints(exerciseIdentifier);
         }
 
         if (earnedXP > 0) {
-            // ユーザーの合計XPを更新
-            // Note: getXp()とsetXp()は以前の修正で追加されました
             int newTotalXp = currentUser.getXp() + earnedXP;
             currentUser.setXp(newTotalXp);
-            
-            // データベースにユーザー情報を保存（XPの永続化）
             userRepository.save(currentUser); 
 
-            // 成功メッセージに獲得XPを追加
             redirectAttributes.addFlashAttribute("successMessage", 
                 form.getRecordDate().toString() + " のトレーニングを記録し、" + earnedXP + " XPを獲得しました！");
         } else {
-            // 元のメッセージを保持
             redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " のトレーニングを記録しました！");
         }
-        // ★★★ XP計算とユーザー情報更新ロジックここまで ★★★
         
-        // 2. デイリーミッションの進捗を更新
+        // デイリーミッションの進捗を更新
         missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
         
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
 }
+
+
+
+
+
+
+
