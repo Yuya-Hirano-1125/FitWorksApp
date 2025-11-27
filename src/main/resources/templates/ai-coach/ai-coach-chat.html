@@ -9,7 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-    <link rel="stylesheet" th:href="@{/css/chat.css}"> <style>
+    <link rel="stylesheet" th:href="@{/css/chat.css}"> 
+	<script th:src="@{/js/theme.js}"></script>
+	<style>
         /* チャット画面特有の簡易スタイル */
         .chat-container {
             max-width: 800px;
@@ -154,9 +156,9 @@
 </head>
 <body>
     <div class="main-container">
-        <h1><i class="fa-solid fa-robot"></i> AIコーチ FitBot</h1>
+        <h1><i class="fa-solid fa-robot"></i> AIトーク</h1>
         <p style="text-align: center; color: #aaa; margin-bottom: 20px;">
-            あなたのレベルや履歴に合わせて、最適なメニューを提案します。
+            あなたのレベルや履歴に合わせて、最適なメニューを提案します！
         </p>
 
         <div class="chat-container">

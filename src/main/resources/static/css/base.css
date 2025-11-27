@@ -325,4 +325,68 @@ h1 {
 	    background-color: #218838; /* 少し濃い緑に変化 */
 	    color: white;
 	}
+	/* ========================================================= */
+	/* ACCESSIBILITY THEMES (色覚特性対応テーマ) */
+	/* ========================================================= */
+
+	/* 1. ユニバーサルデザイン (CUD推奨配色: 青・オレンジ基調) */
+	/* P型・D型など多くの色覚タイプで判別しやすい配色 */
+	body.theme-universal {
+	    --primary-color: #005c97;    /* 濃い青 (メイン) */
+	    --secondary-color: #e69f00;  /* オレンジ (強調) */
+	    --ai-accent-color: #56b4e9;  /* スカイブルー */
+	    --dark-text: #222222;        /* 濃い黒 */
+	    --light-bg: #f0f8ff;         /* 淡い青背景 */
+	    --container-bg: #ffffff;
+	    --error-color: #d55e00;      /* 朱色 (見分けやすい赤) */
+	    --success-color: #009e73;    /* 青みの緑 */
+	    
+	    --ai-bubble: #e6f2ff;        
+	    --user-bubble: #ffedcc;      
+
+	    /* 背景アニメーションを落ち着いた青系に変更 */
+	    background: linear-gradient(135deg, #f0f8ff, #dbeafe, #bfdbfe);
+	    animation: none; 
+	}
+
+	/* ユニバーサルテーマ時のボタン調整 */
+	body.theme-universal .button.primary {
+	    background: var(--primary-color);
+	    color: #fff;
+	}
+	body.theme-universal .button.secondary {
+	    border-color: var(--primary-color);
+	    color: var(--primary-color);
+	}
+
+	/* 2. ハイコントラスト (弱視・羞明など向け) */
+	/* 黒背景・黄文字でコントラスト比を最大化 */
+	body.theme-high-contrast {
+	    --primary-color: #ffff00;    /* 黄色 */
+	    --secondary-color: #00ffff;  /* シアン */
+	    --ai-accent-color: #ffffff;  /* 白 */
+	    --dark-text: #ffffff;        /* 文字は白 */
+	    --light-bg: #000000;         /* 背景は黒 */
+	    --container-bg: #000000;     
+	    --error-color: #ff5555;
+	    --success-color: #55ff55;
+	    
+	    --ai-bubble: #333333;
+	    --user-bubble: #003366;
+
+	    background: #000000;
+	    animation: none;
+	}
+
+	/* ハイコントラスト時の視認性向上 */
+	body.theme-high-contrast .main-container,
+	body.theme-high-contrast .button {
+	    border: 2px solid #ffffff; 
+	    box-shadow: none;
+	    transform: none !important;
+	}
+	body.theme-high-contrast a {
+	    text-decoration: underline; /* リンクを見やすく */
+	}
+
 }
