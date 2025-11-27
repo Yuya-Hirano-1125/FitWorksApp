@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：ドルフィ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- ドルフィの画像に変更 -->
+        <img th:src="@{/img/character/mizu2.png}" alt="ドルフィの画像">
+        <h1><i class="fa-solid fa-droplet"></i> ドルフィ</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            魔法のティアラを身につけた水の精霊イルカ。<br>
+            美しい水紋を描きながら跳ねる姿は、海の祝福そのもの。<br>
+            優雅で友好的な性格で、仲間を癒す力を持つ。<br>
+            波とともに現れ、月光の海で歌うように泳ぐという。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>属性：</label> 水</div>
+        <div class="stat"><label>分類：</label> 精霊型・イルカ族</div>
+        <div class="stat"><label>サイズ：</label> 小型</div>
+        <div class="stat"><label>性格：</label> 優雅・友好的・癒し系</div>
+        <div class="stat"><label>生息地：</label> クリスタル海・月光の入り江</div>
+        <div class="stat"><label>レア度：</label> ★★★★☆</div>
+    </div>
+</div>
+</body>
+</html>

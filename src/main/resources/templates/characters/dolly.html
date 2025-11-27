@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：ドリー</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- ドリーの画像に変更 -->
+        <img th:src="@{/img/character/mizu1.png}" alt="ドリーの画像">
+        <h1><i class="fa-solid fa-droplet"></i> ドリー</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            王冠をかぶった水の妖精イルカ。<br>
+            きらめく瞳と頬のピンクの輝きが特徴で、海の仲間たちに愛されている。<br>
+            水しぶきを操る魔法を使い、敵をかわしながら優雅に泳ぐ。<br>
+            ドリーのジャンプは祝福の合図とされ、海の精霊たちが集まるという。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>属性：</label> 水</div>
+        <div class="stat"><label>分類：</label> 精霊型・イルカ族</div>
+        <div class="stat"><label>サイズ：</label> 小型</div>
+        <div class="stat"><label>性格：</label> 優雅・友好的・好奇心旺盛</div>
+        <div class="stat"><label>生息地：</label> クリスタル海・月光の入り江</div>
+        <div class="stat"><label>レア度：</label> ★★★☆☆</div>
+    </div>
+</div>
+</body>
+</html>

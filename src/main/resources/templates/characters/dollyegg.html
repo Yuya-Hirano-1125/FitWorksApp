@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：ルーナドロップ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- ルーナドロップの画像に変更 -->
+        <img th:src="@{/img/character/mizu0.png}" alt="ルーナドロップの画像">
+        <h1><i class="fa-solid fa-droplet"></i> ルーナドロップ</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            月光の加護を受けた神秘の水卵。<br>
+            この卵からは、水の精霊イルカ「ドリー」が誕生すると言われている。<br>
+            表面は青く輝き、周囲には水泡と霧が漂っている。<br>
+            満月の夜、静かな入り江で孵化の瞬間を迎える。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>名前：</label> ルーナドロップ</div>
+        <div class="stat"><label>状態：</label> 孵化準備中</div>
+        <div class="stat"><label>属性：</label> 水</div>
+        <div class="stat"><label>分類：</label> 卵型（精霊の卵）</div>
+        <div class="stat"><label>サイズ：</label> 約45cm（推定）</div>
+        <div class="stat"><label>孵化予測：</label> 月光環境で72時間以内</div>
+        <div class="stat"><label>レア度：</label> ★☆☆☆☆（穏やか）</div>
+    </div>
+</div>
+</body>
+</html>
