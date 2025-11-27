@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アカウント削除 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/settings.css}">
+    <style>
+        .always-open {
+            display: block !important;
+            max-height: none !important;
+            padding: 15px !important;
+            border: none !important;
+        }
+        .warning-text {
+            color: var(--error-color);
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body class="settings-page">
+<div class="main-container">
+    <h1><i class="fa-solid fa-user-slash header-icon"></i> アカウント削除</h1>
+    
+    <!-- 注意事項セクション -->
+    <div class="setting-section" style="--section-index: 1;">
+        <div class="section-header">
+            <div><span class="section-icon"><i class="fa-solid fa-triangle-exclamation"></i></span> 注意事項</div>
+        </div>
+        <div class="section-content always-open">
+            <p class="warning-text">⚠ この操作は取り消せません</p>
+            <p class="warning-text">
+                アカウントを削除すると、すべてのデータ（トレーニング履歴、進捗、設定など）が完全に失われます。<br>
+                再度ログインすることはできません。慎重にご確認ください。
+            </p>
+        </div>
+    </div>
+
+    <!-- ボタンコンテナ -->
+    <div class="button-container" style="margin-top: 40px;">
+        <form th:action="@{/delete-account}" method="post" onsubmit="return confirmDelete()">
+            <button type="submit" class="button primary" 
+                    style="background: var(--error-color); border-color: var(--error-color); box-shadow: 0 8px 25px rgba(255, 74, 74, 0.6);">
+                退会する <i class="fa-solid fa-trash"></i>
+            </button>
+        </form>
+        
+        <a th:href="@{/settings}" class="button secondary" style="margin-top: 10px;">
+            キャンセルして戻る <i class="fa-solid fa-rotate-left"></i>
+        </a>
+    </div>
+</div>
+
+<script>
+    function confirmDelete() {
+        return confirm("本当にアカウントを削除しますか？\nこの操作は元に戻せません。");
+    }
+</script>
+</body>
+</html>

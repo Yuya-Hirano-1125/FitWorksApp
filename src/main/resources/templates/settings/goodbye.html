@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>削除完了 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/settings.css}">
+    <style>
+        .goodbye-container {
+            max-width: 600px;
+            margin: 80px auto;
+            padding: 40px;
+            text-align: center;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .goodbye-container h1 {
+            color: var(--error-color);
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        .goodbye-container p {
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .button.primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 25px rgba(74, 144, 255, 0.6);
+        }
+        .button.secondary {
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+<div class="goodbye-container">
+    <h1><i class="fa-solid fa-user-slash"></i> 削除完了</h1>
+    <p>アカウントは正常に削除されました。<br>これまでのご利用ありがとうございました。</p>
+    <div class="button-group">
+        <a th:href="@{/login}" class="button primary">
+            ログイン画面へ戻る <i class="fa-solid fa-right-to-bracket"></i>
+        </a>
+        <a th:href="@{/home}" class="button secondary">
+            ホームへ戻る <i class="fa-solid fa-house"></i>
+        </a>
+    </div>
+</div>
+</body>
+</html>
