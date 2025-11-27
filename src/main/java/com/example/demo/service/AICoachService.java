@@ -1,67 +1,81 @@
 package com.example.demo.service;
 
-import jakarta.annotation.PostConstruct;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.google.genai.Client;
-import com.google.genai.types.GenerateContentResponse;
+import com.example.demo.entity.TrainingRecord;
+import com.example.demo.entity.User;
 
 @Service
 public class AICoachService {
 
-    @Value("${gemini.api.key}")
-    private String geminiApiKey;
+    @Value("${gemini.api.key}") // application.propertiesなどで設定されていると仮定
+    private String apiKey;
 
-    private Client client;
+    // ★ メインのメソッド: ユーザー情報を含めた回答を生成
+    public String generateCoachingAdvice(User user, List<TrainingRecord> history, String userMessage) {
+        
+        // 1. システムプロンプト（AIへの役割指示）の構築
+        String systemPrompt = buildSystemPrompt(user, history);
 
-    // アプリケーション起動時にクライアントを初期化
-    @PostConstruct
-    public void init() {
-        if (geminiApiKey != null && !geminiApiKey.isBlank()) {            
-            // APIキーを使用してGeminiクライアントを作成
-            this.client = Client.builder()
-                .apiKey(geminiApiKey)
-                .build();
-        } else {
-            System.err.println("Warning: gemini.api.key is not set in application.properties");
-        }
+        // 2. APIリクエストの作成と送信 (実際の実装に合わせて修正してください)
+        // ここでは、プロンプトとユーザーメッセージを結合して送信するイメージです
+        String fullPrompt = systemPrompt + "\n\nUser Question: " + userMessage;
+        
+        return callGeminiApi(fullPrompt); 
     }
 
-    public String generateResponse(String prompt) {
-        // クライアントが初期化されていない場合のエラーハンドリング
-        if (client == null) {
-            return "エラー: APIキーが設定されていないため、AI機能を利用できません。管理者にお問い合わせください。";
+    // ★ プロンプト構築ロジック
+    private String buildSystemPrompt(User user, List<TrainingRecord> history) {
+        StringBuilder sb = new StringBuilder();
+        
+        // 基本役割
+        sb.append("あなたはフィットネスアプリ『FitWorks』の専属AIトレーナーです。\n");
+        sb.append("ユーザーの目標、経験レベル、体調、利用可能時間に合わせて、具体的で効果的なトレーニングメニューを提案してください。\n");
+        sb.append("回答は励ますような、ポジティブで親しみやすい口調（日本語）でお願いします。\n\n");
+
+        // ユーザー情報
+        String levelLabel = determineLevelLabel(user.getLevel());
+        sb.append("【ユーザー情報】\n");
+        sb.append("- 名前: ").append(user.getUsername()).append("\n");
+        sb.append("- 現在のレベル: Lv.").append(user.getLevel()).append(" (").append(levelLabel).append(")\n");
+        
+        // トレーニング履歴
+        sb.append("【直近のトレーニング履歴 (重複部位を避ける参考にしてください)】\n");
+        if (history != null && !history.isEmpty()) {
+            for (TrainingRecord record : history) {
+                String menu = "WEIGHT".equals(record.getType()) ? record.getExerciseName() : record.getCardioType();
+                sb.append("- ").append(record.getRecordDate()).append(": ").append(menu).append("\n");
+            }
+        } else {
+            sb.append("- 記録なし（初心者、または久しぶりのトレーニングの可能性があります）\n");
         }
 
-        try {
-            // Geminiモデルを指定 (高速でチャット向きな gemini-1.5-flash を推奨)
-            String modelId = "gemini-2.5-flash";
+        // 提案のルール
+        sb.append("\n【提案時のルール】\n");
+        sb.append("1. ユーザーが部位（胸、背中など）を指定した場合は、それに特化したメニューを提案してください。\n");
+        sb.append("2. 時間（30分など）が指定された場合、その時間内で終わるセット数・休憩時間を考慮してください。\n");
+        sb.append("3. 直近で鍛えた部位が疲労している可能性がある場合は、別の部位を提案するか、確認してください。\n");
+        sb.append("4. 初心者にはフォームの注意点を、上級者には高強度テクニック（スーパーセットなど）を含めても良いです。\n");
 
-            // APIを呼び出してコンテンツを生成
-            // 第3引数のconfigはnullの場合、デフォルト設定が使用されます
-            GenerateContentResponse response = client.models.generateContent(modelId, prompt, null);
+        return sb.toString();
+    }
 
-            // 生成されたテキストを返す
-            return response.text();
+    // レベルから「初心者/中級者/上級者」を判定する簡易ロジック
+    private String determineLevelLabel(int level) {
+        if (level <= 10) return "初心者";
+        if (level <= 30) return "初中級者";
+        if (level <= 50) return "中級者";
+        return "上級者";
+    }
 
-        } catch (Exception e) {
-            // エラー発生時のログ出力とユーザーへの通知
-            e.printStackTrace();
-            return "申し訳ありません。AIの処理中にエラーが発生しました (" + e.getMessage() + ")。しばらく待ってから再度お試しください。";
-        }
+    // 実際のAPI呼び出し部分（既存の実装を使用してください）
+    private String callGeminiApi(String prompt) {
+        // ... (既存のGemini API呼び出しコード) ...
+        // 例: WebClientやRestTemplateを使ってGoogleのAPIを叩く処理
+        // ここではダミーレスポンスを返します
+        return "（API連携処理がここに記述されます）AIからの回答: " + prompt; 
     }
 }
-
-
-
-
-
-
-
-
-
-
-                                                                            
-
