@@ -160,17 +160,16 @@
         </p>
 
         <div class="chat-container">
-            <div class="chat-window" id="chat-window">
+            <divdiv class="chat-window" id="chat-window">
 				<div class="chat-row bot">
-				    <img th:src="@{/img/AIcoach.png}" alt="AI" class="profile-icon">
-				    
+				    <img th:src="@{/img/AIcoach.png}" alt="AI" class="profile-icon">	    
 				    <div class="message bot">
 				        こんにちは、<span th:text="${username}">ユーザー</span>さん！<br>
 				        今日はどこの部位を鍛えたいですか？<br>
 				        トレーニング歴（初心者、中級者、上級者）などトレーニング時間や体調についても教えてくれると、より良い提案ができますよ！💪
 				    </div>
 				</div>
-            
+				</div>
             <div class="suggestions">
                 <div class="suggestion-chip" onclick="setInput('30分で胸を鍛えたい！')">30分で胸</div>
                 <div class="suggestion-chip" onclick="setInput('今日は疲れてるから軽めに全身')">疲れてるから軽め</div>
