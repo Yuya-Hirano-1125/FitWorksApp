@@ -7,27 +7,30 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.TrainingRecord;
 import com.example.demo.entity.User;
+// ★ 追加: Google Gen AI SDKのインポート
+import com.google.genai.Client;
+import com.google.genai.types.GenerateContentResponse;
 
 @Service
 public class AICoachService {
 
-    @Value("${gemini.api.key}") // application.propertiesなどで設定されていると仮定
+    @Value("${gemini.api.key}") // application.propertiesで設定したキー
     private String apiKey;
 
-    // ★ メインのメソッド: ユーザー情報を含めた回答を生成
+    // メインのメソッド: ユーザー情報を含めた回答を生成
     public String generateCoachingAdvice(User user, List<TrainingRecord> history, String userMessage) {
         
         // 1. システムプロンプト（AIへの役割指示）の構築
         String systemPrompt = buildSystemPrompt(user, history);
 
-        // 2. APIリクエストの作成と送信 (実際の実装に合わせて修正してください)
-        // ここでは、プロンプトとユーザーメッセージを結合して送信するイメージです
+        // 2. APIリクエストの作成
+        // プロンプトとユーザーメッセージを結合して送信
         String fullPrompt = systemPrompt + "\n\nUser Question: " + userMessage;
         
         return callGeminiApi(fullPrompt); 
     }
 
-    // ★ プロンプト構築ロジック
+    // プロンプト構築ロジック (変更なし)
     private String buildSystemPrompt(User user, List<TrainingRecord> history) {
         StringBuilder sb = new StringBuilder();
         
@@ -63,7 +66,7 @@ public class AICoachService {
         return sb.toString();
     }
 
-    // レベルから「初心者/中級者/上級者」を判定する簡易ロジック
+    // レベル判定 (変更なし)
     private String determineLevelLabel(int level) {
         if (level <= 10) return "初心者";
         if (level <= 30) return "初中級者";
@@ -71,11 +74,24 @@ public class AICoachService {
         return "上級者";
     }
 
-    // 実際のAPI呼び出し部分（既存の実装を使用してください）
+    // ★ 修正: 実際のGemini API呼び出し
     private String callGeminiApi(String prompt) {
-        // ... (既存のGemini API呼び出しコード) ...
-        // 例: WebClientやRestTemplateを使ってGoogleのAPIを叩く処理
-        // ここではダミーレスポンスを返します
-        return "（API連携処理がここに記述されます）AIからの回答: " + prompt; 
+        try {
+            // Clientの作成 (APIキーを使用)
+            Client client = Client.builder()
+                .apiKey(apiKey)
+                .build();
+            
+            // Gemini APIを呼び出し (モデルは gemini-1.5-flash を使用)
+            // 第3引数(config)はnullでも動作します
+            GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", prompt, null);
+            
+            // 生成されたテキストを返す
+            return response.text();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "申し訳ありません。AIとの通信中にエラーが発生しました。\n(エラー詳細: " + e.getMessage() + ")";
+        }
     }
 }
