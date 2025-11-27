@@ -102,6 +102,54 @@
             background: #555;
             color: white;
         }
+		.chat-row {
+		        display: flex;
+		        align-items: flex-start; /* 上揃え */
+		        gap: 10px;               /* アイコンと吹き出しの間隔 */
+		        margin-bottom: 15px;     /* 次のメッセージとの間隔 */
+		        max-width: 90%;          /* 画面幅いっぱいにはしない */
+		    }
+
+		    /* AI（Bot）の行は左寄せ */
+		    .chat-row.bot {
+		        align-self: flex-start;
+		    }
+
+		    /* ユーザーの行は右寄せ（今回は画像なし想定ですが構造を統一する場合） */
+		    .chat-row.user {
+		        align-self: flex-end;
+		        justify-content: flex-end;
+		    }
+
+		    /* キャラクターアイコンのスタイル */
+		    .profile-icon {
+		        width: 45px;             /* アイコンのサイズ */
+		        height: 45px;
+		        border-radius: 50%;      /* 丸くする */
+		        object-fit: cover;       /* 画像の比率を維持 */
+		        flex-shrink: 0;          /* 縮まないように固定 */
+		        box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 影をつけて浮き出させる */
+		    }
+
+		    /* 吹き出しの微調整（LINE風に角を調整） */
+		    .message {
+		        position: relative;
+		        margin: 0; /* コンテナで間隔調整するためリセット */
+		    }
+		    
+		    /* Botの吹き出し：左上の角を少し尖らせる（お好みで） */
+		    .message.bot {
+		        border-top-left-radius: 5px; 
+		    }
+		    
+		    /* ユーザーのメッセージはアイコンなしで右寄せのまま維持する場合の調整 */
+		    .message.user {
+		        /* chat-windowがflex-direction: columnなので、
+		           単体のdivの場合は align-self: flex-end が効くが、
+		           統一感のためにJSで .chat-row に包むか、既存のままにするか選べます。
+		           ここでは既存のユーザー表示は崩さないよう、JSでBotだけ構造を変えます。 */
+		    }
+		
     </style>
 </head>
 <body>
@@ -113,12 +161,15 @@
 
         <div class="chat-container">
             <div class="chat-window" id="chat-window">
-                <div class="message bot">
-                    こんにちは、<span th:text="${username}">ユーザー</span>さん！<br>
-                    今日はどこの部位を鍛えたいですか？<br>
-                    トレーニング歴（初心者、中級者、上級者）などトレーニング時間や体調についても教えてくれると、より良い提案ができますよ！💪
-                </div>
-            </div>
+				<div class="chat-row bot">
+				    <img th:src="@{/img/AIcoach.png}" alt="AI" class="profile-icon">
+				    
+				    <div class="message bot">
+				        こんにちは、<span th:text="${username}">ユーザー</span>さん！<br>
+				        今日はどこの部位を鍛えたいですか？<br>
+				        トレーニング歴（初心者、中級者、上級者）などトレーニング時間や体調についても教えてくれると、より良い提案ができますよ！💪
+				    </div>
+				</div>
             
             <div class="suggestions">
                 <div class="suggestion-chip" onclick="setInput('30分で胸を鍛えたい！')">30分で胸</div>
@@ -194,15 +245,48 @@
             }
         }
 
-        function addMessage(text, sender) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender}`;
-            msgDiv.id = 'msg-' + Date.now();
-            msgDiv.innerHTML = text; // innerHTMLを使ってHTMLタグ（<br>やアイコン）を有効化
-            chatWindow.appendChild(msgDiv);
-            chatWindow.scrollTop = chatWindow.scrollHeight; // 最下部へスクロール
-            return msgDiv.id;
-        }
+		// 既存の addMessage 関数をこれに置き換えてください
+		function addMessage(text, sender) {
+		    if (sender === 'bot') {
+		        // --- AIの場合：アイコン付きのレイアウトを作成 ---
+		        
+		        // 1. 行（コンテナ）を作成
+		        const rowDiv = document.createElement('div');
+		        rowDiv.className = 'chat-row bot';
+		        rowDiv.id = 'msg-row-' + Date.now(); // ローディング削除用にID付与
+
+		        // 2. 画像を作成
+		        const img = document.createElement('img');
+		        img.src = '/img/AIcoach.png'; // 画像パス
+		        img.className = 'profile-icon';
+		        img.alt = 'AI';
+
+		        // 3. 吹き出しを作成
+		        const msgDiv = document.createElement('div');
+		        msgDiv.className = 'message bot';
+		        msgDiv.innerHTML = text;
+
+		        // 4. 合体させてチャット画面に追加
+		        rowDiv.appendChild(img);
+		        rowDiv.appendChild(msgDiv);
+		        chatWindow.appendChild(rowDiv);
+
+		        chatWindow.scrollTop = chatWindow.scrollHeight;
+		        return rowDiv.id; // IDを返す（ローディング削除のため）
+
+		    } else {
+		        // --- ユーザーの場合：既存のまま（右側の吹き出しのみ） ---
+		        
+		        const msgDiv = document.createElement('div');
+		        msgDiv.className = 'message user';
+		        msgDiv.id = 'msg-' + Date.now();
+		        msgDiv.innerHTML = text;
+		        
+		        chatWindow.appendChild(msgDiv);
+		        chatWindow.scrollTop = chatWindow.scrollHeight;
+		        return msgDiv.id;
+		    }
+		}
     </script>
 </body>
 </html>
