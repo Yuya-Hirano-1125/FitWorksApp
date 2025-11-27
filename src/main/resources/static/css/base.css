@@ -27,20 +27,6 @@
     75% { background-position: 50% 25%; background-color: #c5eff7; } /* Light Blue */
     100% { background-position: 0% 50%; background-color: #fce4ec; } /* Back to Light Pink */
 }
-/* ポップインの動きをよりソフトに、弾む感じに */
-@keyframes popIn {
-    0% { opacity: 0; transform: translateY(20px) scale(0.8); }
-    60% { opacity: 1; transform: translateY(-8px) scale(1.03); } /* 少し大きめに弾む */
-    100% { opacity: 1; transform: translateY(0) scale(1.0); }
-}
-/* ホバー時のソフトな浮遊アニメーションを常に適用 */
-@keyframes gentleFloat {
-    0% { transform: translateY(0px) rotate(0deg); }
-    25% { transform: translateY(-3px) rotate(-0.5deg); }
-    50% { transform: translateY(0px) rotate(0deg); }
-    75% { transform: translateY(3px) rotate(0.5deg); }
-    100% { transform: translateY(0px) rotate(0deg); }
-}
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
