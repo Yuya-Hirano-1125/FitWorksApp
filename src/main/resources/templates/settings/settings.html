@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/settings.css}">
+    
+    <script th:src="@{/js/theme.js}"></script>
 </head>
 <body class="settings-page">
 <div class="main-container">
@@ -100,23 +102,23 @@
             <div><span class="section-icon"><i class="fa-solid fa-sliders"></i></span> 一般設定</div>
             <span class="arrow">▼</span>
         </div>
-		<div class="section-content" id="general-content">
-		            <div class="setting-item">
-		                <label for="theme-selector">テーマ設定 (色覚サポート)</label>
-		                <select id="theme-selector" onchange="changeTheme(this.value)">
-		                    <option value="default">デフォルト (パステル)</option>
-		                    <option value="universal">ユニバーサル (青・オレンジ)</option>
-		                    <option value="high-contrast">ハイコントラスト</option>
-		                </select>
-		            </div>
-		            <div class="setting-item">
-		                <label>測定単位</label>
-		                <select>
-		                    <option>メートル法 (kg/cm)</option>
-		                    <option>ヤード・ポンド法 (lb/in)</option>
-		                </select>
-		            </div>
-		        </div>
+        <div class="section-content" id="general-content">
+            <div class="setting-item">
+                <label for="theme-selector">テーマ設定 (色覚サポート)</label>
+                <select id="theme-selector" onchange="changeTheme(this.value)">
+                    <option value="default">デフォルト (パステル)</option>
+                    <option value="universal">ユニバーサル (青・オレンジ)</option>
+                    <option value="high-contrast">ハイコントラスト</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <label>測定単位</label>
+                <select>
+                    <option>メートル法 (kg/cm)</option>
+                    <option>ヤード・ポンド法 (lb/in)</option>
+                </select>
+            </div>
+        </div>
     </div>
 
     <div class="setting-section" style="--section-index: 5;">
@@ -156,77 +158,43 @@
 </div>
 
 <script>
-	function changeTheme(themeName) {
-	        const body = document.body;
-	        
-	        // 一旦すべてのテーマクラスを削除
-	        body.classList.remove('theme-universal', 'theme-high-contrast');
-	        
-	        // 選択されたテーマのクラスを追加
-	        if (themeName === 'universal') {
-	            body.classList.add('theme-universal');
-	        } else if (themeName === 'high-contrast') {
-	            body.classList.add('theme-high-contrast');
-	        }
-	        
-	        // 設定をブラウザに保存 (リロードしても維持されるように)
-	        localStorage.setItem('fitworks-theme', themeName);
-	    }
+    // --- テーマ変更処理 ---
+    function changeTheme(themeName) {
+        // 1. 設定をブラウザに保存
+        localStorage.setItem('fitworks-theme', themeName);
+        
+        // 2. theme.js の関数を呼び出して、即座にCSSクラスを切り替える
+        if (typeof applyTheme === 'function') {
+            applyTheme();
+        } else {
+            console.warn('theme.js is not loaded. Please check your static/js folder.');
+        }
+    }
 
-	    // ページ読み込み時の初期化処理
-	    document.addEventListener('DOMContentLoaded', () => {
-	        // 1. 保存されたテーマを適用
-	        const savedTheme = localStorage.getItem('fitworks-theme') || 'default';
-	        changeTheme(savedTheme);
-	        
-	        // 2. セレクトボックスの値を保存されたものに合わせる
-	        const themeSelector = document.getElementById('theme-selector');
-	        if (themeSelector) {
-	            themeSelector.value = savedTheme;
-	        }
+    // --- ログアウト確認 ---
+    function confirmLogout() {
+        return confirm("本当にログアウトしますか？");
+    }
 
-	        // --- 既存のアコーディオン初期化コード ---
-	        document.querySelectorAll('.setting-section').forEach(section => {
-	            // ... (既存のコード)
-	            const content = section.querySelector('.section-content');
-	            const arrow = section.querySelector('.arrow');
-	            
-	            content.style.maxHeight = '0px';
-	            content.style.paddingTop = '0px';
-	            content.style.paddingBottom = '0px';
-	            content.style.display = 'none';
-	            
-	            if (arrow) {
-	                arrow.innerHTML = '▼';
-	            }
-	        });
-	    });
+    // --- アコーディオン（開閉）処理 ---
     function toggleSection(contentId) {
         const content = document.getElementById(contentId);
-        // section-header は content の一つ上の要素 (setting-section) の最初の子要素
         const sectionHeader = content.previousElementSibling; 
         const arrow = sectionHeader.querySelector('.arrow');
         
-        // セクションが閉じているかチェック (maxHeightが0または空文字列の場合)
         if (content.style.maxHeight && content.style.maxHeight !== '0px') {
-            // CLOSING (閉じる)
+            // 閉じる処理
             content.style.maxHeight = '0px';
             content.style.paddingTop = '0px';
             content.style.paddingBottom = '0px';
             arrow.innerHTML = '▼';
             
-            // アニメーション完了後にdisplay: noneを設定
             setTimeout(() => {
                  content.style.display = 'none';
-            }, 300); // CSSのtransition時間(0.3s)と一致させる
-            
+            }, 300); 
         } else {
-            // OPENING (開く)
-            // display: block に設定しないと scrollHeight が計算できない
+            // 開く処理
             content.style.display = 'block'; 
-            
-            // scrollHeight を使用してコンテンツの高さに合わせる
-            // +30px は paddingTop(10px) + paddingBottom(15px) + 余裕(5px) のため
             content.style.maxHeight = content.scrollHeight + 30 + "px"; 
             content.style.paddingTop = '10px';
             content.style.paddingBottom = '15px';
@@ -234,27 +202,25 @@
         }
     }
 
-    // 変更点: ログアウト確認ダイアログを表示する新しい関数
-    function confirmLogout() {
-        // window.confirm() を使用し、ユーザーが 'OK' をクリックした場合は true を返してリンク遷移を実行
-        // 'キャンセル' をクリックした場合は false を返してリンク遷移を阻止
-        return confirm("本当にログアウトしますか？");
-    }
-	
-
-    // ページロード時の初期設定
+    // --- 初期化処理 ---
     document.addEventListener('DOMContentLoaded', () => {
+        // 1. 保存されたテーマ設定を読み込み、セレクトボックスに反映する
+        const savedTheme = localStorage.getItem('fitworks-theme') || 'default';
+        const selector = document.getElementById('theme-selector');
+        if (selector) {
+            selector.value = savedTheme;
+        }
+
+        // 2. アコーディオンの初期状態を「閉じた状態」に設定
         document.querySelectorAll('.setting-section').forEach(section => {
             const content = section.querySelector('.section-content');
             const arrow = section.querySelector('.arrow');
             
-            // 強制的に初期状態を非表示に設定
             content.style.maxHeight = '0px';
             content.style.paddingTop = '0px';
             content.style.paddingBottom = '0px';
-            content.style.display = 'none'; // DOMからも非表示にする
+            content.style.display = 'none';
             
-            // 矢印の向きを設定
             if (arrow) {
                 arrow.innerHTML = '▼';
             }
@@ -263,3 +229,5 @@
 </script>
 </body>
 </html>
+
+
