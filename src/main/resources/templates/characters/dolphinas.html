@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：ドルフィナス</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- ドルフィナスの画像に変更 -->
+        <img th:src="@{/img/character/mizu3.png}" alt="ドルフィナスの画像">
+        <h1><i class="fa-solid fa-droplet"></i> ドルフィナス</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            ドルフィが進化した水霊王「ドルフィナス」。<br>
+            王冠と水の三叉槍を携え、海の精霊たちを統べる存在。<br>
+            波を操り、嵐を鎮める力を持ち、深海の守護者として崇められている。<br>
+            その姿は威厳に満ち、星潮の神殿にて海の調和を司る。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>属性：</label> 水</div>
+        <div class="stat"><label>分類：</label> 進化型・水霊王</div>
+        <div class="stat"><label>サイズ：</label> 中型</div>
+        <div class="stat"><label>性格：</label> 威厳・慈愛・統率力</div>
+        <div class="stat"><label>生息地：</label> 星潮の神殿</div>
+        <div class="stat"><label>レア度：</label> ★★★★★</div>
+    </div>
+</div>
+</body>
+</html>
