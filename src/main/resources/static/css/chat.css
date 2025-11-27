@@ -134,14 +134,14 @@
 .chat-input-area input[type="text"]:focus {
     border: 1px solid var(--ai-accent-color);
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.8), inset 0 2px 5px rgba(0,0,0,0.8);
-    background-color: #333;
+    background-color: rgb(255, 255, 255);
 }
 
 /* Send Button */
 .button.chat-send {
     padding: 0 25px; 
     background: linear-gradient(45deg, var(--ai-accent-color), #00c8c8);
-    color: #1e1e1e;
+    color: rgb(245, 255, 254);
 }
 
 /* Mobile Adjustments */
