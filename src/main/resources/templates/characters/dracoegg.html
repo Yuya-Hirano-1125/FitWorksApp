@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：ドラコの卵</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- 卵の画像に変更 -->
+        <img th:src="@{/img/hi0.png}" alt="ドラコの卵">
+        <h1><i class="fa-solid fa-fire"></i> ドラコの卵</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            灼熱の炎に包まれた神秘の卵。<br>
+            伝説によれば、この卵から炎の幻獣「ドラコ」が誕生するという。<br>
+            表面は赤く輝き、周囲には常に熱気が漂っている。<br>
+            孵化の瞬間には、空が赤く染まり、火の精霊が舞い降りるとされる。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>状態：</label> 孵化準備中</div>
+        <div class="stat"><label>属性：</label> 炎</div>
+        <div class="stat"><label>分類：</label> 卵型（幻獣の卵）</div>
+        <div class="stat"><label>サイズ：</label> 約60cm（推定）</div>
+        <div class="stat"><label>孵化予測：</label> 高温環境で48時間以内</div>
+        <div class="stat"><label>レア度：</label> ★☆☆☆☆（接触注意）</div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：ドラコス</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- ドラコスの画像に変更 -->
+        <img th:src="@{/img/hi2.png}" alt="ドラコスの画像">
+        <h1><i class="fa-solid fa-fire"></i> ドラコス</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            星のような瞳を持つチビ炎竜。<br>
+            火の精霊の加護を受けて生まれ、炎のたてがみと尾が常に燃えている。<br>
+            好奇心旺盛で遊び好きだが、仲間を守る時は驚くほど勇敢。<br>
+            胸の小さな炎紋は、成長とともに輝きを増すという。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>属性：</label> 炎</div>
+        <div class="stat"><label>分類：</label> 幼竜型</div>
+        <div class="stat"><label>サイズ：</label> 超小型</div>
+        <div class="stat"><label>性格：</label> 元気・好奇心旺盛・仲間思い</div>
+        <div class="stat"><label>生息地：</label> 火山のふもと・温泉地帯</div>
+        <div class="stat"><label>レア度：</label> ★★★★☆</div>
+    </div>
+</div>
+</body>
+</html>
