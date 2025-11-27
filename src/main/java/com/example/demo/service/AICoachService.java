@@ -30,8 +30,7 @@ public class AICoachService {
         sb.append("ユーザーの要望に合わせて、具体的で効果的なトレーニングメニューを提案してください。\n");
         sb.append("回答はポジティブで親しみやすい口調（日本語）でお願いします。\n\n");
 
-        // ★ 修正点1: レベルによる勝手な決めつけを廃止
-        // アプリのLvは単なる継続度として伝え、フィットネスレベルはユーザーの申告を優先するよう指示
+        // ユーザー情報
         sb.append("【ユーザー情報】\n");
         sb.append("- 名前: ").append(user.getUsername()).append("\n");
         sb.append("- アプリ利用レベル: Lv.").append(user.getLevel()).append("\n");
@@ -48,17 +47,17 @@ public class AICoachService {
             sb.append("- 記録なし\n");
         }
 
-        // ★ 修正点2: 出力フォーマットの改善（アスタリスク禁止）
-        sb.append("\n【回答のルール】\n");
-        sb.append("1. **回答には「*」（アスタリスク）を使用しないでください。** マークダウンの太字強調などは不要です。\n");
-        sb.append("2. 箇条書きには「・」や「- 」を使用し、見やすく整形してください。\n");
-        sb.append("3. メニュー提案は、種目名と回数/セット数を簡潔に提示してください。\n");
-        sb.append("4. 長い前置きは省略し、スマホで読みやすい長さ（短め）にまとめてください。\n");
+        // ★ 修正点: 記号禁止ルールをより強力かつシンプルに記述
+        sb.append("\n【回答の絶対ルール（厳守）】\n");
+        sb.append("1. テキスト内の強調表示（太字）は一切禁止です。アスタリスク記号は絶対に使わないでください。\n");
+        sb.append("2. メニュー名や見出しもプレーンテキストで出力してください。\n");
+        sb.append("3. 箇条書きには「・」または「- 」のみを使用してください。\n");
+        sb.append("4. 構成は「挨拶」→「メニュー（箇条書き）」→「一言」の順で、簡潔にまとめてください。\n");
+        sb.append("5. 100文字以内で書いてください。\n");
+        sb.append("6. 語尾にムキをつけてください。\n");
 
         return sb.toString();
     }
-
-    // determineLevelLabel メソッドは不要になったため削除しました
 
     private String callGeminiApi(String prompt) {
         try {
@@ -66,6 +65,7 @@ public class AICoachService {
                 .apiKey(apiKey)
                 .build();
             
+            // モデル名を指定（もし2.5で挙動が安定しない場合は "gemini-1.5-flash" もお試しください）
             GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", prompt, null);
             return response.text();
 
@@ -75,20 +75,5 @@ public class AICoachService {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
