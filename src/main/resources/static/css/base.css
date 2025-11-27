@@ -325,32 +325,33 @@ h1 {
 	    background-color: #218838; /* 少し濃い緑に変化 */
 	    color: white;
 	}
-	/* --- 既存のコードの一番下に追加 --- */
-
 	/* ========================================================= */
-	/* ACCESSIBILITY THEMES (色覚サポートテーマ) */
+	/* ACCESSIBILITY THEMES (色覚特性対応テーマ) */
 	/* ========================================================= */
 
-	/* 1. ユニバーサルテーマ (CUD推奨配色ベース: 青・オレンジ) */
-	/* 赤・緑の色覚特性の方でも識別しやすい配色です */
+	/* 1. ユニバーサルデザイン (CUD推奨配色: 青・オレンジ基調) */
+	/* P型・D型など多くの色覚タイプで判別しやすい配色 */
 	body.theme-universal {
 	    --primary-color: #005c97;    /* 濃い青 (メイン) */
-	    --secondary-color: #e69f00;  /* オレンジ (アクセント) */
+	    --secondary-color: #e69f00;  /* オレンジ (強調) */
 	    --ai-accent-color: #56b4e9;  /* スカイブルー */
-	    --dark-text: #222222;        /* より濃い黒 */
-	    --light-bg: #f0f8ff;         /* アリスブルー (薄い青背景) */
+	    --dark-text: #222222;        /* 濃い黒 */
+	    --light-bg: #f0f8ff;         /* 淡い青背景 */
 	    --container-bg: #ffffff;
-	    --error-color: #d55e00;      /* 朱色 (識別しやすい赤) */
+	    --error-color: #d55e00;      /* 朱色 (見分けやすい赤) */
 	    --success-color: #009e73;    /* 青みの緑 */
 	    
-	    /* 背景アニメーションの上書き (落ち着いた青系) */
+	    --ai-bubble: #e6f2ff;        
+	    --user-bubble: #ffedcc;      
+
+	    /* 背景アニメーションを落ち着いた青系に変更 */
 	    background: linear-gradient(135deg, #f0f8ff, #dbeafe, #bfdbfe);
-	    animation: none; /* 動きを止めて見やすくする */
+	    animation: none; 
 	}
 
-	/* ユニバーサルテーマのボタン調整 */
+	/* ユニバーサルテーマ時のボタン調整 */
 	body.theme-universal .button.primary {
-	    background: var(--primary-color); /* グラデーションなしの単色 */
+	    background: var(--primary-color);
 	    color: #fff;
 	}
 	body.theme-universal .button.secondary {
@@ -358,47 +359,34 @@ h1 {
 	    color: var(--primary-color);
 	}
 
-	/* 2. ハイコントラストテーマ (弱視・全色盲など向け) */
-	/* 黒背景・白/黄色文字でコントラスト比を最大化 */
+	/* 2. ハイコントラスト (弱視・羞明など向け) */
+	/* 黒背景・黄文字でコントラスト比を最大化 */
 	body.theme-high-contrast {
-	    --primary-color: #ffff00;    /* 黄色 (黒背景で最も目立つ) */
+	    --primary-color: #ffff00;    /* 黄色 */
 	    --secondary-color: #00ffff;  /* シアン */
 	    --ai-accent-color: #ffffff;  /* 白 */
-	    --dark-text: #ffffff;        /* テキストは白 */
-	    --light-bg: #000000;         /* 背景は完全な黒 */
-	    --container-bg: #000000;     /* コンテナも黒 */
-	    --error-color: #ff0000;
-	    --success-color: #00ff00;
+	    --dark-text: #ffffff;        /* 文字は白 */
+	    --light-bg: #000000;         /* 背景は黒 */
+	    --container-bg: #000000;     
+	    --error-color: #ff5555;
+	    --success-color: #55ff55;
 	    
-	    /* チャットバブル用 */
 	    --ai-bubble: #333333;
-	    --user-bubble: #004080;
+	    --user-bubble: #003366;
 
 	    background: #000000;
 	    animation: none;
 	}
 
 	/* ハイコントラスト時の視認性向上 */
-	body.theme-high-contrast .main-container {
-	    border: 2px solid #ffffff; /* 白い枠線で境界を明確に */
-	    box-shadow: none;
-	}
+	body.theme-high-contrast .main-container,
 	body.theme-high-contrast .button {
-	    border: 2px solid currentColor;
-	    background: #000;
-	    color: var(--primary-color);
+	    border: 2px solid #ffffff; 
 	    box-shadow: none;
-	    transform: none !important; /* アニメーション停止 */
+	    transform: none !important;
 	}
-	body.theme-high-contrast .button:hover {
-	    background: var(--primary-color);
-	    color: #000;
-	}
-	body.theme-high-contrast input, 
-	body.theme-high-contrast select {
-	    background: #000;
-	    color: #fff;
-	    border: 1px solid #fff;
+	body.theme-high-contrast a {
+	    text-decoration: underline; /* リンクを見やすく */
 	}
 
 }
