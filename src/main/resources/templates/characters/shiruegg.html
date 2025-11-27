@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：フォリアン</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- フォリアンの画像に変更 -->
+        <img th:src="@{/img/character/kusa0.png}" alt="フォリアンの画像">
+        <h1><i class="fa-solid fa-leaf"></i> フォリアン</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            緑の葉と花々に包まれた自然の卵「フォリアン」。<br>
+            伝承によれば、この卵から森の精霊「シル」が誕生するとされる。<br>
+            表面には小さな芽や蔓が伸び、命の鼓動が静かに響いている。<br>
+            孵化の瞬間には森がざわめき、風と光が祝福を捧げるという。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>名前：</label> フォリアン</div>
+        <div class="stat"><label>状態：</label> 孵化準備中</div>
+        <div class="stat"><label>属性：</label> 自然</div>
+        <div class="stat"><label>分類：</label> 卵型（精霊の卵）</div>
+        <div class="stat"><label>サイズ：</label> 約50cm（推定）</div>
+        <div class="stat"><label>孵化予測：</label> 森の静寂環境で72時間以内</div>
+        <div class="stat"><label>レア度：</label> ★☆☆☆☆（癒し系）</div>
+    </div>
+</div>
+</body>
+</html>

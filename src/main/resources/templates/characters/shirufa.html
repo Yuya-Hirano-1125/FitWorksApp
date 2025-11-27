@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：シルファ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- シルファの画像に変更 -->
+        <img th:src="@{/img/character/kusa2.png}" alt="シルファの画像">
+        <h1><i class="fa-solid fa-leaf"></i> シルファ</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            花冠とランタンを携えた森の精霊「シルファ」。<br>
+            シルの進化形態であり、森の灯火を守る役割を担っている。<br>
+            翼で風を操り、葉の魔法で仲間を癒す力を持つ。<br>
+            星風の森に現れ、精霊たちの導き手として活躍する。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>属性：</label> 自然</div>
+        <div class="stat"><label>分類：</label> 中間進化型・森霊族</div>
+        <div class="stat"><label>サイズ：</label> 小型</div>
+        <div class="stat"><label>性格：</label> 穏やか・高潔・癒し系</div>
+        <div class="stat"><label>生息地：</label> 星風の森・フォリアンの灯台</div>
+        <div class="stat"><label>レア度：</label> ★★★★☆</div>
+    </div>
+</div>
+</body>
+</html>

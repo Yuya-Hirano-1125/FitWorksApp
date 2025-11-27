@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：シル</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- シルの画像に変更 -->
+        <img th:src="@{/img/character/kusa1.png}" alt="シルの画像">
+        <h1><i class="fa-solid fa-leaf"></i> シル</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            緑の葉に包まれた森の妖精モンスター。<br>
+            きらめく瞳と小さな羽根を持ち、森の精霊たちと共に暮らしている。<br>
+            風と植物を操る魔法を使い、仲間を癒す力に長けている。<br>
+            頭の芽は感情に応じて揺れ、森の気配を感じ取るセンサーでもある。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>属性：</label> 自然</div>
+        <div class="stat"><label>分類：</label> 精霊型・葉族</div>
+        <div class="stat"><label>サイズ：</label> 超小型</div>
+        <div class="stat"><label>性格：</label> 穏やか・好奇心旺盛・癒し系</div>
+        <div class="stat"><label>生息地：</label> 星風の森・精霊の泉</div>
+        <div class="stat"><label>レア度：</label> ★★★☆☆</div>
+    </div>
+</div>
+</body>
+</html>
