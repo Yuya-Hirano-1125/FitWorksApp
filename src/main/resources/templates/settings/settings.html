@@ -100,22 +100,23 @@
             <div><span class="section-icon"><i class="fa-solid fa-sliders"></i></span> 一般設定</div>
             <span class="arrow">▼</span>
         </div>
-        <div class="section-content" id="general-content">
-            <div class="setting-item">
-                <label>テーマ</label>
-                <select>
-                    <option>ダーク</option>
-                    <option>ライト</option>
-                </select>
-            </div>
-            <div class="setting-item">
-                <label>測定単位</label>
-                <select>
-                    <option>メートル法 (kg/cm)</option>
-                    <option>ヤード・ポンド法 (lb/in)</option>
-                </select>
-            </div>
-        </div>
+		<div class="section-content" id="general-content">
+		            <div class="setting-item">
+		                <label for="theme-selector">テーマ設定 (色覚サポート)</label>
+		                <select id="theme-selector" onchange="changeTheme(this.value)">
+		                    <option value="default">デフォルト (パステル)</option>
+		                    <option value="universal">ユニバーサル (青・オレンジ)</option>
+		                    <option value="high-contrast">ハイコントラスト</option>
+		                </select>
+		            </div>
+		            <div class="setting-item">
+		                <label>測定単位</label>
+		                <select>
+		                    <option>メートル法 (kg/cm)</option>
+		                    <option>ヤード・ポンド法 (lb/in)</option>
+		                </select>
+		            </div>
+		        </div>
     </div>
 
     <div class="setting-section" style="--section-index: 5;">
@@ -155,6 +156,51 @@
 </div>
 
 <script>
+	function changeTheme(themeName) {
+	        const body = document.body;
+	        
+	        // 一旦すべてのテーマクラスを削除
+	        body.classList.remove('theme-universal', 'theme-high-contrast');
+	        
+	        // 選択されたテーマのクラスを追加
+	        if (themeName === 'universal') {
+	            body.classList.add('theme-universal');
+	        } else if (themeName === 'high-contrast') {
+	            body.classList.add('theme-high-contrast');
+	        }
+	        
+	        // 設定をブラウザに保存 (リロードしても維持されるように)
+	        localStorage.setItem('fitworks-theme', themeName);
+	    }
+
+	    // ページ読み込み時の初期化処理
+	    document.addEventListener('DOMContentLoaded', () => {
+	        // 1. 保存されたテーマを適用
+	        const savedTheme = localStorage.getItem('fitworks-theme') || 'default';
+	        changeTheme(savedTheme);
+	        
+	        // 2. セレクトボックスの値を保存されたものに合わせる
+	        const themeSelector = document.getElementById('theme-selector');
+	        if (themeSelector) {
+	            themeSelector.value = savedTheme;
+	        }
+
+	        // --- 既存のアコーディオン初期化コード ---
+	        document.querySelectorAll('.setting-section').forEach(section => {
+	            // ... (既存のコード)
+	            const content = section.querySelector('.section-content');
+	            const arrow = section.querySelector('.arrow');
+	            
+	            content.style.maxHeight = '0px';
+	            content.style.paddingTop = '0px';
+	            content.style.paddingBottom = '0px';
+	            content.style.display = 'none';
+	            
+	            if (arrow) {
+	                arrow.innerHTML = '▼';
+	            }
+	        });
+	    });
     function toggleSection(contentId) {
         const content = document.getElementById(contentId);
         // section-header は content の一つ上の要素 (setting-section) の最初の子要素
@@ -194,6 +240,7 @@
         // 'キャンセル' をクリックした場合は false を返してリンク遷移を阻止
         return confirm("本当にログアウトしますか？");
     }
+	
 
     // ページロード時の初期設定
     document.addEventListener('DOMContentLoaded', () => {
