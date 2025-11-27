@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>ガチャ演出中…</title>
+
+    <!-- 戻る対策：キャッシュ無効 -->
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <style>
         body {
             background: #000;
@@ -13,7 +19,7 @@
             margin: 0;
             color: white;
             font-size: 24px;
-            flex-direction: column; /* 画像と文字を縦に並べる */
+            flex-direction: column;
         }
         img {
             max-width: 100%;
@@ -29,13 +35,12 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // Controllerから渡された count を取得
-        const count = /*[[${count}]]*/ 1; 
-        
+        const count = /*[[${count}]]*/ 1;
+
         setTimeout(() => {
-            // 結果判定のURLへ遷移 (回数をパラメータとして渡す)
-            window.location.href = '/gacha/roll?count=' + count;
-        }, 3000); // 3秒待機（GIFの長さに合わせて調整してください）
+            // 戻れないように履歴に残さず遷移
+            window.location.replace('/gacha/roll?count=' + count);
+        }, 3000);
         /*]]>*/
     </script>
 </body>
