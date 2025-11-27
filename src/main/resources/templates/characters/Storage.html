@@ -7,8 +7,14 @@
 
     <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/Storage.css}">
+	<link rel="stylesheet" th:href="@{/css/base.css}">
 </head>
-<body>
+  <body>
+		<div class="back-btn-container">
+		            <a th:href="@{/home}" class="button secondary">
+		                <i class="fa-solid fa-house"></i> ホームに戻る
+		            </a>
+		</div>
     
     <header>
         <h1>キャラクター解放</h1>
@@ -17,7 +23,7 @@
 
     <div class="character-list-wrapper">
         <div class="character-list-container" id="character-container">
-            
+			<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card fire" data-attribute="fire" data-unlocked-level="1">
                 <div class="card-content">
                     <div class="evolution-tag">★0</div>
@@ -31,7 +37,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">1</span>で解放</p>
                 </div>
             </div>
-            
+            </a>
+		
+		<a th:href="@{/character/draco/}" class="character-link"> 
             <div class="character-card fire" data-attribute="fire" data-unlocked-level="5">
                 <div class="card-content">
                     <div class="evolution-tag">★1</div>
@@ -45,7 +53,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">5</span>で解放</p>
                 </div>
             </div>
-            
+        </a>
+		
+		<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card fire" data-attribute="fire" data-unlocked-level="10">
                 <div class="card-content">
                     <div class="evolution-tag">★2</div>
@@ -58,8 +68,11 @@
                     <p class="lock-text">LOCKED</p>
                     <p class="lock-required-level">Lv.<span class="required-level-display">10</span>で解放</p>
                 </div>
+			
             </div>
-
+		</a>
+		
+		<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card fire" data-attribute="fire" data-unlocked-level="15">
                 <div class="card-content">
                     <div class="evolution-tag">★3</div>
@@ -73,7 +86,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">15</span>で解放</p>
                 </div>
             </div>
-
+		</a>
+		
+		<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card water" data-attribute="water" data-unlocked-level="20">
                 <div class="card-content">
                     <div class="evolution-tag">★0</div>
@@ -87,7 +102,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">20</span>で解放</p>
                 </div>
             </div>
-
+		</a>
+		
+		<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card water" data-attribute="water" data-unlocked-level="25">
                 <div class="card-content">
                     <div class="evolution-tag">★1</div>
@@ -101,7 +118,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">25</span>で解放</p>
                 </div>
             </div>
-            
+         </a>
+		 
+		 <a th:href="@{/character/info/}" class="character-link">  
             <div class="character-card water" data-attribute="water" data-unlocked-level="30">
                 <div class="card-content">
                     <div class="evolution-tag">★2</div>
@@ -115,7 +134,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">30</span>で解放</p>
                 </div>
             </div>
-
+		</a>
+		
+		<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card water" data-attribute="water" data-unlocked-level="35">
                 <div class="card-content">
                     <div class="evolution-tag">★3</div>
@@ -129,7 +150,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">35</span>で解放</p>
                 </div>
             </div>
-            
+         </a>
+		 
+		 <a th:href="@{/character/info/}" class="character-link">  
             <div class="character-card grass" data-attribute="grass" data-unlocked-level="40">
                 <div class="card-content">
                     <div class="evolution-tag">★0</div>
@@ -143,7 +166,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">40</span>で解放</p>
                 </div>
             </div>
-            
+          </a>
+		  
+		  <a th:href="@{/character/info/}" class="character-link">  
             <div class="character-card grass" data-attribute="grass" data-unlocked-level="45">
                 <div class="card-content">
                     <div class="evolution-tag">★1</div>
@@ -157,7 +182,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">45</span>で解放</p>
                 </div>
             </div>
-            
+           </a>
+		   
+		   <a th:href="@{/character/info/}" class="character-link">
             <div class="character-card grass" data-attribute="grass" data-unlocked-level="50">
                 <div class="card-content">
                     <div class="evolution-tag">★2</div>
@@ -171,7 +198,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">50</span>で解放</p>
                 </div>
             </div>
+			</a>
             
+			<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card grass" data-attribute="grass" data-unlocked-level="55">
                 <div class="card-content">
                     <div class="evolution-tag">★3</div>
@@ -185,7 +214,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">55</span>で解放</p>
                 </div>
             </div>
-            
+			</a>
+			
+			<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card light" data-attribute="light" data-unlocked-level="60">
                 <div class="card-content">
                     <div class="evolution-tag">★0</div>
@@ -199,7 +230,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">60</span>で解放</p>
                 </div>
             </div>
+			</a>
 
+			<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card light" data-attribute="light" data-unlocked-level="65">
                 <div class="card-content">
                     <div class="evolution-tag">★1</div>
@@ -213,7 +246,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">65</span>で解放</p>
                 </div>
             </div>
+			</a>
 
+			<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card light" data-attribute="light" data-unlocked-level="70">
                 <div class="card-content">
                     <div class="evolution-tag">★2</div>
@@ -227,7 +262,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">70</span>で解放</p>
                 </div>
             </div>
+			</a>
 
+			<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card light" data-attribute="light" data-unlocked-level="75">
                 <div class="card-content">
                     <div class="evolution-tag">★3</div>
@@ -241,8 +278,10 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">75</span>で解放</p>
                 </div>
             </div>
+			</a>
 
-            <div class="character-card dark" data-attribute="dark" data-unlocked-level="80">
+			<a th:href="@{/character/info/}" class="character-link">
+			<div class="character-card dark" data-attribute="dark" data-unlocked-level="80">
                 <div class="card-content">
                     <div class="evolution-tag">★0</div>
                     <img class="character-img" data-src="/img/char_dark_egg.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="闇の卵">
@@ -255,7 +294,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">80</span>で解放</p>
                 </div>
             </div>
+			</a>
 
+			<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card dark" data-attribute="dark" data-unlocked-level="85">
                 <div class="card-content">
                     <div class="evolution-tag">★1</div>
@@ -269,7 +310,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">85</span>で解放</p>
                 </div>
             </div>
+			</a>
 
+			<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card dark" data-attribute="dark" data-unlocked-level="90">
                 <div class="card-content">
                     <div class="evolution-tag">★2</div>
@@ -283,7 +326,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">90</span>で解放</p>
                 </div>
             </div>
+			</a>
 
+			<a th:href="@{/character/info/}" class="character-link">
             <div class="character-card dark" data-attribute="dark" data-unlocked-level="95">
                 <div class="card-content">
                     <div class="evolution-tag">★3</div>
@@ -297,7 +342,9 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">95</span>で解放</p>
                 </div>
             </div>
+			</a>
             
+			<a th:hreff="@{/character/info/}" class="character-link">
             <div class="character-card dark" data-attribute="dark" data-unlocked-level="999">
                 <div class="card-content">
                     <div class="evolution-tag">???</div>
@@ -311,7 +358,8 @@
                     <p class="lock-required-level">Lv.<span class="required-level-display">999</span>で解放</p>
                 </div>
             </div>
-
+			</a>
+      
         </div>
     </div>
 

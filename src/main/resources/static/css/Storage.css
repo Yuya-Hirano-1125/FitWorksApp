@@ -8,10 +8,17 @@ body {
 header {
     text-align: center;
     padding: 20px;
-    background: #ff9800;
-    color: #fff;
+    color: rgb(0, 0, 0);
 }
-
+h1 {
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-size: 45px; /* さらに大きく */
+    font-weight: 900; /* より太く */
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(255, 105, 180, 0.4); /* ソフトな影を強調 */
+    animation: fadeIn 0.8s ease-out forwards;
+}
 .user-level {
     font-size: 22px;
 }
@@ -68,4 +75,8 @@ header {
 
 .character-img {
     width: 100%;
+}
+.back-home-btn:hover {
+    background: #ff9800;
+    color: #fff;
 }
