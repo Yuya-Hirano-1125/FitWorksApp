@@ -3,158 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIコーチ 🤖💬 | FitWorks</title>
+    <title>AIコーチ | FitWorks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
-    <meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link rel="stylesheet" th:href="@{/css/base.css}">
-    <link rel="stylesheet" th:href="@{/css/chat.css}">
+    <link rel="stylesheet" th:href="@{/css/chat.css}"> <style>
+        /* チャット画面特有の簡易スタイル */
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1e1e1e;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            height: 70vh;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .chat-window {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        .message.bot {
+            align-self: flex-start;
+            background: #333;
+            color: #ddd;
+            border-bottom-left-radius: 2px;
+        }
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            border-bottom-right-radius: 2px;
+        }
+        .input-area {
+            padding: 15px;
+            background: #252525;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #444;
+        }
+        .input-area input {
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 25px;
+            border: 1px solid #555;
+            background: #333;
+            color: white;
+            outline: none;
+        }
+        .input-area input:focus {
+            border-color: #2575fc;
+        }
+        .input-area button {
+            background: #2575fc;
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .input-area button:hover {
+            transform: scale(1.1);
+        }
+        .suggestions {
+            padding: 10px 15px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            background: #252525;
+        }
+        .suggestion-chip {
+            background: #444;
+            color: #ccc;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+        .suggestion-chip:hover {
+            background: #555;
+            color: white;
+        }
+    </style>
 </head>
-<body class="chat-page">
-<div class="main-container">
-    <h1><i class="fa-solid fa-robot header-icon"></i>AIコーチ </h1>
-	
-    <div class="chat-history" id="chatHistory">
-        <div class="message-bubble ai-message">
-            こんにちは！AIコーチのFitBotです。あなたの今日のトレーニングに最適なメニューを提案します！
-			<br><strong>「今日のメニュー」</strong>や<strong>「ダイエット方法」</strong>など、何でも聞いてください。
+<body>
+    <div class="main-container">
+        <h1><i class="fa-solid fa-robot"></i> AIコーチ FitBot</h1>
+        <p style="text-align: center; color: #aaa; margin-bottom: 20px;">
+            あなたのレベルや履歴に合わせて、最適なメニューを提案します。
+        </p>
+
+        <div class="chat-container">
+            <div class="chat-window" id="chat-window">
+                <div class="message bot">
+                    こんにちは、<span th:text="${username}">ユーザー</span>さん！<br>
+                    今日はどこの部位を鍛えたいですか？<br>
+                    時間や体調についても教えてくれると、より良い提案ができますよ！💪
+                </div>
+            </div>
+            
+            <div class="suggestions">
+                <div class="suggestion-chip" onclick="setInput('30分で胸を鍛えたい！')">30分で胸</div>
+                <div class="suggestion-chip" onclick="setInput('今日は疲れてるから軽めに全身')">疲れてるから軽め</div>
+                <div class="suggestion-chip" onclick="setInput('腹筋を割るためのメニューを教えて')">腹筋メニュー</div>
+                <div class="suggestion-chip" onclick="setInput('初心者向けの背中トレは？')">初心者向け背中</div>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="例: 昨日は脚だったので、今日は胸を30分やりたいです。" onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
         </div>
-    </div>
-    
-    <div class="chat-input-area">
-        <input type="text" placeholder="メッセージを入力してください..." id="messageInput" onkeydown="handleKey(event)">
-        <button type="button" class="button chat-send" onclick="sendMessage()">送信 <i class="fa-solid fa-paper-plane"></i></button>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <a th:href="@{/home}" class="button secondary">ホームに戻る</a>
+        </div>
     </div>
 
     <script>
-        const chatHistory = document.getElementById('chatHistory');
-        const messageInput = document.getElementById('messageInput');
-        
-        // CSRFトークンを安全に取得
-        const csrfMetaToken = document.querySelector('meta[name="_csrf"]');
-        const csrfMetaHeader = document.querySelector('meta[name="_csrf_header"]');
+        const chatWindow = document.getElementById('chat-window');
+        const userInput = document.getElementById('user-input');
 
-        const csrfToken = csrfMetaToken ? csrfMetaToken.content : null;
-        const csrfHeader = csrfMetaHeader ? csrfMetaHeader.content : null;
+        function setInput(text) {
+            userInput.value = text;
+            userInput.focus();
+        }
 
-        function handleKey(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault(); 
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
                 sendMessage();
             }
         }
 
         async function sendMessage() {
-            const message = messageInput.value.trim();
+            const message = userInput.value.trim();
             if (!message) return;
 
-            displayMessage(message, 'user');
-            messageInput.value = '';
-            
-            // ローディングメッセージをタイピングアニメーションとして表示
-            const loadingBubble = displayMessage('AIが回答を生成中です...', 'ai', true);
+            // ユーザーメッセージを表示
+            addMessage(message, 'user');
+            userInput.value = '';
+
+            // ローディング表示（簡易的）
+            const loadingId = addMessage('考え中... <i class="fa-solid fa-spinner fa-spin"></i>', 'bot');
 
             try {
-                const headers = {
-                    // ★ 修正1: Content-TypeをJSONに変更
-                    'Content-Type': 'application/json' 
-                };
-                
-                // CSRFトークンをヘッダーに追加
-                if (csrfToken && csrfHeader) {
-                    headers[csrfHeader] = csrfToken; 
-                }
-                
-                // API呼び出し
-                const response = await fetch('/api/chat', {
+                // CSRFトークン対策（Spring Securityを使用している場合）
+                // const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+                // const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+                const response = await fetch('/api/ai-coach/chat', {
                     method: 'POST',
-                    headers: headers,
-                    
-                    // ★ 修正2: bodyをJSON文字列に変更し、DTOのフィールド名 ('text') を使用
-                    body: JSON.stringify({ 'text': message })
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // 'X-CSRF-TOKEN': csrfToken 
+                    },
+                    body: JSON.stringify({ message: message })
                 });
 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    // 500エラーや400エラーの詳細をチャットバブルに表示
-                    throw new Error(`API呼び出しエラー: ${response.status}. 詳細: ${errorText.substring(0, 300)}`);
-                }
+                const data = await response.json();
                 
-                // レスポンスボディを取得
-                // ※サーバー側AICoachRestController.javaはMessageオブジェクトを返します
-                const jsonResponse = await response.json(); 
-                const aiResponseText = jsonResponse.text || "応答がありませんでした。"; 
+                // ローディングを削除してAIの回答を表示
+                document.getElementById(loadingId).remove();
+                
+                // 改行コードを<br>に変換して表示
+                const formattedReply = data.reply.replace(/\n/g, '<br>');
+                addMessage(formattedReply, 'bot');
 
-                // GeminiのMarkdownをHTMLに整形する関数
-                const formattedResponse = formatAiResponse(aiResponseText);
-                
-                loadingBubble.innerHTML = formattedResponse;
-                loadingBubble.classList.remove('loading');
-                
             } catch (error) {
-                // ❗ 修正点: ユーザーが要望したエラーメッセージとスタイルを適用
-                const errorMessage = 'AIフィットネスコーチ 🤖 FitBot<br>❗AI処理中にエラーが発生しました。時間を置いて再度お試しください。';
-                
-                loadingBubble.innerHTML = errorMessage;
-                loadingBubble.classList.remove('loading');
-                
-                // エラーバブルのスタイルを赤く変更して目立たせる
-                loadingBubble.style.backgroundColor = 'var(--error-color)';
-                loadingBubble.style.color = 'white'; 
-                loadingBubble.style.border = '1px solid var(--error-color)';
-                loadingBubble.style.boxShadow = '0 4px 10px rgba(255, 74, 74, 0.4)';
-                
-                console.error('API Error:', error);
+                console.error('Error:', error);
+                document.getElementById(loadingId).remove();
+                addMessage('すみません、エラーが発生しました。もう一度試してください。', 'bot');
             }
-            
-            scrollToBottom();
         }
 
-        function displayMessage(text, sender, isLoading = false) {
-            const bubble = document.createElement('div');
-            bubble.className = `message-bubble ${sender}-message ${isLoading ? 'loading' : ''}`;
-            bubble.innerHTML = text; 
-            chatHistory.appendChild(bubble);
-            scrollToBottom();
-            return bubble;
+        function addMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+            msgDiv.id = 'msg-' + Date.now();
+            msgDiv.innerHTML = text; // innerHTMLを使ってHTMLタグ（<br>やアイコン）を有効化
+            chatWindow.appendChild(msgDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight; // 最下部へスクロール
+            return msgDiv.id;
         }
-
-        function scrollToBottom() {
-            // アニメーションを滑らかにする
-            chatHistory.scrollTo({
-                top: chatHistory.scrollHeight,
-                behavior: 'smooth'
-            });
-        }
-        
-        function formatAiResponse(text) {
-            // 1. 強調 (**太字**) を <strong> タグに変換
-            let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            
-            // 2. 箇条書き (* または - で始まる行) を <ul><li> に変換 (簡易版)
-            formattedText = formattedText.replace(/(\*|\-)\s(.*?)\n/g, '<li>$2</li>').replace(/(\*|\-)\s(.*?)$/g, '<li>$2</li>');
-            if (formattedText.includes('<li>')) {
-                // <li>タグがある場合、全体を<ul>で囲む
-                formattedText = '<ul>' + formattedText + '</ul>';
-                formattedText = formattedText.replace(/<\/ul>\s*<ul>/g, ''); 
-            }
-            
-            // 3. 改行コードを <br> に変換
-            formattedText = formattedText.replace(/\n/g, '<br>');
-            
-            return formattedText;
-        }
-
-        scrollToBottom();
     </script>
-</div>
-<div class="control-buttons-top" style="margin-bottom: 15px;">
-        <a th:href="@{/training}" class="button secondary" 
-           style="display: block; width: 100%; text-align: center; text-decoration: none;">
-            <i class="fa-solid fa-dumbbell"></i> トレーニング選択に戻る
-        </a>
-    </div>
 </body>
 </html>

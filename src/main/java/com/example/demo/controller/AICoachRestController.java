@@ -1,69 +1,67 @@
-// src/main/java/com/example/demo/controller/AICoachRestController.java
 package com.example.demo.controller;
- 
-import org.springframework.http.ResponseEntity;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.ChatRequest;
-import com.example.demo.dto.Message;
+import com.example.demo.entity.TrainingRecord;
+import com.example.demo.entity.User;
+import com.example.demo.repository.TrainingRecordRepository;
 import com.example.demo.service.AICoachService;
- 
+import com.example.demo.service.UserService;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/ai-coach")
 public class AICoachRestController {
- 
-    private final AICoachService aiCoachService;
- 
-    private static final String INITIAL_QUESTION_BODY =
-        "💪 最高のトレーニングプランを作成するため、以下の4点をまとめて教えてください！"
-        + "\n\n**🎯 トレーニング計画のための質問:**"
-        + "\n* **1. 経験レベル**: 初級 / 中級 / 上級"
-        + "\n* **2. 可能時間**: 1回あたりのトレーニング時間 (例: 35分)"
-        + "\n* **3. 鍛えたい部位**: 胸、背中、脚、全身など"
-        + "\n* **4. 場所/器具**: 家（自重・ダンベル）、ジム（全器具）"
-        + "\n\n例: **中級、45分、胸と腕、ジム**";
- 
-    public AICoachRestController(AICoachService aiCoachService) {
-        this.aiCoachService = aiCoachService;
-    }
- 
+
+    @Autowired
+    private AICoachService aiCoachService;
+    
+    @Autowired
+    private UserService userService;
+    
+    @Autowired
+    private TrainingRecordRepository trainingRecordRepository;
+
     @PostMapping("/chat")
-    public ResponseEntity<Message> getAICoachResponse(@RequestBody ChatRequest chatRequestDto) {
-        String userMessage = chatRequestDto.getText();
-        String userName = chatRequestDto.getUserName();
-        String aiResponseText;
+    public Map<String, String> chat(@RequestBody Map<String, String> payload, Authentication authentication) {
+        Map<String, String> response = new HashMap<>();
         
-        // ★ 修正1: userNameがnull/空の場合に備えて、デフォルトのユーザー名を定義
-        String safeUserName = (userName != null && !userName.trim().isEmpty()) ? userName : "ユーザー"; 
-        
-        boolean hasUserName = userName != null && !userName.trim().isEmpty(); 
-        String greetingName = hasUserName ? userName + "さん、" : "";
- 
-        try {
-            String trimmedMessage = userMessage.trim().toLowerCase();
-            
-            if (trimmedMessage.isEmpty() || trimmedMessage.contains("こんにちは") || trimmedMessage.contains("ヘルプ") || trimmedMessage.contains("おはよう")) {
-                aiResponseText = "**" + greetingName + "AIコーチ FitBot です！**" + INITIAL_QUESTION_BODY;
-            } else {
-                
-                String userReference = hasUserName ? "(" + userName + "さん向けに) " : "";
-                
-                // ★ 修正2: プロンプト内で safeUserName を使用し、nullを避けるe;
-                String promptWithInstruction = 
-                    userReference + "次の質問に、**回答をMarkdownの箇条書き形式で、200文字以内（簡潔に）**で整理して回答してください。回答の冒頭でユーザー(" + safeUserName + "さん)に話しかけてください。質問: " + userMessage;
-                
-                // aiCoachService.generateResponse() を呼び出す
-                aiResponseText = aiCoachService.generateResponse(promptWithInstruction);
-            }
- 
-        } catch (Exception e) {
-            aiResponseText = "❗AI処理中にエラーが発生しました。時間を置いて再度お試しください。";
+        // 1. ログインユーザー情報の取得
+        User user = null;
+        if (authentication != null) {
+            user = userService.findByUsername(authentication.getName());
         }
+
+        if (user == null) {
+            response.put("reply", "ログインしてください。");
+            return response;
+        }
+
+        // 2. ユーザーメッセージの取得
+        String userMessage = payload.get("message");
+
+        // 3. トレーニング履歴の取得 (最新10件)
+        List<TrainingRecord> history = trainingRecordRepository.findTop10ByUser_IdOrderByRecordDateDesc(user.getId());
+
+        // 4. AIサービスへコンテキスト付きで依頼
+        // (Serviceメソッドを先ほど修正したものに変更);
+        String aiReply = aiCoachService.generateCoachingAdvice(user, history, userMessage);
         
-        Message aiMessageDto = new Message("ai", aiResponseText);
-        return ResponseEntity.ok(aiMessageDto);
-    } 
+        response.put("reply", aiReply);
+        return response;
+    }
 }
+
+
+
+
+
+
