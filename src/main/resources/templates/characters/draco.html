@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：ドラコ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <img src="draco.png" alt="ドラコの画像"> <!-- 実際の画像パスに変更してください -->
+        <h1><i class="fa-solid fa-fire"></i> ドラコ</h1>
+    </div>
+    <div class="dex-info">
+        <p class="warning-text">
+            ⚠ この操作は取り消せません<br>
+            アカウントを削除すると、すべてのデータ（トレーニング履歴、進捗、設定など）が完全に失われます。<br>
+            再度ログインすることはできません。慎重にご確認ください。
+        </p>
+        <p>
+            炎の精霊が宿るとされる幻獣。<br>
+            背中の炎の翼と燃える尾で空を舞い、敵を威嚇する。<br>
+            その瞳は黄金に輝き、仲間を守る強い意志を秘めている。
+        </p>
+    </div>
+    <div class="dex-stats">
+        <div class="stat"><label>属性：</label> 炎</div>
+        <div class="stat"><label>分類：</label> 幻獣型</div>
+        <div class="stat"><label>サイズ：</label> 小型</div>
+        <div class="stat"><label>性格：</label> 勇敢・忠誠心が強い</div>
+        <div class="stat"><label>生息地：</label> 火山地帯・灼熱の谷</div>
+        <div class="stat"><label>レア度：</label> ★★★★☆</div>
+    </div>
+</div>
+</body>
+</html>
