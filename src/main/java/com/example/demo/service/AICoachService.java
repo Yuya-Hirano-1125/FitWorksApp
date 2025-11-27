@@ -54,7 +54,7 @@ public class AICoachService {
         sb.append("3. 箇条書きには「・」または「- 」のみを使用してください。\n");
         sb.append("4. 構成は「挨拶」→「メニュー（箇条書き）」→「一言」の順で、簡潔にまとめてください。\n");
         sb.append("5. 100文字以内で書いてください。\n");
-        sb.append("6. 語尾にムキをつけてください。\n");
+        sb.append(". 語尾にムキをつけてください。\n");
 
         return sb.toString();
     }
