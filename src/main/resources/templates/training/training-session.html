@@ -190,109 +190,108 @@
         <p class="exercise-type" th:if="${trainingType == 'cardio'}"><i class="fa-solid fa-running"></i> 有酸素運動</p>
         <p class="exercise-type" th:if="${trainingType == 'ai-suggested'}"><i class="fa-solid fa-star"></i> AIおすすめプログラム</p>
         
-            <div class="interval-container">
-                <h3 style="color: var(--primary-color); margin-bottom: 5px; margin-top: 20px;">インターバルタイマー</h3>
-                <div id="interval-display" class="timer-display timer-interval">01:00</div>
-                <div class="timer-settings">
-                    <input type="number" id="interval-minutes" value="1" min="0" max="59" style="width: 50px;"> 分
-                    <input type="number" id="interval-seconds" value="0" min="0" max="59" style="width: 50px;"> 秒
-                    <button id="interval-set" class="button timer-button-tertiary"><i class="fa-solid fa-clock"></i> 設定</button>
-                </div>
-                <div class="timer-controls">
-                    <button id="interval-start-pause" class="button timer-button-primary"><i class="fa-solid fa-play"></i> 開始</button>
-                    <button id="interval-reset" class="button timer-button-secondary"><i class="fa-solid fa-rotate-left"></i> リセット</button>
-                </div>
+        <div class="interval-container">
+            <h3 style="color: var(--primary-color); margin-bottom: 5px; margin-top: 20px;">インターバルタイマー</h3>
+            <div id="interval-display" class="timer-display timer-interval">01:00</div>
+            <div class="timer-settings">
+                <input type="number" id="interval-minutes" value="1" min="0" max="59" style="width: 50px;"> 分
+                <input type="number" id="interval-seconds" value="0" min="0" max="59" style="width: 50px;"> 秒
+                <button id="interval-set" class="button timer-button-tertiary"><i class="fa-solid fa-clock"></i> 設定</button>
             </div>
-        </div>
-
-        <div th:if="${trainingType == 'free-weight'}" class="record-form-container">
-            <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px;">
-                <i class="fa-solid fa-pen-to-square"></i> 実績を記録
-            </h3>
-            <form th:action="@{/training-log/save}" method="post">
-                <input type="hidden" name="recordDate" th:value="${today}">
-                <input type="hidden" name="type" value="WEIGHT">
-                <input type="hidden" name="exerciseName" th:value="${selectedExercise}">
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">重量</label>
-                        <input type="number" name="weight" class="form-input" step="0.5" placeholder="0" required>
-                        <span class="unit">kg</span>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">回数</label>
-                        <input type="number" name="reps" class="form-input" placeholder="0" required>
-                        <span class="unit">回 (Reps)</span>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">セット数</label>
-                        <input type="number" name="sets" class="form-input" value="1" required>
-                        <span class="unit">セット</span>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn-finish">
-                    記録して終了 <i class="fa-solid fa-check"></i>
-                </button>
-            </form>
-        </div>
-
-        <div th:if="${trainingType == 'cardio'}" class="record-form-container">
-            <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px;">
-                <i class="fa-solid fa-pen-to-square"></i> 実績を記録
-            </h3>
-            <form th:action="@{/training-log/save}" method="post">
-                <input type="hidden" name="recordDate" th:value="${today}">
-                <input type="hidden" name="type" value="CARDIO">
-                <input type="hidden" name="cardioType" th:value="${selectedExercise}">
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">時間</label>
-                        <input type="number" name="durationMinutes" class="form-input" placeholder="0" required>
-                        <span class="unit">分 (Minutes)</span>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">距離</label>
-                        <input type="number" name="distanceKm" class="form-input" step="0.1" placeholder="0.0">
-                        <span class="unit">km (任意)</span>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn-finish">
-                    記録して終了 <i class="fa-solid fa-check"></i>
-                </button>
-            </form>
-        </div>
-
-        <div th:if="${trainingType == 'ai-suggested'}">
-             <div class="log-placeholder" style="border-color: var(--ai-accent-color); box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);">
-                <p style="color: var(--ai-accent-color); font-weight: 600;">FitBotの提案内容:</p>
-                <ul class="program-list">
-                    <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 1. 種目A: 4セット x 10回 (70kg) (AIプログラムの例)</li>
-                    <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 2. 種目B: 3セット x 12回 (20kg)</li>
-                    <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 3. 種目C: 3セット x 15回</li>
-                </ul>
-                <p style="margin-top: 20px; color: var(--primary-color);">目標時間: 45分 / 休憩時間: 60秒</p>
-            </div>
-            <div class="control-buttons">
-                 <a th:href="@{/training-log}" class="button primary">セッション完了 (カレンダーに戻る)</a>
+            <div class="timer-controls">
+                <button id="interval-start-pause" class="button timer-button-primary"><i class="fa-solid fa-play"></i> 開始</button>
+                <button id="interval-reset" class="button timer-button-secondary"><i class="fa-solid fa-rotate-left"></i> リセット</button>
             </div>
         </div>
     </div>
-	
-	<div class="button-container" style="margin-top: 20px;">
-	        <a th:href="@{/ai-coach}" class="button primary">
-	            トレーニング内容をAIコーチに相談 🤖
-	        </a>
-	    </div>
-		
-    <div class="control-buttons" style="margin-top: -5px;">
-        <a th:href="@{/training}" class="button secondary">
-            中断してメニュー選択に戻る <i class="fa-solid fa-arrow-rotate-left"></i>
-        </a>
+
+    <div th:if="${trainingType == 'free-weight'}" class="record-form-container">
+        <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px;">
+            <i class="fa-solid fa-pen-to-square"></i> 実績を記録
+        </h3>
+        <form th:action="@{/training-log/save}" method="post" id="weight-form">
+            <input type="hidden" name="recordDate" th:value="${today}">
+            <input type="hidden" name="type" value="WEIGHT">
+            <input type="hidden" name="exerciseName" th:value="${selectedExercise}">
+            
+            <table style="width: 100%; color: white; border-collapse: separate; border-spacing: 0 10px;">
+                <thead>
+                    <tr style="color: #aaa; font-size: 0.9em;">
+                        <th style="text-align: center; width: 15%;">Set</th>
+                        <th style="text-align: center; width: 40%;">重量 (kg)</th>
+                        <th style="text-align: center; width: 40%;">回数 (Reps)</th>
+                        <th style="width: 5%;"></th>
+                    </tr>
+                </thead>
+                <tbody id="sets-container">
+                    </tbody>
+            </table>
+
+            <button type="button" id="add-set-btn" class="button secondary" style="width: 100%; margin-top: 10px; padding: 10px; font-size: 0.9em;">
+                <i class="fa-solid fa-plus"></i> セットを追加
+            </button>
+            
+            <button type="submit" class="btn-finish" style="margin-top: 20px;">
+                記録して終了 <i class="fa-solid fa-check"></i>
+            </button>
+        </form>
     </div>
+
+    <div th:if="${trainingType == 'cardio'}" class="record-form-container">
+        <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px;">
+            <i class="fa-solid fa-pen-to-square"></i> 実績を記録
+        </h3>
+        <form th:action="@{/training-log/save}" method="post">
+            <input type="hidden" name="recordDate" th:value="${today}">
+            <input type="hidden" name="type" value="CARDIO">
+            <input type="hidden" name="cardioType" th:value="${selectedExercise}">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">時間</label>
+                    <input type="number" name="durationMinutes" class="form-input" placeholder="0" required>
+                    <span class="unit">分 (Minutes)</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">距離</label>
+                    <input type="number" name="distanceKm" class="form-input" step="0.1" placeholder="0.0">
+                    <span class="unit">km (任意)</span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-finish">
+                記録して終了 <i class="fa-solid fa-check"></i>
+            </button>
+        </form>
+    </div>
+
+    <div th:if="${trainingType == 'ai-suggested'}">
+         <div class="log-placeholder" style="border-color: var(--ai-accent-color); box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);">
+            <p style="color: var(--ai-accent-color); font-weight: 600;">FitBotの提案内容:</p>
+            <ul class="program-list">
+                <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 1. 種目A: 4セット x 10回 (70kg) (AIプログラムの例)</li>
+                <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 2. 種目B: 3セット x 12回 (20kg)</li>
+                <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 3. 種目C: 3セット x 15回</li>
+            </ul>
+            <p style="margin-top: 20px; color: var(--primary-color);">目標時間: 45分 / 休憩時間: 60秒</p>
+        </div>
+        <div class="control-buttons">
+             <a th:href="@{/training-log}" class="button primary">セッション完了 (カレンダーに戻る)</a>
+        </div>
+    </div>
+</div>
+
+<div class="button-container" style="margin-top: 20px;">
+    <a th:href="@{/ai-coach}" class="button primary">
+        トレーニング内容をAIコーチに相談 🤖
+    </a>
+</div>
+    
+<div class="control-buttons" style="margin-top: -5px;">
+    <a th:href="@{/training}" class="button secondary">
+        中断してメニュー選択に戻る <i class="fa-solid fa-arrow-rotate-left"></i>
+    </a>
+</div>
 </div>
 
 <script>
@@ -307,107 +306,49 @@
         };
 
         // =======================================================
-        // 1. トレーニングタイマー機能 (Countdown Timer)
+        // セット追加機能 (新規追加)
         // =======================================================
-        const cdDisplay = document.getElementById('countdown-display');
-        const cdMinInput = document.getElementById('countdown-minutes');
-        const cdSecInput = document.getElementById('countdown-seconds');
-        const cdSetBtn = document.getElementById('countdown-set');
-        const cdStartPauseBtn = document.getElementById('countdown-start-pause');
-        const cdResetBtn = document.getElementById('countdown-reset');
-
-        let cdInitialTime = 300000; // 初期値: 5分
-        let cdRemainingTime = cdInitialTime;
-        let cdTimer = null;
-        let isCdRunning = false;
+        const setsContainer = document.getElementById('sets-container');
+        const addSetBtn = document.getElementById('add-set-btn');
         
-        const updateCdDisplay = () => {
-            if(!cdDisplay) return;
-            cdDisplay.textContent = formatTime(cdRemainingTime);
+        if (setsContainer && addSetBtn) {
+            let setCounter = 0;
 
-            if (cdRemainingTime <= 10000 && cdRemainingTime > 0) {
-                 cdDisplay.style.color = '#ff0000'; 
-            } else {
-                 cdDisplay.style.color = '#ffcc00'; 
-            }
-        };
+            const addSetRow = (weight = '', reps = '') => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="text-align: center; font-weight: bold; vertical-align: middle;">${setCounter + 1}</td>
+                    <td style="padding: 0 5px;">
+                        <input type="number" name="setList[${setCounter}].weight" class="form-input" step="0.5" placeholder="kg" value="${weight}" required style="text-align: center;">
+                    </td>
+                    <td style="padding: 0 5px;">
+                        <input type="number" name="setList[${setCounter}].reps" class="form-input" placeholder="回" value="${reps}" required style="text-align: center;">
+                    </td>
+                    <td style="text-align: center; vertical-align: middle;">
+                         <i class="fa-solid fa-trash" onclick="removeRow(this)" style="color: #666; cursor: pointer;"></i>
+                    </td>
+                `;
+                setsContainer.appendChild(tr);
+                setCounter++;
+            };
 
-        const handleCdFinish = () => {
-            clearInterval(cdTimer);
-            isCdRunning = false;
-            cdStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 開始';
-            cdStartPauseBtn.classList.remove('timer-button-secondary');
-            cdStartPauseBtn.classList.add('timer-button-primary');
+            // 行削除機能
+            window.removeRow = function(icon) {
+                const row = icon.closest('tr');
+                row.remove();
+                // ※注意: インデックスを詰め直す処理が必要な場合がありますが、
+                // Spring Bootは飛び飛びのインデックス(setList[0], setList[2]...)でもバインド可能なため
+                // 簡易実装としてそのままにしています。
+            };
 
-            alert('トレーニングタイマー終了！');
-        };
+            // 初期状態で3セット分表示
+            addSetRow();
+            addSetRow();
+            addSetRow();
 
-        const startCountdown = () => {
-            if (cdRemainingTime <= 0) {
-                resetCountdown();
-                return;
-            }
-            
-            if (!isCdRunning) {
-                isCdRunning = true;
-                cdStartPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 停止';
-                cdStartPauseBtn.classList.remove('timer-button-primary');
-                cdStartPauseBtn.classList.add('timer-button-secondary');
-
-                const startTime = Date.now() - (cdInitialTime - cdRemainingTime);
-                
-                cdTimer = setInterval(() => {
-                    const elapsedTime = Date.now() - startTime;
-                    cdRemainingTime = cdInitialTime - elapsedTime;
-                    
-                    if (cdRemainingTime <= 0) {
-                        cdRemainingTime = 0;
-                        updateCdDisplay();
-                        handleCdFinish();
-                        return;
-                    }
-                    updateCdDisplay();
-                }, 100);
-            } else {
-                clearInterval(cdTimer);
-                isCdRunning = false;
-                cdInitialTime = cdRemainingTime; 
-                cdStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 再開';
-                cdStartPauseBtn.classList.remove('timer-button-secondary');
-                cdStartPauseBtn.classList.add('timer-button-primary');
-            }
-        };
-
-        const resetCountdown = () => {
-            clearInterval(cdTimer);
-            isCdRunning = false;
-            
-            const minutes = parseInt(cdMinInput.value) || 0;
-            const seconds = parseInt(cdSecInput.value) || 0;
-            
-            const newInitialTime = (minutes * 60000) + (seconds * 1000);
-
-            if (newInitialTime < 1000) {
-                cdInitialTime = 300000; 
-                cdMinInput.value = 5;
-                cdSecInput.value = 0;
-            } else {
-                cdInitialTime = newInitialTime;
-            }
-
-            cdRemainingTime = cdInitialTime;
-            
-            updateCdDisplay();
-            cdStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 開始';
-            cdStartPauseBtn.classList.remove('timer-button-secondary');
-            cdStartPauseBtn.classList.add('timer-button-primary');
-        };
-        
-        if(cdSetBtn && cdStartPauseBtn && cdResetBtn) {
-            cdSetBtn.addEventListener('click', resetCountdown);
-            cdStartPauseBtn.addEventListener('click', startCountdown);
-            cdResetBtn.addEventListener('click', resetCountdown);
-            resetCountdown(); 
+            addSetBtn.addEventListener('click', () => {
+                addSetRow();
+            });
         }
 
         // =======================================================
@@ -517,3 +458,61 @@
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
