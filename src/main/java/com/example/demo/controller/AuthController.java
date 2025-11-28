@@ -49,15 +49,16 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public String processForgotPassword(@RequestParam("email") String email,
                                         RedirectAttributes redirectAttributes) {
-        boolean emailFoundAndSent = true; 
+        // 実際の処理: UserServiceを使ってメールアドレスが存在するかチェックし、リセットリンクを送信 (模擬)
+        boolean emailFoundAndSent = userService.processForgotPassword(email); // ★ 修正
+        
         if (emailFoundAndSent) {
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "パスワードリセット用のリンクをメールアドレス " + email + " 宛に送信しました。"); // ★ セミコロンを修正
+            // HTMLの th:if="${param.success}" に対応させるため、クエリパラメータでリダイレクト
+            return "redirect:/forgot-password?success"; // ★ 修正: クエリパラメータを使用
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage",
-                    "そのメールアドレスは登録されていません。");
+            // HTMLの th:if="${param.error}" に対応させるため、クエリパラメータでリダイレクト
+            return "redirect:/forgot-password?error"; // ★ 修正: クエリパラメータを使用
         }
-        return "redirect:/forgot-password";
     }
 
     // --- パスワード変更 ---
@@ -118,60 +119,5 @@ public class AuthController {
     @GetMapping("/settings")
     public String settings() { return "settings/settings"; } // 修正済み
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

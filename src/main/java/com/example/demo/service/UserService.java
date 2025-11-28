@@ -33,6 +33,27 @@ public class UserService {
         return userRepository.findById(id);
     }
     
+    // 【追加】メールアドレスでユーザーを検索する（UserRepositoryにfindByEmailがあると仮定）
+    public Optional<User> findByEmail(String email) {
+        // UserRepositoryインターフェースに Optional<User> findByEmail(String email); が定義されている前提
+        return userRepository.findByEmail(email);
+    }
+    
+    // 【追加】パスワードリセットの処理を模擬
+    public boolean processForgotPassword(String email) {
+        Optional<User> optionalUser = findByEmail(email);
+        
+        if (optionalUser.isPresent()) {
+            // 実際にはここでリセットトークンを生成し、メール送信サービスを呼び出します。
+            // 現時点ではメール送信の代わりにログを出力し、成功を模擬します。
+            System.out.println("パスワードリセットリンクをメールアドレス: " + email + " に送信しました。 (模擬)");
+            return true;
+        } else {
+            // ユーザーが見つからない
+            return false;
+        }
+    }
+    
     public void save(User user) {
         userRepository.save(user);
     }
@@ -123,8 +144,3 @@ public class UserService {
         userRepository.save(user);
     }
 }
-
-
-
-
-

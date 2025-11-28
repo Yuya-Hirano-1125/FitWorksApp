@@ -12,12 +12,12 @@ import com.example.demo.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
+    // 【追加】メールアドレスでユーザーを検索するメソッド
+    Optional<User> findByEmail(String email);
+
     // ★追加: レベルが高い順、同じならXPが多い順に上位20件を取得
     List<User> findTop20ByOrderByLevelDescExperiencePointsDesc();
 }
-
-
-
 
 
 
