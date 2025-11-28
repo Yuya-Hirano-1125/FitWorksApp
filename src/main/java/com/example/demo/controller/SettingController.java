@@ -117,4 +117,12 @@ public class SettingController {
         // 削除完了画面を返す
         return "settings/goodbye";
     }
+    
+    
+ // 利用規約画面
+    @GetMapping("/terms")
+    public String terms() {
+        // templates/misc/terms.html を表示するよう指定
+        return "misc/terms"; 
+    }
 }
