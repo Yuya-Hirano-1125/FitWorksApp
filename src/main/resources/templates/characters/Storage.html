@@ -14,19 +14,18 @@
   <body>
     <header>
         <h1>キャラクター解放</h1>
-		<a th:href="@{/character}" class="character-display">
-		            <img th:src="@{/img/hi1.png}" alt="Character Image" />
-		        </a>
         <p class="user-level">現在のレベル: <span id="current-level">1</span></p>
     </header>
-
+	
     <div class="character-list-wrapper">
         <div class="character-list-container" id="character-container">
-			<a th:href="@{/character/info/}" class="character-link">
+			
+			<!--★１炎タイプの卵 -->
+			<a th:href="@{/characters/dracoegg}" class="character-link">
             <div class="character-card fire" data-attribute="fire" data-unlocked-level="1">
                 <div class="card-content">
                     <div class="evolution-tag">★1</div>
-                    <img class="character-img" data-src="/img/character/hi0.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="炎の卵">
+                    <img class="character-img" data-src="/img/character/0.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="炎の卵">
                     <p class="character-name">エンバーハート</p>
                     <p class="required-level">Lv.1 解放</p>
                 </div>
@@ -37,12 +36,13 @@
                 </div>
             </div>
             </a>
-		
+			
+			<!--★2炎タイプの1進化目 -->
 		<a th:href="@{/characters/draco}" class="character-link"> 
             <div class="character-card fire" data-attribute="fire" data-unlocked-level="5">
                 <div class="card-content">
                     <div class="evolution-tag">★2</div>
-                    <img class="character-img" data-src="/img/character/hi1.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ドラコ">
+                    <img class="character-img" data-src="/img/character/10.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ドラコ">
                     <p class="character-name">ドラコ</p>
                     <p class="required-level">Lv.10 解放</p>
                 </div>
@@ -54,7 +54,8 @@
             </div>
         </a>
 		
-		<a th:href="@{/character/info/}" class="character-link">
+		<!--★3炎タイプの2進化目 -->
+		<a th:href="@{/characters/dracos}" class="character-link">
             <div class="character-card fire" data-attribute="fire" data-unlocked-level="10">
                 <div class="card-content">
                     <div class="evolution-tag">★3</div>
@@ -71,7 +72,8 @@
             </div>
 		</a>
 		
-		<a th:href="@{/character/info/}" class="character-link">
+		<!--★4炎タイプの最終進化 -->
+		<a th:href="@{/characters/dragonoid}" class="character-link">
             <div class="character-card fire" data-attribute="fire" data-unlocked-level="15">
                 <div class="card-content">
                     <div class="evolution-tag">★4</div>
@@ -87,7 +89,8 @@
             </div>
 		</a>
 		
-		<a th:href="@{/character/info/}" class="character-link">
+		<!--★1水タイプの卵 -->
+		<a th:href="@{/characters/dollyegg}" class="character-link">
             <div class="character-card water" data-attribute="water" data-unlocked-level="20">
                 <div class="card-content">
                     <div class="evolution-tag">★1</div>
@@ -103,7 +106,8 @@
             </div>
 		</a>
 		
-		<a th:href="@{/character/info/}" class="character-link">
+		<!--★2水タイプの1進化目 -->
+		<a th:href="@{/characters/dolly}" class="character-link">
             <div class="character-card water" data-attribute="water" data-unlocked-level="25">
                 <div class="card-content">
                     <div class="evolution-tag">★2</div>
@@ -119,7 +123,8 @@
             </div>
          </a>
 		 
-		 <a th:href="@{/character/info/}" class="character-link">  
+		 <!--★3水タイプの2進化目 -->
+		 <a th:href="@{/characters/dolphy}" class="character-link">  
             <div class="character-card water" data-attribute="water" data-unlocked-level="30">
                 <div class="card-content">
                     <div class="evolution-tag">★3</div>
@@ -135,7 +140,8 @@
             </div>
 		</a>
 		
-		<a th:href="@{/character/info/}" class="character-link">
+		<!--★4水タイプの最終進化 -->
+		<a th:href="@{/characters/dolphinas}" class="character-link">
             <div class="character-card water" data-attribute="water" data-unlocked-level="35">
                 <div class="card-content">
                     <div class="evolution-tag">★4</div>
@@ -151,7 +157,8 @@
             </div>
          </a>
 		 
-		 <a th:href="@{/character/info/}" class="character-link">  
+		 <!--★1草タイプの卵 -->
+		 <a th:href="@{/characters/info/}" class="character-link">  
             <div class="character-card grass" data-attribute="grass" data-unlocked-level="40">
                 <div class="card-content">
                     <div class="evolution-tag">★1</div>
@@ -167,7 +174,8 @@
             </div>
           </a>
 		  
-		  <a th:href="@{/character/info/}" class="character-link">  
+		  <!--★2草タイプの1進化目 -->
+		  <a th:href="@{/characters/info/}" class="character-link">  
             <div class="character-card grass" data-attribute="grass" data-unlocked-level="45">
                 <div class="card-content">
                     <div class="evolution-tag">★2</div>
@@ -183,7 +191,8 @@
             </div>
            </a>
 		   
-		   <a th:href="@{/character/info/}" class="character-link">
+		   <!--★3草タイプの2進化目 -->
+		   <a th:href="@{/characters/info/}" class="character-link">
             <div class="character-card grass" data-attribute="grass" data-unlocked-level="50">
                 <div class="card-content">
                     <div class="evolution-tag">★3</div>
@@ -199,7 +208,8 @@
             </div>
 			</a>
             
-			<a th:href="@{/character/info/}" class="character-link">
+			<!--★4草タイプの最終進化 -->
+			<a th:href="@{/characters/info/}" class="character-link">
             <div class="character-card grass" data-attribute="grass" data-unlocked-level="55">
                 <div class="card-content">
                     <div class="evolution-tag">★4</div>
@@ -215,7 +225,8 @@
             </div>
 			</a>
 			
-			<a th:href="@{/character/info/}" class="character-link">
+			<!--★1光タイプの卵 -->
+			<a th:href="@{/characters/info/}" class="character-link">
             <div class="character-card light" data-attribute="light" data-unlocked-level="60">
                 <div class="card-content">
                     <div class="evolution-tag">★1</div>
@@ -231,7 +242,8 @@
             </div>
 			</a>
 
-			<a th:href="@{/character/info/}" class="character-link">
+			<!--★2光タイプの1進化目 -->
+			<a th:href="@{/characters/info/}" class="character-link">
             <div class="character-card light" data-attribute="light" data-unlocked-level="65">
                 <div class="card-content">
                     <div class="evolution-tag">★2</div>
@@ -247,7 +259,8 @@
             </div>
 			</a>
 
-			<a th:href="@{/character/info/}" class="character-link">
+			<!--★3光タイプの2進化目 -->
+			<a th:href="@{/characters/info/}" class="character-link">
             <div class="character-card light" data-attribute="light" data-unlocked-level="70">
                 <div class="card-content">
                     <div class="evolution-tag">★3</div>
@@ -263,7 +276,8 @@
             </div>
 			</a>
 
-			<a th:href="@{/character/info/}" class="character-link">
+			<!--★4光タイプの最終進化 -->
+			<a th:href="@{/characters/info/}" class="character-link">
             <div class="character-card light" data-attribute="light" data-unlocked-level="75">
                 <div class="card-content">
                     <div class="evolution-tag">★4</div>
@@ -279,7 +293,8 @@
             </div>
 			</a>
 
-			<a th:href="@{/character/info/}" class="character-link">
+			<!--★1闇タイプの卵 -->
+			<a th:href="@{/characters/info/}" class="character-link">
 			<div class="character-card dark" data-attribute="dark" data-unlocked-level="80">
                 <div class="card-content">
                     <div class="evolution-tag">★1</div>
@@ -295,7 +310,8 @@
             </div>
 			</a>
 
-			<a th:href="@{/character/info/}" class="character-link">
+			<!--★2闇タイプの1進化目 -->
+			<a th:href="@{/characters/info/}" class="character-link">
             <div class="character-card dark" data-attribute="dark" data-unlocked-level="85">
                 <div class="card-content">
                     <div class="evolution-tag">★2</div>
@@ -311,7 +327,8 @@
             </div>
 			</a>
 
-			<a th:href="@{/character/info/}" class="character-link">
+			<!--★3闇タイプの2進化目 -->
+			<a th:href="@{/characters/info/}" class="character-link">
             <div class="character-card dark" data-attribute="dark" data-unlocked-level="90">
                 <div class="card-content">
                     <div class="evolution-tag">★3</div>
@@ -326,8 +343,9 @@
                 </div>
             </div>
 			</a>
-
-			<a th:href="@{/character/info/}" class="character-link">
+			
+			<!--★4闇タイプの最終進化 -->
+			<a th:href="@{/characters/info/}" class="character-link">
             <div class="character-card dark" data-attribute="dark" data-unlocked-level="95">
                 <div class="card-content">
                     <div class="evolution-tag">★4</div>
@@ -343,7 +361,7 @@
             </div>
 			</a>
             
-			<a th:hreff="@{/character/info/}" class="character-link">
+			<a th:hreff="@{/characters/info/}" class="character-link">
             <div class="character-card dark" data-attribute="dark" data-unlocked-level="999">
                 <div class="card-content">
                     <div class="evolution-tag">???</div>
