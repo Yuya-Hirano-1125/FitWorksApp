@@ -12,10 +12,10 @@
 	<script th:src="@{/js/theme.js}"></script>
 </head>
   <body>
+	<div id="lock-message" class="hidden">
+			        このキャラクターはロックされています。レベルが足りません。
+	</div>
     <header>
-		<div id="lock-message" class="hidden">
-		        このキャラクターはロックされています。レベルが足りません。
-		    </div>
 		<div class="back-btn-container">
 		            <a th:href="@{/home}" class="button secondary">
 		                <i class="fa-solid fa-house"></i> ホームに戻る
