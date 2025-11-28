@@ -80,3 +80,34 @@ h1 {
     background: #ff9800;
     color: #fff;
 }
+
+/* ------------------------
+   ロックメッセージ表示エリア
+ ------------------------ */
+#lock-message {
+    position: fixed; /* 画面に固定 */
+    top: 50%; /* 垂直方向中央 */
+    left: 50%; /* 水平方向中央 */
+    transform: translate(-50%, -50%); /* 完全に中央に配置 */
+    
+    /* 見た目の調整 */
+    background-color: #e74c3c; /* 赤系の背景色 */
+    color: white; /* 文字色 */
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    font-weight: bold;
+    z-index: 1000; /* 他の要素より手前に表示 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    
+    /* アニメーションで滑らかに表示/非表示 */
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* hidden クラスが付いている場合は非表示にする */
+#lock-message.hidden {
+    opacity: 0;
+    /* クリックイベントを無視させる */
+    pointer-events: none;
+}
