@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random; // ★ 追加
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,6 +160,67 @@ public class TrainingController {
 			"トレッドミルインターバル (上級)"
 		);
 
+	// ★★★ 【新規追加】AIおすすめメニュー生成メソッド ★★★
+    /**
+     * ランダムなAIおすすめトレーニングメニューを生成します。
+     * @return プログラムリスト、目標時間、休憩時間を含むMap
+     */
+    private Map<String, Object> generateAiSuggestedMenu() {
+        Map<String, Object> menu = new LinkedHashMap<>();
+        List<String> programList = new ArrayList<>();
+        Random random = new Random();
+
+        // 1. 鍛える部位をランダムに選択 (今回は胸、背中、脚、肩から一つ選ぶ)
+        List<String> mainParts = List.of("胸", "背中", "脚", "肩");
+        String selectedPart = mainParts.get(random.nextInt(mainParts.size()));
+        
+        // 2. その部位の種目をランダムに選択 (3-4種目)
+        List<String> exercises = FREE_WEIGHT_EXERCISES_BY_PART.get(selectedPart);
+        if (exercises == null || exercises.isEmpty()) {
+            exercises = List.of("全身サーキット (中級)"); // Fallback
+        }
+        
+        List<String> availableExercises = new ArrayList<>(exercises);
+        List<String> selectedExercises = new ArrayList<>();
+        
+        int numExercises = 3 + random.nextInt(2); // 3-4 exercises
+        
+        for (int i = 0; i < numExercises && !availableExercises.isEmpty(); i++) {
+            int index = random.nextInt(availableExercises.size());
+            selectedExercises.add(availableExercises.remove(index));
+        }
+        
+        // 3. 各種目にセット数、回数、重量を割り当てる
+        for (int i = 0; i < selectedExercises.size(); i++) {
+            String exercise = selectedExercises.get(i);
+            int sets = 3 + random.nextInt(2); // 3-4 sets
+            int reps = 8 + random.nextInt(5); // 8-12 reps
+            // 難易度とランダムな値で重量を決定
+            int baseWeight = 30; 
+            int difficultyAdjustment = getExperiencePoints(exercise) / 30;
+            int weight = baseWeight + random.nextInt(50) + difficultyAdjustment; 
+            
+            programList.add((i + 1) + ". " + exercise + ": " + sets + "セット x " + reps + "回 (" + weight + "kg)");
+        }
+        
+        // 4. 有酸素運動を追加する確率 (40%)
+        if (random.nextInt(10) < 4) {
+            String cardio = CARDIO_EXERCISES.get(random.nextInt(CARDIO_EXERCISES.size()));
+            int duration = 15 + random.nextInt(16); // 15-30 minutes
+            programList.add((selectedExercises.size() + 1) + ". " + cardio + ": " + duration + "分");
+        }
+
+        // 5. 目標時間と休憩時間を設定
+        int totalTime = 40 + random.nextInt(31); // 40-70 minutes
+        int restTime = 45 + random.nextInt(31); // 45-75 seconds
+
+        menu.put("programList", programList);
+        menu.put("targetTime", totalTime);
+        menu.put("restTime", restTime);
+        
+        return menu;
+    }
+	
 	@GetMapping("/training")
 	public String showTrainingOptions(Authentication authentication, Model model) {	
 		if (getCurrentUser(authentication) == null) {
@@ -207,6 +269,13 @@ public class TrainingController {
 			case "ai-suggested":
 				title = "AIおすすめメニューセッション";
 				selectedExercise = "AIおすすめプログラム";	
+				
+                // ★ 【変更点】AIメニュー生成ロジックの呼び出しとモデルへの追加
+                Map<String, Object> aiMenu = generateAiSuggestedMenu();
+                model.addAttribute("programList", aiMenu.get("programList"));
+                model.addAttribute("targetTime", aiMenu.get("targetTime"));
+                model.addAttribute("restTime", aiMenu.get("restTime"));
+                // ★ 変更点終わり
 				break;
 			case "free-weight":
 			case "cardio":

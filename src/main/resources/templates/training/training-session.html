@@ -271,11 +271,14 @@
          <div class="log-placeholder" style="border-color: var(--ai-accent-color); box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);">
             <p style="color: var(--ai-accent-color); font-weight: 600;">FitBotの提案内容:</p>
             <ul class="program-list">
-                <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 1. 種目A: 4セット x 10回 (70kg) (AIプログラムの例)</li>
-                <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 2. 種目B: 3セット x 12回 (20kg)</li>
-                <li><i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 3. 種目C: 3セット x 15回</li>
+                <li th:each="program : ${programList}">
+                    <i class="fa-solid fa-circle-right" style="color:#00c8c8;"></i> 
+                    <span th:text="${program}">1. 種目A: 4セット x 10回 (70kg) (AIプログラムの例)</span>
+                </li>
             </ul>
-            <p style="margin-top: 20px; color: var(--primary-color);">目標時間: 45分 / 休憩時間: 60秒</p>
+            <p style="margin-top: 20px; color: var(--primary-color);">
+                目標時間: <span th:text="${targetTime}">45</span>分 / 休憩時間: <span th:text="${restTime}">60</span>秒
+            </p>
         </div>
         <div class="control-buttons">
              <a th:href="@{/training-log}" class="button primary">セッション完了 (カレンダーに戻る)</a>
@@ -460,9 +463,6 @@
 </script>
 </body>
 </html>
-
-
-
 
 
 
