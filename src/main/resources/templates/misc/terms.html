@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>利用規約 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    
+    <style>
+        /* 利用規約専用スタイル */
+        .terms-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .terms-content h2 {
+            font-size: 1.1rem;
+            color: var(--primary-color, #ff69b4); /* アプリのテーマカラー */
+            border-bottom: 2px dashed #eee;
+            padding-bottom: 5px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .terms-content h2:first-child {
+            margin-top: 0;
+        }
+
+        .terms-content p {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .terms-content ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .terms-content li {
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+
+        /* 戻るボタンエリア */
+        .action-area {
+            margin-top: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <h1><i class="fa-solid fa-file-contract header-icon"></i> 利用規約</h1>
+    
+    <div class="terms-container">
+        <div class="terms-content">
+            <h2>第1条（はじめに）</h2>
+            <p>この利用規約（以下，「本規約」といいます。）は，FitWorks Project（以下，「当チーム」といいます。）がこのウェブサイト上で提供するサービス（以下，「本サービス」といいます。）の利用条件を定めるものです。登録ユーザーの皆さま（以下，「ユーザー」といいます。）には，本規約に従って，本サービスをご利用いただきます。</p>
+
+            <h2>第2条（利用登録）</h2>
+            <p>登録希望者が当チームの定める方法によって利用登録を申請し，当チームがこれを承認することによって，利用登録が完了するものとします。</p>
+
+            <h2>第3条（禁止事項）</h2>
+            <p>ユーザーは，本サービスの利用にあたり，以下の行為をしてはなりません。</p>
+            <ul>
+                <li>法令または公序良俗に違反する行為</li>
+                <li>犯罪行為に関連する行為</li>
+                <li>本サービスの内容等，本サービスに含まれる著作権，商標権ほか知的財産権を侵害する行為</li>
+                <li>他のユーザーに成りすます行為</li>
+                <li>その他，当チームが不適切と判断する行為</li>
+            </ul>
+
+            <h2>第4条（本サービスの提供の停止等）</h2>
+            <p>当チームは，以下のいずれかの事由があると判断した場合，ユーザーに事前に通知することなく本サービスの全部または一部の提供を停止または中断することができるものとします。</p>
+            <ul>
+                <li>本サービスにかかるコンピュータシステムの保守点検または更新を行う場合</li>
+                <li>地震，落雷，火災，停電または天災などの不可抗力により，本サービスの提供が困難となった場合</li>
+            </ul>
+
+            <h2>第5条（免責事項）</h2>
+            <p>当チームは，本サービスに関して，ユーザーと他のユーザーまたは第三者との間において生じた取引，連絡または紛争等について一切責任を負いません。</p>
+            
+            <p style="text-align: right; margin-top: 30px; font-size: 0.8rem; color: #999;">
+                2025年制定
+            </p>
+        </div>
+    </div>
+
+    <div class="action-area">
+        <a th:href="@{/settings}" class="button secondary" style="background: #fff; color: #555; border: 1px solid #ddd; display:inline-block; width: auto; padding: 10px 30px;">
+            <i class="fa-solid fa-arrow-left"></i> 設定に戻る
+        </a>
+    </div>
+
+    <p style="margin-top: 30px; font-size: 0.85rem; color: #aaa; text-align: center;">
+        &copy; 2025 FitWorks Project
+    </p>
+</div>
+</body>
+</html>

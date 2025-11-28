@@ -14,79 +14,105 @@
     <style>
         /* --- スタート画面専用スタイル（レスポンシブ対応） --- */
 
-        /* 画面全体のコンテナ設定 (home.htmlのサイズ感に合わせる) */
+        /* 画面全体のコンテナ設定 */
         .main-container {
-            max-width: 600px; /* PCで見ても横長になりすぎないように制限 */
-            width: 90%;       /* スマホでは画面の90%の幅を使う */
-            margin: 30px auto;
+            max-width: 600px;
+            width: 90%;
+            margin: 40px auto;
             padding: 40px 30px;
-            /* base.cssのアニメーション等は継承されます */
+            text-align: center; /* 全体を中央揃えベースに */
         }
 
         /* ロゴ周り */
         .start-logo-container {
-            text-align: center;
             margin-bottom: 25px;
+            animation: fadeInDown 1s ease-out;
         }
         
         .start-logo {
-            /* 基本サイズ（PCなど） */
             width: 160px;
             height: 160px;
-            border-radius: 35px;
-            object-fit: contain; /* 画像全体を表示 */
+            border-radius: 40px; /* 少し丸みを強く */
+            object-fit: contain;
             background-color: #fff;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-            transition: all 0.3s ease; /* サイズ変化を滑らかに */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* 影を少しリッチに */
+            transition: transform 0.3s ease;
+        }
+        
+        .start-logo:hover {
+            transform: scale(1.05) rotate(-3deg);
         }
 
         /* タイトルテキスト */
         h1 {
-            font-size: 2.4rem;
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 800;
             margin-bottom: 10px;
-            transition: font-size 0.3s ease;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        .catch-copy {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: rgb(240, 152, 172); /* アプリのテーマカラーに合わせる */
+            margin-bottom: 10px;
+            display: block;
         }
 
         .sub-heading {
-            font-size: 1.1rem;
+            font-size: 1.0rem;
             margin-bottom: 30px;
             color: #666;
-            transition: font-size 0.3s ease;
+            line-height: 1.6;
         }
 
         /* アプリ説明カード */
         .app-description {
             background-color: #fff;
-            border-radius: 20px;
+            border-radius: 25px;
             padding: 30px;
             margin: 30px 0;
             text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .description-text {
             font-size: 1.05rem;
             color: #555;
             line-height: 1.8;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
         }
 
-        .feature-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 20px;
+        /* 特徴リストを2列グリッドにして見やすく */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
 
-        .feature-list li {
-            margin-bottom: 12px;
+        .feature-item {
             display: flex;
             align-items: center;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #444;
         }
 
-        .feature-list i {
-            color: #ff9966;
-            font-size: 1.4rem;
-            width: 35px;
+        .feature-item i {
+            color: #fff;
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
             text-align: center;
-            margin-right: 12px;
-            flex-shrink: 0; /* アイコンが潰れないようにする */
+            border-radius: 50%;
+            margin-right: 10px;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            box-shadow: 0 3px 8px rgba(255, 94, 98, 0.3);
         }
 
         /* ボタンエリア */
@@ -99,73 +125,99 @@
         
         .button {
             padding: 18px 25px;
-            font-size: 1.2rem;
-            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px; /* 角丸を強くしてモダンに */
             width: 100%;
             display: block;
             text-align: center;
-            box-sizing: border-box; /* パディングを含めた幅計算 */
+            box-sizing: border-box;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* プライマリーボタン（登録）を目立たせる */
+        .button.primary {
+            background: linear-gradient(45deg, #ff9966, #ff5e62);
+            color: white;
+            border: none;
+            box-shadow: 0 5px 15px rgba(255, 94, 98, 0.4);
+        }
+
+        .button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 94, 98, 0.5);
+        }
+        
+        .button.primary i {
+            margin-right: 8px;
         }
 
         .button.secondary {
-            background: #fff;
-            color: #333;
-            border: 2px solid #ddd;
+            background: #f8f9fa;
+            color: #555;
+            border: 2px solid #eee;
         }
         
         .button.secondary:hover {
-            background: #f9f9f9;
-            border-color: #ccc;
+            background: #fff;
+            border-color: #ddd;
+            color: #333;
         }
-        
+
+        /* アニメーション用 */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* ------------------------------------------- */
         /* スマホ向けレスポンシブ設定 (画面幅 480px以下) */
         /* ------------------------------------------- */
         @media screen and (max-width: 480px) {
             .main-container {
-                width: 95%;      /* 横幅を広げる */
-                padding: 25px 20px; /* 余白を減らす */
-                margin: 10px auto;
+                width: 92%;
+                padding: 20px 15px;
             }
 
             .start-logo {
-                width: 120px;    /* ロゴを小さく */
-                height: 120px;
-                border-radius: 25px;
+                width: 200px;
+                height: 200px;
             }
 
             h1 {
-                font-size: 1.8rem; /* タイトル文字サイズ縮小 */
+                font-size: 2.0rem;
+            }
+            
+            .catch-copy {
+                font-size: 1.0rem;
             }
 
             .sub-heading {
-                font-size: 0.95rem;
-                margin-bottom: 20px;
+                font-size: 0.9rem;
             }
 
             .app-description {
-                padding: 20px;   /* 説明文の余白縮小 */
-                margin: 20px 0;
-                font-size: 0.95rem;
-            }
-
-            .feature-list li {
-                font-size: 0.95rem;
+                padding: 20px;
             }
             
-            .feature-list i {
-                font-size: 1.2rem;
-                width: 25px;
-                margin-right: 10px;
+            .description-text {
+                font-size: 0.95rem;
             }
 
-            .auth-buttons {
-                margin-top: 30px;
+            /* スマホでは1列に戻すか、文字サイズ調整 */
+            .feature-grid {
                 gap: 12px;
+            }
+            
+            .feature-item {
+                font-size: 0.9rem;
             }
 
             .button {
-                padding: 15px 20px; /* ボタンを少しコンパクトに */
+                padding: 15px 20px;
                 font-size: 1rem;
             }
         }
@@ -178,21 +230,41 @@
     </div>
 
     <h1>FitWorks</h1>
-    <p class="sub-heading">毎日の運動が、冒険に変わる。</p>
+    <span class="catch-copy">毎日の運動が、冒険に変わる。</span>
+    <p class="sub-heading">
+        続かないトレーニングはもう終わり。<br>
+        ゲーム感覚で、理想の自分へレベルアップ。
+    </p>
     
     <div class="app-description">
-        <p>FitWorksは、あなたのフィットネスライフをサポートするゲーミフィケーションアプリです。日々の努力を可視化し、楽しみながら継続しましょう！</p>
-        <ul class="feature-list">
-            <li><i class="fa-solid fa-dumbbell"></i> トレーニングでXP獲得</li>
-            <li><i class="fa-solid fa-user-astronaut"></i> レベルアップとキャラ育成</li>
-            <li><i class="fa-solid fa-shirt"></i> ガチャでアイテムGet</li>
-            <li><i class="fa-solid fa-comments"></i> 仲間と繋がる掲示板</li>
-        </ul>
+        <p class="description-text">
+            FitWorksは、あなたの努力を「XP（経験値）」に変えるフィットネスRPGアプリです。汗をかいた分だけ、あなたもパートナーも強くなれる！
+        </p>
+        <div class="feature-grid">
+            <div class="feature-item">
+                <i class="fa-solid fa-dumbbell"></i> 運動でXP獲得
+            </div>
+            <div class="feature-item">
+                <i class="fa-solid fa-user-astronaut"></i> キャラ育成
+            </div>
+            <div class="feature-item">
+                <i class="fa-solid fa-gift"></i> ご褒美ガチャ
+            </div>
+            <div class="feature-item">
+                <i class="fa-solid fa-robot"></i> AIコーチ機能
+            </div>
+            <div class="feature-item">
+                <i class="fa-solid fa-trophy"></i> ランキング
+            </div>
+            <div class="feature-item">
+                <i class="fa-solid fa-comments"></i> 掲示板で交流
+            </div>
+        </div>
     </div>
     
     <div class="auth-buttons">
         <a th:href="@{/register}" class="button primary">
-            <i class="fa-solid fa-user-plus"></i> 新規登録してはじめる
+            <i class="fa-solid fa-rocket"></i> 今すぐ冒険を始める(新規登録)
         </a>
 
         <a th:href="@{/login}" class="button secondary">
@@ -200,7 +272,7 @@
         </a>
     </div>
     
-    <p style="margin-top: 30px; font-size: 0.85rem; color: #aaa;">
+    <p style="margin-top: 30px; font-size: 0.8rem; color: #bbb;">
         &copy; 2025 FitWorks Project
     </p>
 </div>

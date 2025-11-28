@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>エラー | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    
+    <style>
+        /* エラー画面専用スタイル */
+        .error-container {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .error-code {
+            font-size: 6rem;
+            font-weight: 800;
+            color: #ff9966; /* アプリのアクセントカラー */
+            margin: 0;
+            line-height: 1;
+            text-shadow: 2px 2px 0px #eee;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .error-message {
+            font-size: 1.2rem;
+            color: #555;
+            margin: 20px 0 40px 0;
+        }
+
+        /* 浮遊アニメーション */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* 詳細情報（開発時などに見る用、本番では隠しても良い） */
+        .error-details {
+            font-size: 0.8rem;
+            color: #999;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fa-solid fa-triangle-exclamation" th:if="${status != 404}"></i>
+            <i class="fa-solid fa-map-location-dot" th:if="${status == 404}"></i>
+        </div>
+
+        <h1 class="error-code" th:text="${status}">404</h1>
+
+        <div class="error-message">
+            <p th:if="${status == 404}">
+                お探しのページは見つかりませんでした。<br>
+                URLが間違っているか、削除された可能性があります。
+            </p>
+            <p th:if="${status != 404}">
+                予期せぬエラーが発生しました。<br>
+                しばらく経ってから再度お試しください。
+            </p>
+        </div>
+        
+        <div class="error-details">
+            <span th:text="${error}">Internal Server Error</span>
+        </div>
+
+        <a th:href="@{/}" class="button secondary">
+            <i class="fa-solid fa-house"></i> スタート画面に戻る
+        </a>
+    </div>
+</div>
+</body>
+</html>
