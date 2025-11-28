@@ -19,7 +19,6 @@ public class UserService {
     private final TrainingRecordRepository trainingRecordRepository; 
     private final PasswordEncoder passwordEncoder; 
 
-    // コンストラクタ
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TrainingRecordRepository trainingRecordRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -30,7 +29,6 @@ public class UserService {
         return userRepository.findByUsername(username).orElse(null);
     }
 
-    // ★追加: IDでユーザーを検索するメソッド (MissionServiceで使用)
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
@@ -52,7 +50,6 @@ public class UserService {
         return false;
     }
     
-    // 既存の経験値加算（ユーザー名指定）
     public void addExperience(String username, int xp) {
          Optional<User> optionalUser = userRepository.findByUsername(username);
          if (optionalUser.isPresent()) {
@@ -62,13 +59,11 @@ public class UserService {
          }
     }
 
-    // ★追加: Userオブジェクトを直接受け取って経験値を加算するメソッド (MissionServiceで使用)
     public void addExp(User user, int xp) {
-        user.addXp(xp); // UserエンティティのaddXpメソッドを呼び出す
+        user.addXp(xp);
         userRepository.save(user);
     }
     
-    // デイリーミッションのステータスを取得
     public MissionStatusDto getDailyMissionStatus(User user) {
         final int MISSION_REWARD_XP = 300; 
         final String MISSION_TEXT = "筋トレ記録を1回投稿する";
@@ -128,3 +123,8 @@ public class UserService {
         userRepository.save(user);
     }
 }
+
+
+
+
+

@@ -11,7 +11,7 @@
 	
 	<script th:src="@{/js/theme.js}"></script>
     <style>
-        /* ✅ 経験値バーのスタイル修正 */
+        /* 経験値バーのスタイル */
         .xp-bar {
             width: 100%;
             height: 25px;
@@ -30,16 +30,61 @@
             text-align: center;
             line-height: 25px;
             border-radius: 12px;
-            transition: width 1s ease-in-out; /* ★ 増加アニメーション */
-			}
-        /* 新規追加: キャラクターと着せ替えボタンの配置用スタイル */
-        /* キャラクターと着せ替えボタンの配置用スタイル */
+            transition: width 1s ease-in-out;
+        }
+
+        /* キャラクターエリア全体の配置 */
         .character-section {
             position: relative;
             display: flex;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 50px;
         }
+
+        /* キャラクター表示エリア（背景・正方形） */
+        .character-display {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            
+            width: 400px;
+            height: 400px;
+            
+            /* 背景画像 */
+            background-image: url('/img/background/fire-original.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+            
+            margin: 0 auto;
+            text-decoration: none;
+            padding-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        /* アニメーション定義 */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* キャラクター画像のスタイル */
+        .character-display img {
+            width: auto;
+            height: 85%;
+            max-width: 95%;
+            object-fit: contain;
+            
+            /* ふわふわアニメーションと濃い影 */
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 20px 15px rgba(0,0,0,0.5));
+        }
+
+        /* 着せ替えボタン */
         .customize-button {
             position: absolute;
             top: 0;
@@ -65,21 +110,10 @@
             flex-grow: 1;
             text-align: center;
         }
-		@keyframes float {
-		        0% { transform: translateY(0px); }
-		        50% { transform: translateY(-25px); } /* 上に15px移動 */
-		        100% { transform: translateY(0px); }
-		    }
-
-		    /* キャラクター画像にアニメーションを適用 */
-		    .character-display img {
-		        animation: float 2s ease-in-out infinite; /* 3秒かけて滑らかに永遠に繰り返す */
-		        filter: drop-shadow(0 20px 15px rgba(0,0,0,0.5)); /* 影をつけて浮遊感を強調 */
-				margin-top: 30px;
-		    }	
     </style>
 </head>
 <body class="home-page">
+
 <div class="main-container"> 
     <div class="app-logo-display">
         <img th:src="@{/img/applogo.jpg}" alt="App Logo" />
@@ -103,8 +137,6 @@
     
     <div class="character-section">
         <a th:href="@{/character}" class="character-display">
-			
-			<!--ホーム画面に表示するキャラクター-->
             <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character Image" />
         </a>
         
@@ -165,3 +197,5 @@
     
 </body>
 </html>
+
+
