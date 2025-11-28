@@ -57,4 +57,44 @@ public class CharacterController {
     public String DolphinasInfo() {
         return "characters/dolphinas"; 
     }
+  //★1草タイプの卵
+    @GetMapping("/shiruegg") 
+    public String ShiruEggInfo() {
+        return "characters/shiruegg"; 
+    }
+  //★2草タイプの1進化目
+    @GetMapping("/shiru") 
+    public String ShiruInfo() {
+        return "characters/shiru"; 
+    }
+  //★3草タイプの2進化目
+    @GetMapping("/shirufa") 
+    public String ShirufaInfo() {
+        return "characters/shirufa"; 
+    }
+  //★4草タイプの最終進化
+    @GetMapping("/shirufina") 
+    public String ShirufinaInfo() {
+        return "characters/shirufina"; 
+    }
+   //★1光タイプの卵
+    @GetMapping("/merryegg") 
+    public String MerryEggInfo() {
+        return "characters/merryegg"; 
+    }
+  //★2光タイプの1進化目
+    @GetMapping("/merry") 
+    public String MerryInfo() {
+        return "characters/merry"; 
+    }
+  //★3光タイプの2進化目
+    @GetMapping("/meriru") 
+    public String MeriruInfo() {
+        return "characters/Meriru"; 
+    }
+  //★4光タイプの最終進化
+    @GetMapping("/merinoa") 
+    public String MerinoaInfo() {
+        return "characters/merinoa"; 
+    }
 }

@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // --------------------------
     setInterval(() => {
         if (currentLevel < maxLevel) {
-            //currentLevel += 1;
+            currentLevel += 99;
             updateCharacterUnlocks();
         }
     }, 1000);
