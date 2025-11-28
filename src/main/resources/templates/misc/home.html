@@ -93,7 +93,7 @@
         <a th:href="@{/character}" class="character-display">
 			
 			<!--ホーム画面に表示するキャラクター-->
-            <img th:src="@{/img/character/0.png}" alt="Character Image" />
+            <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character Image" />
         </a>
         
         <a th:href="@{/gacha/customize}" class="customize-button">
