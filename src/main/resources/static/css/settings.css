@@ -10,29 +10,30 @@
 .settings-page .main-container {
     max-width: 600px; 
     padding: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-    max-width: 600px; 
+    /* 影の色を少し薄く汎用的に */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* Settings Sections (Accordion Style) */
 .setting-section {
     margin-bottom: 0px; 
-    border-bottom: 1px solid #333; 
+    /* ★修正: 固定色(#333)を変数に変更 */
+    border-bottom: 1px solid var(--secondary-color); 
     transition: background-color 0.2s, border-color 0.2s;
-    /* ★ NEW: セクションの登場アニメーション */
+    
+    /* セクションの登場アニメーション */
     opacity: 0;
     transform: translateY(10px);
     animation: fadeIn 0.5s ease-out forwards;
-    animation-delay: calc(0.1s * var(--section-index)); /* CSS変数による遅延 */
+    animation-delay: calc(0.1s * var(--section-index));
 }
-/* settings.htmlの各セクションに --section-index CSS変数を設定する必要があります */
 
 .setting-section:last-of-type {
      border-bottom: none;
 }
 .setting-section:hover {
-    /* 変更: background-color: #2a2a2a; -> 薄いピンクのホバーカラーに変更 */
-    background-color: #fcf4f7;
+    /* ★修正: 背景色を変数(薄い色)に変更 */
+    background-color: var(--ai-bubble);
     border-color: var(--primary-color); 
 }
 
@@ -51,7 +52,7 @@
 .section-header:hover {
     color: var(--primary-color);
 }
-/* ... (以下、スタイルは維持) ... */
+
 .section-icon {
     font-size: 20px;
     margin-right: 15px;
@@ -63,7 +64,11 @@
     border-top: 1px dashed var(--secondary-color); 
     overflow: hidden;
     display: none; /* JSで制御 */
-    background-color: #232323;
+    
+    /* ★重要修正: 背景色を固定(#232323)から変数に変更 */
+    /* これでテーマに合わせて白や黒に変わります */
+    background-color: var(--ai-bubble);
+    
     border-radius: 0 0 10px 10px; 
     margin-bottom: 10px;
     transition: max-height 0.3s ease-out, padding 0.3s ease-out;
@@ -78,8 +83,12 @@
     align-items: center;
     padding: 12px 0;
     font-size: 16px;
-    color: #ccc;
-    border-bottom: 1px dashed #444; 
+    
+    /* ★重要修正: 文字色を固定(#ccc)から変数に変更 */
+    color: var(--dark-text);
+    
+    /* 枠線も変数化 */
+    border-bottom: 1px dashed var(--secondary-color); 
 }
 .setting-item:last-of-type {
     border-bottom: none;
@@ -96,26 +105,24 @@
 .setting-item select {
     width: auto;
     padding: 8px;
-    /* 変更: border: 1px solid #444; -> ライトピンクの枠線に変更 */
     border: 1px solid var(--secondary-color);
-    /* 変更: background-color: #333; -> 白に変更 */
-    background-color: #ffffff;
+    
+    /* ★修正: 入力欄の背景と文字色も変数化 */
+    background-color: var(--container-bg);
     color: var(--dark-text);
+    
     border-radius: 5px;
     box-sizing: border-box;
     font-size: 16px;
 }
 
 .setting-item select:focus {
-    /* 変更: box-shadow: 0 0 10px rgba(0, 230, 118, 0.5); -> Primaryカラーの影に変更 */
     border: 1px solid var(--primary-color);
     outline: none;
     box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
     transform: scale(1.0);
-    /* 変更: background-color: #333; -> ごく薄いピンクに変更 */
-    background-color: #fffafa;
+    background-color: var(--light-bg);
 }
-
 
 /* Toggle Switch */
 .switch {
@@ -132,10 +139,16 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #4a4a4a;
+    background-color: #ccc; /* OFFの状態 */
     transition: .4s;
     border-radius: 25px;
 }
+/* ハイコントラストモード時のスライダー調整 */
+body.theme-high-contrast .slider {
+    background-color: #333;
+    border: 1px solid #fff;
+}
+
 .slider:before {
     position: absolute;
     content: "";
@@ -143,7 +156,7 @@
     width: 18px;
     left: 4px;
     bottom: 3.5px;
-    background-color: #ccc;
+    background-color: white;
     transition: .4s;
     border-radius: 50%;
 }
@@ -153,5 +166,4 @@ input:checked + .slider {
 }
 input:checked + .slider:before {
     transform: translateX(20px);
-    background-color: white;
 }
