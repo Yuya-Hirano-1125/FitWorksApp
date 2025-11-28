@@ -111,3 +111,43 @@ h1 {
     /* クリックイベントを無視させる */
     pointer-events: none;
 }
+
+/* ------------------------
+   メディアクエリの追加・調整
+ ------------------------ */
+
+/* 1. タブレット向け (画面幅 601px ～ 900px) */
+@media (max-width: 900px) {
+    .character-list-container {
+        /* タブレットでは、画面サイズに合わせて3列表示に固定 */
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 15px;
+    }
+}
+
+/* 2. スマートフォン向け (画面幅 600px 以下) */
+@media (max-width: 600px) {
+    /* ヘッダーの調整 */
+    h1 {
+        font-size: 30px; /* 見出しを小さく */
+    }
+
+    /* グリッドコンテナの調整 */
+    .character-list-container {
+        /* スマートフォンでは、2列表示に固定 */
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 10px; /* 隙間を詰める */
+        padding: 10px;
+    }
+    
+    /* カードの文字を小さくしてスペースを確保 */
+    .character-card p {
+        font-size: 0.8em;
+    }
+    
+    /* ロックメッセージのフォントサイズを調整 (画面が狭い場合) */
+    #lock-message {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+}

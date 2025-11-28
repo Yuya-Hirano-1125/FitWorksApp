@@ -13,11 +13,14 @@
 </head>
   <body>
     <header>
+		<div id="lock-message" class="hidden">
+		        このキャラクターはロックされています。レベルが足りません。
+		    </div>
 		<div class="back-btn-container">
 		            <a th:href="@{/home}" class="button secondary">
 		                <i class="fa-solid fa-house"></i> ホームに戻る
 		            </a>
-		        </div>
+		</div>
         <h1>キャラクター解放</h1>
         <p class="user-level">現在のレベル: <span id="current-level">1</span></p>
     </header>
