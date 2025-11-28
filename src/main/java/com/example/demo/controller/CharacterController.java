@@ -97,4 +97,24 @@ public class CharacterController {
     public String MerinoaInfo() {
         return "characters/merinoa"; 
     }
+  //★1闇タイプの卵
+    @GetMapping("/robiegg") 
+    public String RobiEggInfo() {
+        return "characters/robiegg"; 
+    }
+  //★2闇タイプの1進化目
+    @GetMapping("/robi") 
+    public String RobiInfo() {
+        return "characters/robi"; 
+    }
+  //★3闇タイプの2進化目
+    @GetMapping("/robus") 
+    public String RobusInfo() {
+        return "characters/robus"; 
+    }
+  //★4闇タイプの最終進化
+    @GetMapping("/robius") 
+    public String RobiusInfo() {
+        return "characters/robius"; 
+    }
 }
