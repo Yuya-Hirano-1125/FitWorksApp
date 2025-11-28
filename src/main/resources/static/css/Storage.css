@@ -187,3 +187,93 @@ html, body {
         font-size: 1em;
     }
 }
+
+/* ------------------------
+   属性グループコンテナ (新しい要素) のスタイル
+ ------------------------ */
+.character-groups-container {
+    /* 中央揃えされた .character-list-wrapper の子要素として、幅を設定 */
+    max-width: 1200px;
+    width: 95%;
+    padding: 0 20px;
+}
+
+/* 属性グループごとのセクション - 見出しスタイル */
+.attribute-group {
+    margin-bottom: 40px;
+    padding-top: 20px;
+    border-top: 3px solid rgba(0, 0, 0, 0.1);
+}
+
+.attribute-heading {
+    font-size: 28px;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    border-left: 5px solid;
+    font-weight: 700;
+}
+
+/* 属性カラー変数 (必須) */
+.fire-color { border-left-color: #e74c3c; color: #e74c3c; }
+.water-color { border-left-color: #3498db; color: #3498db; }
+.grass-color { border-left-color: #2ecc71; color: #2ecc71; }
+.light-color { border-left-color: #f1c40f; color: #f1c40f; }
+.dark-color { border-left-color: #9b59b6; color: #9b59b6; }
+.secret-color { border-left-color: #34495e; color: #34495e; }
+
+
+/* ------------------------
+   .character-list-container の修正 (中央揃えの核心)
+ ------------------------ */
+.character-list-container {
+    /* 1. カードの幅を固定幅にする (1frを削除) - これで最後の行が中央に寄せやすくなる */
+    grid-template-columns: repeat(auto-fit, minmax(160px, 160px));
+    
+    /* 2. グリッド全体をコンテナ内で中央に配置 */
+    justify-content: center;
+    
+    /* 3. 新しいグループ構造に合わせて不要なパディングや最大幅を削除/上書き */
+    padding: 0; /* 既存の 20px パディングを削除 */
+    max-width: none; /* 既存の 1000px を上書き */
+}
+
+/* ------------------------
+   .character-list-container の修正 (4列固定 Grid表示)
+ ------------------------ */
+.character-list-container {
+    display: grid;
+    
+    /* ★ 修正: 4列固定に設定 (1frで均等に幅を広げる) ★ */
+    grid-template-columns: repeat(4, 1fr); 
+    
+    gap: 20px;
+    padding: 0;
+    max-width: none;
+    
+    /* Flexbox用の設定を削除/無効化 */
+    overflow-x: unset; /* スクロールを無効化 */
+    overflow-y: unset;
+    /* justify-content: unset; */
+}
+
+
+/* ------------------------
+   メディアクエリの調整 (推奨)
+ ------------------------ */
+ /* 1. タブレット向け (画面幅 900px 以下) */
+ @media (max-width: 900px) {
+     .character-list-container {
+         /* 画面が狭くなったら3列に調整 */
+         grid-template-columns: repeat(3, 1fr); 
+         gap: 15px;
+     }
+ }
+
+ /* 2. スマートフォン向け (画面幅 600px 以下) */
+ @media (max-width: 600px) {
+     .character-list-container {
+         /* さらに狭くなったら2列に調整 */
+         grid-template-columns: repeat(2, 1fr); 
+         gap: 10px;
+     }
+ }

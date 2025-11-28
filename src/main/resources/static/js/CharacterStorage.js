@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const maxLevel = 999;
 
     const currentLevelSpan = document.getElementById("current-level");
-    const cards = document.querySelectorAll(".character-card");
+    const cards = document.querySelectorAll(".character-groups-container .character-card");
 
     // --------------------------
     // カードのロック状態を更新
