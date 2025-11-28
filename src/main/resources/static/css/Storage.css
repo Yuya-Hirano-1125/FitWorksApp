@@ -112,6 +112,42 @@ h1 {
     pointer-events: none;
 }
 
+/* ----------------------------------------------------
+   【最終確認】fixed positionの動作を妨げる設定のリセット
+   他のCSSファイル（base.cssなど）の干渉を排除
+ ---------------------------------------------------- */
+
+/* <html> と <body> の transform や perspective を強制的に解除 */
+html, body {
+    transform: none !important;
+    perspective: none !important;
+    /* その他の干渉する可能性のあるプロパティもリセット */
+    filter: none !important;
+    contain: none !important;
+}
+
+/* ロックメッセージのスタイル (既存の設定に !important を追加) */
+#lock-message {
+    position: fixed !important; 
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    
+    /* 必ず画面最前面に表示 */
+    z-index: 99999 !important; 
+    
+    /* 既存の見た目のプロパティも維持 */
+    background-color: #e74c3c; 
+    color: white; 
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
 /* ------------------------
    メディアクエリの追加・調整
  ------------------------ */
