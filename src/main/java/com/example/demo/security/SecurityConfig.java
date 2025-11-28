@@ -97,6 +97,7 @@ public class SecurityConfig {
                     "/change-password",
                     "/forgot-password",
                     "/register",
+                    "/error",
                     "/login",
                     "/css/**",
                     "/js/**",
