@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>よくある質問 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    
+    <style>
+        /* FAQ専用スタイル */
+        .faq-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .faq-item {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 20px;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .question {
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            font-size: 1.05rem;
+        }
+
+        .q-mark {
+            color: var(--primary-color, #ff69b4);
+            font-weight: 800;
+            margin-right: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            line-height: 1.2;
+        }
+
+        .answer {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.6;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .a-mark {
+            color: #888;
+            font-weight: 800;
+            margin-right: 10px;
+            font-family: 'Poppins', sans-serif;
+            margin-top: 2px;
+        }
+
+        /* 戻るボタンエリア */
+        .action-area {
+            margin-top: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <h1><i class="fa-solid fa-circle-question header-icon"></i> FAQ</h1>
+    <p class="sub-heading">よくあるご質問をまとめました</p>
+    
+    <div class="faq-container">
+        
+        <div class="faq-item">
+            <div class="question">
+                <span class="q-mark">Q.</span>
+                XP（経験値）はどうすれば貯まりますか？
+            </div>
+            <div class="answer">
+                <span class="a-mark">A.</span>
+                <div>
+                    トレーニング記録をつける、または毎日のログインボーナスで獲得できます。一定のXPが貯まるとレベルアップし、新しいアイテムが解放されます。
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="question">
+                <span class="q-mark">Q.</span>
+                ガチャで手に入れたアイテムはどこで確認できますか？
+            </div>
+            <div class="answer">
+                <span class="a-mark">A.</span>
+                <div>
+                    ホーム画面のアバターアイコンをタップするか、メニューの「キャラクター設定」から確認・着せ替えが可能です。
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="question">
+                <span class="q-mark">Q.</span>
+                退会したいのですが、どうすればいいですか？
+            </div>
+            <div class="answer">
+                <span class="a-mark">A.</span>
+                <div>
+                    設定画面の「アカウント管理」から「アカウント削除」を選択してください。なお、一度削除したデータは復元できませんのでご注意ください。
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="question">
+                <span class="q-mark">Q.</span>
+                パスワードを忘れました。
+            </div>
+            <div class="answer">
+                <span class="a-mark">A.</span>
+                <div>
+                    ログイン画面の「パスワードを忘れた方」リンクから、パスワードのリセット手続きを行ってください。
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="action-area">
+        <a th:href="@{/settings}" class="button secondary" style="background: #fff; color: #555; border: 1px solid #ddd; display:inline-block; width: auto; padding: 10px 30px;">
+            <i class="fa-solid fa-arrow-left"></i> 設定に戻る
+        </a>
+    </div>
+
+    <p style="margin-top: 30px; font-size: 0.85rem; color: #aaa; text-align: center;">
+        &copy; 2024 FitWorks Project
+    </p>
+</div>
+</body>
+</html>

@@ -131,4 +131,10 @@ public class SettingController {
     public String privacy() {
         return "settings/privacy"; // templates/settings/privacy.html を表示
     }
+    
+ // FaQ画面
+    @GetMapping("/faq")
+    public String faq() {
+        return "settings/faq"; // templates/settings/faq.html を表示
+    }
 }
