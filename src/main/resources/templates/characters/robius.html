@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：ロービアス</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- ロービアスの画像に変更 -->
+        <img th:src="@{/img/character/yami3.png}" alt="ロービアスの画像">
+        <h1><i class="fa-solid fa-meteor"></i> ロービアス</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            ローバスが進化した星霧の賢者「ロービアス」。<br>
+            星界の杖を操り、夢と記憶の流れを自在に操る力を持つ。<br>
+            その瞳は宇宙の深淵を映し、語られぬ叡智を秘めている。<br>
+            星眠の空域に降り立ち、銀河の調律者として精霊たちを導く。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>属性：</label> 星</div>
+        <div class="stat"><label>分類：</label> 進化型・星霧族</div>
+        <div class="stat"><label>サイズ：</label> 中型</div>
+        <div class="stat"><label>性格：</label> 深遠・叡智・静寂</div>
+        <div class="stat"><label>生息地：</label> 星眠の空域・星界の祭壇</div>
+        <div class="stat"><label>レア度：</label> ★★★★★</div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：ローバス</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- ローバスの画像に変更 -->
+        <img th:src="@{/img/character/yami2.png}" alt="ローバスの画像">
+        <h1><i class="fa-solid fa-meteor"></i> ローバス</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            ロービが成長し、星霧の魔導師としての力を得た姿「ローバス」。<br>
+            星屑のローブと魔力の結晶を携え、宇宙の記憶に触れる術を習得している。<br>
+            その瞳は銀河の流れを映し、夢と現実の境界を見通す力を秘めている。<br>
+            さらなる進化を予感させる存在として、星眠の空域で静かに力を蓄えている。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>属性：</label> 星</div>
+        <div class="stat"><label>分類：</label> 星霧族・魔導型</div>
+        <div class="stat"><label>サイズ：</label> 小型</div>
+        <div class="stat"><label>性格：</label> 神秘的・知的・静寂系</div>
+        <div class="stat"><label>生息地：</label> 星眠の空域・記憶の星殿</div>
+        <div class="stat"><label>レア度：</label> ★★★★☆</div>
+    </div>
+</div>
+</body>
+</html>
