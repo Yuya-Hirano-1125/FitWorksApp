@@ -123,6 +123,12 @@ public class SettingController {
     @GetMapping("/terms")
     public String terms() {
         // templates/misc/terms.html を表示するよう指定
-        return "misc/terms"; 
+        return "settings/terms"; 
+    }
+    
+ // プライバシーポリシー画面
+    @GetMapping("/privacy")
+    public String privacy() {
+        return "settings/privacy"; // templates/settings/privacy.html を表示
     }
 }

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プライバシーポリシー | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    
+    <style>
+        /* 利用規約と同じスタイルを使用 */
+        .policy-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .policy-content h2 {
+            font-size: 1.1rem;
+            color: var(--primary-color, #ff69b4);
+            border-bottom: 2px dashed #eee;
+            padding-bottom: 5px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .policy-content h2:first-child {
+            margin-top: 0;
+        }
+
+        .policy-content p {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .policy-content ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .policy-content li {
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+
+        /* 戻るボタンエリア */
+        .action-area {
+            margin-top: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <h1><i class="fa-solid fa-user-shield header-icon"></i> プライバシーポリシー</h1>
+    
+    <div class="policy-container">
+        <div class="policy-content">
+            <h2>第1条（個人情報）</h2>
+            <p>「個人情報」とは，個人情報保護法にいう「個人情報」を指すものとし，生存する個人に関する情報であって，当該情報に含まれる氏名，生年月日，住所，電話番号，連絡先その他の記述等により特定の個人を識別できる情報を指します。</p>
+
+            <h2>第2条（個人情報の収集方法）</h2>
+            <p>当チームは，ユーザーが利用登録をする際に以下の情報を収集することがあります。</p>
+            <ul>
+                <li>ユーザー名（ニックネーム）</li>
+                <li>メールアドレス</li>
+                <li>パスワード（暗号化して保存）</li>
+                <li>身体データ（身長、体重など、任意入力項目）</li>
+            </ul>
+
+            <h2>第3条（個人情報の利用目的）</h2>
+            <p>収集した個人情報の利用目的は以下のとおりです。</p>
+            <ul>
+                <li>本サービスの提供・運営のため</li>
+                <li>ユーザーからのお問い合わせに回答するため</li>
+                <li>メンテナンス，重要なお知らせなど必要に応じたご連絡のため</li>
+                <li>利用規約に違反したユーザーや，不正・不当な目的でサービスを利用しようとするユーザーの特定をし，ご利用をお断りするため</li>
+            </ul>
+
+            <h2>第4条（個人情報の第三者提供）</h2>
+            <p>当チームは，あらかじめユーザーの同意を得ることなく，第三者に個人情報を提供することはありません。ただし，個人情報保護法その他の法令で認められる場合を除きます。</p>
+
+            <h2>第5条（お問い合わせ窓口）</h2>
+            <p>本ポリシーに関するお問い合わせは，アプリ内の掲示板または運営メールアドレスまでお願いいたします。</p>
+            
+            <p style="text-align: right; margin-top: 30px; font-size: 0.8rem; color: #999;">
+                2025年制定
+            </p>
+        </div>
+    </div>
+
+    <div class="action-area">
+        <a th:href="@{/settings}" class="button secondary" style="background: #fff; color: #555; border: 1px solid #ddd; display:inline-block; width: auto; padding: 10px 30px;">
+            <i class="fa-solid fa-arrow-left"></i> 設定に戻る
+        </a>
+    </div>
+
+    <p style="margin-top: 30px; font-size: 0.85rem; color: #aaa; text-align: center;">
+        &copy; 2025 FitWorks Project
+    </p>
+</div>
+</body>
+</html>
