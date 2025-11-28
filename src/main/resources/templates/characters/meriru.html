@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：メリル</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Spring Boot の static 配下のCSSを参照 -->
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+</head>
+<body>
+<div class="dex-container">
+    <div class="dex-header">
+        <!-- メリルの画像に変更 -->
+        <img th:src="@{/img/character/hikari2.png}" alt="メリルの画像">
+        <h1><i class="fa-solid fa-star"></i> メリル</h1>
+    </div>
+
+    <div class="dex-info">
+        <p>
+            眠りの精霊として知られる天使羊「メリル」。<br>
+            小さな翼と光輪を持ち、夢見の空域を漂いながら安らぎを届ける。<br>
+            抱えた枕には癒しの魔力が宿り、眠る者の心を穏やかにする力を持つ。<br>
+            その存在は、夜空に輝く優しさの象徴とされている。
+        </p>
+    </div>
+
+    <div class="dex-stats">
+        <div class="stat"><label>属性：</label> 光</div>
+        <div class="stat"><label>分類：</label> 精霊型・天使羊族</div>
+        <div class="stat"><label>サイズ：</label> 小型</div>
+        <div class="stat"><label>性格：</label> 穏やか・眠たげ・癒し系</div>
+        <div class="stat"><label>生息地：</label> 夢見の空域・星雲の丘</div>
+        <div class="stat"><label>レア度：</label> ★★★★☆</div>
+    </div>
+</div>
+</body>
+</html>
