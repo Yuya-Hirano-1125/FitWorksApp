@@ -65,6 +65,17 @@
             flex-grow: 1;
             text-align: center;
         }
+		@keyframes float {
+		        0% { transform: translateY(0px); }
+		        50% { transform: translateY(-15px); } /* 上に15px移動 */
+		        100% { transform: translateY(0px); }
+		    }
+
+		    /* キャラクター画像にアニメーションを適用 */
+		    .character-display img {
+		        animation: float 3s ease-in-out infinite; /* 3秒かけて滑らかに永遠に繰り返す */
+		        filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2)); /* 影をつけて浮遊感を強調 */
+		    }	
     </style>
 </head>
 <body class="home-page">
