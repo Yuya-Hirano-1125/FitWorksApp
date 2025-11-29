@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random; // ★ 追加
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,19 +51,15 @@ public class TrainingController {
 	} 
 	
 	// ★★★ 経験値(XP)定数と計算ロジック ★★★
-	private static final int XP_BEGINNER = 300;	// 初級: 300 XP
-	private static final int XP_INTERMEDIATE = 500; // 中級: 500 XP
-	private static final int XP_ADVANCED = 1000; // 上級: 1000 XP
+	private static final int XP_BEGINNER = 300;
+	private static final int XP_INTERMEDIATE = 500;
+	private static final int XP_ADVANCED = 1000;
 	private static final int XP_PER_LEVEL = 5000; 
 
-	/**
-	 * 種目名から難易度（基本XP）を取得するヘルパーメソッド
-	 */
 	private int getExperiencePoints(String exerciseName) {
 		if (exerciseName == null || exerciseName.trim().isEmpty()) {
 			return 0; 
 		}
-		
 		if (exerciseName.contains("(上級)")) {
 			return XP_ADVANCED;
 		} else if (exerciseName.contains("(中級)")) {
@@ -74,14 +70,8 @@ public class TrainingController {
 		return 0; 
 	}
 	
-	/**
-	 * 実績フォームのセットリストに基づき、全セットのボリュームの合計を計算する (重量x回数)
-	 * @param form TrainingLogFormオブジェクト
-	 * @return 計算された総ボリューム (XPとして加算)
-	 */
 	private int calculateTotalVolumeXp(TrainingLogForm form) {
 		if (form.getSetList() == null || form.getSetList().isEmpty()) {
-			// setListがない場合、単一レコードのデータを使用
 			Double singleWeight = form.getWeight();
 			Integer singleReps = form.getReps();
 			Integer sets = form.getSets();
@@ -92,110 +82,59 @@ public class TrainingController {
 			return 0;
 		}
 
-		// setListがある場合（トレーニングセッションからの記録）
 		double totalVolume = 0;
-		
 		for (TrainingLogForm.SetDetail detail : form.getSetList()) {
 			Double weight = detail.getWeight();
 			Integer reps = detail.getReps();
-			
 			if (weight != null && reps != null && weight > 0 && reps > 0) {
-				// ボリューム = 重量 (kg) × 回数 (reps)
 				totalVolume += weight * reps;
 			}
 		}
-		
-		// 総ボリュームを整数にして返す (これが追加XPとなる)
 		return (int) Math.round(totalVolume);
 	}
 
 	private static final Map<String, List<String>> FREE_WEIGHT_EXERCISES_BY_PART = new LinkedHashMap<>() {{
-		put("胸", List.of(
-			"チェストフライ (初級)",	
-			"ベンチプレス (中級)",	
-			"ダンベルプレス (中級)",	
-			"インクラインプレス (中級)"
-		));
-		put("背中", List.of(
-			"ラットプルダウン (初級)",	
-			"シーテッドロー (初級)",	
-			"ベントオーバーロー (中級)",	
-			"デッドリフト (上級)"
-		));
-		put("脚", List.of(
-			"レッグプレス (初級)",	
-			"レッグエクステンション (初級)",	
-			"レッグカール (初級)",	
-			"スクワット (中級)"
-		));
-		put("肩", List.of(
-			"サイドレイズ (初級)",	
-			"フロントレイズ (初級)",	
-			"ショルダープレス (中級)",	
-			"オーバーヘッドプレス (中級)"
-		));
-		put("腕", List.of(
-			"アームカール (初級)",	
-			"ハンマーカール (初級)",	
-			"トライセプスエクステンション (初級)"
-		));
-		put("腹筋", List.of(
-			"クランチ (初級)",	
-			"レッグレイズ (中級)",	
-			"ロシアンツイスト (中級)"
-		));
-		put("その他", List.of(
-			"カーフレイズ (初級)",	
-			"ヒップスラスト (中級)"
-		));
+		put("胸", List.of("チェストフライ (初級)", "ベンチプレス (中級)", "ダンベルプレス (中級)", "インクラインプレス (中級)"));
+		put("背中", List.of("ラットプルダウン (初級)", "シーテッドロー (初級)", "ベントオーバーロー (中級)", "デッドリフト (上級)"));
+		put("脚", List.of("レッグプレス (初級)", "レッグエクステンション (初級)", "レッグカール (初級)", "スクワット (中級)"));
+		put("肩", List.of("サイドレイズ (初級)", "フロントレイズ (初級)", "ショルダープレス (中級)", "オーバーヘッドプレス (中級)"));
+		put("腕", List.of("アームカール (初級)", "ハンマーカール (初級)", "トライセプスエクステンション (初級)"));
+		put("腹筋", List.of("クランチ (初級)", "レッグレイズ (中級)", "ロシアンツイスト (中級)"));
+		put("その他", List.of("カーフレイズ (初級)", "ヒップスラスト (中級)"));
 	}};
 	
 	private static final List<String> CARDIO_EXERCISES = List.of(
-			"ウォーキング (初級)",	
-			"サイクリング (初級)",	
-			"エリプティカル (初級)",	
-			"ランニング (中級)",	
-			"水泳 (中級)",	
-			"ローイング (中級)",	
-			"トレッドミルインターバル (上級)"
-		);
+			"ウォーキング (初級)", "サイクリング (初級)", "エリプティカル (初級)", "ランニング (中級)", "水泳 (中級)", "ローイング (中級)", "トレッドミルインターバル (上級)"
+	);
 
-	// ★★★ 【新規追加】AIおすすめメニュー生成メソッド ★★★
-    /**
-     * ランダムなAIおすすめトレーニングメニューを生成します。
-     * @return プログラムリスト、目標時間、休憩時間を含むMap
-     */
+    // ランダム生成ロジック（既存）
     private Map<String, Object> generateAiSuggestedMenu() {
         Map<String, Object> menu = new LinkedHashMap<>();
         List<String> programList = new ArrayList<>();
         Random random = new Random();
 
-        // 1. 鍛える部位をランダムに選択 (今回は胸、背中、脚、肩から一つ選ぶ)
         List<String> mainParts = List.of("胸", "背中", "脚", "肩");
         String selectedPart = mainParts.get(random.nextInt(mainParts.size()));
         
-        // 2. その部位の種目をランダムに選択 (3-4種目)
         List<String> exercises = FREE_WEIGHT_EXERCISES_BY_PART.get(selectedPart);
         if (exercises == null || exercises.isEmpty()) {
-            exercises = List.of("全身サーキット (中級)"); // Fallback
+            exercises = List.of("全身サーキット (中級)");
         }
         
         List<String> availableExercises = new ArrayList<>(exercises);
         List<String> selectedExercises = new ArrayList<>();
         
-        int numExercises = 3 + random.nextInt(2); // 3-4 exercises
+        int numExercises = 3 + random.nextInt(2);
         
         for (int i = 0; i < numExercises && !availableExercises.isEmpty(); i++) {
             int index = random.nextInt(availableExercises.size());
             selectedExercises.add(availableExercises.remove(index));
         }
         
-        // 3. 各種目にセット数、回数、重量を割り当てる
         for (int i = 0; i < selectedExercises.size(); i++) {
             String exercise = selectedExercises.get(i);
-            int sets = 3 + random.nextInt(2); // 3-4 sets
-            int reps = 8 + random.nextInt(5); // 8-12 reps
-            // 難易度とランダムな値で重量を決定
+            int sets = 3 + random.nextInt(2);
+            int reps = 8 + random.nextInt(5);
             int baseWeight = 30; 
             int difficultyAdjustment = getExperiencePoints(exercise) / 30;
             int weight = baseWeight + random.nextInt(50) + difficultyAdjustment; 
@@ -203,22 +142,56 @@ public class TrainingController {
             programList.add((i + 1) + ". " + exercise + ": " + sets + "セット x " + reps + "回 (" + weight + "kg)");
         }
         
-        // 4. 有酸素運動を追加する確率 (40%)
         if (random.nextInt(10) < 4) {
             String cardio = CARDIO_EXERCISES.get(random.nextInt(CARDIO_EXERCISES.size()));
-            int duration = 15 + random.nextInt(16); // 15-30 minutes
+            int duration = 15 + random.nextInt(16);
             programList.add((selectedExercises.size() + 1) + ". " + cardio + ": " + duration + "分");
         }
 
-        // 5. 目標時間と休憩時間を設定
-        int totalTime = 40 + random.nextInt(31); // 40-70 minutes
-        int restTime = 45 + random.nextInt(31); // 45-75 seconds
+        int totalTime = 40 + random.nextInt(31);
+        int restTime = 45 + random.nextInt(31);
 
         menu.put("programList", programList);
         menu.put("targetTime", totalTime);
         menu.put("restTime", restTime);
         
         return menu;
+    }
+
+    // ★★★ 【新規追加】AIの提案テキストを解析してリスト化するメソッド ★★★
+    private List<String> parseAiProposal(String proposalText) {
+        List<String> programList = new ArrayList<>();
+        if (proposalText == null || proposalText.trim().isEmpty()) {
+            return programList;
+        }
+
+        // 改行で分割して行ごとに処理
+        String[] lines = proposalText.split("\n");
+        for (String line : lines) {
+            String trimmedLine = line.trim();
+            // メニューっぽくない行（挨拶など）を除外する簡易フィルタ
+            // 数字が含まれる、または特定のキーワードが含まれる行をメニューとみなす
+            if (!trimmedLine.isEmpty() && 
+                (trimmedLine.matches(".*\\d+.*") || // 数字を含む
+                 trimmedLine.contains("セット") || 
+                 trimmedLine.contains("回") || 
+                 trimmedLine.contains("分") ||
+                 trimmedLine.contains("・") ||      // 中黒リスト
+                 trimmedLine.matches("^[0-9]+\\..*") // "1. " で始まる
+                )) {
+                
+                // HTMLタグ除去（<br>などが入っている場合用）
+                String cleanLine = trimmedLine.replaceAll("<[^>]*>", "");
+                programList.add(cleanLine);
+            }
+        }
+        
+        // 解析できなかった場合、全文をそのまま表示させる
+        if (programList.isEmpty()) {
+            programList.add("AI提案内容: " + proposalText);
+        }
+        
+        return programList;
     }
 	
 	@GetMapping("/training")
@@ -254,6 +227,8 @@ public class TrainingController {
 	public String startTrainingSession(
 			@RequestParam("type") String type,
 			@RequestParam(value = "exerciseName", required = false) String exerciseName,
+            // ★ 追加: チャットから送られてくる提案テキストを受け取る
+            @RequestParam(value = "aiProposal", required = false) String aiProposal,
 			Authentication authentication,
 			Model model) {
 		
@@ -270,13 +245,23 @@ public class TrainingController {
 				title = "AIおすすめメニューセッション";
 				selectedExercise = "AIおすすめプログラム";	
 				
-                // ★ 【変更点】AIメニュー生成ロジックの呼び出しとモデルへの追加
-                Map<String, Object> aiMenu = generateAiSuggestedMenu();
-                model.addAttribute("programList", aiMenu.get("programList"));
-                model.addAttribute("targetTime", aiMenu.get("targetTime"));
-                model.addAttribute("restTime", aiMenu.get("restTime"));
-                // ★ 変更点終わり
+                // ★ 【修正】チャットからの提案があれば優先し、なければランダム生成
+                if (aiProposal != null && !aiProposal.trim().isEmpty()) {
+                    List<String> parsedProgram = parseAiProposal(aiProposal);
+                    model.addAttribute("programList", parsedProgram);
+                    
+                    // チャットからの場合は固定値または適当なランダム値を設定（テキストから解析するのは難易度が高いため）
+                    model.addAttribute("targetTime", 45); // 例: 45分
+                    model.addAttribute("restTime", 60);   // 例: 60秒
+                } else {
+                    // 既存のランダム生成ロジック
+                    Map<String, Object> aiMenu = generateAiSuggestedMenu();
+                    model.addAttribute("programList", aiMenu.get("programList"));
+                    model.addAttribute("targetTime", aiMenu.get("targetTime"));
+                    model.addAttribute("restTime", aiMenu.get("restTime"));
+                }
 				break;
+                
 			case "free-weight":
 			case "cardio":
 				if (exerciseName != null && !exerciseName.trim().isEmpty()) {
@@ -299,6 +284,8 @@ public class TrainingController {
 		return "training/training-session";	
 	}
 	
+	// ... (以下のメソッド showTrainingLog, showAllTrainingLog, form methods, saveTrainingRecord は変更なし) ...
+    // 長くなるため省略しませんが、元のファイルの残りの部分をそのまま維持してください。
 	@GetMapping("/training-log")
 	public String showTrainingLog(
 			Authentication authentication,

@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="_csrf" th:content="${_csrf.token}"/>
-	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>AIコーチ | FitWorks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/chat.css}"> 
-	<script th:src="@{/js/theme.js}"></script>
-	<style>
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
         /* チャット画面特有の簡易スタイル */
         .chat-container {
             max-width: 800px;
@@ -44,6 +44,7 @@
             background: #333;
             color: #ddd;
             border-bottom-left-radius: 2px;
+            border-top-left-radius: 5px;
         }
         .message.user {
             align-self: flex-end;
@@ -104,54 +105,59 @@
             background: #555;
             color: white;
         }
-		.chat-row {
-		        display: flex;
-		        align-items: flex-start; /* 上揃え */
-		        gap: 10px;               /* アイコンと吹き出しの間隔 */
-		        margin-bottom: 15px;     /* 次のメッセージとの間隔 */
-		        max-width: 90%;          /* 画面幅いっぱいにはしない */
-		    }
-
-		    /* AI（Bot）の行は左寄せ */
-		    .chat-row.bot {
-		        align-self: flex-start;
-		    }
-
-		    /* ユーザーの行は右寄せ（今回は画像なし想定ですが構造を統一する場合） */
-		    .chat-row.user {
-		        align-self: flex-end;
-		        justify-content: flex-end;
-		    }
-
-		    /* キャラクターアイコンのスタイル */
-		    .profile-icon {
-		        width: 45px;             /* アイコンのサイズ */
-		        height: 45px;
-		        border-radius: 50%;      /* 丸くする */
-		        object-fit: cover;       /* 画像の比率を維持 */
-		        flex-shrink: 0;          /* 縮まないように固定 */
-		        box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 影をつけて浮き出させる */
-		    }
-
-		    /* 吹き出しの微調整（LINE風に角を調整） */
-		    .message {
-		        position: relative;
-		        margin: 0; /* コンテナで間隔調整するためリセット */
-		    }
-		    
-		    /* Botの吹き出し：左上の角を少し尖らせる（お好みで） */
-		    .message.bot {
-		        border-top-left-radius: 5px; 
-		    }
-		    
-		    /* ユーザーのメッセージはアイコンなしで右寄せのまま維持する場合の調整 */
-		    .message.user {
-		        /* chat-windowがflex-direction: columnなので、
-		           単体のdivの場合は align-self: flex-end が効くが、
-		           統一感のためにJSで .chat-row に包むか、既存のままにするか選べます。
-		           ここでは既存のユーザー表示は崩さないよう、JSでBotだけ構造を変えます。 */
-		    }
-		
+        .chat-row {
+            display: flex;
+            align-items: flex-start; /* 上揃え */
+            gap: 10px;               /* アイコンと吹き出しの間隔 */
+            margin-bottom: 15px;     /* 次のメッセージとの間隔 */
+            max-width: 90%;          /* 画面幅いっぱいにはしない */
+        }
+        /* AI（Bot）の行は左寄せ */
+        .chat-row.bot {
+            align-self: flex-start;
+        }
+        /* ユーザーの行は右寄せ */
+        .chat-row.user {
+            align-self: flex-end;
+            justify-content: flex-end;
+        }
+        /* キャラクターアイコンのスタイル */
+        .profile-icon {
+            width: 45px;             /* アイコンのサイズ */
+            height: 45px;
+            border-radius: 50%;      /* 丸くする */
+            object-fit: cover;       /* 画像の比率を維持 */
+            flex-shrink: 0;          /* 縮まないように固定 */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 影をつけて浮き出させる */
+        }
+        /* 吹き出しの微調整 */
+        .message {
+            position: relative;
+            margin: 0; /* コンテナで間隔調整するためリセット */
+        }
+        
+        /* トレーニング開始ボタンのスタイル */
+        .start-training-btn {
+            background: linear-gradient(135deg, #007bff, #2575fc);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+            display: block; /* 吹き出し内でブロック要素として表示 */
+            margin-top: 15px; /* メッセージ本文との間隔 */
+            width: fit-content; /* 内容に合わせて幅を調整 */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .start-training-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .start-training-btn i {
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
@@ -162,16 +168,16 @@
         </p>
 
         <div class="chat-container">
-            <divdiv class="chat-window" id="chat-window">
-				<div class="chat-row bot">
-				    <img th:src="@{/img/AIcoach.png}" alt="AI" class="profile-icon">	    
-				    <div class="message bot">
-				        こんにちは、<span th:text="${username}">ユーザー</span>さん！<br>
-				        今日はどこの部位を鍛えたいですか？<br>
-				        トレーニング歴（初心者、中級者、上級者）などトレーニング時間や体調についても教えてくれると、より良い提案ができますよ！💪
-				    </div>
-				</div>
-				</div>
+            <div class="chat-window" id="chat-window">
+                <div class="chat-row bot">
+                    <img th:src="@{/img/AIcoach.png}" alt="AI" class="profile-icon">        
+                    <div class="message bot">
+                        こんにちは、<span th:text="${username}">ユーザー</span>さん！<br>
+                        今日はどこの部位を鍛えたいですか？<br>
+                        トレーニング歴（初心者、中級者、上級者）などトレーニング時間や体調についても教えてくれると、より良い提案ができますよ！💪
+                    </div>
+                </div>
+            </div>
             <div class="suggestions">
                 <div class="suggestion-chip" onclick="setInput('30分で胸を鍛えたい！')">30分で胸</div>
                 <div class="suggestion-chip" onclick="setInput('今日は疲れてるから軽めに全身')">疲れてるから軽め</div>
@@ -199,10 +205,57 @@
             userInput.focus();
         }
 
+        // 修正: 日本語入力の変換確定(Enter)で送信されないように isComposing をチェック
         function handleKeyPress(e) {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !e.isComposing) {
+                e.preventDefault(); // フォーム送信などを防ぐ
                 sendMessage();
             }
+        }
+
+        // 修正: AIの提案テキスト(menuText)を受け取り、aiProposalとして送信する処理を追加
+        function startSuggestedTraining(menuText) {
+            // CSRFトークンを取得
+            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+            
+            // 動的にフォームを作成
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/training/start'; 
+
+            // type=ai-suggested
+            const typeInput = document.createElement('input');
+            typeInput.type = 'hidden';
+            typeInput.name = 'type';
+            typeInput.value = 'ai-suggested';
+            form.appendChild(typeInput);
+
+            // exerciseName
+            const nameInput = document.createElement('input');
+            nameInput.type = 'hidden';
+            nameInput.name = 'exerciseName';
+            nameInput.value = 'AIおすすめプログラム'; 
+            form.appendChild(nameInput);
+            
+            // ★ ここが重要: AIの提案内容をパラメータとして追加
+            if (menuText) {
+                const menuInput = document.createElement('input');
+                menuInput.type = 'hidden';
+                menuInput.name = 'aiProposal'; // Controller側で受け取る名前
+                menuInput.value = menuText;
+                form.appendChild(menuInput);
+            }
+            
+            // CSRFトークン
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_csrf';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+
+            // フォームを一時的にbodyに追加して送信
+            document.body.appendChild(form);
+            form.submit();
         }
 
         async function sendMessage() {
@@ -213,11 +266,11 @@
             addMessage(message, 'user');
             userInput.value = '';
 
-            // ローディング表示（簡易的）
+            // ローディング表示
             const loadingId = addMessage('考え中... <i class="fa-solid fa-spinner fa-spin"></i>', 'bot');
 
             try {
-                // CSRFトークン対策（Spring Securityを使用している場合）
+                // CSRFトークン対策
                 const csrfToken = document.querySelector('meta[name="_csrf"]').content;
                 const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
 
@@ -232,11 +285,25 @@
 
                 const data = await response.json();
                 
-                // ローディングを削除してAIの回答を表示
+                // ローディングを削除
                 document.getElementById(loadingId).remove();
                 
-                // 改行コードを<br>に変換して表示
-                const formattedReply = data.reply.replace(/\n/g, '<br>');
+                // エスケープ処理 (シングルクォート等を無害化してJS引数に渡せるようにする)
+                const rawReplySafe = data.reply.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                
+                // 改行コードを<br>に変換して表示用テキストを作成
+                let formattedReply = data.reply.replace(/\n/g, '<br>');
+                
+                // メニュー提案が含まれている場合、ボタンを追加
+                if (data.reply.includes("セット") || data.reply.includes("プログラム") || data.reply.includes("提案")) {
+                    formattedReply += `
+                        <br><br>
+                        <button class="start-training-btn" onclick="startSuggestedTraining('${rawReplySafe}')">
+                            <i class="fa-solid fa-dumbbell"></i> このメニューでトレーニングを開始
+                        </button>
+                    `;
+                }
+                
                 addMessage(formattedReply, 'bot');
 
             } catch (error) {
@@ -246,48 +313,41 @@
             }
         }
 
-		// 既存の addMessage 関数をこれに置き換えてください
-		function addMessage(text, sender) {
-		    if (sender === 'bot') {
-		        // --- AIの場合：アイコン付きのレイアウトを作成 ---
-		        
-		        // 1. 行（コンテナ）を作成
-		        const rowDiv = document.createElement('div');
-		        rowDiv.className = 'chat-row bot';
-		        rowDiv.id = 'msg-row-' + Date.now(); // ローディング削除用にID付与
+        function addMessage(text, sender) {
+            if (sender === 'bot') {
+                // --- AIの場合：アイコン付きのレイアウト ---
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'chat-row bot';
+                rowDiv.id = 'msg-row-' + Date.now();
 
-		        // 2. 画像を作成
-		        const img = document.createElement('img');
-		        img.src = '/img/AIcoach.png'; // 画像パス
-		        img.className = 'profile-icon';
-		        img.alt = 'AI';
+                const img = document.createElement('img');
+                img.src = '/img/AIcoach.png';
+                img.className = 'profile-icon';
+                img.alt = 'AI';
 
-		        // 3. 吹き出しを作成
-		        const msgDiv = document.createElement('div');
-		        msgDiv.className = 'message bot';
-		        msgDiv.innerHTML = text;
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message bot';
+                msgDiv.innerHTML = text;
 
-		        // 4. 合体させてチャット画面に追加
-		        rowDiv.appendChild(img);
-		        rowDiv.appendChild(msgDiv);
-		        chatWindow.appendChild(rowDiv);
+                rowDiv.appendChild(img);
+                rowDiv.appendChild(msgDiv);
+                chatWindow.appendChild(rowDiv);
 
-		        chatWindow.scrollTop = chatWindow.scrollHeight;
-		        return rowDiv.id; // IDを返す（ローディング削除のため）
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                return rowDiv.id;
 
-		    } else {
-		        // --- ユーザーの場合：既存のまま（右側の吹き出しのみ） ---
-		        
-		        const msgDiv = document.createElement('div');
-		        msgDiv.className = 'message user';
-		        msgDiv.id = 'msg-' + Date.now();
-		        msgDiv.innerHTML = text;
-		        
-		        chatWindow.appendChild(msgDiv);
-		        chatWindow.scrollTop = chatWindow.scrollHeight;
-		        return msgDiv.id;
-		    }
-		}
+            } else {
+                // --- ユーザーの場合：吹き出しのみ ---
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message user';
+                msgDiv.id = 'msg-' + Date.now();
+                msgDiv.innerHTML = text;
+                
+                chatWindow.appendChild(msgDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                return msgDiv.id;
+            }
+        }
     </script>
 </body>
 </html>
