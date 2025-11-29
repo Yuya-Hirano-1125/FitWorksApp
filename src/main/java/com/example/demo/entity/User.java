@@ -4,12 +4,12 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType; // 新規追加
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn; // 新規追加
-import jakarta.persistence.ManyToOne; // 新規追加
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class User {
@@ -17,8 +17,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
- // ★★★ ここに経験値(XP)フィールドを追加 ★★★
+
+    // ★★★ 経験値(XP)フィールド ★★★
     private int xp = 0; // 初期値は0
+
     @Column(unique = true)
     private String username;
 
@@ -43,6 +45,18 @@ public class User {
     @JoinColumn(name = "equipped_costume_item_id")
     private Item equippedCostumeItem;
 
+    // ★★★ 新規追加: 設定項目 ★★★
+    // 1. トレーニングリマインダー通知 (デフォルトON)
+    private boolean notificationTrainingReminder = true;
+
+    // 2. AIコーチの提案通知 (デフォルトON)
+    private boolean notificationAiSuggestion = true;
+
+    // 3. 進捗レポートメール (デフォルトOFF)
+    private boolean notificationProgressReport = false;
+
+    // 4. テーマ設定 (デフォルト "default")
+    private String theme = "default";
 
     public User() {
         if (this.level == null) this.level = 1;
@@ -50,7 +64,7 @@ public class User {
         if (this.isRewardClaimedToday == null) this.isRewardClaimedToday = false;
     }
 
-    // --- Getter / Setter (既存) ---
+    // --- Getter / Setter ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -79,14 +93,26 @@ public class User {
     public Boolean getIsRewardClaimedToday() { return isRewardClaimedToday; }
     public void setIsRewardClaimedToday(Boolean isRewardClaimedToday) { this.isRewardClaimedToday = isRewardClaimedToday; }
 
-    // --- Getter / Setter (新規追加: キャラクター装備アイテム) ---
     public Item getEquippedBackgroundItem() { return equippedBackgroundItem; }
     public void setEquippedBackgroundItem(Item equippedBackgroundItem) { this.equippedBackgroundItem = equippedBackgroundItem; }
 
     public Item getEquippedCostumeItem() { return equippedCostumeItem; }
     public void setEquippedCostumeItem(Item equippedCostumeItem) { this.equippedCostumeItem = equippedCostumeItem; }
+
+    // ★★★ 追加: 設定項目のGetter/Setter ★★★
+    public boolean isNotificationTrainingReminder() { return notificationTrainingReminder; }
+    public void setNotificationTrainingReminder(boolean notificationTrainingReminder) { this.notificationTrainingReminder = notificationTrainingReminder; }
+
+    public boolean isNotificationAiSuggestion() { return notificationAiSuggestion; }
+    public void setNotificationAiSuggestion(boolean notificationAiSuggestion) { this.notificationAiSuggestion = notificationAiSuggestion; }
+
+    public boolean isNotificationProgressReport() { return notificationProgressReport; }
+    public void setNotificationProgressReport(boolean notificationProgressReport) { this.notificationProgressReport = notificationProgressReport; }
+
+    public String getTheme() { return theme != null ? theme : "default"; }
+    public void setTheme(String theme) { this.theme = theme; }
     
-    // --- レベルアップ関連 (既存) ---
+    // --- レベルアップ関連 ---
     public int calculateRequiredXp() {
         int currentLevel = getLevel(); 
         return 1000 + (currentLevel - 1) * 200;
@@ -108,14 +134,8 @@ public class User {
         if (requiredXp == 0) return 0; 
         return (int)(((double) currentXp / requiredXp) * 100);
     }
- // ★★★ XPのゲッターとセッターを追加 ★★★
 
-    public int getXp() {
-        return xp;
-    }
-
-    public void setXp(int xp) {
-        this.xp = xp;
-    }
+    // ★★★ XPのゲッターとセッター ★★★
+    public int getXp() { return xp; }
+    public void setXp(int xp) { this.xp = xp; }
 }
-

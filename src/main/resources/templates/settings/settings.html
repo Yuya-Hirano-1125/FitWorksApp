@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
     <title>設定 | FitWorks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -47,23 +50,29 @@
         </div>
         <div class="section-content" id="notification-content">
             <div class="setting-item">
-                <label>トレーニングリマインダー</label>
+                <label for="trainingReminder">トレーニングリマインダー</label>
                 <label class="switch">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" id="trainingReminder" 
+                           th:checked="${user.notificationTrainingReminder}"
+                           onchange="updateSetting('notificationTrainingReminder', this.checked)">
                     <span class="slider"></span>
                 </label>
             </div>
             <div class="setting-item">
-                <label>AIコーチの提案通知</label>
+                <label for="aiSuggestion">AIコーチの提案通知</label>
                 <label class="switch">
-                    <input type="checkbox" checked>
+                    <input type="checkbox" id="aiSuggestion"
+                           th:checked="${user.notificationAiSuggestion}"
+                           onchange="updateSetting('notificationAiSuggestion', this.checked)">
                     <span class="slider"></span>
                 </label>
             </div>
             <div class="setting-item">
-                <label>進捗レポートメール</label>
+                <label for="progressReport">進捗レポートメール</label>
                 <label class="switch">
-                    <input type="checkbox">
+                    <input type="checkbox" id="progressReport"
+                           th:checked="${user.notificationProgressReport}"
+                           onchange="updateSetting('notificationProgressReport', this.checked)">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -105,10 +114,10 @@
         <div class="section-content" id="general-content">
             <div class="setting-item">
                 <label for="theme-selector">テーマ設定 (色覚サポート)</label>
-                <select id="theme-selector" onchange="changeTheme(this.value)">
-                    <option value="default">デフォルト (パステル)</option>
-                    <option value="universal">ユニバーサル (青・オレンジ)</option>
-                    <option value="high-contrast">ハイコントラスト</option>
+                <select id="theme-selector" onchange="handleThemeChange(this.value)">
+                    <option value="default" th:selected="${user.theme == 'default'}">デフォルト (パステル)</option>
+                    <option value="universal" th:selected="${user.theme == 'universal'}">ユニバーサル (青・オレンジ)</option>
+                    <option value="high-contrast" th:selected="${user.theme == 'high-contrast'}">ハイコントラスト</option>
                 </select>
             </div>
             <div class="setting-item">
@@ -147,9 +156,11 @@
     </div>
     
     <div class="button-container" style="margin-top: 40px;">
-        <a th:href="@{/}" onclick="return confirmLogout()" class="button primary" style="background: var(--error-color); border-color: var(--error-color); box-shadow: 0 8px 25px rgba(255, 74, 74, 0.6);">
-            ログアウト <i class="fa-solid fa-right-from-bracket"></i>
-        </a>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" onclick="return confirmLogout()" class="button primary" style="background: var(--error-color); border-color: var(--error-color); box-shadow: 0 8px 25px rgba(255, 74, 74, 0.6);">
+                ログアウト <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </form>
         
         <a th:href="@{/home}" class="button secondary" style="margin-top: 10px;">
             <i class="fa-solid fa-house"></i>ホームに戻る
@@ -158,17 +169,46 @@
 </div>
 
 <script>
-    // --- テーマ変更処理 ---
-    function changeTheme(themeName) {
-        // 1. 設定をブラウザに保存
+    // --- 設定更新用API呼び出し ---
+    async function updateSetting(key, value) {
+        try {
+            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+            const payload = {};
+            payload[key] = value;
+
+            const response = await fetch('/api/settings/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                console.log(key + ' updated successfully');
+            } else {
+                console.error('Failed to update setting');
+                alert('設定の保存に失敗しました。');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    // --- テーマ変更処理 (DB保存 + クライアント反映) ---
+    function handleThemeChange(themeName) {
+        // 1. 画面上の見た目を即座に変更 (theme.jsの機能を利用)
         localStorage.setItem('fitworks-theme', themeName);
-        
-        // 2. theme.js の関数を呼び出して、即座にCSSクラスを切り替える
         if (typeof applyTheme === 'function') {
             applyTheme();
-        } else {
-            console.warn('theme.js is not loaded. Please check your static/js folder.');
         }
+
+        // 2. サーバーに設定を保存
+        updateSetting('theme', themeName);
     }
 
     // --- ログアウト確認 ---
@@ -183,17 +223,14 @@
         const arrow = sectionHeader.querySelector('.arrow');
         
         if (content.style.maxHeight && content.style.maxHeight !== '0px') {
-            // 閉じる処理
+            // 閉じる
             content.style.maxHeight = '0px';
             content.style.paddingTop = '0px';
             content.style.paddingBottom = '0px';
             arrow.innerHTML = '▼';
-            
-            setTimeout(() => {
-                 content.style.display = 'none';
-            }, 300); 
+            setTimeout(() => { content.style.display = 'none'; }, 300); 
         } else {
-            // 開く処理
+            // 開く
             content.style.display = 'block'; 
             content.style.maxHeight = content.scrollHeight + 30 + "px"; 
             content.style.paddingTop = '10px';
@@ -204,30 +241,29 @@
 
     // --- 初期化処理 ---
     document.addEventListener('DOMContentLoaded', () => {
-        // 1. 保存されたテーマ設定を読み込み、セレクトボックスに反映する
-        const savedTheme = localStorage.getItem('fitworks-theme') || 'default';
+        // DBに保存されているテーマがあればそれを優先、なければLocalStorage、それもなければデフォルト
         const selector = document.getElementById('theme-selector');
         if (selector) {
-            selector.value = savedTheme;
+            // 現在の選択値を適用（DBの値を反映）
+            localStorage.setItem('fitworks-theme', selector.value);
+            if (typeof applyTheme === 'function') {
+                applyTheme();
+            }
         }
 
-        // 2. アコーディオンの初期状態を「閉じた状態」に設定
+        // アコーディオン初期状態
         document.querySelectorAll('.setting-section').forEach(section => {
             const content = section.querySelector('.section-content');
             const arrow = section.querySelector('.arrow');
             
+            // デフォルトで閉じておく
             content.style.maxHeight = '0px';
             content.style.paddingTop = '0px';
             content.style.paddingBottom = '0px';
             content.style.display = 'none';
-            
-            if (arrow) {
-                arrow.innerHTML = '▼';
-            }
+            if (arrow) arrow.innerHTML = '▼';
         });
     });
 </script>
 </body>
 </html>
-
-
