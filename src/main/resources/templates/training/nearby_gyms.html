@@ -23,23 +23,57 @@
             width: 100%; 
             height: 100%; 
             position: relative; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         } 
+
+        /* 検索バーのスタイル (新規追加) */
+        .search-container {
+            width: 90%;
+            max-width: 600px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 1002;
+            position: relative;
+        }
+        .search-input {
+            flex-grow: 1;
+            padding: 12px;
+            border-radius: 25px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            outline: none;
+        }
+        .search-button {
+            background: var(--primary-color, #ff69b4);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        .search-button:active {
+            transform: scale(0.95);
+        }
+
         /* 地図コンテナを中央寄せ */ 
 		#map-container { 
 		    width: 90%; 
 		    max-width: 1200px; 
-		    height: calc(100vh - 350px); /* 高さはそのままでOK */
-		    min-height: 300px; /* 必要なら最小高さを指定 */
+		    height: 50vh; /* 高さを画面の半分程度に */
+		    min-height: 300px;
 		    
-		    /* ✅ 修正: 通常の配置に戻し、マージンで中央寄せにする */
 		    position: relative; 
-		    margin: 20px auto; /* 上下20px、左右中央 */
+		    margin: 10px auto; 
 		    
-		    /* ❌ 削除またはコメントアウトするプロパティ */
-		    /* top: 280px; */
-		    /* left: 50%; */
-		    /* transform: translateX(-50%); */
-
 		    border-radius: 15px; 
 		    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
 		    z-index: 1; 
@@ -47,16 +81,17 @@
         #map { 
             width: 100%; 
             height: 100%; 
+            border-radius: 15px;
         } 
         
-        /* 🌟 【追加】ホームに戻るボタンのスタイル 🌟 */
+        /* ホームに戻るボタンのスタイル */
         .back-home-button {
             position: absolute;
             top: 15px;
             left: 20px;
-            z-index: 1001; /* 最前面に配置 */
+            z-index: 1001; 
             padding: 8px 15px;
-            background-color: #3498db; /* 青系統 */
+            background-color: #3498db; 
             color: white;
             text-decoration: none;
             border-radius: 20px;
@@ -70,44 +105,34 @@
         .back-home-button i {
             margin-right: 5px;
         }
-        /* -------------------------------------- */
 
-        /* ステータスメッセージの中央寄せ */ 
+        /* ステータスメッセージ */ 
         #status-message { 
             padding: 8px 15px; 
             background: linear-gradient(135deg, #f0f0f0, #ffffff); 
             border: 1px solid #ddd; 
             border-radius: 20px; 
-            position: absolute; 
-            top: 15px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            z-index: 1000; 
+            margin-top: 10px;
             font-weight: 700; 
             font-size: 0.9em; 
             color: #2c3e50; 
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
             text-align: center; 
-            max-width: 80%; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
+            max-width: 90%; 
         } 
-        /* 検索結果リストの中央寄せ */ 
+
+        /* 検索結果リスト */ 
         #places-list { 
-            position: relative; 
-            bottom: 0px; 
-            width: 80%; 
+            width: 90%; 
             max-width: 1200px; 
-            left: 50%; 
-            transform: translateX(-50%); 
             height: 300px; 
             background: #fff; 
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); 
             padding: 10px; 
             box-sizing: border-box; 
             overflow-y: auto; 
-            z-index: 999; 
+            margin-bottom: 20px;
+            border-radius: 10px;
         } 
         #places-list h2 { 
             font-size: 1.1em; 
@@ -117,39 +142,36 @@
             margin: 0 0 10px; 
         } 
 		#places-list li {
-		        display: flex;               /* 横並びにする */
-		        justify-content: space-between; /* 文字を左、ボタンを右に配置 */
-		        align-items: center;         /* 上下中央揃え */
-		        border-bottom: 1px solid #eee; /* 区切り線 */
-		        padding: 12px 5px;           /* 余白を広げる */
-		        list-style: none;            /* 点を消す */
-		    }
+	        display: flex;               
+	        justify-content: space-between; 
+	        align-items: center;         
+	        border-bottom: 1px solid #eee; 
+	        padding: 12px 5px;           
+	        list-style: none;            
+	    }
 
-		    /* ✅ 追加: 施設情報のテキストエリア */
-		    .place-info {
-		        padding-right: 10px;
-		        line-height: 1.4;
-		    }
+	    .place-info {
+	        padding-right: 10px;
+	        line-height: 1.4;
+	    }
 
-		    /* ✅ 追加: 「ルート」ボタンのデザイン */
-		    .route-btn {
-		        background-color: #4CAF50;    /* 地図に合う緑色 */
-		        color: #fff;
-		        padding: 8px 16px;            /* ボタンの大きさ */
-		        border-radius: 20px;          /* 丸みをつける */
-		        font-size: 0.85rem;
-		        font-weight: bold;
-		        text-decoration: none;        /* 下線を消す */
-		        white-space: nowrap;          /* 改行させない */
-		        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-		        display: inline-flex;
-		        align-items: center;
-		        gap: 5px;                     /* アイコンと文字の間隔 */
-		    }
-
-		    .route-btn:active {
-		        transform: scale(0.98);       /* 押した時に少し凹む演出 */
-		    }
+	    .route-btn {
+	        background-color: #4CAF50;    
+	        color: #fff;
+	        padding: 8px 16px;            
+	        border-radius: 20px;          
+	        font-size: 0.85rem;
+	        font-weight: bold;
+	        text-decoration: none;        
+	        white-space: nowrap;          
+	        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	        display: inline-flex;
+	        align-items: center;
+	        gap: 5px;                     
+	    }
+	    .route-btn:active {
+	        transform: scale(0.98);       
+	    }
         #gym-results-ul { 
             list-style: none; 
             padding: 0; 
@@ -165,9 +187,6 @@
         #gym-results-ul li:hover { 
             background-color: #f9f9f9; 
         } 
-        #gym-results-ul li:last-child { 
-            border-bottom: none; 
-        } 
     </style>  
  </head>
 <body class="map-page">
@@ -176,6 +195,11 @@
 
     <div class="main-container">
         
+        <div class="search-container">
+            <input type="text" id="keyword-input" class="search-input" placeholder="施設名で検索 (例: エニタイム, 市民体育館)">
+            <button onclick="performSearch()" class="search-button">検索</button>
+        </div>
+
         <div id="status-message">現在地を取得中です...</div>
         <div id="map-container">
             <div id="map"></div>
@@ -184,6 +208,12 @@
         <div id="places-list">
             <h2>近くで見つかった施設</h2>
             <ul id="gym-results-ul"></ul>
+        </div>
+        
+        <div class="container" style="margin-bottom: 30px; text-align: center;">
+            <a th:href="@{/home}" class="button secondary">
+                <i class="fa-solid fa-house"></i> ホームに戻る
+            </a>
         </div>
     </div>
     
@@ -197,6 +227,8 @@
         const GEOAPIFY_PLACES_KEY = "1b287cca41c24370a70eec923dc99ab9"; 
         
         let map;
+        let userLat = 35.681236; // デフォルト東京駅
+        let userLon = 139.767125;
         const statusMessage = document.getElementById('status-message');
         const gymMarkers = [];
         
@@ -218,10 +250,11 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
-                        const { latitude, longitude } = position.coords;
-                        statusMessage.textContent = "現在地を取得しました。施設をGeoapifyで検索中...";
-                        initMap({ lat: latitude, lon: longitude });
-                        searchNearbyPlaces({ lat: latitude, lon: longitude });
+                        userLat = position.coords.latitude;
+                        userLon = position.coords.longitude;
+                        statusMessage.textContent = "現在地を取得しました。周辺の施設を検索中...";
+                        initMap({ lat: userLat, lon: userLon });
+                        searchNearbyPlaces(); // 初回検索（キーワードなし）
                     },
                     (error) => handleLocationError(error),
                     { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
@@ -234,9 +267,8 @@
         function handleLocationError(error) {
             console.error("Geolocation Error:", error);
             statusMessage.textContent = "現在地を取得できませんでした。デフォルト位置（東京駅）で表示します。";
-            const defaultPos = { lat: 35.681236, lon: 139.767125 };
-            initMap(defaultPos);
-            searchNearbyPlaces(defaultPos);
+            initMap({ lat: userLat, lon: userLon });
+            searchNearbyPlaces();
         }
 
         // ---- マップ初期化 ----
@@ -263,21 +295,38 @@
             .addTo(map);
         }
 
-        // ---- 施設検索（★今回追加） ---
-		async function searchNearbyPlaces(position) {
-		    const radius = 15000;
+        // ---- 検索ボタンクリック時の処理 ----
+        function performSearch() {
+            const keyword = document.getElementById('keyword-input').value;
+            searchNearbyPlaces(keyword);
+        }
 
-		    const lat = Number(position.lat.toFixed(6));
-		    const lon = Number(position.lon.toFixed(6));
+        // ---- 施設検索 (キーワード対応版) ---
+		async function searchNearbyPlaces(keyword = "") {
+		    const radius = 10000; // 10km圏内
 
-			const categories = "sport.fitness,sport.fitness.fitness_centre,sport.sports_centre";
-			const url =
+		    const lat = Number(userLat.toFixed(6));
+		    const lon = Number(userLon.toFixed(6));
+
+            // ★ カテゴリに leisure.sports_centre (公共スポーツセンターなど) を追加
+			const categories = "sport.fitness,sport.fitness.fitness_centre,sport.sports_centre,leisure.sports_centre";
+			
+            let url =
 			    `https://api.geoapify.com/v2/places?` +
 			    `categories=${categories}` +
 			    `&filter=circle:${lon},${lat},${radius}` +
 			    `&bias=proximity:${lon},${lat}` +
-			    `&limit=20` +
+			    `&limit=30` +
 			    `&apiKey=${GEOAPIFY_PLACES_KEY}`;
+
+            // ★ キーワードがあれば name フィルタを追加（エニタイムなどの特定チェーン検索用）
+            if (keyword && keyword.trim() !== "") {
+                // Geoapifyのnameパラメータで名前フィルタリングが可能
+                url += `&name=${encodeURIComponent(keyword.trim())}`;
+                statusMessage.textContent = `「${keyword}」で検索中...`;
+            } else {
+                statusMessage.textContent = "周辺の施設を検索中...";
+            }
 
 		    console.log("Geoapify Search URL:", url);
 
@@ -290,12 +339,15 @@
 
 		        const data = await response.json();
 		        if (!data.features || data.features.length === 0) {
-		            statusMessage.textContent = "近くにトレーニング施設が見つかりませんでした。";
+		            statusMessage.textContent = keyword ? `「${keyword}」は見つかりませんでした。` : "近くにトレーニング施設が見つかりませんでした。";
+                    // 結果リストをクリア
+                    document.getElementById('gym-results-ul').innerHTML = '<li style="text-align:center; color:#777;">見つかりませんでした</li>';
+                    gymMarkers.forEach(marker => map.removeLayer(marker));
 		            return;
 		        }
 
 		        statusMessage.textContent = `近くで ${data.features.length} 件見つかりました！`;
-		        addPlacesToMap(data.features, position);
+		        addPlacesToMap(data.features);
 
 		    } catch (error) {
 		        statusMessage.textContent = "通信エラーが発生しました。";
@@ -304,7 +356,8 @@
 		}
 
         // ---- マップ & リスト描画 ----
-        function addPlacesToMap(features, userPosition) {
+        function addPlacesToMap(features) {
+            // 既存マーカー削除
             gymMarkers.forEach(marker => map.removeLayer(marker));
             gymMarkers.length = 0;
 
@@ -323,9 +376,7 @@
                     "住所不明";
 
                 const googleMapsUrl =
-                    `https://www.google.com/maps/dir/?api=1&origin=` +
-                    `${userPosition.lat},${userPosition.lon}` +
-                    `&destination=${lat},${lon}`;
+                    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
 
                 const popupContent = `
                     <div style="max-width: 200px; padding: 5px;">
@@ -367,10 +418,5 @@
 
         window.onload = getLocationAndInitMap;
     </script>
-	<div class="container" style="margin-bottom: 30px;">
-			        <a th:href="@{/home}" class="button secondary">
-			            <i class="fa-solid fa-house"></i> ホームに戻る
-			        </a>
-			    </div>
 </body>
 </html>
