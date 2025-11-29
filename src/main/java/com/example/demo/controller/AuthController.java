@@ -21,11 +21,12 @@ public class AuthController {
         this.userService = userService;
     }
 
- // --- スタート画面（ここを追加） ---
+    // --- スタート画面 ---
     @GetMapping("/")
     public String showStartPage() {
         return "start"; // templates/start.html を表示
     }
+
     // --- ログイン/登録関連 ---
     @GetMapping("/login")
     public String login() { return "auth/login"; } 
@@ -37,7 +38,7 @@ public class AuthController {
     public String registerUser(@RequestParam("username") String username,
                                @RequestParam("password") String password,
                                Model model) {
-        // 実際の登録ロジックをここに実装する
+        // 実際の登録ロジックはUserService等で行う想定
         model.addAttribute("message", "登録が完了しました。ログインしてください。");
         return "auth/login"; 
     }
@@ -49,41 +50,16 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public String processForgotPassword(@RequestParam("email") String email,
                                         RedirectAttributes redirectAttributes) {
-        // 実際の処理: UserServiceを使ってメールアドレスが存在するかチェックし、リセットリンクを送信 (模擬)
-        boolean emailFoundAndSent = userService.processForgotPassword(email); // ★ 修正
+        boolean emailFoundAndSent = userService.processForgotPassword(email); 
         
         if (emailFoundAndSent) {
-            // HTMLの th:if="${param.success}" に対応させるため、クエリパラメータでリダイレクト
-            return "redirect:/forgot-password?success"; // ★ 修正: クエリパラメータを使用
+            return "redirect:/forgot-password?success"; 
         } else {
-            // HTMLの th:if="${param.error}" に対応させるため、クエリパラメータでリダイレクト
-            return "redirect:/forgot-password?error"; // ★ 修正: クエリパラメータを使用
+            return "redirect:/forgot-password?error"; 
         }
     }
 
-    // --- パスワード変更 ---
-    /*@PostMapping("/change-password")
-    public String changePassword(@RequestParam("currentPassword") String oldPassword,
-                                 @RequestParam("newPassword") String newPassword,
-                                 @RequestParam("confirmPassword") String confirmPassword,
-                                 @AuthenticationPrincipal UserDetails userDetails,
-                                 Model model) {
-        if (!newPassword.equals(confirmPassword)) {
-            model.addAttribute("errorMessage", "新しいパスワードが一致しません");
-            return "change-password";
-        }
-        
-        // 実際のパスワード変更ロジック
-        boolean success = true; 
-        
-        if(success) {
-            model.addAttribute("successMessage", "パスワードが正常に変更されました！🎉");
-        } else {
-            model.addAttribute("errorMessage", "現在のパスワードが正しくありません");
-        }
-        return "change-password";
-    }*/
-
+    // --- ホーム画面 ---
     @GetMapping("/home")
     public String home(
         @AuthenticationPrincipal UserDetails userDetails,
@@ -105,19 +81,8 @@ public class AuthController {
         } else {
             model.addAttribute("username", "ゲスト");
         }
-        return "misc/home"; // 修正済み
+        return "misc/home"; 
     }
 
-    // @GetMapping("/training") // <--- 削除しました。TrainingControllerに一任されます。
-    // public String training() { return "training"; } 
-    
-    // NOTE: /gacha のマッピングは GachaController に移管されたため、削除。
-    
-    
-    // NOTE: /training-log のマッピングは TrainingController に移管されたため、削除。
-
-    @GetMapping("/settings")
-    public String settings() { return "settings/settings"; } // 修正済み
+    // 重複していた settings メソッドを削除しました
 }
-
-

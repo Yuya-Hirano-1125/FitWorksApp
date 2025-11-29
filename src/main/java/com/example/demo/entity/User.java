@@ -45,15 +45,15 @@ public class User {
     @JoinColumn(name = "equipped_costume_item_id")
     private Item equippedCostumeItem;
 
-    // ★★★ 新規追加: 設定項目 ★★★
+    // ★★★ 新規追加: 設定項目 (Boolean型に変更してエラー回避) ★★★
     // 1. トレーニングリマインダー通知 (デフォルトON)
-    private boolean notificationTrainingReminder = true;
+    private Boolean notificationTrainingReminder = true;
 
     // 2. AIコーチの提案通知 (デフォルトON)
-    private boolean notificationAiSuggestion = true;
+    private Boolean notificationAiSuggestion = true;
 
     // 3. 進捗レポートメール (デフォルトOFF)
-    private boolean notificationProgressReport = false;
+    private Boolean notificationProgressReport = false;
 
     // 4. テーマ設定 (デフォルト "default")
     private String theme = "default";
@@ -62,6 +62,11 @@ public class User {
         if (this.level == null) this.level = 1;
         if (this.experiencePoints == null) this.experiencePoints = 0;
         if (this.isRewardClaimedToday == null) this.isRewardClaimedToday = false;
+        // 設定項目の初期値保証
+        if (this.notificationTrainingReminder == null) this.notificationTrainingReminder = true;
+        if (this.notificationAiSuggestion == null) this.notificationAiSuggestion = true;
+        if (this.notificationProgressReport == null) this.notificationProgressReport = false;
+        if (this.theme == null) this.theme = "default";
     }
 
     // --- Getter / Setter ---
@@ -99,15 +104,27 @@ public class User {
     public Item getEquippedCostumeItem() { return equippedCostumeItem; }
     public void setEquippedCostumeItem(Item equippedCostumeItem) { this.equippedCostumeItem = equippedCostumeItem; }
 
-    // ★★★ 追加: 設定項目のGetter/Setter ★★★
-    public boolean isNotificationTrainingReminder() { return notificationTrainingReminder; }
-    public void setNotificationTrainingReminder(boolean notificationTrainingReminder) { this.notificationTrainingReminder = notificationTrainingReminder; }
+    // ★★★ 追加: 設定項目のGetter/Setter (Boolean型に対応) ★★★
+    public Boolean isNotificationTrainingReminder() { 
+        return notificationTrainingReminder != null ? notificationTrainingReminder : true; 
+    }
+    public void setNotificationTrainingReminder(Boolean notificationTrainingReminder) { 
+        this.notificationTrainingReminder = notificationTrainingReminder; 
+    }
 
-    public boolean isNotificationAiSuggestion() { return notificationAiSuggestion; }
-    public void setNotificationAiSuggestion(boolean notificationAiSuggestion) { this.notificationAiSuggestion = notificationAiSuggestion; }
+    public Boolean isNotificationAiSuggestion() { 
+        return notificationAiSuggestion != null ? notificationAiSuggestion : true; 
+    }
+    public void setNotificationAiSuggestion(Boolean notificationAiSuggestion) { 
+        this.notificationAiSuggestion = notificationAiSuggestion; 
+    }
 
-    public boolean isNotificationProgressReport() { return notificationProgressReport; }
-    public void setNotificationProgressReport(boolean notificationProgressReport) { this.notificationProgressReport = notificationProgressReport; }
+    public Boolean isNotificationProgressReport() { 
+        return notificationProgressReport != null ? notificationProgressReport : false; 
+    }
+    public void setNotificationProgressReport(Boolean notificationProgressReport) { 
+        this.notificationProgressReport = notificationProgressReport; 
+    }
 
     public String getTheme() { return theme != null ? theme : "default"; }
     public void setTheme(String theme) { this.theme = theme; }
