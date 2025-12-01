@@ -45,6 +45,45 @@
         .gacha-button-unit a {
             width: 45%;
         }
+
+        /* 提供割合テーブル用のスタイル */
+        .rate-container {
+            margin-top: 40px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .rate-container h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        .rate-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .rate-table th, .rate-table td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .rate-table th {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .rarity-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #333;
+            font-weight: 800;
+            font-size: 0.8rem;
+            min-width: 40px;
+            text-align: center;
+        }
     </style>
 </head>
 <body class="gacha-page">
@@ -54,10 +93,6 @@
 
     <div class="gacha-display">
         <i class="fa-solid fa-gift"></i>
-        
-
-     
-
     </div>
 
 	<p>所持シェイカー：１０個</p>
@@ -66,12 +101,37 @@
         <a th:href="@{/gacha/animation(count=1)}" class="button primary">1回引く</a>
         <a th:href="@{/gacha/animation(count=6)}" class="button primary">6連で引く</a>
     </div>
+
+    <div class="rate-container">
+        <h3><i class="fa-solid fa-list-ul"></i> 提供割合・ラインナップ</h3>
+        <table class="rate-table">
+            <thead>
+                <tr>
+                    <th width="20%">レア</th>
+                    <th width="60%">アイテム名</th>
+                    <th width="20%">確率</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${probabilityList}">
+                    <td>
+                        <span class="rarity-badge" 
+                              th:text="${item.rarity}" 
+                              th:style="'background-color: ' + ${item.color}">
+                        </span>
+                    </td>
+                    <td th:text="${item.name}"></td>
+                    <td th:text="${item.rate}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 	
 </div>
 <div class="button-container" style="margin-top: 40px;">
-        <a th:href="@{/home}" class="button secondary">
-           <i class="fa-solid fa-house"></i> ホームに戻る 
-        </a>
-    </div>
+    <a th:href="@{/home}" class="button secondary">
+       <i class="fa-solid fa-house"></i> ホームに戻る 
+    </a>
+</div>
 </body>
 </html>
