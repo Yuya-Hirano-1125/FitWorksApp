@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食事記録 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/training-log.css}"> 
+    <style>
+        .log-indicator.meal {
+            color: #4CAF50; /* 食事記録は緑色 */
+        }
+    </style>
+    
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body class="training-log-page"> <div class="main-container">
+    
+    <h1 style="margin-bottom: 5px;"><i class="header-icon fa-solid fa-utensils"></i>食事記録</h1>
+    <p class="sub-heading" th:text="${username} + 'さんの栄養バランスを管理しましょう。'">
+        食事記録カレンダー
+    </p>
+
+    <div class="calendar-nav-container">
+        <a th:href="@{/log/meal(year=${prevYear}, month=${prevMonth})}" class="nav-arrow">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        
+        <h2 class="calendar-title" th:text="${currentYearMonth.year} + '年 ' + ${currentYearMonth.monthValue} + '月'"></h2>
+        
+        <a th:href="@{/log/meal(year=${nextYear}, month=${nextMonth})}" class="nav-arrow">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+    </div>
+
+    <div class="calendar-grid">
+        <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" 
+             th:classappend="${dayLabel == '土'} ? 'sat' : ((${dayLabel == '日'} ? 'sun' : ''))">
+             曜日
+        </div>
+        
+        <th:block th:each="date : ${calendarDays}">
+            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''},
+                          dayOfWeek=${date != null ? date.dayOfWeek.name() : ''},
+                          isToday=${date != null and date.isEqual(currentDate)},
+                          isLogged=${date != null and loggedDates.containsKey(date)}"
+                 class="calendar-day-cell"
+                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today' : '') + 
+                                                                    ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + 
+                                                                     ((${dayOfWeek == 'SUNDAY'} ? ' sun' : ''))))"
+                 th:attr="data-date=${date != null ? date.toString() : ''}"
+                 th:onclick="${date != null} ? 'openMealLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
+
+                <span class="day-number" th:text="${dateNumber}">1</span>
+                
+                <span th:if="${isLogged}" class="log-indicator meal">
+                    <i class="fa-solid fa-apple-whole"></i> </span>
+            </div>
+        </th:block>
+    </div>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <a th:href="@{/log/meal/all}" class="button" style="background-color: #555; color: white; width: 100%; display: block; text-align: center;">
+            <i class="fa-solid fa-list"></i> 全記録をリストで見る
+        </a>
+    </div>
+
+</div>
+
+<div id="mealLogModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeMealLogModal()">&times;</span>
+        <h2 id="modalDateTitle" class="modal-title"></h2>
+        
+        <div id="logViewArea">
+             </div>
+
+        <p class="modal-instruction">食事内容を記録：</p>
+        
+        <div id="formContainer">
+            <p>フォームを読み込んでいます...</p>
+        </div>
+
+        <a th:href="@{/log/meal/all}" class="button secondary view-all-button">
+            記録一覧を見る
+        </a>
+    </div>
+</div>
+
+<div style="max-width: 450px; margin: 30px auto 70px auto; padding: 0 10px;">
+    <a th:href="@{/home}" class="button secondary">
+        <i class="fa-solid fa-house"></i>
+        <span>ホームに戻る</span>
+    </a>
+</div>
+
+<script th:inline="javascript">
+    // 食事フォームを非同期で読み込む関数
+    function loadMealForm(date) {
+        const url = /*[[@{/log/meal/form}]]*/ '/log/meal/form';
+        const fetchUrl = url + '?date=' + date;
+
+        fetch(fetchUrl)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('formContainer').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('formContainer').innerHTML = '<p class="error-message">フォームの読み込みに失敗しました。</p>';
+                console.error('Form load error:', error);
+            });
+    }
+
+    // 記録モーダルを開く関数
+    function openMealLogModal(dateString, isLogged) {
+        const [year, month, day] = dateString.split('-');
+        const displayDate = `${year}年${month}月${day}日`;
+        
+        const modal = document.getElementById('mealLogModal');
+        document.getElementById('modalDateTitle').innerText = displayDate;
+        const formContainer = document.getElementById('formContainer');
+
+        // フォームをロード
+        formContainer.innerHTML = '<p>フォームを読み込んでいます...</p>';
+        loadMealForm(dateString);
+
+        // 記録済みメッセージの表示
+        const logViewArea = document.getElementById('logViewArea');
+        if (isLogged) {
+            logViewArea.innerHTML = '<p style="font-weight: 700; color: #4CAF50; margin-bottom: 10px;">✅ この日は記録済みです。追加の食事を記録できます。</p>';
+        } else {
+            logViewArea.innerHTML = '<p style="color: #999; margin-bottom: 10px;">この日はまだ記録がありません。</p>';
+        }
+
+        modal.classList.add('is-active');
+    }
+
+    // 記録モーダルを閉じる関数
+    function closeMealLogModal() {
+        const modal = document.getElementById('mealLogModal');
+        modal.classList.remove('is-active');
+        document.getElementById('formContainer').innerHTML = '<p>フォームを読み込んでいます...</p>';
+    }
+
+    // モーダル外クリックで閉じる処理
+    window.onclick = function(event) {
+        const modal = document.getElementById('mealLogModal');
+        if (modal.classList.contains('is-active') && event.target === modal) {
+            closeMealLogModal();
+        }
+    }
+</script>
+
+</body>
+</html>

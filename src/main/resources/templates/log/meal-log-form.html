@@ -9,137 +9,120 @@
 	
 	<script th:src="@{/js/theme.js}"></script>
 	<style>
-	    /* フォームのコンテナを中央に配置 */
-	    .log-form-container {
-	        max-width: 600px;
-	        margin: 40px auto;
-	        padding: 20px;
-	        background-color: #ffffff;
-	        border-radius: 10px;
-	        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-	    }
-	    /* フォームカードのスタイル */
+	    /* フォームカードのスタイル（モーダル内用に少し調整） */
 	    .form-card {
-	        padding: 20px;
+	        padding: 0;
+	        box-shadow: none; /* モーダル内なので影を消す */
 	    }
-	    /* グループごとの間隔 */
 	    .form-group {
 	        margin-bottom: 15px;
 	    }
-	    /* ラベルのスタイル */
 	    .form-group label {
 	        display: block;
 	        margin-bottom: 5px;
 	        font-weight: bold;
 	        color: #333;
+	        font-size: 0.9em;
 	    }
-	    /* 入力フィールドの共通スタイル */
 	    .form-group input[type="date"],
 	    .form-group input[type="time"],
 	    .form-group input[type="number"],
 	    .form-group textarea,
 	    .form-group select {
 	        width: 100%;
-	        padding: 10px;
+	        padding: 8px; /* 少し小さめに */
 	        border: 1px solid #ccc;
 	        border-radius: 5px;
-	        box-sizing: border-box; /* paddingをwidthに含める */
-	        font-size: 1em;
+	        box-sizing: border-box;
+	        font-size: 0.95em;
 	        transition: border-color 0.2s;
 	    }
 	    .form-group input:focus,
 	    .form-group select:focus,
 	    .form-group textarea:focus {
-	        border-color: #4CAF50; /* 焦点が当たったときの色 */
+	        border-color: #4CAF50;
 	        outline: none;
 	    }
-	    /* 送信ボタンのスタイル */
 	    .submit-button {
 	        width: 100%;
-	        padding: 12px;
-	        background-color: #4CAF50; /* 食事記録に合わせた緑色 */
+	        padding: 10px;
+	        background-color: #4CAF50;
 	        color: white;
 	        border: none;
 	        border-radius: 5px;
-	        font-size: 1.1em;
+	        font-size: 1.0em;
 	        cursor: pointer;
-	        margin-top: 20px;
+	        margin-top: 10px;
 	        transition: background-color 0.2s, transform 0.2s;
 	    }
 	    .submit-button:hover {
 	        background-color: #45a049;
 	        transform: translateY(-1px);
 	    }
-	    /* エラーメッセージ */
 	    .error-message {
 	        color: red;
-	        font-size: 0.9em;
-	        margin-top: 5px;
+	        font-size: 0.8em;
+	        margin-top: 3px;
 	    }
 	</style>
-	</head>
-<body>
-    <div th:insert="~{fragments/header :: header}"></div> 
 
-    <main class="log-form-container">
-        <h1>食事記録の入力</h1>
+	<form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post" class="form-card">
+	    
+	    <div class="form-group">
+	        <label for="date">日付:</label>
+	        <input type="date" id="date" th:field="*{date}" required>
+	        <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="error-message"></div>
+	    </div>
 
-        <form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post" class="form-card">
-            
-            <div class="form-group">
-                <label for="date">日付:</label>
-                <input type="date" id="date" th:field="*{date}" required>
-                <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="error-message"></div>
-            </div>
+	    <div class="form-group">
+	        <label for="time">時刻:</label>
+	        <input type="time" id="time" th:field="*{time}" required>
+	        <div th:if="${#fields.hasErrors('time')}" th:errors="*{time}" class="error-message"></div>
+	    </div>
 
-            <div class="form-group">
-                <label for="time">時刻:</label>
-                <input type="time" id="time" th:field="*{time}" required>
-                <div th:if="${#fields.hasErrors('time')}" th:errors="*{time}" class="error-message"></div>
-            </div>
+	    <div class="form-group">
+	        <label for="mealType">食事の種類:</label>
+	        <select id="mealType" th:field="*{mealType}" required>
+	            <option value="">選択してください</option>
+	            <option value="朝食">朝食</option>
+	            <option value="昼食">昼食</option>
+	            <option value="夕食">夕食</option>
+	            <option value="間食">間食</option>
+	        </select>
+	        <div th:if="${#fields.hasErrors('mealType')}" th:errors="*{mealType}" class="error-message"></div>
+	    </div>
+	    
+	    <div class="form-group">
+	        <label for="content">食事内容:</label>
+	        <textarea id="content" th:field="*{content}" rows="2" placeholder="例: ご飯1膳, 焼き魚, 味噌汁" required></textarea>
+	        <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="error-message"></div>
+	    </div>
 
-            <div class="form-group">
-                <label for="mealType">食事の種類:</label>
-                <select id="mealType" th:field="*{mealType}" required>
-                    <option value="">選択してください</option>
-                    <option value="朝食">朝食</option>
-                    <option value="昼食">昼食</option>
-                    <option value="夕食">夕食</option>
-                    <option value="間食">間食</option>
-                </select>
-                <div th:if="${#fields.hasErrors('mealType')}" th:errors="*{mealType}" class="error-message"></div>
-            </div>
-            
-            <div class="form-group">
-                <label for="content">食事内容:</label>
-                <textarea id="content" th:field="*{content}" rows="3" placeholder="例: ご飯1膳, 焼き魚, 味噌汁" required></textarea>
-                <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="error-message"></div>
-            </div>
+	    <div class="form-group">
+	        <label for="calories">カロリー (kcal):</label>
+	        <input type="number" id="calories" th:field="*{calories}" min="0" required>
+	        <div th:if="${#fields.hasErrors('calories')}" th:errors="*{calories}" class="error-message"></div>
+	    </div>
+	    
+	    <div style="display: flex; gap: 10px;">
+	        <div class="form-group" style="flex: 1;">
+	            <label for="protein">P (g):</label>
+	            <input type="number" id="protein" th:field="*{protein}" min="0" step="0.1" placeholder="タンパク質">
+	        </div>
 
-            <div class="form-group">
-                <label for="calories">カロリー (kcal):</label>
-                <input type="number" id="calories" th:field="*{calories}" min="0" required>
-                <div th:if="${#fields.hasErrors('calories')}" th:errors="*{calories}" class="error-message"></div>
-            </div>
-            
-            <div class="form-group">
-                <label for="protein">タンパク質 (g) (任意):</label>
-                <input type="number" id="protein" th:field="*{protein}" min="0" step="0.1">
-            </div>
+	        <div class="form-group" style="flex: 1;">
+	            <label for="fat">F (g):</label>
+	            <input type="number" id="fat" th:field="*{fat}" min="0" step="0.1" placeholder="脂質">
+	        </div>
 
-            <div class="form-group">
-                <label for="fat">脂質 (g) (任意):</label>
-                <input type="number" id="fat" th:field="*{fat}" min="0" step="0.1">
-            </div>
+	        <div class="form-group" style="flex: 1;">
+	            <label for="carbohydrate">C (g):</label>
+	            <input type="number" id="carbohydrate" th:field="*{carbohydrate}" min="0" step="0.1" placeholder="炭水化物">
+	        </div>
+	    </div>
 
-            <div class="form-group">
-                <label for="carbohydrate">炭水化物 (g) (任意):</label>
-                <input type="number" id="carbohydrate" th:field="*{carbohydrate}" min="0" step="0.1">
-            </div>
-
-            <button type="submit" class="button primary">記録を保存</button>
-        </form>
-
+	    <button type="submit" class="submit-button">記録を保存</button>
+	</form>
         <a th:href="@{/log/meal/all}" class="button primary">食事記録一覧へ</a>
     </main>
 	<div style="text-align: center; margin-top: 30px;">

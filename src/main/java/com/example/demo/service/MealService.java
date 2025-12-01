@@ -1,6 +1,9 @@
 package com.example.demo.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -42,5 +45,17 @@ public class MealService {
 
     public List<MealRecord> getMealRecordsByUser(User user) {
         return mealRecordRepository.findByUserOrderByMealDateTimeDesc(user);
+    }
+    
+    /** 指定された月の食事記録を取得する */
+    public List<MealRecord> getMonthlyMealRecords(User user, YearMonth yearMonth) {
+        LocalDate startDict = yearMonth.atDay(1);
+        LocalDate endData = yearMonth.atEndOfMonth();
+        
+        // 月初 00:00:00 から 月末 23:59:59 までの範囲
+        LocalDateTime startDateTime = startDict.atStartOfDay();
+        LocalDateTime endDateTime = endData.atTime(LocalTime.MAX);
+        
+        return mealRecordRepository.findByUserAndMealDateTimeBetween(user, startDateTime, endDateTime);
     }
 }

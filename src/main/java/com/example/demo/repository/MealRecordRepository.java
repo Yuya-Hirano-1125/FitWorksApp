@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +15,6 @@ public interface MealRecordRepository extends JpaRepository<MealRecord, Long> {
     /** 特定のユーザーの食事記録を最新順で取得 */
     List<MealRecord> findByUserOrderByMealDateTimeDesc(User user);
     
-    // TODO: AIコーチングのために、最新の数日間のデータを取得するメソッドなどを追加できます
+    /** 特定の期間（開始日時～終了日時）の食事記録を取得 */
+    List<MealRecord> findByUserAndMealDateTimeBetween(User user, LocalDateTime start, LocalDateTime end);
 }
