@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/characters")
-public class CharacterController {
+public class CharactersStorageController {
 
 	//キャラクター解放画面へ遷移
     @GetMapping("/storage")
