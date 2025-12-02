@@ -16,12 +16,22 @@
             background-color: #f8f9fa; /* 背景色を薄いグレーに */
         }
         
-        .page-title {
-            color: #343a40; 
+        /* タイトルエリアをFlexbox化してボタンを右寄せにするためのスタイル */
+        .page-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 30px;
-            font-size: 2rem;
             border-bottom: 3px solid #007bff; 
             padding-bottom: 10px;
+        }
+
+        .page-title {
+            color: #343a40; 
+            font-size: 2rem;
+            margin: 0; /* マージンを親コンテナに任せるためリセット */
+            border-bottom: none; /* 親コンテナにボーダーを移動 */
+            padding-bottom: 0;
         }
 
         /* Home画面風のカードデザインを強化 */
@@ -72,6 +82,10 @@
             font-weight: bold;
             border-radius: 8px;
             transition: background-color 0.2s;
+            text-align: center;
+            display: block;
+            text-decoration: none;
+            box-sizing: border-box;
         }
 
         .button.primary {
@@ -123,7 +137,13 @@
 <body>
 
 <div class="container main-content">
-    <h1 class="page-title">🏋️ トレーニングメニュー選択</h1>
+    
+    <div class="page-header-container">
+        <h1 class="page-title">🏋️ トレーニングメニュー選択</h1>
+        <a th:href="@{/training/exercises}" class="button" style="background-color: #28a745; color: white; width: auto; margin: 0; padding: 8px 16px; font-size: 1rem;">
+            <i class="fa-solid fa-list"></i> 種目一覧
+        </a>
+    </div>
     
     <div th:if="${param.logout}" class="alert alert-success">ログアウトしました。</div>
 
