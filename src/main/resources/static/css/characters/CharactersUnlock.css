@@ -1,0 +1,360 @@
+@charset "UTF-8";
+
+/* =========================================
+   ベーススタイル (base.css を継承)
+   ========================================= */
+header {
+    text-align: center;
+    padding: 20px 10px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+}
+
+h1 {
+    margin: 0;
+    font-size: 28px;
+    text-transform: uppercase;
+}
+
+.status-bar {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+    font-weight: bold;
+    color: var(--dark-text, #555);
+    flex-wrap: wrap;
+}
+
+.status-item {
+    background: white;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* =========================================
+   バトルパスレイアウト
+   ========================================= */
+.battle-pass-wrapper {
+    max-width: 650px;
+    margin: 30px auto;
+    padding: 0 20px;
+    padding-bottom: 80px;
+}
+
+.pass-section {
+    margin-bottom: 60px;
+    position: relative;
+    padding-bottom: 40px;
+    border-bottom: 2px dashed rgba(0,0,0,0.1);
+}
+.pass-section:last-child {
+    border-bottom: none;
+}
+
+/* 属性見出し */
+.attribute-heading {
+    font-size: 22px;
+    margin-bottom: 30px;
+    padding-left: 15px;
+    border-left: 8px solid #ccc;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--dark-text, #333);
+    text-shadow: 2px 2px 0px rgba(255,255,255,0.8);
+}
+
+/* 属性別カラー */
+.fire-color  { border-left-color: #ff6b6b; color: #ff6b6b; }
+.water-color { border-left-color: #4facfe; color: #4facfe; }
+.grass-color { border-left-color: #43e97b; color: #43e97b; }
+.light-color { border-left-color: #fddb92; color: #f39c12; }
+.dark-color  { border-left-color: #a18cd1; color: #8e44ad; }
+
+/* トラック */
+.pass-track-container {
+    width: 100%;
+    overflow: visible; 
+}
+
+.pass-track {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    position: relative;
+    padding-left: 60px;
+}
+
+/* 進行ライン */
+.track-line {
+    position: absolute;
+    top: 30px;
+    bottom: 30px;
+    left: 24px;
+    width: 8px;
+    background: rgba(255,255,255,0.6);
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 4px;
+    z-index: 0;
+}
+
+.track-line-progress {
+    position: absolute;
+    top: 30px;
+    left: 24px;
+    width: 8px;
+    background: #ccc;
+    border-radius: 4px;
+    z-index: 0;
+    transition: height 1s ease;
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.pass-section:has(.fire-color) .track-line-progress  { background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 100%); }
+.pass-section:has(.water-color) .track-line-progress { background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%); }
+.pass-section:has(.grass-color) .track-line-progress { background: linear-gradient(to bottom, #43e97b 0%, #38f9d7 100%); }
+.pass-section:has(.light-color) .track-line-progress { background: linear-gradient(to bottom, #f6d365 0%, #fda085 100%); }
+.pass-section:has(.dark-color) .track-line-progress  { background: linear-gradient(to bottom, #a18cd1 0%, #fbc2eb 100%); }
+
+/* ノード */
+.pass-node {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.node-marker {
+    position: absolute;
+    top: 50%;
+    left: -36px;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    background: #ccc;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 16px;
+    border: 4px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    z-index: 2;
+}
+
+.pass-node.claimed .node-marker { background: var(--success-color, #2ecc71); }
+.pass-node.active-node .node-marker { 
+    background: var(--primary-color, #ff69b4); 
+    transform: translateY(-50%) scale(1.2);
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.6);
+}
+.pass-node.locked .node-marker { background: #bdc3c7; }
+
+/* キャラクターカード */
+.character-card {
+    display: flex;
+    align-items: center;
+    background: var(--container-bg, white);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+    border: 2px solid transparent;
+    text-align: left;
+    gap: 20px;
+    min-height: 120px;
+    position: relative; /* オーバーレイのために必須 */
+    overflow: hidden;   /* オーバーレイを角丸に収める */
+}
+
+/* 画像エリア */
+.character-img-wrapper {
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    position: relative;
+    background: var(--light-bg, #f0f8ff);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+.character-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.character-card:not(.locked-card):hover .character-img {
+    transform: scale(1.1);
+}
+
+/* テキスト情報エリア */
+.card-content {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.character-name {
+    font-weight: 900;
+    font-size: 18px;
+    margin: 0 0 8px 0;
+    color: var(--dark-text, #333);
+}
+
+.evolution-tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 4px 8px;
+    border-bottom-right-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 2;
+    backdrop-filter: blur(2px);
+}
+
+/* カードの状態スタイル */
+.character-card.ready-to-evolve {
+    border-color: var(--primary-color, #ff69b4);
+    background: #fff;
+    box-shadow: 0 0 20px rgba(255, 105, 180, 0.2);
+}
+
+.requirements-box {
+    background: var(--light-bg, #f8f8f8);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.req-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    align-items: center;
+}
+.req-row.met { color: var(--success-color, #27ae60); font-weight: bold; }
+.req-row.unmet { color: var(--error-color, #e74c3c); }
+
+.evolve-btn {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    background: var(--primary-color, #ff69b4);
+    color: white;
+    font-size: 13px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+.evolve-btn:active { transform: translateY(2px); box-shadow: none; }
+.evolve-btn:hover { background: #ff85c1; }
+.evolve-btn.disabled {
+    background: #dcdcdc;
+    color: #888;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* =========================================
+   ★ LOCKEDオーバーレイ (完全隠蔽版)
+   ========================================= */
+.lock-overlay {
+    position: absolute;
+    inset: 0; /* 上下左右0で親要素いっぱいに広げる */
+    background: #2c3e50; /* ★完全不透明なダークカラーに変更 */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    z-index: 10;
+    /* backdrop-filterは不透明にするため不要 */
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+/* ロックカード時はオーバーレイを表示 */
+.character-card.locked-card .lock-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ロックアイコンとテキスト */
+.lock-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    color: #bdc3c7;
+}
+.lock-text {
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: 3px;
+    margin: 0 0 5px 0;
+    color: #ecf0f1;
+}
+.lock-required-level {
+    font-size: 12px;
+    background: rgba(255,255,255,0.1); /* 少し明るいグレー背景 */
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+/* ★重要: ロックされている時は、中身を完全に見えなくする */
+.character-card.locked-card .character-img-wrapper,
+.character-card.locked-card .card-content {
+    opacity: 0 !important; /* 透明度0 */
+    visibility: hidden !important; /* 完全に隠す */
+}
+
+/* 戻るボタン */
+.back-btn-container { text-align: center; margin-top: 40px; }
+.button.secondary {
+    display: inline-block;
+    padding: 12px 30px;
+    background: white;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+.button.secondary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* スマホ対応 */
+@media screen and (max-width: 480px) {
+    .pass-track { padding-left: 50px; }
+    .track-line, .track-line-progress { left: 18px; }
+    .node-marker { left: -32px; width: 30px; height: 30px; font-size: 14px; }
+    
+    .character-img-wrapper { width: 90px; height: 90px; }
+    .character-card { padding: 12px; gap: 12px; min-height: 90px; }
+    .character-name { font-size: 16px; }
+}

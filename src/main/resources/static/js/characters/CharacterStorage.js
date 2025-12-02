@@ -41,12 +41,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // --------------------------
     // レベルアップ（1秒ごと）
     // --------------------------
-    setInterval(() => {
-        if (currentLevel < maxLevel) {
-            currentLevel += 1;
-            updateCharacterUnlocks();
-        }
-    }, 1000);
+   // setInterval(() => {
+       // if (currentLevel < maxLevel) {
+           //currentLevel += 1;
+            //updateCharacterUnlocks();
+        //}
+   // }, 1000);
 
 	// ... (既存のコード)
 

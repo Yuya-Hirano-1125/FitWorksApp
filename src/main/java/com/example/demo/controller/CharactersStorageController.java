@@ -11,7 +11,7 @@ public class CharactersStorageController {
 	//キャラクター解放画面へ遷移
     @GetMapping("/storage")
     public String showCharacterStorage() {
-        return "characters/Storage"; 
+        return "characters/menu/CharactersStorage"; 
     }
     
     //★１炎タイプの卵

@@ -1,27 +1,69 @@
 <!DOCTYPE html>
-<html th:xmlns="http://www.thymeleaf.org" lang="ja">
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>メニュー画面</title>
-    <link rel="stylesheet" th:href="@{/css/Storage.css}">
-	<link rel="stylesheet" th:href="@{/css/base.css}">
-    <link rel="stylesheet" th:href="@{/css/CharactersMenu.css}">
+    <title>キャラクターメニュー | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/characters/CharactersMenu.css}">
+    
+    <script th:src="@{/js/theme.js}"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>🛠️ キャラクターメニュー</h1>
-        <nav class="menu">
-            <ul>
-                <li><a href="#">キャラクター解放</a></li>
-                <li><a href="#">キャラクター一覧</a></li>
-                <li><a href="#">素材一覧</a></li>
-                <li><a href="#">背景一覧</a></li>
-            </ul>
-        </nav>
-        <div class="content">
-            <p>ここに各メニューに対応するコンテンツが表示されます。</p>
-        </div>
+
+<div class="main-container">
+    <div class="header-section">
+        <h1>キャラクターメニュー</h1>
+        <p class="sub-heading">キャラクターの育成・管理を行います</p>
     </div>
+
+    <div class="menu-list">
+        
+        <a th:href="@{/characters/menu/CharactersUnlock}" class="menu-button style-unlock">
+            <div class="icon-area"><i class="fa-solid fa-lock-open"></i></div>
+            <div class="text-area">
+                <span class="main-text">キャラクター解放</span>
+                <span class="sub-text">条件を満たして新キャラを解放</span>
+            </div>
+            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </a>
+
+         <a th:href="@{/characters/menu/CharactersStorage}" class="menu-button style-unlock">
+            <div class="icon-area"><i class="fa-solid fa-users"></i></div>
+            <div class="text-area">
+                <span class="main-text">キャラクター一覧</span>
+                <span class="sub-text">所持キャラクターの確認・変更</span>
+            </div>
+            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </a>
+
+       <a th:href="@{/characters/menu/CharactersItem}" class="menu-button style-unlock">
+            <div class="icon-area"><i class="fa-solid fa-cubes"></i></div>
+            <div class="text-area">
+                <span class="main-text">素材一覧</span>
+                <span class="sub-text">育成アイテムの確認</span>
+            </div>
+            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </a>
+
+        <a href="#" class="menu-button style-backgrounds">
+            <div class="icon-area"><i class="fa-solid fa-image"></i></div>
+            <div class="text-area">
+                <span class="main-text">背景一覧</span>
+                <span class="sub-text">ホーム画面の背景カスタマイズ</span>
+            </div>
+            <i class="fa-solid fa-chevron-right arrow-icon"></i>
+        </a>
+		<div class="back-btn-container">
+		            <a th:href="@{/home}" class="button secondary">
+		                <i class="fa-solid fa-house"></i> ホームに戻る
+		            </a>
+		        </div>
+
+    </div>
+</div>
 </body>
 </html>
