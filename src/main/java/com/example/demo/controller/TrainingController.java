@@ -71,7 +71,7 @@ public class TrainingController {
     private TrainingLogicService trainingLogicService;
     
     // ★追加: 体重記録用リポジトリ
-    @Autowired(required = false) // まだ作成していない場合にエラーにならないよう false にしていますが、作成後は不要です
+    @Autowired
     private BodyWeightRecordRepository bodyWeightRecordRepository;
 
     private User getCurrentUser(Authentication authentication) {
@@ -269,6 +269,7 @@ public class TrainingController {
 
         String exerciseIdentifier = null;
         int savedCount = 0;
+        int earnedXP = 0;
 
         if ("WEIGHT".equals(form.getType())) {
             exerciseIdentifier = form.getExerciseName();
@@ -310,9 +311,18 @@ public class TrainingController {
             exerciseIdentifier = form.getCardioType();
             trainingRecordRepository.save(record);
             savedCount = 1;
+        } else if ("BODY_WEIGHT".equals(form.getType())) {
+            // ★追加: 体重記録の保存
+            BodyWeightRecord record = new BodyWeightRecord();
+            record.setUser(currentUser);
+            record.setDate(form.getRecordDate());
+            record.setWeight(form.getWeight()); // フォームのweightフィールドを体重として使用
+            bodyWeightRecordRepository.save(record);
+            savedCount = 1;
+            earnedXP = 10; // 体重記録は10XP獲得
         }
 
-        int earnedXP = 0;
+        // 経験値計算（筋トレ・有酸素の場合）
         if (savedCount > 0 && exerciseIdentifier != null) {
             int baseDifficultyXp = trainingLogicService.getExperiencePoints(exerciseIdentifier);
             int additionalXp = 0;
@@ -328,9 +338,9 @@ public class TrainingController {
             int newTotalXp = currentUser.getXp() + earnedXP;
             currentUser.setXp(newTotalXp);
             userRepository.save(currentUser);
-            redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " のトレーニングを記録し、" + earnedXP + " XPを獲得しました！");
+            redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " の記録を保存し、" + earnedXP + " XPを獲得しました！");
         } else {
-            redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " のトレーニングを記録しました！");
+            redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " の記録を保存しました！");
         }
 
         missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
@@ -383,6 +393,14 @@ public class TrainingController {
                     r -> true,
                     (a, b) -> a
                 ));
+        
+        // ★追加: 体重記録がある日もログありとする
+        List<BodyWeightRecord> weightRecords = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
+        for(BodyWeightRecord wr : weightRecords) {
+            if (wr.getDate() != null && !wr.getDate().isBefore(firstOfMonth) && !wr.getDate().isAfter(lastOfMonth)) {
+                loggedDates.put(wr.getDate(), true);
+            }
+        }
 
         List<LocalDate> calendarDays = new ArrayList<>();
         int paddingDays = firstOfMonth.getDayOfWeek().getValue() % 7;
@@ -416,7 +434,7 @@ public class TrainingController {
         return "log/training-log";
     }
 
-    // ★★★ グラフ表示用に修正したメソッド ★★★
+    // 全記録一覧（グラフ表示）
     @GetMapping("/training-log/all")
     public String showAllTrainingLog(
             Authentication authentication,
@@ -436,14 +454,13 @@ public class TrainingController {
         // 日付でソート（昇順）
         recordsForChart.sort((r1, r2) -> r1.getRecordDate().compareTo(r2.getRecordDate()));
 
-        // 3. 体重記録の取得（リポジトリがある場合）
+        // 3. 体重記録の取得
         List<BodyWeightRecord> weightRecords = new ArrayList<>();
         if (bodyWeightRecordRepository != null) {
             weightRecords = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
         }
 
-        // 4. データ集計用Map (Key: ソート可能な日付文字列 "yyyy-MM-dd" 等)
-        // ソート順を維持するためにTreeMapを使用
+        // 4. データ集計用Map
         Map<String, int[]> durationMap = new TreeMap<>(); // [0]=cardio, [1]=weight
         Map<String, List<Double>> weightMap = new TreeMap<>();
 
@@ -480,7 +497,6 @@ public class TrainingController {
         }
 
         // マージしてチャートデータ作成
-        // 全てのユニークなキーを取得
         List<String> allKeys = new ArrayList<>();
         allKeys.addAll(durationMap.keySet());
         allKeys.addAll(weightMap.keySet());
@@ -488,8 +504,6 @@ public class TrainingController {
 
         List<DailyChartData> chartDataList = new ArrayList<>();
         
-        // 前回の体重を保持して、記録がない日も線をつなぐ（あるいはnullにしておくかは要件次第）
-        // ここでは、その期間の平均があればそれを出し、なければnull（Chart.jsのspanGaps: trueでつながる）
         for (String key : allKeys) {
             int[] durations = durationMap.getOrDefault(key, new int[]{0, 0});
             List<Double> weights = weightMap.get(key);
@@ -521,14 +535,11 @@ public class TrainingController {
     // 集計用のキー生成
     private String getKey(LocalDate date, String period) {
         if ("week".equals(period)) {
-            // 週の開始日（月曜日）をキーにする
             LocalDate startOfWeek = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-            return startOfWeek.toString(); // "yyyy-MM-dd"
+            return startOfWeek.toString();
         } else if ("month".equals(period)) {
-            // "yyyy-MM"
             return date.format(DateTimeFormatter.ofPattern("yyyy-MM"));
         } else {
-            // 日次 "yyyy-MM-dd"
             return date.toString();
         }
     }
@@ -536,14 +547,11 @@ public class TrainingController {
     // 表示用ラベル生成
     private String getLabel(String key, String period) {
         if ("week".equals(period)) {
-            // "MM/dd~"
             LocalDate date = LocalDate.parse(key);
             return date.format(DateTimeFormatter.ofPattern("MM/dd")) + "~";
         } else if ("month".equals(period)) {
-            // "yyyy/MM"
             return key.replace("-", "/");
         } else {
-            // "MM/dd"
             LocalDate date = LocalDate.parse(key);
             return date.format(DateTimeFormatter.ofPattern("MM/dd"));
         }
@@ -566,6 +574,8 @@ public class TrainingController {
         model.addAttribute("trainingLogForm", form);
         return "log/training-log-form-cardio";
     }
+    
+    // ★追加: 体重記録フォームの表示
     @GetMapping("/training-log/form/body-weight")
     public String showBodyWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
         TrainingLogForm form = new TrainingLogForm();
