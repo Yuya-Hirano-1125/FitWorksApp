@@ -3,8 +3,10 @@ package com.example.demo.controller;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -22,11 +24,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.demo.dto.DailyChartData;
 import com.example.demo.dto.TrainingLogForm;
+import com.example.demo.entity.BodyWeightRecord;
 import com.example.demo.entity.ExerciseBookmark;
 import com.example.demo.entity.MySet;
 import com.example.demo.entity.TrainingRecord;
 import com.example.demo.entity.User;
+import com.example.demo.repository.BodyWeightRecordRepository;
 import com.example.demo.repository.ExerciseBookmarkRepository;
 import com.example.demo.repository.MySetRepository;
 import com.example.demo.repository.TrainingRecordRepository;
@@ -35,6 +40,7 @@ import com.example.demo.service.MissionService;
 import com.example.demo.service.TrainingDataService;
 import com.example.demo.service.TrainingLogicService;
 import com.example.demo.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 public class TrainingController {
@@ -57,12 +63,15 @@ public class TrainingController {
     @Autowired
     private MySetRepository mySetRepository;
 
-    // ★★★ 新しいServiceを注入 ★★★
     @Autowired
     private TrainingDataService trainingDataService;
 
     @Autowired
     private TrainingLogicService trainingLogicService;
+    
+    // ★追加: 体重記録用リポジトリ
+    @Autowired(required = false) // まだ作成していない場合にエラーにならないよう false にしていますが、作成後は不要です
+    private BodyWeightRecordRepository bodyWeightRecordRepository;
 
     private User getCurrentUser(Authentication authentication) {
         if (authentication == null) return null;
@@ -76,7 +85,6 @@ public class TrainingController {
             return "redirect:/login";
         }
 
-        // training.html 用の単純な文字列リストを取得
         Map<String, List<String>> simpleFreeWeightMap = trainingDataService.getSimpleFreeWeightExercisesMap();
         List<String> simpleCardioList = trainingDataService.getSimpleCardioExercisesList();
 
@@ -95,7 +103,6 @@ public class TrainingController {
             return "redirect:/login";
         }
 
-        // 詳細データを持つオブジェクトを渡す
         model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercises());
         model.addAttribute("cardioExercises", trainingDataService.getCardioExercises());
 
@@ -224,7 +231,6 @@ public class TrainingController {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
 
         model.addAttribute("mySet", new MySet());
-        // フォーム用には単純リストを渡す
         model.addAttribute("freeWeightExercisesByPart", trainingDataService.getSimpleFreeWeightExercisesMap());
         model.addAttribute("cardioExercises", trainingDataService.getSimpleCardioExercisesList());
         return "training/myset-form";
@@ -307,7 +313,6 @@ public class TrainingController {
 
         int earnedXP = 0;
         if (savedCount > 0 && exerciseIdentifier != null) {
-            // Serviceを使ってXP計算
             int baseDifficultyXp = trainingLogicService.getExperiencePoints(exerciseIdentifier);
             int additionalXp = 0;
             if ("WEIGHT".equals(form.getType())) {
@@ -410,11 +415,81 @@ public class TrainingController {
         return "log/training-log";
     }
 
+    // ★★★ グラフ表示用に修正したメソッド ★★★
     @GetMapping("/training-log/all")
     public String showAllTrainingLog(Authentication authentication, Model model) {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
+
+        // 1. 全トレーニング記録の取得
         List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
+        
+        // 2. グラフ表示用に古い順で取得し直す（あるいはソートする）
+        // ここでは全件取得済みのものを日付昇順にして集計に使います
+        List<TrainingRecord> recordsForChart = new ArrayList<>(allRecords);
+        recordsForChart.sort((r1, r2) -> r1.getRecordDate().compareTo(r2.getRecordDate()));
+
+        // 3. 体重記録の取得（リポジトリがある場合）
+        List<BodyWeightRecord> weightRecords = new ArrayList<>();
+        if (bodyWeightRecordRepository != null) {
+            weightRecords = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
+        }
+
+        // 4. データ集計用Map (Key: "MM/dd")
+        Map<String, DailyChartData> chartDataMap = new LinkedHashMap<>();
+
+        // トレーニング時間の集計
+        for (TrainingRecord record : recordsForChart) {
+            if (record.getRecordDate() == null) continue;
+            
+            // 日付文字列生成 (例: "12/01")
+            String dateStr = record.getRecordDate().format(DateTimeFormatter.ofPattern("MM/dd"));
+            
+            DailyChartData data = chartDataMap.getOrDefault(dateStr, new DailyChartData(dateStr, 0, 0, null));
+            
+            // 時間の計算（有酸素はdurationMinutes、筋トレはセット数や想定時間など。
+            // ここでは簡易的に筋トレ1セット=3分と仮定するか、Durationフィールドがあればそれを使います）
+            int duration = 0;
+            if (record.getDurationMinutes() != null) {
+                duration = record.getDurationMinutes();
+            } else {
+                // 筋トレで時間が記録されていない場合、1セット3分として概算（要件に合わせて調整してください）
+                int sets = record.getSets() != null ? record.getSets() : 1;
+                duration = sets * 3; 
+            }
+
+            if ("CARDIO".equalsIgnoreCase(record.getType())) {
+                data.setCardioMinutes(data.getCardioMinutes() + duration);
+            } else {
+                data.setWeightMinutes(data.getWeightMinutes() + duration);
+            }
+            chartDataMap.put(dateStr, data);
+        }
+
+        // 体重データのマージ
+        for (BodyWeightRecord wr : weightRecords) {
+            if (wr.getDate() == null) continue;
+            
+            String dateStr = wr.getDate().format(DateTimeFormatter.ofPattern("MM/dd"));
+            DailyChartData data = chartDataMap.getOrDefault(dateStr, new DailyChartData(dateStr, 0, 0, null));
+            
+            data.setBodyWeight(wr.getWeight());
+            chartDataMap.put(dateStr, data);
+        }
+
+        // JSON変換
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            // 日付順になっているMapの値を取り出す
+            List<DailyChartData> chartDataList = new ArrayList<>(chartDataMap.values());
+            
+            String jsonChartData = mapper.writeValueAsString(chartDataList);
+            model.addAttribute("chartDataJson", jsonChartData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("chartDataJson", "[]");
+        }
+
         model.addAttribute("records", allRecords);
         return "log/training-log-all";
     }
