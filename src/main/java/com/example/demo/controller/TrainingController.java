@@ -566,4 +566,12 @@ public class TrainingController {
         model.addAttribute("trainingLogForm", form);
         return "log/training-log-form-cardio";
     }
+    @GetMapping("/training-log/form/body-weight")
+    public String showBodyWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
+        TrainingLogForm form = new TrainingLogForm();
+        form.setRecordDate(date);
+        form.setType("BODY_WEIGHT");
+        model.addAttribute("trainingLogForm", form);
+        return "log/training-log-form-body-weight";
+    }
 }

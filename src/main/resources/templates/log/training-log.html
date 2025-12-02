@@ -79,15 +79,17 @@
         <p class="modal-instruction">新しい記録を追加：</p>
         
         <div class="form-group">
-            <label for="trainingType">トレーニングの種類:</label>
+            <label for="trainingType">記録の種類:</label>
             <select id="trainingType" class="form-control" onchange="loadTrainingForm(this.value, document.getElementById('selectedDateInput').value)">
                 <option value="WEIGHT">フリーウェイト (筋トレ)</option>
                 <option value="CARDIO">有酸素運動 (ランニングなど)</option>
+                <option value="BODY_WEIGHT">体重記録</option>
             </select>
         </div>
         
+        <input type="hidden" id="selectedDateInput" name="date" value="">
+        
         <div id="formContainer">
-            <input type="hidden" id="selectedDateInput" name="date" value="">
             <p>フォームを読み込んでいます...</p>
         </div>
 
@@ -104,12 +106,18 @@
     </a>
 </div>
 
-<script>
+<script th:inline="javascript">
     // トレーニングフォームを非同期で読み込む関数
     function loadTrainingForm(type, date) {
-        const url = type === 'WEIGHT' 
-            ? /*[[@{/training-log/form/weight}]]*/ '/training-log/form/weight' + '?date=' + date
-            : /*[[@{/training-log/form/cardio}]]*/ '/training-log/form/cardio' + '?date=' + date;
+        let url = '';
+        if (type === 'WEIGHT') {
+            url = /*[[@{/training-log/form/weight}]]*/ '/training-log/form/weight';
+        } else if (type === 'CARDIO') {
+            url = /*[[@{/training-log/form/cardio}]]*/ '/training-log/form/cardio';
+        } else if (type === 'BODY_WEIGHT') {
+            url = /*[[@{/training-log/form/body-weight}]]*/ '/training-log/form/body-weight';
+        }
+        url += '?date=' + date;
 
         fetch(url)
             .then(response => response.text())
@@ -126,6 +134,10 @@
     function openLogModal(dateString, isLogged) {
         const [year, month, day] = dateString.split('-');
         const displayDate = `${year}年${month}月${day}日`;
+        
+        // 日付をセット
+        document.getElementById('selectedDateInput').value = dateString;
+        document.getElementById('modalDateTitle').innerText = displayDate;
         
         const modal = document.getElementById('logModal');
         const trainingTypeSelect = document.getElementById('trainingType');
@@ -144,18 +156,15 @@
             logViewArea.innerHTML = '<p style="color: #999; margin-bottom: 10px;">この日はまだ記録がありません。</p>';
         }
 
-        // ★★★ 修正点: クラスを追加するだけで表示をCSSに任せる ★★★
         modal.classList.add('is-active');
     }
 
     // 記録モーダルを閉じる関数
     function closeLogModal() {
         const modal = document.getElementById('logModal');
-        
-        // 1. モーダルを非表示 (CSSクラスを使用)
         modal.classList.remove('is-active');
         
-        // 2. フォームの状態をリセット
+        // リセット
         document.getElementById('formContainer').innerHTML = '<p>フォームを読み込んでいます...</p>';
         document.getElementById('trainingType').value = 'WEIGHT'; 
     }
@@ -163,14 +172,12 @@
     // モーダル外クリックで閉じる処理
     window.onclick = function(event) {
         const modal = document.getElementById('logModal');
-        // モーダルが表示中かつクリック対象が背景の場合に閉じる
         if (modal.classList.contains('is-active') && event.target === modal) {
             closeLogModal();
         }
     }
-    
-    // ★★★ 修正点: 初期化のためのリスナーは不要、すべて削除 ★★★
 </script>
 
 </body>
 </html>
+
