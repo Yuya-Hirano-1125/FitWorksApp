@@ -85,7 +85,7 @@ body {
 }
 
 .main-container:hover {
-    transform: translateY(-10px) scale(1.02); /* 浮く高さを強調し、少し拡大 */
+    transform: translateY(-1px) scale(1.01); /* 浮く高さを強調し、少し拡大 */
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), 0 0 20px var(--primary-color), 0 0 0 8px var(--primary-color); /* ホバー時の境界線も強調 */
 }
 
@@ -172,7 +172,7 @@ h1 {
 
 .button.primary:hover, button.primary:hover {
     animation: none; /* ホバー中はgentleFloatを停止 */
-    transform: translateY(-12px) scale(1.04) rotate(-1deg); /* より大きく弾む、少し回転 */
+    transform: translateY(-5px) scale(1.0) rotate(-1deg); /* より大きく弾む、少し回転 */
     box-shadow: 0 18px 45px rgba(255, 105, 180, 0.9), 0 0 25px var(--primary-color);
     background: linear-gradient(45deg, var(--secondary-color), var(--primary-color)); /* グラデーションの向きを反転 */
 }

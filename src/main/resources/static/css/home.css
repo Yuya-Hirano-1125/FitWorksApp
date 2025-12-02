@@ -73,7 +73,7 @@
 } 
 .daily-mission-button:hover { 
     animation: none; /* ホバー中は浮遊を停止 */ 
-    transform: translateY(-6px) scale(1.03) rotate(1deg); /* より大きく弾む、少し回転 */ 
+    transform: translateY(-5px) scale(1.03) rotate(1deg); /* より大きく弾む、少し回転 */ 
     box-shadow: 0 8px 25px rgba(135, 206, 235, 0.9), 0 0 15px var(--ai-accent-color); 
 } 
 .daily-mission-button i { 
