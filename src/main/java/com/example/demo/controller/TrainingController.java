@@ -3,12 +3,15 @@ package com.example.demo.controller;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +25,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.demo.dto.DailyChartData;
 import com.example.demo.dto.TrainingLogForm;
+import com.example.demo.entity.BodyWeightRecord;
 import com.example.demo.entity.ExerciseBookmark;
 import com.example.demo.entity.MySet;
 import com.example.demo.entity.TrainingRecord;
 import com.example.demo.entity.User;
+import com.example.demo.repository.BodyWeightRecordRepository;
 import com.example.demo.repository.ExerciseBookmarkRepository;
 import com.example.demo.repository.MySetRepository;
 import com.example.demo.repository.TrainingRecordRepository;
@@ -35,6 +41,7 @@ import com.example.demo.service.MissionService;
 import com.example.demo.service.TrainingDataService;
 import com.example.demo.service.TrainingLogicService;
 import com.example.demo.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 public class TrainingController {
@@ -57,12 +64,15 @@ public class TrainingController {
     @Autowired
     private MySetRepository mySetRepository;
 
-    // ★★★ 新しいServiceを注入 ★★★
     @Autowired
     private TrainingDataService trainingDataService;
 
     @Autowired
     private TrainingLogicService trainingLogicService;
+    
+    // ★追加: 体重記録用リポジトリ
+    @Autowired(required = false) // まだ作成していない場合にエラーにならないよう false にしていますが、作成後は不要です
+    private BodyWeightRecordRepository bodyWeightRecordRepository;
 
     private User getCurrentUser(Authentication authentication) {
         if (authentication == null) return null;
@@ -76,7 +86,6 @@ public class TrainingController {
             return "redirect:/login";
         }
 
-        // training.html 用の単純な文字列リストを取得
         Map<String, List<String>> simpleFreeWeightMap = trainingDataService.getSimpleFreeWeightExercisesMap();
         List<String> simpleCardioList = trainingDataService.getSimpleCardioExercisesList();
 
@@ -95,7 +104,6 @@ public class TrainingController {
             return "redirect:/login";
         }
 
-        // 詳細データを持つオブジェクトを渡す
         model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercises());
         model.addAttribute("cardioExercises", trainingDataService.getCardioExercises());
 
@@ -224,7 +232,6 @@ public class TrainingController {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
 
         model.addAttribute("mySet", new MySet());
-        // フォーム用には単純リストを渡す
         model.addAttribute("freeWeightExercisesByPart", trainingDataService.getSimpleFreeWeightExercisesMap());
         model.addAttribute("cardioExercises", trainingDataService.getSimpleCardioExercisesList());
         return "training/myset-form";
@@ -307,7 +314,6 @@ public class TrainingController {
 
         int earnedXP = 0;
         if (savedCount > 0 && exerciseIdentifier != null) {
-            // Serviceを使ってXP計算
             int baseDifficultyXp = trainingLogicService.getExperiencePoints(exerciseIdentifier);
             int additionalXp = 0;
             if ("WEIGHT".equals(form.getType())) {
@@ -410,13 +416,137 @@ public class TrainingController {
         return "log/training-log";
     }
 
+    // ★★★ グラフ表示用に修正したメソッド ★★★
     @GetMapping("/training-log/all")
-    public String showAllTrainingLog(Authentication authentication, Model model) {
+    public String showAllTrainingLog(
+            Authentication authentication,
+            @RequestParam(value = "period", defaultValue = "day") String period,
+            Model model) {
+        
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
+
+        model.addAttribute("period", period);
+
+        // 1. 全トレーニング記録の取得
         List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
+        
+        // 集計用レコード
+        List<TrainingRecord> recordsForChart = new ArrayList<>(allRecords);
+        // 日付でソート（昇順）
+        recordsForChart.sort((r1, r2) -> r1.getRecordDate().compareTo(r2.getRecordDate()));
+
+        // 3. 体重記録の取得（リポジトリがある場合）
+        List<BodyWeightRecord> weightRecords = new ArrayList<>();
+        if (bodyWeightRecordRepository != null) {
+            weightRecords = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
+        }
+
+        // 4. データ集計用Map (Key: ソート可能な日付文字列 "yyyy-MM-dd" 等)
+        // ソート順を維持するためにTreeMapを使用
+        Map<String, int[]> durationMap = new TreeMap<>(); // [0]=cardio, [1]=weight
+        Map<String, List<Double>> weightMap = new TreeMap<>();
+
+        // トレーニング記録の集計
+        for (TrainingRecord record : recordsForChart) {
+            if (record.getRecordDate() == null) continue;
+            
+            String key = getKey(record.getRecordDate(), period);
+            
+            durationMap.putIfAbsent(key, new int[]{0, 0});
+            int[] durations = durationMap.get(key);
+            
+            int duration = 0;
+            if (record.getDurationMinutes() != null) {
+                duration = record.getDurationMinutes();
+            } else {
+                int sets = record.getSets() != null ? record.getSets() : 1;
+                duration = sets * 3; 
+            }
+
+            if ("CARDIO".equalsIgnoreCase(record.getType())) {
+                durations[0] += duration;
+            } else {
+                durations[1] += duration;
+            }
+        }
+
+        // 体重データの集計
+        for (BodyWeightRecord wr : weightRecords) {
+            if (wr.getDate() == null) continue;
+            String key = getKey(wr.getDate(), period);
+            
+            weightMap.computeIfAbsent(key, k -> new ArrayList<>()).add(wr.getWeight());
+        }
+
+        // マージしてチャートデータ作成
+        // 全てのユニークなキーを取得
+        List<String> allKeys = new ArrayList<>();
+        allKeys.addAll(durationMap.keySet());
+        allKeys.addAll(weightMap.keySet());
+        allKeys = allKeys.stream().distinct().sorted().collect(Collectors.toList());
+
+        List<DailyChartData> chartDataList = new ArrayList<>();
+        
+        // 前回の体重を保持して、記録がない日も線をつなぐ（あるいはnullにしておくかは要件次第）
+        // ここでは、その期間の平均があればそれを出し、なければnull（Chart.jsのspanGaps: trueでつながる）
+        for (String key : allKeys) {
+            int[] durations = durationMap.getOrDefault(key, new int[]{0, 0});
+            List<Double> weights = weightMap.get(key);
+            Double avgWeight = null;
+            
+            if (weights != null && !weights.isEmpty()) {
+                double avg = weights.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+                avgWeight = Math.round(avg * 10.0) / 10.0;
+            }
+            
+            String displayDate = getLabel(key, period);
+            chartDataList.add(new DailyChartData(displayDate, durations[0], durations[1], avgWeight));
+        }
+
+        // JSON変換
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonChartData = mapper.writeValueAsString(chartDataList);
+            model.addAttribute("chartDataJson", jsonChartData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("chartDataJson", "[]");
+        }
+
         model.addAttribute("records", allRecords);
         return "log/training-log-all";
+    }
+    
+    // 集計用のキー生成
+    private String getKey(LocalDate date, String period) {
+        if ("week".equals(period)) {
+            // 週の開始日（月曜日）をキーにする
+            LocalDate startOfWeek = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            return startOfWeek.toString(); // "yyyy-MM-dd"
+        } else if ("month".equals(period)) {
+            // "yyyy-MM"
+            return date.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        } else {
+            // 日次 "yyyy-MM-dd"
+            return date.toString();
+        }
+    }
+    
+    // 表示用ラベル生成
+    private String getLabel(String key, String period) {
+        if ("week".equals(period)) {
+            // "MM/dd~"
+            LocalDate date = LocalDate.parse(key);
+            return date.format(DateTimeFormatter.ofPattern("MM/dd")) + "~";
+        } else if ("month".equals(period)) {
+            // "yyyy/MM"
+            return key.replace("-", "/");
+        } else {
+            // "MM/dd"
+            LocalDate date = LocalDate.parse(key);
+            return date.format(DateTimeFormatter.ofPattern("MM/dd"));
+        }
     }
 
     @GetMapping("/training-log/form/weight")
@@ -435,5 +565,13 @@ public class TrainingController {
         form.setType("CARDIO");
         model.addAttribute("trainingLogForm", form);
         return "log/training-log-form-cardio";
+    }
+    @GetMapping("/training-log/form/body-weight")
+    public String showBodyWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
+        TrainingLogForm form = new TrainingLogForm();
+        form.setRecordDate(date);
+        form.setType("BODY_WEIGHT");
+        model.addAttribute("trainingLogForm", form);
+        return "log/training-log-form-body-weight";
     }
 }

@@ -7,13 +7,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-	
-	<script th:src="@{/js/theme.js}"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/theme.js}"></script>
+    
     <style>
         .log-list-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .chart-options {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .chart-options .button {
+            padding: 5px 15px;
+            font-size: 0.9rem;
+            min-width: 80px;
         }
         .record-card {
             background: white;
@@ -92,6 +112,22 @@
 
     <h1><i class="fa-solid fa-list-ul header-icon"></i>全トレーニング記録</h1>
     
+    <div class="chart-container">
+        <div class="chart-options">
+            <a th:href="@{/training-log/all(period='day')}" 
+               class="button" 
+               th:classappend="${period == 'day' or period == null} ? 'primary' : 'secondary'">日次</a>
+            <a th:href="@{/training-log/all(period='week')}" 
+               class="button" 
+               th:classappend="${period == 'week'} ? 'primary' : 'secondary'">週次</a>
+            <a th:href="@{/training-log/all(period='month')}" 
+               class="button" 
+               th:classappend="${period == 'month'} ? 'primary' : 'secondary'">月次</a>
+        </div>
+        
+        <canvas id="trainingChart"></canvas>
+    </div>
+
     <div th:if="${records.empty}" class="no-records">
         <p>まだ記録がありません。<br>トレーニングを行って記録してみましょう！</p>
         <a th:href="@{/training}" class="button primary" style="margin-top:15px;">トレーニングを始める</a>
@@ -134,5 +170,96 @@
 
     </div>
 </div>
+
+<script th:inline="javascript">
+    const rawData = /*[[${chartDataJson}]]*/ '[]';
+    let chartData = [];
+    try {
+        chartData = JSON.parse(rawData);
+    } catch(e) {
+        console.error("JSON parse error", e);
+    }
+
+    if(chartData && chartData.length > 0) {
+        const labels = chartData.map(d => d.date);
+        const cardioData = chartData.map(d => d.cardioMinutes);
+        const weightData = chartData.map(d => d.weightMinutes);
+        const bodyWeightData = chartData.map(d => d.bodyWeight);
+
+        const ctx = document.getElementById('trainingChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '体重 (kg)',
+                        data: bodyWeightData,
+                        type: 'line',
+                        borderColor: '#FF6384',
+                        backgroundColor: '#FF6384',
+                        yAxisID: 'y1',
+                        tension: 0.1,
+                        order: 0,
+                        spanGaps: true // データが抜けていても線をつなぐ
+                    },
+                    {
+                        label: '有酸素 (分)',
+                        data: cardioData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        stack: 'Stack 0',
+                        yAxisID: 'y',
+                        order: 1
+                    },
+                    {
+                        label: 'フリーウェイト (分)',
+                        data: weightData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        stack: 'Stack 0',
+                        yAxisID: 'y',
+                        order: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        stacked: true,
+                        title: {
+                            display: true,
+                            text: 'トレーニング時間 (分)'
+                        },
+                        ticks: {
+                            stepSize: 5
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                        title: {
+                            display: true,
+                            text: '体重 (kg)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
 </body>
 </html>
