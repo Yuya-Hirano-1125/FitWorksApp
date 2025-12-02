@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイセット作成 | FitWorks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        .form-group { margin-bottom: 20px; text-align: left;}
+        .form-group label { font-weight: bold; display: block; margin-bottom: 5px; color: var(--dark-text); }
+        .form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+        
+        .exercise-group h3 {
+            background: #f8f9fa; padding: 10px; border-left: 5px solid var(--primary-color);
+            margin-top: 20px; font-size: 1.1em; color: var(--dark-text);
+        }
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 10px;
+            padding: 10px;
+        }
+        .checkbox-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px; border-radius: 6px; border: 1px solid #eee;
+        }
+        .checkbox-item:hover { background-color: #f0f8ff; }
+        .checkbox-item input { transform: scale(1.3); }
+        
+        .sticky-footer {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(255,255,255,0.95);
+            padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .main-container { padding-bottom: 80px; } /* フッター分の余白 */
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="main-container">
+        <h1><i class="fa-solid fa-pen-to-square"></i> マイセット作成</h1>
+
+        <form th:action="@{/training/mysets/save}" method="post" th:object="${mySet}">
+            <div class="form-group">
+                <label for="name">マイセット名</label>
+                <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="例：月曜日の胸トレ" required>
+            </div>
+
+            <div class="form-group">
+                <label>種目を選択</label>
+                
+                <div th:each="entry : ${freeWeightExercisesByPart}">
+                    <h3 th:text="${entry.key}">部位</h3>
+                    <div class="checkbox-grid">
+                        <div th:each="exercise : ${entry.value}" class="checkbox-item">
+                            <input type="checkbox" th:field="*{exerciseNames}" th:value="${exercise}" th:id="${#ids.seq('ex')}">
+                            <label th:for="${#ids.prev('ex')}" th:text="${exercise}">種目名</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-group">
+                    <h3>有酸素運動</h3>
+                    <div class="checkbox-grid">
+                        <div th:each="cardio : ${cardioExercises}" class="checkbox-item">
+                            <input type="checkbox" th:field="*{exerciseNames}" th:value="${cardio}" th:id="${#ids.seq('cardio')}">
+                            <label th:for="${#ids.prev('cardio')}" th:text="${cardio}">有酸素</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sticky-footer">
+                <a th:href="@{/training/mysets}" class="button secondary" style="margin-right: 10px;">キャンセル</a>
+                <button type="submit" class="button" style="background-color: #28a745; min-width: 150px;">
+                    <i class="fa-solid fa-save"></i> 保存する
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

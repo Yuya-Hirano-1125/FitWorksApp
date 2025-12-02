@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイセット一覧 | FitWorks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        .myset-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 6px solid #6f42c1;
+        }
+        .myset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .myset-title { font-size: 1.2rem; font-weight: bold; color: var(--dark-text); }
+        .myset-exercises { margin: 10px 0; padding-left: 20px; color: #555; }
+        .myset-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .btn-start {
+            background-color: var(--primary-color); color: white; border: none;
+            padding: 8px 16px; border-radius: 20px; cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 5px; font-weight: bold;
+        }
+        .btn-delete {
+            background-color: #ffebee; color: #ff4444; border: 1px solid #ff4444;
+            padding: 8px 12px; border-radius: 20px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="main-container">
+        <h1><i class="fa-solid fa-list-check" style="color: #6f42c1;"></i> マイセット一覧</h1>
+
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${message}" class="alert alert-info" th:text="${message}"></div>
+
+        <div style="text-align: right; margin-bottom: 20px;">
+            <a th:href="@{/training/mysets/new}" class="button" style="background-color: #28a745;">
+                <i class="fa-solid fa-plus"></i> 新規作成
+            </a>
+        </div>
+
+        <div th:if="${mySets.isEmpty()}" style="text-align: center; color: #777; padding: 40px;">
+            <p>まだマイセットがありません。<br>お気に入りの種目を組み合わせてセットを作りましょう！</p>
+        </div>
+
+        <div th:each="set : ${mySets}" class="myset-card">
+            <div class="myset-header">
+                <span class="myset-title" th:text="${set.name}">セット名</span>
+                <span style="font-size: 0.9em; color: #888;" th:text="${set.exerciseNames.size()} + ' 種目'">3 種目</span>
+            </div>
+            
+            <ul class="myset-exercises">
+                <li th:each="ex, stat : ${set.exerciseNames}" th:if="${stat.index < 3}" th:text="${ex}">種目名</li>
+                <li th:if="${set.exerciseNames.size() > 3}" style="list-style: none; color: #888;">...他</li>
+            </ul>
+
+            <div class="myset-actions">
+                <form th:action="@{/training/mysets/delete/{id}(id=${set.id})}" method="post" onsubmit="return confirm('本当に削除しますか？');">
+                    <button type="submit" class="btn-delete"><i class="fa-solid fa-trash"></i></button>
+                </form>
+
+                <form th:action="@{/training/start}" method="post">
+                    <input type="hidden" name="type" value="myset">
+                    <input type="hidden" name="mySetId" th:value="${set.id}">
+                    <button type="submit" class="btn-start">
+                        <i class="fa-solid fa-play"></i> スタート
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center;">
+            <a th:href="@{/training}" class="button secondary">戻る</a>
+        </div>
+    </div>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

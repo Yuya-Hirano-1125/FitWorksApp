@@ -147,6 +147,12 @@
     
     <div th:if="${param.logout}" class="alert alert-success">ログアウトしました。</div>
 
+    <div style="margin-bottom: 25px;">
+        <a th:href="@{/training/mysets}" class="button" style="background-color: #6f42c1; color: white; width: 100%; display: block; text-align: center; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <i class="fa-solid fa-list-check"></i> マイセットから選ぶ
+        </a>
+    </div>
+
     <div class="card training-option">
         <form th:action="@{/training/start}" method="post">
             <input type="hidden" name="type" value="ai-suggested"/>

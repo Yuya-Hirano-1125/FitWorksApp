@@ -19,15 +19,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.TrainingLogForm;
-import com.example.demo.entity.ExerciseBookmark; // 追加
+import com.example.demo.entity.ExerciseBookmark;
+import com.example.demo.entity.MySet;
 import com.example.demo.entity.TrainingRecord;
 import com.example.demo.entity.User;
-import com.example.demo.repository.ExerciseBookmarkRepository; // 追加
+import com.example.demo.repository.ExerciseBookmarkRepository;
+import com.example.demo.repository.MySetRepository;
 import com.example.demo.repository.TrainingRecordRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.MissionService;
@@ -48,9 +51,13 @@ public class TrainingController {
 	@Autowired 
 	private MissionService missionService; 
 
-    // ★★★ 追加: ブックマーク用リポジトリ ★★★
+    // ★★★ ブックマーク用リポジトリ ★★★
     @Autowired
     private ExerciseBookmarkRepository exerciseBookmarkRepository;
+
+    // ★★★ マイセット用リポジトリ ★★★
+    @Autowired
+    private MySetRepository mySetRepository;
 
 	private User getCurrentUser(Authentication authentication) { 
 		if (authentication == null) return null; 
@@ -114,7 +121,7 @@ public class TrainingController {
 			"ウォーキング (初級)", "サイクリング (初級)", "エリプティカル (初級)", "ランニング (中級)", "水泳 (中級)", "ローイング (中級)", "トレッドミルインターバル (上級)"
 	);
 
-    // ランダム生成ロジック（既存）
+    // ランダム生成ロジック
     private Map<String, Object> generateAiSuggestedMenu() {
         Map<String, Object> menu = new LinkedHashMap<>();
         List<String> programList = new ArrayList<>();
@@ -165,35 +172,30 @@ public class TrainingController {
         return menu;
     }
 
-    // ★★★ 【新規追加】AIの提案テキストを解析してリスト化するメソッド ★★★
+    // AI提案テキスト解析
     private List<String> parseAiProposal(String proposalText) {
         List<String> programList = new ArrayList<>();
         if (proposalText == null || proposalText.trim().isEmpty()) {
             return programList;
         }
 
-        // 改行で分割して行ごとに処理
         String[] lines = proposalText.split("\n");
         for (String line : lines) {
             String trimmedLine = line.trim();
-            // メニューっぽくない行（挨拶など）を除外する簡易フィルタ
-            // 数字が含まれる、または特定のキーワードが含まれる行をメニューとみなす
             if (!trimmedLine.isEmpty() && 
-                (trimmedLine.matches(".*\\d+.*") || // 数字を含む
+                (trimmedLine.matches(".*\\d+.*") || 
                  trimmedLine.contains("セット") || 
                  trimmedLine.contains("回") || 
                  trimmedLine.contains("分") ||
-                 trimmedLine.contains("・") ||      // 中黒リスト
-                 trimmedLine.matches("^[0-9]+\\..*") // "1. " で始まる
+                 trimmedLine.contains("・") ||      
+                 trimmedLine.matches("^[0-9]+\\..*") 
                 )) {
                 
-                // HTMLタグ除去（<br>などが入っている場合用）
                 String cleanLine = trimmedLine.replaceAll("<[^>]*>", "");
                 programList.add(cleanLine);
             }
         }
         
-        // 解析できなかった場合、全文をそのまま表示させる
         if (programList.isEmpty()) {
             programList.add("AI提案内容: " + proposalText);
         }
@@ -214,7 +216,7 @@ public class TrainingController {
 		return "training/training";	
 	}
 
-    // ★★★ 【新規追加】ブックマーク一覧画面 ★★★
+    // ★★★ ブックマーク一覧画面 ★★★
     @GetMapping("/training/bookmarks")
     public String showBookmarkList(Authentication authentication, Model model) {
         User currentUser = getCurrentUser(authentication);
@@ -228,7 +230,7 @@ public class TrainingController {
         return "training/bookmark-list";
     }
 
-    // ★★★ 【新規追加】ブックマークの追加・削除（トグル）API ★★★
+    // ★★★ ブックマーク登録/解除 ★★★
     @PostMapping("/training/bookmark/toggle")
     public String toggleBookmark(
             @RequestParam("exerciseName") String exerciseName,
@@ -242,21 +244,71 @@ public class TrainingController {
             return "redirect:/login";
         }
 
-        // 既存のブックマークを確認
         Optional<ExerciseBookmark> existing = exerciseBookmarkRepository.findByUserAndExerciseName(currentUser, exerciseName);
         
         if (existing.isPresent()) {
-            // 既に存在すれば削除
             exerciseBookmarkRepository.delete(existing.get());
             redirectAttributes.addFlashAttribute("message", "「" + exerciseName + "」のブックマークを解除しました。");
         } else {
-            // 存在しなければ新規登録
             ExerciseBookmark bookmark = new ExerciseBookmark(currentUser, exerciseName, type);
             exerciseBookmarkRepository.save(bookmark);
             redirectAttributes.addFlashAttribute("successMessage", "「" + exerciseName + "」をブックマークしました！");
         }
 
         return "redirect:" + redirectUrl;
+    }
+
+    // ★★★ マイセット一覧表示 ★★★
+    @GetMapping("/training/mysets")
+    public String showMySetList(Authentication authentication, Model model) {
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) return "redirect:/login";
+
+        List<MySet> mySets = mySetRepository.findByUserOrderByIdDesc(currentUser);
+        model.addAttribute("mySets", mySets);
+        return "training/myset-list";
+    }
+
+    // ★★★ マイセット作成フォーム表示 ★★★
+    @GetMapping("/training/mysets/new")
+    public String showMySetForm(Authentication authentication, Model model) {
+        if (getCurrentUser(authentication) == null) return "redirect:/login";
+
+        model.addAttribute("mySet", new MySet());
+        model.addAttribute("freeWeightExercisesByPart", FREE_WEIGHT_EXERCISES_BY_PART);
+        model.addAttribute("cardioExercises", CARDIO_EXERCISES);
+        return "training/myset-form";
+    }
+
+    // ★★★ マイセット保存処理 ★★★
+    @PostMapping("/training/mysets/save")
+    public String saveMySet(
+            @ModelAttribute MySet mySet,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+        
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) return "redirect:/login";
+
+        mySet.setUser(currentUser);
+        mySetRepository.save(mySet);
+        redirectAttributes.addFlashAttribute("successMessage", "マイセット「" + mySet.getName() + "」を保存しました！");
+        
+        return "redirect:/training/mysets";
+    }
+
+    // ★★★ マイセット削除処理 ★★★
+    @PostMapping("/training/mysets/delete/{id}")
+    public String deleteMySet(@PathVariable("id") Long id, Authentication authentication, RedirectAttributes redirectAttributes) {
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) return "redirect:/login";
+
+        MySet target = mySetRepository.findByIdAndUser(id, currentUser);
+        if (target != null) {
+            mySetRepository.delete(target);
+            redirectAttributes.addFlashAttribute("message", "マイセットを削除しました。");
+        }
+        return "redirect:/training/mysets";
     }
 
 	@GetMapping("/training/map")
@@ -267,7 +319,6 @@ public class TrainingController {
 		return "training/nearby_gyms";	
 	}
 
-    // ★★★ 【修正】種目一覧表示 (ブックマーク情報の受け渡しを追加) ★★★
 	@GetMapping("/training/exercises")
 	public String showExerciseList(Authentication authentication, Model model) {
 		User currentUser = getCurrentUser(authentication);
@@ -275,7 +326,6 @@ public class TrainingController {
 			return "redirect:/login";	
 		}
         
-        // ユーザーのブックマーク済み種目名リストを取得してViewに渡す
         List<String> bookmarkedNames = exerciseBookmarkRepository.findByUserOrderByIdDesc(currentUser)
                 .stream()
                 .map(ExerciseBookmark::getExerciseName)
@@ -290,8 +340,9 @@ public class TrainingController {
 	public String startTrainingSession(
 			@RequestParam("type") String type,
 			@RequestParam(value = "exerciseName", required = false) String exerciseName,
-            // ★ 追加: チャットから送られてくる提案テキストを受け取る
             @RequestParam(value = "aiProposal", required = false) String aiProposal,
+            // ★追加: マイセットID
+            @RequestParam(value = "mySetId", required = false) Long mySetId,
 			Authentication authentication,
 			Model model) {
 		
@@ -308,22 +359,40 @@ public class TrainingController {
 				title = "AIおすすめメニューセッション";
 				selectedExercise = "AIおすすめプログラム";	
 				
-                // ★ 【修正】チャットからの提案があれば優先し、なければランダム生成
                 if (aiProposal != null && !aiProposal.trim().isEmpty()) {
                     List<String> parsedProgram = parseAiProposal(aiProposal);
                     model.addAttribute("programList", parsedProgram);
                     
-                    // チャットからの場合は固定値または適当なランダム値を設定（テキストから解析するのは難易度が高いため）
-                    model.addAttribute("targetTime", 45); // 例: 45分
-                    model.addAttribute("restTime", 60);   // 例: 60秒
+                    model.addAttribute("targetTime", 45);
+                    model.addAttribute("restTime", 60);
                 } else {
-                    // 既存のランダム生成ロジック
                     Map<String, Object> aiMenu = generateAiSuggestedMenu();
                     model.addAttribute("programList", aiMenu.get("programList"));
                     model.addAttribute("targetTime", aiMenu.get("targetTime"));
                     model.addAttribute("restTime", aiMenu.get("restTime"));
                 }
 				break;
+
+            // ★★★ マイセット開始ロジック ★★★
+            case "myset":
+                if (mySetId != null) {
+                    MySet mySet = mySetRepository.findByIdAndUser(mySetId, currentUser);
+                    if (mySet != null) {
+                        title = "マイセット: " + mySet.getName();
+                        selectedExercise = mySet.getName();
+                        
+                        List<String> exercises = new ArrayList<>();
+                        for (int i = 0; i < mySet.getExerciseNames().size(); i++) {
+                            exercises.add((i + 1) + ". " + mySet.getExerciseNames().get(i));
+                        }
+                        model.addAttribute("programList", exercises);
+                        
+                        // 目標時間は種目数 x 10分と仮定
+                        model.addAttribute("targetTime", exercises.size() * 10);
+                        model.addAttribute("restTime", 60);
+                    }
+                }
+                break;
                 
 			case "free-weight":
 			case "cardio":
@@ -517,7 +586,7 @@ public class TrainingController {
 		int earnedXP = 0;
 		if (savedCount > 0 && exerciseIdentifier != null) {
 			
-			// 1. 難易度による基本XPを取得 (例: 初級なら 300 XP)
+			// 1. 難易度による基本XPを取得
 			int baseDifficultyXp = getExperiencePoints(exerciseIdentifier);	
 			
 			// 2. 追加XP (ボリュームまたは時間) の計算
@@ -526,11 +595,9 @@ public class TrainingController {
 			if ("WEIGHT".equals(form.getType())) {
 				// フリーウェイトの場合: 重量 × 回数 (総ボリューム) を追加XPとする
 				additionalXp = calculateTotalVolumeXp(form);
-				/* 計算例: 300 (初級) + (20kg * 3回) = 360 XP */
 			} else if ("CARDIO".equals(form.getType()) && form.getDurationMinutes() != null) {
 				// 有酸素運動の場合: 時間 (分) を追加XPとする
 				additionalXp = form.getDurationMinutes();
-				/* 計算例: 300 (初級) + 30分 = 330 XP */
 			}
 			
 			// 3. 獲得XP = 基本XP (難易度) + 追加XP (ボリューム/時間)
@@ -540,7 +607,7 @@ public class TrainingController {
 		if (earnedXP > 0) {
 			int newTotalXp = currentUser.getXp() + earnedXP;
 			currentUser.setXp(newTotalXp);
-			// 💡 TODO: ここにレベルアップチェックと処理を追加する
+			// 💡 TODO: レベルアップチェック
 			userRepository.save(currentUser);	
 
 			redirectAttributes.addFlashAttribute("successMessage",	
