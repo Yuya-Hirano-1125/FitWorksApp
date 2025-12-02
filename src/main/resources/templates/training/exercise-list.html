@@ -36,17 +36,39 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(255, 105, 180, 0.2);
         }
-        .exercise-detail-card h3 {
-            color: var(--dark-text);
-            font-size: 24px;
-            font-weight: 800;
-            margin-top: 0;
+        
+        /* ★★★ 追加: ヘッダーレイアウトとブックマークボタン ★★★ */
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 10px;
+        }
+        .exercise-header h3 {
+            margin: 0; /* h3のデフォルトマージンをリセット */
             display: flex;
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
+            color: var(--dark-text);
+            font-size: 24px;
+            font-weight: 800;
         }
+        .bookmark-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.8rem;
+            color: gold; /* ブックマークアイコンの色 */
+            padding: 0 0 0 10px;
+            transition: transform 0.2s;
+            line-height: 1;
+        }
+        .bookmark-btn:hover {
+            transform: scale(1.1);
+        }
+        /* ★★★ 追加終わり ★★★ */
+
         .exercise-detail-card .category {
             font-size: 12px;
             color: var(--secondary-color);
@@ -100,7 +122,7 @@
                 padding: 15px;
                 border-left: 6px solid var(--primary-color);
             }
-            .exercise-detail-card h3 {
+            .exercise-header h3 {
                 font-size: 20px;
             }
         }
@@ -109,13 +131,25 @@
 <body class="exercise-list-page">
 <div class="main-container">
     <h1><i class="fa-solid fa-book-open header-icon"></i>種目ライブラリ</h1>
-    <p class="sub-heading">難易度順にトレーニングのやり方とポイントを確認しましょう。</p>
+    <p class="sub-heading">難易度順にトレーニングのやり方とポイントを確認しましょう。<br>気になった種目はブックマークして保存できます。</p>
+
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}" style="margin-bottom: 20px; color: green; font-weight: bold;"></div>
+    <div th:if="${message}" class="alert alert-info" th:text="${message}" style="margin-bottom: 20px; color: #555;"></div>
 
     <div class="exercise-section">
         <h2><i class="fa-solid fa-weight-hanging"></i> フリーウェイト</h2>
         
         <div class="exercise-detail-card">
-            <h3>ラットプルダウン <span class="level-badge level-beginner">初級</span></h3>
+            <div class="exercise-header">
+                <h3>ラットプルダウン <span class="level-badge level-beginner">初級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="ラットプルダウン (初級)">
+                    <input type="hidden" name="type" value="free-weight">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('ラットプルダウン (初級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">広背筋, 上腕二頭筋</span>
             <p><strong>広背筋を効果的に鍛えるマシン種目です。</strong>逆三角形の体型を作るのに役立ちます。</p>
             <ul>
@@ -125,7 +159,16 @@
         </div>
 
         <div class="exercise-detail-card">
-            <h3>レッグプレス <span class="level-badge level-beginner">初級</span></h3>
+            <div class="exercise-header">
+                <h3>レッグプレス <span class="level-badge level-beginner">初級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="レッグプレス (初級)">
+                    <input type="hidden" name="type" value="free-weight">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('レッグプレス (初級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">大腿四頭筋, 大臀筋, ハムストリングス</span>
             <p><strong>スクワットに比べて腰への負担が少なく、高重量で集中的に下半身を鍛えられるマシン種目です。</strong></p>
             <ul>
@@ -135,7 +178,16 @@
         </div>
 
         <div class="exercise-detail-card">
-            <h3>ベンチプレス <span class="level-badge level-intermediate">中級</span></h3>
+            <div class="exercise-header">
+                <h3>ベンチプレス <span class="level-badge level-intermediate">中級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="ベンチプレス (中級)">
+                    <input type="hidden" name="type" value="free-weight">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('ベンチプレス (中級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">胸, 肩 (前部), 上腕三頭筋</span>
             <p><strong>大胸筋を鍛える代表的な種目です。</strong>フォームを意識することで、より効果的に筋肉に負荷をかけられます。</p>
             <ul>
@@ -145,7 +197,16 @@
         </div>
 
         <div class="exercise-detail-card">
-            <h3>スクワット <span class="level-badge level-intermediate">中級</span></h3>
+            <div class="exercise-header">
+                <h3>スクワット <span class="level-badge level-intermediate">中級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="スクワット (中級)">
+                    <input type="hidden" name="type" value="free-weight">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('スクワット (中級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">大腿四頭筋, ハムストリングス, 大臀筋</span>
             <p><strong>「キング・オブ・エクササイズ」と呼ばれる、下半身全体の筋力向上に不可欠な種目です。</strong>正しいフォームはケガの予防にもつながります。</p>
             <ul>
@@ -155,7 +216,16 @@
         </div>
 
         <div class="exercise-detail-card">
-            <h3>ショルダープレス <span class="level-badge level-intermediate">中級</span></h3>
+            <div class="exercise-header">
+                <h3>ショルダープレス <span class="level-badge level-intermediate">中級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="ショルダープレス (中級)">
+                    <input type="hidden" name="type" value="free-weight">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('ショルダープレス (中級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">三角筋 (肩), 上腕三頭筋</span>
             <p><strong>肩全体、特に前部と中部の三角筋を鍛えるのに効果的な種目です。</strong>肩の力強さと安定性を向上させます。</p>
             <ul>
@@ -165,7 +235,16 @@
         </div>
 
         <div class="exercise-detail-card">
-            <h3>オーバーヘッドプレス <span class="level-badge level-intermediate">中級</span></h3>
+            <div class="exercise-header">
+                <h3>オーバーヘッドプレス <span class="level-badge level-intermediate">中級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="オーバーヘッドプレス (中級)">
+                    <input type="hidden" name="type" value="free-weight">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('オーバーヘッドプレス (中級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">三角筋 (肩), 上腕三頭筋, 僧帽筋</span>
             <p><strong>全身を使って高重量を扱う、肩の筋力・パワー向上に最適な種目です。</strong>立って行うことで体幹の安定性も鍛えられます。</p>
             <ul>
@@ -175,7 +254,16 @@
         </div>
         
         <div class="exercise-detail-card">
-            <h3>ベントオーバーロー <span class="level-badge level-intermediate">中級</span></h3>
+            <div class="exercise-header">
+                <h3>ベントオーバーロー <span class="level-badge level-intermediate">中級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="ベントオーバーロー (中級)">
+                    <input type="hidden" name="type" value="free-weight">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('ベントオーバーロー (中級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">広背筋, 僧帽筋, 脊柱起立筋</span>
             <p><strong>背中の厚みと広がりを両方鍛えられる、背中の複合トレーニングの基本です。</strong></p>
             <ul>
@@ -185,11 +273,20 @@
         </div>
 
         <div class="exercise-detail-card">
-            <h3>デッドリフト <span class="level-badge level-advanced">上級</span></h3>
+            <div class="exercise-header">
+                <h3>デッドリフト <span class="level-badge level-advanced">上級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="デッドリフト (上級)">
+                    <input type="hidden" name="type" value="free-weight">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('デッドリフト (上級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">背筋群, ハムストリングス, 大臀筋</span>
             <p><strong>全身の筋力を効率よく高める、非常に効果的なコンパウンド（複合）種目です。</strong>多くの筋肉を同時に使うため、高い集中力が必要です。</p>
             <ul>
-                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> バーを握り、背筋をまっすぐに伸ばしたまま、お尻を突き出すようにしてバーを持ち上げます。立ち上がったとき、肩、腰、膝が一直線になるようにします。</li></li>
+                <li><i class="fa-solid fa-circle-check"></i> <strong>やり方:</strong> バーを握り、背筋をまっすぐに伸ばしたまま、お尻を突き出すようにしてバーを持ち上げます。立ち上がったとき、肩、腰、膝が一直線になるようにします。</li>
                 <li><i class="fa-solid fa-circle-check"></i> <strong>ポイント:</strong> バーを床から引き離す際、背中が丸まらないように細心の注意を払い、常に腹圧を意識しましょう。</li>
             </ul>
         </div>
@@ -200,7 +297,16 @@
         <h2><i class="fa-solid fa-running"></i> 有酸素運動</h2>
         
         <div class="exercise-detail-card">
-            <h3>ウォーキング (早歩き) <span class="level-badge level-beginner">初級</span></h3>
+            <div class="exercise-header">
+                <h3>ウォーキング (早歩き) <span class="level-badge level-beginner">初級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="ウォーキング (初級)">
+                    <input type="hidden" name="type" value="cardio">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('ウォーキング (初級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">基礎代謝向上, 脂肪燃焼促進, リフレッシュ</span>
             <p><strong>誰でも手軽に始められ、日々の健康維持に最適な有酸素運動です。</strong>意識して早歩きすることで運動効果が高まります。</p>
             <ul>
@@ -210,7 +316,16 @@
         </div>
 
         <div class="exercise-detail-card">
-            <h3>サイクリング (エアロバイク) <span class="level-badge level-beginner">初級</span></h3>
+            <div class="exercise-header">
+                <h3>サイクリング (エアロバイク) <span class="level-badge level-beginner">初級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="サイクリング (初級)">
+                    <input type="hidden" name="type" value="cardio">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('サイクリング (初級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">大腿四頭筋, ハムストリングス, 膝への負担軽減</span>
             <p><strong>膝への負担が少なく、長時間続けやすい有酸素運動です。</strong>主に下半身の持久力向上に役立ちます。</p>
             <ul>
@@ -220,7 +335,16 @@
         </div>
 
         <div class="exercise-detail-card">
-            <h3>エリプティカル (クロストレーナー) <span class="level-badge level-beginner">初級</span></h3>
+            <div class="exercise-header">
+                <h3>エリプティカル (クロストレーナー) <span class="level-badge level-beginner">初級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="エリプティカル (初級)">
+                    <input type="hidden" name="type" value="cardio">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('エリプティカル (初級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">全身持久力, 膝への負担軽減, 運動連鎖</span>
             <p><strong>ランニングに近い効果を、膝関節にほとんど負担をかけずに得られる全身運動です。</strong>上半身と下半身を同時に動かします。</p>
             <ul>
@@ -230,7 +354,16 @@
         </div>
 
         <div class="exercise-detail-card">
-            <h3>ランニング (ジョギング) <span class="level-badge level-intermediate">中級</span></h3>
+            <div class="exercise-header">
+                <h3>ランニング (ジョギング) <span class="level-badge level-intermediate">中級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="ランニング (中級)">
+                    <input type="hidden" name="type" value="cardio">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('ランニング (中級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">全身持久力, 心肺機能の向上</span>
             <p><strong>手軽に始められる最も基本的な有酸素運動です。</strong>心臓と肺の機能を高め、脂肪燃焼を促進します。</p>
             <ul>
@@ -240,7 +373,16 @@
         </div>
 
         <div class="exercise-detail-card">
-            <h3>水泳 <span class="level-badge level-intermediate">中級</span></h3>
+            <div class="exercise-header">
+                <h3>水泳 <span class="level-badge level-intermediate">中級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="水泳 (中級)">
+                    <input type="hidden" name="type" value="cardio">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('水泳 (中級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">全身持久力, 筋力, 抵抗運動</span>
             <p><strong>水による抵抗を利用して全身の筋力と持久力を高める、非常に低負荷な全身運動です。</strong>関節への負担がほぼゼロです。</p>
             <ul>
@@ -250,7 +392,16 @@
         </div>
         
         <div class="exercise-detail-card">
-            <h3>ローイング (ボート漕ぎ) <span class="level-badge level-intermediate">中級</span></h3>
+            <div class="exercise-header">
+                <h3>ローイング (ボート漕ぎ) <span class="level-badge level-intermediate">中級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="ローイング (中級)">
+                    <input type="hidden" name="type" value="cardio">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('ローイング (中級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">全身持久力, 背中, 脚, 体幹</span>
             <p><strong>脚、体幹、上半身の9つの主要な筋肉群を同時に使う、全身の効率的な有酸素運動です。</strong></p>
             <ul>
@@ -260,7 +411,16 @@
         </div>
 
         <div class="exercise-detail-card">
-            <h3>トレッドミルインターバル <span class="level-badge level-advanced">上級</span></h3>
+            <div class="exercise-header">
+                <h3>トレッドミルインターバル <span class="level-badge level-advanced">上級</span></h3>
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" value="トレッドミルインターバル (上級)">
+                    <input type="hidden" name="type" value="cardio">
+                    <button type="submit" class="bookmark-btn" title="ブックマーク">
+                        <i th:class="${bookmarkedNames != null && bookmarkedNames.contains('トレッドミルインターバル (上級)') ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'}"></i>
+                    </button>
+                </form>
+            </div>
             <span class="category">心肺機能の最大化, 脂肪燃焼効率の向上</span>
             <p><strong>高強度と低強度を交互に繰り返すことで、短時間で高い運動効果を得られるトレーニングです。</strong></p>
             <ul>
@@ -273,6 +433,9 @@
     <div class="button-container" style="margin-top: 30px;">
         <a th:href="@{/training}" class="button secondary">
             <i class="fa-solid fa-chevron-left"></i> トレーニング選択に戻る
+        </a>
+        <a th:href="@{/training/bookmarks}" class="button" style="margin-left: 10px; background-color: var(--primary-color); color: white;">
+            <i class="fa-solid fa-bookmark"></i> ブックマーク一覧へ
         </a>
     </div>
 

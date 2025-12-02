@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ブックマーク済みトレーニング | FitWorks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        .bookmark-container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .bookmark-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid var(--primary-color);
+        }
+        .bookmark-info h3 { margin: 0 0 5px 0; color: var(--dark-text); }
+        .bookmark-type { font-size: 0.85em; color: #666; background: #f0f0f0; padding: 2px 8px; border-radius: 4px; }
+        .action-buttons { display: flex; gap: 10px; }
+        .btn-start {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-remove {
+            background-color: transparent;
+            color: #999;
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .btn-remove:hover { background-color: #ffebee; color: #ff4444; border-color: #ff4444; }
+        .empty-state { text-align: center; padding: 40px; color: #777; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="main-container bookmark-container">
+        <h1><i class="fa-solid fa-bookmark" style="color: gold;"></i> ブックマーク一覧</h1>
+        
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${message}" class="alert alert-info" th:text="${message}"></div>
+
+        <div th:if="${bookmarks.isEmpty()}" class="empty-state">
+            <i class="fa-regular fa-bookmark fa-3x" style="margin-bottom: 15px;"></i>
+            <p>ブックマークされたトレーニングはありません。<br>種目一覧からお気に入りのトレーニングを追加しましょう！</p>
+            <a th:href="@{/training/exercises}" class="button">種目一覧へ</a>
+        </div>
+
+        <div th:each="bookmark : ${bookmarks}" class="bookmark-card">
+            <div class="bookmark-info">
+                <h3 th:text="${bookmark.exerciseName}">ベンチプレス (中級)</h3>
+                <span class="bookmark-type" th:text="${bookmark.type == 'free-weight' ? 'フリーウェイト' : '有酸素運動'}">TYPE</span>
+            </div>
+            
+            <div class="action-buttons">
+                <form th:action="@{/training/start}" method="post">
+                    <input type="hidden" name="type" th:value="${bookmark.type}">
+                    <input type="hidden" name="exerciseName" th:value="${bookmark.exerciseName}">
+                    <button type="submit" class="btn-start">
+                        <i class="fa-solid fa-play"></i> 開始
+                    </button>
+                </form>
+
+                <form th:action="@{/training/bookmark/toggle}" method="post">
+                    <input type="hidden" name="exerciseName" th:value="${bookmark.exerciseName}">
+                    <input type="hidden" name="type" th:value="${bookmark.type}">
+                    <input type="hidden" name="redirectUrl" value="/training/bookmarks">
+                    <button type="submit" class="btn-remove" title="解除">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <a th:href="@{/training}" class="button secondary">戻る</a>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

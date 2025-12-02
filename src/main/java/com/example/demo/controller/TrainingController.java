@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -23,8 +24,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.TrainingLogForm;
+import com.example.demo.entity.ExerciseBookmark; // 追加
 import com.example.demo.entity.TrainingRecord;
 import com.example.demo.entity.User;
+import com.example.demo.repository.ExerciseBookmarkRepository; // 追加
 import com.example.demo.repository.TrainingRecordRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.MissionService;
@@ -44,6 +47,10 @@ public class TrainingController {
 	
 	@Autowired 
 	private MissionService missionService; 
+
+    // ★★★ 追加: ブックマーク用リポジトリ ★★★
+    @Autowired
+    private ExerciseBookmarkRepository exerciseBookmarkRepository;
 
 	private User getCurrentUser(Authentication authentication) { 
 		if (authentication == null) return null; 
@@ -207,6 +214,51 @@ public class TrainingController {
 		return "training/training";	
 	}
 
+    // ★★★ 【新規追加】ブックマーク一覧画面 ★★★
+    @GetMapping("/training/bookmarks")
+    public String showBookmarkList(Authentication authentication, Model model) {
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        List<ExerciseBookmark> bookmarks = exerciseBookmarkRepository.findByUserOrderByIdDesc(currentUser);
+        model.addAttribute("bookmarks", bookmarks);
+        
+        return "training/bookmark-list";
+    }
+
+    // ★★★ 【新規追加】ブックマークの追加・削除（トグル）API ★★★
+    @PostMapping("/training/bookmark/toggle")
+    public String toggleBookmark(
+            @RequestParam("exerciseName") String exerciseName,
+            @RequestParam("type") String type,
+            @RequestParam(value = "redirectUrl", defaultValue = "/training/exercises") String redirectUrl,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+        
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        // 既存のブックマークを確認
+        Optional<ExerciseBookmark> existing = exerciseBookmarkRepository.findByUserAndExerciseName(currentUser, exerciseName);
+        
+        if (existing.isPresent()) {
+            // 既に存在すれば削除
+            exerciseBookmarkRepository.delete(existing.get());
+            redirectAttributes.addFlashAttribute("message", "「" + exerciseName + "」のブックマークを解除しました。");
+        } else {
+            // 存在しなければ新規登録
+            ExerciseBookmark bookmark = new ExerciseBookmark(currentUser, exerciseName, type);
+            exerciseBookmarkRepository.save(bookmark);
+            redirectAttributes.addFlashAttribute("successMessage", "「" + exerciseName + "」をブックマークしました！");
+        }
+
+        return "redirect:" + redirectUrl;
+    }
+
 	@GetMapping("/training/map")
 	public String showNearbyGymsMap(Authentication authentication) {
 		if (getCurrentUser(authentication) == null) {
@@ -215,11 +267,22 @@ public class TrainingController {
 		return "training/nearby_gyms";	
 	}
 
+    // ★★★ 【修正】種目一覧表示 (ブックマーク情報の受け渡しを追加) ★★★
 	@GetMapping("/training/exercises")
-	public String showExerciseList(Authentication authentication) {
-		if (getCurrentUser(authentication) == null) {
+	public String showExerciseList(Authentication authentication, Model model) {
+		User currentUser = getCurrentUser(authentication);
+		if (currentUser == null) {
 			return "redirect:/login";	
 		}
+        
+        // ユーザーのブックマーク済み種目名リストを取得してViewに渡す
+        List<String> bookmarkedNames = exerciseBookmarkRepository.findByUserOrderByIdDesc(currentUser)
+                .stream()
+                .map(ExerciseBookmark::getExerciseName)
+                .collect(Collectors.toList());
+        
+        model.addAttribute("bookmarkedNames", bookmarkedNames);
+
 		return "training/exercise-list";	
 	}
 
@@ -284,8 +347,6 @@ public class TrainingController {
 		return "training/training-session";	
 	}
 	
-	// ... (以下のメソッド showTrainingLog, showAllTrainingLog, form methods, saveTrainingRecord は変更なし) ...
-    // 長くなるため省略しませんが、元のファイルの残りの部分をそのまま維持してください。
 	@GetMapping("/training-log")
 	public String showTrainingLog(
 			Authentication authentication,
