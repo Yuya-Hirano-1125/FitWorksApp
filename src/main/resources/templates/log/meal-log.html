@@ -11,44 +11,50 @@
 	
 	<script th:src="@{/js/theme.js}"></script>
     <style>
-        /* 食事画面特有のアイコン色調整 */
-        .header-icon-meal {
-            color: #4CAF50; /* 緑色 */
-        }
-        /* 記録済みマーカーの色変更 */
-        .log-indicator-meal {
-            color: #4CAF50 !important;
-        }
+        .header-icon-meal { color: #4CAF50; }
+        .log-indicator-meal { color: #4CAF50 !important; }
+        
+        /* 埋め込みフォーム用の追加スタイル */
+        .meal-form-container { text-align: left; padding: 0 5px; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: #555; font-size: 0.9em; }
+        .form-group.half { flex: 1; }
+        .form-control { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1em; background-color: #fff; }
+        .form-control:focus { border-color: #4CAF50; outline: none; }
+        .form-control[readonly] { background-color: #f3f3f3; color: #777; cursor: not-allowed; }
+        .macro-section { background-color: #f9f9f9; border: 1px dashed #ccc; border-radius: 10px; padding: 15px; }
+        .macro-row { display: flex; gap: 10px; justify-content: space-between; }
+        .macro-item { flex: 1; text-align: center; }
+        .macro-item label { font-size: 0.85em; color: #777; margin-bottom: 3px; }
+        .macro-input { text-align: center; font-weight: bold; }
+        .p-input:focus { border-color: #3498db !important; }
+        .f-input:focus { border-color: #e74c3c !important; }
+        .c-input:focus { border-color: #f1c40f !important; }
+        .text-danger { color: #e74c3c; font-size: 0.85em; display: block; margin-top: 5px; }
+        .btn-submit { width: 100%; margin-top: 20px; padding: 12px; font-size: 1.1em; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-submit:hover { background-color: #45a049; }
     </style>
 </head>
-<body class="training-log-page"> <div class="main-container">
+<body class="training-log-page">
+<div class="main-container">
     
     <h1 style="margin-bottom: 5px;">
         <i class="header-icon header-icon-meal fa-solid fa-utensils"></i> 食事記録
     </h1>
-    <p class="sub-heading" th:text="${username} + 'さんの食事を管理しましょう。'">
-        食事記録カレンダー
-    </p>
+    <p class="sub-heading" th:text="${username} + 'さんの食事を管理しましょう。'">食事記録カレンダー</p>
 
     <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
     
     <div class="calendar-nav-container">
-        <a th:href="@{/log/meal(year=${prevYear}, month=${prevMonth})}" class="nav-arrow">
-            <i class="fa-solid fa-chevron-left"></i>
-        </a>
-        
+        <a th:href="@{/log/meal(year=${prevYear}, month=${prevMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></a>
         <h2 class="calendar-title" th:text="${currentYearMonth.year} + '年 ' + ${currentYearMonth.monthValue} + '月'"></h2>
-        
-        <a th:href="@{/log/meal(year=${nextYear}, month=${nextMonth})}" class="nav-arrow">
-            <i class="fa-solid fa-chevron-right"></i>
-        </a>
+        <a th:href="@{/log/meal(year=${nextYear}, month=${nextMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></a>
     </div>
 
     <div class="calendar-grid">
         <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" 
-             th:classappend="${dayLabel == '土'} ? 'sat' : ((${dayLabel == '日'} ? 'sun' : ''))">
-             曜日
-        </div>
+             th:classappend="${dayLabel == '土'} ? 'sat' : ((${dayLabel == '日'} ? 'sun' : ''))">曜日</div>
         
         <th:block th:each="date : ${calendarDays}">
             <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''},
@@ -63,10 +69,7 @@
                  th:onclick="${date != null} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
 
                 <span class="day-number" th:text="${dateNumber}">1</span>
-                
-                <span th:if="${isLogged}" class="log-indicator log-indicator-meal">
-                    <i class="fa-solid fa-utensils"></i>
-                </span>
+                <span th:if="${isLogged}" class="log-indicator log-indicator-meal"><i class="fa-solid fa-utensils"></i></span>
             </div>
         </th:block>
     </div>
@@ -76,7 +79,6 @@
             <i class="fa-solid fa-list"></i> 全記録をリストで見る
         </a>
     </div>
-
 </div>
 
 <div id="logModal" class="modal">
@@ -84,66 +86,91 @@
         <span class="close-button" onclick="closeLogModal()">&times;</span>
         <h2 id="modalDateTitle" class="modal-title"></h2>
         
-        <div id="logViewArea">
-             </div>
+        <div id="logViewArea"></div>
 
         <p class="modal-instruction">食事内容を記録：</p>
         
-        <input type="hidden" id="selectedDateInput" name="date" value="">
-        
-        <div id="formContainer">
-            <p>フォームを読み込んでいます...</p>
+        <div class="meal-form-container">
+            <form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post">
+                
+                <div class="form-group">
+                    <label for="dateInput"><i class="fa-regular fa-calendar"></i> 日付</label>
+                    <input type="date" id="dateInput" th:field="*{date}" class="form-control" readonly>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="time"><i class="fa-regular fa-clock"></i> 時刻</label>
+                        <input type="time" id="time" th:field="*{time}" class="form-control" required>
+                    </div>
+                    <div class="form-group half">
+                        <label for="mealType"><i class="fa-solid fa-utensils"></i> 種類</label>
+                        <select id="mealType" th:field="*{mealType}" class="form-control" required>
+                            <option value="朝食">朝食</option>
+                            <option value="昼食">昼食</option>
+                            <option value="夕食">夕食</option>
+                            <option value="間食">間食</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="content">食事内容</label>
+                    <textarea id="content" th:field="*{content}" class="form-control" rows="2" placeholder="例: ご飯、焼き魚、味噌汁" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="calories">🔥 総カロリー (kcal)</label>
+                    <input type="number" id="calories" th:field="*{calories}" class="form-control" placeholder="0" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label>PFCバランス (g) <span style="font-size:0.8em; font-weight:normal; color:#888;">※任意</span></label>
+                    <div class="macro-section">
+                        <div class="macro-row">
+                            <div class="macro-item">
+                                <label for="protein">P (タンパク質)</label>
+                                <input type="number" id="protein" th:field="*{protein}" class="form-control macro-input p-input" step="0.1" min="0" placeholder="0.0">
+                            </div>
+                            <div class="macro-item">
+                                <label for="fat">F (脂質)</label>
+                                <input type="number" id="fat" th:field="*{fat}" class="form-control macro-input f-input" step="0.1" min="0" placeholder="0.0">
+                            </div>
+                            <div class="macro-item">
+                                <label for="carbohydrate">C (炭水化物)</label>
+                                <input type="number" id="carbohydrate" th:field="*{carbohydrate}" class="form-control macro-input c-input" step="0.1" min="0" placeholder="0.0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-check"></i> 記録を保存
+                </button>
+            </form>
         </div>
 
-        <a th:href="@{/log/meal/all}" class="button secondary view-all-button">
-            全記録を見る
-        </a>
+        <a th:href="@{/log/meal/all}" class="button secondary view-all-button" style="margin-top: 20px;">全記録を見る</a>
     </div>
 </div>
 
 <div style="max-width: 450px; margin: 30px auto 70px auto; padding: 0 10px;">
     <a th:href="@{/home}" class="button secondary">
-        <i class="fa-solid fa-house"></i>
-        <span>ホームに戻る</span>
+        <i class="fa-solid fa-house"></i> <span>ホームに戻る</span>
     </a>
 </div>
 
 <script th:inline="javascript">
-    // 食事フォームを読み込む関数
-    function loadMealForm(date) {
-        let url = /*[[@{/log/meal/form}]]*/ '/log/meal/form';
-        url += '?date=' + date;
-
-        fetch(url)
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('formContainer').innerHTML = html;
-            })
-            .catch(error => {
-                document.getElementById('formContainer').innerHTML = '<p class="error-message">フォームの読み込みに失敗しました。</p>';
-                console.error('Form load error:', error);
-            });
-    }
-
-    // 記録モーダルを開く関数
+    // 記録モーダルを開く関数（AJAX呼び出しは削除し、日付セットのみ行う）
     function openLogModal(dateString, isLogged) {
         const [year, month, day] = dateString.split('-');
         const displayDate = `${year}年${month}月${day}日`;
         
-        // 日付をセット
-        document.getElementById('selectedDateInput').value = dateString;
+        // 日付をフォームにセット
+        document.getElementById('dateInput').value = dateString;
         document.getElementById('modalDateTitle').innerText = displayDate;
         
-        const modal = document.getElementById('logModal');
-        const formContainer = document.getElementById('formContainer');
-
-        // フォームのリセットと読み込み開始
-        formContainer.innerHTML = '<div style="padding:20px; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> 読み込み中...</div>';
-        
-        // 常に食事フォームをロード
-        loadMealForm(dateString);
-
-        // 記録済みメッセージの表示切り替え
+        // 記録済みメッセージの切り替え
         const logViewArea = document.getElementById('logViewArea');
         if (isLogged) {
             logViewArea.innerHTML = '<p style="font-weight: 700; color: #4CAF50; margin-bottom: 10px;">✅ この日は記録済みです。</p>';
@@ -151,16 +178,14 @@
             logViewArea.innerHTML = '<p style="color: #999; margin-bottom: 10px;">この日はまだ記録がありません。</p>';
         }
 
-        modal.classList.add('is-active');
+        // モーダル表示
+        document.getElementById('logModal').classList.add('is-active');
     }
 
     // 記録モーダルを閉じる関数
     function closeLogModal() {
-        const modal = document.getElementById('logModal');
-        modal.classList.remove('is-active');
-        
-        // リセット
-        document.getElementById('formContainer').innerHTML = '<p>フォームを読み込んでいます...</p>';
+        document.getElementById('logModal').classList.remove('is-active');
+        // フォームのリセットは必要ならここで行う（例: inputs.value = ''）
     }
 
     // モーダル外クリックで閉じる処理

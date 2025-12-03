@@ -114,7 +114,7 @@ public class MealController {
         model.addAttribute("prevMonth", targetYearMonth.minusMonths(1).getMonthValue());
         model.addAttribute("nextYear", targetYearMonth.plusMonths(1).getYear());
         model.addAttribute("nextMonth", targetYearMonth.plusMonths(1).getMonthValue());
-
+        model.addAttribute("mealLogForm", new MealLogForm());
         return "log/meal-log"; // 新しいカレンダーテンプレート
     }
 
