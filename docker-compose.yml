@@ -15,11 +15,6 @@ services:
       # 🔑 SQLiteファイルのパスを明示的に上書き
       # DBファイルを /app/data ディレクトリに作成するように変更れます
       SPRING_DATASOURCE_URL: jdbc:sqlite:/app/data/fitworks.db
-    volumes:
-      # 🔑 永続化設定: macOS側の volume を コンテナ内の /app/data ディレクトリにマッピング
-      - sqlite_data:/app/data
-
-# データの永続化のためのボリュームを定義
-volumes:
-  sqlite_data:
-
+	  volumes:
+	        # 作成したローカルのDBファイルを、コンテナ内の所定の位置にマウントする
+	        - /Users/yuya/FitWorksApp/fitworks.db:/app/data/fitworks.db
