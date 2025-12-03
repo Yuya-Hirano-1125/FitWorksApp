@@ -356,7 +356,7 @@
 }
 
 /* ========================================================= */ 
-/* 🌟 RPG TUTORIAL V3 (FINAL: SEMI-TRANSPARENT GLASS & ZOOM FIX) 🌟 */ 
+/* 🌟 RPG TUTORIAL V3 (FINAL: BRIGHT, TRANSPARENT & ZOOM FIX) 🌟 */ 
 /* ========================================================= */ 
 
 .help-icon-btn {
@@ -398,14 +398,14 @@
     border: 3px dashed #ffeb3b; 
     border-radius: 12px;
     
-    /* 影の濃度調整 */
+    /* 影の濃度調整 (0.5) */
     box-shadow: 0 0 20px rgba(255, 235, 59, 1), 
                 0 0 0 9999px rgba(0, 0, 0, 0.5); 
                 
     z-index: 9001; 
     pointer-events: none; 
     
-    /* 位置移動のラグを無くすため opacity のみアニメーション */
+    /* ★重要: 位置移動のラグを無くすため opacity のみアニメーション */
     transition: opacity 0.2s ease-out; 
     
     display: none;
