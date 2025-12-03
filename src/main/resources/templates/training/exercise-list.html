@@ -127,6 +127,36 @@
                 font-size: 1.1rem;
             }
         }
+		/* --- 追加: ページ内リンクナビゲーション --- */
+		.shortcut-nav {
+		    display: flex;
+		    flex-wrap: wrap;
+		    gap: 10px;
+		    justify-content: center; /* 中央寄せ */
+		    margin-bottom: 30px;
+		}
+
+		.shortcut-btn {
+		    display: inline-block;
+		    background-color: #fff;
+		    border: 2px solid var(--secondary-color); /* ピンクの枠線 */
+		    color: var(--dark-text);
+		    padding: 8px 20px;
+		    border-radius: 50px; /* 丸くする */
+		    text-decoration: none;
+		    font-weight: bold;
+		    font-size: 0.9rem;
+		    transition: all 0.3s ease;
+		    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+		}
+
+		.shortcut-btn:hover {
+		    background-color: var(--secondary-color);
+		    color: #fff; /* ホバー時は白文字に */
+		    transform: translateY(-3px); /* ぴょこっと浮く */
+		    box-shadow: 0 6px 12px rgba(255, 182, 193, 0.4);
+		}
+		/* --------------------------------------- */
     </style>
 </head>
 <body class="exercise-list-page">
@@ -135,12 +165,25 @@
     <p class="sub-heading">
         正しいフォームとポイントを理解して、効果的なトレーニングを行いましょう。
     </p>
+	
+	<div class="shortcut-nav">
+	        <a th:each="entry, stat : ${freeWeightExercisesByPart}"
+	           th:href="@{'#part-' + ${stat.index}}"
+	           th:text="${entry.key}"
+	           class="shortcut-btn">
+	           部位名
+	        </a>
+	        
+	        <a href="#part-cardio" class="shortcut-btn">
+	            <i class="fa-solid fa-running"></i> 有酸素運動
+	        </a>
+	    </div>
 
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}" style="margin-bottom: 20px;"></div>
     <div th:if="${message}" class="alert alert-info" th:text="${message}" style="margin-bottom: 20px;"></div>
 
-    <div class="exercise-section" th:each="entry : ${freeWeightExercisesByPart}">
-        <h2 th:text="${entry.key}">部位名</h2>
+	<div class="exercise-section" th:each="entry, stat : ${freeWeightExercisesByPart}">
+	    <h2 th:id="'part-' + ${stat.index}" th:text="${entry.key}">部位名</h2>
         
         <div class="exercise-grid">
             <div class="exercise-detail-card" th:each="exercise : ${entry.value}">
@@ -178,7 +221,7 @@
     </div>
     
     <div class="exercise-section">
-        <h2><i class="fa-solid fa-running"></i> 有酸素運動</h2>
+        <h2 id="part-cardio"><i class="fa-solid fa-running"></i> 有酸素運動</h2>
         
         <div class="exercise-grid">
             <div class="exercise-detail-card" th:each="exercise : ${cardioExercises}">
@@ -217,9 +260,9 @@
 
     <div class="button-container" style="margin-top: 40px; text-align: center;">
         <a th:href="@{/training}" class="button secondary">
-            <i class="fa-solid fa-chevron-left"></i> トレーニング選択に戻る
+            <i class="fa-solid fa-arrow-rotate-left"></i> メニュー選択に戻る
         </a>
-        <a th:href="@{/training/bookmarks}" class="button" style="margin-left: 10px; background-color: var(--primary-color); color: white;">
+        <a th:href="@{/training/bookmarks}" class="button primary" style="margin-left: 10px; background-color: var(--primary-color); color: white;">
             <i class="fa-solid fa-bookmark"></i> ブックマーク一覧へ
         </a>
     </div>
