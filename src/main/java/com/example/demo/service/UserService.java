@@ -25,6 +25,37 @@ public class UserService {
         this.trainingRecordRepository = trainingRecordRepository;
     }
     
+    // --- 新規追加: ユーザー登録処理 ---
+    @Transactional
+    public void registerNewUser(String username, String email, String rawPassword) {
+        // 1. ユーザー名の重複チェック
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("そのユーザー名は既に使用されています。");
+        }
+
+        // 2. メールアドレスの重複チェック (UserRepositoryにfindByEmailがある前提)
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("そのメールアドレスは既に使用されています。");
+        }
+
+        // 3. ユーザーエンティティの作成
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setEmail(email);
+        // パスワードをBCryptでハッシュ化して保存
+        newUser.setPassword(passwordEncoder.encode(rawPassword));
+        
+        // 初期設定 (必要に応じて)
+        newUser.setLevel(1);
+        newUser.setExperiencePoints(0);
+        newUser.setTheme("default");
+
+        // 4. DBに保存
+        userRepository.save(newUser);
+    }
+
+    // --- 以下、既存のメソッド ---
+
     public User findByUsername(String username) {
         return userRepository.findByUsername(username).orElse(null);
     }
@@ -33,23 +64,16 @@ public class UserService {
         return userRepository.findById(id);
     }
     
-    // 【追加】メールアドレスでユーザーを検索する（UserRepositoryにfindByEmailがあると仮定）
     public Optional<User> findByEmail(String email) {
-        // UserRepositoryインターフェースに Optional<User> findByEmail(String email); が定義されている前提
         return userRepository.findByEmail(email);
     }
     
-    // 【追加】パスワードリセットの処理を模擬
     public boolean processForgotPassword(String email) {
         Optional<User> optionalUser = findByEmail(email);
-        
         if (optionalUser.isPresent()) {
-            // 実際にはここでリセットトークンを生成し、メール送信サービスを呼び出します。
-            // 現時点ではメール送信の代わりにログを出力し、成功を模擬します。
             System.out.println("パスワードリセットリンクをメールアドレス: " + email + " に送信しました。 (模擬)");
             return true;
         } else {
-            // ユーザーが見つからない
             return false;
         }
     }

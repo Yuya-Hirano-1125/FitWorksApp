@@ -24,7 +24,7 @@ public class AuthController {
     // --- スタート画面 ---
     @GetMapping("/")
     public String showStartPage() {
-        return "start"; // templates/start.html を表示
+        return "start"; 
     }
 
     // --- ログイン/登録関連 ---
@@ -34,13 +34,37 @@ public class AuthController {
     @GetMapping("/register")
     public String registerForm() { return "auth/register"; } 
 
+    // ★★★ 修正: 実際の登録処理を実装 ★★★
     @PostMapping("/register")
     public String registerUser(@RequestParam("username") String username,
+                               @RequestParam("email") String email,
                                @RequestParam("password") String password,
+                               @RequestParam("confirmPassword") String confirmPassword,
                                Model model) {
-        // 実際の登録ロジックはUserService等で行う想定
-        model.addAttribute("message", "登録が完了しました。ログインしてください。");
-        return "auth/login"; 
+        
+        // 1. パスワードの一致確認
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("error", "パスワードと確認用パスワードが一致しません。");
+            return "auth/register"; // 入力画面に戻る
+        }
+
+        try {
+            // 2. サービスを呼び出して保存
+            userService.registerNewUser(username, email, password);
+            
+            // 3. 成功したらログイン画面へリダイレクト（パラメータでメッセージ表示などを制御可能）
+            return "redirect:/login?registered"; 
+            
+        } catch (IllegalArgumentException e) {
+            // ユーザー名やメールの重複エラーなど
+            model.addAttribute("error", e.getMessage());
+            return "auth/register";
+        } catch (Exception e) {
+            // その他の予期せぬエラー
+            e.printStackTrace();
+            model.addAttribute("error", "登録中にエラーが発生しました。もう一度お試しください。");
+            return "auth/register";
+        }
     }
 
     // --- パスワードリセット ---
@@ -66,7 +90,6 @@ public class AuthController {
         Model model
     ) {
         if (userDetails != null) {
-            // ユーザー情報を取得
             User user = userService.findByUsername(userDetails.getUsername());
             
             if (user != null) {
@@ -83,6 +106,4 @@ public class AuthController {
         }
         return "misc/home"; 
     }
-
-    // 重複していた settings メソッドを削除しました
 }
