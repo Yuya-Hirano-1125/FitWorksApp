@@ -3,7 +3,8 @@
 /* ========================================================= */ 
  
 .home-page .main-container { 
-    max-width: 700px; 
+    max-width: 700px;
+    position: relative; /* 追加: ヘルプボタンの絶対配置の基準点 */
 } 
  
 /* --- TOP BAR ELEMENTS (XP Bar & Daily Mission) --- */ 
@@ -408,5 +409,189 @@
         margin-right: 10px;
         margin-bottom: 0;
         animation: iconWiggle 2s ease-in-out infinite alternate;
+    }
+}
+
+/* ========================================================= */ 
+/* TUTORIAL & HELP ICON STYLE (Added Feature) */ 
+/* ========================================================= */ 
+
+/* --- ヘルプマーク（はてなアイコン） --- */
+.help-icon-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 28px;
+    cursor: pointer;
+    z-index: 100; /* 他の要素より手前に */
+    transition: transform 0.2s, color 0.2s;
+    padding: 0;
+}
+
+.help-icon-btn:hover {
+    transform: scale(1.15) rotate(10deg);
+    color: var(--primary-color);
+}
+
+/* --- チュートリアルオーバーレイ --- */
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(5px);
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.tutorial-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.tutorial-card {
+    background: #ffffff;
+    width: 85%;
+    max-width: 400px;
+    border-radius: 25px;
+    padding: 35px 30px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    border: 4px solid var(--primary-color);
+    transform: scale(0.8) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+}
+
+.tutorial-overlay.active .tutorial-card {
+    transform: scale(1) translateY(0);
+}
+
+/* スキップボタン（右上） */
+.tutorial-skip-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: #999;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 5px;
+}
+.tutorial-skip-btn:hover {
+    color: var(--dark-text);
+}
+
+.tutorial-icon-area {
+    font-size: 55px;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    margin-top: 10px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.tutorial-icon-area i {
+    animation: iconWiggle 2s ease-in-out infinite alternate;
+}
+
+.tutorial-content h2 {
+    color: var(--primary-color);
+    font-size: 24px;
+    margin-bottom: 15px;
+    font-weight: 800;
+}
+
+.tutorial-content p {
+    color: var(--dark-text);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 30px;
+    min-height: 75px;
+}
+
+.tutorial-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.tutorial-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.tutorial-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.tutorial-dot.active {
+    background: var(--primary-color);
+    transform: scale(1.3);
+}
+
+.tutorial-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.tutorial-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 50px;
+    border: none;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#tutorial-prev {
+    background: #f0f0f0;
+    color: #888;
+}
+#tutorial-prev:hover:not(:disabled) {
+    background: #e0e0e0;
+}
+#tutorial-prev:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+#tutorial-next {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+}
+#tutorial-next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 105, 180, 0.6);
+}
+
+/* モバイル対応：ヘルプボタンの位置調整 */
+@media (max-width: 600px) {
+    .help-icon-btn {
+        top: 15px;
+        right: 15px;
+        font-size: 24px;
     }
 }

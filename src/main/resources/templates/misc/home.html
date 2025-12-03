@@ -115,6 +115,10 @@
 <body class="home-page">
 
 <div class="main-container"> 
+    <button class="help-icon-btn" onclick="showTutorial(true)" aria-label="ヘルプ（チュートリアル）">
+        <i class="fa-solid fa-circle-question"></i>
+    </button>
+
     <div class="app-logo-display">
         <img th:src="@{/img/applogo.jpg}" alt="App Logo" />
         
@@ -194,8 +198,163 @@
         <span>設定</span>
     </a>
 </nav>
+
+<div id="tutorial-overlay" class="tutorial-overlay">
+    <div class="tutorial-card">
+        <button class="tutorial-skip-btn" onclick="skipTutorial()">スキップ</button>
+        
+        <div class="tutorial-content">
+            <div class="tutorial-icon-area">
+                <i id="tutorial-icon" class="fa-solid fa-hand-sparkles"></i>
+            </div>
+            <h2 id="tutorial-title">FitWorksへようこそ！</h2>
+            <p id="tutorial-desc">毎日のトレーニングを楽しく続けられるアプリです。<br>主な機能をご紹介します！</p>
+        </div>
+        
+        <div class="tutorial-controls">
+            <div class="tutorial-dots" id="tutorial-dots"></div>
+            
+            <div class="tutorial-actions">
+                <button id="tutorial-prev" class="tutorial-btn" onclick="changeStep(-1)" disabled>戻る</button>
+                <button id="tutorial-next" class="tutorial-btn" onclick="changeStep(1)">次へ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // チュートリアルの内容データ
+    const tutorialSteps = [
+        {
+            icon: 'fa-hand-sparkles',
+            title: 'FitWorksへようこそ！',
+            desc: 'あなたのフィットネスライフをサポートします。<br>まずはアプリの使い方を見てみましょう。'
+        },
+        {
+            icon: 'fa-dumbbell',
+            title: 'トレーニング記録',
+            desc: '「トレーニングを開始」から運動を記録！<br>頑張った分だけXP（経験値）が貯まります。'
+        },
+        {
+            icon: 'fa-dragon',
+            title: 'パートナーの成長',
+            desc: 'レベルアップすると、画面のキャラクターが進化！<br>新しい姿を見せてくれるようになります。'
+        },
+        {
+            icon: 'fa-gift',
+            title: 'ご褒美ガチャ',
+            desc: '貯めたポイントでガチャを回そう！<br>可愛いアバターアイテムなどをゲットできます。'
+        },
+        {
+            icon: 'fa-robot',
+            title: 'AIコーチ',
+            desc: 'メニューに迷ったり、悩みがあるときは<br>AIコーチチャットでいつでも相談してください。'
+        }
+    ];
+
+    let currentStep = 0;
+    const STORAGE_KEY = 'fitworks_tutorial_completed';
+
+    // 初期化処理
+    document.addEventListener('DOMContentLoaded', function() {
+        // まだチュートリアルを完了していない場合のみ自動表示
+        if (!localStorage.getItem(STORAGE_KEY)) {
+            showTutorial(false); // false = 自動表示モード
+        }
+    });
+
+    // チュートリアルを表示する関数
+    // isManual = true: ヘルプボタンから手動で開いた場合
+    function showTutorial(isManual) {
+        currentStep = 0; // 最初から開始
+        const overlay = document.getElementById('tutorial-overlay');
+        generateDots();
+        renderStep();
+        
+        overlay.style.display = 'flex';
+        // フェードイン
+        setTimeout(() => {
+            overlay.classList.add('active');
+        }, 10);
+    }
+
+    // ステップの内容を描画
+    function renderStep() {
+        const step = tutorialSteps[currentStep];
+        
+        const iconEl = document.getElementById('tutorial-icon');
+        iconEl.className = `fa-solid ${step.icon}`;
+        
+        document.getElementById('tutorial-title').innerHTML = step.title;
+        document.getElementById('tutorial-desc').innerHTML = step.desc;
+
+        // ボタン制御
+        document.getElementById('tutorial-prev').disabled = (currentStep === 0);
+        
+        const nextBtn = document.getElementById('tutorial-next');
+        if (currentStep === tutorialSteps.length - 1) {
+            nextBtn.textContent = 'さあ、始めよう！';
+        } else {
+            nextBtn.textContent = '次へ';
+        }
+        
+        updateDots();
+    }
+
+    // ドットナビゲーションの生成
+    function generateDots() {
+        const container = document.getElementById('tutorial-dots');
+        container.innerHTML = '';
+        tutorialSteps.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.className = `tutorial-dot ${index === 0 ? 'active' : ''}`;
+            container.appendChild(dot);
+        });
+    }
+
+    // ドットの更新
+    function updateDots() {
+        const dots = document.querySelectorAll('.tutorial-dot');
+        dots.forEach((dot, index) => {
+            if (index === currentStep) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
+    }
+
+    // ページ切り替え
+    function changeStep(direction) {
+        if (direction === 1 && currentStep === tutorialSteps.length - 1) {
+            finishTutorial(); // 最後まで見たら完了扱い
+            return;
+        }
+        
+        currentStep += direction;
+        if (currentStep < 0) currentStep = 0;
+        if (currentStep >= tutorialSteps.length) currentStep = tutorialSteps.length - 1;
+        
+        renderStep();
+    }
+
+    // スキップボタンが押されたとき
+    function skipTutorial() {
+        finishTutorial();
+    }
+
+    // チュートリアル終了処理
+    function finishTutorial() {
+        const overlay = document.getElementById('tutorial-overlay');
+        overlay.classList.remove('active');
+        
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            // 完了フラグを保存（次回から自動表示しない）
+            localStorage.setItem(STORAGE_KEY, 'true');
+        }, 400);
+    }
+</script>
     
 </body>
 </html>
-
-
