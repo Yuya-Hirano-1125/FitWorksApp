@@ -11,7 +11,7 @@
 	
 	<script th:src="@{/js/theme.js}"></script>
     <style>
-        /* 経験値バーのスタイル (変更なし) */
+        /* 経験値バーのスタイル */
         .xp-bar {
             width: 100%;
             height: 25px;
@@ -32,42 +32,59 @@
             border-radius: 12px;
             transition: width 1s ease-in-out;
         }
+
+        /* キャラクターエリア全体の配置 */
         .character-section {
             position: relative;
             display: flex;
             justify-content: center;
             margin-top: 50px;
         }
+
+        /* キャラクター表示エリア（背景・正方形） */
         .character-display {
             display: flex;
             justify-content: center;
             align-items: flex-end;
+            
             width: 400px;
             height: 400px;
+            
+            /* 背景画像 */
             background-image: url('/img/background/fire-original.png');
             background-repeat: no-repeat;
             background-position: center;
             background-size: cover;
+            
             border-radius: 25px;
             box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+            
             margin: 0 auto;
             text-decoration: none;
             padding-bottom: 10px;
             box-sizing: border-box;
         }
+
+        /* アニメーション定義 */
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-50px); }
             100% { transform: translateY(0px); }
         }
+
+        /* キャラクター画像のスタイル */
         .character-display img {
             width: auto;
             height: 85%;
             max-width: 95%;
             object-fit: contain;
+            
+            /* ふわふわアニメーションと濃い影 */
             animation: float 3s ease-in-out infinite;
             filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9));
         }
+
+        /* 着せ替えボタン */
         .customize-button {
             position: absolute;
             top: 0;
@@ -107,6 +124,7 @@
         
         <div id="tutorial-xp-area">
             <div class="xp-daily-header"></div>
+            
             <div class="xp-bar-container">
                 <span th:text="'レベル ' + ${level} + ' (XP: ' + ${experiencePoints} + '/' + ${requiredXp} + ')'"></span>
                 <div class="xp-bar">
@@ -147,8 +165,7 @@
     <a th:href="@{/training/map}" class="daily-mission-button" style="background: linear-gradient(45deg, #4CAF50, #8BC34A); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); margin-top: 15px;">
        <i class="fa-solid fa-map-location-dot" style="margin-left: 5px;"></i> 近くのトレーニング施設を探す 
     </a>
-    
-    <a id="tutorial-ai-btn" th:href="@{/ai-coach}" class="daily-mission-button" style="background: linear-gradient(45deg, #6a11cb, #2575fc); box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4); margin-top: 15px;">
+	<a id="tutorial-ai-btn" th:href="@{/ai-coach}" class="daily-mission-button" style="background: linear-gradient(45deg, #6a11cb, #2575fc); box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4); margin-top: 15px;">
 	   <i class="fa-solid fa-robot" style="margin-left: 5px;"></i> AIチャット 
 	</a>
 </div>
@@ -189,68 +206,62 @@
 <div id="tutorial-focus-ring" class="tutorial-focus-ring"></div>
 
 <div id="tutorial-rpg-box" class="tutorial-rpg-box">
-    <div class="rpg-header">
-        <div class="rpg-coach-icon">
-            <i class="fa-solid fa-robot"></i>
-        </div>
-        <div class="rpg-title">AIコーチ</div>
+    <div class="rpg-char-icon">
+        <img th:src="@{/img/AIcoach.png}" alt="AI Coach" onerror="this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png'">
     </div>
     
-    <div class="rpg-body" id="rpg-text">
-        こんにちは！FitWorksへようこそ。
-    </div>
+    <div class="rpg-name-tag">AIコーチ</div>
     
-    <div class="rpg-footer">
-        <span class="rpg-steps" id="rpg-steps">1 / 5</span>
-        <div class="rpg-btn-group">
-            <button class="rpg-btn rpg-btn-skip" onclick="endRpgTutorial()">スキップ</button>
-            <button class="rpg-btn rpg-btn-next" onclick="nextRpgStep()">次へ <i class="fa-solid fa-caret-right"></i></button>
+    <div class="rpg-text-area" id="rpg-text">
         </div>
+    
+    <div class="rpg-controls">
+        <button class="rpg-btn rpg-btn-skip" onclick="endRpgTutorial()">スキップ</button>
+        <button class="rpg-btn rpg-btn-next" id="rpg-next-btn" onclick="nextRpgStep()">
+            次へ <i class="fa-solid fa-caret-down"></i>
+        </button>
     </div>
 </div>
 
 <script>
-    // チュートリアルのステップ定義
-    // targetId: フォーカスするHTML要素のID (nullの場合は画面全体)
-    // text: 表示するメッセージ
+    // チュートリアルデータ
     const rpgSteps = [
         {
-            targetId: null, // 最初は全体
-            text: "FitWorksへようこそ！<br>ここでは、毎日の運動を記録して、パートナーキャラクターと一緒に成長できます。"
+            targetId: null,
+            text: "こんにちは！FitWorksへようこそ！\nこのアプリは、日々の運動を楽しく続けるためのパートナーです。"
         },
         {
             targetId: 'tutorial-training-btn',
-            text: "まずはここ！<b>「トレーニングを開始」</b>から日々の運動を記録しましょう。<br>記録をつけるとXP（経験値）がもらえますよ！"
+            text: "まずはここ！「トレーニングを開始」ボタン。\n日々の運動を記録して、XP（経験値）をゲットしましょう！"
         },
         {
             targetId: 'tutorial-xp-area',
-            text: "XPが貯まるとレベルアップ！<br>今のレベルと、次のレベルまでの道のりはここで確認できます。"
+            text: "獲得したXPはここに溜まります。\nXPが満タンになるとレベルアップ！何が起こるかはお楽しみ…。"
         },
         {
             targetId: 'tutorial-char-display',
-            text: "レベルが上がると、あなたのパートナーが進化したり、新しい姿を見せてくれます。<br>毎日頑張って育ててあげてくださいね！"
+            text: "あなたの頑張りに応じて、パートナーも成長します。\n進化したり、着せ替えを楽しんだりできますよ！"
         },
         {
             targetId: 'tutorial-mission-btn',
-            text: "毎日<b>「デイリーミッション」</b>にも挑戦しましょう。<br>達成するとガチャチケットなどが貰えるかも？"
+            text: "「デイリーミッション」も毎日チェック！\nクリアするとガチャチケットなどの豪華報酬がもらえます。"
         },
         {
             targetId: 'tutorial-menu-nav',
-            text: "その他、ガチャや掲示板など、楽しい機能がたくさんあります。<br>メニューから色々試してみてくださいね！"
+            text: "他にも、ガチャや掲示板など楽しい機能がたくさん！\n下のメニューから色々試してみてくださいね。"
         },
         {
             targetId: 'tutorial-ai-btn',
-            text: "もし使い方やメニューに迷ったら、いつでも私（AIコーチ）にチャットで相談してください。<br>それでは、トレーニング頑張りましょう！"
+            text: "もし使い方に迷ったり、トレーニングの悩みがあれば、\nいつでも私（AIコーチ）にチャットで相談してくださいね！"
         }
     ];
 
     let currentRpgStep = 0;
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_done';
+    let typeWriterInterval;
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_done_v2';
 
     document.addEventListener('DOMContentLoaded', function() {
-        // 初回アクセス時のみ自動開始
         if (!localStorage.getItem(STORAGE_KEY_RPG)) {
-            // 少し待ってから開始（画面描画安定待ち）
             setTimeout(() => startRpgTutorial(false), 500);
         }
     });
@@ -266,35 +277,63 @@
     function updateRpgView() {
         const step = rpgSteps[currentRpgStep];
         
-        // テキスト更新
+        // テキストエリアをクリア
         const textBox = document.getElementById('rpg-text');
-        // フェード効果
-        textBox.style.opacity = 0;
-        setTimeout(() => {
-            textBox.innerHTML = step.text;
-            textBox.style.opacity = 1;
-        }, 150);
-
-        // ステップ数更新
-        document.getElementById('rpg-steps').innerText = (currentRpgStep + 1) + " / " + rpgSteps.length;
+        textBox.innerHTML = '';
         
-        // ボタンのテキスト変更（最後だけ「完了」）
-        const nextBtn = document.querySelector('.rpg-btn-next');
+        // タイプライター演出の開始
+        startTypewriter(step.text, textBox);
+
+        // ボタンのテキスト変更
+        const nextBtn = document.getElementById('rpg-next-btn');
         if (currentRpgStep === rpgSteps.length - 1) {
-            nextBtn.innerHTML = '完了 <i class="fa-solid fa-check"></i>';
+            nextBtn.innerHTML = '完了！ <i class="fa-solid fa-check"></i>';
         } else {
-            nextBtn.innerHTML = '次へ <i class="fa-solid fa-caret-right"></i>';
+            nextBtn.innerHTML = '次へ <i class="fa-solid fa-caret-down"></i>';
         }
 
-        // フォーカスリングの移動
+        // スコープの移動
         moveFocusRing(step.targetId);
+    }
+
+    // 文字を一文字ずつ表示する関数
+    function startTypewriter(text, element) {
+        if (typeWriterInterval) clearInterval(typeWriterInterval);
+        
+        let i = 0;
+        // 改行コードを<br>に変換して配列化（タグ壊れ防止のため簡易的に）
+        const displayHtml = text.replace(/\n/g, '<br>');
+        
+        // HTMLタグが含まれる場合の簡易対応として、一度全文字入れるが透明にし、徐々に不透明にする手法もあるが、
+        // 今回はシンプルに文字を追加していく（タグは含まない前提のテキストデータ）
+        // ※データに<br>以外のタグを含めないでください
+        
+        // 配列に分解（サロゲートペア対応）
+        const chars = [...text]; 
+        
+        typeWriterInterval = setInterval(() => {
+            if (i < chars.length) {
+                const char = chars[i];
+                if (char === '\n') {
+                    element.innerHTML += '<br>';
+                } else {
+                    element.innerHTML += char;
+                }
+                i++;
+                
+                // 最後の文字にカーソルをつける
+                if (i === chars.length) {
+                    element.innerHTML += '<span class="rpg-next-cursor">▼</span>';
+                    clearInterval(typeWriterInterval);
+                }
+            }
+        }, 30); // 30msごとに1文字
     }
 
     function moveFocusRing(targetId) {
         const ring = document.getElementById('tutorial-focus-ring');
         
         if (!targetId) {
-            // ターゲットがない場合（全体説明）、リングを隠す
             ring.classList.remove('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
@@ -302,14 +341,10 @@
 
         const targetEl = document.getElementById(targetId);
         if (targetEl) {
-            // ターゲットの位置とサイズを取得
             const rect = targetEl.getBoundingClientRect();
-            
-            // スクロール位置を加味して絶対座標を計算
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
             
-            // リングの位置を設定（少し余裕を持たせる）
             const padding = 10;
             ring.style.top = (rect.top + scrollTop - padding) + 'px';
             ring.style.left = (rect.left + scrollLeft - padding) + 'px';
@@ -317,13 +352,13 @@
             ring.style.height = (rect.height + (padding * 2)) + 'px';
             
             ring.classList.add('active');
-
-            // ターゲット要素へスムーズにスクロール
             targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
     }
 
     function nextRpgStep() {
+        // もしタイプライター途中なら、即時全表示して止める機能をつけると親切だが、
+        // 今回はシンプルに次へ進む
         if (currentRpgStep < rpgSteps.length - 1) {
             currentRpgStep++;
             updateRpgView();
@@ -336,6 +371,7 @@
         document.getElementById('tutorial-backdrop').classList.remove('active');
         document.getElementById('tutorial-rpg-box').classList.remove('active');
         document.getElementById('tutorial-focus-ring').classList.remove('active');
+        if (typeWriterInterval) clearInterval(typeWriterInterval);
         
         localStorage.setItem(STORAGE_KEY_RPG, 'true');
     }
@@ -343,17 +379,3 @@
     
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
