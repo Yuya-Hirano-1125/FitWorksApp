@@ -10,17 +10,15 @@
 </head>
 <body>
 
-    <header>
-        <h1>EVOLUTION PATH</h1>
-        <div class="status-bar">
-            <div class="status-item"><i class="fa-solid fa-crown"></i> Lv.<span id="current-level">1</span></div>
-            <div class="status-item">🔥 <span id="stone-fire">0</span></div>
-            <div class="status-item">💧 <span id="stone-water">0</span></div>
-            <div class="status-item">🌿 <span id="stone-grass">0</span></div>
-            <div class="status-item">✨ <span id="stone-light">0</span></div>
-            <div class="status-item">🌑 <span id="stone-dark">0</span></div>
-        </div>
-    </header>
+	<header>
+	        <h1>EVOLUTION PATH</h1>
+	        <div class="status-bar">
+	            <div class="status-item" style="padding: 8px 25px; font-size: 18px;">
+	                <i class="fa-solid fa-crown" style="color:#f1c40f; margin-right:5px;"></i> 
+	                Lv.<span id="current-level">1</span>
+	            </div>
+	        </div>
+	    </header>
 
     <div class="battle-pass-wrapper">
 
@@ -531,47 +529,81 @@
 
     </div>
 
-    <div class="debug-panel">
-        <h3>🛠 Debug System</h3>
-        <div class="debug-row">
-            <button type="button" onclick="window.addLevel(10)">Lv +10</button>
-            <button type="button" onclick="window.addLevel(1)">Lv +1</button>
-        </div>
-        <div class="debug-row">
-            <button type="button" onclick="window.addStone('fire', 5)">🔥 +5</button>
-            <button type="button" onclick="window.addStone('water', 5)">💧 +5</button>
-        </div>
-        <div class="debug-row">
-            <button type="button" onclick="window.addStone('grass', 5)">🌿 +5</button>
-            <button type="button" onclick="window.addStone('light', 5)">✨ +5</button>
-            <button type="button" onclick="window.addStone('dark', 5)">🌑 +5</button>
-        </div>
-        <div class="debug-row">
-            <button type="button" onclick="window.resetAll()" style="background:#e74c3c; width:100%;">Reset</button>
-        </div>
-    </div>
+	<div class="debug-panel">
+	        <h3>Debug Menu</h3>
+	        
+	        <div class="debug-row">
+	            <span>Level:</span>
+	            <button type="button" onclick="window.addLevel(1)">+1</button>
+	            <button type="button" onclick="window.addLevel(10)">+10</button>
+	        </div>
 
-    <style>
-        .debug-panel {
-            position: fixed; bottom: 20px; right: 20px;
-            background: rgba(0,0,0,0.8); color: white;
-            padding: 15px; border-radius: 10px; z-index: 9999;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            font-size: 12px;
-        }
-        .debug-panel h3 { margin: 0 0 10px; font-size: 14px; border-bottom: 1px solid #555; padding-bottom: 5px; }
-        .debug-row { display: flex; gap: 5px; margin-bottom: 5px; flex-wrap: wrap; }
-        .debug-row button {
-            padding: 5px 8px; cursor: pointer; border: none; border-radius: 4px;
-            background: #3498db; color: white; font-weight: bold; flex-grow: 1;
-        }
-    </style>
+	        <hr style="border:0; border-top:1px solid #555; margin:8px 0;">
 
-    <div class="back-btn-container">
-        <a th:href="@{/characters/menu/CharactersMenu}" class="button secondary">
-            <i class="fa-solid fa-house"></i> キャラクターメニューに戻る
-        </a>
-    </div>
+	        <div style="display:flex; flex-direction:column; gap:6px;">
+	            <div class="debug-row">
+	                <span style="width:20px;">🔥</span>
+	                <button onclick="window.debugAddMaterial('fire', 'r', 5)" class="btn-r">R+5</button>
+	                <button onclick="window.debugAddMaterial('fire', 'sr', 3)" class="btn-sr">SR+3</button>
+	                <button onclick="window.debugAddMaterial('fire', 'ssr', 1)" class="btn-ssr">SSR+1</button>
+	            </div>
+	            <div class="debug-row">
+	                <span style="width:20px;">💧</span>
+	                <button onclick="window.debugAddMaterial('water', 'r', 5)" class="btn-r">R+5</button>
+	                <button onclick="window.debugAddMaterial('water', 'sr', 3)" class="btn-sr">SR+3</button>
+	                <button onclick="window.debugAddMaterial('water', 'ssr', 1)" class="btn-ssr">SSR+1</button>
+	            </div>
+	            <div class="debug-row">
+	                <span style="width:20px;">🌿</span>
+	                <button onclick="window.debugAddMaterial('grass', 'r', 5)" class="btn-r">R+5</button>
+	                <button onclick="window.debugAddMaterial('grass', 'sr', 3)" class="btn-sr">SR+3</button>
+	                <button onclick="window.debugAddMaterial('grass', 'ssr', 1)" class="btn-ssr">SSR+1</button>
+	            </div>
+	            <div class="debug-row">
+	                <span style="width:20px;">✨</span>
+	                <button onclick="window.debugAddMaterial('light', 'r', 5)" class="btn-r">R+5</button>
+	                <button onclick="window.debugAddMaterial('light', 'sr', 3)" class="btn-sr">SR+3</button>
+	                <button onclick="window.debugAddMaterial('light', 'ssr', 1)" class="btn-ssr">SSR+1</button>
+	            </div>
+	            <div class="debug-row">
+	                <span style="width:20px;">🌑</span>
+	                <button onclick="window.debugAddMaterial('dark', 'r', 5)" class="btn-r">R+5</button>
+	                <button onclick="window.debugAddMaterial('dark', 'sr', 3)" class="btn-sr">SR+3</button>
+	                <button onclick="window.debugAddMaterial('dark', 'ssr', 1)" class="btn-ssr">SSR+1</button>
+	            </div>
+	        </div>
+
+	        <hr style="border:0; border-top:1px solid #555; margin:8px 0;">
+
+	        <div class="debug-row">
+	            <button type="button" onclick="window.resetAll()" style="background:#e74c3c; width:100%; font-weight:bold;">RESET ALL</button>
+	        </div>
+	    </div>
+
+	    <style>
+	        .debug-panel {
+	            position: fixed; bottom: 20px; right: 20px;
+	            background: rgba(0,0,0,0.85); color: white;
+	            padding: 15px; border-radius: 12px; z-index: 99999;
+	            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+	            font-size: 12px; font-family: sans-serif;
+	            max-height: 80vh; overflow-y: auto;
+	        }
+	        .debug-panel h3 { margin: 0 0 10px; font-size: 14px; border-bottom: 1px solid #555; padding-bottom: 5px; text-align:center; color:#ccc; }
+	        .debug-row { display: flex; align-items: center; gap: 5px; }
+	        .debug-row button {
+	            padding: 4px 8px; cursor: pointer; border: none; border-radius: 4px;
+	            color: white; font-size: 11px; transition: opacity 0.2s;
+	            flex: 1;
+	        }
+	        .debug-row button:active { transform: scale(0.95); }
+	        .debug-row button:hover { opacity: 0.8; }
+	        
+	        /* ボタン色分け */
+	        .btn-r { background: #3498db; }
+	        .btn-sr { background: #9b59b6; }
+	        .btn-ssr { background: #f1c40f; color: #333 !important; }
+	    </style>
 	
 	<!--ポップアップ進化画面-->
 	

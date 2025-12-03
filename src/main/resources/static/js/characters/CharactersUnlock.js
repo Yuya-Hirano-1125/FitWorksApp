@@ -62,53 +62,43 @@ function getEvolutionRecipe(targetStar) {
     return [];
 }
 
-/* 4. メイン UI更新関数 */
+/* 4. メイン UI更新関数（LOCKED時：素材非表示＆名前伏せ字版） */
 function updateUI() {
-    // ステータスバー更新
+    // ステータスバー更新（レベルのみ）
     const levelEl = document.getElementById('current-level');
     if(levelEl) levelEl.textContent = window.gameState.level;
     
-    // 素材数更新
-    ['fire', 'water', 'grass', 'light', 'dark'].forEach(type => {
-        // オブジェクトの中身を合計して表示、または代表値を表示（ここでは仮にRの数を出すなど）
-        // ※HTML側のID構造によりますが、ここではシンプルにRの数を出す例、あるいは合計
-        const el = document.getElementById(`stone-${type}`);
-        if(el && window.gameState.stones[type]) {
-            // 簡易的にR/SR/SSRの合計を表示（必要に応じて変更してください）
-            const s = window.gameState.stones[type];
-            el.textContent = s.r + s.sr + s.ssr;
-        }
-    });
-
     // --- トラック（属性）ごとの処理 ---
     const tracks = document.querySelectorAll('.pass-track');
 
     tracks.forEach((track, trackIndex) => {
         const nodes = track.querySelectorAll('.pass-node');
         
-        // 【追加機能】前の属性をコンプリートしているか判定
+        // 前の属性をコンプリートしているか判定
         let isAttributeUnlocked = true;
         if (trackIndex > 0) {
-            // ひとつ前のトラックを取得
             const prevTrack = tracks[trackIndex - 1];
             const prevNodes = prevTrack.querySelectorAll('.pass-node');
-            // 前トラックの最後のキャラ
             const lastNodeOfPrev = prevNodes[prevNodes.length - 1];
             
-            // 最後のキャラが「claimed（進化済み）」でなければ、今の属性はまだロック
             if (!lastNodeOfPrev.classList.contains('claimed')) {
                 isAttributeUnlocked = false;
             }
         }
 
-        // 最初のノード（卵）の挑戦権は、属性ロックが解除されているかどうかで決まる
         let isPrevClaimed = isAttributeUnlocked; 
 
         nodes.forEach((node, index) => {
             const card = node.querySelector('.js-card');
             if (!card) return; 
 
-            // 要素取得
+            // ★追加：名前要素を取得し、元の名前を保存しておく
+            const charNameEl = card.querySelector('.character-name');
+            if (charNameEl && !charNameEl.dataset.originalName) {
+                // まだ保存していなければ、現在のテキスト（本来の名前）を保存
+                charNameEl.dataset.originalName = charNameEl.textContent;
+            }
+
             const evolveBtn = card.querySelector('.js-evolve-btn');
             const materialText = card.querySelector('.js-req-material');
             const lockText = card.querySelector('.lock-required-level');
@@ -125,6 +115,7 @@ function updateUI() {
             const currentLevel = window.gameState.level;
             const isLevelMet = (currentLevel >= reqLevel);
             
+            // 素材を持っているか判定
             let isMaterialMet = true;
             recipe.forEach(item => {
                 const held = window.gameState.stones[type] ? window.gameState.stones[type][item.rank] : 0;
@@ -135,28 +126,46 @@ function updateUI() {
 
             // --- 表示ロジック ---
             if (isClaimed) {
-                // 進化済み
+                // 【進化済み】
                 card.classList.remove('locked-card');
+                
+                // ★名前を元に戻す
+                if (charNameEl) charNameEl.textContent = charNameEl.dataset.originalName;
+
+                // ロック関連非表示
+                const lockElements = card.querySelectorAll('.locked-overlay, .lock-text, .lock-icon, .fa-lock');
+                lockElements.forEach(el => el.style.display = 'none');
+
+                if(materialText) materialText.style.display = 'none';
+
                 if(evolveBtn) {
                     evolveBtn.textContent = "進化完了";
                     evolveBtn.classList.add('disabled');
                     evolveBtn.style.background = "#2ecc71";
                     evolveBtn.onclick = null;
                 }
-                isPrevClaimed = true; // 次へ進める
+                isPrevClaimed = true;
 
             } else if (isPrevClaimed) {
-                // 挑戦可能 (前のキャラをクリア済み ＆ 属性ロック解除済み)
+                // 【挑戦可能】
                 card.classList.remove('locked-card');
-                if(lockText) lockText.style.display = 'none';
+                
+                // ★名前を元に戻す
+                if (charNameEl) charNameEl.textContent = charNameEl.dataset.originalName;
 
-                // 素材テキスト
+                if(lockText) lockText.style.display = 'none';
+                
+                const lockElements = card.querySelectorAll('.locked-overlay, .lock-text, .lock-icon, .fa-lock');
+                lockElements.forEach(el => el.style.display = 'none');
+
+                // 素材テキストを表示
                 if (materialText) {
+                    materialText.style.display = 'block';
+
                     if (recipe.length === 0) {
                         materialText.innerHTML = `<i class="fa-solid fa-bolt"></i> 素材不要`;
                         materialText.style.color = '#2ecc71';
                     } else {
-                        // アイコン表示
                         const firstItem = recipe[0];
                         let iconPath = '';
                         if (MATERIAL_IMAGES[type]) iconPath = MATERIAL_IMAGES[type][firstItem.rank];
@@ -173,10 +182,10 @@ function updateUI() {
                     }
                 }
 
-                // ボタン制御
                 if (!isLevelMet) {
                     evolveBtn.textContent = `Lv.${reqLevel}で解放`;
                     evolveBtn.classList.add('disabled');
+                    evolveBtn.style.background = ""; 
                     evolveBtn.onclick = null;
                 } else {
                     if (!isMaterialMet) {
@@ -188,19 +197,26 @@ function updateUI() {
                         evolveBtn.classList.remove('disabled');
                         evolveBtn.style.background = ""; 
                     }
-                    // ★修正：モーダルを開く処理
                     evolveBtn.onclick = () => window.openEvolutionModal(card, type, targetStar, recipe);
                 }
-                isPrevClaimed = false; // 次はまだロック
+                isPrevClaimed = false; 
 
             } else {
-                // 完全ロック (前のキャラ未クリア または 前の属性未コンプ)
+                // 【完全ロック】
                 card.classList.add('locked-card');
+                
+                // ★名前を「???」にする
+                if (charNameEl) charNameEl.textContent = "???";
+
                 if(lockText) {
                     lockText.style.display = 'block';
-                    // もし属性ロックなら文言を変えるなどしても良いが、ここでは統一
                     lockText.textContent = "LOCKED";
                 }
+                
+                if (materialText) {
+                    materialText.style.display = 'none';
+                }
+
                 if(evolveBtn) {
                     evolveBtn.textContent = "???";
                     evolveBtn.classList.add('disabled');
@@ -363,22 +379,43 @@ window.closeDynamicModal = function() {
         setTimeout(() => modal.remove(), 200);
     }
 };
-
-/* 6. 進化実行 */
+/* =========================================================
+   6. 進化実行（修正版：緑背景削除、アイコン色変更）
+   ========================================================= */
 window.executeEvolution = function(card, type, recipe) {
+    // 1. 素材を消費
     recipe.forEach(item => {
         window.gameState.stones[type][item.rank] -= item.count;
     });
     
+    // 2. 親ノードを取得
     const node = card.closest('.pass-node');
     if(node) {
+        // ノードを「取得済み(claimed)」状態にする
         node.classList.add('claimed');
+
+        // (A) CSSのフィルター解除
+        card.classList.remove('locked');
+        
+        // (B) ロック関連の要素を非表示
+        const lockElements = card.querySelectorAll('.locked-overlay, .lock-text, .lock-icon, .fa-lock, .fa-solid.fa-lock');
+        lockElements.forEach(el => {
+            el.style.display = 'none';
+        });
+
+        // (C) マーカーのスタイル変更
         const marker = node.querySelector('.node-marker');
         if(marker) {
             marker.innerHTML = '<i class="fa-solid fa-check"></i>';
+            
+            // ★変更点：背景を透明にし、アイコンと枠線を緑色にする
+            marker.style.background = 'transparent'; 
+            marker.style.borderColor = '#2ecc71';
+            marker.style.color = '#2ecc71'; // チェックマークの色
         }
     }
-    // UI更新（次のキャラのロック解除判定など）
+
+    // 3. UI全体の更新
     updateUI();
 };
 
@@ -387,18 +424,37 @@ window.addLevel = function(amount) {
     window.gameState.level += amount;
     updateUI();
 };
-// 素材一括増加
-window.addStone = function(type, amount) {
-    window.gameState.stones[type].r += amount;
-    window.gameState.stones[type].sr += amount;
-    window.gameState.stones[type].ssr += 1; 
-    updateUI();
+
+// ★追加：指定した属性・ランクの素材を個別に増やす
+window.debugAddMaterial = function(type, rank, amount) {
+    if (window.gameState.stones[type]) {
+        window.gameState.stones[type][rank] += amount;
+        
+        // ログ出力（確認用）
+        console.log(`Added ${amount} to ${type} ${rank}. Total: ${window.gameState.stones[type][rank]}`);
+        
+        updateUI();
+    }
 };
+
 window.resetAll = function() {
     window.gameState.level = 1;
     ['fire','water','grass','light','dark'].forEach(t => {
         window.gameState.stones[t] = { r:0, sr:0, ssr:0 };
     });
-    document.querySelectorAll('.pass-node').forEach(n => n.classList.remove('claimed'));
+    
+    // 進化状態のリセット
+    document.querySelectorAll('.pass-node').forEach(n => {
+        n.classList.remove('claimed');
+        const marker = n.querySelector('.node-marker');
+        if(marker) {
+            // マーカーを元の状態に戻す（中身を空にし、スタイルをリセット）
+            marker.innerHTML = ''; 
+            marker.style.background = '';
+            marker.style.borderColor = '';
+            marker.style.color = '';
+        }
+    });
+    
     updateUI();
 };

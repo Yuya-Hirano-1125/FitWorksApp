@@ -299,3 +299,29 @@ h1 {
     box-shadow: 0 5px 15px rgba(142, 68, 173, 0.4);
 }
 .js-evolve-btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+
+/* =========================================
+   LOCKED表示の調整
+   ========================================= */
+
+/* 1. 名前に被っているLOCKED（オーバーレイや擬似要素）を消す */
+.locked-card .locked-overlay,
+.locked-card::after,
+.locked-card::before {
+    display: none !important;
+    content: none !important;
+}
+
+/* 2. 下にあるLOCKEDの文字をさらに下に下げる */
+.lock-required-level {
+    margin-top: 30px !important;  /* 数値を大きくするとさらに下がります */
+    padding-bottom: 10px;
+    display: block;
+    position: relative;
+    z-index: 5;
+    
+    /* 文字の見た目調整（お好みで） */
+    color: #e74c3c;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
