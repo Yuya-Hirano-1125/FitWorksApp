@@ -1,0 +1,108 @@
+/* 全体レイアウト */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Noto Sans JP', 'Poppins', sans-serif;
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.header-section h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.sub-heading {
+    color: #666;
+    font-size: 1rem;
+}
+
+/* 素材セクション */
+.material-section {
+    margin-bottom: 2.5rem;
+}
+
+.material-section h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+/* 素材リストを5列グリッドに */
+.material-list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5列固定 */
+    gap: 1rem;
+}
+
+/* 素材カード */
+.material-card {
+    background: #fdfdfd;
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease;
+}
+
+.material-card:hover {
+    transform: scale(1.05);
+}
+
+/* 素材画像 */
+.material-card img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+
+/* 素材名 */
+.material-name {
+    font-weight: bold;
+    margin: 4px 0;
+    font-size: 0.95rem;
+}
+
+/* 所持数／必要数 */
+.material-count {
+    font-size: 0.85rem;
+    color: #555;
+}
+
+/* レア度ごとの枠線カラー */
+.rarity-r .material-card {
+    border: 2px solid #4caf50; /* 緑 */
+}
+.rarity-sr .material-card {
+    border: 2px solid #2196f3; /* 青 */
+}
+.rarity-ssr .material-card {
+    border: 2px solid #ff9800; /* 金 */
+}
+
+/* 戻るボタン */
+.back-btn-container {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.button.secondary {
+    background: #eee;
+    border: 1px solid #ccc;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.button.secondary:hover {
+    background: #ddd;
+}
