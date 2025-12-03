@@ -356,7 +356,7 @@
 }
 
 /* ========================================================= */ 
-/* 🌟 RPG TUTORIAL V3 (FIXED: Layout Separation & Size) 🌟 */ 
+/* 🌟 RPG TUTORIAL V3 (FIXED: CENTERED & LARGE) 🌟 */ 
 /* ========================================================= */ 
 
 .help-icon-btn {
@@ -392,7 +392,7 @@
     display: block;
 }
 
-/* スポットライト (影を暗く: opacity 0.6) */
+/* スポットライト */
 .tutorial-focus-ring {
     position: absolute;
     border: 3px dashed #ffeb3b; 
@@ -436,16 +436,17 @@
     opacity: 1;
 }
 
-/* RPGメッセージボックス (大型化・レイアウト分離) */
+/* RPGメッセージボックス (中央配置・大型化・レイアウト分離) */
 .tutorial-rpg-box {
     position: fixed;
     top: 20px; 
-    left: 10px; 
-    right: 10px; /* 画面幅を有効活用（ヘルプボタンと被らないようマージンで調整も可だが、大きくしたいので幅優先） */
-    margin: 0 auto; /* 中央寄せ */
     
-    width: auto; 
-    max-width: 700px; /* ★さらに大きく */
+    /* ★中央配置の鉄板コード */
+    left: 50%;
+    transform: translateX(-50%) translateY(-150px);
+    
+    width: 90%; 
+    max-width: 600px; 
     
     /* 黒背景・白文字 */
     background: rgba(0, 0, 0, 0.95);
@@ -457,35 +458,35 @@
     
     border-radius: 15px;
     
-    /* ★パディング増量 */
+    /* パディング増量 */
     padding: 20px 25px;
     
     z-index: 9002;
     display: flex;
-    /* ★重要: 上揃え + gapで物理的に分離 */
+    /* 上揃え + gapで物理的に分離 */
     align-items: flex-start; 
-    gap: 20px; /* ★アイコンとテキストの間隔を確実に確保 */
+    gap: 20px; 
     
     opacity: 0;
-    transform: translateY(-150px); 
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
 }
 
 .tutorial-rpg-box.active {
     opacity: 1;
-    transform: translateY(0);
+    /* アニメーション後の位置：X軸は中央、Y軸は0(定位置) */
+    transform: translateX(-50%) translateY(0);
 }
 
 /* キャラクターアイコンエリア */
 .rpg-char-icon, .rpg-char-area {
-    /* ★サイズ固定・縮小禁止 (flex-shrink: 0) */
-    width: 80px; /* ★アイコンも大きく */
+    /* サイズ固定 */
+    width: 80px; 
     height: 80px;
-    flex: 0 0 80px; /* 幅を固定して確保 */
+    flex: 0 0 80px; 
     
     position: relative;
-    margin-top: 5px; /* テキストの高さと視線を合わせる */
-    margin-right: 0; /* gapを使うのでmarginは不要 */
+    margin-top: 5px; 
+    margin-right: 0; 
 }
 .rpg-char-area img {
     width: 100%;
@@ -496,14 +497,14 @@
 
 /* メッセージコンテンツエリア */
 .rpg-content {
-    flex: 1; /* 残りの幅をすべて使う */
-    min-width: 0; /* 子要素のはみ出し防止 */
+    flex: 1; 
+    min-width: 0; 
     display: flex;
     flex-direction: column;
 }
 
 .rpg-name-tag {
-    align-self: flex-start; /* 左寄せ */
+    align-self: flex-start; 
     display: inline-block;
     background: var(--primary-color);
     color: #fff;
@@ -515,9 +516,9 @@
     border: 1px solid #fff;
 }
 
-/* メッセージテキスト (サイズ拡大) */
+/* メッセージテキスト */
 .rpg-text-area {
-    font-size: 16px; /* ★文字サイズUP (14px -> 16px) */
+    font-size: 16px; 
     line-height: 1.7;
     color: #ffffff;
     font-weight: 500;
