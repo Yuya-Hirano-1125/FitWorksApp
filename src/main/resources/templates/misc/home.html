@@ -230,7 +230,7 @@
     /* targetIdに 'tutorial-rpg-box' を指定すると、メッセージ自体にスポットライトが当たります */
     const rpgSteps = [
         {
-            targetId: 'tutorial-rpg-box', // 最初は自分自身を強調
+            targetId: 'tutorial-rpg-box', 
             text: "こんにちは！FitWorksへようこそ！\nここでは運動をRPG感覚で楽しむことができます。"
         },
         {
@@ -262,7 +262,7 @@
     let currentRpgStep = 0;
     let typeWriterInterval;
     let updateLoopId; 
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v9'; // バージョンアップ
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v10'; // バージョンアップ
 
     document.addEventListener('DOMContentLoaded', function() {
         if (!localStorage.getItem(STORAGE_KEY_RPG)) {
@@ -344,12 +344,16 @@
         }
 
         if (!targetId) {
-            // 全体表示モード
+            // 全体表示モード (画面中央)
+            // absoluteなので scrollを加算
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            
             spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.5)'; 
             spotlight.style.width = '0';
             spotlight.style.height = '0';
-            spotlight.style.top = '50%';
-            spotlight.style.left = '50%';
+            spotlight.style.top = (scrollTop + (window.innerHeight / 2)) + 'px';
+            spotlight.style.left = (scrollLeft + (window.innerWidth / 2)) + 'px';
             return;
         }
 
@@ -364,6 +368,7 @@
         }
     }
     
+    // ★重要: 位置更新 (absolute配置 + scroll加算)
     function updateSpotlightPosition() {
         const step = rpgSteps[currentRpgStep];
         const spotlight = document.getElementById('tutorial-spotlight');
@@ -371,23 +376,27 @@
         
         if (!spotlight.classList.contains('active')) return;
 
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
         if (step && step.targetId) {
              const targetEl = document.getElementById(step.targetId);
              if(targetEl) {
                  const rect = targetEl.getBoundingClientRect();
                  const padding = 10;
                  
+                 // absolute配置のため、viewport座標(rect)にスクロール量(scroll)を加算
                  spotlight.style.width = (rect.width + padding * 2) + 'px';
                  spotlight.style.height = (rect.height + padding * 2) + 'px';
-                 spotlight.style.top = (rect.top - padding) + 'px';
-                 spotlight.style.left = (rect.left - padding) + 'px';
+                 spotlight.style.top = (rect.top + scrollTop - padding) + 'px';
+                 spotlight.style.left = (rect.left + scrollLeft - padding) + 'px';
                  spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.5)'; 
                  
                  // メッセージボックス自体がターゲットの時は指差しを出さない
                  if (step.targetId !== 'tutorial-rpg-box') {
                      pointer.style.display = 'block';
-                     pointer.style.top = (rect.bottom + 20) + 'px';
-                     pointer.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+                     pointer.style.top = (rect.bottom + scrollTop + 20) + 'px';
+                     pointer.style.left = (rect.left + scrollLeft + rect.width / 2 - 20) + 'px';
                  } else {
                      pointer.style.display = 'none';
                  }
@@ -397,8 +406,9 @@
             spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.5)'; 
             spotlight.style.width = '0';
             spotlight.style.height = '0';
-            spotlight.style.top = '50%';
-            spotlight.style.left = '50%';
+            // ターゲット無し時は画面中央
+            spotlight.style.top = (scrollTop + (window.innerHeight / 2)) + 'px';
+            spotlight.style.left = (scrollLeft + (window.innerWidth / 2)) + 'px';
         }
     }
 

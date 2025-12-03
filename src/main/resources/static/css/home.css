@@ -219,13 +219,12 @@
         width: 90px; 
         height: 90px; 
         border-radius: 50%;
-        background: linear-gradient(45deg, var(--primary-color), #ff88c8, #87ceeb); 
-        box-shadow: 0 10px 40px rgba(255, 105, 180, 0.9); 
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        box-shadow: 0 10px 25px rgba(255, 105, 180, 0.6);
         color: #ffffff;
-        padding: 0;
-        font-size: 12px;
-        transform: translateY(0);
-        border: 5px solid #ffffff; 
+        padding: 18px 40px;
+        font-size: 19px;
+        border: none;
         animation: gentleFloat 3s ease-in-out infinite alternate, softPulse 4s ease-in-out infinite alternate; 
         flex-grow: 0; 
         flex-basis: auto;
@@ -356,7 +355,7 @@
 }
 
 /* ========================================================= */ 
-/* 🌟 RPG TUTORIAL V3 (FINAL: SOLID, BRIGHT, NO TRANSPARENCY) 🌟 */ 
+/* 🌟 RPG TUTORIAL V3 (FINAL: ABSOLUTE POSITIONING FIX) 🌟 */ 
 /* ========================================================= */ 
 
 .help-icon-btn {
@@ -394,7 +393,7 @@
 
 /* スポットライト (枠ズレ防止のため transition: none/opacity のみ) */
 .tutorial-focus-ring {
-    position: absolute;
+    position: absolute; /* ★fixedからabsoluteに変更してスクロール追従をJSに任せる */
     border: 3px dashed #ffeb3b; 
     border-radius: 12px;
     
@@ -404,7 +403,10 @@
                 
     z-index: 9001; 
     pointer-events: none; 
+    
+    /* ★重要: 位置移動のラグを無くすため opacity のみアニメーション */
     transition: opacity 0.2s ease-out; 
+    
     display: none;
     opacity: 0;
 }
@@ -421,23 +423,26 @@
 
 /* チュートリアル用のスポットライト（home.htmlとの連携） */
 .tutorial-spotlight {
-    position: fixed;
-    top: 50%;
-    left: 50%;
+    position: absolute; /* ★重要: ここもabsoluteに変更 */
+    /* top/leftはJSで制御 */
+    top: 0;
+    left: 0;
     width: 0;
     height: 0;
+    
     border-radius: 10px; 
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5) !important; 
     z-index: 9998;
     pointer-events: none;
     opacity: 0;
+    
     transition: opacity 0.4s ease-out;
 }
 .tutorial-spotlight.active {
     opacity: 1;
 }
 
-/* RPGメッセージボックス (不透明・透かしなし・目立つ・ズーム追従) */
+/* RPGメッセージボックス (明るい半透明) */
 .tutorial-rpg-box {
     position: fixed;
     top: 20px; 
@@ -449,17 +454,16 @@
     max-height: 80vh;
     overflow-y: auto;
     
-    /* ★背景を完全に不透明な白にする */
-    background: #ffffff; 
-    /* すりガラス効果は削除 */
-    backdrop-filter: none; 
+    /* ★明るい半透明白（0.85） + すりガラス */
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     
     color: #333333;
     
-    /* 枠線を太く、目立たせる */
-    border: 3px solid #ff69b4; 
-    /* 影を調整 */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    /* 枠線と影（影なし） */
+    border: 3px solid var(--primary-color);
+    box-shadow: none; 
     
     border-radius: 20px;
     padding: 20px 25px;
@@ -500,8 +504,7 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    /* 白背景なので通常の影 */
-    filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+    filter: none;
 }
 
 @media (max-width: 600px) {
@@ -530,7 +533,7 @@
     font-size: 13px;
     font-weight: bold;
     margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    box-shadow: none; 
     border: none;
 }
 
@@ -540,7 +543,6 @@
     line-height: 1.7;
     color: #333333; 
     font-weight: 600; 
-    /* 光彩などは削除し、クリアに見せる */
     text-shadow: none;
     word-break: break-word; 
 }
@@ -573,7 +575,7 @@
 
 .rpg-btn {
     border: none;
-    background: #f0f0f0; 
+    background: rgba(255, 255, 255, 0.5); 
     padding: 8px 16px;
     border-radius: 20px;
     font-size: 12px;
@@ -587,7 +589,6 @@
 .rpg-btn:hover {
     background: #e0e0e0;
     color: #333;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .rpg-btn-skip {
@@ -604,7 +605,7 @@
 .rpg-btn-next {
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: white;
-    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.4); 
+    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3); 
 }
 .rpg-btn-next:hover {
     transform: scale(1.05);
