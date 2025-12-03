@@ -11,12 +11,22 @@ public class CharactersMenuController {
     public String showCharactersMenu() {
         return "characters/menu/CharactersMenu"; 
     }
+
+    // キャラクター一覧画面へ遷移
     @GetMapping("/characters/menu/CharactersStorage")
     public String showCharactersStorage() {
-        return "/characters/menu/CharactersStorage"; 
+        return "characters/menu/CharactersStorage"; 
     }
+
+    // キャラクター解放画面へ遷移
     @GetMapping("/characters/menu/CharactersUnlock")
     public String showCharactersUnlock() {
-        return "/characters/menu/CharactersUnlock"; 
+        return "characters/menu/CharactersUnlock"; 
+    }
+
+    // 進化素材画面へ遷移（素材一覧は存在しないのでこちらを使う）
+    @GetMapping("/characters/menu/CharactersEvolutionMaterial")
+    public String showCharactersEvolutionMaterial() {
+        return "characters/menu/CharactersEvolutionMaterial"; 
     }
 }
