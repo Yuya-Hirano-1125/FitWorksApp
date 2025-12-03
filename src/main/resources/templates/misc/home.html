@@ -261,7 +261,7 @@
     let currentRpgStep = 0;
     let typeWriterInterval;
     let updateLoopId; // アニメーションループ用のID
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v5';
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v6'; // バージョンアップ
 
     document.addEventListener('DOMContentLoaded', function() {
         if (!localStorage.getItem(STORAGE_KEY_RPG)) {
@@ -269,7 +269,6 @@
         }
         
         // ★重要: ループで常時位置合わせを行うのでイベントリスナーは補完的役割になる
-        // しかし、スクロール開始時などの反応をよくするため残しておく
         window.addEventListener('resize', updateSpotlightPosition);
         window.addEventListener('scroll', updateSpotlightPosition);
     });
@@ -342,7 +341,7 @@
 
         if (!targetId) {
             // 全体表示モード
-            spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.6)'; 
+            spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.5)'; 
             spotlight.style.width = '0';
             spotlight.style.height = '0';
             spotlight.style.top = '50%';
@@ -381,7 +380,7 @@
                  spotlight.style.height = (rect.height + padding * 2) + 'px';
                  spotlight.style.top = (rect.top - padding) + 'px';
                  spotlight.style.left = (rect.left - padding) + 'px';
-                 spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.6)'; // 影の濃さ維持
+                 spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.5)'; 
                  
                  // 指差しアイコンの位置更新
                  pointer.style.display = 'block';
@@ -391,7 +390,7 @@
         } else {
             // ターゲットがない時は中心
             pointer.style.display = 'none';
-            spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.6)'; 
+            spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.5)'; 
             spotlight.style.width = '0';
             spotlight.style.height = '0';
             spotlight.style.top = '50%';

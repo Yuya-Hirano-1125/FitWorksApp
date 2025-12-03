@@ -356,7 +356,7 @@
 }
 
 /* ========================================================= */ 
-/* 🌟 RPG TUTORIAL V3 (FIXED: Zoom & Resize Stable) 🌟 */ 
+/* 🌟 RPG TUTORIAL V3 (BRIGHT THEME & ZOOM FIX) 🌟 */ 
 /* ========================================================= */ 
 
 .help-icon-btn {
@@ -398,14 +398,16 @@
     border: 3px dashed #ffeb3b; 
     border-radius: 12px;
     
+    /* 影を薄くして画面を見やすく */
     box-shadow: 0 0 20px rgba(255, 235, 59, 1), 
-                0 0 0 9999px rgba(0, 0, 0, 0.6); 
+                0 0 0 9999px rgba(0, 0, 0, 0.5); 
                 
     z-index: 9001; 
     pointer-events: none; 
     
-    /* ★重要: 位置移動のアニメーションを削除し、透明度のみアニメーションさせる */
+    /* ★重要: 位置移動の遅延(transition)を削除し、透明度のみアニメーションさせる */
     transition: opacity 0.2s ease-out; 
+    /* 位置プロパティ(top, left, width, height)にはtransitionをかけない */
     
     display: none;
     opacity: 0;
@@ -431,7 +433,8 @@
     height: 0;
     
     border-radius: 10px; 
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6) !important; 
+    /* 影の濃さを控えめに (0.5) */
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5) !important; 
     z-index: 9998;
     pointer-events: none;
     opacity: 0;
@@ -443,7 +446,7 @@
     opacity: 1;
 }
 
-/* RPGメッセージボックス */
+/* RPGメッセージボックス (明るいテーマ・中央配置・大型化・レイアウト分離) */
 .tutorial-rpg-box {
     position: fixed;
     top: 20px; 
@@ -460,21 +463,21 @@
     max-height: 80vh;
     overflow-y: auto;
     
-    /* 黒背景・白文字 */
-    background: rgba(0, 0, 0, 0.95);
-    color: #ffffff;
+    /* ★明るいテーマ（白背景・濃い文字） */
+    background: rgba(255, 255, 255, 0.98);
+    color: #333333;
     
-    border: 2px solid var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.2) inset, 
-                0 15px 40px rgba(0,0,0,0.6);
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5) inset, 
+                0 15px 40px rgba(0,0,0,0.3);
     
-    border-radius: 15px;
+    border-radius: 20px;
     padding: 20px 25px;
     
     z-index: 9002;
     display: flex;
     align-items: flex-start; 
-    gap: 20px; 
+    gap: 20px; /* アイコンと文字の間隔確保 */
     
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
@@ -496,10 +499,9 @@
 
 /* キャラクターアイコンエリア */
 .rpg-char-icon, .rpg-char-area {
-    /* サイズ固定・縮小禁止 */
     width: 80px; 
     height: 80px;
-    flex: 0 0 80px; 
+    flex: 0 0 80px; /* 縮小禁止 */
     
     position: relative;
     margin-top: 5px; 
@@ -509,7 +511,8 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+    /* 明るい背景に合う影 */
+    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.15));
 }
 
 @media (max-width: 600px) {
@@ -538,16 +541,16 @@
     font-size: 13px;
     font-weight: bold;
     margin-bottom: 10px;
-    border: 1px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* メッセージテキスト */
+/* メッセージテキスト (濃い文字) */
 .rpg-text-area {
     font-size: 1rem; 
     line-height: 1.7;
-    color: #ffffff;
-    font-weight: 500;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    color: #333333; /* 濃いグレー */
+    font-weight: 600; /* 少し太くして視認性確保 */
+    text-shadow: none;
     word-break: break-word; 
 }
 
@@ -559,7 +562,7 @@
 
 .rpg-next-cursor {
     display: inline-block;
-    color: #ffeb3b; 
+    color: var(--primary-color); 
     margin-left: 5px;
     animation: cursorBounce 0.8s infinite;
 }
@@ -579,35 +582,37 @@
 
 .rpg-btn {
     border: none;
-    background: rgba(255, 255, 255, 0.2); 
+    background: #f0f0f0; 
     padding: 8px 16px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: bold;
-    color: #fff;
+    color: #666;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap; 
 }
 .rpg-btn:hover {
-    background: rgba(255, 255, 255, 0.4);
+    background: #e0e0e0;
+    color: #333;
 }
 
 .rpg-btn-skip {
     background: transparent;
     text-decoration: underline;
-    color: #ccc;
+    color: #999;
 }
 .rpg-btn-skip:hover {
-    color: #fff;
+    color: var(--primary-color);
 }
 
 .rpg-btn-next {
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.4);
 }
 .rpg-btn-next:hover {
     transform: scale(1.05);
     background: linear-gradient(45deg, #ff8fa3, #ffc2cd);
+    color: white;
 }
