@@ -227,9 +227,10 @@
 
 <script>
     /* チュートリアルデータ */
+    /* targetIdに 'tutorial-rpg-box' を指定すると、メッセージ自体にスポットライトが当たります */
     const rpgSteps = [
         {
-            targetId: null,
+            targetId: 'tutorial-rpg-box', 
             text: "こんにちは！FitWorksへようこそ！\nここでは運動をRPG感覚で楽しむことができます。"
         },
         {
@@ -260,15 +261,14 @@
 
     let currentRpgStep = 0;
     let typeWriterInterval;
-    let updateLoopId; // アニメーションループ用のID
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v8'; // バージョンアップ
+    let updateLoopId; 
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v10'; // バージョンアップ
 
     document.addEventListener('DOMContentLoaded', function() {
         if (!localStorage.getItem(STORAGE_KEY_RPG)) {
             setTimeout(() => startRpgTutorial(), 800);
         }
         
-        // ★重要: ループで常時位置合わせを行うのでイベントリスナーは補完的役割
         window.addEventListener('resize', updateSpotlightPosition);
         window.addEventListener('scroll', updateSpotlightPosition);
     });
@@ -278,12 +278,9 @@
         document.getElementById('tutorial-spotlight').classList.add('active');
         document.getElementById('tutorial-rpg-box').classList.add('active');
         
-        // ★重要: スクロール禁止を削除し、自由な操作を許可
-        // document.body.style.overflow = 'hidden'; 
-        
         updateRpgView();
         
-        // ★重要: 常時追従ループを開始
+        // 常時追従ループを開始
         startUpdateLoop();
     }
 
@@ -321,7 +318,6 @@
         moveSpotlight(step.targetId);
     }
 
-    // ★重要: 毎フレーム位置を更新するループ関数
     function startUpdateLoop() {
         if (updateLoopId) cancelAnimationFrame(updateLoopId);
         
@@ -340,35 +336,48 @@
         const spotlight = document.getElementById('tutorial-spotlight');
         const pointer = document.getElementById('tutorial-pointer');
 
+        // ターゲットがない、またはターゲットが自分自身なら指差しは消す
+        if (!targetId || targetId === 'tutorial-rpg-box') {
+            pointer.style.display = 'none';
+        } else {
+            pointer.style.display = 'block';
+        }
+
         if (!targetId) {
-            // 全体表示モード
+            // 全体表示モード (画面中央)
+            // absoluteなので scrollを加算
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            
             spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.5)'; 
             spotlight.style.width = '0';
             spotlight.style.height = '0';
-            spotlight.style.top = '50%';
-            spotlight.style.left = '50%';
-            pointer.style.display = 'none';
+            spotlight.style.top = (scrollTop + (window.innerHeight / 2)) + 'px';
+            spotlight.style.left = (scrollLeft + (window.innerWidth / 2)) + 'px';
             return;
         }
 
         const targetEl = document.getElementById(targetId);
         if (targetEl) {
-            // 要素までスクロール
-            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // 自分自身以外ならスクロールして見せる
+            if (targetId !== 'tutorial-rpg-box') {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
             
-            // 位置合わせ（ループ内でも呼ばれるが、ここでも即時呼ぶ）
             updateSpotlightPosition();
         }
     }
     
-    // 位置更新の本体ロジック
+    // ★重要: 位置更新 (absolute配置 + scroll加算)
     function updateSpotlightPosition() {
         const step = rpgSteps[currentRpgStep];
         const spotlight = document.getElementById('tutorial-spotlight');
         const pointer = document.getElementById('tutorial-pointer');
         
-        // チュートリアルがアクティブでないなら何もしない
         if (!spotlight.classList.contains('active')) return;
+
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
 
         if (step && step.targetId) {
              const targetEl = document.getElementById(step.targetId);
@@ -376,27 +385,30 @@
                  const rect = targetEl.getBoundingClientRect();
                  const padding = 10;
                  
-                 // スポットライトの位置更新
-                 // getBoundingClientRectはビューポート相対座標なので、fixed配置のspotlightと一致する
+                 // absolute配置のため、viewport座標(rect)にスクロール量(scroll)を加算
                  spotlight.style.width = (rect.width + padding * 2) + 'px';
                  spotlight.style.height = (rect.height + padding * 2) + 'px';
-                 spotlight.style.top = (rect.top - padding) + 'px';
-                 spotlight.style.left = (rect.left - padding) + 'px';
+                 spotlight.style.top = (rect.top + scrollTop - padding) + 'px';
+                 spotlight.style.left = (rect.left + scrollLeft - padding) + 'px';
                  spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.5)'; 
                  
-                 // 指差しアイコンの位置更新
-                 pointer.style.display = 'block';
-                 pointer.style.top = (rect.bottom + 20) + 'px';
-                 pointer.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+                 // メッセージボックス自体がターゲットの時は指差しを出さない
+                 if (step.targetId !== 'tutorial-rpg-box') {
+                     pointer.style.display = 'block';
+                     pointer.style.top = (rect.bottom + scrollTop + 20) + 'px';
+                     pointer.style.left = (rect.left + scrollLeft + rect.width / 2 - 20) + 'px';
+                 } else {
+                     pointer.style.display = 'none';
+                 }
              }
         } else {
-            // ターゲットがない時は中心
             pointer.style.display = 'none';
             spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.5)'; 
             spotlight.style.width = '0';
             spotlight.style.height = '0';
-            spotlight.style.top = '50%';
-            spotlight.style.left = '50%';
+            // ターゲット無し時は画面中央
+            spotlight.style.top = (scrollTop + (window.innerHeight / 2)) + 'px';
+            spotlight.style.left = (scrollLeft + (window.innerWidth / 2)) + 'px';
         }
     }
 
@@ -418,7 +430,6 @@
         spot.classList.remove('active');
         pointer.style.display = 'none';
 
-        // ループ停止
         stopUpdateLoop();
         
         localStorage.setItem(STORAGE_KEY_RPG, 'true');
