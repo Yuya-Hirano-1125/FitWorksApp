@@ -110,154 +110,6 @@
             flex-grow: 1;
             text-align: center;
         }
-
-        /* =========================================
-           ★ここから改良版チュートリアル用CSS
-           ========================================= */
-
-        /* スポットライト演出: 画面全体を覆う巨大な影を作り、真ん中だけ穴を開ける */
-        .tutorial-spotlight {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 10px; 
-            /* 画面外まで広がる巨大な影 (radiusを大きく取って「穴」以外を暗くする) */
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85); 
-            z-index: 9998;
-            pointer-events: none; /* クリックを透過 */
-            opacity: 0;
-            transition: all 0.4s ease-out; /* 穴の移動をスムーズに */
-        }
-        .tutorial-spotlight.active {
-            opacity: 1;
-        }
-
-        /* 指差しアイコン */
-        .tutorial-pointer {
-            position: fixed;
-            font-size: 3rem;
-            color: #ffeb3b;
-            z-index: 9999;
-            display: none;
-            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
-            animation: pointMove 1s ease-in-out infinite;
-            pointer-events: none;
-        }
-        @keyframes pointMove {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(15px); }
-            100% { transform: translateY(0); }
-        }
-
-        /* RPG風メッセージボックス (位置を上部に変更) */
-        .tutorial-rpg-box {
-            position: fixed;
-            /* ロゴ画像の上に被せるため top を指定 (ヘルプボタンやヘッダーを避けた位置) */
-            top: 70px; 
-            left: 50%;
-            /* 初期位置はさらに上に隠しておく */
-            transform: translateX(-50%) translateY(-200px);
-            width: 90%;
-            max-width: 600px;
-            background: rgba(20, 20, 30, 0.95);
-            border: 2px solid #4facfe;
-            border-radius: 15px;
-            color: #fff;
-            padding: 0;
-            z-index: 9999;
-            display: flex;
-            /* キャラクターとテキストを上揃えにする */
-            align-items: flex-start;
-            opacity: 0;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27), opacity 0.4s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .tutorial-rpg-box.active {
-            /* 定位置に降りてくる */
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        /* キャラクターエリア (ボックスの上部にはみ出させる) */
-        .rpg-char-area {
-            width: 100px;
-            margin-right: -10px;
-            margin-top: -15px; 
-            margin-left: -10px;
-            position: relative;
-            z-index: 2;
-            flex-shrink: 0;
-        }
-        .rpg-char-area img {
-            width: 100%;
-            display: block;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
-            transition: transform 0.2s;
-        }
-        /* 喋るアニメーション */
-        .rpg-char-area img.talking {
-            animation: bounce 0.2s infinite alternate;
-        }
-        @keyframes bounce {
-            from { transform: translateY(0); }
-            to { transform: translateY(-3px); }
-        }
-
-        /* テキストエリア */
-        .rpg-content {
-            flex-grow: 1;
-            padding: 15px 15px 15px 5px; /* 左パディングを減らす */
-            position: relative;
-        }
-        .rpg-name-tag {
-            background: #4facfe;
-            color: #fff;
-            padding: 2px 10px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 5px;
-        }
-        .rpg-text-area {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            min-height: 3.2em;
-            margin-bottom: 10px;
-            white-space: pre-wrap;
-        }
-
-        /* ボタン類 */
-        .rpg-controls {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        .rpg-btn {
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9rem;
-            transition: background 0.2s;
-        }
-        .rpg-btn-skip {
-            background: transparent;
-            color: #aaa;
-            border: 1px solid #555;
-        }
-        .rpg-btn-skip:hover { color: #fff; border-color: #fff; }
-        .rpg-btn-next {
-            background: #4facfe;
-            color: #fff;
-        }
-        .rpg-btn-next:hover {
-            background: #00f2fe;
-            box-shadow: 0 0 10px #00f2fe;
-        }
     </style>
 </head>
 <body class="home-page">
@@ -408,14 +260,16 @@
 
     let currentRpgStep = 0;
     let typeWriterInterval;
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v5'; // バージョンアップして強制再表示
+    let updateLoopId; // アニメーションループ用のID
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v5';
 
     document.addEventListener('DOMContentLoaded', function() {
         if (!localStorage.getItem(STORAGE_KEY_RPG)) {
             setTimeout(() => startRpgTutorial(), 800);
         }
         
-        // リサイズ・スクロール時の追従
+        // ★重要: ループで常時位置合わせを行うのでイベントリスナーは補完的役割になる
+        // しかし、スクロール開始時などの反応をよくするため残しておく
         window.addEventListener('resize', updateSpotlightPosition);
         window.addEventListener('scroll', updateSpotlightPosition);
     });
@@ -425,10 +279,12 @@
         document.getElementById('tutorial-spotlight').classList.add('active');
         document.getElementById('tutorial-rpg-box').classList.add('active');
         
-        // 背景スクロール禁止
         document.body.style.overflow = 'hidden'; 
         
         updateRpgView();
+        
+        // ★重要: 常時追従ループを開始
+        startUpdateLoop();
     }
 
     function updateRpgView() {
@@ -437,11 +293,10 @@
         const charImg = document.getElementById('rpg-char-img');
         const nextBtn = document.getElementById('rpg-next-btn');
 
-        // 1. テキスト更新（タイプライター演出）
+        // 1. テキスト更新
         textBox.innerHTML = '';
         if (typeWriterInterval) clearInterval(typeWriterInterval);
         
-        // キャラクターを喋っている風に跳ねさせる
         charImg.classList.add('talking');
         
         let i = 0;
@@ -453,17 +308,32 @@
                 i++;
             } else {
                 clearInterval(typeWriterInterval);
-                charImg.classList.remove('talking'); // 喋り終わったら停止
+                charImg.classList.remove('talking');
             }
         }, 40);
 
-        // 2. ボタン表示切り替え
+        // 2. ボタン表示
         nextBtn.innerHTML = (currentRpgStep === rpgSteps.length - 1) 
             ? '完了 <i class="fa-solid fa-check"></i>' 
             : '次へ <i class="fa-solid fa-caret-right"></i>';
 
-        // 3. スポットライトと指差しの移動
+        // 3. スポットライトと指差しの移動 (初回呼び出し)
         moveSpotlight(step.targetId);
+    }
+
+    // ★重要: 毎フレーム位置を更新するループ関数
+    function startUpdateLoop() {
+        if (updateLoopId) cancelAnimationFrame(updateLoopId);
+        
+        const loop = () => {
+            updateSpotlightPosition();
+            updateLoopId = requestAnimationFrame(loop);
+        };
+        loop();
+    }
+
+    function stopUpdateLoop() {
+        if (updateLoopId) cancelAnimationFrame(updateLoopId);
     }
 
     function moveSpotlight(targetId) {
@@ -486,42 +356,46 @@
             // 要素までスクロール
             targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
-            // 位置合わせ
-            setTimeout(() => {
-                const rect = targetEl.getBoundingClientRect();
-                const padding = 10; 
-
-                // スポットライトの位置とサイズを設定
-                spotlight.style.width = (rect.width + padding * 2) + 'px';
-                spotlight.style.height = (rect.height + padding * 2) + 'px';
-                spotlight.style.top = (rect.top - padding) + 'px';
-                spotlight.style.left = (rect.left - padding) + 'px';
-                spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.85)';
-
-                // 指差しアイコン
-                pointer.style.display = 'block';
-                pointer.style.top = (rect.bottom + 20) + 'px';
-                pointer.style.left = (rect.left + rect.width / 2 - 20) + 'px';
-            }, 300);
+            // 位置合わせ（ループ内でも呼ばれるが、ここでも即時呼ぶ）
+            updateSpotlightPosition();
         }
     }
     
+    // 位置更新の本体ロジック
     function updateSpotlightPosition() {
         const step = rpgSteps[currentRpgStep];
+        const spotlight = document.getElementById('tutorial-spotlight');
+        const pointer = document.getElementById('tutorial-pointer');
+        
+        // チュートリアルがアクティブでないなら何もしない
+        if (!spotlight.classList.contains('active')) return;
+
         if (step && step.targetId) {
              const targetEl = document.getElementById(step.targetId);
              if(targetEl) {
                  const rect = targetEl.getBoundingClientRect();
-                 const spotlight = document.getElementById('tutorial-spotlight');
-                 const pointer = document.getElementById('tutorial-pointer');
                  const padding = 10;
                  
+                 // スポットライトの位置更新
+                 spotlight.style.width = (rect.width + padding * 2) + 'px';
+                 spotlight.style.height = (rect.height + padding * 2) + 'px';
                  spotlight.style.top = (rect.top - padding) + 'px';
                  spotlight.style.left = (rect.left - padding) + 'px';
+                 spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.6)'; // 影の濃さ維持
                  
+                 // 指差しアイコンの位置更新
+                 pointer.style.display = 'block';
                  pointer.style.top = (rect.bottom + 20) + 'px';
                  pointer.style.left = (rect.left + rect.width / 2 - 20) + 'px';
              }
+        } else {
+            // ターゲットがない時は中心
+            pointer.style.display = 'none';
+            spotlight.style.boxShadow = '0 0 0 9999px rgba(0, 0, 0, 0.6)'; 
+            spotlight.style.width = '0';
+            spotlight.style.height = '0';
+            spotlight.style.top = '50%';
+            spotlight.style.left = '50%';
         }
     }
 
@@ -543,9 +417,13 @@
         spot.classList.remove('active');
         pointer.style.display = 'none';
 
-        document.body.style.overflow = ''; // スクロール解除
+        document.body.style.overflow = ''; 
         
         if (typeWriterInterval) clearInterval(typeWriterInterval);
+        
+        // ループ停止
+        stopUpdateLoop();
+        
         localStorage.setItem(STORAGE_KEY_RPG, 'true');
     }
 </script>

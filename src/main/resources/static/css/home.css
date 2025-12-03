@@ -356,7 +356,7 @@
 }
 
 /* ========================================================= */ 
-/* 🌟 RPG TUTORIAL V3 (FIXED: CENTERED & LARGE) 🌟 */ 
+/* 🌟 RPG TUTORIAL V3 (FIXED: Zoom & Resize Stable) 🌟 */ 
 /* ========================================================= */ 
 
 .help-icon-btn {
@@ -392,7 +392,7 @@
     display: block;
 }
 
-/* スポットライト */
+/* スポットライト (JSで常時更新するため、位置のTransitionは削除) */
 .tutorial-focus-ring {
     position: absolute;
     border: 3px dashed #ffeb3b; 
@@ -403,7 +403,10 @@
                 
     z-index: 9001; 
     pointer-events: none; 
-    transition: all 0.2s ease-out; 
+    
+    /* ★重要: 位置移動のアニメーションを削除し、透明度のみアニメーションさせる */
+    transition: opacity 0.2s ease-out; 
+    
     display: none;
     opacity: 0;
 }
@@ -421,32 +424,41 @@
 /* チュートリアル用のスポットライト（home.htmlとの連携） */
 .tutorial-spotlight {
     position: fixed;
+    /* top/left/width/heightはJSで毎フレーム制御 */
     top: 50%;
     left: 50%;
     width: 0;
     height: 0;
+    
     border-radius: 10px; 
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6) !important; 
     z-index: 9998;
     pointer-events: none;
     opacity: 0;
-    transition: all 0.4s ease-out;
+    
+    /* ★重要: 位置移動の遅延を削除 */
+    transition: opacity 0.4s ease-out;
 }
 .tutorial-spotlight.active {
     opacity: 1;
 }
 
-/* RPGメッセージボックス (中央配置・大型化・レイアウト分離) */
+/* RPGメッセージボックス */
 .tutorial-rpg-box {
     position: fixed;
     top: 20px; 
     
-    /* ★中央配置の鉄板コード */
+    /* 中央配置 */
     left: 50%;
     transform: translateX(-50%) translateY(-150px);
     
-    width: 90%; 
-    max-width: 600px; 
+    /* 幅の制御: 画面幅の95%まで、最大700px */
+    width: 95vw; 
+    max-width: 700px; 
+    
+    /* 高さ制御 */
+    max-height: 80vh;
+    overflow-y: auto;
     
     /* 黒背景・白文字 */
     background: rgba(0, 0, 0, 0.95);
@@ -457,13 +469,10 @@
                 0 15px 40px rgba(0,0,0,0.6);
     
     border-radius: 15px;
-    
-    /* パディング増量 */
     padding: 20px 25px;
     
     z-index: 9002;
     display: flex;
-    /* 上揃え + gapで物理的に分離 */
     align-items: flex-start; 
     gap: 20px; 
     
@@ -471,15 +480,23 @@
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
 }
 
+/* ズーム時やスマホ画面での調整 */
+@media (max-width: 600px) {
+    .tutorial-rpg-box {
+        padding: 15px; 
+        gap: 15px;
+        top: 10px; 
+    }
+}
+
 .tutorial-rpg-box.active {
     opacity: 1;
-    /* アニメーション後の位置：X軸は中央、Y軸は0(定位置) */
     transform: translateX(-50%) translateY(0);
 }
 
 /* キャラクターアイコンエリア */
 .rpg-char-icon, .rpg-char-area {
-    /* サイズ固定 */
+    /* サイズ固定・縮小禁止 */
     width: 80px; 
     height: 80px;
     flex: 0 0 80px; 
@@ -493,6 +510,14 @@
     height: 100%;
     object-fit: contain;
     filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+}
+
+@media (max-width: 600px) {
+    .rpg-char-icon, .rpg-char-area {
+        width: 60px;
+        height: 60px;
+        flex: 0 0 60px;
+    }
 }
 
 /* メッセージコンテンツエリア */
@@ -518,12 +543,18 @@
 
 /* メッセージテキスト */
 .rpg-text-area {
-    font-size: 16px; 
+    font-size: 1rem; 
     line-height: 1.7;
     color: #ffffff;
     font-weight: 500;
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     word-break: break-word; 
+}
+
+@media (max-width: 600px) {
+    .rpg-text-area {
+        font-size: 0.9rem; 
+    }
 }
 
 .rpg-next-cursor {
@@ -543,6 +574,7 @@
     align-items: center;
     margin-top: 15px;
     gap: 15px;
+    flex-wrap: wrap; 
 }
 
 .rpg-btn {
@@ -555,6 +587,7 @@
     color: #fff;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap; 
 }
 .rpg-btn:hover {
     background: rgba(255, 255, 255, 0.4);
