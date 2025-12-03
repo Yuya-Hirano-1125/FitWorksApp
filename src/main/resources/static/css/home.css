@@ -356,7 +356,7 @@
 }
 
 /* ========================================================= */ 
-/* 🌟 RPG TUTORIAL V2 (POP DESIGN) 🌟 */ 
+/* 🌟 RPG TUTORIAL V2 (POP DESIGN) - FIXED BACKDROP 🌟 */ 
 /* ========================================================= */ 
 
 /* ヘルプアイコン */
@@ -378,19 +378,23 @@
     color: var(--primary-color);
 }
 
-/* 暗幕 */
+/* 暗幕（修正版）: 画面端まで隙間なく埋める */
 .tutorial-backdrop {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    right: 0;
+    bottom: 0;
+    width: auto; /* vw指定を削除 */
+    height: auto; /* vh指定を削除 */
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(5px);
     z-index: 9000;
     display: none;
     opacity: 0;
     transition: opacity 0.4s ease;
+    margin: 0; /* マージンリセット */
+    padding: 0;
 }
 .tutorial-backdrop.active {
     display: block;
