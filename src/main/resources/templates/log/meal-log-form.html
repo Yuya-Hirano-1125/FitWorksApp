@@ -1,135 +1,198 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>食事記録</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食事記録 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-    <link rel="stylesheet" th:href="@{/css/training-log.css}">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/training-log.css}"> 
 	
 	<script th:src="@{/js/theme.js}"></script>
-	<style>
-	    /* フォームカードのスタイル（モーダル内用に少し調整） */
-	    .form-card {
-	        padding: 0;
-	        box-shadow: none; /* モーダル内なので影を消す */
-	    }
-	    .form-group {
-	        margin-bottom: 15px;
-	    }
-	    .form-group label {
-	        display: block;
-	        margin-bottom: 5px;
-	        font-weight: bold;
-	        color: #333;
-	        font-size: 0.9em;
-	    }
-	    .form-group input[type="date"],
-	    .form-group input[type="time"],
-	    .form-group input[type="number"],
-	    .form-group textarea,
-	    .form-group select {
-	        width: 100%;
-	        padding: 8px; /* 少し小さめに */
-	        border: 1px solid #ccc;
-	        border-radius: 5px;
-	        box-sizing: border-box;
-	        font-size: 0.95em;
-	        transition: border-color 0.2s;
-	    }
-	    .form-group input:focus,
-	    .form-group select:focus,
-	    .form-group textarea:focus {
-	        border-color: #4CAF50;
-	        outline: none;
-	    }
-	    .submit-button {
-	        width: 100%;
-	        padding: 10px;
-	        background-color: #4CAF50;
-	        color: white;
-	        border: none;
-	        border-radius: 5px;
-	        font-size: 1.0em;
-	        cursor: pointer;
-	        margin-top: 10px;
-	        transition: background-color 0.2s, transform 0.2s;
-	    }
-	    .submit-button:hover {
-	        background-color: #45a049;
-	        transform: translateY(-1px);
-	    }
-	    .error-message {
-	        color: red;
-	        font-size: 0.8em;
-	        margin-top: 3px;
-	    }
-	</style>
+    <style>
+        /* 食事画面特有のアイコン色調整 */
+        .header-icon-meal {
+            color: #4CAF50; /* 緑色 */
+        }
+        /* 記録済みマーカーの色変更 */
+        .log-indicator-meal {
+            color: #4CAF50 !important;
+        }
+    </style>
+</head>
+<body class="training-log-page"> <div class="main-container">
+    
+    <h1 style="margin-bottom: 5px;">
+        <i class="header-icon header-icon-meal fa-solid fa-utensils"></i> 食事記録
+    </h1>
+    <p class="sub-heading" th:text="${username} + 'さんの食事を管理しましょう。'">
+        食事記録カレンダー
+    </p>
 
-	<form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post" class="form-card">
-	    
-	    <div class="form-group">
-	        <label for="date">日付:</label>
-	        <input type="date" id="date" th:field="*{date}" required>
-	        <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="error-message"></div>
-	    </div>
+    <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
+    
+    <div class="calendar-nav-container">
+        <a th:href="@{/log/meal(year=${prevYear}, month=${prevMonth})}" class="nav-arrow">
+            <i class="fa-solid fa-chevron-left"></i>
+        </a>
+        
+        <h2 class="calendar-title" th:text="${currentYearMonth.year} + '年 ' + ${currentYearMonth.monthValue} + '月'"></h2>
+        
+        <a th:href="@{/log/meal(year=${nextYear}, month=${nextMonth})}" class="nav-arrow">
+            <i class="fa-solid fa-chevron-right"></i>
+        </a>
+    </div>
 
-	    <div class="form-group">
-	        <label for="time">時刻:</label>
-	        <input type="time" id="time" th:field="*{time}" required>
-	        <div th:if="${#fields.hasErrors('time')}" th:errors="*{time}" class="error-message"></div>
-	    </div>
+    <div class="calendar-grid">
+        <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" 
+             th:classappend="${dayLabel == '土'} ? 'sat' : ((${dayLabel == '日'} ? 'sun' : ''))">
+             曜日
+        </div>
+        
+        <th:block th:each="date : ${calendarDays}">
+            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''},
+                          dayOfWeek=${date != null ? date.dayOfWeek.name() : ''},
+                          isToday=${date != null and date.isEqual(currentDate)},
+                          isLogged=${date != null and loggedDates.containsKey(date)}"
+                 class="calendar-day-cell"
+                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today' : '') + 
+                                                                    ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + 
+                                                                     ((${dayOfWeek == 'SUNDAY'} ? ' sun' : ''))))"
+                 th:attr="data-date=${date != null ? date.toString() : ''}"
+                 th:onclick="${date != null} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
 
-	    <div class="form-group">
-	        <label for="mealType">食事の種類:</label>
-	        <select id="mealType" th:field="*{mealType}" required>
-	            <option value="">選択してください</option>
-	            <option value="朝食">朝食</option>
-	            <option value="昼食">昼食</option>
-	            <option value="夕食">夕食</option>
-	            <option value="間食">間食</option>
-	        </select>
-	        <div th:if="${#fields.hasErrors('mealType')}" th:errors="*{mealType}" class="error-message"></div>
-	    </div>
-	    
-	    <div class="form-group">
-	        <label for="content">食事内容:</label>
-	        <textarea id="content" th:field="*{content}" rows="2" placeholder="例: ご飯1膳, 焼き魚, 味噌汁" required></textarea>
-	        <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="error-message"></div>
-	    </div>
+                <span class="day-number" th:text="${dateNumber}">1</span>
+                
+                <span th:if="${isLogged}" class="log-indicator log-indicator-meal">
+                    <i class="fa-solid fa-utensils"></i>
+                </span>
+            </div>
+        </th:block>
+    </div>
 
-	    <div class="form-group">
-	        <label for="calories">カロリー (kcal):</label>
-	        <input type="number" id="calories" th:field="*{calories}" min="0" required>
-	        <div th:if="${#fields.hasErrors('calories')}" th:errors="*{calories}" class="error-message"></div>
-	    </div>
-	    
-	    <div style="display: flex; gap: 10px;">
-	        <div class="form-group" style="flex: 1;">
-	            <label for="protein">P (g):</label>
-	            <input type="number" id="protein" th:field="*{protein}" min="0" step="0.1" placeholder="タンパク質">
-	        </div>
+    <div style="text-align: center; margin: 20px 0;">
+        <a th:href="@{/log/meal/all}" class="button" style="background-color: #555; color: white; width: 100%; display: block; text-align: center;">
+            <i class="fa-solid fa-list"></i> 全記録をリストで見る
+        </a>
+    </div>
 
-	        <div class="form-group" style="flex: 1;">
-	            <label for="fat">F (g):</label>
-	            <input type="number" id="fat" th:field="*{fat}" min="0" step="0.1" placeholder="脂質">
-	        </div>
+</div>
 
-	        <div class="form-group" style="flex: 1;">
-	            <label for="carbohydrate">C (g):</label>
-	            <input type="number" id="carbohydrate" th:field="*{carbohydrate}" min="0" step="0.1" placeholder="炭水化物">
-	        </div>
-	    </div>
+<div id="logModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeLogModal()">&times;</span>
+        <h2 id="modalDateTitle" class="modal-title"></h2>
+        
+        <div id="logViewArea">
+             </div>
 
-	    <button type="submit" class="submit-button">記録を保存</button>
-	</form>
-        <a th:href="@{/log/meal/all}" class="button primary">食事記録一覧へ</a>
-    </main>
-	<div style="text-align: center; margin-top: 30px;">
-					        <a th:href="@{/home}" class="button secondary">
-					            <i class="fa-solid fa-house"></i> ホームに戻る
-					        </a>
-			</div>
-    <div th:insert="~{fragments/footer :: footer}"></div>
+        <p class="modal-instruction">食事内容を記録：</p>
+        
+        <input type="hidden" id="selectedDateInput" name="date" value="">
+        
+        <div id="formContainer">
+            <p>フォームを読み込んでいます...</p>
+        </div>
+
+        <a th:href="@{/log/meal/all}" class="button secondary view-all-button">
+            全記録を見る
+        </a>
+    </div>
+</div>
+
+<div style="max-width: 450px; margin: 30px auto 70px auto; padding: 0 10px;">
+    <a th:href="@{/home}" class="button secondary">
+        <i class="fa-solid fa-house"></i>
+        <span>ホームに戻る</span>
+    </a>
+</div>
+
+<script th:inline="javascript">
+    // ★変更点: 食事フォームを読み込む関数 (種類分岐なし)
+    function loadMealForm(date) {
+        let url = /*[[@{/log/meal/form}]]*/ '/log/meal/form';
+        url += '?date=' + date;
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('formContainer').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('formContainer').innerHTML = '<p class="error-message">フォームの読み込みに失敗しました。</p>';
+                console.error('Form load error:', error);
+            });
+    }
+
+    // 記録モーダルを開く関数
+    function openLogModal(dateString, isLogged) {
+        const [year, month, day] = dateString.split('-');
+        const displayDate = `${year}年${month}月${day}日`;
+        
+        // 日付をセット
+        document.getElementById('selectedDateInput').value = dateString;
+        document.getElementById('modalDateTitle').innerText = displayDate;
+        
+        const modal = document.getElementById('logModal');
+        const formContainer = document.getElementById('formContainer');
+
+        // フォームのリセットと読み込み開始
+        formContainer.innerHTML = '<div style="padding:20px; text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> 読み込み中...</div>';
+        
+        // ★変更点: 常に食事フォームをロード
+        loadMealForm(dateString);
+
+        // 記録済みメッセージの表示切り替え
+        const logViewArea = document.getElementById('logViewArea');
+        if (isLogged) {
+            logViewArea.innerHTML = '<p style="font-weight: 700; color: #4CAF50; margin-bottom: 10px;">✅ この日は記録済みです。</p>';
+        } else {
+            logViewArea.innerHTML = '<p style="color: #999; margin-bottom: 10px;">この日はまだ記録がありません。</p>';
+        }
+
+        modal.classList.add('is-active');
+    }
+
+    // 記録モーダルを閉じる関数
+    function closeLogModal() {
+        const modal = document.getElementById('logModal');
+        modal.classList.remove('is-active');
+        
+        // リセット
+        document.getElementById('formContainer').innerHTML = '<p>フォームを読み込んでいます...</p>';
+    }
+
+    // モーダル外クリックで閉じる処理
+    window.onclick = function(event) {
+        const modal = document.getElementById('logModal');
+        if (modal.classList.contains('is-active') && event.target === modal) {
+            closeLogModal();
+        }
+    }
+</script>
+
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
