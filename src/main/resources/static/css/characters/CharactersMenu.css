@@ -42,14 +42,15 @@ body {
 }
 
 /* ----------------------------
-   メニューボタン
-   アイコン左揃え / テキスト中央 / 矢印右揃え
-   ---------------------------- */
+   メニューボタン（全て中央揃え）
+   アイコンは左端固定 / 矢印は右端固定
+   テキストは完全中央に配置
+----------------------------- */
 .menu-button {
+    position: relative;   /* ← アイコン絶対配置の基準 */
     display: flex;
     align-items: center;
-    justify-content: space-between; /* アイコン左・矢印右・中央にテキスト */
-    gap: 16px;
+    justify-content: center;   /* ← テキストを中央へ */
     padding: 18px 22px;
     border-radius: 20px;
     text-decoration: none;
@@ -60,13 +61,13 @@ body {
     box-sizing: border-box;
 }
 
-/* ホバーで少し浮く表現 */
+/* ホバー */
 .menu-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 28px rgba(0,0,0,0.16);
 }
 
-/* アイコン（左に固定） */
+/* アイコン（左固定） */
 .icon-area {
     font-size: 1.9rem;
     width: 48px;
@@ -74,18 +75,21 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-shrink: 0;
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-/* テキスト（中央に固定） */
+/* テキスト（真ん中固定） */
 .text-area {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;  /* 文字中央揃え */
+    align-items: center;  
     text-align: center;
     gap: 4px;
-    flex: 1;             /* これで中央に来る */
+    flex: 1;
     min-width: 0;
 }
 
@@ -110,10 +114,13 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-shrink: 0;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-/* --- ボタンカラー（既存のグラデーション） --- */
+/* ボタンカラー */
 .style-unlock {
     background: linear-gradient(135deg, #7b4bff, #2a81ff);
 }
@@ -146,10 +153,11 @@ body {
     font-weight: 600;
 }
 
-/* --- レスポンシブ微調整 --- */
+/* レスポンシブ対応 */
 @media (max-width: 420px) {
-    .icon-area { width: 40px; height: 40px; font-size: 1.6rem; }
+    .icon-area { width: 40px; height: 40px; font-size: 1.6rem; left: 14px; }
+    .arrow-icon { right: 14px; }
     .main-text { font-size: 1.05rem; }
     .sub-text { font-size: 0.8rem; }
-    .menu-button { gap: 12px; padding: 14px 16px; }
+    .menu-button { padding: 14px 16px; }
 }
