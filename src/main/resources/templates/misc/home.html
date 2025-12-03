@@ -258,13 +258,31 @@
 
     let currentRpgStep = 0;
     let typeWriterInterval;
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_done_v2';
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_done_v3'; // キー更新
 
     document.addEventListener('DOMContentLoaded', function() {
         if (!localStorage.getItem(STORAGE_KEY_RPG)) {
             setTimeout(() => startRpgTutorial(false), 500);
         }
+        
+        // ★ 追加: リサイズ・スクロール時に枠の位置を再計算する
+        window.addEventListener('resize', updateFocusPosition);
+        window.addEventListener('scroll', updateFocusPosition);
     });
+    
+    // 現在のステップに合わせて枠位置を更新する関数
+    function updateFocusPosition() {
+        // チュートリアルが表示中かつ、ステップデータがある場合のみ実行
+        const backdrop = document.getElementById('tutorial-backdrop');
+        if (backdrop && backdrop.classList.contains('active')) {
+            const step = rpgSteps[currentRpgStep];
+            if (step && step.targetId) {
+                moveFocusRing(step.targetId, false); // false = スクロールはさせない（位置更新のみ）
+            } else {
+                moveFocusRing(null);
+            }
+        }
+    }
 
     function startRpgTutorial(isManual) {
         currentRpgStep = 0;
@@ -292,8 +310,8 @@
             nextBtn.innerHTML = '次へ <i class="fa-solid fa-caret-down"></i>';
         }
 
-        // スコープの移動
-        moveFocusRing(step.targetId);
+        // スコープの移動 (スクロールもさせる)
+        moveFocusRing(step.targetId, true);
     }
 
     // 文字を一文字ずつ表示する関数
@@ -301,14 +319,7 @@
         if (typeWriterInterval) clearInterval(typeWriterInterval);
         
         let i = 0;
-        // 改行コードを<br>に変換して配列化（タグ壊れ防止のため簡易的に）
         const displayHtml = text.replace(/\n/g, '<br>');
-        
-        // HTMLタグが含まれる場合の簡易対応として、一度全文字入れるが透明にし、徐々に不透明にする手法もあるが、
-        // 今回はシンプルに文字を追加していく（タグは含まない前提のテキストデータ）
-        // ※データに<br>以外のタグを含めないでください
-        
-        // 配列に分解（サロゲートペア対応）
         const chars = [...text]; 
         
         typeWriterInterval = setInterval(() => {
@@ -321,21 +332,21 @@
                 }
                 i++;
                 
-                // 最後の文字にカーソルをつける
                 if (i === chars.length) {
                     element.innerHTML += '<span class="rpg-next-cursor">▼</span>';
                     clearInterval(typeWriterInterval);
                 }
             }
-        }, 30); // 30msごとに1文字
+        }, 30);
     }
 
-    function moveFocusRing(targetId) {
+    // shouldScroll = trueなら画面スクロールする、falseなら位置更新だけ
+    function moveFocusRing(targetId, shouldScroll = true) {
         const ring = document.getElementById('tutorial-focus-ring');
         
         if (!targetId) {
             ring.classList.remove('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if(shouldScroll) window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
 
@@ -352,13 +363,14 @@
             ring.style.height = (rect.height + (padding * 2)) + 'px';
             
             ring.classList.add('active');
-            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            if (shouldScroll) {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
     }
 
     function nextRpgStep() {
-        // もしタイプライター途中なら、即時全表示して止める機能をつけると親切だが、
-        // 今回はシンプルに次へ進む
         if (currentRpgStep < rpgSteps.length - 1) {
             currentRpgStep++;
             updateRpgView();
