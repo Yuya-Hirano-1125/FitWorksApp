@@ -1,13 +1,13 @@
 @charset "UTF-8";
 
-/* Homeと同じベース設定 */
+/* ベース設定 */
 body {
     font-family: 'Poppins', 'Noto Sans JP', sans-serif;
     background-color: #f4f4f9;
     color: #333;
     margin: 0;
     padding: 0;
-    padding-bottom: 80px; /* ボトムナビのスペース */
+    padding-bottom: 80px;
     min-height: 100vh;
 }
 
@@ -15,8 +15,6 @@ body {
     max-width: 600px;
     margin: 0 auto;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
 }
 
 /* ヘッダー */
@@ -28,142 +26,138 @@ body {
 
 .header-section h1 {
     font-size: 1.8rem;
-    color: #333;
-    margin-bottom: 5px;
     font-weight: 800;
 }
 
 .sub-heading {
     color: #666;
     font-size: 0.9rem;
-    margin: 0;
 }
 
-/* ボタンリストのコンテナ */
+/* ボタンリスト */
 .menu-list {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* ボタン間の余白 */
+    gap: 20px;
 }
 
-/* メニューボタン共通スタイル */
+/* ----------------------------
+   メニューボタン（全て中央揃え）
+   アイコンは左端固定 / 矢印は右端固定
+   テキストは完全中央に配置
+----------------------------- */
 .menu-button {
+    position: relative;   /* ← アイコン絶対配置の基準 */
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 20px 25px;
-    border-radius: 20px; /* Homeの丸み */
+    justify-content: center;   /* ← テキストを中央へ */
+    padding: 18px 22px;
+    border-radius: 20px;
     text-decoration: none;
-    color: white;
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
+    color: #fff;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 5px 16px rgba(0,0,0,0.12);
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.menu-button:active {
-    transform: scale(0.98);
-}
-
+/* ホバー */
 .menu-button:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.16);
 }
 
-/* アイコンエリア */
+/* アイコン（左固定） */
 .icon-area {
-    font-size: 1.8rem;
-    width: 50px;
+    font-size: 1.9rem;
+    width: 48px;
+    height: 48px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: 15px;
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-/* テキストエリア */
+/* テキスト（真ん中固定） */
 .text-area {
-    flex-grow: 1;
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;  
+    text-align: center;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
 }
 
 .main-text {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.1;
 }
 
 .sub-text {
-    font-size: 0.8rem;
-    opacity: 0.9;
-    margin-top: 4px;
-    font-weight: 400;
+    font-size: 0.85rem;
+    opacity: 0.95;
+    line-height: 1.1;
 }
 
-/* 右矢印 */
+/* 矢印（右固定） */
 .arrow-icon {
-    font-size: 1.2rem;
-    opacity: 0.8;
-}
-
-/* --- 各ボタンのカラー設定 (Homeのグラデーションを流用) --- */
-
-/* キャラクター解放: AIチャット風 (紫～青) */
-.style-unlock {
-    background: linear-gradient(45deg, #6a11cb, #2575fc);
-    box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4);
-}
-
-/* キャラクター一覧: トレーニング開始風 (オレンジ～赤) */
-.style-list {
-    background: linear-gradient(45deg, #ff9966, #ff5e62);
-    box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4);
-}
-
-/* 素材一覧: マップ風 (緑) */
-.style-materials {
-    background: linear-gradient(45deg, #4CAF50, #8BC34A);
-    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-}
-
-/* 背景一覧: ランキング風 (黄色～オレンジ) */
-.style-backgrounds {
-    background: linear-gradient(45deg, #f1c40f, #f39c12);
-    box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4);
-}
-
-/* ボトムナビゲーション (Homeと共通) */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: #fff;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    font-size: 1.15rem;
+    opacity: 0.9;
+    width: 28px;
+    height: 28px;
     display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
-    z-index: 1000;
-}
-
-.nav-item {
-    display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* ボタンカラー */
+.style-unlock {
+    background: linear-gradient(135deg, #7b4bff, #2a81ff);
+}
+
+.style-list {
+    background: linear-gradient(135deg, #ff8a5c, #ff465c);
+}
+
+.style-materials {
+    background: linear-gradient(135deg, #48c76a, #8bd751);
+}
+
+.style-backgrounds {
+    background: linear-gradient(135deg, #f7d23e, #ff9d00);
+}
+
+/* 戻るボタン */
+.back-btn-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.button.secondary {
+    display: inline-block;
+    padding: 10px 18px;
+    background: #ddd;
+    border-radius: 10px;
     text-decoration: none;
-    color: #888;
-    font-size: 0.75rem;
-    transition: color 0.3s;
+    color: #333;
+    font-weight: 600;
 }
 
-.nav-item i {
-    font-size: 1.2rem;
-    margin-bottom: 4px;
-}
-
-.nav-item:hover {
-    color: #5c67d3;
-}
-
-.nav-item.active {
-    color: #5c67d3;
-    font-weight: 700;
+/* レスポンシブ対応 */
+@media (max-width: 420px) {
+    .icon-area { width: 40px; height: 40px; font-size: 1.6rem; left: 14px; }
+    .arrow-icon { right: 14px; }
+    .main-text { font-size: 1.05rem; }
+    .sub-text { font-size: 0.8rem; }
+    .menu-button { padding: 14px 16px; }
 }

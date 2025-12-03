@@ -355,7 +355,7 @@
 }
 
 /* ========================================================= */ 
-/* 🌟 RPG TUTORIAL V3 (FINAL: ABSOLUTE POSITIONING FIX) 🌟 */ 
+/* 🌟 RPG TUTORIAL V3 (FINAL: BUTTON BLOCK & DYNAMIC POSITION) 🌟 */ 
 /* ========================================================= */ 
 
 .help-icon-btn {
@@ -385,26 +385,25 @@
     background: transparent; 
     z-index: 9000;
     display: none;
-    pointer-events: none; 
+    
+    /* ★重要: クリックをブロックして、下のボタンを押せないようにする */
+    pointer-events: auto; 
 }
 .tutorial-backdrop.active {
     display: block;
 }
 
-/* スポットライト (枠ズレ防止のため transition: none/opacity のみ) */
+/* スポットライト */
 .tutorial-focus-ring {
-    position: absolute; /* ★fixedからabsoluteに変更してスクロール追従をJSに任せる */
+    position: absolute; 
     border: 3px dashed #ffeb3b; 
     border-radius: 12px;
     
-    /* 影の濃度調整 */
     box-shadow: 0 0 20px rgba(255, 235, 59, 1), 
                 0 0 0 9999px rgba(0, 0, 0, 0.5); 
                 
     z-index: 9001; 
     pointer-events: none; 
-    
-    /* ★重要: 位置移動のラグを無くすため opacity のみアニメーション */
     transition: opacity 0.2s ease-out; 
     
     display: none;
@@ -423,95 +422,90 @@
 
 /* チュートリアル用のスポットライト（home.htmlとの連携） */
 .tutorial-spotlight {
-    position: absolute; /* ★重要: ここもabsoluteに変更 */
-    /* top/leftはJSで制御 */
+    position: absolute; /* ★absoluteでスクロール追従 */
     top: 0;
     left: 0;
     width: 0;
     height: 0;
-    
     border-radius: 10px; 
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5) !important; 
     z-index: 9998;
     pointer-events: none;
     opacity: 0;
-    
     transition: opacity 0.4s ease-out;
 }
 .tutorial-spotlight.active {
     opacity: 1;
 }
 
-/* RPGメッセージボックス (明るい半透明) */
+/* RPGメッセージボックス (ターゲット付近に表示) */
 .tutorial-rpg-box {
-    position: fixed;
-    top: 20px; 
+    /* ★ fixedではなくabsoluteにしてJSで制御する */
+    position: absolute;
+    
+    /* 初期値 (JSで上書きされる) */
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%) translateY(-150px);
+    transform: translateX(-50%);
     
     width: 95vw; 
-    max-width: 700px; 
-    max-height: 80vh;
-    overflow-y: auto;
+    max-width: 600px; 
     
-    /* ★明るい半透明白（0.85） + すりガラス */
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    /* ★明るい背景 (0.85) */
+    background: rgba(255, 255, 255, 0.95);
     
     color: #333333;
     
-    /* 枠線と影（影なし） */
     border: 3px solid var(--primary-color);
-    box-shadow: none; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     
     border-radius: 20px;
-    padding: 20px 25px;
+    padding: 15px 20px;
     
+    /* ★バックドロップ(9000)より手前に表示して操作可能にする */
     z-index: 10000;
     
     display: flex;
     align-items: flex-start; 
-    gap: 20px; 
+    gap: 15px; 
     
     opacity: 0;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+    /* 位置アニメーションはJSループで行うためCSS transitionはopacityのみ推奨だが、滑らかさのためにtransformも残す */
+    transition: opacity 0.3s ease-out;
 }
 
 @media (max-width: 600px) {
     .tutorial-rpg-box {
-        padding: 15px; 
-        gap: 15px;
-        top: 10px; 
+        padding: 12px; 
+        gap: 10px;
+        width: 90vw;
     }
 }
 
 .tutorial-rpg-box.active {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
 }
 
 /* キャラクターアイコンエリア */
 .rpg-char-icon, .rpg-char-area {
-    width: 80px; 
-    height: 80px;
-    flex: 0 0 80px; 
+    width: 70px; 
+    height: 70px;
+    flex: 0 0 70px; 
     position: relative;
-    margin-top: 5px; 
-    margin-right: 0; 
+    margin-top: 0; 
 }
 .rpg-char-area img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: none;
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.1));
 }
 
 @media (max-width: 600px) {
     .rpg-char-icon, .rpg-char-area {
-        width: 60px;
-        height: 60px;
-        flex: 0 0 60px;
+        width: 50px;
+        height: 50px;
+        flex: 0 0 50px;
     }
 }
 
@@ -528,19 +522,18 @@
     display: inline-block;
     background: var(--primary-color);
     color: #fff;
-    padding: 4px 15px;
+    padding: 2px 12px;
     border-radius: 20px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     box-shadow: none; 
-    border: none;
 }
 
-/* メッセージテキスト (通常の濃い文字) */
+/* メッセージテキスト */
 .rpg-text-area {
-    font-size: 1rem; 
-    line-height: 1.7;
+    font-size: 0.95rem; 
+    line-height: 1.5;
     color: #333333; 
     font-weight: 600; 
     text-shadow: none;
@@ -549,7 +542,7 @@
 
 @media (max-width: 600px) {
     .rpg-text-area {
-        font-size: 0.9rem; 
+        font-size: 0.85rem; 
     }
 }
 
@@ -568,17 +561,16 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    margin-top: 15px;
-    gap: 15px;
-    flex-wrap: wrap; 
+    margin-top: 10px;
+    gap: 10px;
 }
 
 .rpg-btn {
     border: none;
-    background: rgba(255, 255, 255, 0.5); 
-    padding: 8px 16px;
+    background: #f0f0f0; 
+    padding: 6px 14px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
     color: #666;
     cursor: pointer;
@@ -594,7 +586,7 @@
 .rpg-btn-skip {
     background: transparent;
     text-decoration: underline;
-    color: #555;
+    color: #888;
     text-shadow: none;
     box-shadow: none;
 }
@@ -605,10 +597,8 @@
 .rpg-btn-next {
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: white;
-    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3); 
+    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3); 
 }
 .rpg-btn-next:hover {
     transform: scale(1.05);
-    background: linear-gradient(45deg, #ff8fa3, #ffc2cd);
-    color: white;
 }
