@@ -179,31 +179,39 @@
             transform: scale(1.02);
             background-color: #00c853;
         }
+        
+        /* マイセット用のスタイル調整 */
+        .myset-exercise-block {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .myset-exercise-title {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #555;
+            padding-bottom: 5px;
+        }
     </style>
 </head>
 <body class="session-page">
 <div class="main-container">
     <h1 th:text="${trainingTitle}"><i class="fa-solid fa-bolt-lightning header-icon"></i>セッション開始</h1>
 
-    <div class="program-card">
-        <h2 th:text="${selectedExercise}">種目名</h2>
-
-        <p class="exercise-type" th:if="${trainingType == 'free-weight'}"><i class="fa-solid fa-weight-hanging"></i> フリーウェイト</p>
-        <p class="exercise-type" th:if="${trainingType == 'cardio'}"><i class="fa-solid fa-running"></i> 有酸素運動</p>
-        <p class="exercise-type" th:if="${trainingType == 'ai-suggested'}"><i class="fa-solid fa-star"></i> AIおすすめプログラム</p>
-        
-        <div class="interval-container">
-            <h3 style="color: var(--primary-color); margin-bottom: 5px; margin-top: 20px;">インターバルタイマー</h3>
-            <div id="interval-display" class="timer-display timer-interval">01:00</div>
-            <div class="timer-settings">
-                <input type="number" id="interval-minutes" value="1" min="0" max="59" style="width: 50px;"> 分
-                <input type="number" id="interval-seconds" value="0" min="0" max="59" style="width: 50px;"> 秒
-                <button id="interval-set" class="button timer-button-tertiary"><i class="fa-solid fa-clock"></i> 設定</button>
-            </div>
-            <div class="timer-controls">
-                <button id="interval-start-pause" class="button timer-button-primary"><i class="fa-solid fa-play"></i> 開始</button>
-                <button id="interval-reset" class="button timer-button-secondary"><i class="fa-solid fa-rotate-left"></i> リセット</button>
-            </div>
+    <div class="interval-container">
+        <h3 style="color: var(--primary-color); margin-bottom: 5px; margin-top: 20px; text-align: center;">インターバルタイマー</h3>
+        <div id="interval-display" class="timer-display timer-interval" style="text-align: center;">01:00</div>
+        <div class="timer-settings">
+            <input type="number" id="interval-minutes" value="1" min="0" max="59" style="width: 50px;"> 分
+            <input type="number" id="interval-seconds" value="0" min="0" max="59" style="width: 50px;"> 秒
+            <button id="interval-set" class="button timer-button-tertiary"><i class="fa-solid fa-clock"></i> 設定</button>
+        </div>
+        <div class="timer-controls">
+            <button id="interval-start-pause" class="button timer-button-primary"><i class="fa-solid fa-play"></i> 開始</button>
+            <button id="interval-reset" class="button timer-button-secondary"><i class="fa-solid fa-rotate-left"></i> リセット</button>
         </div>
     </div>
 
@@ -226,7 +234,7 @@
                     </tr>
                 </thead>
                 <tbody id="sets-container">
-                    </tbody>
+                </tbody>
             </table>
 
             <button type="button" id="add-set-btn" class="button secondary" style="width: 100%; margin-top: 10px; padding: 10px; font-size: 0.9em;">
@@ -267,6 +275,74 @@
         </form>
     </div>
 
+    <div th:if="${trainingType == 'myset'}" class="record-form-container">
+        <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px;">
+            <i class="fa-solid fa-list-check"></i> マイセット一括記録
+        </h3>
+        <p style="color:#aaa; font-size:0.9em; margin-bottom:20px;">実施したセットのみ記録されます。未入力の種目は無視されます。</p>
+
+        <form th:action="@{/training-log/save-batch}" method="post">
+            <input type="hidden" name="recordDate" th:value="${today}">
+            
+            <div th:each="exName, stat : ${mySetExercises}" class="myset-exercise-block">
+                
+                <div th:if="${#lists.contains(cardioList, exName)}">
+                    <div class="myset-exercise-title">
+                        <i class="fa-solid fa-person-running"></i> <span th:text="${exName}">ランニング</span> (有酸素)
+                    </div>
+                    <input type="hidden" th:name="|logs[${stat.index}].exerciseName|" th:value="${exName}">
+                    <input type="hidden" th:name="|logs[${stat.index}].type|" value="CARDIO">
+                    <input type="hidden" th:name="|logs[${stat.index}].recordDate|" th:value="${today}">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">時間</label>
+                            <input type="number" th:name="|logs[${stat.index}].durationMinutes|" class="form-input" placeholder="0">
+                            <span class="unit">分</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">距離</label>
+                            <input type="number" th:name="|logs[${stat.index}].distanceKm|" class="form-input" step="0.1" placeholder="0.0">
+                            <span class="unit">km</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:unless="${#lists.contains(cardioList, exName)}">
+                    <div class="myset-exercise-title" th:text="${exName}">ベンチプレス</div>
+                    
+                    <input type="hidden" th:name="|logs[${stat.index}].exerciseName|" th:value="${exName}">
+                    <input type="hidden" th:name="|logs[${stat.index}].type|" value="WEIGHT">
+                    <input type="hidden" th:name="|logs[${stat.index}].recordDate|" th:value="${today}">
+                    
+                    <table style="width: 100%; color: white; border-collapse: separate; border-spacing: 0 5px;">
+                        <thead>
+                            <tr style="color: #aaa; font-size: 0.8em;">
+                                <th style="text-align: center; width: 15%;">Set</th>
+                                <th style="text-align: center; width: 40%;">重量 (kg)</th>
+                                <th style="text-align: center; width: 40%;">回数</th>
+                                <th style="width: 5%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody th:id="|batch-sets-container-${stat.index}|">
+                            </tbody>
+                    </table>
+                    
+                    <button type="button" class="button secondary small" 
+                            style="width: 100%; padding: 5px; font-size: 0.8em; margin-top:5px;"
+                            th:onclick="|addBatchSetRow(${stat.index})|">
+                        <i class="fa-solid fa-plus"></i> セット追加
+                    </button>
+                </div>
+
+            </div>
+            
+            <button type="submit" class="btn-finish">
+                一括記録して終了 <i class="fa-solid fa-check"></i>
+            </button>
+        </form>
+    </div>
+
     <div th:if="${trainingType == 'ai-suggested'}">
          <div class="log-placeholder" style="border-color: var(--ai-accent-color); box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);">
             <p style="color: var(--ai-accent-color); font-weight: 600;">FitBotの提案内容:</p>
@@ -299,7 +375,7 @@
 </div>
 </div>
 
-<script>
+<script th:inline="javascript">
     document.addEventListener('DOMContentLoaded', () => {
         // --- Utility function for formatting time (Minutes:Seconds) ---
         const formatTime = (ms) => {
@@ -311,14 +387,13 @@
         };
 
         // =======================================================
-        // セット追加機能 (新規追加)
+        // 1. セット追加機能 (単発記録用)
         // =======================================================
         const setsContainer = document.getElementById('sets-container');
         const addSetBtn = document.getElementById('add-set-btn');
         
         if (setsContainer && addSetBtn) {
             let setCounter = 0;
-
             const addSetRow = (weight = '', reps = '') => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -336,28 +411,64 @@
                 setsContainer.appendChild(tr);
                 setCounter++;
             };
-
-            // 行削除機能
-            window.removeRow = function(icon) {
-                const row = icon.closest('tr');
-                row.remove();
-                // ※注意: インデックスを詰め直す処理が必要な場合がありますが、
-                // Spring Bootは飛び飛びのインデックス(setList[0], setList[2]...)でもバインド可能なため
-                // 簡易実装としてそのままにしています。
-            };
-
-            // 初期状態で3セット分表示
-            addSetRow();
-            addSetRow();
-            addSetRow();
-
-            addSetBtn.addEventListener('click', () => {
-                addSetRow();
-            });
+            addSetRow(); addSetRow(); addSetRow();
+            addSetBtn.addEventListener('click', () => addSetRow());
         }
 
         // =======================================================
-        // 2. インターバルタイマー機能 (Interval Timer)
+        // 1.5. セット追加機能 (マイセット一括用)
+        // =======================================================
+        window.addBatchSetRow = function(exerciseIndex) {
+            const container = document.getElementById(`batch-sets-container-${exerciseIndex}`);
+            if (!container) return; // 有酸素運動の場合はコンテナがないのでスキップ
+
+            const currentRows = container.querySelectorAll('tr').length;
+            const nextIndex = currentRows;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="text-align: center; font-weight: bold; vertical-align: middle;">${nextIndex + 1}</td>
+                <td style="padding: 0 5px;">
+                    <input type="number" name="logs[${exerciseIndex}].setList[${nextIndex}].weight" class="form-input" step="0.5" placeholder="kg" style="text-align: center;">
+                </td>
+                <td style="padding: 0 5px;">
+                    <input type="number" name="logs[${exerciseIndex}].setList[${nextIndex}].reps" class="form-input" placeholder="回" style="text-align: center;">
+                </td>
+                <td style="text-align: center; vertical-align: middle;">
+                     <i class="fa-solid fa-trash" onclick="removeRow(this)" style="color: #666; cursor: pointer;"></i>
+                </td>
+            `;
+            container.appendChild(tr);
+        };
+
+        // マイセットの初期表示（各筋トレ種目に1セットずつ追加）
+        /*[# th:if="${trainingType == 'myset'}"]*/
+        const mySetExercises = /*[[${mySetExercises}]]*/ [];
+        const cardioList = /*[[${cardioList}]]*/ []; // Controllerから渡される有酸素リスト
+
+        if (mySetExercises && cardioList) {
+            for (let i = 0; i < mySetExercises.length; i++) {
+                // 有酸素リストに含まれていない場合のみセット行を追加
+                if (!cardioList.includes(mySetExercises[i])) {
+                    addBatchSetRow(i);
+                }
+            }
+        }
+        /*[/]*/
+
+        // 行削除機能 (共通)
+        window.removeRow = function(icon) {
+            const row = icon.closest('tr');
+            const container = row.parentElement;
+            row.remove();
+            // 番号の振り直し
+            Array.from(container.children).forEach((tr, index) => {
+                tr.querySelector('td:first-child').textContent = index + 1;
+            });
+        };
+
+        // =======================================================
+        // 2. インターバルタイマー機能
         // =======================================================
         const ivDisplay = document.getElementById('interval-display');
         const ivMinInput = document.getElementById('interval-minutes');
@@ -366,7 +477,7 @@
         const ivStartPauseBtn = document.getElementById('interval-start-pause');
         const ivResetBtn = document.getElementById('interval-reset');
 
-        let ivInitialTime = 60000; // 初期値: 1分
+        let ivInitialTime = 60000;
         let ivRemainingTime = ivInitialTime;
         let ivTimer = null;
         let isIvRunning = false;
@@ -374,7 +485,6 @@
         const updateIvDisplay = () => {
             if(!ivDisplay) return;
             ivDisplay.textContent = formatTime(ivRemainingTime);
-
             if (ivRemainingTime <= 10000 && ivRemainingTime > 0) {
                  ivDisplay.style.color = '#ff0000'; 
             } else {
@@ -388,7 +498,6 @@
             ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 開始';
             ivStartPauseBtn.classList.remove('timer-button-secondary');
             ivStartPauseBtn.classList.add('timer-button-primary');
-
             alert('インターバル終了！次のセットに移りましょう！');
         };
 
@@ -397,19 +506,16 @@
                 resetInterval();
                 return;
             }
-            
             if (!isIvRunning) {
                 isIvRunning = true;
                 ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 停止';
                 ivStartPauseBtn.classList.remove('timer-button-primary');
                 ivStartPauseBtn.classList.add('timer-button-secondary');
-
                 const startTime = Date.now() - (ivInitialTime - ivRemainingTime);
 
                 ivTimer = setInterval(() => {
                     const elapsedTime = Date.now() - startTime;
                     ivRemainingTime = ivInitialTime - elapsedTime;
-                    
                     if (ivRemainingTime <= 0) {           
                         ivRemainingTime = 0;
                         updateIvDisplay();
@@ -431,10 +537,8 @@
         const resetInterval = () => {
             clearInterval(ivTimer);
             isIvRunning = false;
-
             const minutes = parseInt(ivMinInput.value) || 0;
             const seconds = parseInt(ivSecInput.value) || 0;
-            
             const newInitialTime = (minutes * 60000) + (seconds * 1000);
             
             if (newInitialTime < 1000) {
@@ -444,9 +548,7 @@
             } else {
                 ivInitialTime = newInitialTime;
             }
-
             ivRemainingTime = ivInitialTime;
-            
             updateIvDisplay();
             ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 開始';
             ivStartPauseBtn.classList.remove('timer-button-secondary');
@@ -463,58 +565,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
