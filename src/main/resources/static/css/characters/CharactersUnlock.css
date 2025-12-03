@@ -303,11 +303,13 @@ h1 {
     pointer-events: auto;
 }
 
-/* ロックアイコンとテキスト */
-.lock-icon {
-    font-size: 28px;
-    margin-bottom: 8px;
-    color: #bdc3c7;
+/* =======================================================
+   【修正】鍵アイコンを非表示にする
+   ======================================================= */
+
+/* 既存の .lock-icon の記述を探して、中身をこれに書き換えてください */
+.character-card.locked-card .lock-overlay .lock-icon {
+    display: none !important; /* これでアイコンが消えます */
 }
 .lock-text {
     font-weight: 900;
@@ -357,4 +359,114 @@ h1 {
     .character-img-wrapper { width: 90px; height: 90px; }
     .character-card { padding: 12px; gap: 12px; min-height: 90px; }
     .character-name { font-size: 16px; }
+}
+
+/* =======================================================
+   ロック時のスタイル変更 (シルエット表示版)
+   ======================================================= */
+
+/* 1. まず中身を表示させる (元の opacity: 0 を無効化) */
+.character-card.locked-card .character-img-wrapper,
+.character-card.locked-card .card-content {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* 2. 画像を「シルエット（真っ黒な影）」にする */
+.character-card.locked-card .character-img-wrapper img {
+    /* 明るさを0にすると真っ黒なシルエットになります */
+    filter: brightness(0); 
+    opacity: 0.6; /* 少し薄くして、未入手感を出す */
+}
+
+/* 3. ロック画面のオーバーレイ（鍵アイコンがある層）の調整 */
+.character-card.locked-card .lock-overlay {
+    /* 背景を完全に塗りつぶさず、薄い黒にして下のシルエットが見えるようにする */
+    background: rgba(255, 255, 255, 0.1); 
+    /* 必要に応じて鍵アイコンの位置を調整（画像の上に重ねるなど） */
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* =======================================================
+   鍵アイコンの視認性アップ (ここを書き換えてください)
+   ======================================================= */
+
+/* 1. オーバーレイ全体（カード全体にかかる膜） */
+.character-card.locked-card .lock-overlay {
+    /* 背景を少し暗くして、ロックされている雰囲気を出す */
+    background: rgba(0, 0, 0, 0.2); 
+    z-index: 10;
+    
+    /* フレックスボックスで中央揃えを確実に */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 2. 鍵アイコン本体のデザイン変更 */
+.character-card.locked-card .lock-overlay .lock-icon {
+    color: #f1c40f; /* アイコンを「金色」に変更 */
+    font-size: 32px; /* サイズ調整 */
+    
+    /* アイコンの後ろに「黒い丸」を敷く */
+    background: rgba(0, 0, 0, 0.8); 
+    width: 64px;       /* 丸の幅 */
+    height: 64px;      /* 丸の高さ */
+    line-height: 64px; /* アイコンを上下中央に */
+    border-radius: 50%; /* 完全な円にする */
+    text-align: center; /* 左右中央 */
+    
+    /* 少し光らせてリッチにする */
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); 
+    border: 2px solid #fff; /* 白い縁取りを追加 */
+    
+    margin-bottom: 10px; /* テキストとの間隔 */
+    opacity: 1; /* 透明にしない */
+}
+
+/* =======================================================
+   ロックテキストの視認性アップ (黒文字＋白背景)
+   ======================================================= */
+
+/* 「LOCKED」と「LvXXで解放」の両方に適用するスタイル */
+.character-card.locked-card .lock-text,
+.character-card.locked-card .lock-required-level {
+    color: #333 !important; /* 文字色を濃いグレー（黒）に */
+    background: rgba(255, 255, 255, 0.9); /* 背景を白（少し透過）に */
+    
+    padding: 5px 15px;      /* 文字の周りの余白 */
+    border-radius: 20px;    /* 丸みを帯びた形状に */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* 影をつけて浮かせる */
+    
+    font-weight: bold;      /* 太字 */
+    text-shadow: none;      /* 以前の影設定があれば消す */
+    margin-bottom: 8px;     /* 下の要素との隙間 */
+    width: auto;            /* 幅は文字数に合わせる */
+    display: inline-block;  /* ブロック状にする */
+}
+
+/* 「LOCKED」の文字サイズ調整 */
+.character-card.locked-card .lock-text {
+    font-size: 16px;
+    letter-spacing: 2px;
+}
+
+/* 「LvXXで解放」の文字サイズ調整 */
+.character-card.locked-card .lock-required-level {
+    font-size: 13px;
+    color: #e74c3c !important; /* ここだけ赤文字にして目立たせるのもおすすめ（お好みで#333でもOK） */
+}
+
+/* 4. ロック中のテキスト（素材数など）の見た目 */
+.character-card.locked-card .card-content {
+    /* 少しグレーにして「まだ有効じゃない」感を出す */
+    color: #7f8c8d; 
+}
+
+/* ただし、クリックなどの操作は禁止のままにする */
+.character-card.locked-card {
+    pointer-events: none;
 }

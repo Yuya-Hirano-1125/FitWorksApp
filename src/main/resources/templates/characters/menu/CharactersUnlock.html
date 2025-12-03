@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>キャラクター進化パス - 全属性Lv10刻み版</title>
+    <title>キャラクター進化パス - Storage同期版</title>
     <link rel="stylesheet" th:href="@{/css/base.css}" href="base.css">
     <link rel="stylesheet" th:href="@{/css/characters/CharactersUnlock.css}" href="CharactersUnlock.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -25,27 +25,31 @@
     <div class="battle-pass-wrapper">
 
         <div class="pass-section">
-            <h2 class="attribute-heading fire-color">🔥 炎の系譜</h2>
+            <h2 class="attribute-heading fire-color">🔥 炎の系譜 (Lv.1〜)</h2>
             <div class="pass-track-container">
                 <div class="pass-track">
                     <div class="track-line"></div>
-                    <div class="track-line-progress" id="progress-fire" style="height: 10%;"></div>
+                    <div class="track-line-progress" id="progress-fire" style="height: 0%;"></div>
 
                     <div class="pass-node claimed">
                         <div class="node-marker"><i class="fa-solid fa-check"></i></div>
-                        <div class="character-card fire">
+                        <div class="character-card fire js-card" data-req-level="1" data-cost="0" data-type="fire">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★1</div>
                                 <img class="character-img" th:src="@{/img/character/0.png}" src="/img/character/0.png" alt="エンバーハート">
                             </div>
                             <div class="card-content">
                                 <p class="character-name">エンバーハート</p>
-                                <div class="requirements-box"><span class="req-met">取得済み</span></div>
+                                <div class="requirements-box">
+                                    <div class="req-row js-req-level">Lv.1</div>
+                                    <div class="req-row js-req-material">初期所持</div>
+                                </div>
+                                <button class="evolve-btn disabled js-evolve-btn">入手済み</button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
                         <div class="character-card fire locked-card js-card" data-req-level="10" data-cost="5" data-type="fire">
                             <div class="character-img-wrapper">
@@ -68,7 +72,7 @@
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
                         <div class="character-card fire locked-card js-card" data-req-level="20" data-cost="10" data-type="fire">
                             <div class="character-img-wrapper">
@@ -91,7 +95,7 @@
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
                         <div class="character-card fire locked-card js-card" data-req-level="30" data-cost="20" data-type="fire">
                             <div class="character-img-wrapper">
@@ -118,29 +122,38 @@
         </div>
 
         <div class="pass-section">
-            <h2 class="attribute-heading water-color">💧 水の系譜</h2>
+            <h2 class="attribute-heading water-color">💧 水の系譜 (Lv.40〜)</h2>
             <div class="pass-track-container">
                 <div class="pass-track">
                     <div class="track-line"></div>
-                    <div class="track-line-progress" id="progress-water" style="height: 10%;"></div>
+                    <div class="track-line-progress" id="progress-water" style="height: 0%;"></div>
 
-                    <div class="pass-node claimed">
-                        <div class="node-marker"><i class="fa-solid fa-check"></i></div>
-                        <div class="character-card water">
+                    <div class="pass-node">
+                        <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
+                        <div class="character-card water locked-card js-card" data-req-level="40" data-cost="10" data-type="water">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★1</div>
                                 <img class="character-img" th:src="@{/img/character/40.png}" src="/img/character/40.png" alt="ルーナドロップ">
                             </div>
                             <div class="card-content">
                                 <p class="character-name">ルーナドロップ</p>
-                                <div class="requirements-box"><span class="req-met">取得済み</span></div>
+                                <div class="requirements-box">
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.40</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/10</div>
+                                </div>
+                                <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
+                            </div>
+                            <div class="lock-overlay">
+                                <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
+                                <p class="lock-text">LOCKED</p>
+                                <p class="lock-required-level">Lv.40で解放</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card water locked-card js-card" data-req-level="10" data-cost="5" data-type="water">
+                        <div class="character-card water locked-card js-card" data-req-level="50" data-cost="15" data-type="water">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★2</div>
                                 <img class="character-img" th:src="@{/img/character/50.png}" src="/img/character/50.png" alt="ドリー">
@@ -148,22 +161,22 @@
                             <div class="card-content">
                                 <p class="character-name">ドリー</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.10</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/5</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.50</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/15</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.10で解放</p>
+                                <p class="lock-required-level">Lv.50で解放</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card water locked-card js-card" data-req-level="20" data-cost="10" data-type="water">
+                        <div class="character-card water locked-card js-card" data-req-level="60" data-cost="20" data-type="water">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★3</div>
                                 <img class="character-img" th:src="@{/img/character/60.png}" src="/img/character/60.png" alt="ドルフィ">
@@ -171,22 +184,22 @@
                             <div class="card-content">
                                 <p class="character-name">ドルフィ</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.20</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/10</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.60</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/20</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.20で解放</p>
+                                <p class="lock-required-level">Lv.60で解放</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card water locked-card js-card" data-req-level="30" data-cost="20" data-type="water">
+                        <div class="character-card water locked-card js-card" data-req-level="70" data-cost="25" data-type="water">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★4</div>
                                 <img class="character-img" th:src="@{/img/character/70.png}" src="/img/character/70.png" alt="ドルフィナス">
@@ -194,15 +207,15 @@
                             <div class="card-content">
                                 <p class="character-name">ドルフィナス</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.30</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/20</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.70</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/25</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.30で解放</p>
+                                <p class="lock-required-level">Lv.70で解放</p>
                             </div>
                         </div>
                     </div>
@@ -211,29 +224,38 @@
         </div>
 
         <div class="pass-section">
-            <h2 class="attribute-heading grass-color">🌿 草の系譜</h2>
+            <h2 class="attribute-heading grass-color">🌿 草の系譜 (Lv.80〜)</h2>
             <div class="pass-track-container">
                 <div class="pass-track">
                     <div class="track-line"></div>
-                    <div class="track-line-progress" id="progress-grass" style="height: 10%;"></div>
+                    <div class="track-line-progress" id="progress-grass" style="height: 0%;"></div>
 
-                    <div class="pass-node claimed">
-                        <div class="node-marker"><i class="fa-solid fa-check"></i></div>
-                        <div class="character-card grass">
+                    <div class="pass-node">
+                        <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
+                        <div class="character-card grass locked-card js-card" data-req-level="80" data-cost="20" data-type="grass">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★1</div>
                                 <img class="character-img" th:src="@{/img/character/80.png}" src="/img/character/80.png" alt="フォリアン">
                             </div>
                             <div class="card-content">
                                 <p class="character-name">フォリアン</p>
-                                <div class="requirements-box"><span class="req-met">取得済み</span></div>
+                                <div class="requirements-box">
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.80</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/20</div>
+                                </div>
+                                <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
+                            </div>
+                            <div class="lock-overlay">
+                                <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
+                                <p class="lock-text">LOCKED</p>
+                                <p class="lock-required-level">Lv.80で解放</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card grass locked-card js-card" data-req-level="10" data-cost="5" data-type="grass">
+                        <div class="character-card grass locked-card js-card" data-req-level="90" data-cost="25" data-type="grass">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★2</div>
                                 <img class="character-img" th:src="@{/img/character/90.png}" src="/img/character/90.png" alt="シル">
@@ -241,45 +263,45 @@
                             <div class="card-content">
                                 <p class="character-name">シル</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.10</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/5</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.90</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/25</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.10で解放</p>
+                                <p class="lock-required-level">Lv.90で解放</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card grass locked-card js-card" data-req-level="20" data-cost="10" data-type="grass">
+                        <div class="character-card grass locked-card js-card" data-req-level="100" data-cost="30" data-type="grass">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★3</div>
-                                <img class="character-img" th:src="@{/img/character/100.png}" src="/img/character/100.png" alt="シルファ">
+                                <img class="character-img" th:src="@{/img/character/100.png}" src="/img/character/100.png" alt="シルフィ">
                             </div>
                             <div class="card-content">
-                                <p class="character-name">シルファ</p>
+                                <p class="character-name">シルフィ</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.20</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/10</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.100</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/30</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.20で解放</p>
+                                <p class="lock-required-level">Lv.100で解放</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card grass locked-card js-card" data-req-level="30" data-cost="20" data-type="grass">
+                        <div class="character-card grass locked-card js-card" data-req-level="110" data-cost="35" data-type="grass">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★4</div>
                                 <img class="character-img" th:src="@{/img/character/110.png}" src="/img/character/110.png" alt="シルフィナ">
@@ -287,15 +309,15 @@
                             <div class="card-content">
                                 <p class="character-name">シルフィナ</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.30</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/20</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.110</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/35</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.30で解放</p>
+                                <p class="lock-required-level">Lv.110で解放</p>
                             </div>
                         </div>
                     </div>
@@ -304,29 +326,38 @@
         </div>
 
         <div class="pass-section">
-            <h2 class="attribute-heading light-color">✨ 光の系譜</h2>
+            <h2 class="attribute-heading light-color">✨ 光の系譜 (Lv.120〜)</h2>
             <div class="pass-track-container">
                 <div class="pass-track">
                     <div class="track-line"></div>
-                    <div class="track-line-progress" id="progress-light" style="height: 10%;"></div>
+                    <div class="track-line-progress" id="progress-light" style="height: 0%;"></div>
 
-                    <div class="pass-node claimed">
-                        <div class="node-marker"><i class="fa-solid fa-check"></i></div>
-                        <div class="character-card light">
+                    <div class="pass-node">
+                        <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
+                        <div class="character-card light locked-card js-card" data-req-level="120" data-cost="30" data-type="light">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★1</div>
                                 <img class="character-img" th:src="@{/img/character/120.png}" src="/img/character/120.png" alt="ハローネスト">
                             </div>
                             <div class="card-content">
                                 <p class="character-name">ハローネスト</p>
-                                <div class="requirements-box"><span class="req-met">取得済み</span></div>
+                                <div class="requirements-box">
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.120</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/30</div>
+                                </div>
+                                <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
+                            </div>
+                            <div class="lock-overlay">
+                                <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
+                                <p class="lock-text">LOCKED</p>
+                                <p class="lock-required-level">Lv.120で解放</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card light locked-card js-card" data-req-level="10" data-cost="5" data-type="light">
+                        <div class="character-card light locked-card js-card" data-req-level="130" data-cost="35" data-type="light">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★2</div>
                                 <img class="character-img" th:src="@{/img/character/130.png}" src="/img/character/130.png" alt="メリー">
@@ -334,45 +365,45 @@
                             <div class="card-content">
                                 <p class="character-name">メリー</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.10</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/5</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.130</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/35</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.10で解放</p>
+                                <p class="lock-required-level">Lv.130で解放</p>
                             </div>
                         </div>
                     </div>
-
-                    <div class="pass-node locked">
+                    
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card light locked-card js-card" data-req-level="20" data-cost="10" data-type="light">
+                        <div class="character-card light locked-card js-card" data-req-level="140" data-cost="40" data-type="light">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★3</div>
-                                <img class="character-img" th:src="@{/img/character/140.png}" src="/img/character/140.png" alt="メリル">
+                                <img class="character-img" th:src="@{/img/character/140.png}" src="/img/character/140.png" alt="メリノ">
                             </div>
                             <div class="card-content">
-                                <p class="character-name">メリル</p>
+                                <p class="character-name">メリノ</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.20</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/10</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.140</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/40</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.20で解放</p>
+                                <p class="lock-required-level">Lv.140で解放</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card light locked-card js-card" data-req-level="30" data-cost="20" data-type="light">
+                        <div class="character-card light locked-card js-card" data-req-level="150" data-cost="50" data-type="light">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★4</div>
                                 <img class="character-img" th:src="@{/img/character/150.png}" src="/img/character/150.png" alt="メリノア">
@@ -380,15 +411,15 @@
                             <div class="card-content">
                                 <p class="character-name">メリノア</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.30</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/20</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.150</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/50</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.30で解放</p>
+                                <p class="lock-required-level">Lv.150で解放</p>
                             </div>
                         </div>
                     </div>
@@ -397,29 +428,38 @@
         </div>
 
         <div class="pass-section">
-            <h2 class="attribute-heading dark-color">🌑 闇の系譜</h2>
+            <h2 class="attribute-heading dark-color">🌑 闇の系譜 (Lv.160〜)</h2>
             <div class="pass-track-container">
                 <div class="pass-track">
                     <div class="track-line"></div>
-                    <div class="track-line-progress" id="progress-dark" style="height: 10%;"></div>
+                    <div class="track-line-progress" id="progress-dark" style="height: 0%;"></div>
 
-                    <div class="pass-node claimed">
-                        <div class="node-marker"><i class="fa-solid fa-check"></i></div>
-                        <div class="character-card dark">
+                    <div class="pass-node">
+                        <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
+                        <div class="character-card dark locked-card js-card" data-req-level="160" data-cost="40" data-type="dark">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★1</div>
                                 <img class="character-img" th:src="@{/img/character/160.png}" src="/img/character/160.png" alt="ネビュリス">
                             </div>
                             <div class="card-content">
                                 <p class="character-name">ネビュリス</p>
-                                <div class="requirements-box"><span class="req-met">取得済み</span></div>
+                                <div class="requirements-box">
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.160</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/40</div>
+                                </div>
+                                <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
+                            </div>
+                            <div class="lock-overlay">
+                                <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
+                                <p class="lock-text">LOCKED</p>
+                                <p class="lock-required-level">Lv.160で解放</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card dark locked-card js-card" data-req-level="10" data-cost="5" data-type="dark">
+                        <div class="character-card dark locked-card js-card" data-req-level="170" data-cost="45" data-type="dark">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★2</div>
                                 <img class="character-img" th:src="@{/img/character/170.png}" src="/img/character/170.png" alt="ロービ">
@@ -427,22 +467,22 @@
                             <div class="card-content">
                                 <p class="character-name">ロービ</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.10</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/5</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.170</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/45</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.10で解放</p>
+                                <p class="lock-required-level">Lv.170で解放</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card dark locked-card js-card" data-req-level="20" data-cost="10" data-type="dark">
+                        <div class="character-card dark locked-card js-card" data-req-level="180" data-cost="50" data-type="dark">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★3</div>
                                 <img class="character-img" th:src="@{/img/character/180.png}" src="/img/character/180.png" alt="ローバス">
@@ -450,22 +490,22 @@
                             <div class="card-content">
                                 <p class="character-name">ローバス</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.20</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/10</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.180</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/50</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.20で解放</p>
+                                <p class="lock-required-level">Lv.180で解放</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="pass-node locked">
+                    <div class="pass-node">
                         <div class="node-marker"><i class="fa-solid fa-lock"></i></div>
-                        <div class="character-card dark locked-card js-card" data-req-level="30" data-cost="20" data-type="dark">
+                        <div class="character-card dark locked-card js-card" data-req-level="190" data-cost="55" data-type="dark">
                             <div class="character-img-wrapper">
                                 <div class="evolution-tag">★4</div>
                                 <img class="character-img" th:src="@{/img/character/190.png}" src="/img/character/190.png" alt="ロービアス">
@@ -473,15 +513,15 @@
                             <div class="card-content">
                                 <p class="character-name">ロービアス</p>
                                 <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.30</div>
-                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/20</div>
+                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.190</div>
+                                    <div class="req-row js-req-material"><i class="fa-solid fa-cubes"></i> 素材 0/55</div>
                                 </div>
                                 <button class="evolve-btn disabled js-evolve-btn">進化させる！</button>
                             </div>
                             <div class="lock-overlay">
                                 <span class="lock-icon"><i class="fa-solid fa-lock"></i></span>
                                 <p class="lock-text">LOCKED</p>
-                                <p class="lock-required-level">Lv.30で解放</p>
+                                <p class="lock-required-level">Lv.190で解放</p>
                             </div>
                         </div>
                     </div>
@@ -533,191 +573,6 @@
         </a>
     </div>
 
-	<script>
-	        // グローバル変数としてゲーム状態を定義
-	        window.gameState = {
-	            level: 1,
-	            stones: {
-	                fire: 0,
-	                water: 0,
-	                grass: 0,
-	                light: 0,
-	                dark: 0
-	            }
-	        };
-
-	        document.addEventListener('DOMContentLoaded', () => {
-	            updateUI();
-	        });
-
-	        /* --- UI更新のメインロジック --- */
-	        function updateUI() {
-	            // 1. ヘッダーのステータス更新
-	            const levelEl = document.getElementById('current-level');
-	            if(levelEl) levelEl.textContent = window.gameState.level;
-
-	            ['fire', 'water', 'grass', 'light', 'dark'].forEach(type => {
-	                const el = document.getElementById(`stone-${type}`);
-	                if(el) el.textContent = window.gameState.stones[type];
-	            });
-
-	            // 2. カードごとの判定
-	            const cards = document.querySelectorAll('.js-card');
-	            cards.forEach(card => {
-	                const reqLevel = parseInt(card.getAttribute('data-req-level'), 10);
-	                const cost = parseInt(card.getAttribute('data-cost'), 10);
-	                const type = card.getAttribute('data-type'); 
-
-	                // 現在の素材数などを取得
-	                const currentStone = window.gameState.stones[type] || 0;
-	                const evolveBtn = card.querySelector('.js-evolve-btn');
-	                const levelText = card.querySelector('.js-req-level');
-	                const materialText = card.querySelector('.js-req-material');
-
-	                // ★修正点: ロック状態に関わらず、まずはテキスト情報を最新に更新する
-	                
-	                // (1) レベル条件の表示更新
-	                if(levelText) {
-	                    if (window.gameState.level >= reqLevel) {
-	                        levelText.innerHTML = `<i class="fa-solid fa-crown"></i> Lv.${reqLevel} OK`;
-	                        levelText.className = 'req-row met';
-	                    } else {
-	                        levelText.innerHTML = `<i class="fa-solid fa-crown"></i> Lv.${reqLevel}`;
-	                        levelText.className = 'req-row unmet'; // 赤文字
-	                    }
-	                }
-
-	                // (2) 素材条件の表示更新
-	                if(materialText) {
-	                    if (currentStone >= cost) {
-	                        materialText.innerHTML = `<i class="fa-solid fa-cubes"></i> 素材 ${currentStone}/${cost} OK`;
-	                        materialText.className = 'req-row met'; // 緑文字
-	                    } else {
-	                        materialText.innerHTML = `<i class="fa-solid fa-cubes"></i> 素材 ${currentStone}/${cost}`;
-	                        materialText.className = 'req-row unmet'; // 赤文字
-	                    }
-	                }
-
-	                // --- ここからロック解除＆ボタン制御判定 ---
-
-	                // A. レベルロック判定
-	                if (window.gameState.level >= reqLevel) {
-	                    // レベル条件クリア -> ロック解除処理
-	                    if (card.classList.contains('locked-card')) {
-	                        card.classList.remove('locked-card');
-	                        const marker = card.closest('.pass-node').querySelector('.node-marker');
-	                        if(marker) {
-	                            marker.innerHTML = '<i class="fa-solid fa-angles-down"></i>';
-	                            marker.style.background = '#e67e22';
-	                        }
-	                    }
-
-	                    // B. 進化ボタンの制御 (素材が足りているか)
-	                    if (currentStone >= cost) {
-	                        // 進化可能！
-	                        if(evolveBtn) {
-	                            evolveBtn.classList.remove('disabled');
-	                            evolveBtn.textContent = "進化可能！";
-	                            evolveBtn.onclick = null; 
-	                            evolveBtn.onclick = () => window.executeEvolution(card, type, cost);
-	                        }
-	                        card.classList.add('ready-to-evolve');
-	                    } else {
-	                        // 素材不足
-	                        if(evolveBtn) {
-	                            evolveBtn.classList.add('disabled');
-	                            evolveBtn.textContent = "素材不足";
-	                            evolveBtn.onclick = null;
-	                        }
-	                        card.classList.remove('ready-to-evolve');
-	                    }
-
-	                } else {
-	                    // レベル不足 -> ロック継続
-	                    card.classList.add('locked-card');
-	                    // ボタンなどは無効化のまま
-	                    if(evolveBtn) {
-	                        evolveBtn.classList.add('disabled');
-	                        evolveBtn.textContent = "Lv不足"; // ボタンの文言も変えておくと親切
-	                    }
-	                }
-	            });
-
-	            // 3. 進捗バー更新
-	            ['fire', 'water', 'grass', 'light', 'dark'].forEach(type => {
-	                updateProgressBar(type);
-	            });
-	        }
-
-	        /* --- 進捗バー --- */
-	        function updateProgressBar(type) {
-	            const track = document.getElementById(`progress-${type}`);
-	            if(!track) return;
-	            const allCards = document.querySelectorAll(`.character-card.${type}`);
-	            const unlockedCards = document.querySelectorAll(`.character-card.${type}:not(.locked-card)`);
-	            if(allCards.length > 0) {
-	                let progress = (unlockedCards.length / allCards.length) * 100;
-	                if(progress < 10) progress = 10; 
-	                track.style.height = `${progress}%`;
-	            }
-	        }
-
-	        /* --- グローバル関数 (操作用) --- */
-	        window.addLevel = function(amount) {
-	            window.gameState.level += amount;
-	            updateUI();
-	        };
-
-	        window.addStone = function(type, amount) {
-	            window.gameState.stones[type] += amount;
-	            updateUI();
-	        };
-
-	        window.resetAll = function() {
-	            window.gameState.level = 1;
-	            window.gameState.stones = { fire: 0, water: 0, grass: 0, light: 0, dark: 0 };
-	            
-	            // リセット処理
-	            const cards = document.querySelectorAll('.js-card');
-	            cards.forEach(card => {
-	                card.classList.add('locked-card');
-	                card.classList.remove('ready-to-evolve');
-	                const marker = card.closest('.pass-node').querySelector('.node-marker');
-	                if(marker) {
-	                    marker.innerHTML = '<i class="fa-solid fa-lock"></i>';
-	                    marker.style.background = '#bdc3c7';
-	                }
-	                const btn = card.querySelector('.js-evolve-btn');
-	                if(btn) {
-	                    btn.classList.add('disabled');
-	                    btn.textContent = "進化させる！";
-	                    btn.style.background = "";
-	                }
-	            });
-	            updateUI();
-	        };
-
-	        window.executeEvolution = function(card, type, cost) {
-	            if (!confirm(`素材を${cost}個消費して進化させますか？`)) return;
-	            window.gameState.stones[type] -= cost;
-	            updateUI();
-	            
-	            // 進化完了演出
-	            card.classList.remove('ready-to-evolve');
-	            const btn = card.querySelector('.js-evolve-btn');
-	            if(btn) {
-	                btn.textContent = "進化完了";
-	                btn.classList.add('disabled');
-	                btn.style.background = "#2ecc71";
-	                btn.onclick = null;
-	            }
-	            const marker = card.closest('.pass-node').querySelector('.node-marker');
-	            if(marker) {
-	                marker.innerHTML = '<i class="fa-solid fa-check"></i>';
-	                marker.style.background = '#2ecc71';
-	            }
-	            alert("進化しました！");
-	        };
-	    </script>
+    <script th:src="@{/js/characters/CharactersUnlock.js}" src="CharactersUnlock.js"></script>
 </body>
 </html>
