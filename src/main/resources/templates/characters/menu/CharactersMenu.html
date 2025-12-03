@@ -22,6 +22,7 @@
 
     <div class="menu-list">
         
+        <!-- キャラクター解放 -->
         <a th:href="@{/characters/menu/CharactersUnlock}" class="menu-button style-unlock">
             <div class="icon-area"><i class="fa-solid fa-lock-open"></i></div>
             <div class="text-area">
@@ -31,7 +32,8 @@
             <i class="fa-solid fa-chevron-right arrow-icon"></i>
         </a>
 
-         <a th:href="@{/characters/menu/CharactersStorage}" class="menu-button style-unlock">
+        <!-- キャラクター一覧 -->
+        <a th:href="@{/characters/menu/CharactersStorage}" class="menu-button style-unlock">
             <div class="icon-area"><i class="fa-solid fa-users"></i></div>
             <div class="text-area">
                 <span class="main-text">キャラクター一覧</span>
@@ -40,15 +42,17 @@
             <i class="fa-solid fa-chevron-right arrow-icon"></i>
         </a>
 
-       <a th:href="@{/characters/menu/CharactersItem}" class="menu-button style-unlock">
-            <div class="icon-area"><i class="fa-solid fa-cubes"></i></div>
+        <!-- 進化素材一覧 -->
+        <a th:href="@{/characters/menu/CharactersEvolutionMaterial}" class="menu-button style-unlock">
+            <div class="icon-area"><i class="fa-solid fa-gem"></i></div>
             <div class="text-area">
-                <span class="main-text">素材一覧</span>
-                <span class="sub-text">育成アイテムの確認</span>
+                <span class="main-text">進化素材一覧</span>
+                <span class="sub-text">進化に必要な素材を確認</span>
             </div>
             <i class="fa-solid fa-chevron-right arrow-icon"></i>
         </a>
 
+        <!-- 背景一覧 -->
         <a href="#" class="menu-button style-backgrounds">
             <div class="icon-area"><i class="fa-solid fa-image"></i></div>
             <div class="text-area">
@@ -57,11 +61,13 @@
             </div>
             <i class="fa-solid fa-chevron-right arrow-icon"></i>
         </a>
-		<div class="back-btn-container">
-		            <a th:href="@{/home}" class="button secondary">
-		                <i class="fa-solid fa-house"></i> ホームに戻る
-		            </a>
-		        </div>
+
+        <!-- ホームに戻る -->
+        <div class="back-btn-container">
+            <a th:href="@{/home}" class="button secondary">
+                <i class="fa-solid fa-house"></i> ホームに戻る
+            </a>
+        </div>
 
     </div>
 </div>

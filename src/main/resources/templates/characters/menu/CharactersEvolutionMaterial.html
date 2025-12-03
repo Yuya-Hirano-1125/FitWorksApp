@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>進化素材一覧 | FitWorks</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/characters/CharactersEvolutionMaterial.css}">
+</head>
+<body>
+<div class="main-container">
+    <div class="header-section">
+        <h1>進化素材一覧</h1>
+        <p class="sub-heading">モンスター進化に必要な素材を確認できます</p>
+    </div>
+
+    <!-- R素材 -->
+    <section class="material-section rarity-r">
+        <h2>R素材</h2>
+        <div class="material-list">
+            <div th:each="mat : ${rMaterials}" class="material-card">
+                <img th:src="@{'/images/materials/' + ${mat.image}}" th:alt="${mat.name}">
+                <p class="material-name" th:text="${mat.name}"></p>
+                <p class="material-count" th:text="${mat.owned} + '/' + ${mat.required}"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SR素材 -->
+    <section class="material-section rarity-sr">
+        <h2>SR素材</h2>
+        <div class="material-list">
+            <div th:each="mat : ${srMaterials}" class="material-card">
+                <img th:src="@{'/images/materials/' + ${mat.image}}" th:alt="${mat.name}">
+                <p class="material-name" th:text="${mat.name}"></p>
+                <p class="material-count" th:text="${mat.owned} + '/' + ${mat.required}"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SSR素材 -->
+    <section class="material-section rarity-ssr">
+        <h2>SSR素材</h2>
+        <div class="material-list">
+            <div th:each="mat : ${ssrMaterials}" class="material-card">
+                <img th:src="@{'/images/materials/' + ${mat.image}}" th:alt="${mat.name}">
+                <p class="material-name" th:text="${mat.name}"></p>
+                <p class="material-count" th:text="${mat.owned} + '/' + ${mat.required}"></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 戻るボタンをキャラクターメニューに修正 -->
+    <div class="back-btn-container">
+        <a th:href="@{/characters/menu/CharactersMenu}" class="button secondary">
+            <i class="fa-solid fa-arrow-left"></i> メニューに戻る
+        </a>
+    </div>
+</div>
+</body>
+</html>
