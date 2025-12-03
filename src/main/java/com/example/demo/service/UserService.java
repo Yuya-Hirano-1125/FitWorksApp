@@ -1,8 +1,14 @@
 package com.example.demo.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime; // 追加
 import java.util.Optional;
+import java.util.UUID; // 追加
 
+import org.springframework.beans.factory.annotation.Autowired; // 追加
+import org.springframework.beans.factory.annotation.Value; // 追加
+import org.springframework.mail.SimpleMailMessage; // 追加
+import org.springframework.mail.javamail.JavaMailSender; // 追加
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +25,14 @@ public class UserService {
     private final TrainingRecordRepository trainingRecordRepository; 
     private final PasswordEncoder passwordEncoder; 
 
+    // ★追加: メールセンダー
+    @Autowired
+    private JavaMailSender mailSender;
+
+    // ★追加: ベースURL (application.propertiesから取得)
+    @Value("${app.base-url}")
+    private String baseUrl;
+
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, TrainingRecordRepository trainingRecordRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -33,7 +47,7 @@ public class UserService {
             throw new IllegalArgumentException("そのユーザー名は既に使用されています。");
         }
 
-        // 2. メールアドレスの重複チェック (UserRepositoryにfindByEmailがある前提)
+        // 2. メールアドレスの重複チェック
         if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("そのメールアドレスは既に使用されています。");
         }
@@ -45,7 +59,7 @@ public class UserService {
         // パスワードをBCryptでハッシュ化して保存
         newUser.setPassword(passwordEncoder.encode(rawPassword));
         
-        // 初期設定 (必要に応じて)
+        // 初期設定
         newUser.setLevel(1);
         newUser.setExperiencePoints(0);
         newUser.setTheme("default");
@@ -68,13 +82,48 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
     
+    // ★修正: パスワードリセット処理（メール送信実装）
+    @Transactional
     public boolean processForgotPassword(String email) {
         Optional<User> optionalUser = findByEmail(email);
         if (optionalUser.isPresent()) {
-            System.out.println("パスワードリセットリンクをメールアドレス: " + email + " に送信しました。 (模擬)");
+            User user = optionalUser.get();
+            
+            // 1. トークンの生成 (UUID)
+            String token = UUID.randomUUID().toString();
+            
+            // 2. ユーザー情報にトークンと有効期限(例: 24時間)を保存
+            user.setResetPasswordToken(token);
+            user.setTokenExpiration(LocalDateTime.now().plusHours(24));
+            userRepository.save(user); // DB更新
+            
+            // 3. リセットリンクの作成
+            String resetLink = baseUrl + "/reset-password?token=" + token;
+            
+            // 4. メール送信
+            sendResetEmail(user.getEmail(), resetLink);
+            
+            System.out.println("パスワードリセットリンクを送信しました: " + email);
             return true;
         } else {
+            System.out.println("メールアドレスが見つかりません: " + email);
             return false;
+        }
+    }
+
+    // ★追加: メール送信のヘルパーメソッド
+    private void sendResetEmail(String toEmail, String resetLink) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("noreply@fitworks.com"); // 送信元(設定によっては上書きされる場合あり)
+            message.setTo(toEmail);
+            message.setSubject("【FitWorks】パスワード再設定のご案内");
+            message.setText("以下のリンクをクリックしてパスワードを再設定してください。\n\n" + resetLink + "\n\n(このリンクは24時間有効です)");
+            
+            mailSender.send(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("メール送信に失敗しました: " + e.getMessage());
         }
     }
     

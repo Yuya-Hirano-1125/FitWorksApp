@@ -50,6 +50,8 @@ dependencies {
 
     // --- Gemini AI SDK ---
     implementation 'com.google.genai:google-genai:1.28.0'
+    
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {

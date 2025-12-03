@@ -1,6 +1,7 @@
 package com.example.demo.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime; // 追加
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -57,6 +58,10 @@ public class User {
 
     // 4. テーマ設定 (デフォルト "default")
     private String theme = "default";
+
+    // ★★★ 追加: パスワードリセット用トークンと有効期限 ★★★
+    private String resetPasswordToken;
+    private LocalDateTime tokenExpiration;
 
     public User() {
         if (this.level == null) this.level = 1;
@@ -129,6 +134,13 @@ public class User {
     public String getTheme() { return theme != null ? theme : "default"; }
     public void setTheme(String theme) { this.theme = theme; }
     
+    // ★★★ 追加: トークン用のGetter/Setter ★★★
+    public String getResetPasswordToken() { return resetPasswordToken; }
+    public void setResetPasswordToken(String resetPasswordToken) { this.resetPasswordToken = resetPasswordToken; }
+
+    public LocalDateTime getTokenExpiration() { return tokenExpiration; }
+    public void setTokenExpiration(LocalDateTime tokenExpiration) { this.tokenExpiration = tokenExpiration; }
+
     // --- レベルアップ関連 ---
     public int calculateRequiredXp() {
         int currentLevel = getLevel(); 
