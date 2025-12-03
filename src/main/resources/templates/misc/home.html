@@ -258,26 +258,38 @@
 
     let currentRpgStep = 0;
     let typeWriterInterval;
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_done_v3'; // キー更新
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_done_v3';
 
     document.addEventListener('DOMContentLoaded', function() {
         if (!localStorage.getItem(STORAGE_KEY_RPG)) {
             setTimeout(() => startRpgTutorial(false), 500);
         }
         
-        // ★ 追加: リサイズ・スクロール時に枠の位置を再計算する
+        // リサイズ・スクロール時に枠の位置を再計算する
         window.addEventListener('resize', updateFocusPosition);
         window.addEventListener('scroll', updateFocusPosition);
+        
+        // ★重要: チュートリアル中は他のボタンのクリックをブロックする
+        document.addEventListener('click', function(e) {
+            const backdrop = document.getElementById('tutorial-backdrop');
+            if (backdrop && backdrop.classList.contains('active')) {
+                // チュートリアルボックス内のクリックは許可
+                if (e.target.closest('#tutorial-rpg-box')) return;
+                
+                // それ以外（背景や他のボタン）のクリックは無効化
+                e.stopPropagation();
+                e.preventDefault();
+            }
+        }, true); // Captureフェーズで実行
     });
     
     // 現在のステップに合わせて枠位置を更新する関数
     function updateFocusPosition() {
-        // チュートリアルが表示中かつ、ステップデータがある場合のみ実行
         const backdrop = document.getElementById('tutorial-backdrop');
         if (backdrop && backdrop.classList.contains('active')) {
             const step = rpgSteps[currentRpgStep];
             if (step && step.targetId) {
-                moveFocusRing(step.targetId, false); // false = スクロールはさせない（位置更新のみ）
+                moveFocusRing(step.targetId, false); // false = スクロールはさせない
             } else {
                 moveFocusRing(null);
             }
@@ -319,7 +331,6 @@
         if (typeWriterInterval) clearInterval(typeWriterInterval);
         
         let i = 0;
-        const displayHtml = text.replace(/\n/g, '<br>');
         const chars = [...text]; 
         
         typeWriterInterval = setInterval(() => {
@@ -340,7 +351,7 @@
         }, 30);
     }
 
-    // shouldScroll = trueなら画面スクロールする、falseなら位置更新だけ
+    // shouldScroll = trueなら画面スクロールする
     function moveFocusRing(targetId, shouldScroll = true) {
         const ring = document.getElementById('tutorial-focus-ring');
         

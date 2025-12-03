@@ -378,10 +378,10 @@
     color: var(--primary-color);
 }
 
-/* 暗幕（修正）：
-   背景色を透明に設定。
-   これは「クリック防止」の役割のみ担当します。
-   暗がり表現は下の .tutorial-focus-ring で行います。
+/* 暗幕（修正）:
+   pointer-events: none を追加することで、
+   この要素がタッチやクリックを遮断しないようにします。
+   これにより、背面のスクロールが可能になります。
 */
 .tutorial-backdrop {
     position: fixed;
@@ -391,34 +391,31 @@
     bottom: 0;
     width: auto;
     height: auto;
-    background: transparent; /* ここを透明に！ */
+    background: transparent; 
     z-index: 9000;
     display: none;
     margin: 0;
     padding: 0;
+    pointer-events: none; /* ★重要: これでスクロール可能に！ */
 }
 .tutorial-backdrop.active {
     display: block;
 }
 
-/* ターゲットスコープ（修正）：
-   box-shadowを使って「枠の外側」をすべて暗くします。
-   枠の内側は透明なので、下のコンテンツがくっきり見えます。
-*/
+/* ターゲットスコープ（スポットライト） */
 .tutorial-focus-ring {
     position: absolute;
     border: 3px dashed #ffeb3b; /* 黄色い破線 */
     border-radius: 12px;
     
-    /* 重要: box-shadowの第4引数(広がり)を巨大にして、
-       リングの外側すべてを半透明の黒で覆う 
-       (0 0 0 9999px rgba(0,0,0,0.6))
+    /* box-shadowの第4引数(広がり)を巨大にして、
+       リングの外側すべてを半透明の黒で覆うスポットライト効果 
     */
     box-shadow: 0 0 20px rgba(255, 235, 59, 1), /* 内側の光 */
                 0 0 0 9999px rgba(0, 0, 0, 0.65); /* 外側の暗闇 */
                 
     z-index: 9001; 
-    pointer-events: none; 
+    pointer-events: none; /* ここも操作を透過 */
     transition: all 0.2s ease-out; /* 追従をスムーズに */
     display: none;
     opacity: 0;
