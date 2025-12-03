@@ -356,7 +356,7 @@
 }
 
 /* ========================================================= */ 
-/* 🌟 RPG TUTORIAL V3 (FIXED: Compact Top View) 🌟 */ 
+/* 🌟 RPG TUTORIAL V3 (FIXED: Overlap, Layout & Contrast) 🌟 */ 
 /* ========================================================= */ 
 
 .help-icon-btn {
@@ -392,15 +392,14 @@
     display: block;
 }
 
-/* スポットライト (影を明るく修正: opacity 0.4) */
+/* スポットライト (影を暗く: opacity 0.6) */
 .tutorial-focus-ring {
     position: absolute;
     border: 3px dashed #ffeb3b; 
     border-radius: 12px;
     
-    /* 外側の影(第4引数)の透明度を0.4に下げて明るくしました */
     box-shadow: 0 0 20px rgba(255, 235, 59, 1), 
-                0 0 0 9999px rgba(0, 0, 0, 0.4); 
+                0 0 0 9999px rgba(0, 0, 0, 0.6); 
                 
     z-index: 9001; 
     pointer-events: none; 
@@ -419,8 +418,7 @@
     100% { transform: scale(1); border-color: #ffeb3b; }
 }
 
-/* チュートリアル用のスポットライト（home.htmlで定義されているクラスの上書き） */
-/* 必要に応じてこちらのクラスも同様に明るくします */
+/* チュートリアル用のスポットライト（home.htmlとの連携） */
 .tutorial-spotlight {
     position: fixed;
     top: 50%;
@@ -428,8 +426,8 @@
     width: 0;
     height: 0;
     border-radius: 10px; 
-    /* 影を薄く(0.4) */
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4) !important; 
+    /* 影を暗く(0.6) */
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6) !important; 
     z-index: 9998;
     pointer-events: none;
     opacity: 0;
@@ -439,96 +437,96 @@
     opacity: 1;
 }
 
-/* RPGメッセージボックス (上部にコンパクトに表示) */
+/* RPGメッセージボックス (黒背景・白文字・大型化・重なり解消) */
 .tutorial-rpg-box {
     position: fixed;
-    /* 点線の上(ヘッダーエリア)に収まるようトップに配置 */
-    top: 10px; 
-    left: 50%;
-    transform: translateX(-50%) translateY(-200px); /* 初期位置は隠す */
+    top: 15px; /* ロゴの上あたり */
+    left: 10px; /* 左寄せ */
+    right: 70px; /* 右側にヘルプボタン用のスペース */
     
-    /* 幅を狭く修正 */
-    width: 95%;
-    max-width: 400px;
+    width: auto; 
+    max-width: 550px; 
     
-    background: rgba(255, 255, 255, 0.98);
-    border: 3px solid var(--primary-color);
+    /* 黒背景・白文字 */
+    background: rgba(0, 0, 0, 0.95);
+    color: #ffffff;
+    
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.2) inset, 
+                0 10px 25px rgba(0,0,0,0.5);
+    
     border-radius: 15px;
-    box-shadow: 0 0 0 3px #ffffff inset, 
-                0 10px 30px rgba(0,0,0,0.2);
-    padding: 10px 15px;
+    
+    padding: 15px 20px;
+    
     z-index: 9002;
     display: flex;
-    align-items: flex-start; /* 上揃え */
+    /* ★重要: アイコンとテキストが重ならないように上揃えにする */
+    align-items: flex-start; 
+    
     opacity: 0;
+    transform: translateY(-150px); 
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
 }
 
 .tutorial-rpg-box.active {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
 }
 
-/* キャラクターアイコン (少し小さく) */
+/* キャラクターアイコン */
 .rpg-char-icon, .rpg-char-area {
-    /* HTML構造に合わせて調整 */
-    width: 50px;
-    height: 50px;
-    margin-right: 10px;
+    /* 固定幅を指定し、縮小を防ぐ */
+    width: 60px; 
+    height: 60px;
+    min-width: 60px; 
+    
+    /* テキストとの間隔を十分に取る */
+    margin-right: 20px; 
+    
     flex-shrink: 0;
     position: relative;
-    top: 5px;
+    /* 微調整: アイコンの位置をテキスト行に合わせる */
+    margin-top: 5px;
 }
-/* home.htmlの構造用調整 */
 .rpg-char-area img {
     width: 100%;
     height: auto;
-    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
 }
 
-/* もしhome.cssの古い構造(iconクラス)を使う場合 */
-.rpg-char-icon {
-    position: static;
-    border: 2px solid var(--primary-color);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #fff;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-    animation: none;
-    margin-right: 15px;
-}
-
-/* メッセージコンテンツ */
+/* メッセージコンテンツエリア */
 .rpg-content {
     flex-grow: 1;
+    overflow: hidden; /* 万が一のはみ出し防止 */
 }
 
 .rpg-name-tag {
-    position: static;
     display: inline-block;
     background: var(--primary-color);
     color: #fff;
-    padding: 2px 10px;
+    padding: 2px 12px;
     border-radius: 10px;
     font-size: 11px;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 8px; /* 下のマージンを増やす */
+    border: 1px solid #fff;
 }
 
+/* メッセージテキスト (白文字・サイズアップ・改行設定) */
 .rpg-text-area {
-    margin-top: 2px;
-    min-height: 40px; /* 高さを抑える */
-    font-size: 13px;  /* 文字サイズを少し小さく */
-    line-height: 1.5;
-    color: #333;
+    min-height: auto; 
+    font-size: 14px; 
+    line-height: 1.6;
+    color: #ffffff;
     font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    word-break: break-word; /* 長い単語でのレイアウト崩れ防止 */
 }
 
 .rpg-next-cursor {
     display: inline-block;
-    color: var(--primary-color);
+    color: #ffeb3b; 
     margin-left: 5px;
     animation: cursorBounce 0.8s infinite;
 }
@@ -541,32 +539,40 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    margin-top: 5px;
+    margin-top: 10px;
     gap: 10px;
 }
 
 .rpg-btn {
     border: none;
-    background: #f0f0f0;
-    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.2); 
+    padding: 6px 14px;
     border-radius: 15px;
     font-size: 11px;
     font-weight: bold;
-    color: #666;
+    color: #fff;
     cursor: pointer;
     transition: all 0.2s;
+}
+.rpg-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
 }
 
 .rpg-btn-skip {
     background: transparent;
     text-decoration: underline;
+    color: #ccc;
+}
+.rpg-btn-skip:hover {
+    color: #fff;
 }
 
 .rpg-btn-next {
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: white;
-    box-shadow: 0 3px 8px rgba(255, 105, 180, 0.4);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 .rpg-btn-next:hover {
     transform: scale(1.05);
+    background: linear-gradient(45deg, #ff8fa3, #ffc2cd);
 }
