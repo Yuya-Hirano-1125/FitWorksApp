@@ -261,14 +261,14 @@
     let currentRpgStep = 0;
     let typeWriterInterval;
     let updateLoopId; // アニメーションループ用のID
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v6'; // バージョンアップ
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v7'; // バージョンアップ
 
     document.addEventListener('DOMContentLoaded', function() {
         if (!localStorage.getItem(STORAGE_KEY_RPG)) {
             setTimeout(() => startRpgTutorial(), 800);
         }
         
-        // ★重要: ループで常時位置合わせを行うのでイベントリスナーは補完的役割になる
+        // ★重要: ループで常時位置合わせを行うのでイベントリスナーは補完的役割
         window.addEventListener('resize', updateSpotlightPosition);
         window.addEventListener('scroll', updateSpotlightPosition);
     });
@@ -278,7 +278,8 @@
         document.getElementById('tutorial-spotlight').classList.add('active');
         document.getElementById('tutorial-rpg-box').classList.add('active');
         
-        document.body.style.overflow = 'hidden'; 
+        // ★重要: スクロール禁止を削除し、自由な操作を許可
+        // document.body.style.overflow = 'hidden'; 
         
         updateRpgView();
         
@@ -376,6 +377,7 @@
                  const padding = 10;
                  
                  // スポットライトの位置更新
+                 // getBoundingClientRectはビューポート相対座標なので、fixed配置のspotlightと一致する
                  spotlight.style.width = (rect.width + padding * 2) + 'px';
                  spotlight.style.height = (rect.height + padding * 2) + 'px';
                  spotlight.style.top = (rect.top - padding) + 'px';
@@ -416,10 +418,6 @@
         spot.classList.remove('active');
         pointer.style.display = 'none';
 
-        document.body.style.overflow = ''; 
-        
-        if (typeWriterInterval) clearInterval(typeWriterInterval);
-        
         // ループ停止
         stopUpdateLoop();
         

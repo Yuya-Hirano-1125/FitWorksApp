@@ -356,7 +356,7 @@
 }
 
 /* ========================================================= */ 
-/* 🌟 RPG TUTORIAL V3 (BRIGHT THEME & ZOOM FIX) 🌟 */ 
+/* 🌟 RPG TUTORIAL V3 (FINAL: SEMI-TRANSPARENT GLASS & ZOOM FIX) 🌟 */ 
 /* ========================================================= */ 
 
 .help-icon-btn {
@@ -386,28 +386,27 @@
     background: transparent; 
     z-index: 9000;
     display: none;
-    pointer-events: none; 
+    pointer-events: none; /* クリック透過でスクロール可能に */
 }
 .tutorial-backdrop.active {
     display: block;
 }
 
-/* スポットライト (JSで常時更新するため、位置のTransitionは削除) */
+/* スポットライト (枠ズレ防止のため transition: none/opacity のみ) */
 .tutorial-focus-ring {
     position: absolute;
     border: 3px dashed #ffeb3b; 
     border-radius: 12px;
     
-    /* 影を薄くして画面を見やすく */
+    /* 影の濃度調整 */
     box-shadow: 0 0 20px rgba(255, 235, 59, 1), 
                 0 0 0 9999px rgba(0, 0, 0, 0.5); 
                 
     z-index: 9001; 
     pointer-events: none; 
     
-    /* ★重要: 位置移動の遅延(transition)を削除し、透明度のみアニメーションさせる */
+    /* 位置移動のラグを無くすため opacity のみアニメーション */
     transition: opacity 0.2s ease-out; 
-    /* 位置プロパティ(top, left, width, height)にはtransitionをかけない */
     
     display: none;
     opacity: 0;
@@ -426,27 +425,26 @@
 /* チュートリアル用のスポットライト（home.htmlとの連携） */
 .tutorial-spotlight {
     position: fixed;
-    /* top/left/width/heightはJSで毎フレーム制御 */
     top: 50%;
     left: 50%;
     width: 0;
     height: 0;
     
     border-radius: 10px; 
-    /* 影の濃さを控えめに (0.5) */
+    /* 影の濃度 */
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5) !important; 
     z-index: 9998;
     pointer-events: none;
     opacity: 0;
     
-    /* ★重要: 位置移動の遅延を削除 */
+    /* ズーム時のズレを防ぐため、位置プロパティの transition を削除 */
     transition: opacity 0.4s ease-out;
 }
 .tutorial-spotlight.active {
     opacity: 1;
 }
 
-/* RPGメッセージボックス (明るいテーマ・中央配置・大型化・レイアウト分離) */
+/* RPGメッセージボックス (半透明・すりガラス・明るい) */
 .tutorial-rpg-box {
     position: fixed;
     top: 20px; 
@@ -455,7 +453,6 @@
     left: 50%;
     transform: translateX(-50%) translateY(-150px);
     
-    /* 幅の制御: 画面幅の95%まで、最大700px */
     width: 95vw; 
     max-width: 700px; 
     
@@ -463,13 +460,17 @@
     max-height: 80vh;
     overflow-y: auto;
     
-    /* ★明るいテーマ（白背景・濃い文字） */
-    background: rgba(255, 255, 255, 0.98);
+    /* ★半透明の白背景 + すりガラス効果 */
+    background: rgba(255, 255, 255, 0.7); 
+    backdrop-filter: blur(5px); /* 背景をぼかす */
+    -webkit-backdrop-filter: blur(5px); /* Safari対応 */
+    
     color: #333333;
     
     border: 3px solid var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.5) inset, 
-                0 15px 40px rgba(0,0,0,0.3);
+    
+    /* 影なし */
+    box-shadow: none; 
     
     border-radius: 20px;
     padding: 20px 25px;
@@ -477,7 +478,7 @@
     z-index: 9002;
     display: flex;
     align-items: flex-start; 
-    gap: 20px; /* アイコンと文字の間隔確保 */
+    gap: 20px; /* アイコンと文字の間隔 */
     
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
@@ -501,7 +502,7 @@
 .rpg-char-icon, .rpg-char-area {
     width: 80px; 
     height: 80px;
-    flex: 0 0 80px; /* 縮小禁止 */
+    flex: 0 0 80px; 
     
     position: relative;
     margin-top: 5px; 
@@ -511,8 +512,7 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    /* 明るい背景に合う影 */
-    filter: drop-shadow(0 5px 10px rgba(0,0,0,0.15));
+    filter: none;
 }
 
 @media (max-width: 600px) {
@@ -541,15 +541,15 @@
     font-size: 13px;
     font-weight: bold;
     margin-bottom: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: none; 
 }
 
 /* メッセージテキスト (濃い文字) */
 .rpg-text-area {
     font-size: 1rem; 
     line-height: 1.7;
-    color: #333333; /* 濃いグレー */
-    font-weight: 600; /* 少し太くして視認性確保 */
+    color: #333333; 
+    font-weight: 600; 
     text-shadow: none;
     word-break: break-word; 
 }
@@ -582,7 +582,7 @@
 
 .rpg-btn {
     border: none;
-    background: #f0f0f0; 
+    background: rgba(255, 255, 255, 0.5); /* ボタンも少し透過 */
     padding: 8px 16px;
     border-radius: 20px;
     font-size: 12px;
@@ -591,6 +591,7 @@
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap; 
+    box-shadow: none; 
 }
 .rpg-btn:hover {
     background: #e0e0e0;
@@ -609,7 +610,7 @@
 .rpg-btn-next {
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: white;
-    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.4);
+    box-shadow: none; 
 }
 .rpg-btn-next:hover {
     transform: scale(1.05);
