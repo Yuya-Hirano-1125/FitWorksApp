@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 	
 	<script th:src="@{/js/theme.js}"></script>
     <style>
@@ -195,6 +198,60 @@
             border-bottom: 1px dashed #555;
             padding-bottom: 5px;
         }
+
+        /* AI Camera Styles */
+        #ai-verification-container {
+            margin-top: 20px;
+            background: #000;
+            border: 2px solid var(--ai-accent-color);
+            border-radius: 10px;
+            overflow: hidden;
+            display: none; /* 初期状態は非表示 */
+            position: relative;
+        }
+        #output_canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        #ai-status-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #00e676;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        #ai-rep-counter-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 24px;
+            font-weight: 800;
+            border: 1px solid var(--primary-color);
+        }
+        .verification-badge {
+            background-color: #333;
+            color: var(--primary-color);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+            display: none;
+        }
+        .gps-status {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            color: #aaa;
+            text-align: center;
+        }
     </style>
 </head>
 <body class="session-page">
@@ -215,11 +272,28 @@
         </div>
     </div>
 
+    <div th:if="${trainingType == 'free-weight'}" style="margin-top: 20px;">
+        <button id="toggle-ai-camera" class="button primary" style="width: 100%; background: linear-gradient(45deg, #00c853, #009688);">
+            <i class="fa-solid fa-video"></i> AI自動カウントを起動 (BETA)
+        </button>
+        <p style="font-size: 0.8em; color: #aaa; text-align: center; margin-top: 5px;">
+            ※カメラの前でスクワット等の動作を行うと自動で回数が入力されます。全身が映るようにしてください。
+        </p>
+        
+        <div id="ai-verification-container">
+            <video id="input_video" style="display:none"></video>
+            <canvas id="output_canvas"></canvas>
+            <div id="ai-status-overlay">待機中...</div>
+            <div id="ai-rep-counter-overlay">0 回</div>
+        </div>
+    </div>
+
     <div th:if="${trainingType == 'free-weight'}" class="record-form-container">
         <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px;">
             <i class="fa-solid fa-pen-to-square"></i> 実績を記録
+            <span id="ai-verified-badge" class="verification-badge"><i class="fa-solid fa-check-circle"></i> AI確認済み</span>
         </h3>
-        <form th:action="@{/training-log/save}" method="post" id="weight-form">
+        <form th:action="@{/training-log/save}" method="post" id="weight-form" onsubmit="return validateTrainingTime(this);">
             <input type="hidden" name="recordDate" th:value="${today}">
             <input type="hidden" name="type" value="WEIGHT">
             <input type="hidden" name="exerciseName" th:value="${selectedExercise}">
@@ -251,7 +325,15 @@
         <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid #444; padding-bottom:10px;">
             <i class="fa-solid fa-pen-to-square"></i> 実績を記録
         </h3>
-        <form th:action="@{/training-log/save}" method="post">
+        
+        <div style="background: #222; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #555;">
+            <div id="gps-status" class="gps-status"><i class="fa-solid fa-location-crosshairs"></i> GPS未計測</div>
+            <button type="button" id="toggle-gps" class="button secondary small" style="width:100%;">
+                <i class="fa-solid fa-play"></i> GPS計測開始
+            </button>
+        </div>
+
+        <form th:action="@{/training-log/save}" method="post" id="cardio-form" onsubmit="return validateCardio(this);">
             <input type="hidden" name="recordDate" th:value="${today}">
             <input type="hidden" name="type" value="CARDIO">
             <input type="hidden" name="cardioType" th:value="${selectedExercise}">
@@ -259,13 +341,13 @@
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label">時間</label>
-                    <input type="number" name="durationMinutes" class="form-input" placeholder="0" required>
+                    <input type="number" name="durationMinutes" id="cardio-duration" class="form-input" placeholder="0" required>
                     <span class="unit">分 (Minutes)</span>
                 </div>
                 <div class="form-group">
                     <label class="form-label">距離</label>
-                    <input type="number" name="distanceKm" class="form-input" step="0.1" placeholder="0.0">
-                    <span class="unit">km (任意)</span>
+                    <input type="number" name="distanceKm" id="cardio-distance" class="form-input" step="0.1" placeholder="0.0">
+                    <span class="unit">km (GPS自動入力)</span>
                 </div>
             </div>
             
@@ -281,7 +363,7 @@
         </h3>
         <p style="color:#aaa; font-size:0.9em; margin-bottom:20px;">実施したセットのみ記録されます。未入力の種目は無視されます。</p>
 
-        <form th:action="@{/training-log/save-batch}" method="post">
+        <form th:action="@{/training-log/save-batch}" method="post" onsubmit="return validateTrainingTime(this);">
             <input type="hidden" name="recordDate" th:value="${today}">
             
             <div th:each="exName, stat : ${mySetExercises}" class="myset-exercise-block">
@@ -376,6 +458,26 @@
 </div>
 
 <script th:inline="javascript">
+    // === グローバル変数: セッション時間管理 ===
+    let sessionStartTime = Date.now();
+    let sessionElapsedTime = 0; // 秒
+    
+    // 1秒ごとにセッション時間を更新
+    setInterval(() => {
+        sessionElapsedTime = Math.floor((Date.now() - sessionStartTime) / 1000);
+    }, 1000);
+
+    // === バリデーション関数 (タイマー強制) ===
+    window.validateTrainingTime = function(form) {
+        // 例: ページ滞在時間が30秒未満なら警告
+        if (sessionElapsedTime < 30) {
+            if(!confirm("セッション開始から時間が短すぎます（まだ" + sessionElapsedTime + "秒）。本当に記録しますか？\nしっかりトレーニングを行いましょう！")) {
+                return false;
+            }
+        }
+        return true;
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
         // --- Utility function for formatting time (Minutes:Seconds) ---
         const formatTime = (ms) => {
@@ -402,7 +504,7 @@
                         <input type="number" name="setList[${setCounter}].weight" class="form-input" step="0.5" placeholder="kg" value="${weight}" required style="text-align: center;">
                     </td>
                     <td style="padding: 0 5px;">
-                        <input type="number" name="setList[${setCounter}].reps" class="form-input" placeholder="回" value="${reps}" required style="text-align: center;">
+                        <input type="number" name="setList[${setCounter}].reps" class="form-input ai-rep-target" placeholder="回" value="${reps}" required style="text-align: center;" id="reps-input-${setCounter}">
                     </td>
                     <td style="text-align: center; vertical-align: middle;">
                          <i class="fa-solid fa-trash" onclick="removeRow(this)" style="color: #666; cursor: pointer;"></i>
@@ -413,6 +515,21 @@
             };
             addSetRow(); addSetRow(); addSetRow();
             addSetBtn.addEventListener('click', () => addSetRow());
+            
+            // AI用: グローバル関数として公開
+            window.updateCurrentSetReps = function(count) {
+                // 現在入力可能な最後のセット（または最初の空のセット）を探す
+                const inputs = document.querySelectorAll('.ai-rep-target');
+                if(inputs.length > 0) {
+                    // 簡易的に最初のセット、あるいはフォーカスされているセットに入力
+                    // ここでは便宜上、最初の行（セット1）に入力し、満杯なら次へ...というロジックも組めるが
+                    // シンプルに「セット1」を更新する
+                    inputs[0].value = count;
+                    
+                    // バッジ表示
+                    document.getElementById('ai-verified-badge').style.display = 'inline-block';
+                }
+            };
         }
 
         // =======================================================
@@ -444,11 +561,10 @@
         // マイセットの初期表示（各筋トレ種目に1セットずつ追加）
         /*[# th:if="${trainingType == 'myset'}"]*/
         const mySetExercises = /*[[${mySetExercises}]]*/ [];
-        const cardioList = /*[[${cardioList}]]*/ []; // Controllerから渡される有酸素リスト
+        const cardioList = /*[[${cardioList}]]*/ []; 
 
         if (mySetExercises && cardioList) {
             for (let i = 0; i < mySetExercises.length; i++) {
-                // 有酸素リストに含まれていない場合のみセット行を追加
                 if (!cardioList.includes(mySetExercises[i])) {
                     addBatchSetRow(i);
                 }
@@ -456,12 +572,10 @@
         }
         /*[/]*/
 
-        // 行削除機能 (共通)
         window.removeRow = function(icon) {
             const row = icon.closest('tr');
             const container = row.parentElement;
             row.remove();
-            // 番号の振り直し
             Array.from(container.children).forEach((tr, index) => {
                 tr.querySelector('td:first-child').textContent = index + 1;
             });
@@ -496,7 +610,7 @@
             clearInterval(ivTimer);
             isIvRunning = false;
             ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 開始';
-            ivStartPauseBtn.classList.remove('timer-button-secondary');
+            ivStartPauseBtn.classList.remove('timer-button-primary');
             ivStartPauseBtn.classList.add('timer-button-primary');
             alert('インターバル終了！次のセットに移りましょう！');
         };
@@ -561,6 +675,228 @@
             ivResetBtn.addEventListener('click', resetInterval);
             resetInterval();
         }
+
+        // =======================================================
+        // 3. AI Motion Tracking (MediaPipe)
+        // =======================================================
+        const toggleAiBtn = document.getElementById('toggle-ai-camera');
+        const aiContainer = document.getElementById('ai-verification-container');
+        const videoElement = document.getElementById('input_video');
+        const canvasElement = document.getElementById('output_canvas');
+        const aiStatus = document.getElementById('ai-status-overlay');
+        const aiRepCounter = document.getElementById('ai-rep-counter-overlay');
+
+        if (toggleAiBtn && aiContainer) {
+            let camera = null;
+            let pose = null;
+            let isCameraRunning = false;
+            let repCount = 0;
+            let poseState = "UP"; // "UP" or "DOWN"
+
+            // 角度計算関数 (3点の座標から角度を求める)
+            function calculateAngle(a, b, c) {
+                const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
+                let angle = Math.abs(radians * 180.0 / Math.PI);
+                if (angle > 180.0) angle = 360 - angle;
+                return angle;
+            }
+
+            function onResults(results) {
+                if (!results.poseLandmarks) return;
+
+                const canvasCtx = canvasElement.getContext('2d');
+                canvasCtx.save();
+                canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+                
+                // カメラ映像を描画
+                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+                
+                // 骨格を描画
+                drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
+                             {color: '#00FF00', lineWidth: 4});
+                drawLandmarks(canvasCtx, results.poseLandmarks,
+                            {color: '#FF0000', lineWidth: 2});
+
+                // --- カウントロジック (スクワット判定: 腰-膝-足首の角度) ---
+                const landmarks = results.poseLandmarks;
+                // 右足: 24(腰), 26(膝), 28(足首)
+                const rightHip = landmarks[24];
+                const rightKnee = landmarks[26];
+                const rightAnkle = landmarks[28];
+
+                // 信頼度が低い場合は計算しない
+                if (rightHip.visibility > 0.5 && rightKnee.visibility > 0.5 && rightAnkle.visibility > 0.5) {
+                    const angle = calculateAngle(rightHip, rightKnee, rightAnkle);
+                    
+                    // 状態遷移ロジック
+                    if (angle > 160) {
+                        poseState = "UP";
+                        aiStatus.innerText = "状態: 立位 (Start)";
+                        aiStatus.style.color = "#00e676";
+                    }
+                    if (angle < 90 && poseState === "UP") {
+                        poseState = "DOWN"; // 下がったと判定
+                        aiStatus.innerText = "状態: ボトム (OK!)";
+                        aiStatus.style.color = "#ffeb3b";
+                    }
+                    if (angle > 160 && poseState === "DOWN") {
+                        poseState = "UP"; // 戻った
+                        repCount++;
+                        aiRepCounter.innerText = repCount + " 回";
+                        
+                        // 入力フォームに反映
+                        window.updateCurrentSetReps(repCount);
+                        
+                        // 効果音などを鳴らすとさらに良い
+                        console.log("Rep counted!");
+                    }
+                } else {
+                    aiStatus.innerText = "全身を映してください";
+                    aiStatus.style.color = "#ff5252";
+                }
+
+                canvasCtx.restore();
+            }
+
+            toggleAiBtn.addEventListener('click', () => {
+                if (!isCameraRunning) {
+                    aiContainer.style.display = 'block';
+                    toggleAiBtn.innerHTML = '<i class="fa-solid fa-stop"></i> カメラを停止';
+                    toggleAiBtn.classList.remove('primary');
+                    toggleAiBtn.classList.add('secondary');
+
+                    pose = new Pose({locateFile: (file) => {
+                        return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+                    }});
+                    pose.setOptions({
+                        modelComplexity: 1,
+                        smoothLandmarks: true,
+                        minDetectionConfidence: 0.5,
+                        minTrackingConfidence: 0.5
+                    });
+                    pose.onResults(onResults);
+
+                    camera = new Camera(videoElement, {
+                        onFrame: async () => {
+                            await pose.send({image: videoElement});
+                        },
+                        width: 640,
+                        height: 480
+                    });
+                    camera.start();
+                    isCameraRunning = true;
+                    
+                    // Canvasサイズ調整
+                    canvasElement.width = 640;
+                    canvasElement.height = 480;
+                } else {
+                    aiContainer.style.display = 'none';
+                    toggleAiBtn.innerHTML = '<i class="fa-solid fa-video"></i> AI自動カウントを起動';
+                    toggleAiBtn.classList.add('primary');
+                    toggleAiBtn.classList.remove('secondary');
+                    if(camera) camera.stop();
+                    isCameraRunning = false;
+                }
+            });
+        }
+
+        // =======================================================
+        // 4. GPS Tracking (Cardio)
+        // =======================================================
+        const toggleGpsBtn = document.getElementById('toggle-gps');
+        const gpsStatus = document.getElementById('gps-status');
+        const distanceInput = document.getElementById('cardio-distance');
+        
+        // グローバル変数として保持して送信時に検証に使う
+        window.gpsTotalDistanceKm = 0.0; 
+
+        if (toggleGpsBtn) {
+            let watchId = null;
+            let lastLat = null;
+            let lastLon = null;
+
+            // ハバースイン公式 (2点間の距離km)
+            function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+                var R = 6371; // Earth radius in km
+                var dLat = deg2rad(lat2 - lat1);
+                var dLon = deg2rad(lon2 - lon1);
+                var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat1)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                var d = R * c;
+                return d;
+            }
+            function deg2rad(deg) { return deg * (Math.PI / 180); }
+
+            toggleGpsBtn.addEventListener('click', () => {
+                if (watchId === null) {
+                    if (navigator.geolocation) {
+                        gpsStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GPS測位中...';
+                        toggleGpsBtn.innerHTML = '<i class="fa-solid fa-stop"></i> GPS計測停止';
+                        toggleGpsBtn.classList.remove('secondary');
+                        toggleGpsBtn.classList.add('primary'); // 計測中は緑色などに
+
+                        watchId = navigator.geolocation.watchPosition((position) => {
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+
+                            if (lastLat != null) {
+                                const dist = getDistanceFromLatLonInKm(lastLat, lastLon, lat, lon);
+                                // 誤差対策: 極端に小さい移動や異常値は無視 (例: 1秒で100m以上など)
+                                if(dist > 0.002 && dist < 0.1) { 
+                                    window.gpsTotalDistanceKm += dist;
+                                    
+                                    // 表示更新 (小数点第2位まで)
+                                    const displayDist = Math.floor(window.gpsTotalDistanceKm * 100) / 100;
+                                    gpsStatus.innerHTML = `<i class="fa-solid fa-location-arrow"></i> 計測中: ${displayDist} km`;
+                                    
+                                    // 入力欄に自動反映
+                                    if(distanceInput) {
+                                        distanceInput.value = displayDist;
+                                    }
+                                }
+                            }
+                            lastLat = lat;
+                            lastLon = lon;
+                        }, (error) => {
+                            gpsStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> GPSエラー: ' + error.message;
+                        }, {
+                            enableHighAccuracy: true,
+                            maximumAge: 0,
+                            timeout: 5000
+                        });
+
+                    } else {
+                        alert("このブラウザはGPSに対応していません。");
+                    }
+                } else {
+                    // 停止処理
+                    navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
+                    gpsStatus.innerHTML = `<i class="fa-solid fa-check"></i> 計測終了: ${Math.floor(window.gpsTotalDistanceKm * 100) / 100} km`;
+                    toggleGpsBtn.innerHTML = '<i class="fa-solid fa-play"></i> GPS計測再開';
+                    toggleGpsBtn.classList.add('secondary');
+                    toggleGpsBtn.classList.remove('primary');
+                }
+            });
+        }
+        
+        // 有酸素運動の送信時バリデーション
+        window.validateCardio = function(form) {
+            // 時間チェック
+            if (!validateTrainingTime(form)) return false;
+
+            const inputDist = parseFloat(document.getElementById('cardio-distance').value) || 0;
+            // GPS計測値との乖離チェック (例: 入力がGPS計測より1km以上大きい場合は警告)
+            // ※GPS精度や、ルームランナーの場合を考慮して「警告」にとどめる
+            if (window.gpsTotalDistanceKm > 0 && (inputDist - window.gpsTotalDistanceKm) > 1.0) {
+                return confirm("入力された距離(" + inputDist + "km)が、GPS計測距離(" + 
+                               Math.floor(window.gpsTotalDistanceKm*100)/100 + "km)と大きく異なります。\n" +
+                               "屋外ランニングの場合は不正の可能性があります。\n本当に記録しますか？");
+            }
+            return true;
+        };
     });
 </script>
 </body>
