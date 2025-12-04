@@ -1,327 +1,422 @@
 @charset "UTF-8";
 
 /* =========================================
-   ベーススタイル
+   FF風スタイル（キャンディ・ポップ・レスポンシブ Ver.）
    ========================================= */
-body {
-    font-family: "Helvetica Neue", Arial, sans-serif;
-    background-color: #f4f7f6;
-    margin: 0;
-    padding: 0;
-    color: #333;
-    padding-bottom: 80px;
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap');
+
+:root {
+    /* カラーパレット */
+    --win-bg-top: #ff7eb3;
+    --win-bg-btm: #8e44ad;
+    --win-border: #ffffff;
+    --color-text: #ffffff;
+    --color-gold: #ffeb3b;
+    
+    --color-fire: #ff4757;
+    --color-water: #1e90ff;
+    --color-grass: #2ed573;
+    --color-light: #ffa502;
+    --color-dark: #a55eea;
+
+    --font-title: 'Cinzel', serif;
+    --font-body: 'Noto Serif JP', serif;
 }
 
-/* ヘッダー */
+body {
+    font-family: var(--font-body);
+    background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+    color: var(--color-text);
+    padding-bottom: 120px; /* 戻るボタン用の余白 */
+    min-height: 100vh;
+}
+
+/* =========================================
+   共通: ポップ・ウィンドウ
+   ========================================= */
+.ff-window {
+    background: linear-gradient(180deg, var(--win-bg-top) 0%, var(--win-bg-btm) 100%);
+    border: 3px solid var(--win-border);
+    border-radius: 12px;
+    box-shadow: 
+        0 0 0 2px #ff6b81,
+        0 8px 20px rgba(255, 105, 180, 0.4); 
+    position: relative;
+    color: #fff;
+    box-sizing: border-box;
+}
+
+/* ドット柄オーバーレイ */
+.ff-window::before {
+    content: '';
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px);
+    background-size: 10px 10px;
+    pointer-events: none;
+    border-radius: 8px;
+}
+
+/* =========================================
+   ヘッダー
+   ========================================= */
 header {
     text-align: center;
-    padding: 15px 10px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.3);
+    border-bottom: 2px solid #fff;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(255, 105, 180, 0.2);
 }
 
 h1 {
     margin: 0;
-    font-size: 22px;
-    text-transform: uppercase;
-    color: #2c3e50;
+    font-family: var(--font-title);
+    font-size: 24px; /* スマホ考慮して少し小さく */
+    color: #fff;
+    text-shadow: 2px 2px 0 #ff6b81;
     letter-spacing: 1px;
 }
 
-/* ステータスバー */
 .status-bar {
-    display: flex; justify-content: center; gap: 8px;
-    margin-top: 10px; font-weight: bold; color: #555;
-    flex-wrap: wrap;
+    display: flex; justify-content: center; gap: 10px; margin-top: 5px;
 }
 .status-item {
-    background: white; padding: 4px 10px; border-radius: 15px;
-    font-size: 12px; display: flex; align-items: center; gap: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee;
-    white-space: nowrap;
+    background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+    border: 2px solid #fff;
+    border-radius: 20px;
+    padding: 4px 20px;
+    font-size: 14px;
+    display: flex; align-items: center; gap: 5px;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(255, 117, 140, 0.4);
+}
+#current-level {
+    color: var(--color-gold); font-weight: bold; font-size: 18px; text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
 }
 
 /* =========================================
-   メインコンテンツ
+   メインコンテンツレイアウト
    ========================================= */
 .battle-pass-wrapper {
-    padding: 20px 0;
+    padding: 20px 0 60px;
+    width: 95%;
     max-width: 1200px;
     margin: 0 auto;
 }
+
 .pass-section { margin-bottom: 50px; }
 
-.attribute-title {
-    margin-left: 20px; font-size: 20px; color: #2c3e50;
-    border-left: 5px solid #3498db; padding-left: 10px; margin-bottom: 15px;
+.attribute-heading {
+    font-family: var(--font-body);
+    font-weight: bold;
+    font-size: 22px;
+    margin: 0 0 15px 10px;
+    text-shadow: 2px 2px 0 #fff;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 4px dotted #fff;
+    padding-bottom: 5px;
+    max-width: fit-content;
 }
 
-/* トラック部分 */
+/* アイコン色 */
+.fire-color  { color: #ff4757; text-shadow: 1px 1px 0 #fff; }
+.water-color { color: #1e90ff; text-shadow: 1px 1px 0 #fff; }
+.grass-color { color: #2ed573; text-shadow: 1px 1px 0 #fff; }
+.light-color { color: #ffa502; text-shadow: 1px 1px 0 #fff; }
+.dark-color  { color: #a55eea; text-shadow: 1px 1px 0 #fff; }
+
+/* ★変更点：スクロール廃止＆横一列強制レイアウト 
+*/
+.pass-track-container {
+    width: 100%;
+    /* overflow-x: auto; を削除 */
+    padding: 10px 0 30px;
+}
+
 .pass-track {
-    display: flex; gap: 40px; padding: 20px 30px 40px 30px;
-    overflow-x: auto; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
-    align-items: center;
-    /* スクロールバー非表示 */
-    -ms-overflow-style: none; scrollbar-width: none;
+    display: flex; 
+    justify-content: space-between; /* 均等配置 */
+    align-items: flex-start;
+    width: 100%;
+    position: relative;
+    gap: 10px; /* カード間の隙間 */
 }
-.pass-track::-webkit-scrollbar { display: none; }
 
-/* ノード */
+/* ルートライン */
+.track-line {
+    position: absolute; top: 50%; left: 0; width: 100%; height: 8px;
+    background: #fff; z-index: 0;
+    border: 2px solid #ffb8b8; border-radius: 4px;
+}
+.track-line-progress {
+    position: absolute; top: 50%; left: 0; height: 8px;
+    background: linear-gradient(90deg, #ff9a9e, #ff6b81);
+    border-radius: 4px; z-index: 0; transition: width 1s ease;
+}
+
+/* =========================================
+   カードデザイン（レスポンシブ対応）
+   ========================================= */
 .pass-node {
-    position: relative; display: flex; flex-direction: column;
-    align-items: center; min-width: 240px; width: 240px; flex-shrink: 0;
+    flex: 1; /* 親幅に合わせて伸縮 */
+    display: flex; 
+    justify-content: center;
+    position: relative; 
+    z-index: 1;
+    min-width: 0; /* Flexboxでの縮小を許可 */
 }
-.pass-node::after {
-    content: '\f061'; font-family: "Font Awesome 6 Free"; font-weight: 900;
-    position: absolute; right: -30px; top: 50%; transform: translateY(-50%);
-    color: #ccc; font-size: 24px; z-index: 1;
-}
-.pass-node:last-child::after { display: none; }
 
-/* カードデザイン */
 .character-card {
-    background: white; border-radius: 16px; padding: 15px; width: 100%;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center;
-    transition: transform 0.3s, opacity 0.3s, filter 0.3s;
-    position: relative; border: 1px solid #f0f0f0; box-sizing: border-box;
+    background: linear-gradient(180deg, var(--win-bg-top) 0%, var(--win-bg-btm) 100%);
+    border: 3px solid #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(150, 50, 100, 0.2);
+    
+    width: 100%; /* 親(pass-node)いっぱいに広がる */
+    max-width: 220px; /* PCでの最大幅 */
+    min-width: 80px;  /* スマホでの最小幅 */
+    
+    padding: 6px;
+    text-align: center;
+    transition: transform 0.2s;
+    position: relative;
 }
-.character-card:hover { transform: translateY(-5px); }
 
-/* ロック状態 */
-.character-card.locked-card {
-    filter: grayscale(100%); opacity: 0.7; transform: scale(0.98); pointer-events: none;
-}
-.pass-node:not(.claimed) .character-card:not(.locked-card) {
-    border: 2px solid #3498db; box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
+.character-card:not(.locked-card):hover {
+    transform: translateY(-5px);
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(255, 105, 180, 0.5);
+    border-color: #fff;
+    z-index: 10; /* ホバー時は前面へ */
 }
 
-.character-img-container {
-    width: 100%; height: 200px; border-radius: 12px; overflow: hidden;
-    margin-bottom: 12px; position: relative; background: #eee;
+/* 指カーソル (PCのみ表示) */
+@media (min-width: 769px) {
+    .character-card:not(.locked-card):hover::before {
+        content: "👉"; position: absolute; left: -40px; top: 50%;
+        font-size: 30px; color: #fff; animation: cursorBounce 0.8s infinite; z-index: 10;
+        filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.1));
+    }
 }
-.character-img { width: 100%; height: 100%; object-fit: cover; }
+@keyframes cursorBounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(10px); }
+}
+
+/* 画像エリア */
+.character-img-wrapper {
+    width: 100%; 
+    /* アスペクト比を維持しつつ高さを可変に */
+    aspect-ratio: 1 / 0.8; 
+    background: rgba(255,255,255,0.2);
+    margin-bottom: 5px;
+    position: relative;
+    border: 2px solid #fff; border-radius: 8px;
+    overflow: hidden;
+}
+.character-img { width: 100%; height: 100%; object-fit: contain; }
 
 .evolution-tag {
-    position: absolute; top: 10px; left: 10px;
-    background: rgba(0,0,0,0.7); color: #f1c40f; padding: 4px 10px;
-    border-radius: 12px; font-size: 12px; font-weight: bold;
+    position: absolute; top: 0; left: 0;
+    background: #ff6b81; color: #fff;
+    padding: 2px 6px; font-size: 10px; font-weight: bold;
+    border-bottom-right-radius: 8px;
 }
-.character-info h3 { margin: 0 0 10px; font-size: 16px; color: #333; }
+
+/* テキスト（レスポンシブ） */
+.character-name {
+    margin: 5px 0; font-size: 14px; color: #fff; font-weight: bold;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* 長い名前は省略 */
+    border-bottom: 2px dotted rgba(255,255,255,0.5); padding-bottom: 5px;
+}
 
 .requirements-box {
-    background: #f9f9f9; padding: 8px; border-radius: 10px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.2); border-radius: 6px; padding: 4px; margin-bottom: 8px;
 }
-.req-row {
-    font-size: 12px; color: #666; margin-bottom: 4px;
-    display: flex; align-items: center; justify-content: center; gap: 5px;
-}
-.material-icon-sm { width: 16px; height: 16px; object-fit: contain; vertical-align: middle; }
+.req-row { font-size: 11px; color: #fff; display: flex; align-items: center; justify-content: center; gap: 2px; }
 
+/* ボタン */
 .evolve-btn {
-    width: 100%; padding: 12px; border: none; border-radius: 25px;
-    background: linear-gradient(135deg, #3498db, #2980b9); color: white;
-    font-weight: bold; cursor: pointer; transition: all 0.2s;
-    font-size: 14px; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+    width: 100%; padding: 6px;
+    background: linear-gradient(to bottom, #74b9ff, #0984e3);
+    border: 2px solid #fff; border-radius: 15px;
+    color: #fff; font-size: 12px; font-weight: bold; cursor: pointer;
+    box-shadow: 0 3px 0 #0984e3;
+    white-space: nowrap;
 }
-.evolve-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4); }
-.evolve-btn:active { transform: scale(0.98); }
-.evolve-btn.disabled { background: #bdc3c7; color: #fff; cursor: not-allowed; box-shadow: none; transform: none; }
+.evolve-btn:not(.disabled):active { transform: translateY(2px); box-shadow: none; }
+.evolve-btn.disabled { background: #b2bec3; border-color: #dfe6e9; color: #636e72; box-shadow: none; cursor: default; }
 
+/* ノードマーカー */
+.node-marker {
+    position: absolute; top: 50%; left: -8px; /* カードの左端付近 */
+    transform: translateY(-50%);
+    width: 16px; height: 16px;
+    background: #fff; border: 3px solid #ff7eb3; border-radius: 50%;
+    z-index: 2; display: flex; justify-content: center; align-items: center;
+    font-size: 10px; color: #ff7eb3;
+}
+.pass-node:first-child .node-marker { display: none; } /* 最初のノードの線マーカーは消すか調整 */
+
+.pass-node.claimed .node-marker {
+    background: #ffeb3b; border-color: #fff; color: #ff4757; box-shadow: 0 0 10px #ffeb3b;
+}
+
+/* ロック状態 */
+.locked-card { filter: grayscale(0.5) opacity(0.8); background: #6c5ce7; }
+.lock-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(108, 92, 231, 0.8); border-radius: 9px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5;
+}
+.lock-text { font-family: var(--font-title); font-size: 16px; margin: 2px 0; color: #fff; }
 .lock-required-level {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.8); color: white; padding: 8px 16px;
-    border-radius: 20px; font-weight: bold; font-size: 14px; white-space: nowrap; z-index: 10;
-}
-
-/* =========================================================
-   メディアクエリ (スマホ対応)
-   ========================================================= */
-@media (max-width: 768px) {
-    .pass-track {
-        flex-direction: column; overflow-x: hidden; width: auto; padding: 20px; gap: 50px;
-    }
-    .pass-node { width: 100%; max-width: 320px; margin: 0 auto; }
-    .pass-node::after {
-        content: '\f063'; right: auto; left: 50%; top: auto; bottom: -35px; transform: translateX(-50%);
-    }
-    .attribute-title { font-size: 18px; margin-left: 10px; }
+    color: #ff4757; font-weight: bold; font-size: 10px; background: #fff;
+    padding: 2px 6px; border-radius: 10px;
 }
 
 /* =========================================
-   【重要】進化モーダル (完全固定版)
+   モーダル（ポップオーバー風）
    ========================================= */
 .modal-overlay {
-    /* ★強制的に画面固定 */
-    position: fixed !important;
-    top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
-    
-    /* 背景とZ-index */
-    background: rgba(0, 0, 0, 0.85); 
-    z-index: 2147483647 !important; /* 最大値 */
-    
-    display: flex !important; justify-content: center; align-items: center;
-    opacity: 1; transition: opacity 0.3s;
-    backdrop-filter: blur(4px); padding: 20px; box-sizing: border-box;
-    
-    /* リセット */
-    transform: none !important; margin: 0 !important;
+    /* 画面全体を覆わず、絶対配置で制御するため初期は非表示 */
+    position: absolute; 
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: translateY(10px);
 }
-.modal-overlay.hidden { opacity: 0; pointer-events: none; visibility: hidden; }
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
 
 .modal-content {
-    background: white; width: 100%; max-width: 420px;
-    border-radius: 24px; padding: 25px 20px; text-align: center;
-    position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    max-height: 85vh; overflow-y: auto;
-    animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-@keyframes popUp {
-    from { transform: scale(0.9) translateY(20px); opacity: 0; }
-    to { transform: scale(1) translateY(0); opacity: 1; }
-}
-
-.close-modal-btn {
-    position: absolute; top: 10px; right: 10px;
-    background: #f1f2f6; border: none; font-size: 20px; 
-    width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: #7f8c8d;
-    display: flex; align-items: center; justify-content: center;
-}
-#modal-title { margin: 0 0 15px 0; font-size: 18px; color: #2c3e50; }
-
-.modal-char-preview {
-    position: relative; width: 120px; height: 120px; margin: 0 auto 15px;
-    border-radius: 20px; overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2); border: 4px solid #fff;
-}
-.modal-char-preview img { width: 100%; height: 100%; object-fit: cover; }
-.modal-rank-tag {
-    position: absolute; top: 0; left: 0;
-    background: linear-gradient(45deg, #FFD700, #FFA500); color: white;
-    padding: 4px 10px; font-weight: bold; border-bottom-right-radius: 15px; font-size: 12px;
-}
-
-.arrow-icon { font-size: 20px; color: #bdc3c7; margin-bottom: 15px; }
-.modal-requirements p { margin: 0 0 10px; font-size: 14px; color: #7f8c8d; font-weight: bold; }
-
-.material-list-container {
-    display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
-    background: #f8f9fa; padding: 15px; border-radius: 16px; margin-bottom: 20px;
-}
-.material-item {
-    display: flex; flex-direction: column; align-items: center;
-    background: white; padding: 8px; border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05); width: 65px; border: 2px solid transparent;
-}
-.material-item.ok { border-color: #2ecc71; background-color: #f0fff4; }
-.material-item.ng { border-color: #e74c3c; background-color: #fff0f0; }
-
-.material-item img { width: 32px; height: 32px; object-fit: contain; margin-bottom: 4px; }
-.material-count { font-size: 12px; font-weight: bold; }
-.material-count.ok { color: #2ecc71; }
-.material-count.ng { color: #e74c3c; }
-
-.modal-action-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none; color: white; padding: 14px 0;
-    border-radius: 50px; font-size: 16px; font-weight: bold;
-    cursor: pointer; width: 100%;
-    box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
-}
-.modal-action-btn:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; opacity: 0.7; }
-
-/* JSで生成されるモーダル用スタイル */
-.js-generated-modal {
-    position: fixed !important; /* 絶対に固定 */
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.85);
-    z-index: 9999999; /* 最前面 */
-    display: flex; justify-content: center; align-items: center;
-    backdrop-filter: blur(4px);
-    opacity: 0; transition: opacity 0.3s; /* ふわっと表示 */
-}
-
-.js-generated-modal.visible {
-    opacity: 1;
-}
-
-.js-modal-content {
-    background: white;
-    width: 90%; max-width: 400px;
-    border-radius: 20px; padding: 25px;
+    background: linear-gradient(180deg, #ff9ff3 0%, #f368e0 100%);
+    border: 3px solid #fff; border-radius: 15px;
+    width: 280px; /* カードより少し大きい程度 */
+    padding: 10px;
     text-align: center;
-    position: relative;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    max-height: 90vh; overflow-y: auto;
-    transform: scale(0.9); transition: transform 0.3s;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.3);
 }
 
-.js-generated-modal.visible .js-modal-content {
-    transform: scale(1);
+/* 吹き出しの三角（下向き） */
+.modal-content::after {
+    content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #fff;
 }
 
-/* その他の装飾 */
-.js-modal-close {
-    position: absolute; top: 10px; right: 10px;
-    background: #f1f1f1; border: none; width: 32px; height: 32px;
-    border-radius: 50%; cursor: pointer; font-size: 18px; color: #555;
+.modal-header {
+    margin: 0; padding: 5px; border-bottom: 2px dashed rgba(255,255,255,0.5);
+    font-family: var(--font-title); font-size: 16px; color: #fff; text-shadow: 1px 1px 0 #ff6b81;
 }
-.js-modal-title { margin: 0 0 15px 0; font-size: 18px; color: #333; }
-.js-char-img-box {
-    width: 120px; height: 120px; margin: 0 auto 15px;
-    border-radius: 15px; overflow: hidden; border: 4px solid #fff;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2); position: relative;
+
+.modal-body-img img { max-width: 80px; max-height: 80px; object-fit: contain; }
+.modal-message { color: #fff; font-size: 12px; margin: 5px 0; }
+
+.ff-mat-list {
+    display: flex; justify-content: center; gap: 5px; margin: 10px 0;
 }
-.js-char-img-box img { width: 100%; height: 100%; object-fit: cover; }
-.js-rank-tag {
-    position: absolute; top: 0; left: 0; background: gold; color: white;
-    padding: 3px 10px; font-weight: bold; font-size: 12px;
-    border-bottom-right-radius: 10px; text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+.ff-mat-item {
+    background: #fff; padding: 4px; border-radius: 6px; width: 50px;
+    border: 2px solid #ff9ff3;
 }
-.js-arrow { font-size: 20px; color: #ccc; margin-bottom: 15px; }
-.js-mat-list {
-    display: flex; justify-content: center; flex-wrap: wrap; gap: 10px;
-    background: #f9f9f9; padding: 15px; border-radius: 15px; margin-bottom: 20px;
-}
-.js-mat-item {
-    display: flex; flex-direction: column; align-items: center;
-    background: white; padding: 8px; border-radius: 10px;
-    width: 60px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.js-evolve-btn {
-    width: 100%; padding: 15px; border: none; border-radius: 50px;
-    background: linear-gradient(135deg, #3498db, #8e44ad);
-    color: white; font-weight: bold; font-size: 16px; cursor: pointer;
-    box-shadow: 0 5px 15px rgba(142, 68, 173, 0.4);
-}
-.js-evolve-btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+.ff-mat-img { width: 32px; height: 32px; object-fit: contain; }
+.ff-mat-count { font-size: 11px; font-weight: bold; color: #555; }
+.ff-mat-count.ok { color: #2ed573; }
+.ff-mat-count.ng { color: #ff4757; }
+
+.modal-actions { display: flex; justify-content: center; gap: 10px; }
 
 /* =========================================
-   LOCKED表示の調整
+   戻るボタン
    ========================================= */
+.back-btn-container {
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(5px);
+    padding: 15px; text-align: center;
+    border-top: 2px solid #ff7eb3;
+    z-index: 900;
+}
+.btn-back {
+    display: inline-block;
+    padding: 10px 40px;
+    background: #ff6b81; border: 2px solid #fff; border-radius: 30px;
+    color: #fff; font-weight: bold; font-size: 16px; text-decoration: none;
+    box-shadow: 0 4px 10px rgba(255, 107, 129, 0.4);
+    transition: transform 0.1s;
+}
+.btn-back:hover { transform: scale(1.05); background: #ff4757; }
+.btn-back i { margin-right: 5px; }
 
-/* 1. 名前に被っているLOCKED（オーバーレイや擬似要素）を消す */
-.locked-card .locked-overlay,
-.locked-card::after,
-.locked-card::before {
-    display: none !important;
-    content: none !important;
+
+/* =========================================
+   メディアクエリ (スマホ用)
+   ========================================= */
+@media (max-width: 768px) {
+    .pass-track { gap: 4px; padding: 0; } /* 隙間を詰める */
+    
+    .character-card {
+        border-width: 2px;
+        padding: 4px;
+        border-radius: 8px;
+    }
+    
+    .character-img-wrapper { margin-bottom: 2px; border-width: 1px; }
+    
+    .character-name { font-size: 10px; margin: 2px 0; }
+    
+    .requirements-box { padding: 2px; margin-bottom: 4px; }
+    .req-row { font-size: 9px; }
+    
+    .evolve-btn { font-size: 10px; padding: 4px; border-width: 1px; }
+    
+    .node-marker { width: 12px; height: 12px; font-size: 8px; left: -6px; border-width: 2px; }
+    
+    .lock-text { font-size: 12px; }
+    .lock-required-level { font-size: 9px; padding: 2px 4px; }
+
+    /* スマホではポップアップ位置調整 */
+    .modal-content { width: 240px; }
 }
 
-/* 2. 下にあるLOCKEDの文字をさらに下に下げる */
-.lock-required-level {
-    margin-top: 30px !important;  /* 数値を大きくするとさらに下がります */
-    padding-bottom: 10px;
-    display: block;
-    position: relative;
-    z-index: 5;
-    
-    /* 文字の見た目調整（お好みで） */
-    color: #e74c3c;
-    font-weight: bold;
-    letter-spacing: 1px;
+/* =========================================
+   シルエット化の追加設定
+   ========================================= */
+
+/* ロックされたカードの画像だけを真っ黒（シルエット）にする */
+.locked-card .character-img { 
+    filter: brightness(0) opacity(0.7); /* 明度0で黒くし、少し透けさせる */
+    transition: all 0.5s ease;
+}
+
+/* ロック状態のカード全体のスタイル（既存の調整） */
+.locked-card { 
+    background: #555; /* 背景を少し暗く */
+    border-color: #888;
+    box-shadow: none;
+}
+
+/* ホバーしても動かないようにする */
+.locked-card:hover {
+    transform: none;
+    cursor: not-allowed;
+    box-shadow: none;
+    border-color: #888;
+}
+
+/* ロック時は指カーソルも出さない */
+.locked-card:hover::before {
+    display: none;
 }
