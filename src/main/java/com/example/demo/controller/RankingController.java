@@ -22,10 +22,11 @@ public class RankingController {
 
     @GetMapping
     public String index(Model model) {
-        // 強い順にユーザーリストを取得
-        List<User> rankingList = userRepository.findTop20ByOrderByLevelDescExperiencePointsDesc();
+        // ★ 変更: Top20ではなく、全員取得するメソッドを呼び出し
+        // List<User> rankingList = userRepository.findTop20ByOrderByLevelDescExperiencePointsDesc();
+        List<User> rankingList = userRepository.findAllByOrderByLevelDescExperiencePointsDesc();
         
         model.addAttribute("rankingList", rankingList);
-        return "misc/ranking"; // ★ 修正: "ranking" -> "misc/ranking"
+        return "misc/ranking"; 
     }
 }
