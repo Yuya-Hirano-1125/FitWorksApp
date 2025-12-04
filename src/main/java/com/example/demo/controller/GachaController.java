@@ -22,36 +22,29 @@ public class GachaController {
     // 1. ガチャトップ画面
     @GetMapping("/gacha")
     public String index(Model model) {
+        // 排出内容リストをModelに追加
         model.addAttribute("probabilityList", gachaService.getProbabilityList());
         return "gacha/gacha"; 
     }
 
-    // 2. アニメーション画面へ遷移（回数 & userId を保持）
+    // 2. アニメーション画面へ遷移（回数を保持）
     @GetMapping("/gacha/animation")
-    public String animation(
-            @RequestParam("count") int count,
-            @RequestParam("userId") String userId,
-            Model model) {
-
+    public String animation(@RequestParam("count") int count, Model model) {
+        // 次の画面（結果取得）に渡すために回数をModelに入れる
         model.addAttribute("count", count);
-        model.addAttribute("userId", userId);  // ★追加
-
         return "gacha/gacha_animation"; 
     }
 
     // 3. ガチャ結果処理（アニメーション後に呼ばれる）
     @GetMapping("/gacha/roll")
-    public String roll(
-            @RequestParam("count") int count,
-            @RequestParam("userId") String userId,  // ★追加
-            Model model) {
-
-        // Service に userId を渡す（DB 保存される）
-        List<GachaItem> results = gachaService.roll(count, userId);
-
+    public String roll(@RequestParam("count") int count, Model model) {
+        // Serviceのメソッド名 'roll' を使用し、リストを受け取る
+        List<GachaItem> results = gachaService.roll(count);
+        
+        // 結果画面（result.html）に渡す
         model.addAttribute("results", results);
-        model.addAttribute("userId", userId); // ★保持して次画面でも使える
-
+        
         return "gacha/result"; 
     }
 }
+
