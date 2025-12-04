@@ -10,6 +10,47 @@
     <link rel="stylesheet" th:href="@{/css/auth.css}">
 	
 	<script th:src="@{/js/theme.js}"></script>
+	<style>
+	    /* 既存のスタイル... */
+
+	    /* ▼▼▼ ここから追加・修正 ▼▼▼ */
+	    
+	    /* 親枠：ここを基準にアイコンを配置 */
+	    .password-wrapper {
+	        position: relative !important;
+	        display: block !important;
+	        width: 100% !important;
+	    }
+
+	    /* 入力欄：アイコンと重ならないように右に余白を開ける */
+	    .password-wrapper input {
+	        display: block !important;
+	        width: 100% !important;
+	        padding-right: 40px !important; /* 文字がアイコンに被らないように */
+	        box-sizing: border-box !important;
+	    }
+
+	    /* アイコン：親枠の右端・上下中央に絶対配置 */
+	    .password-wrapper .toggle-password-icon {
+	        position: absolute !important;
+	        top: 50% !important;
+	        right: 10px !important;       /* 右端からの距離 */
+	        transform: translateY(-50%) !important; /* ど真ん中に調整 */
+	        z-index: 10 !important;       /* 入力欄より手前に表示 */
+	        cursor: pointer;
+	        color: #888;
+	    }
+	    /* ▲▲▲ ここまで ▲▲▲ */
+		/* --- Microsoft Edge標準のパスワード表示ボタンを消す --- */
+		input::-ms-reveal {
+		    display: none;
+		}
+
+		/* （おまけ）入力欄の「×」クリアボタンも消したい場合 */
+		input::-ms-clear {
+		    display: none;
+		}
+	</style>
 </head>
 <body>
 <div class="main-container">
@@ -27,7 +68,10 @@
         </div>
         <div class="form-group" style="margin-bottom: 5px;">
             <label for="password">パスワード</label>
-            <input type="password" id="password" name="password" required placeholder="パスワード"autocomplete="off">
+			<div class="password-wrapper">
+			        <input type="password" id="password" name="password" required placeholder="パスワード" autocomplete="off">
+			        <i class="fa-solid fa-eye toggle-password-icon" onclick="togglePasswordVisibility('password', this)"></i>
+			    </div>
         </div>
         
         <div class="forgot-password-link">
@@ -44,6 +88,7 @@
         <a th:href="@{/register}">新規登録はこちら</a>
     </p>
 </div>
+<script th:src="@{/js/password.js}"></script>
 </body>
 </html>
 
