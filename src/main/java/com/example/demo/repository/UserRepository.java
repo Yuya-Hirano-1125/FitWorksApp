@@ -14,7 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // 【追加】メールアドレスでユーザーを検索するメソッド
     Optional<User> findByEmail(String email);
-
+    Optional<User> findByResetPasswordToken(String resetPasswordToken);
     // ★追加: レベルが高い順、同じならXPが多い順に上位20件を取得
     List<User> findTop20ByOrderByLevelDescExperiencePointsDesc();
 }

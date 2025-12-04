@@ -106,4 +106,41 @@ public class AuthController {
         }
         return "misc/home"; 
     }
+ // --- パスワードリセット実行 (メールリンクから遷移) ---
+    @GetMapping("/reset-password")
+    public String showResetPasswordForm(@RequestParam("token") String token, Model model) {
+        User user = userService.getByResetPasswordToken(token);
+        if (user == null) {
+            model.addAttribute("error", "無効なリンク、または有効期限切れです。もう一度リセット手続きを行ってください。");
+            return "auth/forgot-password"; 
+        }
+        model.addAttribute("token", token);
+        return "auth/reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String processResetPassword(@RequestParam("token") String token,
+                                       @RequestParam("password") String password,
+                                       @RequestParam("confirmPassword") String confirmPassword,
+                                       Model model) {
+        
+        // 1. トークンの再確認
+        User user = userService.getByResetPasswordToken(token);
+        if (user == null) {
+            model.addAttribute("error", "無効なリンクです。");
+            return "auth/forgot-password";
+        }
+
+        // 2. パスワード一致確認
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("error", "パスワードが一致しません。");
+            model.addAttribute("token", token);
+            return "auth/reset-password";
+        }
+
+        // 3. パスワード更新
+        userService.updatePassword(user, password);
+
+        return "redirect:/login?resetSuccess";
+    }
 }

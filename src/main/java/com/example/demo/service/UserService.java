@@ -1,14 +1,14 @@
 package com.example.demo.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime; // 追加
+import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID; // 追加
+import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired; // 追加
-import org.springframework.beans.factory.annotation.Value; // 追加
-import org.springframework.mail.SimpleMailMessage; // 追加
-import org.springframework.mail.javamail.JavaMailSender; // 追加
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +25,9 @@ public class UserService {
     private final TrainingRecordRepository trainingRecordRepository; 
     private final PasswordEncoder passwordEncoder; 
 
-    // ★追加: メールセンダー
     @Autowired
     private JavaMailSender mailSender;
 
-    // ★追加: ベースURL (application.propertiesから取得)
     @Value("${app.base-url}")
     private String baseUrl;
 
@@ -39,7 +37,7 @@ public class UserService {
         this.trainingRecordRepository = trainingRecordRepository;
     }
     
-    // --- 新規追加: ユーザー登録処理 ---
+    // --- ユーザー登録処理 (修正: メール送信を追加) ---
     @Transactional
     public void registerNewUser(String username, String email, String rawPassword) {
         // 1. ユーザー名の重複チェック
@@ -56,16 +54,39 @@ public class UserService {
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setEmail(email);
-        // パスワードをBCryptでハッシュ化して保存
         newUser.setPassword(passwordEncoder.encode(rawPassword));
         
-        // 初期設定
         newUser.setLevel(1);
         newUser.setExperiencePoints(0);
         newUser.setTheme("default");
 
         // 4. DBに保存
         userRepository.save(newUser);
+
+        // ★追加: 登録完了メールを送信
+        sendRegistrationEmail(newUser.getEmail(), newUser.getUsername());
+    }
+
+    // ★追加: 登録完了メール送信メソッド
+    private void sendRegistrationEmail(String toEmail, String username) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("noreply@fitworks.com");
+            message.setTo(toEmail);
+            message.setSubject("【FitWorks】会員登録ありがとうございます");
+            message.setText(username + " 様\n\n" +
+                            "FitWorksへの会員登録が完了しました。\n" +
+                            "以下のURLからログインしてトレーニングを始めましょう！\n\n" +
+                            "ログイン: " + baseUrl + "/login\n\n" +
+                            "※このメールにお心当たりがない場合は破棄してください。");
+            
+            mailSender.send(message);
+            System.out.println("登録完了メールを送信しました: " + toEmail);
+        } catch (Exception e) {
+            // メール送信に失敗しても登録自体はロールバックしないようにcatchしてログ出力に留める
+            e.printStackTrace();
+            System.err.println("登録完了メールの送信に失敗しました: " + e.getMessage());
+        }
     }
 
     // --- 以下、既存のメソッド ---
@@ -82,25 +103,20 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
     
-    // ★修正: パスワードリセット処理（メール送信実装）
     @Transactional
     public boolean processForgotPassword(String email) {
         Optional<User> optionalUser = findByEmail(email);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             
-            // 1. トークンの生成 (UUID)
             String token = UUID.randomUUID().toString();
             
-            // 2. ユーザー情報にトークンと有効期限(例: 24時間)を保存
             user.setResetPasswordToken(token);
             user.setTokenExpiration(LocalDateTime.now().plusHours(24));
-            userRepository.save(user); // DB更新
+            userRepository.save(user);
             
-            // 3. リセットリンクの作成
             String resetLink = baseUrl + "/reset-password?token=" + token;
             
-            // 4. メール送信
             sendResetEmail(user.getEmail(), resetLink);
             
             System.out.println("パスワードリセットリンクを送信しました: " + email);
@@ -111,11 +127,10 @@ public class UserService {
         }
     }
 
-    // ★追加: メール送信のヘルパーメソッド
     private void sendResetEmail(String toEmail, String resetLink) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("noreply@fitworks.com"); // 送信元(設定によっては上書きされる場合あり)
+            message.setFrom("noreply@fitworks.com");
             message.setTo(toEmail);
             message.setSubject("【FitWorks】パスワード再設定のご案内");
             message.setText("以下のリンクをクリックしてパスワードを再設定してください。\n\n" + resetLink + "\n\n(このリンクは24時間有効です)");
@@ -214,6 +229,21 @@ public class UserService {
         LocalDate today = LocalDate.now();
         user.setLastMissionCompletionDate(today);
         user.setIsRewardClaimedToday(false); 
+        userRepository.save(user);
+    }
+ // ★追加: トークンからユーザーを取得（有効期限チェック付き）
+    public User getByResetPasswordToken(String token) {
+        return userRepository.findByResetPasswordToken(token)
+                .filter(u -> u.getTokenExpiration() != null && u.getTokenExpiration().isAfter(LocalDateTime.now()))
+                .orElse(null);
+    }
+
+    // ★追加: パスワードを更新してトークンを無効化
+    @Transactional
+    public void updatePassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetPasswordToken(null); // トークンをクリア
+        user.setTokenExpiration(null);
         userRepository.save(user);
     }
 }
