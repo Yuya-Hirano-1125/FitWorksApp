@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>背景一覧 | FitWorks</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
+	    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    
+    <link rel="stylesheet" th:href="@{/css/characters/Backgrounds.css}">
+
+    </head>
+<body class="font-sans">
+
+<div class="main-container"> 
+    
+    <div class="header-section">
+        <h1 class="flex items-center">
+            <i class="fa-solid fa-cloud mr-3 text-[var(--primary-color)] text-4xl"></i> 
+            背景一覧
+        </h1>
+        <p class="sub-heading">ホーム画面の背景をカスタマイズできます</p>
+    </div>
+
+    <section class="background-section">
+        <h2>背景選択</h2>
+        
+        <div id="background-list" class="grid grid-cols-2 sm:grid-cols-3 gap-6">
+
+            <div id="card-classroom" class="background-card selected" data-bg="classroom">
+                <div class="card-image-container aspect-video">
+                    <img src="classroom.jpg" alt="教室" class="w-full h-full object-cover">
+                    <div class="card-name-overlay">
+                        教室
+                    </div>
+                </div>
+                <div class="card-status-area">
+                    <p class="status-text">適用中</p>
+                </div>
+            </div>
+
+            <div id="card-gaming-room" class="background-card" data-bg="gaming-room">
+                <div class="card-image-container aspect-video">
+                    <img src="gaming-room.jpg" alt="ゲーミングルーム" class="w-full h-full object-cover">
+                    <div class="card-name-overlay">
+                        ゲーミングルーム
+                    </div>
+                </div>
+                <div class="card-status-area">
+                    <button data-action="select" class="select-button">選択</button>
+                </div>
+            </div>
+            
+            <div id="card-deep-forest" class="background-card" data-bg="deep-forest">
+                <div class="card-image-container aspect-video">
+                    <img src="deep-forest.jpg" alt="深い森" class="w-full h-full object-cover">
+                    <div class="card-name-overlay">
+                        深い森
+                    </div>
+                </div>
+                <div class="card-status-area">
+                    <button data-action="select" class="select-button">選択</button>
+                </div>
+            </div>
+            <div id="card-town-view" class="background-card" data-bg="town-view">
+                <div class="card-image-container aspect-video">
+                    <img src="town-view.jpg" alt="街並み" class="w-full h-full object-cover">
+                    <div class="card-name-overlay">
+                        街並み
+                    </div>
+                </div>
+                <div class="card-status-area">
+                    <button data-action="select" class="select-button">選択</button>
+                </div>
+            </div>
+            <div id="card-dark-castle" class="background-card" data-bg="dark-castle">
+                <div class="card-image-container aspect-video">
+                    <img src="dark-original.jpg" alt="夜の城" class="w-full h-full object-cover">
+                    <div class="card-name-overlay">
+                        夜の城
+                    </div>
+                </div>
+                <div class="card-status-area">
+                    <button data-action="select" class="select-button">選択</button>
+                </div>
+            </div>
+            <div id="card-cloud-sky" class="background-card" data-bg="cloud-sky">
+                <div class="card-image-container aspect-video">
+                    <img src="light-original.jpg" alt="雲の上" class="w-full h-full object-cover">
+                    <div class="card-name-overlay">
+                        雲の上
+                    </div>
+                </div>
+                <div class="card-status-area">
+                    <button data-action="select" class="select-button">選択</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="back-btn-container">
+        <a href="#" class="button secondary">
+            <i class="fa-solid fa-arrow-left mr-3"></i> メニューに戻る
+        </a>
+    </div>
+</div>
+
+<script src="Backgrounds.js"></script>
+
+</body>
+</html>

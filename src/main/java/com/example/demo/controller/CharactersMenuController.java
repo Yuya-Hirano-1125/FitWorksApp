@@ -29,4 +29,9 @@ public class CharactersMenuController {
     public String showCharactersEvolutionMaterial() {
         return "characters/menu/CharactersEvolutionMaterial"; 
     }
+ // --- 背景一覧画面へ遷移 ---
+    @GetMapping("/characters/menu/Backgrounds")
+    public String showBackgrounds() {
+    	return "characters/menu/Backgrounds"; 
+    }
 }
