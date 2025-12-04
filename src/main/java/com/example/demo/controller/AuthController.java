@@ -21,77 +21,106 @@ public class AuthController {
         this.userService = userService;
     }
 
-    // --- スタート画面 ---
     @GetMapping("/")
-    public String showStartPage() {
-        return "start"; 
-    }
+    public String showStartPage() { return "start"; }
 
-    // --- ログイン/登録関連 ---
     @GetMapping("/login")
     public String login() { return "auth/login"; } 
 
+    // --- 新規登録 ---
     @GetMapping("/register")
     public String registerForm() { return "auth/register"; } 
 
-    // ★★★ 修正: 実際の登録処理を実装 ★★★
     @PostMapping("/register")
     public String registerUser(@RequestParam("username") String username,
                                @RequestParam("email") String email,
+                               @RequestParam("phoneNumber") String phoneNumber, // 追加
                                @RequestParam("password") String password,
                                @RequestParam("confirmPassword") String confirmPassword,
                                Model model) {
-        
-        // 1. パスワードの一致確認
         if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "パスワードと確認用パスワードが一致しません。");
-            return "auth/register"; // 入力画面に戻る
+            model.addAttribute("error", "パスワードが一致しません。");
+            return "auth/register";
         }
-
         try {
-            // 2. サービスを呼び出して保存
-            userService.registerNewUser(username, email, password);
-            
-            // 3. 成功したらログイン画面へリダイレクト（パラメータでメッセージ表示などを制御可能）
+            // 電話番号も含めて登録
+            userService.registerNewUser(username, email, phoneNumber, password);
             return "redirect:/login?registered"; 
-            
         } catch (IllegalArgumentException e) {
-            // ユーザー名やメールの重複エラーなど
             model.addAttribute("error", e.getMessage());
             return "auth/register";
         } catch (Exception e) {
-            // その他の予期せぬエラー
             e.printStackTrace();
-            model.addAttribute("error", "登録中にエラーが発生しました。もう一度お試しください。");
+            model.addAttribute("error", "登録中にエラーが発生しました。");
             return "auth/register";
         }
     }
 
-    // --- パスワードリセット ---
+    // --- パスワードリセット (SMSフロー) ---
     @GetMapping("/forgot-password")
     public String forgotPasswordForm() { return "auth/forgot-password"; } 
 
     @PostMapping("/forgot-password")
-    public String processForgotPassword(@RequestParam("email") String email,
+    public String processForgotPassword(@RequestParam("phoneNumber") String phoneNumber,
                                         RedirectAttributes redirectAttributes) {
-        boolean emailFoundAndSent = userService.processForgotPassword(email); 
+        // SMSでコード送信
+        boolean sent = userService.processForgotPasswordBySms(phoneNumber);
         
-        if (emailFoundAndSent) {
-            return "redirect:/forgot-password?success"; 
+        if (sent) {
+            redirectAttributes.addFlashAttribute("phoneNumber", phoneNumber);
+            return "redirect:/verify-code"; // コード入力画面へ
         } else {
             return "redirect:/forgot-password?error"; 
         }
     }
 
-    // --- ホーム画面 ---
+    // --- 認証コード確認画面 ---
+    @GetMapping("/verify-code")
+    public String verifyCodeForm() { return "auth/verify-code"; }
+
+    @PostMapping("/verify-code")
+    public String verifyCode(@RequestParam("phoneNumber") String phoneNumber,
+                             @RequestParam("code") String code,
+                             Model model) {
+        // コード（トークン）でユーザー検索
+        User user = userService.getByResetPasswordToken(code);
+        
+        // ユーザーが存在し、電話番号も一致すればOK
+        if (user != null && user.getPhoneNumber().equals(phoneNumber)) {
+            model.addAttribute("token", code);
+            return "auth/reset-password"; // パスワード変更画面へ
+        } else {
+            model.addAttribute("error", "認証コードが無効か、期限切れです。");
+            model.addAttribute("phoneNumber", phoneNumber);
+            return "auth/verify-code";
+        }
+    }
+
+    // --- パスワード変更実行 ---
+    @PostMapping("/reset-password")
+    public String processResetPassword(@RequestParam("token") String token,
+                                       @RequestParam("password") String password,
+                                       @RequestParam("confirmPassword") String confirmPassword,
+                                       Model model) {
+        User user = userService.getByResetPasswordToken(token);
+        if (user == null) {
+            model.addAttribute("error", "セッションが無効です。最初からやり直してください。");
+            return "auth/forgot-password";
+        }
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("error", "パスワードが一致しません。");
+            model.addAttribute("token", token);
+            return "auth/reset-password";
+        }
+        userService.updatePassword(user, password);
+        return "redirect:/login?resetSuccess";
+    }
+
+    // --- ホーム ---
     @GetMapping("/home")
-    public String home(
-        @AuthenticationPrincipal UserDetails userDetails,
-        Model model
-    ) {
+    public String home(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
-            
             if (user != null) {
                 model.addAttribute("username", user.getUsername());
                 model.addAttribute("level", user.getLevel());
@@ -105,42 +134,5 @@ public class AuthController {
             model.addAttribute("username", "ゲスト");
         }
         return "misc/home"; 
-    }
- // --- パスワードリセット実行 (メールリンクから遷移) ---
-    @GetMapping("/reset-password")
-    public String showResetPasswordForm(@RequestParam("token") String token, Model model) {
-        User user = userService.getByResetPasswordToken(token);
-        if (user == null) {
-            model.addAttribute("error", "無効なリンク、または有効期限切れです。もう一度リセット手続きを行ってください。");
-            return "auth/forgot-password"; 
-        }
-        model.addAttribute("token", token);
-        return "auth/reset-password";
-    }
-
-    @PostMapping("/reset-password")
-    public String processResetPassword(@RequestParam("token") String token,
-                                       @RequestParam("password") String password,
-                                       @RequestParam("confirmPassword") String confirmPassword,
-                                       Model model) {
-        
-        // 1. トークンの再確認
-        User user = userService.getByResetPasswordToken(token);
-        if (user == null) {
-            model.addAttribute("error", "無効なリンクです。");
-            return "auth/forgot-password";
-        }
-
-        // 2. パスワード一致確認
-        if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "パスワードが一致しません。");
-            model.addAttribute("token", token);
-            return "auth/reset-password";
-        }
-
-        // 3. パスワード更新
-        userService.updatePassword(user, password);
-
-        return "redirect:/login?resetSuccess";
     }
 }

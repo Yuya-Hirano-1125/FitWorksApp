@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>認証コード入力 | FitWorks</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+<div class="main-container">
+    <h1>認証コード確認</h1>
+    <p class="info-message">SMSに届いた6桁の数字を入力してください。</p>
+    
+    <p th:if="${error}" class="error-message" th:text="${error}"></p>
+
+    <form th:action="@{/verify-code}" method="post">
+        <input type="hidden" name="phoneNumber" th:value="${phoneNumber != null ? phoneNumber : param.phoneNumber}">
+        
+        <div class="form-group">
+            <label for="code">認証コード</label>
+            <input type="text" id="code" name="code" required placeholder="123456" maxlength="6" style="text-align:center; letter-spacing: 5px; font-size: 1.5em;">
+        </div>
+        
+        <div class="button-container">
+            <button type="submit" class="button primary">次へ</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

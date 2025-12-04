@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/auth.css}">
-	
 	<script th:src="@{/js/theme.js}"></script>
 </head>
 <body>
@@ -16,48 +15,41 @@
     <h1><i class="fa-solid fa-running header-icon"></i>アカウント登録</h1>
     <p class="sub-heading">あなたのフィットネスの目標達成へ向け、今すぐサインアップ！</p>
     
-    <p th:if="${error}" class="error-message" th:text="${error}">
-        </p>
+    <p th:if="${error}" class="error-message" th:text="${error}"></p>
     
     <form th:action="@{/register}" method="post">
-		<div class="form-group">
-		        <label for="new-username">ユーザー名</label>
-		        <input type="text" id="new-username" name="username" required placeholder="ユーザー名を入力" autocomplete="off">
-		    </div>
-		    <div class="form-group">
-		        <label for="email">メールアドレス</label>
-		        <input type="email" id="email" name="email" required placeholder="contact@example.com" autocomplete="off">
-		    </div>
-		    <div class="form-group">
-		        <label for="new-password">パスワード</label>
-		        <input type="password" id="new-password" name="password" required placeholder="パスワードを入力" autocomplete="off">
-		            <div id="password-strength-indicator" class="strength-indicator">
-		                <span id="strength-text">強度: 未入力</span>
-		                <div class="bar-container">
-		                    <div id="strength-bar" class="strength-bar weak"></div>
-		                </div>
-		            </div>
-					<ul id="password-criteria" class="criteria-list">
-						<li id="criteria-length" class="criterion unmet">
-							 <i class="fa-solid fa-xmark"></i> 8文字以上であること
-						</li>
-						<li id="criteria-uppercase" class="criterion unmet">
-							 <i class="fa-solid fa-xmark"></i> 英大文字（A–Z）を含める
-						</li>
-						<li id="criteria-number" class="criterion unmet">
-							 <i class="fa-solid fa-xmark"></i> 数字（0–9）を含める
-						</li>
-						<li id="criteria-special" class="criterion unmet">
-							<i class="fa-solid fa-xmark"></i> 記号（!@#$%^& など）を含める
-						</li>
-					</ul>
-		            </div>
-		        <div class="form-group">
-		</div>
-		<div class="form-group">
-		        <label for="confirm-password">パスワード（確認）</label>
-		        <input type="password" id="confirm-password" name="confirmPassword" required placeholder="パスワードを再度入力" autocomplete="off">
-		    </div>        
+        <div class="form-group">
+            <label for="new-username">ユーザー名</label>
+            <input type="text" id="new-username" name="username" required placeholder="ユーザー名を入力" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="email">メールアドレス</label>
+            <input type="email" id="email" name="email" required placeholder="contact@example.com" autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="phoneNumber">電話番号</label>
+            <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="例: 09012345678" autocomplete="tel">
+        </div>
+        <div class="form-group">
+            <label for="new-password">パスワード</label>
+            <input type="password" id="new-password" name="password" required placeholder="パスワードを入力" autocomplete="off">
+            <div id="password-strength-indicator" class="strength-indicator">
+                <span id="strength-text">強度: 未入力</span>
+                <div class="bar-container">
+                    <div id="strength-bar" class="strength-bar weak"></div>
+                </div>
+            </div>
+            <ul id="password-criteria" class="criteria-list">
+                <li id="criteria-length" class="criterion unmet"><i class="fa-solid fa-xmark"></i> 8文字以上であること</li>
+                <li id="criteria-uppercase" class="criterion unmet"><i class="fa-solid fa-xmark"></i> 英大文字（A–Z）を含める</li>
+                <li id="criteria-number" class="criterion unmet"><i class="fa-solid fa-xmark"></i> 数字（0–9）を含める</li>
+                <li id="criteria-special" class="criterion unmet"><i class="fa-solid fa-xmark"></i> 記号（!@#$%^& など）を含める</li>
+            </ul>
+        </div>
+        <div class="form-group">
+            <label for="confirm-password">パスワード（確認）</label>
+            <input type="password" id="confirm-password" name="confirmPassword" required placeholder="パスワードを再度入力" autocomplete="off">
+        </div>        
         <div class="button-container">
             <button type="submit" class="button primary">アカウントを作成</button>
         </div>
@@ -70,247 +62,3 @@
 <script th:src="@{/js/password-check.js}"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
