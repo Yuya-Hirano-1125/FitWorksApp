@@ -6,13 +6,28 @@
     <title>背景一覧 | FitWorks</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
-	    
     <script src="https://cdn.tailwindcss.com"></script>
-    
     
     <link rel="stylesheet" th:href="@{/css/characters/Backgrounds.css}">
 
-    </head>
+    <style>
+        .card-name-overlay { pointer-events: none; }
+        .background-card.selected {
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        .status-text { color: var(--primary-color); font-weight: bold; }
+        .select-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: var(--primary-color);
+            color: #fff;
+            font-weight: 700;
+            transition: opacity .2s ease;
+        }
+        .select-button:hover { opacity: .9; }
+    </style>
+</head>
 <body class="font-sans">
 
 <div class="main-container"> 
@@ -30,85 +45,209 @@
         
         <div id="background-list" class="grid grid-cols-2 sm:grid-cols-3 gap-6">
 
+            
             <div id="card-classroom" class="background-card selected" data-bg="classroom">
                 <div class="card-image-container aspect-video">
-                    <img src="classroom.jpg" alt="教室" class="w-full h-full object-cover">
-                    <div class="card-name-overlay">
-                        教室
-                    </div>
+                    <img th:src="@{/img/background/classroom.png}" alt="教室" class="w-full h-full object-cover cursor-pointer">
+                    <div class="card-name-overlay">教室</div>
                 </div>
                 <div class="card-status-area">
                     <p class="status-text">適用中</p>
                 </div>
             </div>
 
+           
             <div id="card-gaming-room" class="background-card" data-bg="gaming-room">
                 <div class="card-image-container aspect-video">
-                    <img src="gaming-room.jpg" alt="ゲーミングルーム" class="w-full h-full object-cover">
-                    <div class="card-name-overlay">
-                        ゲーミングルーム
-                    </div>
+                    <img th:src="@{/img/background/gaming-room.png}" alt="ゲーミングルーム" class="w-full h-full object-cover cursor-pointer">
+                    <div class="card-name-overlay">ゲーミングルーム</div>
                 </div>
                 <div class="card-status-area">
-                    <button data-action="select" class="select-button">選択</button>
+                    <button type="button" class="select-button" data-action="select">選択</button>
                 </div>
             </div>
             
             <div id="card-deep-forest" class="background-card" data-bg="deep-forest">
                 <div class="card-image-container aspect-video">
-                    <img src="deep-forest.jpg" alt="深い森" class="w-full h-full object-cover">
-                    <div class="card-name-overlay">
-                        深い森
-                    </div>
+                    <img th:src="@{/img/background/deep-forest.png}" alt="深い森" class="w-full h-full object-cover cursor-pointer">
+                    <div class="card-name-overlay">深い森</div>
                 </div>
                 <div class="card-status-area">
-                    <button data-action="select" class="select-button">選択</button>
+                    <button type="button" class="select-button" data-action="select">選択</button>
                 </div>
             </div>
+
             <div id="card-town-view" class="background-card" data-bg="town-view">
                 <div class="card-image-container aspect-video">
-                    <img src="town-view.jpg" alt="街並み" class="w-full h-full object-cover">
-                    <div class="card-name-overlay">
-                        街並み
-                    </div>
+                    <img th:src="@{/img/background/town-view.png}" alt="街並み" class="w-full h-full object-cover cursor-pointer">
+                    <div class="card-name-overlay">街並み</div>
                 </div>
                 <div class="card-status-area">
-                    <button data-action="select" class="select-button">選択</button>
+                    <button type="button" class="select-button" data-action="select">選択</button>
                 </div>
             </div>
+
             <div id="card-dark-castle" class="background-card" data-bg="dark-castle">
                 <div class="card-image-container aspect-video">
-                    <img src="dark-original.jpg" alt="夜の城" class="w-full h-full object-cover">
-                    <div class="card-name-overlay">
-                        夜の城
-                    </div>
+                    <img th:src="@{/img/background/dark-original.png}" alt="夜の城" class="w-full h-full object-cover cursor-pointer">
+                    <div class="card-name-overlay">夜の城</div>
                 </div>
                 <div class="card-status-area">
-                    <button data-action="select" class="select-button">選択</button>
+                    <button type="button" class="select-button" data-action="select">選択</button>
                 </div>
             </div>
+
             <div id="card-cloud-sky" class="background-card" data-bg="cloud-sky">
                 <div class="card-image-container aspect-video">
-                    <img src="light-original.jpg" alt="雲の上" class="w-full h-full object-cover">
-                    <div class="card-name-overlay">
-                        雲の上
-                    </div>
+                    <img th:src="@{/img/background/light-original.png}" alt="雲の上" class="w-full h-full object-cover cursor-pointer">
+                    <div class="card-name-overlay">雲の上</div>
                 </div>
                 <div class="card-status-area">
-                    <button data-action="select" class="select-button">選択</button>
+                    <button type="button" class="select-button" data-action="select">選択</button>
+                </div>
+            </div>
+
+            
+            <div id="card-fire" class="background-card" data-bg="fire-original">
+                <div class="card-image-container aspect-video">
+                    <img th:src="@{/img/background/fire-original.png}" alt="炎の世界" class="w-full h-full object-cover cursor-pointer">
+                    <div class="card-name-overlay">炎の世界</div>
+                </div>
+                <div class="card-status-area">
+                    <button type="button" class="select-button">選択</button>
+                </div>
+            </div>
+
+            <div id="card-grass" class="background-card" data-bg="grass-original">
+                <div class="card-image-container aspect-video">
+                    <img th:src="@{/img/background/grass-original.png}" alt="草原" class="w-full h-full object-cover cursor-pointer">
+                    <div class="card-name-overlay">草原</div>
+                </div>
+                <div class="card-status-area">
+                    <button type="button" class="select-button">選択</button>
+                </div>
+            </div>
+
+            <div id="card-server-room" class="background-card" data-bg="server-room">
+                <div class="card-image-container aspect-video">
+                    <img th:src="@{/img/background/server-room.png}" alt="サーバールーム" class="w-full h-full object-cover cursor-pointer">
+                    <div class="card-name-overlay">サーバールーム</div>
+                </div>
+                <div class="card-status-area">
+                    <button type="button" class="select-button">選択</button>
+                </div>
+            </div>
+
+            <div id="card-snow-road" class="background-card" data-bg="snow-road">
+                <div class="card-image-container aspect-video">
+                    <img th:src="@{/img/background/snow-road.png}" alt="雪道" class="w-full h-full object-cover cursor-pointer">
+                    <div class="card-name-overlay">雪道</div>
+                </div>
+                <div class="card-status-area">
+                    <button type="button" class="select-button">選択</button>
+                </div>
+            </div>
+
+            <div id="card-water" class="background-card" data-bg="water-original">
+                <div class="card-image-container aspect-video">
+                    <img th:src="@{/img/background/water-original.png}" alt="水の世界" class="w-full h-full object-cover cursor-pointer">
+                    <div class="card-name-overlay">水の世界</div>
+                </div>
+                <div class="card-status-area">
+                    <button type="button" class="select-button">選択</button>
                 </div>
             </div>
 
         </div>
-    </section>
+    
+		<div class="back-btn-container flex justify-center mt-8">
+		    <a th:href="@{/characters/menu/CharactersMenu}" 
+		       class="button secondary w-full max-w-xl px-10 py-5 text-2xl font-bold rounded-lg 
+		              bg-[var(--primary-color)] text-white hover:opacity-90 shadow-lg transition text-center">
+		        <i class="fa-solid fa-arrow-left mr-3"></i> キャラクターメニューに戻る
+		    </a>
+		</div>
 
-	<div class="back-btn-container">
-	        <a th:href="@{/characters/menu/CharactersMenu}" class="button secondary">
-	            <i class="fa-solid fa-arrow-left"></i> 戻る
-	        </a>
+
+    <!-- ポップアップ -->
+    <div id="popup" class="hidden fixed inset-0 z-[1000] bg-black/70 flex items-center justify-center p-4">
+        <div class="flex flex-col items-center">
+            <img id="popup-image" src="" alt="背景全体" class="max-w-[90vw] max-h-[80vh] rounded shadow-lg">
+            <button id="close-popup" 
+                    class="mt-6 px-8 py-3 rounded-lg font-bold text-white 
+                           bg-[var(--primary-color)] hover:opacity-90 
+                           shadow-lg transition" type="button">
+                閉じる
+            </button>
+        </div>
+    </div>
+
+    <script src="Backgrounds.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const backgroundList = document.getElementById('background-list');
+            const popup = document.getElementById('popup');
+            const popupImage = document.getElementById('popup-image');
+            const closePopup = document.getElementById('close-popup');
+
+            // 画像クリックでポップアップ表示
+            backgroundList.addEventListener('click', (e) => {
+                const img = e.target.closest('.card-image-container img');
+                if (img) {
+                    popupImage.src = img.src;
+                    popup.classList.remove('hidden');
+                }
+            });
+
+            // 閉じるボタン
+            closePopup.addEventListener('click', () => {
+                popup.classList.add('hidden');
+                popupImage.src = '';
+            });
+
+            // 背景クリックでも閉じる
+            popup.addEventListener('click', (e) => {
+                if (e.target === popup) {
+                    popup.classList.add('hidden');
+                    popupImage.src = '';
+                }
+            });
+
+            // 選択ボタンで背景適用（イベント委譲）
+            backgroundList.addEventListener('click', (e) => {
+                const selectBtn = e.target.closest('.select-button');
+                if (!selectBtn) return;
+
+                e.preventDefault();
+
+                // 対象カードを取得
+                const targetCard = selectBtn.closest('.background-card');
+                if (!targetCard) return;
+
+                // 全カードの選択解除＆ステータスを「選択」に戻す
+                document.querySelectorAll('.background-card').forEach(card => {
+                    card.classList.remove('selected');
+                    const statusArea = card.querySelector('.card-status-area');
+                    if (statusArea) {
+                        // 既存のノードを再利用（イベント委譲なのでOK）
+                        statusArea.innerHTML = '<button type="button" class="select-button" data-action="select">選択</button>';
+                    }
+                });
+
+                // 対象カードを適用中に変更
+                targetCard.classList.add('selected');
+                const targetStatus = targetCard.querySelector('.card-status-area');
+                if (targetStatus) {
+                    targetStatus.innerHTML = '<p class="status-text">適用中</p>';
+                }
+
+                // ここで実際の背景適用処理が必要なら、データ属性で識別して反映（例）
+                // const bgKey = targetCard.dataset.bg;
+                // applyBackground(bgKey); // 例えばページ背景の切り替えなど
+            });
+        });
+    </script>
+
 </div>
-
-<script src="Backgrounds.js"></script>
-
 </body>
 </html>
