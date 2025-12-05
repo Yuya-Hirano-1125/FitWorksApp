@@ -10,6 +10,43 @@
     <link rel="stylesheet" th:href="@{/css/training-log.css}"> 
 	
 	<script th:src="@{/js/theme.js}"></script>
+    <style>
+        /* SNSシェアボタン用スタイル */
+        .sns-buttons-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .btn-sns {
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            border: none;
+        }
+        .btn-sns:hover { opacity: 0.9; transform: translateY(-1px); color: white; }
+        .btn-sns i { margin-right: 5px; font-size: 1.1em; }
+
+        /* X (Twitter) */
+        .btn-sns-x { background-color: #000; }
+        
+        /* LINE */
+        .btn-sns-line { background-color: #06C755; }
+        
+        /* Instagram (グラデーション) */
+        .btn-sns-insta { 
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); 
+        }
+    </style>
 </head>
 <body class="training-log-page">
 <div class="main-container">
@@ -106,6 +143,40 @@
     </a>
 </div>
 
+<div th:if="${aiAdvice}" id="aiAdviceModal" class="modal is-active" style="z-index: 2000;">
+    <div class="modal-content" style="max-width: 400px; text-align: center; background: #fff; border-radius: 15px; padding: 30px;">
+        <span class="close-button" onclick="document.getElementById('aiAdviceModal').style.display='none'">&times;</span>
+        
+        <div style="margin-bottom: 15px;">
+            <img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4CAF50; padding: 2px;">
+        </div>
+        
+        <h3 style="color: #4CAF50; margin-bottom: 15px; font-weight: bold;">Good Job!</h3>
+        
+        <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; position: relative;">
+            <i class="fa-solid fa-quote-left" style="color: #bcdbf3; font-size: 1.5em; position: absolute; top: 10px; left: 10px;"></i>
+            <p id="aiAdviceText" th:text="${aiAdvice}" style="margin: 0; padding: 5px 10px; color: #333; font-weight: 500; line-height: 1.6;">
+                ここにAIからのアドバイスが表示されます。
+            </p>
+        </div>
+
+        <div class="sns-buttons-container">
+            <button onclick="shareToX()" class="btn-sns btn-sns-x">
+                <i class="fa-brands fa-x-twitter"></i> X
+            </button>
+            <button onclick="shareToLine()" class="btn-sns btn-sns-line">
+                <i class="fa-brands fa-line"></i> LINE
+            </button>
+            <button onclick="shareToInstagram()" class="btn-sns btn-sns-insta">
+                <i class="fa-brands fa-instagram"></i> Insta
+            </button>
+            <button onclick="document.getElementById('aiAdviceModal').style.display='none'" class="btn-sns" style="background-color: #777; width: auto; padding: 10px 20px;">
+                閉じる
+            </button>
+        </div>
+    </div>
+</div>
+
 <script th:inline="javascript">
     // トレーニングフォームを非同期で読み込む関数
     function loadTrainingForm(type, date) {
@@ -148,7 +219,7 @@
         formContainer.innerHTML = '<p>フォームを読み込んでいます...</p>';
         loadTrainingForm('WEIGHT', dateString);
 
-        // 記録済みメッセージの表示切り替え（簡易版）
+        // 記録済みメッセージの表示切り替え
         const logViewArea = document.getElementById('logViewArea');
         if (isLogged) {
             logViewArea.innerHTML = '<p style="font-weight: 700; color: var(--primary-color); margin-bottom: 10px;">✅ この日は記録済みです。新しい記録を追加するか、全記録を確認してください。</p>';
@@ -172,12 +243,49 @@
     // モーダル外クリックで閉じる処理
     window.onclick = function(event) {
         const modal = document.getElementById('logModal');
-        if (modal.classList.contains('is-active') && event.target === modal) {
+        const adviceModal = document.getElementById('aiAdviceModal');
+        
+        if (modal && modal.classList.contains('is-active') && event.target === modal) {
             closeLogModal();
         }
+        // AIアドバイスモーダル用
+        if (adviceModal && event.target === adviceModal) {
+            adviceModal.style.display = 'none';
+        }
+    }
+
+    // ----------------------------------------------------
+    //  SNSシェア機能用スクリプト
+    // ----------------------------------------------------
+    function getShareText() {
+        const adviceText = document.getElementById('aiAdviceText').innerText;
+        return `【FitWorks】トレーニング完了！🔥\nAIトレーナー「${adviceText}」\n\n#FitWorks #筋トレ #ワークアウト`;
+    }
+
+    function shareToX() {
+        const text = getShareText();
+        const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(shareUrl, '_blank');
+    }
+
+    function shareToLine() {
+        const text = getShareText();
+        const shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
+        window.open(shareUrl, '_blank');
+    }
+
+    function shareToInstagram() {
+        const text = getShareText();
+        navigator.clipboard.writeText(text).then(() => {
+            alert("文章をコピーしました！📋\nInstagramを開きます。投稿やストーリーズに貼り付けてください。");
+            window.open('https://www.instagram.com/', '_blank');
+        }).catch(err => {
+            console.error('Copy failed', err);
+            alert("文章のコピーに失敗しました。\n(手動でコピーしてください)");
+            window.open('https://www.instagram.com/', '_blank');
+        });
     }
 </script>
 
 </body>
 </html>
-

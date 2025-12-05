@@ -16,10 +16,28 @@ public class AICoachService {
     @Value("${gemini.api.key}")
     private String apiKey;
 
+    /**
+     * チャットでの相談に対する回答を生成する
+     */
     public String generateCoachingAdvice(User user, List<TrainingRecord> history, String userMessage) {
         String systemPrompt = buildSystemPrompt(user, history);
         String fullPrompt = systemPrompt + "\n\nUser Question: " + userMessage;
         return callGeminiApi(fullPrompt); 
+    }
+
+    /**
+     * ★追加: トレーニング記録に対するワンポイントアドバイスを生成する
+     */
+    public String generateTrainingAdvice(User user, String trainingSummary) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("あなたはフィットネスアプリの専属AIトレーナーです。\n");
+        sb.append("ユーザーがトレーニングを記録しました。この努力を盛大に褒めて、モチベーションを上げてください。\n");
+        sb.append("【ユーザー】").append(user.getUsername()).append("さん\n");
+        sb.append("【行ったトレーニング】").append(trainingSummary).append("\n");
+        
+        sb.append("\nルール: 100文字以内で簡潔に。熱血かつポジティブに。絵文字(💪🔥など)を多用して。語尾にムキをつけてください。");
+
+        return callGeminiApi(sb.toString());
     }
 
     private String buildSystemPrompt(User user, List<TrainingRecord> history) {
@@ -49,14 +67,13 @@ public class AICoachService {
             sb.append("- 記録なし\n");
         }
 
-        // ★ 修正点: 記号禁止ルールをより強力かつシンプルに記述
         sb.append("\n【回答の絶対ルール（厳守）】\n");
         sb.append("1. テキスト内の強調表示（太字）は一切禁止です。アスタリスク記号は絶対に使わないでください。\n");
         sb.append("2. メニュー名や見出しもプレーンテキストで出力してください。\n");
         sb.append("3. 箇条書きには「・」または「- 」のみを使用してください。\n");
         sb.append("4. 構成は「挨拶」→「メニュー（箇条書き）」→「一言」の順で、簡潔にまとめてください。\n");
-        sb.append("5. 100文字以内で書いてください。\n");
-        sb.append(". 語尾にムキをつけてください。\n");
+        sb.append("5. 200文字以内で書いてください。\n");
+        sb.append("6. 語尾にムキをつけてください。\n");
 
         return sb.toString();
     }
@@ -67,15 +84,13 @@ public class AICoachService {
                 .apiKey(apiKey)
                 .build();
             
-            // モデル名を指定（もし2.5で挙動が安定しない場合は "gemini-1.5-flash" もお試しください）
-            GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", prompt, null);
+            // 応答速度重視のモデルを使用
+            GenerateContentResponse response = client.models.generateContent("gemini-2.0-flash", prompt, null);
             return response.text();
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "通信エラーが発生しました。もう一度試してください。";
+            return "トレーニングお疲れ様です！その調子で筋肉を育てていきましょう！ムキ！💪";
         }
     }
 }
-
-

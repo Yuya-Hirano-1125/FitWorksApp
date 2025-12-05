@@ -229,8 +229,18 @@ public class TrainingDataService {
         return CARDIO_DATA_LIST;
     }
 
-    // 以前のController/Viewが期待する単純な文字列マップに変換して返す（後方互換用）
-    public Map<String, List<String>> getSimpleFreeWeightExercisesMap() {
+    // 文字列リストを返す（Controller互換用）
+    public List<String> getSimpleCardioExercisesList() {
+        return CARDIO_DATA_LIST.stream()
+                .map(ExerciseData::getFullName)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 部位ごとの種目名リストを返す（Map<String, List<String>>）
+     * 以前はハードコードされていましたが、EXERCISE_DATA_MAPから生成するように統一しました。
+     */
+    public Map<String, List<String>> getFreeWeightExercisesByPart() {
         Map<String, List<String>> simpleMap = new LinkedHashMap<>();
         for (Map.Entry<String, List<ExerciseData>> entry : EXERCISE_DATA_MAP.entrySet()) {
             List<String> simpleList = entry.getValue().stream()
@@ -241,10 +251,15 @@ public class TrainingDataService {
         return simpleMap;
     }
 
-    // 以前のController/Viewが期待する単純な文字列リストに変換して返す（後方互換用）
-    public List<String> getSimpleCardioExercisesList() {
-        return CARDIO_DATA_LIST.stream()
-                .map(ExerciseData::getFullName)
-                .collect(Collectors.toList());
+    // 後方互換性のため（getFreeWeightExercisesByPartと同じものを返す）
+    public Map<String, List<String>> getSimpleFreeWeightExercisesMap() {
+        return getFreeWeightExercisesByPart();
+    }
+
+    /**
+     * 部位のリスト（キーの一覧）だけを返す
+     */
+    public List<String> getMuscleParts() {
+        return new ArrayList<>(EXERCISE_DATA_MAP.keySet());
     }
 }
