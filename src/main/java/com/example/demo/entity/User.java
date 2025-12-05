@@ -1,7 +1,7 @@
 package com.example.demo.entity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime; // 追加
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,10 +15,10 @@ import jakarta.persistence.ManyToOne;
 @Entity
 public class User {
 
-    // ... (既存のフィールド id, xp, username, password, email, level 等はそのまま) ...
+    // ★ Long → int に変更
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     private int xp = 0;
 
@@ -28,16 +28,16 @@ public class User {
     private String password;
 
     @Column(unique = true)
-    private String email; 
-    
+    private String email;
+
     @Column(unique = true)
     private String phoneNumber;
-    
-    private Integer level = 1; 
-    private Integer experiencePoints = 0; 
+
+    private Integer level = 1;
+    private Integer experiencePoints = 0;
 
     private LocalDate lastMissionCompletionDate;
-    private Boolean isRewardClaimedToday = false; 
+    private Boolean isRewardClaimedToday = false;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "equipped_background_item_id")
@@ -52,12 +52,11 @@ public class User {
     private Boolean notificationProgressReport = false;
     private String theme = "default";
 
-    // ★★★ 追加: パスワードリセット用トークンと有効期限 ★★★
+    // パスワードリセット用
     private String resetPasswordToken;
     private LocalDateTime tokenExpiration;
 
     public User() {
-        // ... (既存のコンストラクタ処理) ...
         if (this.level == null) this.level = 1;
         if (this.experiencePoints == null) this.experiencePoints = 0;
         if (this.isRewardClaimedToday == null) this.isRewardClaimedToday = false;
@@ -67,10 +66,12 @@ public class User {
         if (this.theme == null) this.theme = "default";
     }
 
-    // ... (既存のGetter/Setterはそのまま) ...
+    // Getter / Setter
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public int getXp() { return xp; }
+    public void setXp(int xp) { this.xp = xp; }
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
@@ -81,57 +82,74 @@ public class User {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    // ... (中略: level, experiencePoints, items, notifications などのGetter/Setter) ...
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
     public Integer getLevel() { return level != null ? level : 1; }
     public void setLevel(Integer level) { this.level = level; }
+
     public Integer getExperiencePoints() { return experiencePoints != null ? experiencePoints : 0; }
     public void setExperiencePoints(Integer experiencePoints) { this.experiencePoints = experiencePoints; }
+
     public LocalDate getLastMissionCompletionDate() { return lastMissionCompletionDate; }
     public void setLastMissionCompletionDate(LocalDate lastMissionCompletionDate) { this.lastMissionCompletionDate = lastMissionCompletionDate; }
+
     public Boolean getIsRewardClaimedToday() { return isRewardClaimedToday; }
     public void setIsRewardClaimedToday(Boolean isRewardClaimedToday) { this.isRewardClaimedToday = isRewardClaimedToday; }
+
     public Item getEquippedBackgroundItem() { return equippedBackgroundItem; }
     public void setEquippedBackgroundItem(Item equippedBackgroundItem) { this.equippedBackgroundItem = equippedBackgroundItem; }
+
     public Item getEquippedCostumeItem() { return equippedCostumeItem; }
     public void setEquippedCostumeItem(Item equippedCostumeItem) { this.equippedCostumeItem = equippedCostumeItem; }
-    public Boolean isNotificationTrainingReminder() { return notificationTrainingReminder != null ? notificationTrainingReminder : true; }
-    public void setNotificationTrainingReminder(Boolean notificationTrainingReminder) { this.notificationTrainingReminder = notificationTrainingReminder; }
-    public Boolean isNotificationAiSuggestion() { return notificationAiSuggestion != null ? notificationAiSuggestion : true; }
-    public void setNotificationAiSuggestion(Boolean notificationAiSuggestion) { this.notificationAiSuggestion = notificationAiSuggestion; }
-    public Boolean isNotificationProgressReport() { return notificationProgressReport != null ? notificationProgressReport : false; }
-    public void setNotificationProgressReport(Boolean notificationProgressReport) { this.notificationProgressReport = notificationProgressReport; }
+
+    public Boolean isNotificationTrainingReminder() {
+        return notificationTrainingReminder != null ? notificationTrainingReminder : true;
+    }
+    public void setNotificationTrainingReminder(Boolean notificationTrainingReminder) {
+        this.notificationTrainingReminder = notificationTrainingReminder;
+    }
+
+    public Boolean isNotificationAiSuggestion() {
+        return notificationAiSuggestion != null ? notificationAiSuggestion : true;
+    }
+    public void setNotificationAiSuggestion(Boolean notificationAiSuggestion) {
+        this.notificationAiSuggestion = notificationAiSuggestion;
+    }
+
+    public Boolean isNotificationProgressReport() {
+        return notificationProgressReport != null ? notificationProgressReport : false;
+    }
+    public void setNotificationProgressReport(Boolean notificationProgressReport) {
+        this.notificationProgressReport = notificationProgressReport;
+    }
+
     public String getTheme() { return theme != null ? theme : "default"; }
     public void setTheme(String theme) { this.theme = theme; }
 
-    // ★★★ 追加: トークン用のGetter/Setter ★★★
     public String getResetPasswordToken() { return resetPasswordToken; }
     public void setResetPasswordToken(String resetPasswordToken) { this.resetPasswordToken = resetPasswordToken; }
 
     public LocalDateTime getTokenExpiration() { return tokenExpiration; }
     public void setTokenExpiration(LocalDateTime tokenExpiration) { this.tokenExpiration = tokenExpiration; }
 
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-    
-    // ... (レベルアップ関連メソッド) ...
+    // レベルアップ計算
     public int calculateRequiredXp() {
-        int currentLevel = getLevel(); 
+        int currentLevel = getLevel();
         return 1000 + (currentLevel - 1) * 200;
     }
+
     public void addXp(int xp) {
-        int currentXp = getExperiencePoints(); 
-        this.experiencePoints = currentXp + xp;
+        this.experiencePoints += xp;
         while (this.experiencePoints >= calculateRequiredXp()) {
             this.experiencePoints -= calculateRequiredXp();
             this.level++;
         }
     }
+
     public int getProgressPercent() {
-        int currentXp = getExperiencePoints(); 
-        int requiredXp = calculateRequiredXp();
-        if (requiredXp == 0) return 0; 
-        return (int)(((double) currentXp / requiredXp) * 100);
+        int required = calculateRequiredXp();
+        if (required == 0) return 0;
+        return (int)(((double) this.experiencePoints / required) * 100);
     }
-    public int getXp() { return xp; }
-    public void setXp(int xp) { this.xp = xp; }
 }

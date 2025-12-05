@@ -1,74 +1,60 @@
 package com.example.demo.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.demo.entity.User;
 import com.example.demo.model.GachaItem;
 import com.example.demo.service.GachaService;
+import com.example.demo.service.UserService;
 
 @Controller
 public class GachaController {
 
     private final GachaService gachaService;
+    private final UserService userService;
 
-    public GachaController(GachaService gachaService) {
+    public GachaController(GachaService gachaService, UserService userService) {
         this.gachaService = gachaService;
+        this.userService = userService;
     }
 
-    // --- ガチャトップ ---
+    // ガチャトップ
     @GetMapping("/gacha")
-    public String index(
-            @RequestParam("userId") Integer userId,
-            Model model) {
-
-        if (userId == null) {
-            return "redirect:/login"; // 念のため
-        }
-
-        model.addAttribute("userId", userId);
+    public String index(Model model) {
         model.addAttribute("probabilityList", gachaService.getProbabilityList());
-
         return "gacha/gacha";
     }
 
-    // --- ガチャ演出ページ ---
+    // アニメーション
     @GetMapping("/gacha/animation")
-    public String animation(
-            @RequestParam("userId") Integer userId,
-            @RequestParam("count") int count,
-            Model model) {
-
-        if (userId == null) return "redirect:/login";
-
-        model.addAttribute("userId", userId);
+    public String animation(@RequestParam("count") int count, Model model) {
         model.addAttribute("count", count);
-
         return "gacha/gacha_animation";
     }
 
-    // --- ガチャ結果 ---
+    // ガチャ結果（保存もここで実行）
     @GetMapping("/gacha/roll")
     public String roll(
-            @RequestParam("userId") Integer userId,
             @RequestParam("count") int count,
+            @AuthenticationPrincipal UserDetails userDetails,
             Model model) {
 
-        if (userId == null) return "redirect:/login";
+        // 現在ログイン中のユーザーを取得
+        User user = userService.findByUsername(userDetails.getUsername());
 
-        List<GachaItem> results = new ArrayList<>();
+        int userId = user.getId();  // ← これが超重要
 
-        // 1回ずつ DB 保存付きのガチャを回す
-        for (int i = 0; i < count; i++) {
-            results.add(gachaService.drawGacha(userId));
-        }
+        // ★ userId を渡す
+        List<GachaItem> results = gachaService.roll(count, userId);
 
         model.addAttribute("results", results);
-        model.addAttribute("userId", userId);
 
         return "gacha/result";
     }
