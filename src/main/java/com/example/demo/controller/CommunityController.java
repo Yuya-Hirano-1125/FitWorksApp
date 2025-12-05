@@ -43,16 +43,21 @@ public class CommunityController {
         this.userService = userService;
     }
 
-    // 一覧表示
+ // 一覧表示
     @GetMapping
     public String index(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        
+        // ★修正箇所: findAllByOrderByCreatedAtDesc() ではなく、
+        // さっき作った findAllWithLikes() を呼び出します。
+        List<Post> posts = postRepository.findAllWithLikes();
+        
         model.addAttribute("posts", posts);
         
         if (userDetails != null) {
             User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
             model.addAttribute("currentUser", currentUser);
         }
+        
         return "community/index";
     }
 
