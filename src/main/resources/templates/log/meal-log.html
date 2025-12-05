@@ -160,8 +160,31 @@
     </a>
 </div>
 
+<div th:if="${aiAdvice}" id="aiAdviceModal" class="modal is-active" style="z-index: 2000;">
+    <div class="modal-content" style="max-width: 400px; text-align: center; background: #fff; border-radius: 15px; padding: 30px;">
+        <span class="close-button" onclick="document.getElementById('aiAdviceModal').style.display='none'">&times;</span>
+        
+        <div style="margin-bottom: 15px;">
+            <img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4CAF50; padding: 2px;">
+        </div>
+        
+        <h3 style="color: #4CAF50; margin-bottom: 15px; font-weight: bold;">登録完了！</h3>
+        
+        <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; position: relative;">
+            <i class="fa-solid fa-quote-left" style="color: #bcdbf3; font-size: 1.5em; position: absolute; top: 10px; left: 10px;"></i>
+            <p th:text="${aiAdvice}" style="margin: 0; padding: 5px 10px; color: #333; font-weight: 500; line-height: 1.6;">
+                ここにAIからのアドバイスが表示されます。
+            </p>
+        </div>
+
+        <button onclick="document.getElementById('aiAdviceModal').style.display='none'" class="btn-submit" style="width: auto; padding: 10px 30px; margin-top: 0;">
+            閉じる
+        </button>
+    </div>
+</div>
+
 <script th:inline="javascript">
-    // 記録モーダルを開く関数（AJAX呼び出しは削除し、日付セットのみ行う）
+    // 記録モーダルを開く関数
     function openLogModal(dateString, isLogged) {
         const [year, month, day] = dateString.split('-');
         const displayDate = `${year}年${month}月${day}日`;
@@ -185,14 +208,19 @@
     // 記録モーダルを閉じる関数
     function closeLogModal() {
         document.getElementById('logModal').classList.remove('is-active');
-        // フォームのリセットは必要ならここで行う（例: inputs.value = ''）
     }
 
     // モーダル外クリックで閉じる処理
     window.onclick = function(event) {
-        const modal = document.getElementById('logModal');
-        if (modal.classList.contains('is-active') && event.target === modal) {
+        const logModal = document.getElementById('logModal');
+        const adviceModal = document.getElementById('aiAdviceModal');
+        
+        if (logModal && logModal.classList.contains('is-active') && event.target === logModal) {
             closeLogModal();
+        }
+        // AIアドバイスモーダル用
+        if (adviceModal && event.target === adviceModal) {
+            adviceModal.style.display = 'none';
         }
     }
 </script>
