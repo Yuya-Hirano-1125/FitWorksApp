@@ -56,6 +56,7 @@ public class MissionService {
 
     /**
      * ミッションの進捗を更新します。
+     * incrementProgress() が進捗を増やし、必要なら completed=true にしてくれる。
      */
     @Transactional
     public void updateMissionProgress(Long userId, String missionType) {
@@ -63,17 +64,16 @@ public class MissionService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
 
         LocalDate today = LocalDate.now();
-        
+
         missionStatusRepository.findByUserAndDateAndMissionType(user, today, missionType)
                 .ifPresent(missionStatus -> {
-                    missionStatus.incrementProgress();
+                    missionStatus.incrementProgress(); // ← 進捗＋クリア判定まで完了
                     missionStatusRepository.save(missionStatus);
                 });
     }
 
     /**
      * 完了したミッションの報酬を獲得します (経験値を付与します)。
-     * ★ 修正: このメソッドシグネチャがMissionControllerの呼び出しと一致しています。
      */
     @Transactional
     public boolean claimMissionReward(Long userId, Long missionId) {
@@ -89,11 +89,11 @@ public class MissionService {
 
         // ミッションが完了しており、まだ報酬を獲得していないこと
         if (missionStatus.isCompleted() && !missionStatus.isRewardClaimed()) {
-            // Userを再度フェッチして、Detached Objectエラーを回避する（Optional）
-            User user = userService.findById(userId).orElseThrow(() -> new IllegalStateException("User not found in claim process."));
+            User user = userService.findById(userId)
+                    .orElseThrow(() -> new IllegalStateException("User not found in claim process."));
             int rewardExp = missionStatus.getRewardExp();
 
-            // UserServiceの addExp を呼び出し、経験値を付与しレベルアップを処理
+            // 経験値付与
             userService.addExp(user, rewardExp); 
 
             // 報酬をクレーム済みに更新

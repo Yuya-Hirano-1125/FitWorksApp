@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-// ... (既存のインポート) ...
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -44,61 +43,112 @@ import com.example.demo.service.TrainingLogicService;
 import com.example.demo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import lombok.Data;
-
 @Controller
 public class TrainingController {
 
-    // ... (Autowiredなどは変更なし) ...
-    @Autowired private UserService userService;
-    @Autowired private UserRepository userRepository;
-    @Autowired private TrainingRecordRepository trainingRecordRepository;
-    @Autowired private MissionService missionService;
-    @Autowired private ExerciseBookmarkRepository exerciseBookmarkRepository;
-    @Autowired private MySetRepository mySetRepository;
-    @Autowired private TrainingDataService trainingDataService;
-    @Autowired private TrainingLogicService trainingLogicService;
-    @Autowired private BodyWeightRecordRepository bodyWeightRecordRepository;
+    private final UserService userService;
+    private final UserRepository userRepository;
+    private final TrainingRecordRepository trainingRecordRepository;
+    private final MissionService missionService;
+    private final ExerciseBookmarkRepository exerciseBookmarkRepository;
+    private final MySetRepository mySetRepository;
+    private final TrainingDataService trainingDataService;
+    private final TrainingLogicService trainingLogicService;
+    private final BodyWeightRecordRepository bodyWeightRecordRepository;
+
+    @Autowired
+    public TrainingController(UserService userService,
+                              UserRepository userRepository,
+                              TrainingRecordRepository trainingRecordRepository,
+                              MissionService missionService,
+                              ExerciseBookmarkRepository exerciseBookmarkRepository,
+                              MySetRepository mySetRepository,
+                              TrainingDataService trainingDataService,
+                              TrainingLogicService trainingLogicService,
+                              BodyWeightRecordRepository bodyWeightRecordRepository) {
+        this.userService = userService;
+        this.userRepository = userRepository;
+        this.trainingRecordRepository = trainingRecordRepository;
+        this.missionService = missionService;
+        this.exerciseBookmarkRepository = exerciseBookmarkRepository;
+        this.mySetRepository = mySetRepository;
+        this.trainingDataService = trainingDataService;
+        this.trainingLogicService = trainingLogicService;
+        this.bodyWeightRecordRepository = bodyWeightRecordRepository;
+    }
 
     private User getCurrentUser(Authentication authentication) {
         if (authentication == null) return null;
         return userService.findByUsername(authentication.getName());
     }
     
-    @Data
+    // Lombok(@Data)を使わずに手動でGetter/Setterを定義（エラー回避のため）
     public static class BatchTrainingLogForm {
         private List<TrainingLogForm> logs;
+
+        public List<TrainingLogForm> getLogs() {
+            return logs;
+        }
+
+        public void setLogs(List<TrainingLogForm> logs) {
+            this.logs = logs;
+        }
     }
 
-    // ... (showTrainingOptions, showExerciseList は変更なし) ...
+    // ----------------------------------------------------------------
+    // 1. トレーニング選択トップ画面 (training.html)
+    // ----------------------------------------------------------------
     @GetMapping("/training")
     public String showTrainingOptions(Authentication authentication, Model model) {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
-        Map<String, List<String>> simpleFreeWeightMap = trainingDataService.getSimpleFreeWeightExercisesMap();
-        List<String> simpleCardioList = trainingDataService.getSimpleCardioExercisesList();
-        model.addAttribute("freeWeightExercisesByPart", simpleFreeWeightMap);
-        model.addAttribute("freeWeightParts", simpleFreeWeightMap.keySet());
-        model.addAttribute("cardioExercises", simpleCardioList);
+        
+        // ドロップダウン用データ
+        model.addAttribute("freeWeightParts", trainingDataService.getMuscleParts());
+        model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercisesByPart());
+        
+        // 有酸素運動リスト
+        model.addAttribute("cardioExercises", trainingDataService.getCardioExercises());
+        
         return "training/training";
+    }
+
+    // ----------------------------------------------------------------
+    // 2. 部位別メニューリスト画面 (training-list.html)
+    // ----------------------------------------------------------------
+    @GetMapping("/training-list")
+    public String showTrainingList(Authentication authentication, Model model) {
+        if (getCurrentUser(authentication) == null) return "redirect:/login";
+
+        // ★ドロップダウン用データを渡す
+        model.addAttribute("freeWeightParts", trainingDataService.getMuscleParts());
+        model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercisesByPart());
+
+        return "training/training-list";
     }
 
     @GetMapping("/training/exercises")
     public String showExerciseList(Authentication authentication, Model model) {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
+        
         model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercises());
         model.addAttribute("cardioExercises", trainingDataService.getCardioExercises());
+        
         List<String> bookmarkedNames = exerciseBookmarkRepository.findByUserOrderByIdDesc(currentUser)
                 .stream().map(ExerciseBookmark::getExerciseName).collect(Collectors.toList());
         model.addAttribute("bookmarkedNames", bookmarkedNames);
+        
         return "training/exercise-list";
     }
 
-    // ★修正: セッション開始処理
+ // ----------------------------------------------------------------
+    // 3. トレーニングセッション開始処理 (POST: /training/start)
+    // ----------------------------------------------------------------
     @PostMapping("/training/start")
     public String startTrainingSession(
             @RequestParam("type") String type,
-            @RequestParam(value = "exerciseName", required = false) String exerciseName,
+            // ★変更: String -> List<String> に変更し、複数の値を受け取れるようにする
+            @RequestParam(value = "exerciseName", required = false) List<String> exerciseNames, 
             @RequestParam(value = "aiProposal", required = false) String aiProposal,
             @RequestParam(value = "mySetId", required = false) Long mySetId,
             Authentication authentication,
@@ -109,23 +159,26 @@ public class TrainingController {
 
         String title = "";
         String selectedExercise = "";
+        
+        // ★追加: 複数選択された種目を格納するリスト
+        List<String> finalProgramList = new ArrayList<>();
 
         switch (type) {
             case "ai-suggested":
                 title = "AIおすすめメニューセッション";
                 selectedExercise = "AIおすすめプログラム";
                 if (aiProposal != null && !aiProposal.trim().isEmpty()) {
-                    List<String> parsedProgram = trainingLogicService.parseAiProposal(aiProposal);
-                    model.addAttribute("programList", parsedProgram);
+                    finalProgramList = trainingLogicService.parseAiProposal(aiProposal);
                     model.addAttribute("targetTime", 45);
                     model.addAttribute("restTime", 60);
                 } else {
                     Map<String, Object> aiMenu = trainingLogicService.generateAiSuggestedMenu();
-                    model.addAttribute("programList", aiMenu.get("programList"));
+                    finalProgramList = (List<String>) aiMenu.get("programList");
                     model.addAttribute("targetTime", aiMenu.get("targetTime"));
                     model.addAttribute("restTime", aiMenu.get("restTime"));
                 }
                 break;
+
             case "myset":
                 if (mySetId != null) {
                     MySet mySet = mySetRepository.findByIdAndUser(mySetId, currentUser);
@@ -133,43 +186,58 @@ public class TrainingController {
                         title = "マイセット: " + mySet.getName();
                         selectedExercise = mySet.getName();
                         
-                        List<String> exercises = new ArrayList<>();
+                        // 番号を振ってリストにする
                         for (int i = 0; i < mySet.getExerciseNames().size(); i++) {
-                            exercises.add((i + 1) + ". " + mySet.getExerciseNames().get(i));
+                            finalProgramList.add((i + 1) + ". " + mySet.getExerciseNames().get(i));
                         }
-                        model.addAttribute("programList", exercises);
-                        model.addAttribute("mySetExercises", mySet.getExerciseNames());
                         
-                        // ★追加: 有酸素運動か判定するためにリストを渡す
+                        model.addAttribute("mySetExercises", mySet.getExerciseNames());
                         model.addAttribute("cardioList", trainingDataService.getSimpleCardioExercisesList());
-
-                        model.addAttribute("targetTime", exercises.size() * 10);
+                        model.addAttribute("targetTime", finalProgramList.size() * 10);
                         model.addAttribute("restTime", 60);
                     }
                 }
                 break;
+
             case "free-weight":
             case "cardio":
-                if (exerciseName != null && !exerciseName.trim().isEmpty()) {
-                    selectedExercise = exerciseName.trim();
+                // ★修正: リストが空でないかチェック
+                if (exerciseNames != null && !exerciseNames.isEmpty()) {
+                    // 最初の1つを代表名としてセット（ログ保存などで使用）
+                    selectedExercise = exerciseNames.get(0);
+                    
+                    // 複数選択されている場合、セッション画面のリスト表示用にセット
+                    if (exerciseNames.size() > 1) {
+                         for (int i = 0; i < exerciseNames.size(); i++) {
+                            finalProgramList.add((i + 1) + ". " + exerciseNames.get(i));
+                        }
+                        title = "カスタムメニュー (" + exerciseNames.size() + "種目)";
+                    } else {
+                        // 1つだけの場合
+                        title = ("free-weight".equals(type) ? "フリーウェイト" : "有酸素運動") + "セッション";
+                    }
                 } else {
-                    return "redirect:/training";
+                    return "redirect:/training-list";
                 }
-                title = ("free-weight".equals(type) ? "フリーウェイト" : "有酸素運動") + "セッション";
                 break;
+
             default:
                 return "redirect:/training";
         }
+
         model.addAttribute("trainingType", type);
         model.addAttribute("trainingTitle", title);
         model.addAttribute("selectedExercise", selectedExercise);
+        // ★プログラムリスト（メニュー一覧）を画面に渡す
+        model.addAttribute("programList", finalProgramList);
         model.addAttribute("today", LocalDate.now());
+        
         return "training/training-session";
     }
 
-    // ... (ブックマーク、マイセット関連メソッドは変更なし) ...
-    // showBookmarkList, toggleBookmark, showMySetList, showMySetForm, saveMySet, deleteMySet
-    // saveTrainingRecord(単体) も変更なし
+    // ----------------------------------------------------------------
+    // ブックマーク・マイセット関連
+    // ----------------------------------------------------------------
     @GetMapping("/training/bookmarks")
     public String showBookmarkList(Authentication authentication, Model model) {
         User currentUser = getCurrentUser(authentication);
@@ -240,6 +308,9 @@ public class TrainingController {
         return "redirect:/training/mysets";
     }
     
+    // ----------------------------------------------------------------
+    // ログ保存・表示関連
+    // ----------------------------------------------------------------
     @PostMapping("/training-log/save")
     public String saveTrainingRecord(@ModelAttribute("trainingLogForm") TrainingLogForm form, Authentication authentication, RedirectAttributes redirectAttributes) {
         User currentUser = getCurrentUser(authentication);
@@ -324,7 +395,6 @@ public class TrainingController {
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
     
-    // ★修正: マイセット一括保存処理（有酸素・筋トレ両対応）
     @PostMapping("/training-log/save-batch")
     public String saveBatchTrainingLog(@ModelAttribute BatchTrainingLogForm batchForm, 
                                        @RequestParam("recordDate") LocalDate recordDate,
@@ -342,14 +412,14 @@ public class TrainingController {
                     form.setRecordDate(recordDate);
                 }
 
-                // ★有酸素運動の場合
+                // 有酸素運動の場合
                 if ("CARDIO".equals(form.getType())) {
                     if (form.getDurationMinutes() != null && form.getDurationMinutes() > 0) {
                         TrainingRecord record = new TrainingRecord();
                         record.setUser(currentUser);
                         record.setRecordDate(form.getRecordDate());
                         record.setType("CARDIO");
-                        record.setCardioType(form.getExerciseName()); // フォームのexerciseNameを使用
+                        record.setCardioType(form.getExerciseName()); 
                         record.setDurationMinutes(form.getDurationMinutes());
                         record.setDistanceKm(form.getDistanceKm());
                         trainingRecordRepository.save(record);
@@ -360,7 +430,7 @@ public class TrainingController {
                         totalXp += (baseXp + form.getDurationMinutes());
                     }
                 } 
-                // ★筋トレ（フリーウェイト）の場合
+                // 筋トレ（フリーウェイト）の場合
                 else {
                     if (form.getSetList() != null && !form.getSetList().isEmpty()) {
                         int savedCount = 0;
@@ -402,8 +472,6 @@ public class TrainingController {
         return "redirect:/training-log?year=" + recordDate.getYear() + "&month=" + recordDate.getMonthValue();
     }
     
-    // ... (以下の既存メソッドは変更なし) ...
-    // showNearbyGymsMap, showTrainingLog, showAllTrainingLog, helper methods, forms
     @GetMapping("/training/map")
     public String showNearbyGymsMap(Authentication authentication) {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
@@ -495,14 +563,26 @@ public class TrainingController {
 
     @GetMapping("/training-log/form/weight")
     public String showWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
-        TrainingLogForm form = new TrainingLogForm(); form.setRecordDate(date); form.setType("WEIGHT"); model.addAttribute("trainingLogForm", form); return "log/training-log-form-weight";
+        TrainingLogForm form = new TrainingLogForm(); 
+        form.setRecordDate(date); 
+        form.setType("WEIGHT"); 
+        model.addAttribute("trainingLogForm", form); 
+        return "log/training-log-form-weight";
     }
     @GetMapping("/training-log/form/cardio")
     public String showCardioLogForm(@RequestParam("date") LocalDate date, Model model) {
-        TrainingLogForm form = new TrainingLogForm(); form.setRecordDate(date); form.setType("CARDIO"); model.addAttribute("trainingLogForm", form); return "log/training-log-form-cardio";
+        TrainingLogForm form = new TrainingLogForm(); 
+        form.setRecordDate(date); 
+        form.setType("CARDIO"); 
+        model.addAttribute("trainingLogForm", form); 
+        return "log/training-log-form-cardio";
     }
     @GetMapping("/training-log/form/body-weight")
     public String showBodyWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
-        TrainingLogForm form = new TrainingLogForm(); form.setRecordDate(date); form.setType("BODY_WEIGHT"); model.addAttribute("trainingLogForm", form); return "log/training-log-form-body-weight";
+        TrainingLogForm form = new TrainingLogForm(); 
+        form.setRecordDate(date); 
+        form.setType("BODY_WEIGHT"); 
+        model.addAttribute("trainingLogForm", form); 
+        return "log/training-log-form-body-weight";
     }
 }

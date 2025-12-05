@@ -2,9 +2,7 @@ package com.example.demo.controller;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +23,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.MealLogForm;
 import com.example.demo.entity.MealRecord;
 import com.example.demo.entity.User;
+import com.example.demo.service.AICoachService;
 import com.example.demo.service.MealService;
 import com.example.demo.service.UserService;
 
@@ -41,8 +41,10 @@ public class MealController {
     
     @Autowired
     private MealService mealService;
+    
+    @Autowired
+    private AICoachService aiCoachService;
 
-    // ... (showMealLogCalendar メソッドはそのまま維持) ...
     @GetMapping
     public String showMealLogCalendar(@AuthenticationPrincipal UserDetails userDetails,
                                       @RequestParam(value = "year", required = false) Integer year,
@@ -102,34 +104,37 @@ public class MealController {
         model.addAttribute("nextYear", targetYearMonth.plusMonths(1).getYear());
         model.addAttribute("nextMonth", targetYearMonth.plusMonths(1).getMonthValue());
 
-        // ★フォーム用オブジェクトをカレンダー画面に渡す
         model.addAttribute("mealLogForm", new MealLogForm());
 
         return "log/meal-log";
     }
 
-    // ★ 削除: showMealLogForm メソッドは不要になったので消してください
-
     @PostMapping("/save")
     public String saveMealLog(@Valid @ModelAttribute("mealLogForm") MealLogForm form, 
                               BindingResult result, 
                               @AuthenticationPrincipal UserDetails userDetails,
-                              Model model) {
+                              Model model,
+                              RedirectAttributes redirectAttributes) {
         
         if (result.hasErrors()) {
-            // ★変更: エラー時はカレンダー画面にリダイレクト（簡易対応）
-            // 元の meal-log-form は存在しないため、そこには戻せません
             return "redirect:/log/meal"; 
         }
 
         User user = userService.findByUsername(userDetails.getUsername());
         MealRecord savedRecord = mealService.saveMealRecord(form, user);
 
+        // ★AIアドバイスの生成処理
+        try {
+            String advice = aiCoachService.generateMealAdvice(user, savedRecord);
+            redirectAttributes.addFlashAttribute("aiAdvice", advice);
+        } catch (Exception e) {
+            System.out.println("AI Advice Error: " + e.getMessage());
+        }
+
         LocalDate date = savedRecord.getMealDateTime().toLocalDate();
         return "redirect:/log/meal?year=" + date.getYear() + "&month=" + date.getMonthValue();
     }
     
-    // ... (showAllMealLogs メソッドはそのまま維持) ...
     @GetMapping("/all")
     public String showAllMealLogs(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         User user = userService.findByUsername(userDetails.getUsername());
@@ -139,32 +144,3 @@ public class MealController {
         return "log/meal-log-all"; 
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
