@@ -13,84 +13,72 @@
 <body class="mission-page">
 <div class="main-container">
     
-    <h1 style="margin-bottom: 5px;"><i class="header-icon fa-solid fa-list-check"></i>今日のミッション</h1>
+    <h1 style="margin-bottom: 5px;">
+        <i class="header-icon fa-solid fa-list-check"></i>今日のミッション
+    </h1>
     <p class="sub-heading">達成して、ご褒美をもらいましょう！毎日午前4時に更新されます。</p>
     
+    <!-- ミッション一覧 -->
     <div class="mission-list">
-        
-        <!-- ミッション1: ランニング -->
-        <div class="mission-card">
+        <div class="mission-card" th:each="mission : ${missions}">
             <div class="mission-icon">
-                <i class="fa-solid fa-running"></i>
+                <i class="fa-solid fa-running" th:if="${mission.missionType == 'TRAINING_LOG'}"></i>
+                <i class="fa-solid fa-dumbbell" th:if="${mission.missionType == 'COMMUNITY_POST'}"></i>
+                <i class="fa-solid fa-robot" th:if="${mission.missionType == 'AI_COACH'}"></i>
             </div>
             <div class="mission-details">
                 <div class="mission-header">
-                    <span class="mission-title">ランニング 30分 🏃‍♀️</span>
-                    <span class="mission-reward">🎁 1000 XP</span>
+                    <span class="mission-title" th:text="${mission.description}"></span>
+                    <span class="mission-reward">🎁 <span th:text="${mission.rewardExp}"></span> XP</span>
                 </div>
                 <div class="mission-progress-container">
                     <div class="progress-bar-wrap">
-                        <div class="progress-bar" style="width: 0%;"></div>
+                        <div class="progress-bar"
+                             th:style="|width:${(mission.currentCount * 100) / mission.requiredCount}%|">
+                        </div>
                     </div>
-                    <span class="progress-text">0% (0/30分)</span>
+                    <span class="progress-text"
+                          th:text="|${(mission.currentCount * 100) / mission.requiredCount}% (${mission.currentCount}/${mission.requiredCount})|">
+                    </span>
                 </div>
             </div>
-            <!-- 報酬受け取りフォーム -->
-            <form th:action="@{/daily-mission/claim/{id}(id=${missions[0].id})}" method="post">
-                <button type="submit" class="button mission-cta-button">報酬を受け取る</button>
+            <!-- ✅ 表示切り替え部分 -->
+            <form th:action="@{/daily-mission/claim/{id}(id=${mission.id})}" method="post">
+                <!-- 挑戦中ボタン（未達成の間は遷移用ボタンを表示） -->
+                <button th:if="${!mission.completed and mission.missionType == 'TRAINING_LOG'}"
+                        type="button" class="button mission-cta-button"
+                        th:onclick="|window.location.href='/daily-mission/running';|">
+                    挑戦中
+                </button>
+
+                <!-- ✅ コミュニティ投稿は /community に変更 -->
+                <button th:if="${!mission.completed and mission.missionType == 'COMMUNITY_POST'}"
+                        type="button" class="button mission-cta-button"
+                        th:onclick="|window.location.href='/community';|">
+                    挑戦中
+                </button>
+
+                <button th:if="${!mission.completed and mission.missionType == 'AI_COACH'}"
+                        type="button" class="button mission-cta-button"
+                        th:onclick="|window.location.href='/daily-mission/ai-coach';|">
+                    挑戦中
+                </button>
+
+                <!-- ミッションクリアで報酬受け取りボタン -->
+                <button th:if="${mission.completed and !mission.rewardClaimed}"
+                        type="submit" class="button mission-cta-button">
+                    報酬を受け取る (+<span th:text="${mission.rewardExp}"></span> XP)
+                </button>
+
+                <!-- 報酬受け取り済み -->
+                <p th:if="${mission.rewardClaimed}">報酬受け取り済み</p>
             </form>
         </div>
-
-        <!-- ミッション2: 筋トレ記録 -->
-        <div class="mission-card">
-            <div class="mission-icon">
-                <i class="fa-solid fa-dumbbell"></i>
-            </div>
-            <div class="mission-details">
-                <div class="mission-header">
-                    <span class="mission-title">筋トレ記録を 1回 投稿 💪</span>
-                    <span class="mission-reward">🎁 1000 XP</span>
-                </div>
-                <div class="mission-progress-container">
-                    <div class="progress-bar-wrap">
-                        <div class="progress-bar" style="width: 0%;"></div>
-                    </div>
-                    <span class="progress-text">0% (0/1回)</span>
-                </div>
-            </div>
-            <!-- 報酬受け取りフォーム -->
-            <form th:action="@{/daily-mission/claim/{id}(id=${missions[1].id})}" method="post">
-                <button type="submit" class="button mission-cta-button">報酬を受け取る</button>
-            </form>
-        </div>
-
-        <!-- ミッション3: AIコーチ -->
-        <div class="mission-card">
-            <div class="mission-icon">
-                <i class="fa-solid fa-apple-whole"></i>
-            </div>
-            <div class="mission-details">
-                <div class="mission-header">
-                    <span class="mission-title">AIコーチを使ってみよう</span>
-                    <span class="mission-reward">🎁 1000 XP</span>
-                </div>
-                <div class="mission-progress-container">
-                    <div class="progress-bar-wrap">
-                        <div class="progress-bar" style="width: 0%;"></div>
-                    </div>
-                    <span class="progress-text">0% (0/1回)</span>
-                </div>
-            </div>
-            <!-- 報酬受け取りフォーム -->
-            <form th:action="@{/daily-mission/claim/{id}(id=${missions[2].id})}" method="post">
-                <button type="submit" class="button mission-cta-button">報酬を受け取る</button>
-            </form>
-        </div>
-
     </div>
     
 </div>
 
+<!-- ホームに戻るボタン -->
 <div style="max-width: 450px; margin: 30px auto 70px auto; padding: 0 10px;">
     <a th:href="@{/home}" class="button secondary">
         <i class="fa-solid fa-house"></i>
