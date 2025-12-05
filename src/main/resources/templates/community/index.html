@@ -7,142 +7,39 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
-        /* --- コミュニティページ固有のスタイル --- */
-        .new-post-area { 
-            background: var(--ai-bubble); 
-            padding: 25px; 
-            border-radius: 20px; 
-            margin-bottom: 40px; 
-            border: 2px dashed var(--secondary-color);
-            text-align: left;
-        }
-        .new-post-area h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .custom-input, .custom-textarea { 
-            width: 100%; 
-            padding: 15px; 
-            margin-bottom: 15px; 
-            border-radius: 15px; 
-            border: 2px solid #fff; 
-            background: #fff;
-            font-family: inherit;
-            resize: none; 
-            overflow: hidden; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-        }
-        .custom-input:focus, .custom-textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.1);
-        }
-
-        .post-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .post-card {
-            background: #fff; 
-            border-radius: 20px; 
-            padding: 20px 25px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
-            border: 2px solid var(--light-bg); 
-            text-align: left;
-            position: relative;
-            transition: border-color 0.3s;
-            overflow: hidden; 
-        }
-        .post-card:hover {
-            border-color: var(--secondary-color);
-        }
-
-        .post-title a { 
-            font-size: 1.25rem; 
-            font-weight: 800; 
-            color: var(--dark-text); 
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: color 0.2s;
-            word-break: break-word;
-            overflow-wrap: break-word;
-        }
-        .post-title a:hover {
-            color: var(--primary-color);
-        }
-        .post-title i {
-            color: var(--primary-color);
-            font-size: 0.9rem;
-            flex-shrink: 0;
-        }
-
-        .post-meta { 
-            font-size: 0.85rem; 
-            color: #888; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; /* 縦位置中央揃え */
-            margin-bottom: 12px;
-            border-bottom: 1px solid #f0f0f0;
-            padding-bottom: 8px;
-        }
-
-        .post-excerpt {
-            font-size: 0.95rem;
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 15px;
-            word-break: break-word;
-            overflow-wrap: break-word;
-        }
-        
-        .btn-comment {
-            display: inline-block;
-            background: var(--ai-accent-color);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
-            box-shadow: 0 4px 10px rgba(135, 206, 235, 0.4);
-            border: 2px solid transparent;
-        }
-        .btn-comment:hover {
-            background: var(--primary-color);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(255, 105, 180, 0.4);
-        }
+        /* CSS省略... 既存のデザインを維持 */
+        .new-post-area { background: var(--ai-bubble); padding: 25px; border-radius: 20px; margin-bottom: 40px; border: 2px dashed var(--secondary-color); text-align: left; }
+        .new-post-area h3 { margin-top: 0; color: var(--primary-color); font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .custom-input, .custom-textarea { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 15px; border: 2px solid #fff; background: #fff; font-family: inherit; resize: none; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: all 0.3s ease; box-sizing: border-box; }
+        .custom-input:focus, .custom-textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.1); }
+        .post-list { display: flex; flex-direction: column; gap: 20px; margin-bottom: 40px; }
+        .post-card { background: #fff; border-radius: 20px; padding: 20px 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 2px solid var(--light-bg); text-align: left; position: relative; transition: border-color 0.3s; overflow: hidden; }
+        .post-card:hover { border-color: var(--secondary-color); }
+        .post-title a { font-size: 1.25rem; font-weight: 800; color: var(--dark-text); text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.2s; word-break: break-word; overflow-wrap: break-word; }
+        .post-title a:hover { color: var(--primary-color); }
+        .post-title i { color: var(--primary-color); font-size: 0.9rem; flex-shrink: 0; }
+        .post-meta { font-size: 0.85rem; color: #888; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
+        .post-excerpt { font-size: 0.95rem; color: #555; line-height: 1.6; margin-bottom: 15px; word-break: break-word; overflow-wrap: break-word; }
+        .btn-comment { display: inline-block; background: var(--ai-accent-color); color: white; padding: 8px 20px; border-radius: 25px; font-size: 0.9rem; font-weight: 700; text-decoration: none; transition: all 0.3s cubic-bezier(.25,.8,.25,1); box-shadow: 0 4px 10px rgba(135, 206, 235, 0.4); border: 2px solid transparent; }
+        .btn-comment:hover { background: var(--primary-color); transform: translateY(-3px); box-shadow: 0 6px 15px rgba(255, 105, 180, 0.4); }
         .btn-comment i { margin-right: 5px; }
 
-        /* ★追加: いいねボタンのスタイル */
+        /* いいねボタンのデザイン */
         .like-form { display: inline-block; }
         .btn-like {
             background: none; border: none; cursor: pointer;
-            font-size: 1.1rem; color: #ccc;
+            font-size: 1.1rem; color: #ccc; /* デフォルトはグレー */
             transition: all 0.3s; padding: 2px 5px;
         }
         .btn-like:hover { transform: scale(1.2); }
-        .btn-like.liked { color: #ff4757; } /* いいね済の色 */
+        
+        /* ★重要: いいね済み(.liked)のときは赤ピンクにする */
+        .btn-like.liked { color: #ff4757; } 
+        
         .like-count { font-size: 0.9rem; margin-left: 2px; color: #666; font-weight: bold; }
     </style>
 </head>
@@ -179,8 +76,8 @@
                     <div style="display: flex; align-items: center; gap: 5px;">
                         <form th:action="@{/community/{id}/like(id=${post.id})}" method="post" class="like-form">
                             <button type="submit" class="btn-like" 
-                                    th:classappend="${currentUser != null && post.likedBy.contains(currentUser)} ? 'liked' : ''">
-                                <i th:class="${currentUser != null && post.likedBy.contains(currentUser)} ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+                                    th:classappend="${post.isLikedBy(currentUser)} ? 'liked' : ''">
+                                <i th:class="${post.isLikedBy(currentUser)} ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
                             </button>
                         </form>
                         <span class="like-count" th:text="${post.likedBy.size()}">0</span>

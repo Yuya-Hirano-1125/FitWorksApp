@@ -26,21 +26,18 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title; // タイトル
-
+    private String title; 
     @Column(columnDefinition = "TEXT")
-    private String content; // 内容
-
-    private LocalDateTime createdAt; // 投稿日時
+    private String content; 
+    private LocalDateTime createdAt; 
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User author; // 投稿者
+    private User author; 
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Comment> comments; // この投稿への返信リスト
+    private List<Comment> comments; 
 
-    // ★追加: 「いいね」したユーザーのリスト
     @ManyToMany
     @JoinTable(
         name = "post_likes",
@@ -49,7 +46,6 @@ public class Post {
     )
     private Set<User> likedBy = new HashSet<>();
 
-    // コンストラクタ
     public Post() {
         this.createdAt = LocalDateTime.now();
     }
@@ -73,7 +69,13 @@ public class Post {
     public List<Comment> getComments() { return comments; }
     public void setComments(List<Comment> comments) { this.comments = comments; }
 
-    // ★追加: いいねのGetter/Setter
     public Set<User> getLikedBy() { return likedBy; }
     public void setLikedBy(Set<User> likedBy) { this.likedBy = likedBy; }
+
+    // ★追加: IDを使って「自分がいいね済みか」を確実に判定するメソッド
+    public boolean isLikedBy(User user) {
+        if (user == null) return false;
+        // ユーザーリストの中に、自分と同じIDのユーザーがいるかチェック
+        return likedBy.stream().anyMatch(u -> u.getId().equals(user.getId()));
+    }
 }

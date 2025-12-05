@@ -7,20 +7,26 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
         /* --- 詳細ページ固有のスタイル --- */
-        body { padding-bottom: 120px; }
+        
+        /* 入力欄が被らないように下の余白を多めに確保 */
+        body { 
+            padding-bottom: 120px; 
+        }
 
+        /* 投稿詳細エリア */
         .post-detail-area {
             text-align: left;
             margin-bottom: 40px;
             padding-bottom: 30px;
             border-bottom: 2px dashed var(--secondary-color);
             width: 100%;
-            overflow-wrap: break-word;
+            overflow-wrap: break-word; /* 長文折り返し対策 */
         }
 
         .post-title {
@@ -30,7 +36,6 @@
             margin-bottom: 15px;
             line-height: 1.3;
             word-break: break-word;
-            overflow-wrap: break-word;
         }
 
         .post-meta {
@@ -42,19 +47,27 @@
             gap: 15px;
             align-items: center;
         }
-        .post-meta span { display: flex; align-items: center; gap: 6px; }
+        .post-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
         .post-content {
             font-size: 1.1rem;
             line-height: 1.8;
             color: var(--dark-text);
-            white-space: pre-wrap;
+            white-space: pre-wrap; /* 改行を反映 */
             word-break: break-word;
-            overflow-wrap: break-word;
         }
 
         /* コメントセクション */
-        .comments-section { text-align: left; margin-bottom: 20px; width: 100%; }
+        .comments-section {
+            text-align: left;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
         .comments-header {
             font-size: 1.2rem;
             font-weight: 800;
@@ -91,7 +104,6 @@
             color: var(--dark-text);
             white-space: pre-wrap; 
             word-break: break-word;
-            overflow-wrap: break-word;
         }
         .no-comments { text-align: center; color: #999; padding: 20px; font-style: italic; }
 
@@ -157,17 +169,21 @@
         }
         .btn-send i { margin-right: 5px; }
 
-        /* ★追加: いいねボタンのスタイル */
+        /* ★ いいねボタンのスタイル */
         .like-form { display: inline-block; }
         .btn-like {
             background: none; border: none; cursor: pointer;
-            font-size: 1.5rem; color: #ccc;
+            font-size: 1.5rem; color: #ccc; /* デフォルトはグレー */
             transition: all 0.3s; padding: 5px 10px;
             display: flex; align-items: center; gap: 5px;
         }
         .btn-like:hover { transform: scale(1.1); }
+        
+        /* いいね済みの場合の色（赤ピンク） */
         .btn-like.liked { color: #ff4757; }
+        
         .like-text { font-size: 1rem; font-weight: bold; }
+
     </style>
 </head>
 <body>
@@ -189,8 +205,8 @@
              <div style="margin-top: 25px; text-align: right; border-top: 1px solid #f0f0f0; padding-top: 15px;">
                  <form th:action="@{/community/{id}/like(id=${post.id})}" method="post" class="like-form">
                      <button type="submit" class="btn-like" 
-                             th:classappend="${currentUser != null && post.likedBy.contains(currentUser)} ? 'liked' : ''">
-                         <i th:class="${currentUser != null && post.likedBy.contains(currentUser)} ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+                             th:classappend="${post.isLikedBy(currentUser)} ? 'liked' : ''">
+                         <i th:class="${post.isLikedBy(currentUser)} ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
                          <span class="like-text" th:text="${post.likedBy.size()} + ' いいね'">0 いいね</span>
                      </button>
                  </form>

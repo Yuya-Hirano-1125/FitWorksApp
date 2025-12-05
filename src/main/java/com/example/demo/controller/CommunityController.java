@@ -31,7 +31,6 @@ public class CommunityController {
     private final UserRepository userRepository;
     private final UserService userService;
     
-    // NGワードのリスト
     private static final List<String> NG_WORDS = List.of("死ね", "バカ", "アホ", "殺す", "暴力");
 
     public CommunityController(PostRepository postRepository,
@@ -54,7 +53,6 @@ public class CommunityController {
             User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
             model.addAttribute("currentUser", currentUser);
         }
-        
         return "community/index";
     }
 
@@ -64,7 +62,6 @@ public class CommunityController {
                              @RequestParam String content,
                              @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
-        
         String cleanTitle = filterNgWords(title);
         String cleanContent = filterNgWords(content);
 
@@ -72,16 +69,14 @@ public class CommunityController {
         post.setTitle(cleanTitle);
         post.setContent(cleanContent);
         post.setAuthor(user);
-
         postRepository.save(post);
         
-        // ★ 変更点: 既存のメソッドを使用（新しいメソッドは不要）
         userService.markMissionCompletedByPost(user);
 
         return "redirect:/community";
     }
 
-    // 投稿詳細＆コメント表示
+    // 詳細表示
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetails userDetails) {
         Post post = postRepository.findByIdWithComments(id).orElseThrow();
@@ -91,19 +86,16 @@ public class CommunityController {
             User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
             model.addAttribute("currentUser", currentUser);
         }
-        
         return "community/detail";
     }
 
-    // コメント投稿処理
+    // コメント投稿
     @PostMapping("/{id}/comment")
     public String createComment(@PathVariable Long id,
                                 @RequestParam String content,
                                 @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
-        
         Post post = postRepository.findById(id).orElseThrow();
-        
         String cleanContent = filterNgWords(content);
 
         Comment comment = new Comment();
@@ -115,7 +107,7 @@ public class CommunityController {
         return "redirect:/community/" + id;
     }
 
- // ★修正箇所: いいね機能の処理
+    // ★修正: いいね機能 (IDベースで確実に判定)
     @PostMapping("/{id}/like")
     public String toggleLike(@PathVariable Long id, 
                              @AuthenticationPrincipal UserDetails userDetails,
@@ -125,16 +117,21 @@ public class CommunityController {
             return "redirect:/login";
         }
 
-        // 変更前: Post post = postRepository.findById(id).orElseThrow();
-        // ↓
-        // 変更後: findByIdWithComments を使うことで「いいね情報」も一緒に取得され、エラーが起きなくなります
+        // いいね情報も含めて投稿を取得
         Post post = postRepository.findByIdWithComments(id).orElseThrow();
-        
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
 
-        if (post.getLikedBy().contains(user)) {
-            post.getLikedBy().remove(user);
+        // 既にいいねリストの中に「自分と同じIDのユーザー」がいるか探す
+        User existingLike = post.getLikedBy().stream()
+                .filter(u -> u.getId().equals(user.getId()))
+                .findFirst()
+                .orElse(null);
+
+        if (existingLike != null) {
+            // 既にいいね済みなら -> 解除する (リストから削除)
+            post.getLikedBy().remove(existingLike);
         } else {
+            // まだなら -> いいねする (リストに追加)
             post.getLikedBy().add(user);
         }
 
@@ -143,10 +140,9 @@ public class CommunityController {
         String referer = request.getHeader("Referer");
         return "redirect:" + (referer != null ? referer : "/community");
     }
+
     private String filterNgWords(String text) {
-        if (text == null || text.isEmpty()) {
-            return text;
-        }
+        if (text == null || text.isEmpty()) return text;
         String filteredText = text;
         for (String ngWord : NG_WORDS) {
             if (filteredText.contains(ngWord)) {
