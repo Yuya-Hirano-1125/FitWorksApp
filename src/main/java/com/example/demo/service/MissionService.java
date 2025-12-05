@@ -53,9 +53,9 @@ public class MissionService {
 
             for (String type : missingTypes) {
                 DailyMissionStatus newMission = switch (type) {
-                    case "TRAINING_LOG" -> new DailyMissionStatus(user, today, type, "トレーニングを1回記録する", 1, 300);
-                    case "COMMUNITY_POST" -> new DailyMissionStatus(user, today, type, "コミュニティに1回投稿する", 1, 200);
-                    case "AI_COACH" -> new DailyMissionStatus(user, today, type, "AIコーチを使ってみよう", 1, 150);
+                    case "TRAINING_LOG" -> new DailyMissionStatus(user, today, type, "トレーニングを1回記録する", 1);
+                    case "COMMUNITY_POST" -> new DailyMissionStatus(user, today, type, "コミュニティに1回投稿する", 1);
+                    case "AI_COACH" -> new DailyMissionStatus(user, today, type, "AIコーチを使ってみよう", 1);
                     default -> throw new IllegalArgumentException("Unknown mission type: " + type);
                 };
                 missionStatusRepository.save(newMission);
@@ -71,13 +71,13 @@ public class MissionService {
      */
     private List<DailyMissionStatus> generateDailyMissions(User user, LocalDate date) {
         DailyMissionStatus mission1 = new DailyMissionStatus(
-            user, date, "TRAINING_LOG", "トレーニングを1回記録する", 1, 300
+            user, date, "TRAINING_LOG", "トレーニングを1回記録する", 1
         );
         DailyMissionStatus mission2 = new DailyMissionStatus(
-            user, date, "COMMUNITY_POST", "コミュニティに1回投稿する", 1, 200
+            user, date, "COMMUNITY_POST", "コミュニティに1回投稿する", 1
         );
         DailyMissionStatus mission3 = new DailyMissionStatus(
-            user, date, "AI_COACH", "AIコーチを使ってみよう", 1, 150
+            user, date, "AI_COACH", "AIコーチを使ってみよう", 1
         );
 
         missionStatusRepository.saveAll(List.of(mission1, mission2, mission3));
@@ -120,7 +120,7 @@ public class MissionService {
         if (missionStatus.isCompleted() && !missionStatus.isRewardClaimed()) {
             User user = userService.findById(userId)
                     .orElseThrow(() -> new IllegalStateException("User not found in claim process."));
-            int rewardExp = missionStatus.getRewardExp();
+            int rewardExp = missionStatus.getRewardExp(); // ✅ 常に1000
 
             // 経験値付与
             userService.addExp(user, rewardExp);

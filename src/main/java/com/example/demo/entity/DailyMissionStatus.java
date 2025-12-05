@@ -46,18 +46,18 @@ public class DailyMissionStatus {
     private boolean rewardClaimed = false; 
 
     @Column(nullable = false)
-    private int rewardExp; 
+    private int rewardExp = 1000; // ✅ 常に1000に固定
 
     // コンストラクタ
     public DailyMissionStatus() {}
 
-    public DailyMissionStatus(User user, LocalDate date, String missionType, String description, int requiredCount, int rewardExp) {
+    public DailyMissionStatus(User user, LocalDate date, String missionType, String description, int requiredCount) {
         this.user = user;
         this.date = date;
         this.missionType = missionType;
         this.description = description;
         this.requiredCount = requiredCount;
-        this.rewardExp = rewardExp;
+        this.rewardExp = 1000; // ✅ 固定値
     }
 
     // 進捗をインクリメントし、完了状態をチェックするメソッド
@@ -72,7 +72,7 @@ public class DailyMissionStatus {
         return false;
     }
 
-    // getter, setter (全量表示のため省略、実際には必要)
+    // getter, setter
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public User getUser() { return user; }
@@ -92,5 +92,8 @@ public class DailyMissionStatus {
     public boolean isRewardClaimed() { return rewardClaimed; }
     public void setRewardClaimed(boolean rewardClaimed) { this.rewardClaimed = rewardClaimed; }
     public int getRewardExp() { return rewardExp; }
-    public void setRewardExp(int rewardExp) { this.rewardExp = rewardExp; }
+    public void setRewardExp(int rewardExp) { 
+        // ✅ 常に1000に固定するため、外部から変更されても1000に戻す
+        this.rewardExp = 1000; 
+    }
 }
