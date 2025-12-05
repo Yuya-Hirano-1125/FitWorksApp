@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.demo.dto.MissionStatusDto;
 import com.example.demo.entity.DailyMissionStatus;
 import com.example.demo.entity.User;
-import com.example.demo.service.CommunityService;
+import com.example.demo.service.CommunityService; // ★ コミュニティ投稿用サービス（必要なら）
 import com.example.demo.service.MissionService;
 import com.example.demo.service.UserService;
 
@@ -26,7 +26,7 @@ public class MissionController {
 
     private final UserService userService;
     private final MissionService missionService;
-    private final CommunityService communityService;
+    private final CommunityService communityService; // ★ コミュニティ投稿用サービス
 
     public MissionController(UserService userService,
                              MissionService missionService,
@@ -36,7 +36,9 @@ public class MissionController {
         this.communityService = communityService;
     }
 
-    /** デイリーミッション画面を表示 */
+    /**
+     * デイリーミッション画面を表示
+     */
     @GetMapping
     public String showDailyMission(@AuthenticationPrincipal UserDetails userDetails,
                                    Model model) {
@@ -49,12 +51,15 @@ public class MissionController {
             return "redirect:/login";
         }
 
+        // ミッション進捗情報
         MissionStatusDto missionStatus = userService.getDailyMissionStatus(user);
         model.addAttribute("missionStatus", missionStatus);
 
+        // 今日のミッション一覧
         List<DailyMissionStatus> missions = missionService.getOrCreateTodayMissions(user);
         model.addAttribute("missions", missions);
 
+        // ユーザー情報
         model.addAttribute("level", user.getLevel());
         model.addAttribute("experiencePoints", user.getExperiencePoints());
         model.addAttribute("requiredXp", user.calculateRequiredXp());
@@ -63,26 +68,33 @@ public class MissionController {
         return "misc/daily-mission";
     }
 
-    /** FAQ画面 */
+    /**
+     * FAQ画面
+     */
     @GetMapping("/faq")
     public String showFaq() {
         return "misc/faq";
     }
 
-    /** AIコーチ画面に遷移 */
+    /**
+     * AIコーチ画面に遷移
+     */
     @GetMapping("/ai-coach")
     public String showAiCoachPage(@AuthenticationPrincipal UserDetails userDetails,
                                   RedirectAttributes redirectAttributes) {
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
             if (user != null) {
+                // ★ AIコーチ利用ミッション進捗を更新
                 missionService.updateMissionProgress(user.getId(), "AI_COACH");
             }
         }
         return "ai-coach/ai-coach-chat";
     }
 
-    /** ミッション報酬を獲得する処理 */
+    /**
+     * ミッション報酬を獲得する処理
+     */
     @PostMapping("/claim/{missionId}")
     public String claimReward(@AuthenticationPrincipal UserDetails userDetails,
                               @PathVariable Long missionId,
@@ -111,13 +123,16 @@ public class MissionController {
         return "redirect:/daily-mission";
     }
 
-    /** ミッション1: ランニング → トレーニング画面へ遷移 */
+    /**
+     * ミッション1: ランニング → トレーニング画面へ遷移
+     */
     @GetMapping("/running")
     public String showRunningMission(@AuthenticationPrincipal UserDetails userDetails,
                                      RedirectAttributes redirectAttributes) {
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
             if (user != null) {
+                // ★ トレーニングログミッション進捗を更新
                 missionService.updateMissionProgress(user.getId(), "TRAINING_LOG");
                 redirectAttributes.addFlashAttribute("successMessage", "ランニングを記録しました！ミッション進捗が更新されました。");
             }
@@ -125,10 +140,11 @@ public class MissionController {
         return "training/training";
     }
 
-    /** ミッション2: コミュニティ投稿 */
+    /**
+     * ミッション2: コミュニティ投稿
+     */
     @PostMapping("/community/post")
     public String postCommunity(@AuthenticationPrincipal UserDetails userDetails,
-                                @RequestParam String title,
                                 @RequestParam String content,
                                 RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
@@ -140,9 +156,10 @@ public class MissionController {
             return "redirect:/login";
         }
 
-        // 投稿処理（タイトルと本文を渡す）
-        communityService.createPost(user, title, content);
+        // 投稿処理
+        communityService.createPost(user, content);
 
+        // ★ コミュニティ投稿ミッション進捗を更新
         missionService.updateMissionProgress(user.getId(), "COMMUNITY_POST");
 
         redirectAttributes.addFlashAttribute("successMessage", "コミュニティに投稿しました！ミッション進捗が更新されました。");
