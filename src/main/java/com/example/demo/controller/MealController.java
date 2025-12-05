@@ -128,7 +128,6 @@ public class MealController {
             String advice = aiCoachService.generateMealAdvice(user, savedRecord);
             redirectAttributes.addFlashAttribute("aiAdvice", advice);
         } catch (Exception e) {
-            // AIのエラーで保存処理を止めない
             System.out.println("AI Advice Error: " + e.getMessage());
         }
 

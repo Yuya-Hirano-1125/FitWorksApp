@@ -20,7 +20,6 @@ public class AICoachService {
 
     /**
      * チャット画面でのトレーニング・食事相談への回答を生成する
-     * (前回の修正を含み、食事履歴も考慮できるようにしています)
      */
     public String generateCoachingAdvice(User user, List<TrainingRecord> trainingHistory, List<MealRecord> mealHistory, String userMessage) {
         String systemPrompt = buildSystemPrompt(user, trainingHistory, mealHistory);
@@ -29,14 +28,14 @@ public class AICoachService {
     }
     
     /**
-     * 後方互換性用（食事履歴を渡さない呼び出し用）
+     * 後方互換性用
      */
     public String generateCoachingAdvice(User user, List<TrainingRecord> history, String userMessage) {
         return generateCoachingAdvice(user, history, null, userMessage);
     }
 
     /**
-     * ★新規追加: 食事記録に対するワンポイントアドバイスを生成する
+     * ★食事記録に対するワンポイントアドバイスを生成する
      */
     public String generateMealAdvice(User user, MealRecord mealRecord) {
         StringBuilder sb = new StringBuilder();
