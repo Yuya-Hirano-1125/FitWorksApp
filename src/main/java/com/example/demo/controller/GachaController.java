@@ -25,33 +25,34 @@ public class GachaController {
         this.userService = userService;
     }
 
-    // ガチャトップ
+    // 1. ガチャ画面
     @GetMapping("/gacha")
     public String index(Model model) {
         model.addAttribute("probabilityList", gachaService.getProbabilityList());
         return "gacha/gacha";
     }
 
-    // アニメーション
+    // 2. 演出画面
     @GetMapping("/gacha/animation")
     public String animation(@RequestParam("count") int count, Model model) {
         model.addAttribute("count", count);
         return "gacha/gacha_animation";
     }
 
-    // ガチャ結果（保存もここで実行）
+    // 3. ガチャ結果
     @GetMapping("/gacha/roll")
     public String roll(
             @RequestParam("count") int count,
             @AuthenticationPrincipal UserDetails userDetails,
             Model model) {
 
-        // 現在ログイン中のユーザーを取得
+        if (userDetails == null) {
+            return "redirect:/login";
+        }
+
         User user = userService.findByUsername(userDetails.getUsername());
+        Long userId = user.getId();
 
-        int userId = user.getId();  // ← これが超重要
-
-        // ★ userId を渡す
         List<GachaItem> results = gachaService.roll(count, userId);
 
         model.addAttribute("results", results);

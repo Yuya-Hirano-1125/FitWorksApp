@@ -21,8 +21,9 @@ public class GachaService {
 
     private final Random random = new Random();
 
-    // 複数回ガチャ
-    public List<GachaItem> roll(int count, int userId) {
+    // ▼ 複数回ガチャ
+    public List<GachaItem> roll(int count, Long userId) {
+
         List<GachaItem> results = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
@@ -32,8 +33,8 @@ public class GachaService {
         return results;
     }
 
-    // 単発 + DB保存
-    public GachaItem drawGacha(int userId) {
+    // ▼ 単発ガチャ + DB保存
+    public GachaItem drawGacha(Long userId) {
 
         GachaItem item = getRandomItem();
 
@@ -49,7 +50,7 @@ public class GachaService {
         return item;
     }
 
-    // 抽選
+    // ▼ ランダム抽選
     private GachaItem getRandomItem() {
 
         int r = random.nextInt(100);
@@ -63,7 +64,7 @@ public class GachaService {
         }
     }
 
-    // 出現確率
+    // ▼ 提供割合
     public List<Map<String, Object>> getProbabilityList() {
 
         List<Map<String, Object>> list = new ArrayList<>();

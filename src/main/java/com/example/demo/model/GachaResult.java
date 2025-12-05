@@ -2,15 +2,15 @@ package com.example.demo.model;
 
 public class GachaResult {
 
-    private int id;
-    private int userId;        // INT に変更
+    private Long id;
+    private Long userId;       // ★ Long 型に変更
     private String itemName;
     private String rarity;
     private String createdAt;
 
     public GachaResult() {}
 
-    public GachaResult(int userId, String itemName, String rarity, String createdAt) {
+    public GachaResult(Long userId, String itemName, String rarity, String createdAt) {
         this.userId = userId;
         this.itemName = itemName;
         this.rarity = rarity;
@@ -18,11 +18,11 @@ public class GachaResult {
     }
 
     // Getter / Setter
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
     public String getItemName() { return itemName; }
     public void setItemName(String itemName) { this.itemName = itemName; }

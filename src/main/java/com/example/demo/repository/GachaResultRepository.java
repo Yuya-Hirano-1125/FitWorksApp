@@ -17,6 +17,7 @@ public class GachaResultRepository {
 
     private final String DB_URL = "jdbc:sqlite:fitworks.db";
 
+    // ▼ 保存処理
     public void save(GachaResult result) {
 
         String sql = "INSERT INTO gacha_result (user_id, item_name, rarity, created_at) VALUES (?, ?, ?, ?)";
@@ -24,10 +25,11 @@ public class GachaResultRepository {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, result.getUserId());
+            pstmt.setLong(1, result.getUserId());
             pstmt.setString(2, result.getItemName());
             pstmt.setString(3, result.getRarity());
             pstmt.setString(4, result.getCreatedAt());
+
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -35,7 +37,8 @@ public class GachaResultRepository {
         }
     }
 
-    public List<GachaResult> findByUserId(int userId) {
+    // ▼ userId で検索
+    public List<GachaResult> findByUserId(Long userId) {
 
         String sql = "SELECT * FROM gacha_result WHERE user_id = ? ORDER BY id DESC";
         List<GachaResult> list = new ArrayList<>();
@@ -43,19 +46,20 @@ public class GachaResultRepository {
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, userId);
+            pstmt.setLong(1, userId);
+
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
 
                 GachaResult result = new GachaResult(
-                    rs.getInt("user_id"),
+                    rs.getLong("user_id"),
                     rs.getString("item_name"),
                     rs.getString("rarity"),
                     rs.getString("created_at")
                 );
-                result.setId(rs.getInt("id"));
 
+                result.setId(rs.getLong("id"));
                 list.add(result);
             }
 
