@@ -1,19 +1,23 @@
 @charset "UTF-8";
 
+/* ========================================================= */
+/* CHARACTERS MENU STYLE - Based on Home Layout */
+/* ========================================================= */
+
 /* ベース設定 */
 body {
     font-family: 'Poppins', 'Noto Sans JP', sans-serif;
-    background-color: #f4f4f9;
-    color: #333;
+    background-color: #f4f4f9; 
+    color: var(--dark-text, #333);
     margin: 0;
     padding: 0;
-    padding-bottom: 80px;
+    padding-bottom: 100px;
     min-height: 100vh;
 }
 
 .main-container {
     max-width: 600px;
-    margin: 0 auto;
+    margin: 20px auto;
     padding: 20px;
 }
 
@@ -27,14 +31,21 @@ body {
 .header-section h1 {
     font-size: 1.8rem;
     font-weight: 800;
+    color: var(--primary-color, #ff69b4);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 .sub-heading {
-    color: #666;
+    color: #888;
     font-size: 0.9rem;
+    font-weight: 600;
 }
 
-/* ボタンリスト */
+/* メニューリスト */
 .menu-list {
     display: flex;
     flex-direction: column;
@@ -42,114 +53,264 @@ body {
 }
 
 /* ----------------------------
-   メニューボタン（全て中央揃え）
-   アイコンは左端固定 / 矢印は右端固定
-   テキストは完全中央に配置
+   メニューボタン (カードスタイル化)
 ----------------------------- */
 .menu-button {
-    position: relative;   /* ← アイコン絶対配置の基準 */
-    display: flex;
-    align-items: center;
-    justify-content: center;   /* ← テキストを中央へ */
-    padding: 18px 22px;
+    position: relative;
+    width: 100%;
+    height: 90px;
     border-radius: 20px;
     text-decoration: none;
-    color: #fff;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    box-shadow: 0 5px 16px rgba(0,0,0,0.12);
-    width: 100%;
+    color: var(--dark-text, #4a4a4a);
+    background: #ffffff;
+    
+    /* カード風の影 */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    
+    /* デフォルトの枠線（透明にしておく） */
+    border: 2px solid transparent;
+    
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+    cursor: pointer;
     box-sizing: border-box;
 }
 
-/* ホバー */
+/* ホバー時の動き */
 .menu-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 28px rgba(0,0,0,0.16);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* アイコン（左固定） */
+.menu-button:active {
+    transform: translateY(-2px) scale(0.98);
+}
+
+/* ----------------------------
+   内部要素のレイアウト
+----------------------------- */
+
+/* 左アイコン */
 .icon-area {
-    font-size: 1.9rem;
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--ai-bubble, #f0f0f0);
+    color: var(--primary-color, #ff69b4);
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 1.5rem;
+    
     position: absolute;
     left: 20px;
     top: 50%;
     transform: translateY(-50%);
+    
+    transition: all 0.3s;
 }
 
-/* テキスト（真ん中固定） */
+.menu-button:hover .icon-area {
+    background: var(--primary-color, #ff69b4);
+    color: #fff;
+    transform: translateY(-50%) rotate(10deg);
+}
+
+/* テキストエリア */
 .text-area {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;  
     text-align: center;
-    gap: 4px;
-    flex: 1;
-    min-width: 0;
-}
-
-.main-text {
-    font-size: 1.15rem;
-    font-weight: 700;
-    line-height: 1.1;
-}
-
-.sub-text {
-    font-size: 0.85rem;
-    opacity: 0.95;
-    line-height: 1.1;
-}
-
-/* 矢印（右固定） */
-.arrow-icon {
-    font-size: 1.15rem;
-    opacity: 0.9;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    gap: 5px;
+    
     position: absolute;
-    right: 20px;
+    left: 80px;
+    right: 60px;
     top: 50%;
     transform: translateY(-50%);
 }
 
-/* ボタンカラー */
+.main-text {
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--dark-text, #333);
+}
+
+.sub-text {
+    font-size: 0.8rem;
+    color: #888;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+/* 右矢印 */
+.arrow-icon {
+    font-size: 1.2rem;
+    color: #ccc;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    
+    transition: transform 0.3s;
+}
+
+.menu-button:hover .arrow-icon {
+    color: var(--primary-color, #ff69b4);
+    transform: translateY(-50%) translateX(5px);
+}
+
+/* ----------------------------
+   各ボタンのカラー設定
+----------------------------- */
+
+/* ① 着せ替え (ピンク) */
 .style-unlock {
-    background: linear-gradient(135deg, #7b4bff, #2a81ff);
+    border-color: #ffb6c1; /* var(--secondary-color) */
+}
+.style-unlock .icon-area {
+    background: #fff0f5;
+    color: #ff69b4;
+}
+.style-unlock:hover {
+    background: #fff0f5;
+    border-color: #ff69b4;
 }
 
-.style-list {
-    background: linear-gradient(135deg, #ff8a5c, #ff465c);
+/* ② 背景一覧 (ここをピンクに変更しました) */
+.style-collection {
+    border-color: #ffb6c1; /* var(--secondary-color) と同じピンク枠線 */
+}
+.style-collection .icon-area {
+    background: #fff0f5; /* 背景色も薄いピンクに */
+    color: #ff69b4;      /* アイコンも濃いピンクに */
+}
+.style-collection:hover {
+    background: #fff0f5;
+    border-color: #ff69b4; /* ホバー時に濃いピンク枠線 */
 }
 
-.style-materials {
-    background: linear-gradient(135deg, #48c76a, #8bd751);
+/* ③ ガチャ (紫/ゴールド系 - そのまま維持) */
+.style-gacha {
+    border-color: #dda0dd;
+}
+.style-gacha .icon-area {
+    background: #f8f0ff;
+    color: #9370db;
+}
+.style-gacha:hover {
+    background: #f8f0ff;
+    border-color: #9370db;
 }
 
-.style-backgrounds {
-    background: linear-gradient(135deg, #f7d23e, #ff9d00);
-}
-
-/* 戻るボタン */
-.back-btn-container {
-    margin-top: 20px;
+/* ----------------------------
+   戻るボタン
+----------------------------- */
+.button-container {
+    margin-top: 40px;
     text-align: center;
 }
 
+.button-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 30px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 700;
+    color: #888;
+    background: #fff;
+    border: 2px solid #ddd;
+    transition: all 0.3s;
+}
 
+.button-secondary:hover {
+    border-color: var(--primary-color, #ff69b4);
+    color: var(--primary-color, #ff69b4);
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+/* =========================================
+   追加するカラー設定
+   ========================================= */
 
-/* レスポンシブ対応 */
-@media (max-width: 420px) {
-    .icon-area { width: 40px; height: 40px; font-size: 1.6rem; left: 14px; }
-    .arrow-icon { right: 14px; }
-    .main-text { font-size: 1.05rem; }
-    .sub-text { font-size: 0.8rem; }
-    .menu-button { padding: 14px 16px; }
+/* ② キャラクター一覧 (ブルー系) */
+.style-storage {
+    border-color: #b3e5fc; /* 薄い青の枠線 */
+}
+.style-storage .icon-area {
+    background: #e1f5fe; /* 薄い青の背景 */
+    color: #03a9f4;      /* 濃い青のアイコン */
+}
+.style-storage:hover {
+    background: #e1f5fe;
+    border-color: #03a9f4; /* ホバー時は濃い青枠線 */
+}
+
+/* ③ 進化素材一覧 (オレンジ/イエロー系) */
+.style-material {
+    border-color: #ffe0b2; /* 薄いオレンジの枠線 */
+}
+.style-material .icon-area {
+    background: #fff3e0; /* 薄いオレンジの背景 */
+    color: #ff9800;      /* 濃いオレンジのアイコン */
+}
+.style-material:hover {
+    background: #fff3e0;
+    border-color: #ff9800; /* ホバー時は濃いオレンジ枠線 */
+}
+
+/* ④ 背景一覧 (グリーン系) */
+.style-backgrounds {
+    border-color: #c8e6c9; /* 薄い緑の枠線 */
+}
+.style-backgrounds .icon-area {
+    background: #e8f5e9; /* 薄い緑の背景 */
+    color: #4caf50;      /* 濃い緑のアイコン */
+}
+.style-backgrounds:hover {
+    background: #e8f5e9;
+    border-color: #4caf50; /* ホバー時は濃い緑枠線 */
+}
+/* =========================================
+   ホバー時のアイコン色を各色に合わせる設定
+   ========================================= */
+
+/* ② キャラクター一覧 (ブルー) */
+.style-storage:hover .icon-area {
+    background: #03a9f4; /* ホバー時のアイコン背景を青に */
+    color: #fff;
+}
+.style-storage:hover .arrow-icon {
+    color: #03a9f4;      /* 矢印も青に */
+}
+
+/* ③ 進化素材一覧 (オレンジ) */
+.style-material:hover .icon-area {
+    background: #ff9800; /* ホバー時のアイコン背景をオレンジに */
+    color: #fff;
+}
+.style-material:hover .arrow-icon {
+    color: #ff9800;      /* 矢印もオレンジに */
+}
+
+/* ④ 背景一覧 (グリーン) */
+.style-backgrounds:hover .icon-area {
+    background: #4caf50; /* ホバー時のアイコン背景を緑に */
+    color: #fff;
+}
+.style-backgrounds:hover .arrow-icon {
+    color: #4caf50;      /* 矢印も緑に */
 }
