@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -27,9 +29,8 @@ public class CommunityController {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-    private final UserService userService; // ★ 追加: ミッション更新用サービス
+    private final UserService userService;
     
-    // NGワードのリスト
     private static final List<String> NG_WORDS = List.of("死ね", "バカ", "アホ", "殺す", "暴力");
 
     public CommunityController(PostRepository postRepository,
@@ -42,20 +43,25 @@ public class CommunityController {
         this.userService = userService;
     }
 
-    // 掲示板トップ（一覧表示）
+    // 一覧表示
     @GetMapping
-    public String index(Model model) {
-        model.addAttribute("posts", postRepository.findAllByOrderByCreatedAtDesc());
+    public String index(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        model.addAttribute("posts", posts);
+        
+        if (userDetails != null) {
+            User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
+            model.addAttribute("currentUser", currentUser);
+        }
         return "community/index";
     }
 
-    // 新規投稿処理
+    // 投稿処理
     @PostMapping("/post")
-    public String createPost(@RequestParam String title,
+    public String createPost(@RequestParam String title, 
                              @RequestParam String content,
                              @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
-        
         String cleanTitle = filterNgWords(title);
         String cleanContent = filterNgWords(content);
 
@@ -64,31 +70,32 @@ public class CommunityController {
         post.setContent(cleanContent);
         post.setAuthor(user);
         postRepository.save(post);
-
-        // ★ 投稿したらミッションをクリア扱いにする
+        
         userService.markMissionCompletedByPost(user);
 
         return "redirect:/community";
     }
 
-    // 投稿詳細＆コメント表示
+    // 詳細表示
     @GetMapping("/{id}")
-    public String detail(@PathVariable Long id, Model model) {
-        // コメントも一緒に取得するメソッドに変更
+    public String detail(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetails userDetails) {
         Post post = postRepository.findByIdWithComments(id).orElseThrow();
         model.addAttribute("post", post);
+        
+        if (userDetails != null) {
+            User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
+            model.addAttribute("currentUser", currentUser);
+        }
         return "community/detail";
     }
 
-    // コメント投稿処理
+    // コメント投稿
     @PostMapping("/{id}/comment")
     public String createComment(@PathVariable Long id,
                                 @RequestParam String content,
                                 @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
-        
         Post post = postRepository.findById(id).orElseThrow();
-        
         String cleanContent = filterNgWords(content);
 
         Comment comment = new Comment();
@@ -100,11 +107,42 @@ public class CommunityController {
         return "redirect:/community/" + id;
     }
 
-    // NGワードフィルタリング
-    private String filterNgWords(String text) {
-        if (text == null || text.isEmpty()) {
-            return text;
+    // ★修正: いいね機能 (IDベースで確実に判定)
+    @PostMapping("/{id}/like")
+    public String toggleLike(@PathVariable Long id, 
+                             @AuthenticationPrincipal UserDetails userDetails,
+                             HttpServletRequest request) {
+        
+        if (userDetails == null) {
+            return "redirect:/login";
         }
+
+        // いいね情報も含めて投稿を取得
+        Post post = postRepository.findByIdWithComments(id).orElseThrow();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+
+        // 既にいいねリストの中に「自分と同じIDのユーザー」がいるか探す
+        User existingLike = post.getLikedBy().stream()
+                .filter(u -> u.getId().equals(user.getId()))
+                .findFirst()
+                .orElse(null);
+
+        if (existingLike != null) {
+            // 既にいいね済みなら -> 解除する (リストから削除)
+            post.getLikedBy().remove(existingLike);
+        } else {
+            // まだなら -> いいねする (リストに追加)
+            post.getLikedBy().add(user);
+        }
+
+        postRepository.save(post);
+
+        String referer = request.getHeader("Referer");
+        return "redirect:" + (referer != null ? referer : "/community");
+    }
+
+    private String filterNgWords(String text) {
+        if (text == null || text.isEmpty()) return text;
         String filteredText = text;
         for (String ngWord : NG_WORDS) {
             if (filteredText.contains(ngWord)) {
