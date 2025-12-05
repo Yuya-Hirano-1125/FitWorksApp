@@ -7,8 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-	
-	<script th:src="@{/js/theme.js}"></script>
+    <script th:src="@{/js/theme.js}"></script>
 
     <style>
         .gacha-page .main-container {
@@ -49,24 +48,28 @@
     <h1><i class="fa-solid fa-gift"></i> ガチャ結果</h1>
     <p class="sub-heading">おめでとう！以下のアイテムを獲得しました！</p>
 
-    <!-- ▼ ガチャ結果一覧（Thymeleaf） -->
+    <!-- ▼ ガチャ結果一覧 -->
     <div class="result-list">
         <div class="result-card" th:each="item : ${results}">
             <img th:src="@{${item.imagePath}}" alt="result">
-            <div class="result-name" th:text="${item.name}">サンプル名</div>
-            <div class="result-rarity" th:text="${item.rarity}">レア度</div>
+            <div class="result-name" th:text="${item.name}"></div>
+            <div class="result-rarity" th:text="${item.rarity}"></div>
         </div>
     </div>
 
-    <!-- ▼ ボタン -->
+    <!-- ▼ ボタン：userId を確実に引き継ぐ -->
     <div class="button-container" style="margin-top: 40px;">
-        <a th:href="@{/gacha}" class="button primary">
-            <i class="fa-solid fa-rotate-right"></i> もう一度引く 
+
+        <!-- ★ userId を渡してガチャトップへ戻す -->
+        <a th:href="@{/gacha(userId=${userId})}" class="button primary">
+            <i class="fa-solid fa-rotate-right"></i> もう一度引く
         </a>
 
+        <!-- ★ ホームにも userId を付ける必要はない（SecurityContext でOK） -->
         <a th:href="@{/home}" class="button secondary" style="margin-top: 20px;">
-            <i class="fa-solid fa-house"></i> ホームに戻る 
+            <i class="fa-solid fa-house"></i> ホームに戻る
         </a>
+
     </div>
 </div>
 
