@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -135,5 +136,22 @@ public class MissionService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 毎日午前4時に全ユーザーのミッションを更新するスケジューラ
+     */
+    @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Tokyo")
+    @Transactional
+    public void resetDailyMissions() {
+        List<User> users = userRepository.findAll();
+        LocalDate today = LocalDate.now();
+
+        for (User user : users) {
+            // 既存の今日のミッションを削除して再生成
+            missionStatusRepository.deleteByUserAndDate(user, today);
+            generateDailyMissions(user, today);
+        }
+        System.out.println("✅ デイリーミッションを午前4時に更新しました");
     }
 }

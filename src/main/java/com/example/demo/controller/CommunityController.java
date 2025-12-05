@@ -20,6 +20,7 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.MissionService;
 import com.example.demo.service.UserService;
 
 @Controller
@@ -30,40 +31,39 @@ public class CommunityController {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-    
+    private final MissionService missionService; // ✅ 追加
+
     private static final List<String> NG_WORDS = List.of("死ね", "バカ", "アホ", "殺す", "暴力");
 
     public CommunityController(PostRepository postRepository,
                                CommentRepository commentRepository,
                                UserRepository userRepository,
-                               UserService userService) {
+                               UserService userService,
+                               MissionService missionService) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.missionService = missionService; // ✅ 追加
     }
 
- // 一覧表示
+    // 一覧表示
     @GetMapping
     public String index(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        
-        // ★修正箇所: findAllByOrderByCreatedAtDesc() ではなく、
-        // さっき作った findAllWithLikes() を呼び出します。
         List<Post> posts = postRepository.findAllWithLikes();
-        
         model.addAttribute("posts", posts);
-        
+
         if (userDetails != null) {
             User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
             model.addAttribute("currentUser", currentUser);
         }
-        
+
         return "community/index";
     }
 
     // 投稿処理
     @PostMapping("/post")
-    public String createPost(@RequestParam String title, 
+    public String createPost(@RequestParam String title,
                              @RequestParam String content,
                              @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
@@ -75,8 +75,9 @@ public class CommunityController {
         post.setContent(cleanContent);
         post.setAuthor(user);
         postRepository.save(post);
-        
-        userService.markMissionCompletedByPost(user);
+
+        // ✅ ミッション進捗更新
+        missionService.updateMissionProgress(user.getId(), "COMMUNITY_POST");
 
         return "redirect:/community";
     }
@@ -86,7 +87,7 @@ public class CommunityController {
     public String detail(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetails userDetails) {
         Post post = postRepository.findByIdWithComments(id).orElseThrow();
         model.addAttribute("post", post);
-        
+
         if (userDetails != null) {
             User currentUser = userRepository.findByUsername(userDetails.getUsername()).orElse(null);
             model.addAttribute("currentUser", currentUser);
@@ -108,35 +109,31 @@ public class CommunityController {
         comment.setAuthor(user);
         comment.setPost(post);
         commentRepository.save(comment);
-        
+
         return "redirect:/community/" + id;
     }
 
-    // ★修正: いいね機能 (IDベースで確実に判定)
+    // いいね機能
     @PostMapping("/{id}/like")
-    public String toggleLike(@PathVariable Long id, 
+    public String toggleLike(@PathVariable Long id,
                              @AuthenticationPrincipal UserDetails userDetails,
                              HttpServletRequest request) {
-        
+
         if (userDetails == null) {
             return "redirect:/login";
         }
 
-        // いいね情報も含めて投稿を取得
         Post post = postRepository.findByIdWithComments(id).orElseThrow();
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
 
-        // 既にいいねリストの中に「自分と同じIDのユーザー」がいるか探す
         User existingLike = post.getLikedBy().stream()
                 .filter(u -> u.getId().equals(user.getId()))
                 .findFirst()
                 .orElse(null);
 
         if (existingLike != null) {
-            // 既にいいね済みなら -> 解除する (リストから削除)
             post.getLikedBy().remove(existingLike);
         } else {
-            // まだなら -> いいねする (リストに追加)
             post.getLikedBy().add(user);
         }
 
