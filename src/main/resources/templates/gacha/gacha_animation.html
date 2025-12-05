@@ -36,15 +36,6 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         const count = /*[[${count}]]*/ 1;
+        const userId = /*[[${userId}]]*/ 0;
 
-        setTimeout(() => {
-            // 戻れないように履歴に残さず遷移
-            window.location.replace('/gacha/roll?count=' + count);
-        }, 3000);
-        /*]]>*/
-    </script>
-</body>
-</html>
-
-
-
+        // userId と count を確実に引き継いで r
