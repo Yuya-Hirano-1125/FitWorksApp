@@ -18,4 +18,7 @@ public interface DailyMissionStatusRepository extends JpaRepository<DailyMission
     
     // ユーザー、日付、ミッションタイプで特定のミッションステータスを取得
     Optional<DailyMissionStatus> findByUserAndDateAndMissionType(User user, LocalDate date, String missionType);
+    
+    // ✅ ユーザーと日付でミッションを削除
+    void deleteByUserAndDate(User user, LocalDate date);
 }
