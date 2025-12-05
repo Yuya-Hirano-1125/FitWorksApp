@@ -2,7 +2,6 @@ package com.example.demo.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -22,24 +21,22 @@ public class GachaService {
 
     private final Random random = new Random();
 
-    // ---- 複数回ガチャ ----
+    // 複数回ガチャ
     public List<GachaItem> roll(int count, int userId) {
-
         List<GachaItem> results = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
-            results.add(drawGacha(userId)); // DB保存付き
+            results.add(drawGacha(userId));
         }
 
         return results;
     }
 
-    // ---- 単発ガチャ + DB保存 ----
+    // 単発 + DB保存
     public GachaItem drawGacha(int userId) {
 
         GachaItem item = getRandomItem();
 
-        // DB 保存
         GachaResult result = new GachaResult(
             userId,
             item.getName(),
@@ -52,7 +49,7 @@ public class GachaService {
         return item;
     }
 
-    // ---- ガチャ抽選処理 ----
+    // 抽選
     private GachaItem getRandomItem() {
 
         int r = random.nextInt(100);
@@ -66,31 +63,31 @@ public class GachaService {
         }
     }
 
-    // ---- 確率リスト表示 ----
+    // 出現確率
     public List<Map<String, Object>> getProbabilityList() {
 
         List<Map<String, Object>> list = new ArrayList<>();
 
-        Map<String, Object> ssr = new HashMap<>();
-        ssr.put("rarity", "SSR");
-        ssr.put("name", "超レア・プログラム");
-        ssr.put("rate", "5%");
-        ssr.put("color", "#FFD700");
-        list.add(ssr);
+        list.add(Map.of(
+                "rarity", "SSR",
+                "name", "超レア・プログラム",
+                "rate", "5%",
+                "color", "#FFD700"
+        ));
 
-        Map<String, Object> sr = new HashMap<>();
-        sr.put("rarity", "SR");
-        sr.put("name", "レア・プログラム");
-        sr.put("rate", "20%");
-        sr.put("color", "#C0C0C0");
-        list.add(sr);
+        list.add(Map.of(
+                "rarity", "SR",
+                "name", "レア・プログラム",
+                "rate", "20%",
+                "color", "#C0C0C0"
+        ));
 
-        Map<String, Object> rMap = new HashMap<>();
-        rMap.put("rarity", "R");
-        rMap.put("name", "ノーマル・プログラム");
-        rMap.put("rate", "75%");
-        rMap.put("color", "#B87333");
-        list.add(rMap);
+        list.add(Map.of(
+                "rarity", "R",
+                "name", "ノーマル・プログラム",
+                "rate", "75%",
+                "color", "#B87333"
+        ));
 
         return list;
     }

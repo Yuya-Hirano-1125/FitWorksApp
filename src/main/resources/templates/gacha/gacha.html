@@ -7,8 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-	
-	<script th:src="@{/js/theme.js}"></script>
+    
+    <script th:src="@{/js/theme.js}"></script>
+
     <style>
         .gacha-page .main-container {
             max-width: 600px;
@@ -86,8 +87,10 @@
         }
     </style>
 </head>
+
 <body class="gacha-page">
 <div class="main-container">
+
     <h1><i class="fa-solid fa-gift header-icon"></i>ガチャ</h1>
     <p class="sub-heading">レアな着せ替えを手に入れよう！</p>
 
@@ -95,11 +98,17 @@
         <i class="fa-solid fa-gifts"></i>
     </div>
 
-	<p>所持シェイカー：１０個</p>
-	<p>消費シェイカー：１個</p>
+    <p>所持シェイカー：１０個</p>
+    <p>消費シェイカー：１個</p>
+
+    <!-- ★★★ ここを修正：必ず userId が URL に含まれるようにした ★★★ -->
     <div class="gacha-button-unit">
-        <a th:href="@{/gacha/animation(count=1)}" class="button primary">1回引く</a>
-        <a th:href="@{/gacha/animation(count=6)}" class="button primary">6連で引く</a>
+        <a th:href="@{/gacha/animation(count=1, userId=${userId})}" class="button primary">
+            1回引く
+        </a>
+        <a th:href="@{/gacha/animation(count=6, userId=${userId})}" class="button primary">
+            6連で引く
+        </a>
     </div>
 
     <div class="rate-container">
@@ -126,12 +135,14 @@
             </tbody>
         </table>
     </div>
-	
+    
 </div>
+
 <div class="button-container" style="margin-top: 40px;">
     <a th:href="@{/home}" class="button secondary">
        <i class="fa-solid fa-house"></i> ホームに戻る 
     </a>
 </div>
+
 </body>
 </html>
