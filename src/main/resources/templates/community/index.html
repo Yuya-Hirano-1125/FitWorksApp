@@ -4,87 +4,208 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>コミュニティ | FitWorks</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-	<link rel="stylesheet" th:href="@{/css/base.css}">
-	
-	<script th:src="@{/js/theme.js}"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <script th:src="@{/js/theme.js}"></script>
+
     <style>
-        /* 簡易スタイル */
-        .community-container { max-width: 700px; margin: 0 auto; padding: 20px; padding-bottom: 40px; }
-        
-        /* 投稿カードのデザイン */
+        /* --- コミュニティページ固有のスタイル --- */
+        .new-post-area { 
+            background: var(--ai-bubble); 
+            padding: 25px; 
+            border-radius: 20px; 
+            margin-bottom: 40px; 
+            border: 2px dashed var(--secondary-color);
+            text-align: left;
+        }
+        .new-post-area h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-input, .custom-textarea { 
+            width: 100%; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border-radius: 15px; 
+            border: 2px solid #fff; 
+            background: #fff;
+            font-family: inherit;
+            resize: none; 
+            overflow: hidden; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        .custom-input:focus, .custom-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.1);
+        }
+
+        .post-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
         .post-card {
-            background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid var(--secondary-color);
-            text-decoration: none; display: block; color: inherit; transition: transform 0.2s;
+            background: #fff; 
+            border-radius: 20px; 
+            padding: 20px 25px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            border: 2px solid var(--light-bg); 
+            text-align: left;
+            position: relative;
+            transition: border-color 0.3s;
+            overflow: hidden; 
         }
-        .post-card:hover { transform: translateY(-3px); }
-        .post-title { font-size: 1.2rem; font-weight: bold; color: var(--primary-color); margin-bottom: 5px;}
-        .post-meta { font-size: 0.85rem; color: #666; display: flex; justify-content: space-between; }
-        
-        /* 投稿フォームのデザイン */
-        .new-post-form { background: #fff0f5; padding: 20px; border-radius: 15px; margin-bottom: 30px; border: 2px dashed var(--primary-color);}
-        
-        /* ★★★ 手動リサイズを無効化し、自動拡張に対応するために修正 ★★★ */
-        .form-input, .form-textarea { 
-            width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd;
-            resize: none; /* 手動リサイズを無効化 */
-            overflow: hidden; /* 不要なスクロールバーを非表示 */
+        .post-card:hover {
+            border-color: var(--secondary-color);
         }
-        
-        .btn-submit { background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; }
-        
-        /* 追加: ホームに戻るボタンのデザイン */
-        .btn-home-container { text-align: center; margin-top: 40px; }
-        .btn-home {
-            background: #888; /* 少し落ち着いた色 */
-            color: white;
-            padding: 12px 30px;
-            border-radius: 25px;
+
+        .post-title a { 
+            font-size: 1.25rem; 
+            font-weight: 800; 
+            color: var(--dark-text); 
             text-decoration: none;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.2s;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        .post-title a:hover {
+            color: var(--primary-color);
+        }
+        .post-title i {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .post-meta { 
+            font-size: 0.85rem; 
+            color: #888; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; /* 縦位置中央揃え */
+            margin-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
+
+        .post-excerpt {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .btn-comment {
             display: inline-block;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            background: var(--ai-accent-color);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+            box-shadow: 0 4px 10px rgba(135, 206, 235, 0.4);
+            border: 2px solid transparent;
         }
-        .btn-home:hover {
-            transform: translateY(-2px);
-            background: #777;
+        .btn-comment:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 105, 180, 0.4);
         }
-		/*test*/
+        .btn-comment i { margin-right: 5px; }
+
+        /* ★追加: いいねボタンのスタイル */
+        .like-form { display: inline-block; }
+        .btn-like {
+            background: none; border: none; cursor: pointer;
+            font-size: 1.1rem; color: #ccc;
+            transition: all 0.3s; padding: 2px 5px;
+        }
+        .btn-like:hover { transform: scale(1.2); }
+        .btn-like.liked { color: #ff4757; } /* いいね済の色 */
+        .like-count { font-size: 0.9rem; margin-left: 2px; color: #666; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="community-container">
-        <h1><i class="fa-solid fa-comments"></i> みんなの広場 </h1>
+
+    <div class="main-container">
         
-        <div class="new-post-form">
-            <h3>質問や成果を投稿しよう！</h3>
+        <div class="header-section">
+            <h1><i class="fa-solid fa-comments header-icon"></i>みんなの広場</h1>
+            <p class="sub-heading">質問や成果を投稿して、仲間と交流しよう！</p>
+        </div>
+        
+        <div class="new-post-area">
+            <h3><i class="fa-solid fa-pen-nib"></i> 新しい投稿を作成</h3>
             <form th:action="@{/community/post}" method="post">
-                <input type="text" name="title" class="form-input" placeholder="タイトル (例: プロテインのおすすめは？)" required>
-                <textarea name="content" class="form-textarea" id="auto-expand-textarea" rows="3" placeholder="本文" required></textarea>
-                <button type="submit" class="btn-submit">投稿する</button>
+                <input type="text" name="title" class="custom-input" placeholder="タイトル (例: おすすめのプロテインは？)" required>
+                <textarea name="content" class="custom-textarea" id="auto-expand-textarea" rows="3" placeholder="本文を入力してください..." required></textarea>
+                
+                <button type="submit" class="button primary">
+                    <i class="fa-solid fa-paper-plane"></i> 投稿する
+                </button>
             </form>
         </div>
 
-        <div th:each="post : ${posts}">
-			<a th:href="@{/community/{id}(id=${post.id})}" class="post-card">
-			    <div class="post-title" th:text="${post.title}">タイトル</div>
-			    <div class="post-meta">
-			        <span th:text="'👤 ' + ${post.author.username}">ユーザー名</span>
-			        <span th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd HH:mm')}">日時</span>
-			    </div>
-			    <div style="margin-top:10px; font-size:0.9rem;" th:text="${#strings.abbreviate(post.content, 50)}">内容の抜粋...</div>
-			    
-			    <div style="margin-top:8px; font-size:0.8rem; color:var(--ai-accent-color);">
-			        <span class="btn-comment">
-			            コメントを見る
-			        </span>
-			    </div>
-			</a>
+        <div class="post-list">
+            <div th:each="post : ${posts}" class="post-card">
+                
+                <div class="post-meta">
+                    <span>
+                        <span th:text="'👤 ' + ${post.author.username}">ユーザー名</span>
+                        <span th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd HH:mm')}">日時</span>
+                    </span>
+
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <form th:action="@{/community/{id}/like(id=${post.id})}" method="post" class="like-form">
+                            <button type="submit" class="btn-like" 
+                                    th:classappend="${currentUser != null && post.likedBy.contains(currentUser)} ? 'liked' : ''">
+                                <i th:class="${currentUser != null && post.likedBy.contains(currentUser)} ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+                            </button>
+                        </form>
+                        <span class="like-count" th:text="${post.likedBy.size()}">0</span>
+                    </div>
+                </div>
+
+                <div class="post-title">
+                    <a th:href="@{/community/{id}(id=${post.id})}">
+                        <span th:text="${post.title}">タイトル</span>
+                    </a>
+                </div>
+                
+                <div class="post-excerpt" th:text="${#strings.abbreviate(post.content, 60)}">
+                    内容の抜粋...
+                </div>
+                
+                <div style="text-align: right;">
+                    <a th:href="@{/community/{id}(id=${post.id})}" class="btn-comment">
+                        <i class="fa-regular fa-comments"></i> コメントを見る
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <div class="btn-home-container">
+        <div class="button-container">
             <a th:href="@{/home}" class="button secondary">
                  <i class="fa-solid fa-house"></i> ホームに戻る
             </a>
@@ -95,20 +216,12 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const textarea = document.getElementById('auto-expand-textarea');
-            
             if (!textarea) return;
-
             function autoExpand() {
-                // まず高さをリセットして、内容に応じて正しい scrollHeight を取得できるようにする
                 textarea.style.height = 'auto';
-                // scrollHeight に基づいて高さを設定
                 textarea.style.height = (textarea.scrollHeight + 2) + 'px';
             }
-
-            // ページロード時にも一度実行 (初期表示で内容が入っている場合や、最小高さを確保するため)
             autoExpand(); 
-
-            // 入力 (input) イベントが発生するたびに高さを調整
             textarea.addEventListener('input', autoExpand);
         });
     </script>

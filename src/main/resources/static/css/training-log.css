@@ -3,7 +3,7 @@
 /* ========================================================= */
 
 .training-log-page .main-container {
-    max-width: 800px; /* カレンダー表示のため幅を広げる */
+    max-width: 650px; /* カレンダー表示のため幅を広げる */
 }
 
 /* --- CALENDAR NAVIGATION --- */
