@@ -30,6 +30,9 @@ public class MissionController {
         this.missionService = missionService;
     }
 
+    /**
+     * デイリーミッション画面を表示
+     */
     @GetMapping 
     public String showDailyMission(
         @AuthenticationPrincipal UserDetails userDetails,
@@ -58,12 +61,27 @@ public class MissionController {
         return "misc/daily-mission";
     }
     
+    /**
+     * FAQ画面
+     */
     @GetMapping("/faq")
     public String showFaq() {
         return "misc/faq"; 
     }
+
+    /**
+     * AIコーチ画面に遷移
+     */
+    @GetMapping("/ai-coach")
+    public String showAiCoachPage() {
+        return "ai-coach/ai-coach-chat";
+    }
     
-    @PostMapping("/daily-mission/claim")
+    /**
+     * ミッション報酬を獲得する処理
+     * 成功したら AIコーチ画面へ遷移
+     */
+    @PostMapping("/claim/{missionId}")
     public String claimReward(
         @AuthenticationPrincipal UserDetails userDetails,
         @PathVariable Long missionId,
@@ -86,47 +104,21 @@ public class MissionController {
                 "ミッション報酬 " + status.getRewardXp() + " XPを受け取りました！ " +
                 "現在のレベル: " + user.getLevel() + 
                 " (経験値: " + user.getExperiencePoints() + "/" + user.calculateRequiredXp() + ")");
+            // 成功時は AIコーチ画面へ
+            return "redirect:/daily-mission/ai-coach";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", 
                 "報酬を受け取れませんでした。ミッションを完了しているか、既に受け取り済みか確認してください。");
+            return "redirect:/daily-mission";
         }
-        
-        return "redirect:/community";
+    }
+
+    /**
+     * ミッション1: ランニング → トレーニング画面へ遷移
+     */
+    @GetMapping("/running")
+    public String showRunningMission() {
+        // templates/training/training.html を返す
+        return "training/training";
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

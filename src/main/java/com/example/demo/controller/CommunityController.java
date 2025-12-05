@@ -18,6 +18,7 @@ import com.example.demo.entity.User;
 import com.example.demo.repository.CommentRepository;
 import com.example.demo.repository.PostRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.MissionService;
 import com.example.demo.service.UserService;
 
 @Controller
@@ -27,7 +28,8 @@ public class CommunityController {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-    private final UserService userService; // ★ 追加: ミッション更新用サービス
+    private final UserService userService;
+    private final MissionService missionService; // ミッション更新用サービス
     
     // NGワードのリスト
     private static final List<String> NG_WORDS = List.of("死ね", "バカ", "アホ", "殺す", "暴力");
@@ -35,17 +37,26 @@ public class CommunityController {
     public CommunityController(PostRepository postRepository,
                                CommentRepository commentRepository,
                                UserRepository userRepository,
-                               UserService userService) {
+                               UserService userService,
+                               MissionService missionService) {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.missionService = missionService;
     }
 
     // 掲示板トップ（一覧表示）
     @GetMapping
-    public String index(Model model) {
+    public String index(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         model.addAttribute("posts", postRepository.findAllByOrderByCreatedAtDesc());
+
+        // ★ 今日のミッション一覧も画面に渡す
+        if (userDetails != null) {
+            User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+            model.addAttribute("missions", missionService.getOrCreateTodayMissions(user));
+        }
+
         return "community/index";
     }
 
@@ -65,8 +76,8 @@ public class CommunityController {
         post.setAuthor(user);
         postRepository.save(post);
 
-        // ★ 投稿したらミッションをクリア扱いにする
-        userService.markMissionCompletedByPost(user);
+        // ★ 投稿したらミッション進捗を更新
+        missionService.updateMissionProgress(user.getId(), "COMMUNITY_POST");
 
         return "redirect:/community";
     }
@@ -74,7 +85,6 @@ public class CommunityController {
     // 投稿詳細＆コメント表示
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
-        // コメントも一緒に取得するメソッドに変更
         Post post = postRepository.findByIdWithComments(id).orElseThrow();
         model.addAttribute("post", post);
         return "community/detail";
