@@ -9,7 +9,8 @@
 /* Form Input Styles */
 .form-group input[type="text"],
 .form-group input[type="password"],
-.form-group input[type="email"] {
+.form-group input[type="email"],
+ .form-group input[type="tel"]{
     width: 100%;
     padding: 16px 18px; 
     /* 変更: border: none; -> 枠線を追加 */
