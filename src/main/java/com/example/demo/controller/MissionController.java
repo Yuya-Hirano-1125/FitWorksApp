@@ -157,7 +157,7 @@ public class MissionController {
         }
 
         // 投稿処理
-        communityService.createPost(user, content);
+        communityService.createPost(user, content, content);
 
         // ★ コミュニティ投稿ミッション進捗を更新
         missionService.updateMissionProgress(user.getId(), "COMMUNITY_POST");
