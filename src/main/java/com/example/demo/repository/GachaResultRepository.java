@@ -68,5 +68,5 @@ public class GachaResultRepository {
         }
 
         return list;
-    }
+    }//test
 }
