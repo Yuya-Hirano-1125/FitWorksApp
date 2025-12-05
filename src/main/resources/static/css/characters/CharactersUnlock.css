@@ -392,31 +392,21 @@ h1 {
 }
 
 /* =========================================
-   シルエット化の追加設定
+   シルエット化設定
    ========================================= */
-
-/* ロックされたカードの画像だけを真っ黒（シルエット）にする */
-.locked-card .character-img { 
-    filter: brightness(0) opacity(0.7); /* 明度0で黒くし、少し透けさせる */
+/* ロック中の画像は黒塗り（シルエット）にする */
+.locked-card .character-img {
+    filter: brightness(0) opacity(0.8);
     transition: all 0.5s ease;
 }
 
-/* ロック状態のカード全体のスタイル（既存の調整） */
-.locked-card { 
-    background: #555; /* 背景を少し暗く */
-    border-color: #888;
-    box-shadow: none;
-}
-
-/* ホバーしても動かないようにする */
+/* ロック中はホバーしても動かさない */
 .locked-card:hover {
     transform: none;
-    cursor: not-allowed;
     box-shadow: none;
-    border-color: #888;
+    border-color: #6c5ce7; /* ロック時の枠色 */
+    cursor: default;
 }
-
-/* ロック時は指カーソルも出さない */
 .locked-card:hover::before {
-    display: none;
+    display: none; /* 指カーソルも消す */
 }
