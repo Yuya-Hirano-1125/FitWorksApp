@@ -1,5 +1,5 @@
 package com.example.demo.security;
- 
+
 import java.io.IOException;
 
 import jakarta.servlet.Filter;
@@ -19,49 +19,46 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher; // そのまま残す
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.example.demo.service.CustomUserDetailsService;
- 
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
- 
+
     private final CustomUserDetailsService userDetailsService;
- 
+
     public SecurityConfig(CustomUserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
- 
+
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // パスワードエンコーダーを定義
         return new BCryptPasswordEncoder();
     }
- 
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        // 認証プロバイダーを定義
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-    
- 
+
     /**
-     * CSRFトークンをレスポンスヘッダーに含めるカスタムフィルターを定義します。
+     * CSRFトークンをレスポンスヘッダーにも載せるフィルター
      */
     private Filter csrfCookieFilter() {
         return (request, response, chain) -> {
             CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
-            
+
             HttpServletResponse httpResponse = (HttpServletResponse) response;
-            
+
             if (csrfToken != null) {
-                // クライアント側で読み取り可能なヘッダーとしてトークンを設定
                 httpResponse.setHeader(csrfToken.getHeaderName(), csrfToken.getToken());
             }
+
             try {
                 chain.doFilter(request, response);
             } catch (IOException | ServletException e) {
@@ -69,52 +66,57 @@ public class SecurityConfig {
             }
         };
     }
- 
+
     @Bean
-    @SuppressWarnings("deprecation") // ★ 修正: 非推奨メソッドの警告を抑制
+    @SuppressWarnings("deprecation")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
-            // 1. CORSを有効化
+            // --- CORS ---
             .cors(Customizer.withDefaults())
-            
-            // 2. CSRF設定: Cookieでトークンを公開
-            .csrf((csrf) -> csrf
-                // JSからアクセスできるように HttpOnly=false でCookieにトークンを設定
+
+            // --- CSRF（安全に Cookie 設定） ---
+            .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
-            // 3. CSRFトークンを全てのレスポンスヘッダーに含めるフィルターを追加
             .addFilterAfter(csrfCookieFilter(), BasicAuthenticationFilter.class)
-            
-            // 4. ページごとのアクセス制御
+
+            // --- アクセス制御 ---
             .authorizeHttpRequests(auth -> auth
+
+                // 🔓 認証不要のパス
                 .requestMatchers(
-                    "/",
-                    "/home",
-                    "/training",
-                    "/gacha",
-                    "/settings",
-                    "/change-password",
-                    "/forgot-password",
-                    "/register",
-                    "/error",
-                    "/terms",
-                    "/login",
-                    "/css/**",
-                    "/js/**",
-                    "/images/**",
-                    "/img/**"
-                    // ★ ここにあった "/{path:[^\\.]*}" を削除！
+                    "/", "/login", "/register",
+                    "/forgot-password", "/verify-code", "/reset-password",
+                    "/error", "/terms",
+
+                    // 静的ファイル
+                    "/css/**", "/js/**", "/images/**", "/img/**"
                 ).permitAll()
-                .requestMatchers("/api/**").authenticated()
+
+                // 🔒 必ずログインが必要なページ
+                .requestMatchers(
+                    "/home",
+                    "/training", "/training/**",
+                    "/settings", "/change-password",
+                    "/community/**",
+                    "/log/**",
+                    "/characters/**",
+                    "/daily-mission/**",
+                    "/ranking/**",
+                    "/ai-coach/**",
+                    "/training-log/**"
+                ).authenticated()
+
+                // 🔒 ガチャは必ず“ログイン後のみ”
+                .requestMatchers("/gacha/**").authenticated()
+
+                // その他はすべて認証必要
                 .anyRequest().authenticated()
             )
-            
-            
-            
-            
-            
-            // 5. フォームログイン
+
+            // --- フォームログイン ---
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
@@ -122,22 +124,19 @@ public class SecurityConfig {
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
-            
-            // 6. ログアウト設定
+
+            // --- ログアウト ---
             .logout(logout -> logout
-                // POST /logout に変更 (AntPathRequestMatcherをそのまま使用し、警告を抑制)
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID", "XSRF-TOKEN") // CSRF Cookieも削除
+                .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                 .permitAll()
             )
-            
-            // 7. 認証プロバイダ登録
+
+            // --- 認証プロバイダ ---
             .authenticationProvider(authenticationProvider());
-            
+
         return http.build();
     }
 }
-
-

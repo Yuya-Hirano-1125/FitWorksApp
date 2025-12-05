@@ -1,32 +1,58 @@
 package com.example.demo.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.model.GachaItem;
+import com.example.demo.model.GachaResult;
+import com.example.demo.repository.GachaResultRepository;
 
 @Service
 public class GachaService {
 
+    @Autowired
+    private GachaResultRepository repository;
+
     private final Random random = new Random();
 
-    public List<GachaItem> roll(int count) {
+    // ▼ 複数回ガチャ
+    public List<GachaItem> roll(int count, Long userId) {
 
         List<GachaItem> results = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
-            results.add(pickOne());
+            results.add(drawGacha(userId));
         }
 
         return results;
     }
 
-    private GachaItem pickOne() {
+    // ▼ 単発ガチャ + DB保存
+    public GachaItem drawGacha(Long userId) {
+
+        GachaItem item = getRandomItem();
+
+        GachaResult result = new GachaResult(
+            userId,
+            item.getName(),
+            item.getRarity(),
+            LocalDateTime.now().toString()
+        );
+
+        repository.save(result);
+
+        return item;
+    }
+
+    // ▼ ランダム抽選
+    private GachaItem getRandomItem() {
+
         int r = random.nextInt(100);
 
         if (r < 5) {
@@ -37,34 +63,32 @@ public class GachaService {
             return new GachaItem("ノーマル・プログラム", "R", "/img/r.png");
         }
     }
-    
-    // 排出内容と確率のリストを返すメソッドを追加
+
+    // ▼ 提供割合
     public List<Map<String, Object>> getProbabilityList() {
+
         List<Map<String, Object>> list = new ArrayList<>();
 
-        // SSR (5%)
-        Map<String, Object> ssr = new HashMap<>();
-        ssr.put("rarity", "SSR");
-        ssr.put("name", "超レア・プログラム");
-        ssr.put("rate", "5%");
-        ssr.put("color", "#FFD700"); // ゴールド
-        list.add(ssr);
+        list.add(Map.of(
+                "rarity", "SSR",
+                "name", "超レア・プログラム",
+                "rate", "5%",
+                "color", "#FFD700"
+        ));
 
-        // SR (20%)
-        Map<String, Object> sr = new HashMap<>();
-        sr.put("rarity", "SR");
-        sr.put("name", "レア・プログラム");
-        sr.put("rate", "20%");
-        sr.put("color", "#C0C0C0"); // シルバー
-        list.add(sr);
+        list.add(Map.of(
+                "rarity", "SR",
+                "name", "レア・プログラム",
+                "rate", "20%",
+                "color", "#C0C0C0"
+        ));
 
-        // R (75%)
-        Map<String, Object> r = new HashMap<>();
-        r.put("rarity", "R");
-        r.put("name", "ノーマル・プログラム");
-        r.put("rate", "75%");
-        r.put("color", "#B87333"); // ブロンズ
-        list.add(r);
+        list.add(Map.of(
+                "rarity", "R",
+                "name", "ノーマル・プログラム",
+                "rate", "75%",
+                "color", "#B87333"
+        ));
 
         return list;
     }

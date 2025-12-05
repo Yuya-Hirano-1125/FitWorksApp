@@ -12,23 +12,10 @@ import com.example.demo.entity.User;
 
 @Repository
 public interface DailyMissionStatusRepository extends JpaRepository<DailyMissionStatus, Long> {
-
-    /**
-     * 指定ユーザーの指定日付に紐づく全てのミッションステータスを取得
-     *
-     * @param user ユーザー
-     * @param date 日付
-     * @return ミッションステータス一覧
-     */
+    
+    // ユーザーと日付で今日のミッションステータスを取得
     List<DailyMissionStatus> findByUserAndDate(User user, LocalDate date);
-
-    /**
-     * 指定ユーザーの指定日付・ミッションタイプに紐づくミッションステータスを取得
-     *
-     * @param user ユーザー
-     * @param date 日付
-     * @param missionType ミッションタイプ (例: TRAINING_LOG, COMMUNITY_POST)
-     * @return ミッションステータス (存在しない場合は Optional.empty)
-     */
+    
+    // ユーザー、日付、ミッションタイプで特定のミッションステータスを取得
     Optional<DailyMissionStatus> findByUserAndDateAndMissionType(User user, LocalDate date, String missionType);
 }

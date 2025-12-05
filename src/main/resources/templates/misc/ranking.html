@@ -4,145 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ランキング | FitWorks</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
     <link rel="stylesheet" th:href="@{/css/base.css}">
-    <script th:src="@{/js/theme.js}"></script>
-
+	
+	<script th:src="@{/js/theme.js}"></script>
     <style>
-        /* --- ランキング固有のスタイル調整 --- */
+        /* ランキング専用スタイル */
+        .ranking-container { max-width: 600px; margin: 20px auto; padding: 0 15px; padding-bottom: 100px; }
+        .ranking-header { text-align: center; margin-bottom: 30px; }
+        .ranking-header h1 { color: var(--primary-color); font-size: 1.8rem; text-shadow: 2px 2px 0px #ffe8f0; }
         
-        /* リスト全体のスタイル */
-        .ranking-list { 
-            list-style: none; 
-            padding: 0; 
-            margin: 20px 0 40px 0;
-            width: 100%;
-        }
-
-        /* 個別のランキングカード */
+        .ranking-list { list-style: none; padding: 0; }
         .ranking-item {
-            display: flex; 
-            align-items: center; 
-            background: var(--ai-bubble); /* base.cssの薄いグレー/白を使用 */
-            border-radius: 20px; /* base.cssに合わせて丸く */
-            padding: 15px 20px; 
-            margin-bottom: 15px;
-            border: 2px solid transparent; /* 境界線の準備 */
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            display: flex; align-items: center; background: white; border-radius: 15px;
+            padding: 15px; margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 2px solid transparent;
+            transition: transform 0.2s;
         }
-
-        /* ホバー時の挙動 */
-        .ranking-item:hover { 
-            transform: translateX(5px) scale(1.01); 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            background: #ffffff;
-            border-color: var(--secondary-color);
-        }
-
-        /* 順位バッジ (共通) */
+        .ranking-item:hover { transform: scale(1.02); }
+        
+        /* 順位バッジ */
         .rank-badge {
-            width: 45px; 
-            height: 45px; 
-            border-radius: 50%; 
-            background: #fff; 
-            color: var(--dark-text);
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            font-weight: 900; 
-            font-size: 1.2rem;
-            margin-right: 20px; 
-            flex-shrink: 0;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            width: 40px; height: 40px; border-radius: 50%; background: #eee; color: #555;
+            display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 1.2rem;
+            margin-right: 15px; flex-shrink: 0;
         }
+        
+        /* 1位〜3位の特別装飾 */
+        .rank-1 { background: linear-gradient(45deg, #ffd700, #fff0a0); color: #b8860b; border: 2px solid #ffd700; }
+        .rank-2 { background: linear-gradient(45deg, #c0c0c0, #e0e0e0); color: #707070; border: 2px solid #c0c0c0; }
+        .rank-3 { background: linear-gradient(45deg, #cd7f32, #eab676); color: #8b4513; border: 2px solid #cd7f32; }
+        .ranking-item.top-rank { border-color: var(--ai-accent-color); }
 
-        /* --- 上位3位の特別装飾 --- */
-        /* 1位: ゴールド */
-        .rank-1 { 
-            background: linear-gradient(135deg, #ffd700, #fff0a0); 
-            color: #b8860b; 
-            border: 2px solid #fff;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-        }
-        /* 2位: シルバー */
-        .rank-2 { 
-            background: linear-gradient(135deg, #c0c0c0, #e0e0e0); 
-            color: #707070; 
-            border: 2px solid #fff;
-        }
-        /* 3位: ブロンズ */
-        .rank-3 { 
-            background: linear-gradient(135deg, #cd7f32, #eab676); 
-            color: #8b4513; 
-            border: 2px solid #fff;
-        }
-
-        /* 上位ランカーの行自体を強調（枠線など） */
-        .ranking-item.top-rank { 
-            background: #fff;
-            border: 2px solid var(--secondary-color);
-        }
-        /* 1位だけさらに特別感を出す */
-        .ranking-item:has(.rank-1) {
-            border-color: var(--primary-color);
-            background: #fff0f5; /* ほんのりピンク背景 */
-        }
-
-        /* ユーザー情報エリア */
-        .user-info { 
-            flex-grow: 1; 
-            text-align: left;
-        }
-        .user-name { 
-            font-weight: 800; 
-            font-size: 1.1rem; 
-            color: var(--dark-text); 
-            margin-bottom: 4px;
-        }
-        .user-stats { 
-            font-size: 0.9rem; 
-            color: #666; 
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* レベルなどのタグ */
-        .stat-tag { 
-            background: var(--ai-accent-color); 
-            color: white; 
-            padding: 3px 10px; 
-            border-radius: 12px; 
-            font-size: 0.75rem; 
-            font-weight: 700;
-        }
-        .xp-text {
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        /* モバイル対応 */
-        @media (max-width: 600px) {
-            .ranking-item { padding: 12px; }
-            .rank-badge { width: 35px; height: 35px; font-size: 1rem; margin-right: 12px; }
-            .user-name { font-size: 1rem; }
+        .user-info { flex-grow: 1; }
+        .user-name { font-weight: 800; font-size: 1.1rem; color: var(--dark-text); }
+        .user-stats { font-size: 0.9rem; color: #666; margin-top: 2px; }
+        .level-tag { background: var(--primary-color); color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; margin-right: 5px; }
+        
+        .back-btn-container { text-align: center; margin-top: 30px; }
+        .back-btn {
+            background: #888; color: white; padding: 12px 30px; border-radius: 25px;
+            text-decoration: none; font-weight: bold; display: inline-block;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-
-    <div class="main-container">
-        
+    <div class="ranking-container">
         <div class="ranking-header">
-            <h1>
-                <i class="fa-solid fa-trophy header-icon"></i>ランキング
-            </h1>
-            <p class="sub-heading">トップランカーを目指してトレーニングしよう！</p>
+            <h1><i class="fa-solid fa-trophy" style="color: gold;"></i> ランキング</h1>
+            <p>トップランカーを目指してトレーニングしよう！</p>
         </div>
 
         <ul class="ranking-list">
@@ -159,20 +71,18 @@
                 <div class="user-info">
                     <div class="user-name" th:text="${user.username}">ユーザー名</div>
                     <div class="user-stats">
-                        <span class="stat-tag" th:text="'Lv.' + ${user.level}">Lv.10</span>
-                        <span class="xp-text" th:text="${user.experiencePoints} + ' XP'">1200 XP</span>
+                        <span class="level-tag" th:text="'Lv.' + ${user.level}">Lv.10</span>
+                        <span th:text="'Total XP: ' + ${user.experiencePoints}">XP: 1200</span>
                     </div>
                 </div>
             </li>
         </ul>
 
-        <div class="button-container">
+        <div class="back-btn-container">
             <a th:href="@{/home}" class="button secondary">
                 <i class="fa-solid fa-house"></i> ホームに戻る
             </a>
         </div>
-
     </div>
-
 </body>
 </html>

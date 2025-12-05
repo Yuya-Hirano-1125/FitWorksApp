@@ -1,7 +1,6 @@
 package com.example.demo.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -247,24 +246,5 @@ public class TrainingDataService {
         return CARDIO_DATA_LIST.stream()
                 .map(ExerciseData::getFullName)
                 .collect(Collectors.toList());
-    }
-    
-    public Map<String, List<String>> getFreeWeightExercisesByPart() {
-        Map<String, List<String>> map = new LinkedHashMap<>();
-        map.put("胸", Arrays.asList("ベンチプレス", "ダンベルフライ", "インクラインベンチプレス", "チェストプレス"));
-        map.put("背中", Arrays.asList("デッドリフト", "懸垂(チンニング)", "ラットプルダウン", "ワンハンドローイング"));
-        map.put("脚", Arrays.asList("スクワット", "レッグプレス", "レッグエクステンション", "ランジ"));
-        map.put("肩", Arrays.asList("ミリタリープレス", "サイドレイズ", "フロントレイズ", "リアレイズ"));
-        map.put("腕", Arrays.asList("バーベルカール", "ハンマーカール", "トライセプスエクステンション", "フレンチプレス"));
-        map.put("腹筋", Arrays.asList("クランチ", "レッグレイズ", "ロシアンツイスト", "プランク"));
-        return map;
-    }
-
-    /**
-     * 部位のリスト（キーの一覧）だけを返す
-     * (エラーの原因になっているメソッド)
-     */
-    public List<String> getMuscleParts() {
-        return new ArrayList<>(getFreeWeightExercisesByPart().keySet());
     }
 }

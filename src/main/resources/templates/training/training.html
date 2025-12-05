@@ -29,8 +29,8 @@
         .page-title {
             color: #343a40; 
             font-size: 2rem;
-            margin: 0; 
-            border-bottom: none;
+            margin: 0; /* マージンを親コンテナに任せるためリセット */
+            border-bottom: none; /* 親コンテナにボーダーを移動 */
             padding-bottom: 0;
         }
 
@@ -43,6 +43,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             background-color: #ffffff;
+            /* pointer-events: none; /* デフォルトではクリックイベントを無効にする（フォーム内ボタンで有効化） */
         }
         
         .card:hover {
@@ -56,8 +57,7 @@
             color: #007bff; 
         }
         
-        /* フリーウェイトカードの特別色（必要なら残す） */
-        #free-weight-card {
+        #free-weight-option {
             background-color: #e6f0ff; 
             border-color: #007bff;
         }
@@ -86,7 +86,6 @@
             display: block;
             text-decoration: none;
             box-sizing: border-box;
-            cursor: pointer;
         }
 
         .button.primary {
@@ -105,19 +104,31 @@
             color: #666666;
         }
         
-        .button.secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-        .button.secondary:hover {
-            background-color: #5a6268;
-        }
-        
         .text-secondary {
             color: #6c757d;
         }
 
+        /* 画面下部の固定ボタン用スタイル */
+        .fixed-footer-button {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px 0;
+            background-color: #ffffff; 
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .fixed-footer-button .container {
+            max-width: 600px; /* PC/タブレット表示時の幅を制限 (ベースCSSのcontainerに依存) */
+            margin: auto;
+            padding: 0 15px;
+        }
+
+        /* 固定フッター分の余白を確保 */
         .main-content {
+            /*padding-bottom: 100px; */
 			padding-bottom: 30px;
         }
 
@@ -130,7 +141,7 @@
     <div class="page-header-container">
         <h1 class="page-title"><i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i> トレーニングメニュー選択</h1>
         <a th:href="@{/training/exercises}" class="button" style="background-color: #28a745; color: white; width: auto; margin: 0; padding: 8px 16px; font-size: 1rem;">
-            <i class="fa-solid fa-list"></i> 全種目一覧
+            <i class="fa-solid fa-list"></i> 種目一覧
         </a>
     </div>
     
@@ -152,15 +163,29 @@
         </form>
     </div>
 
-    <div class="card training-option" id="free-weight-card">
-        <h2 class="card-title">フリーウェイト</h2>
-        <p class="text-secondary">部位別のメニューリストから種目を選択してスタートします。</p>
-        
-        <a th:href="@{/training-list}" class="button primary mt-3">
-            <i class="fa-solid fa-dumbbell"></i> 部位別リストから選ぶ
-        </a>
+    <div class="card training-option" id="free-weight-option">
+        <form th:action="@{/training/start}" method="post">
+            <input type="hidden" name="type" value="free-weight"/>
+            <h2 class="card-title">フリーウェイト</h2>
+            
+            <div class="form-group">
+                <label for="musclePart">鍛えたい部位:</label>
+                <select id="musclePart" class="form-control" required>
+                    <option value="">部位を選択してください</option>
+                    <option th:each="part : ${freeWeightParts}" th:value="${part}" th:text="${part}"></option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="exerciseName">種目名:</label>
+                <select id="exerciseName" name="exerciseName" class="form-control" required disabled>
+                    <option value="">部位を選択してから種目を選んでください</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="button primary mt-3" id="startFreeWeightSessionButton" disabled><i class="fa-solid fa-dumbbell"></i> セッション開始 </button>
+        </form>
     </div>
-
     <div class="card training-option">
         <form th:action="@{/training/start}" method="post">
             <input type="hidden" name="type" value="cardio"/>
@@ -181,10 +206,51 @@
 </div>
 
 <div class="container" style="margin-bottom: 30px;">
-    <a th:href="@{/home}" class="button secondary">
-        <i class="fa-solid fa-house"></i> ホームに戻る
-    </a>
-</div>
+        <a th:href="@{/home}" class="button secondary">
+            <i class="fa-solid fa-house"></i> ホームに戻る
+        </a>
+    </div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const freeWeightExercisesByPart = /*[[${freeWeightExercisesByPart}]]*/ {};
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const musclePartSelect = document.getElementById('musclePart');
+        const exerciseNameSelect = document.getElementById('exerciseName');
+        const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
+        
+        if (musclePartSelect && exerciseNameSelect) {
+            
+            musclePartSelect.addEventListener('change', function() {
+                const selectedPart = this.value;
+                
+                exerciseNameSelect.innerHTML = '<option value="">種目を選択してください</option>';
+                exerciseNameSelect.disabled = true;
+                startFreeWeightSessionButton.disabled = true;
+
+                if (selectedPart && freeWeightExercisesByPart[selectedPart]) {
+                    const exercises = freeWeightExercisesByPart[selectedPart];
+                    
+                    exercises.forEach(exercise => {
+                        const option = document.createElement('option');
+                        option.value = exercise;
+                        option.textContent = exercise;
+                        exerciseNameSelect.appendChild(option);
+                    });
+                    exerciseNameSelect.disabled = false;
+                } else {
+                    exerciseNameSelect.innerHTML = '<option value="">部位を選択してから種目を選んでください</option>';
+                }
+            });
+            
+            exerciseNameSelect.addEventListener('change', function() {
+                startFreeWeightSessionButton.disabled = !this.value;
+            });
+        }
+    });
+    /*]]>*/
+</script>
 
 </body>
 </html>

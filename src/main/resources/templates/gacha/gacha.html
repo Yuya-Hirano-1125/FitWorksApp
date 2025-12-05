@@ -7,8 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-	
-	<script th:src="@{/js/theme.js}"></script>
+    <script th:src="@{/js/theme.js}"></script>
+
     <style>
         .gacha-page .main-container {
             max-width: 600px;
@@ -27,14 +27,9 @@
             margin-bottom: 30px;
             animation: pulseGlow 5s ease-in-out infinite alternate;
         }
-        .gacha-display h2 {
-            color: var(--ai-accent-color);
-            margin-bottom: 10px;
-        }
         .gacha-display i {
             font-size: 60px;
             color: var(--primary-color);
-            animation: fadeIn 1s;
         }
         .gacha-button-unit {
             display: flex;
@@ -46,7 +41,6 @@
             width: 45%;
         }
 
-        /* 提供割合テーブル用のスタイル */
         .rate-container {
             margin-top: 40px;
             text-align: left;
@@ -86,8 +80,10 @@
         }
     </style>
 </head>
+
 <body class="gacha-page">
 <div class="main-container">
+
     <h1><i class="fa-solid fa-gift header-icon"></i>ガチャ</h1>
     <p class="sub-heading">レアな着せ替えを手に入れよう！</p>
 
@@ -95,12 +91,19 @@
         <i class="fa-solid fa-gifts"></i>
     </div>
 
-	<p>所持シェイカー：１０個</p>
-	<p>消費シェイカー：１個</p>
+    <p>所持シェイカー：１０個</p>
+    <p>消費シェイカー：１個</p>
+
+    <!-- ▼▼▼ userId を確実に引き継ぐ重要ポイント ▼▼▼ -->
     <div class="gacha-button-unit">
-        <a th:href="@{/gacha/animation(count=1)}" class="button primary">1回引く</a>
-        <a th:href="@{/gacha/animation(count=6)}" class="button primary">6連で引く</a>
+        <a th:href="@{/gacha/animation(userId=${userId}, count=1)}" class="button primary">
+            1回引く
+        </a>
+        <a th:href="@{/gacha/animation(userId=${userId}, count=6)}" class="button primary">
+            6連で引く
+        </a>
     </div>
+    <!-- ▲▲▲ ここが今回の重要修正ポイント ▲▲▲ -->
 
     <div class="rate-container">
         <h3><i class="fa-solid fa-list-ul"></i> 提供割合・ラインナップ</h3>
@@ -115,9 +118,9 @@
             <tbody>
                 <tr th:each="item : ${probabilityList}">
                     <td>
-                        <span class="rarity-badge" 
-                              th:text="${item.rarity}" 
-                              th:style="'background-color: ' + ${item.color}">
+                        <span class="rarity-badge"
+                              th:text="${item.rarity}"
+                              th:style="'background-color:' + ${item.color}">
                         </span>
                     </td>
                     <td th:text="${item.name}"></td>
@@ -126,12 +129,14 @@
             </tbody>
         </table>
     </div>
-	
+
 </div>
+
 <div class="button-container" style="margin-top: 40px;">
     <a th:href="@{/home}" class="button secondary">
-       <i class="fa-solid fa-house"></i> ホームに戻る 
+        <i class="fa-solid fa-house"></i> ホームに戻る
     </a>
 </div>
+
 </body>
 </html>
