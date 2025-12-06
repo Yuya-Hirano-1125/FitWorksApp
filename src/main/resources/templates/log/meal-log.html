@@ -44,6 +44,10 @@
     </h1>
     <p class="sub-heading" th:text="${username} + 'さんの食事を管理しましょう。'">食事記録カレンダー</p>
 
+    <div th:if="${aiAdvice}" class="success-message" style="background-color: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9;">
+        <i class="fa-solid fa-robot"></i> <b>AIコーチ:</b> <span th:text="${aiAdvice}"></span>
+    </div>
+
     <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
     
     <div class="calendar-nav-container">
@@ -87,6 +91,20 @@
         <h2 id="modalDateTitle" class="modal-title"></h2>
         
         <div id="logViewArea"></div>
+
+        <div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #4CAF50;">
+            <h3 style="font-size: 1rem; margin-top: 0; color: #2e7d32;"><i class="fa-solid fa-camera"></i> AIで画像を解析する</h3>
+            <form th:action="@{/log/meal/analyze}" method="post" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center;">
+                <input type="file" name="mealImage" accept="image/*" class="form-control" style="font-size: 0.9em; padding: 8px;" required>
+                <button type="submit" class="button" style="background-color: #2e7d32; color: white; border: none; font-size: 0.9em; padding: 10px 15px; white-space: nowrap;">
+                    解析
+                </button>
+            </form>
+            <p style="font-size: 0.8em; color: #666; margin: 5px 0 0 0;">※解析結果が下のフォームに自動入力されます</p>
+            <div th:if="${aiComment}" style="margin-top: 10px; font-weight: bold; color: #e65100;">
+                <i class="fa-solid fa-comment-dots"></i> <span th:text="${aiComment}"></span>
+            </div>
+        </div>
 
         <p class="modal-instruction">食事内容を記録：</p>
         

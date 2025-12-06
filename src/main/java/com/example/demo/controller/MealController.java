@@ -45,11 +45,8 @@ public class MealController {
     private MealService mealService;
     
     @Autowired
-    private AICoachService aiCoachService; // 追加
+    private AICoachService aiCoachService;
 
-    /**
-     * ★追加: 食事画像のAI解析処理
-     */
     @PostMapping("/analyze")
     public String analyzeMeal(@RequestParam("mealImage") MultipartFile file,
                               @AuthenticationPrincipal UserDetails userDetails,
@@ -75,7 +72,6 @@ public class MealController {
             redirectAttributes.addFlashAttribute("error", "AI解析に失敗しました。もう一度試してください。");
         }
 
-        // カレンダー画面（フォームがある画面）に戻る
         return "redirect:/log/meal";
     }
 
@@ -96,7 +92,6 @@ public class MealController {
         Map<LocalDate, Boolean> loggedDates = records.stream()
                 .collect(Collectors.toMap(r -> r.getMealDateTime().toLocalDate(), r -> true, (e, r) -> e));
 
-        // カレンダー作成ロジック（省略可だが維持）
         List<LocalDate> calendarDays = new ArrayList<>();
         LocalDate firstOfMonth = targetYearMonth.atDay(1);
         int paddingDays = firstOfMonth.getDayOfWeek().getValue() % 7;
@@ -118,7 +113,6 @@ public class MealController {
         model.addAttribute("nextYear", targetYearMonth.plusMonths(1).getYear());
         model.addAttribute("nextMonth", targetYearMonth.plusMonths(1).getMonthValue());
 
-        // ★フォームの初期化（AI解析結果がある場合は反映）
         MealLogForm form = new MealLogForm();
         if (model.containsAttribute("analyzedData")) {
             Map<String, Object> data = (Map<String, Object>) model.asMap().get("analyzedData");
@@ -129,7 +123,7 @@ public class MealController {
                 form.setFat(toDouble(data.get("fat")));
                 form.setCarbohydrate(toDouble(data.get("carbohydrate")));
                 model.addAttribute("aiComment", data.get("comment"));
-                form.setDate(today.toString()); // 日付は今日にしておく
+                form.setDate(today.toString()); 
             }
         }
         model.addAttribute("mealLogForm", form);
@@ -141,10 +135,22 @@ public class MealController {
     public String saveMealLog(@Valid @ModelAttribute("mealLogForm") MealLogForm form, 
                               BindingResult result, 
                               @AuthenticationPrincipal UserDetails userDetails,
-                              Model model) {
+                              RedirectAttributes redirectAttributes) { // RedirectAttributesを追加
+        
         if (result.hasErrors()) return "redirect:/log/meal?error";
+        
         User user = userService.findByUsername(userDetails.getUsername());
         MealRecord savedRecord = mealService.saveMealRecord(form, user);
+        
+        // ★追加: 登録後のAIアドバイス生成処理
+        try {
+            String advice = aiCoachService.generateMealAdvice(user, form);
+            redirectAttributes.addFlashAttribute("aiAdvice", advice); // 画面表示用にセット
+        } catch (Exception e) {
+            e.printStackTrace();
+            // エラーでも登録自体は成功しているのでスルー
+        }
+
         LocalDate date = savedRecord.getMealDateTime().toLocalDate();
         return "redirect:/log/meal?year=" + date.getYear() + "&month=" + date.getMonthValue();
     }
@@ -156,7 +162,6 @@ public class MealController {
         return "log/meal-log-all"; 
     }
 
-    // Helper methods
     private Integer toInteger(Object obj) {
         if (obj instanceof Number) return ((Number) obj).intValue();
         return 0;

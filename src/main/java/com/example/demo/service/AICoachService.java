@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.dto.MealLogForm;
 import com.example.demo.entity.TrainingRecord;
 import com.example.demo.entity.User;
 import com.google.genai.Client;
@@ -44,7 +45,24 @@ public class AICoachService {
     }
 
     /**
-     * ★追加: 食事画像を解析して栄養素を推定する
+     * ★追加: 食事記録に対するワンポイントアドバイスを生成する
+     */
+    public String generateMealAdvice(User user, MealLogForm form) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("あなたは栄養管理の専門家AIです。");
+        sb.append("ユーザーが食事を記録しました。この食事内容に対して、栄養バランスの観点から短く褒める、またはアドバイスをしてください。\n");
+        sb.append("【ユーザー】").append(user.getUsername()).append("さん\n");
+        sb.append("【食事内容】").append(form.getContent()).append("\n");
+        sb.append("【カロリー】").append(form.getCalories()).append("kcal\n");
+        sb.append("【PFC】P:").append(form.getProtein()).append("g, F:").append(form.getFat()).append("g, C:").append(form.getCarbohydrate()).append("g\n");
+        
+        sb.append("\nルール: 100文字以内。親しみやすい口調で。絵文字(🥗🍎など)を使って。語尾にムキをつけてください。");
+
+        return callGeminiApi(sb.toString());
+    }
+
+    /**
+     * 食事画像を解析して栄養素を推定する
      */
     public String analyzeMealImage(MultipartFile imageFile) {
         try {
@@ -52,13 +70,11 @@ public class AICoachService {
                 .apiKey(apiKey)
                 .build();
 
-            // 1. 画像データを準備
             String mimeType = imageFile.getContentType();
             if (mimeType == null) mimeType = "image/jpeg";
             byte[] imageBytes = imageFile.getBytes();
             Part imagePart = Part.fromBytes(imageBytes, mimeType);
 
-            // 2. プロンプト（JSON形式での出力を強制）
             String promptText = """
                 この食事の画像を分析してください。
                 以下の情報をJSON形式で出力してください。Markdownのコードブロックは不要です。純粋なJSON文字列のみを返してください。
@@ -77,12 +93,10 @@ public class AICoachService {
 
             Content content = Content.fromParts(textPart, imagePart);
 
-            // 3. API呼び出し (Gemini 2.0 Flash)
             GenerateContentResponse response = client.models.generateContent("gemini-2.0-flash", content, null);
             
             String responseText = response.text();
             
-            // Markdownの除去 (```json ... ```)
             return responseText.replaceAll("```json", "").replaceAll("```", "").trim();
 
         } catch (Exception e) {
