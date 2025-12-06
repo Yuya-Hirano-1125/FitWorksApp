@@ -34,6 +34,42 @@
         .text-danger { color: #e74c3c; font-size: 0.85em; display: block; margin-top: 5px; }
         .btn-submit { width: 100%; margin-top: 20px; padding: 12px; font-size: 1.1em; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .btn-submit:hover { background-color: #45a049; }
+        
+        /* --- SNSシェアボタン用スタイル (追加) --- */
+        .sns-buttons-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .btn-sns {
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            border: none;
+        }
+        .btn-sns:hover { opacity: 0.9; transform: translateY(-1px); color: white; }
+        .btn-sns i { margin-right: 5px; font-size: 1.1em; }
+
+        /* X (Twitter) */
+        .btn-sns-x { background-color: #000; }
+        
+        /* LINE */
+        .btn-sns-line { background-color: #06C755; }
+        
+        /* Instagram (グラデーション) */
+        .btn-sns-insta { 
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); 
+        }
     </style>
 </head>
 <body class="training-log-page">
@@ -43,10 +79,6 @@
         <i class="header-icon header-icon-meal fa-solid fa-utensils"></i> 食事記録
     </h1>
     <p class="sub-heading" th:text="${username} + 'さんの食事を管理しましょう。'">食事記録カレンダー</p>
-
-    <div th:if="${aiAdvice}" class="success-message" style="background-color: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9;">
-        <i class="fa-solid fa-robot"></i> <b>AIコーチ:</b> <span th:text="${aiAdvice}"></span>
-    </div>
 
     <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
     
@@ -94,7 +126,7 @@
 
         <div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #4CAF50;">
             <h3 style="font-size: 1rem; margin-top: 0; color: #2e7d32;"><i class="fa-solid fa-camera"></i> AIで画像を解析する</h3>
-            <form th:action="@{/log/meal/analyze}" method="post" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center;">
+            <form th:action="@{/log/meal/analyze}" method="post" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center;" onsubmit="showLoading(this)">
                 <input type="file" name="mealImage" accept="image/*" class="form-control" style="font-size: 0.9em; padding: 8px;" required>
                 <button type="submit" class="button" style="background-color: #2e7d32; color: white; border: none; font-size: 0.9em; padding: 10px 15px; white-space: nowrap;">
                     解析
@@ -109,7 +141,7 @@
         <p class="modal-instruction">食事内容を記録：</p>
         
         <div class="meal-form-container">
-            <form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post">
+            <form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post" onsubmit="showLoading(this)">
                 
                 <div class="form-group">
                     <label for="dateInput"><i class="fa-regular fa-calendar"></i> 日付</label>
@@ -178,6 +210,40 @@
     </a>
 </div>
 
+<div th:if="${aiAdvice}" id="aiAdviceModal" class="modal is-active" style="z-index: 2000;">
+    <div class="modal-content" style="max-width: 400px; text-align: center; background: #fff; border-radius: 15px; padding: 30px;">
+        <span class="close-button" onclick="document.getElementById('aiAdviceModal').style.display='none'">&times;</span>
+        
+        <div style="margin-bottom: 15px;">
+            <img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4CAF50; padding: 2px;">
+        </div>
+        
+        <h3 style="color: #4CAF50; margin-bottom: 15px; font-weight: bold;">Good Job!</h3>
+        
+        <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; position: relative;">
+            <i class="fa-solid fa-quote-left" style="color: #bcdbf3; font-size: 1.5em; position: absolute; top: 10px; left: 10px;"></i>
+            <p id="aiAdviceText" th:text="${aiAdvice}" style="margin: 0; padding: 5px 10px; color: #333; font-weight: 500; line-height: 1.6;">
+                ここにAIからのアドバイスが表示されます。
+            </p>
+        </div>
+
+        <div class="sns-buttons-container">
+            <button onclick="shareToX()" class="btn-sns btn-sns-x">
+                <i class="fa-brands fa-x-twitter"></i> X
+            </button>
+            <button onclick="shareToLine()" class="btn-sns btn-sns-line">
+                <i class="fa-brands fa-line"></i> LINE
+            </button>
+            <button onclick="shareToInstagram()" class="btn-sns btn-sns-insta">
+                <i class="fa-brands fa-instagram"></i> Insta
+            </button>
+            <button onclick="document.getElementById('aiAdviceModal').style.display='none'" class="btn-sns" style="background-color: #777; width: auto; padding: 10px 20px;">
+                閉じる
+            </button>
+        </div>
+    </div>
+</div>
+
 <script th:inline="javascript">
     // 記録モーダルを開く関数（日付セットのみ）
     function openLogModal(dateString, isLogged) {
@@ -208,9 +274,62 @@
     // モーダル外クリックで閉じる処理
     window.onclick = function(event) {
         const modal = document.getElementById('logModal');
-        if (modal.classList.contains('is-active') && event.target === modal) {
+        const adviceModal = document.getElementById('aiAdviceModal');
+        
+        if (modal && modal.classList.contains('is-active') && event.target === modal) {
             closeLogModal();
         }
+        if (adviceModal && event.target === adviceModal) {
+            adviceModal.style.display = 'none';
+        }
+    }
+
+    // --- ローディング表示関数 (追加) ---
+    function showLoading(form) {
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) {
+            btn.disabled = true;
+            const originalText = btn.textContent;
+            // ボタンの幅を固定してガタつきを防ぐ（任意）
+            btn.style.width = btn.offsetWidth + 'px';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 保存中...';
+            
+            // 安全策: 15秒後にボタンを復活させる
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }, 15000);
+        }
+    }
+
+    // --- SNSシェア機能 (追加) ---
+    function getShareText() {
+        const adviceText = document.getElementById('aiAdviceText').innerText;
+        return `【FitWorks】食事記録完了！🥗\nAIトレーナー「${adviceText}」\n\n#FitWorks #食事管理 #ダイエット`;
+    }
+
+    function shareToX() {
+        const text = getShareText();
+        const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+        window.open(shareUrl, '_blank');
+    }
+
+    function shareToLine() {
+        const text = getShareText();
+        const shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
+        window.open(shareUrl, '_blank');
+    }
+
+    function shareToInstagram() {
+        const text = getShareText();
+        navigator.clipboard.writeText(text).then(() => {
+            alert("文章をコピーしました！📋\nInstagramを開きます。投稿やストーリーズに貼り付けてください。");
+            window.open('https://www.instagram.com/', '_blank');
+        }).catch(err => {
+            console.error('Copy failed', err);
+            alert("文章のコピーに失敗しました。\n(手動でコピーしてください)");
+            window.open('https://www.instagram.com/', '_blank');
+        });
     }
 </script>
 

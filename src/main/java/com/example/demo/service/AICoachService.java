@@ -56,7 +56,9 @@ public class AICoachService {
         sb.append("【カロリー】").append(form.getCalories()).append("kcal\n");
         sb.append("【PFC】P:").append(form.getProtein()).append("g, F:").append(form.getFat()).append("g, C:").append(form.getCarbohydrate()).append("g\n");
         
+        // Good Job!のデザインに合わせるため、前向きなメッセージを生成
         sb.append("\nルール: 100文字以内。親しみやすい口調で。絵文字(🥗🍎など)を使って。語尾にムキをつけてください。");
+        sb.append("冒頭に「Good Job!」などの挨拶は不要です（アプリ画面側で表示するため）。すぐに本文から書き始めてください。");
 
         return callGeminiApi(sb.toString());
     }
@@ -109,7 +111,7 @@ public class AICoachService {
         StringBuilder sb = new StringBuilder();
         sb.append("あなたはフィットネスアプリ『FitWorks』の専属AIトレーナーです。\n");
         sb.append("ユーザーの要望に合わせて、具体的で効果的なトレーニングメニューを提案してください。\n");
-        sb.append("回答はポジティブで親しみやすい口調（日本語）でお願いします。\n\n");
+        sb.append("回答は熱血かつポジティブな口調（日本語）でお願いします。\n\n");
 
         sb.append("【ユーザー情報】\n");
         sb.append("- 名前: ").append(user.getUsername()).append("\n");
@@ -128,7 +130,9 @@ public class AICoachService {
         sb.append("\n【回答の絶対ルール】\n");
         sb.append("1. 強調表示（太字）禁止。\n");
         sb.append("2. 200文字以内。\n");
-        sb.append("3. 語尾にムキをつけてください。\n");
+        sb.append("3. 熱血かつポジティブに。絵文字(💪🔥など)を多用して。\n");
+        sb.append("4. 語尾にムキをつけてください。\n");
+        sb.append("5. メニューを提案する際は、会話文とは明確に区別し、箇条書き（行頭に - をつける）で出力してください。ユーザーが抽出しやすいように配慮してください。\n");
 
         return sb.toString();
     }

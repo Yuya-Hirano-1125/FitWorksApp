@@ -285,6 +285,29 @@
             window.open('https://www.instagram.com/', '_blank');
         });
     }
+
+    // ----------------------------------------------------
+    //  保存中のローディング表示
+    // ----------------------------------------------------
+    document.addEventListener('submit', function(e) {
+        // イベント発生元が #formContainer 内のフォームかどうかチェック
+        const form = e.target;
+        if (form.closest('#formContainer')) {
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn) {
+                // 二重送信防止 & ローディング表示
+                btn.disabled = true;
+                const originalText = btn.textContent;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 保存中...';
+                
+                // 万が一のために数秒後に戻す（画面遷移しないバリデーションエラー時などの安全策）
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }, 10000);
+            }
+        }
+    });
 </script>
 
 </body>

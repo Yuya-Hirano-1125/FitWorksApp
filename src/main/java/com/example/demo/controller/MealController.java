@@ -135,20 +135,21 @@ public class MealController {
     public String saveMealLog(@Valid @ModelAttribute("mealLogForm") MealLogForm form, 
                               BindingResult result, 
                               @AuthenticationPrincipal UserDetails userDetails,
-                              RedirectAttributes redirectAttributes) { // RedirectAttributesを追加
+                              RedirectAttributes redirectAttributes) { 
         
         if (result.hasErrors()) return "redirect:/log/meal?error";
         
         User user = userService.findByUsername(userDetails.getUsername());
         MealRecord savedRecord = mealService.saveMealRecord(form, user);
         
-        // ★追加: 登録後のAIアドバイス生成処理
+        // ★登録後のAIアドバイス生成処理
         try {
+            // 前回の修正でAICoachServiceに追加したメソッドを呼び出します
             String advice = aiCoachService.generateMealAdvice(user, form);
-            redirectAttributes.addFlashAttribute("aiAdvice", advice); // 画面表示用にセット
+            // FlashAttributeに入れることで、リダイレクト後の画面でのみ有効なデータとして渡します
+            redirectAttributes.addFlashAttribute("aiAdvice", advice); 
         } catch (Exception e) {
             e.printStackTrace();
-            // エラーでも登録自体は成功しているのでスルー
         }
 
         LocalDate date = savedRecord.getMealDateTime().toLocalDate();

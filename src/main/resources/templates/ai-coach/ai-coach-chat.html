@@ -241,12 +241,23 @@
             nameInput.value = 'AIおすすめプログラム'; 
             form.appendChild(nameInput);
             
-            // AIの提案内容をパラメータとして追加
+            // AIの提案内容から「箇条書き部分」のみを抽出してパラメータとして追加
             if (menuText) {
+                // 正規表現: 行頭が「-」「・」「*」または「数字.」で始まる行をマッチさせる
+                // (例: "- ベンチプレス...", "1. スクワット...")
+                // 会話文（「はい、わかりました！」など）を除去してメニューだけにする
+                const matches = menuText.match(/(?:^|\n)\s*[-・*1-9]\.?\s+.+/g);
+                
+                let cleanMenu = menuText;
+                if (matches && matches.length > 0) {
+                    // 抽出した行を結合し、余分な空白を除去
+                    cleanMenu = matches.map(m => m.trim()).join('\n');
+                }
+
                 const menuInput = document.createElement('input');
                 menuInput.type = 'hidden';
                 menuInput.name = 'aiProposal'; // Controller側で受け取る名前
-                menuInput.value = menuText;
+                menuInput.value = cleanMenu;
                 form.appendChild(menuInput);
             }
             
@@ -303,7 +314,10 @@
                 let formattedReply = data.reply.replace(/\n/g, '<br>');
                 
                 // メニュー提案が含まれている場合、ボタンを追加
-                if (data.reply.includes("セット") || data.reply.includes("プログラム") || data.reply.includes("提案")) {
+                const keywords = ["セット", "プログラム", "提案", "回", "メニュー", "種目", "秒", "分"];
+                const isMenuProposal = keywords.some(keyword => data.reply.includes(keyword));
+
+                if (isMenuProposal) {
                     formattedReply += `
                         <br><br>
                         <button class="start-training-btn" onclick="startSuggestedTraining('${rawReplySafe}')">
