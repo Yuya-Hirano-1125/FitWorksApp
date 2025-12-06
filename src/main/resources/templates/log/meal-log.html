@@ -34,35 +34,6 @@
         .text-danger { color: #e74c3c; font-size: 0.85em; display: block; margin-top: 5px; }
         .btn-submit { width: 100%; margin-top: 20px; padding: 12px; font-size: 1.1em; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .btn-submit:hover { background-color: #45a049; }
-
-        /* ★追加: AIボタンとローディングのスタイル */
-        .ai-section { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; text-align: center; }
-        .btn-ai-camera {
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: white; padding: 12px 20px; border-radius: 50px;
-            cursor: pointer; display: inline-block; width: 90%;
-            font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            transition: transform 0.2s;
-        }
-        .btn-ai-camera:active { transform: scale(0.98); }
-        .btn-ai-camera i { margin-right: 8px; }
-        .ai-loading-overlay {
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.9); z-index: 10;
-            flex-direction: column; align-items: center; justify-content: center;
-            border-radius: 15px;
-        }
-        .spinner {
-            width: 40px; height: 40px; border: 4px solid #f3f3f3;
-            border-top: 4px solid #2575fc; border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 10px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .ai-comment-box {
-            background-color: #f0f8ff; border-left: 4px solid #2575fc;
-            padding: 10px; margin-bottom: 15px; font-size: 0.9em; color: #333;
-            border-radius: 4px; display: none; /* 初期は非表示 */
-        }
     </style>
 </head>
 <body class="training-log-page">
@@ -74,7 +45,6 @@
     <p class="sub-heading" th:text="${username} + 'さんの食事を管理しましょう。'">食事記録カレンダー</p>
 
     <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
-    <div th:if="${error}" class="success-message" style="background-color: #ffebee; color: #c62828;" th:text="${error}"></div>
     
     <div class="calendar-nav-container">
         <a th:href="@{/log/meal(year=${prevYear}, month=${prevMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></a>
@@ -112,29 +82,13 @@
 </div>
 
 <div id="logModal" class="modal">
-    <div class="modal-content" style="position: relative;"> <span class="close-button" onclick="closeLogModal()">&times;</span>
+    <div class="modal-content">
+        <span class="close-button" onclick="closeLogModal()">&times;</span>
         <h2 id="modalDateTitle" class="modal-title"></h2>
         
         <div id="logViewArea"></div>
 
-        <div id="aiLoading" class="ai-loading-overlay">
-            <div class="spinner"></div>
-            <p style="color: #2575fc; font-weight: bold;">AIが画像を解析中...<br><span style="font-size: 0.8em; color: #666;">これには数秒かかります</span></p>
-        </div>
-
-        <div class="ai-section">
-            <form id="aiAnalyzeForm" th:action="@{/log/meal/analyze}" method="post" enctype="multipart/form-data">
-                <label class="btn-ai-camera">
-                    <i class="fa-solid fa-camera"></i> AIカメラで自動入力
-                    <input type="file" name="mealImage" accept="image/*" capture="environment" style="display:none;" onchange="submitAiForm()">
-                </label>
-                <input type="hidden" name="targetDate" id="aiTargetDate">
-            </form>
-        </div>
-
-        <div id="aiCommentArea" class="ai-comment-box"></div>
-
-        <p class="modal-instruction" style="margin-bottom: 10px;">食事内容を記録：</p>
+        <p class="modal-instruction">食事内容を記録：</p>
         
         <div class="meal-form-container">
             <form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post">
@@ -167,7 +121,7 @@
 
                 <div class="form-group">
                     <label for="calories">🔥 総カロリー (kcal)</label>
-                    <input type="number" id="calories" th:field="*{calories}" class="form-control" placeholder="0" min="0" required>
+                    <input type="number" id="calories" th:field="*{calories}" class="form-control" placeholder="0" min="0" max="5000" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                 </div>
 
                 <div class="form-group">
@@ -176,15 +130,15 @@
                         <div class="macro-row">
                             <div class="macro-item">
                                 <label for="protein">P (タンパク質)</label>
-                                <input type="number" id="protein" th:field="*{protein}" class="form-control macro-input p-input" step="0.1" min="0" placeholder="0.0">
+                                <input type="number" id="protein" th:field="*{protein}" class="form-control macro-input p-input" step="0.1" min="0" max="500" placeholder="0.0" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
                             </div>
                             <div class="macro-item">
                                 <label for="fat">F (脂質)</label>
-                                <input type="number" id="fat" th:field="*{fat}" class="form-control macro-input f-input" step="0.1" min="0" placeholder="0.0">
+                                <input type="number" id="fat" th:field="*{fat}" class="form-control macro-input f-input" step="0.1" min="0" max="500" placeholder="0.0" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
                             </div>
                             <div class="macro-item">
                                 <label for="carbohydrate">C (炭水化物)</label>
-                                <input type="number" id="carbohydrate" th:field="*{carbohydrate}" class="form-control macro-input c-input" step="0.1" min="0" placeholder="0.0">
+                                <input type="number" id="carbohydrate" th:field="*{carbohydrate}" class="form-control macro-input c-input" step="0.1" min="0" max="500" placeholder="0.0" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
                             </div>
                         </div>
                     </div>
@@ -207,45 +161,7 @@
 </div>
 
 <script th:inline="javascript">
-    /*<![CDATA[*/
-    // サーバーからのAI解析結果を取得 (Thymeleaf変数)
-    const analyzedData = /*[[${analyzedData}]]*/ null;
-    const analyzedDate = /*[[${analyzedDate}]]*/ null; // Controllerから日付も返してもらう想定
-    /*]]>*/
-
-    // ページ読み込み時の処理
-    document.addEventListener('DOMContentLoaded', function() {
-        // AI解析データがある場合、自動でモーダルを開いて値をセット
-        if (analyzedData) {
-            // 日付はControllerから渡されたもの、なければ今日
-            let targetDate = analyzedDate || new Date().toISOString().split('T')[0];
-            
-            // モーダルを開く（isLoggedはとりあえずfalseで）
-            openLogModal(targetDate, false);
-
-            // 値をフォームに反映
-            if (analyzedData.content) document.getElementById('content').value = analyzedData.content;
-            if (analyzedData.calories) document.getElementById('calories').value = analyzedData.calories;
-            if (analyzedData.protein) document.getElementById('protein').value = analyzedData.protein;
-            if (analyzedData.fat) document.getElementById('fat').value = analyzedData.fat;
-            if (analyzedData.carbohydrate) document.getElementById('carbohydrate').value = analyzedData.carbohydrate;
-
-            // AIコメントの表示
-            if (analyzedData.comment) {
-                const commentBox = document.getElementById('aiCommentArea');
-                commentBox.innerHTML = '<strong>🤖 AIコーチ:</strong> ' + analyzedData.comment;
-                commentBox.style.display = 'block';
-            }
-        }
-    });
-
-    // AI解析フォーム送信
-    function submitAiForm() {
-        document.getElementById('aiLoading').style.display = 'flex';
-        document.getElementById('aiAnalyzeForm').submit();
-    }
-
-    // 記録モーダルを開く関数
+    // 記録モーダルを開く関数（日付セットのみ）
     function openLogModal(dateString, isLogged) {
         const [year, month, day] = dateString.split('-');
         const displayDate = `${year}年${month}月${day}日`;
@@ -253,9 +169,6 @@
         // 日付をフォームにセット
         document.getElementById('dateInput').value = dateString;
         document.getElementById('modalDateTitle').innerText = displayDate;
-        
-        // ★AIフォーム用のhidden日付にもセット
-        document.getElementById('aiTargetDate').value = dateString;
         
         // 記録済みメッセージの切り替え
         const logViewArea = document.getElementById('logViewArea');
@@ -272,8 +185,6 @@
     // 記録モーダルを閉じる関数
     function closeLogModal() {
         document.getElementById('logModal').classList.remove('is-active');
-        // AIコメントをリセット
-        document.getElementById('aiCommentArea').style.display = 'none';
     }
 
     // モーダル外クリックで閉じる処理

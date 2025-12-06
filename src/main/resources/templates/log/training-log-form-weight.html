@@ -11,15 +11,15 @@
     </div>
     <div class="form-group">
         <label for="weight">重量 (kg):</label>
-        <input type="number" id="weight" th:field="*{weight}" class="form-control" step="0.5" placeholder="例: 60.0" required/>
+        <input type="number" id="weight" th:field="*{weight}" class="form-control" step="0.5" min="0" max="500" placeholder="例: 60.0" required oninput="this.value = this.value.replace(/[^0-9.]/g, '');"/>
     </div>
     <div class="form-group">
         <label for="sets">セット数:</label>
-        <input type="number" id="sets" th:field="*{sets}" class="form-control" placeholder="例: 3" required/>
+        <input type="number" id="sets" th:field="*{sets}" class="form-control" min="1" max="50" placeholder="例: 3" required oninput="this.value = this.value.replace(/[^0-9]/g, '');"/>
     </div>
     <div class="form-group">
         <label for="reps">回数 (Reps):</label>
-        <input type="number" id="reps" th:field="*{reps}" class="form-control" placeholder="例: 10" required/>
+        <input type="number" id="reps" th:field="*{reps}" class="form-control" min="1" max="300" placeholder="例: 10" required oninput="this.value = this.value.replace(/[^0-9]/g, '');"/>
     </div>
     
     <button type="submit" class="button primary">記録を保存 <i class="fa-solid fa-floppy-disk"></i></button>

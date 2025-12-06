@@ -7,7 +7,7 @@
     
     <div class="form-group">
         <label for="weight">体重 (kg):</label>
-        <input type="number" id="weight" th:field="*{weight}" class="form-control" step="0.1" placeholder="例: 65.0" required/>
+        <input type="number" id="weight" th:field="*{weight}" class="form-control" step="0.1" min="10" max="300" placeholder="例: 65.0" required oninput="this.value = this.value.replace(/[^0-9.]/g, '');"/>
     </div>
     
     <button type="submit" class="button primary">記録を保存 <i class="fa-solid fa-floppy-disk"></i></button>

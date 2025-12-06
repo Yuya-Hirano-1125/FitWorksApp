@@ -1,5 +1,6 @@
 package com.example.demo.dto;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,15 +24,19 @@ public class MealLogForm {
 
     @NotNull(message = "カロリーを入力してください")
     @Min(value = 0, message = "カロリーは0以上である必要があります")
+    @Max(value = 5000, message = "カロリーが高すぎます（最大5000kcal）")
     private Integer calories;
 
     @Min(value = 0, message = "タンパク質は0以上である必要があります")
+    @Max(value = 500, message = "タンパク質が多すぎます")
     private Double protein;
 
     @Min(value = 0, message = "脂質は0以上である必要があります")
+    @Max(value = 500, message = "脂質が多すぎます")
     private Double fat;
 
     @Min(value = 0, message = "炭水化物は0以上である必要があります")
+    @Max(value = 500, message = "炭水化物が多すぎます")
     private Double carbohydrate;
     
     private String imageUrl; // 画像URL
