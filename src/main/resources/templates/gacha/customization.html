@@ -2,142 +2,280 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>キャラクターカスタマイズ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キャラクターカスタマイズ | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-	
-	<script th:src="@{/js/theme.js}"></script>
-	<style>
-	    /* 既存のスタイルを維持しつつ、デザインを強化 */
-	    .character-view {
-	        width: 300px;
-	        height: 300px;
-	        border: 4px solid #4CAF50; /* 緑の枠で強調 */
-	        border-radius: 12px;
-	        margin: 20px auto;
-	        position: relative;
-	        background-size: cover;
-	        background-position: center;
-	        overflow: hidden; /* 画像がはみ出さないように */
-	        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* 浮き出るような影 */
-	    }
-	    .character-view img {
-	        display: block;
-	    }
-	    .character-costume {
-	        position: absolute;
-	        top: 0;
-	        left: 0;
-	        width: 100%;
-	        height: 100%;
-	        background-size: contain;
-	        background-repeat: no-repeat;
-	        background-position: center;
-	    }
-	    .item-grid {
-	        display: flex;
-	        flex-wrap: wrap;
-	        gap: 15px;
-	        padding: 20px 0;
-	        justify-content: center; /* 中央寄せ */
-	    }
-	    .item-card {
-	        border: 2px solid #ddd;
-	        padding: 10px;
-	        width: 150px;
-	        text-align: center;
-	        border-radius: 10px;
-	        transition: transform 0.2s, box-shadow 0.2s;
-	        cursor: pointer;
-	        background-color: #f9f9f9;
-	    }
-	    .item-card:hover {
-	        transform: translateY(-3px);
-	        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-	    }
-	    .item-card h4 {
-	        margin: 5px 0;
-	        font-size: 1em;
-	        color: #333;
-	    }
-	    .item-card p {
-	        font-size: 0.8em;
-	        color: #777;
-	    }
-	    .item-card img {
-	        max-width: 100px;
-	        height: auto;
-	        border-radius: 5px;
-	    }
-	    /* ボタンのスタイル調整 */
-	    .button-secondary {
-	        background-color: #95a5a6; /* 灰色の落ち着いた色 */
-	        color: white;
-	        border: none;
-	        padding: 8px 15px;
-	        border-radius: 5px;
-	        cursor: pointer;
-	    }
-	</style>
+    <script th:src="@{/js/theme.js}"></script>
+
+    <style>
+        /* gacha.html のスタイル感に合わせた調整 */
+        .customize-page .main-container {
+            max-width: 700px; /* アイテム一覧が見やすいよう少し広めに */
+        }
+
+        /* キャラクター表示エリア (gacha-display風) */
+        .character-view-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .character-view {
+            width: 300px;
+            height: 300px;
+            /* gacha.html の枠線と影を継承 */
+            border: 4px solid var(--primary-color);
+            background-color: #ffffff;
+            border-radius: 15px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.3); /* ピンク系のグロー */
+            transition: transform 0.3s ease;
+        }
+        
+        .character-view:hover {
+            transform: scale(1.02);
+        }
+
+        .character-view img {
+            display: block;
+        }
+
+        .character-costume {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 2;
+        }
+
+        .current-bg-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--dark-text);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 5;
+        }
+
+        /* 操作ボタンエリア */
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .control-panel form {
+            width: 45%;
+            max-width: 200px;
+        }
+        .control-panel button {
+            margin: 0; /* base.cssのマージンをリセット */
+            width: 100%;
+            font-size: 0.9rem;
+            padding: 12px;
+        }
+
+        /* アイテムリストエリア (rate-container風) */
+        .inventory-section {
+            margin-top: 40px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.6); /* 少し透過した白 */
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 105, 180, 0.1);
+        }
+
+        .inventory-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--dark-text);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .item-card {
+            background: #ffffff;
+            border: 2px solid #eee;
+            padding: 15px;
+            text-align: center;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary-color);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .item-card h4 {
+            margin: 5px 0;
+            font-size: 0.9rem;
+            color: var(--dark-text);
+            font-weight: 700;
+        }
+
+        .item-card p {
+            font-size: 0.75rem;
+            color: #777;
+            margin-bottom: 10px;
+        }
+        
+        .item-card button {
+            font-size: 0.8rem;
+            padding: 8px;
+            margin: 5px 0 0 0;
+            width: 100%;
+        }
+
+        .equip-badge {
+            display: block;
+            margin-top: 5px;
+            color: var(--success-color);
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        /* メッセージ表示 */
+        .message-area {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
-<body>
-    <div th:insert="~{fragments/header :: header}"></div>
 
-    <main class="main-content">
-        <h1>キャラクターカスタマイズ</h1>
+<body class="customize-page">
 
-        <p th:if="${message}" th:text="${message}" style="color: green; font-weight: bold;"></p>
-        <p th:if="${errorMessage}" th:text="${errorMessage}" style="color: red; font-weight: bold;"></p>
+<div class="main-container">
 
-        <h2>キャラクター表示</h2>
-        <div class="character-view" th:style="${equippedBackground != null} ? 'background-image: url(' + ${equippedBackground.item.imagePath} + ');' : 'background-color: #f0f0f0;'">
-            <img th:src="@{/img/mizu1.png}" alt="ベースキャラクター" style="width: 100%; height: auto; position: absolute; bottom: 0;">
+    <h1><i class="fa-solid fa-shirt header-icon"></i>着せ替え</h1>
+    <p class="sub-heading">自分だけのキャラクターを作ろう！</p>
+
+    <div class="message-area">
+        <div th:if="${message}" class="success-message">
+            <i class="fa-solid fa-check-circle"></i> <span th:text="${message}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="error-message">
+            <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span>
+        </div>
+    </div>
+
+    <div class="character-view-container">
+        <div class="character-view" 
+             th:style="${equippedBackground != null} ? 'background-image: url(' + ${equippedBackground.item.imagePath} + ');' : 'background-color: #fff0f5;'">
+            
+            <p class="current-bg-label">
+                <i class="fa-solid fa-image"></i>
+                <span th:text="${equippedBackground} != null ? ${equippedBackground.item.name} : '背景なし'"></span>
+            </p>
+
+            <img th:src="@{/img/mizu1.png}" alt="ベースキャラクター" 
+                 style="width: 100%; height: auto; position: absolute; bottom: 0; z-index: 1;">
             
             <div class="character-costume" th:if="${equippedCostume != null}" 
                  th:style="'background-image: url(' + ${equippedCostume.item.imagePath} + ');'">
             </div>
-            
-            <p style="position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.8); padding: 5px; border-radius: 5px;" 
-               th:text="'現在の背景: ' + (${equippedBackground} != null ? ${equippedBackground.item.name} : 'なし')"></p>
         </div>
+    </div>
 
-        <div style="text-align: center; margin-top: 10px;">
-            <form th:action="@{/gacha/customize/unequip/background}" method="post" style="display: inline;">
-                <button type="submit" class="button button-secondary" th:disabled="${equippedBackground == null}">背景を解除</button>
-            </form>
-            <form th:action="@{/gacha/customize/unequip/costume}" method="post" style="display: inline; margin-left: 10px;">
-                <button type="submit" class="button button-secondary" th:disabled="${equippedCostume == null}">衣装を解除</button>
-            </form>
-        </div>
-		<div style="text-align: center; margin-top: 30px;">
-		        <a th:href="@{/home}" class="button button-primary">
-		            🏠 ホームに戻る
-		        </a>
-		</div>
+    <div class="control-panel">
+        <form th:action="@{/gacha/customize/unequip/background}" method="post">
+            <button type="submit" class="button secondary" th:disabled="${equippedBackground == null}" 
+                    th:classappend="${equippedBackground == null} ? 'disabled' : ''">
+                <i class="fa-solid fa-xmark"></i> 背景を外す
+            </button>
+        </form>
+        <form th:action="@{/gacha/customize/unequip/costume}" method="post">
+            <button type="submit" class="button secondary" th:disabled="${equippedCostume == null}"
+                    th:classappend="${equippedCostume == null} ? 'disabled' : ''">
+                <i class="fa-solid fa-user-slash"></i> 衣装を脱ぐ
+            </button>
+        </form>
+    </div>
 
-        <hr>
-
-        <h2>所有アイテム一覧</h2>
+    <div class="inventory-section">
+        <h3><i class="fa-solid fa-boxes-stacked"></i> アイテムボックス</h3>
+        
         <div class="item-grid">
             <div th:each="userItem : ${ownedItems}" class="item-card">
-                <img th:src="${userItem.item.imagePath}" th:alt="${userItem.item.name}">
-                <h4 th:text="${userItem.item.name}">アイテム名</h4>
-                <p th:text="${'種別: ' + userItem.item.type}"></p>
+                <div class="item-image-wrapper">
+                    <img th:src="${userItem.item.imagePath}" th:alt="${userItem.item.name}">
+                </div>
+                
+                <div>
+                    <h4 th:text="${userItem.item.name}">アイテム名</h4>
+                    <p>
+                        <i th:if="${userItem.item.type.name() == 'BACKGROUND'}" class="fa-regular fa-image"></i>
+                        <i th:if="${userItem.item.type.name() == 'COSTUME'}" class="fa-solid fa-shirt"></i>
+                        <span th:text="${userItem.item.type == 'BACKGROUND' ? '背景' : '衣装'}"></span>
+                    </p>
+                </div>
 
-                <form th:if="${userItem.item.type == 'BACKGROUND' and equippedBackground?.item.id != userItem.item.id}"
-                      th:action="@{/gacha/customize/equip/{itemId}(itemId=${userItem.item.id})}" method="post">
-                    <button type="submit" class="button">背景に装備</button>
-                </form>
-                <span th:if="${userItem.item.type == 'BACKGROUND' and equippedBackground?.item.id == userItem.item.id}" style="color: green; font-weight: bold;">装備中</span>
+                <div th:if="${userItem.item.type.name() == 'BACKGROUND'}">
+                    <form th:if="${equippedBackground?.item.id != userItem.item.id}"
+                          th:action="@{/gacha/customize/equip/{itemId}(itemId=${userItem.item.id})}" method="post">
+                        <button type="submit" class="button primary small">装備する</button>
+                    </form>
+                    <span th:if="${equippedBackground?.item.id == userItem.item.id}" class="equip-badge">
+                        <i class="fa-solid fa-check"></i> 装備中
+                    </span>
+                </div>
 
-                <form th:if="${userItem.item.type == 'COSTUME' and equippedCostume?.item.id != userItem.item.id}"
-                      th:action="@{/gacha/customize/equip/{itemId}(itemId=${userItem.item.id})}" method="post">
-                    <button type="submit" class="button">衣装に装備</button>
-                </form>
-                <span th:if="${userItem.item.type == 'COSTUME' and equippedCostume?.item.id == userItem.item.id}" style="color: green; font-weight: bold;">装備中</span>
+                <div th:if="${userItem.item.type.name() == 'COSTUME'}">
+                    <form th:if="${equippedCostume?.item.id != userItem.item.id}"
+                          th:action="@{/gacha/customize/equip/{itemId}(itemId=${userItem.item.id})}" method="post">
+                        <button type="submit" class="button primary small">着替える</button>
+                    </form>
+                    <span th:if="${equippedCostume?.item.id == userItem.item.id}" class="equip-badge">
+                        <i class="fa-solid fa-check"></i> 装備中
+                    </span>
+                </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <div th:insert="~{fragments/footer :: footer}"></div>
+</div>
+
+<div class="button-container" style="margin-top: 40px; text-align: center; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto;">
+    <a th:href="@{/home}" class="button secondary">
+        <i class="fa-solid fa-house"></i> ホームに戻る
+    </a>
+</div>
+
 </body>
 </html>
