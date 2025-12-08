@@ -161,6 +161,17 @@
 
 </div>
 
+<!-- ホームに戻るボタン -->
+<div style="max-width: 450px; margin: 30px auto 70px auto; padding: 0 10px;">
+    <a th:href="@{/home}" class="button secondary">
+        <i class="fa-solid fa-house"></i>
+        <span>ホームに戻る</span>
+    </a>
+</div>
+
+</body>
+</html>
+
 <!-- モーダル -->
 <div id="rateModal" class="modal">
     <div class="modal-content">
@@ -180,24 +191,27 @@
                 <!-- URだけ虹色アニメーション -->
                 <tr class="ur-row">
                     <td><span class="rarity-badge rarity-UR">UR</span></td>
-                    <td class="rainbow-text">虹の剣</td>
+                    <td class="rainbow-text">夢幻の鍵</td>
                     <td class="rainbow-text">2.35%</td>
                 </tr>
-                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>黄金の盾</td><td>3.53%</td></tr>
-                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>雷の槍</td><td>3.53%</td></tr>
-                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>炎の鎧</td><td>3.53%</td></tr>
-                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>氷の杖</td><td>3.53%</td></tr>
-                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>風の弓</td><td>3.53%</td></tr>
-                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>鉄の剣</td><td>6.59%</td></tr>
-                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>銀の盾</td><td>6.59%</td></tr>
-                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>火の杖</td><td>6.59%</td></tr>
-                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>水の弓</td><td>6.59%</td></tr>
-                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>風の鎧</td><td>6.59%</td></tr>
-                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>木の剣</td><td>8.94%</td></tr>
-                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>革の盾</td><td>8.94%</td></tr>
-                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>石の杖</td><td>8.94%</td></tr>
-                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>銅の弓</td><td>8.94%</td></tr>
-                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>布の鎧</td><td>8.94%</td></tr>
+                <!-- SSR素材 -->
+                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>赫焔鱗</td><td>3.53%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>氷華の杖</td><td>3.53%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>緑晶灯</td><td>3.53%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>夢紡ぎの枕</td><td>3.53%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>月詠みの杖</td><td>3.53%</td></tr>
+                <!-- SR素材 -->
+                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>赤の聖結晶</td><td>6.59%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>青の聖結晶</td><td>6.59%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>緑の聖結晶</td><td>6.59%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>黄の聖結晶</td><td>6.59%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>紫の聖結晶</td><td>6.59%</td></tr>
+                <!-- R素材 -->
+                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>紅玉</td><td>8.94%</td></tr>
+                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>蒼玉</td><td>8.94%</td></tr>
+                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>翠玉</td><td>8.94%</td></tr>
+                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>聖玉</td><td>8.94%</td></tr>
+                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>闇玉</td><td>8.94%</td></tr>
             </tbody>
         </table>
         <!-- レア度ごとの合計確率（右寄せ） -->
@@ -211,6 +225,7 @@
         <p class="total-rate">合計確率：100%</p>
     </div>
 </div>
+
 
 <style>
     /* モーダル内の文字を白に統一 */
