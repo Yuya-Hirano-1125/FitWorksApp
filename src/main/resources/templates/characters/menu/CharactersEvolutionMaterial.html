@@ -32,10 +32,53 @@
                           <span th:text="${item.imagePath}"></span> |
                           <span th:text="${item.count}"></span></p>
 
+<<<<<<< HEAD
                 <!-- 本来の表示 -->
                 <img th:src="${item.imagePath}" th:alt="${item.name}">
                 <p class="material-name" th:text="${item.name}"></p>
                 <p class="material-count" th:text="${item.count}"></p>
+=======
+    <!-- SSR素材 -->
+    <section class="material-section rarity-ssr">
+        <h2>SSR素材</h2>
+        <div class="material-list">
+            <div class="material-card">
+                <img th:src="@{/img/item/SSR-red.png}" alt="赤の至高結晶">
+                <p class="material-name">赫焔鱗</p>
+                <p class="material-count">0/2</p>
+            </div>
+            <div class="material-card">
+                <img th:src="@{/img/item/SSR-blue.png}" alt="青の至高結晶">
+                <p class="material-name">氷華の杖</p>
+                <p class="material-count">1/2</p>
+            </div>
+            <div class="material-card">
+                <img th:src="@{/img/item/SSR-green.png}" alt="緑の至高結晶">
+                <p class="material-name">緑晶灯</p>
+                <p class="material-count">2/2</p>
+            </div>
+            <div class="material-card">
+                <img th:src="@{/img/item/SSR-yellow.png}" alt="黄の至高結晶">
+                <p class="material-name">夢紡ぎの枕</p>
+                <p class="material-count">1/2</p>
+            </div>
+            <div class="material-card">
+                <img th:src="@{/img/item/SSR-purple.png}" alt="紫の至高結晶">
+                <p class="material-name">月詠みの杖</p>
+                <p class="material-count">0/2</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- UR素材 -->
+    <section class="material-section rarity-ur">
+        <h2>UR素材</h2>
+        <div class="material-list">
+            <div class="material-card">
+                <img th:src="@{/img/item/UR-niji.png}" alt="虹の神結晶">
+                <p class="material-name">夢幻の鍵</p>
+                <p class="material-count">0/1</p>
+>>>>>>> branch 'master' of https://github.com/Yuya-Hirano-1125/FitWorksApp.git
             </div>
         </div>
     </section>
