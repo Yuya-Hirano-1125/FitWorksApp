@@ -98,7 +98,6 @@ public class TrainingController {
         }
     }
 
-    // ... (途中省略: showTrainingOptionsなどのGETメソッドは変更なし) ...
     @GetMapping("/training")
     public String showTrainingOptions(Authentication authentication, Model model) {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
