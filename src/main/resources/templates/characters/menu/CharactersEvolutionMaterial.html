@@ -2,15 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>進化素材一覧 | FitWorks</title>
+    <title>素材一覧 | FitWorks</title>
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/characters/CharactersEvolutionMaterial.css}">
 </head>
 <body>
 <div class="main-container">
     <div class="header-section">
-        <h1>進化素材一覧</h1>
-        <p class="sub-heading">モンスター進化に必要な素材を確認できます</p>
+        <h1>素材一覧</h1>
+        <p class="sub-heading">ガチャから出る素材を確認できます</p>
     </div>
 
     <!-- R素材 -->
@@ -105,6 +105,18 @@
                 <img th:src="@{/img/item/SSR-purple.png}" alt="紫の至高結晶">
                 <p class="material-name">月詠みの杖</p>
                 <p class="material-count">0/2</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- UR素材 -->
+    <section class="material-section rarity-ur">
+        <h2>UR素材</h2>
+        <div class="material-list">
+            <div class="material-card">
+                <img th:src="@{/img/item/UR-niji.png}" alt="虹の神結晶">
+                <p class="material-name">虹の神結晶</p>
+                <p class="material-count">0/1</p>
             </div>
         </div>
     </section>
