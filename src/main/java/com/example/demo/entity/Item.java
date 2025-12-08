@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "items")
+@Table(name = "item") // ← テーブル名を "item" に修正
 @Data
 public class Item {
 
@@ -19,13 +19,13 @@ public class Item {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String name; // アイテム名 (例: 森の背景, 赤い帽子)
+    private String name; // アイテム名 (例: 紅玉, 蒼玉)
 
     @Column(nullable = false)
-    private String type; // アイテムの種別 (例: BACKGROUND, COSTUME)
+    private String type; // アイテムの種別 (例: R, SR, SSR, UR)
 
-    @Column(nullable = false)
-    private String imagePath; // 表示用ファイルパス (src/main/resources/static/img/costume/...)
-    
-    private String description;
+    @Column(name = "image_path", nullable = false)
+    private String imagePath; // 表示用ファイルパス (例: /img/item/R-red.png)
+
+    private String description; // アイテム説明（任意）
 }
