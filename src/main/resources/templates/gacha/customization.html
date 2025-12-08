@@ -71,105 +71,38 @@
             z-index: 5;
         }
 
-        /* 操作ボタンエリア */
+        /* 新しいコントロールパネルのスタイル */
+        .control-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #fff;
+        }
+        
+        .control-section h3 {
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            color: var(--dark-text);
+        }
+
         .control-panel {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .control-panel form {
-            width: 45%;
-            max-width: 200px;
-        }
-        .control-panel button {
-            margin: 0; /* base.cssのマージンをリセット */
-            width: 100%;
-            font-size: 0.9rem;
-            padding: 12px;
-        }
-
-        /* アイテムリストエリア (rate-container風) */
-        .inventory-section {
-            margin-top: 40px;
-            text-align: left;
-            background: rgba(255, 255, 255, 0.6); /* 少し透過した白 */
-            padding: 25px;
-            border-radius: 15px;
-            border: 2px solid rgba(255, 105, 180, 0.1);
-        }
-
-        .inventory-section h3 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: var(--dark-text);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            display: flex;
-            align-items: center;
             gap: 10px;
         }
-
-        .item-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 20px;
-            justify-content: center;
-        }
-
-        .item-card {
-            background: #ffffff;
-            border: 2px solid #eee;
-            padding: 15px;
-            text-align: center;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-        }
-
-        .item-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--secondary-color);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .item-card img {
-            width: 100%;
-            height: 100px;
-            object-fit: contain;
-            margin-bottom: 10px;
-        }
-
-        .item-card h4 {
-            margin: 5px 0;
-            font-size: 0.9rem;
-            color: var(--dark-text);
-            font-weight: 700;
-        }
-
-        .item-card p {
-            font-size: 0.75rem;
-            color: #777;
-            margin-bottom: 10px;
-        }
         
-        .item-card button {
-            font-size: 0.8rem;
-            padding: 8px;
-            margin: 5px 0 0 0;
-            width: 100%;
-        }
-
-        .equip-badge {
-            display: block;
-            margin-top: 5px;
-            color: var(--success-color);
-            font-weight: 800;
+        .control-panel a.button { /* aタグに対してボタンのスタイルを適用 */
+            flex-grow: 1;
+            max-width: 300px; /* ボタンを中央に配置しやすくするため */
             font-size: 0.9rem;
+            padding: 12px;
+            margin: 0;
+            text-align: center;
+            text-decoration: none;
         }
 
         /* メッセージ表示 */
@@ -213,96 +146,22 @@
         </div>
     </div>
 
-    <div class="control-panel">
-        <form th:action="@{/gacha/customize/unequip/background}" method="post">
-            <button type="submit" class="button secondary" th:disabled="${equippedBackground == null}" 
-                    th:classappend="${equippedBackground == null} ? 'disabled' : ''">
-                <i class="fa-solid fa-xmark"></i> 背景を外す
-            </button>
-        </form>
-        <form th:action="@{/gacha/customize/unequip/costume}" method="post">
-            <button type="submit" class="button secondary" th:disabled="${equippedCostume == null}"
-                    th:classappend="${equippedCostume == null} ? 'disabled' : ''">
-                <i class="fa-solid fa-user-slash"></i> 衣装を脱ぐ
-            </button>
-        </form>
+    <div class="control-section">
+        <h3><i class="fa-solid fa-user"></i> キャラクター選択</h3>
+        <div class="control-panel">
+            <a th:href="@{/gacha/customize/select/character}" class="button primary">
+                <i class="fa-solid fa-user-check"></i> キャラクター一覧へ
+            </a>
+        </div>
     </div>
-
-    <div class="inventory-section">
-        <h3><i class="fa-solid fa-boxes-stacked"></i> アイテムボックス</h3>
-        
-        <div class="item-grid">
-            
-            <div class="item-card">
-                <div class="item-image-wrapper">
-                    <img th:src="@{/img/background/classroom.png}" alt="教室の背景">
-                </div>
-                
-                <div>
-                    <h4>教室の背景</h4>
-                    <p>
-                        <i class="fa-regular fa-image"></i>
-                        <span>背景</span>
-                    </p>
-                </div>
-
-                <div th:if="${equippedBackground?.item.id != 901}">
-                    <form th:action="@{/gacha/customize/equip/901}" method="post">
-                        <button type="submit" class="button primary small">装備する</button>
-                    </form>
-                </div>
-                 <span th:if="${equippedBackground?.item.id == 901}" class="equip-badge">
-                    <i class="fa-solid fa-check"></i> 装備中
-                </span>
-            </div>
-
-            <div class="item-card">
-                <div class="item-image-wrapper">
-                    <img th:src="@{/img/background/classroom.png}" alt="夕焼けの教室">
-                </div>
-                
-                <div>
-                    <h4>夕焼けの教室</h4>
-                    <p>
-                        <i class="fa-regular fa-image"></i>
-                        <span>背景</span>
-                    </p>
-                </div>
-
-                <div th:if="${equippedBackground?.item.id != 902}">
-                    <form th:action="@{/gacha/customize/equip/902}" method="post">
-                        <button type="submit" class="button primary small">装備する</button>
-                    </form>
-                </div>
-                 <span th:if="${equippedBackground?.item.id == 902}" class="equip-badge">
-                    <i class="fa-solid fa-check"></i> 装備中
-                </span>
-            </div>
-
-            <div class="item-card">
-                <div class="item-image-wrapper">
-                    <img th:src="@{/img/background/classroom.png}" alt="スポーツウェア">
-                </div>
-                
-                <div>
-                    <h4>スポーツウェア</h4>
-                    <p>
-                        <i class="fa-solid fa-shirt"></i>
-                        <span>衣装</span>
-                    </p>
-                </div>
-
-                <div th:if="${equippedCostume?.item.id != 903}">
-                    <form th:action="@{/gacha/customize/equip/903}" method="post">
-                        <button type="submit" class="button primary small">着替える</button>
-                    </form>
-                </div>
-                <span th:if="${equippedCostume?.item.id == 903}" class="equip-badge">
-                    <i class="fa-solid fa-check"></i> 装備中
-                </span>
-            </div>
-
-            </div>
+    
+    <div class="control-section">
+        <h3><i class="fa-solid fa-image"></i> 背景選択</h3>
+        <div class="control-panel">
+            <a th:href="@{/gacha/customize/select/background}" class="button primary">
+                <i class="fa-solid fa-panorama"></i> 背景一覧へ
+            </a>
+        </div>
     </div>
 
 </div>
