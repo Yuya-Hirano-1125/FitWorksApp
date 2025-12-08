@@ -21,7 +21,6 @@
             margin-bottom: 25px;
         }
         
-        /* AI吹き出し風デザイン */
         .ai-bubble {
             background: #e8f5e9; 
             border-radius: 15px; 
@@ -41,7 +40,6 @@
             border-bottom: 10px solid #e8f5e9;
         }
         
-        /* 提案種目エリア */
         .exercise-box {
             border: 2px dashed #a5d6a7; 
             border-radius: 12px; 
@@ -96,7 +94,7 @@
     </style>
 </head>
 <body>
-    <div th:replace="fragments/header :: header"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
 
     <div class="container">
         <div class="result-header">
@@ -109,7 +107,7 @@
                 <strong style="display:block; margin-bottom:5px; color:#1b5e20;">
                     <i class="fa-solid fa-robot"></i> アドバイス
                 </strong>
-                <span th:text="${aiAdvice}">AIからのアドバイス読み込み中...</span>
+                <span th:text="${aiAdvice != null ? aiAdvice : '現在AIサービスが混み合っていますが、こちらのケアがおすすめです！'}">読み込み中...</span>
             </div>
 
             <div class="exercise-box" th:if="${suggestedExercise != null}">
@@ -151,6 +149,6 @@
         </div>
     </div>
 
-    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>
