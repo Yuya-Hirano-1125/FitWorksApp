@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/training-log.css}"> 
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <script th:src="@{/js/theme.js}"></script>
     <style>
         .header-icon-meal { color: #4CAF50; }
@@ -179,8 +182,9 @@
 </div>
 
 <div th:if="${aiAdvice}" id="aiAdviceModal" class="modal is-active" style="z-index: 2000;">
-    <div class="modal-content" style="max-width: 400px; text-align: center; background: #fff; border-radius: 15px; padding: 30px;">
-        <span class="close-button" onclick="document.getElementById('aiAdviceModal').style.display='none'">&times;</span>
+    <div id="shareTarget" class="modal-content" style="max-width: 400px; text-align: center; background: #fff; border-radius: 15px; padding: 30px; position: relative; overflow: hidden;">
+        
+        <span class="close-button no-capture" onclick="document.getElementById('aiAdviceModal').style.display='none'">&times;</span>
         
         <div style="margin-bottom: 15px;">
             <img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4CAF50; padding: 2px;">
@@ -195,19 +199,29 @@
             </p>
         </div>
 
-        <div class="sns-buttons-container">
-            <button onclick="shareToX()" class="btn-sns btn-sns-x">
-                <i class="fa-brands fa-x-twitter"></i> X
+        <div style="margin-top: 10px; margin-bottom: 10px; font-size: 0.8em; color: #aaa; font-weight: bold;">
+            FitWorks Meal Log
+        </div>
+
+        <div class="sns-buttons-container no-capture">
+            <button onclick="shareScreenImage()" class="btn-sns" style="background: linear-gradient(135deg, #4CAF50, #2E7D32); width: 100%; justify-content: center; font-size: 1em; margin-bottom: 10px; padding: 12px;">
+                <i class="fa-solid fa-share-nodes"></i> 画像としてシェアする
             </button>
-            <button onclick="shareToLine()" class="btn-sns btn-sns-line">
-                <i class="fa-brands fa-line"></i> LINE
-            </button>
-            <button onclick="shareToInstagram()" class="btn-sns btn-sns-insta">
-                <i class="fa-brands fa-instagram"></i> Insta
-            </button>
-            <button onclick="document.getElementById('aiAdviceModal').style.display='none'" class="btn-sns" style="background-color: #777; width: auto; padding: 10px 20px;">
-                閉じる
-            </button>
+            
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <button onclick="shareToX()" class="btn-sns btn-sns-x" style="font-size: 0.8em; padding: 8px 12px;">
+                    <i class="fa-brands fa-x-twitter"></i> Text
+                </button>
+                <button onclick="shareToLine()" class="btn-sns btn-sns-line" style="font-size: 0.8em; padding: 8px 12px;">
+                    <i class="fa-brands fa-line"></i> Text
+                </button>
+                <button onclick="shareToInstagram()" class="btn-sns btn-sns-insta" style="font-size: 0.8em; padding: 8px 12px;">
+                    <i class="fa-brands fa-instagram"></i> Copy
+                </button>
+                <button onclick="document.getElementById('aiAdviceModal').style.display='none'" class="btn-sns" style="background-color: #777; font-size: 0.8em; padding: 8px 12px;">
+                    閉じる
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -266,7 +280,61 @@
         }
     }
     
-    // --- SNSシェア機能 ---
+    // ----------------------------------------------------
+    //  画面（画像）シェア機能
+    // ----------------------------------------------------
+    async function shareScreenImage() {
+        const target = document.getElementById('shareTarget');
+        const hideElements = target.querySelectorAll('.no-capture');
+        
+        hideElements.forEach(el => el.style.display = 'none');
+        
+        const originalBtn = document.querySelector('button[onclick="shareScreenImage()"]');
+        const originalText = originalBtn ? originalBtn.innerHTML : '';
+        if(originalBtn) originalBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 生成中...';
+
+        try {
+            const canvas = await html2canvas(target, { 
+                scale: 2, 
+                useCORS: true, 
+                backgroundColor: '#ffffff'
+            });
+
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], "fitworks_meal_log.png", { type: "image/png" });
+                
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'FitWorks Record',
+                            text: getShareText(),
+                        });
+                    } catch (err) {
+                        console.log('Share canceled or failed', err);
+                    }
+                } else {
+                    const link = document.createElement('a');
+                    link.download = 'fitworks_meal_log.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                    alert("画像として保存しました。\nSNSアプリから投稿してください。");
+                }
+                
+                hideElements.forEach(el => el.style.display = '');
+                if(originalBtn) originalBtn.innerHTML = originalText;
+
+            }, 'image/png');
+
+        } catch (error) {
+            console.error('Capture failed:', error);
+            alert('画像の生成に失敗しました。');
+            hideElements.forEach(el => el.style.display = '');
+            if(originalBtn) originalBtn.innerHTML = originalText;
+        }
+    }
+
+    // --- SNSシェア機能（テキスト用） ---
     function getShareText() {
         const adviceText = document.getElementById('aiAdviceText').innerText;
         return `【FitWorks】食事記録完了！🥗\nAIトレーナー「${adviceText}」\n\n#FitWorks #食事管理 #ダイエット`;
