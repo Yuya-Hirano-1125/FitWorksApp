@@ -11,8 +11,36 @@
 
     <style>
         .gacha-page .main-container {
-            max-width: 600px;
+            max-width: 700px;
         }
+
+        .sub-heading {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        /* 提供割合ボタンをサブ見出しの一行下・右寄せ */
+        .rate-button-container {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .rate-button {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 6px;
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+            transition: background 0.3s;
+        }
+        .rate-button:hover {
+            background: #00c853;
+        }
+
         .gacha-display {
             width: 100%;
             height: 250px;
@@ -28,9 +56,10 @@
             animation: pulseGlow 5s ease-in-out infinite alternate;
         }
         .gacha-display i {
-            font-size: 60px;
+            font-size: 70px;
             color: var(--primary-color);
         }
+
         .gacha-button-unit {
             display: flex;
             gap: 20px;
@@ -41,43 +70,64 @@
             width: 45%;
         }
 
-        .rate-container {
-            margin-top: 40px;
-            text-align: left;
-            background: rgba(255, 255, 255, 0.05);
+        /* モーダル */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background: rgba(0,0,0,0.7);
+        }
+        .modal-content {
+            background: #222;
+            margin: 10% auto;
             padding: 20px;
+            border: 2px solid var(--primary-color);
             border-radius: 10px;
+            width: 80%;
+            max-width: 700px;
         }
-        .rate-container h3 {
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-            color: var(--text-color);
-            border-bottom: 1px solid var(--primary-color);
-            padding-bottom: 10px;
+        .close {
+            color: #fff;
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
+
         .rate-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
         }
         .rate-table th, .rate-table td {
-            padding: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
         }
         .rate-table th {
             color: var(--primary-color);
-            font-weight: 600;
+            font-weight: 700;
+            font-size: 1.2rem;
         }
         .rarity-badge {
             display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            color: #333;
+            padding: 8px 14px;
+            border-radius: 6px;
             font-weight: 800;
-            font-size: 0.8rem;
-            min-width: 40px;
+            font-size: 1rem;
+            color: #fff;
+            text-shadow: 0 0 3px rgba(0,0,0,0.5);
+            min-width: 60px;
             text-align: center;
         }
+        .rarity-UR { background: linear-gradient(45deg, #ff00cc, #3333ff); }
+        .rarity-SSR { background-color: #FFD700; }
+        .rarity-SR { background-color: #C0C0C0; }
+        .rarity-R { background-color: #CD7F32; }
     </style>
 </head>
 
@@ -86,6 +136,12 @@
 
     <h1><i class="fa-solid fa-gift header-icon"></i>ガチャ</h1>
     <p class="sub-heading">レアな着せ替えを手に入れよう！</p>
+    <!-- サブ見出しの一行下に右寄せで配置 -->
+    <div class="rate-button-container">
+        <button id="openModal" class="rate-button">
+            <i class="fa-solid fa-list-ul"></i> 提供割合
+        </button>
+    </div>
 
     <div class="gacha-display">
         <i class="fa-solid fa-gifts"></i>
@@ -94,7 +150,6 @@
     <p>所持シェイカー：１０個</p>
     <p>消費シェイカー：１個</p>
 
-    <!-- ▼▼▼ userId を確実に引き継ぐ重要ポイント ▼▼▼ -->
     <div class="gacha-button-unit">
         <a th:href="@{/gacha/animation(userId=${userId}, count=1)}" class="button primary">
             1回引く
@@ -103,40 +158,123 @@
             6連で引く
         </a>
     </div>
-    <!-- ▲▲▲ ここが今回の重要修正ポイント ▲▲▲ -->
 
-    <div class="rate-container">
-        <h3><i class="fa-solid fa-list-ul"></i> 提供割合・ラインナップ</h3>
+</div>
+
+<!-- モーダル -->
+<div id="rateModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModal">&times;</span>
+        <h3 class="modal-title">
+            <i class="fa-solid fa-list-ul"></i> 提供割合・ラインナップ
+        </h3>
         <table class="rate-table">
             <thead>
                 <tr>
-                    <th width="20%">レア</th>
-                    <th width="60%">アイテム名</th>
-                    <th width="20%">確率</th>
+                    <th>レア</th>
+                    <th>アイテム名</th>
+                    <th>確率</th>
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="item : ${probabilityList}">
-                    <td>
-                        <span class="rarity-badge"
-                              th:text="${item.rarity}"
-                              th:style="'background-color:' + ${item.color}">
-                        </span>
-                    </td>
-                    <td th:text="${item.name}"></td>
-                    <td th:text="${item.rate}"></td>
+                <!-- URだけ虹色アニメーション -->
+                <tr class="ur-row">
+                    <td><span class="rarity-badge rarity-UR">UR</span></td>
+                    <td class="rainbow-text">虹の剣</td>
+                    <td class="rainbow-text">2.35%</td>
                 </tr>
+                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>黄金の盾</td><td>3.53%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>雷の槍</td><td>3.53%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>炎の鎧</td><td>3.53%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>氷の杖</td><td>3.53%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>風の弓</td><td>3.53%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>鉄の剣</td><td>6.59%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>銀の盾</td><td>6.59%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>火の杖</td><td>6.59%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>水の弓</td><td>6.59%</td></tr>
+                <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>風の鎧</td><td>6.59%</td></tr>
+                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>木の剣</td><td>8.94%</td></tr>
+                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>革の盾</td><td>8.94%</td></tr>
+                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>石の杖</td><td>8.94%</td></tr>
+                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>銅の弓</td><td>8.94%</td></tr>
+                <tr><td><span class="rarity-badge rarity-R">R</span></td><td>布の鎧</td><td>8.94%</td></tr>
             </tbody>
         </table>
+        <!-- 合計確率を表示 -->
+        <p class="total-rate">合計確率：100%</p>
     </div>
-
 </div>
 
-<div class="button-container" style="margin-top: 40px;">
-    <a th:href="@{/home}" class="button secondary">
-        <i class="fa-solid fa-house"></i> ホームに戻る
-    </a>
-</div>
+<style>
+    /* モーダル内の文字を白に統一 */
+    .modal-content {
+        color: #fff;
+    }
+    .modal-title {
+        font-size: 1.4rem;
+        margin-bottom: 15px;
+        color: var(--primary-color);
+    }
+    .rate-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 1.2rem;
+        line-height: 1.6;
+        color: #fff; /* テーブル文字を白 */
+    }
+    .rate-table th, .rate-table td {
+        padding: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        text-align: center;
+    }
+    .rate-table th {
+        color: var(--primary-color);
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+    .total-rate {
+        text-align: right;
+        font-weight: bold;
+        margin-top: 15px;
+        font-size: 1.2rem;
+        color: var(--primary-color);
+    }
 
-</body>
-</html>
+    /* UR行だけ虹色アニメーション */
+    .rainbow-text {
+        background: linear-gradient(270deg, #ff0000, #ff9900, #33cc33, #3399ff, #9933ff, #ff3399);
+        background-size: 1200% 1200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: rainbowShift 8s ease infinite;
+        font-weight: 800;
+    }
+    @keyframes rainbowShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+</style>
+
+<script>
+    const modal = document.getElementById("rateModal");
+    const openBtn = document.getElementById("openModal");
+    const closeBtn = document.getElementById("closeModal");
+
+    // ボタンをクリックしたらモーダルを表示
+    openBtn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    // ×ボタンをクリックしたらモーダルを閉じる
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // 背景をクリックしたらモーダルを閉じる
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
