@@ -195,7 +195,7 @@
                 <label for="cardioExerciseName">種目名:</label>
                 <select id="cardioExerciseName" name="exerciseName" class="form-control" required>
                     <option value="">種目を選択してください</option>
-                    <option th:each="exercise : ${cardioExercises}" th:value="${exercise}" th:text="${exercise}"></option>
+                    <option th:each="exercise : ${cardioExercises}" th:value="${exercise.name}" th:text="${exercise.name}"></option>
                 </select>
             </div>
             
@@ -234,8 +234,10 @@
                     
                     exercises.forEach(exercise => {
                         const option = document.createElement('option');
-                        option.value = exercise;
-                        option.textContent = exercise;
+                        // ★修正箇所: exerciseがオブジェクトの場合は .name を使用、そうでなければそのまま使用
+                        const val = (exercise.name) ? exercise.name : exercise;
+                        option.value = val;
+                        option.textContent = val;
                         exerciseNameSelect.appendChild(option);
                     });
                     exerciseNameSelect.disabled = false;

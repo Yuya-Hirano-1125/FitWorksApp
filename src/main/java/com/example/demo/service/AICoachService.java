@@ -74,6 +74,52 @@ public class AICoachService {
         sb.append("\nルール: 100文字以内。親しみやすい口調で。絵文字(🥗🍎など)を使って。語尾にムキをつけてください。冒頭の挨拶は不要です。");
         return callGeminiApi(sb.toString());
     }
+    
+    /**
+     * ★追加: 食事内容に基づいたトレーニング提案
+     */
+    public String generateDietBasedTrainingAdvice(User user, MealLogForm mealForm) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("あなたは専属AIトレーナーです。\n");
+        sb.append("ユーザーがたった今食事を摂りました。この食事内容と栄養バランスに基づき、直後に行うべき最適なアクションや、次のトレーニングメニューを提案してください。\n\n");
+        
+        sb.append("【ユーザー】").append(user.getUsername()).append("さん\n");
+        sb.append("【摂取した食事】\n");
+        sb.append("- 内容: ").append(mealForm.getContent()).append("\n");
+        sb.append("- カロリー: ").append(mealForm.getCalories()).append("kcal\n");
+        sb.append("- PFCバランス: P(タンパク質):").append(mealForm.getProtein())
+          .append("g, F(脂質):").append(mealForm.getFat())
+          .append("g, C(炭水化物):").append(mealForm.getCarbohydrate()).append("g\n");
+
+        sb.append("\n【判断基準】\n");
+        sb.append("- 炭水化物が多い場合: 血糖値上昇を抑えるための軽いスクワットや、エネルギーを活用した高強度トレーニングを提案。\n");
+        sb.append("- タンパク質が多い場合: 筋合成を促すための筋トレメニューを推奨。\n");
+        sb.append("- 脂質/カロリー過多の場合: 脂肪燃焼効果の高い有酸素運動やHIITを提案。\n");
+        
+        sb.append("\nルール: 150文字以内。ポジティブに。「食べたことは悪くない、ここからどう動くかだ！」というスタンスで。語尾にムキをつける。");
+        
+        return callGeminiApi(sb.toString());
+    }
+
+    /**
+     * ★追加: コンディショニング・ケア提案
+     */
+    public String generateConditioningAdvice(User user, String conditionType) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("あなたはユーザーの体を気遣うコンディショニング専門のAIトレーナーです。\n");
+        sb.append("ユーザーは現在「").append(conditionType).append("」を求めています。\n");
+        sb.append("その目的に最適な、具体的かつニッチなケア方法やトレーニングを1つ提案してください。\n\n");
+        
+        sb.append("【提案の引き出し】\n");
+        sb.append("- 眼精疲労: 眼球運動、ホットアイケア、遠近体操\n");
+        sb.append("- 全身疲労: 筋膜リリース、交代浴、アクティブレスト\n");
+        sb.append("- 心肺機能強化: タバタ式、インターバル走、心拍数管理\n");
+        sb.append("- 柔軟性向上: 動的ストレッチ、PNFストレッチ\n");
+
+        sb.append("\nルール: 150文字以内。優しく、かつ専門的に。手順を簡潔に教える。語尾にムキをつける。");
+
+        return callGeminiApi(sb.toString());
+    }
 
     /**
      * 食事画像を解析して栄養素を推定する
@@ -105,7 +151,6 @@ public class AICoachService {
             Content content = Content.fromParts(textPart, imagePart);
 
             // ★Gemini 2.0 Flash (試験運用版) を使用
-            // もし動作しない場合は "gemini-1.5-flash" に変更してください
             GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", content, null);
             
             String responseText = response.text();
@@ -132,6 +177,8 @@ public class AICoachService {
         StringBuilder sb = new StringBuilder();
         sb.append("あなたはフィットネスアプリ『FitWorks』の専属AIトレーナーです。\n");
         sb.append("ユーザーの要望に合わせて、具体的で効果的なトレーニングメニューを提案してください。\n");
+        // ★プロンプト強化
+        sb.append("ユーザーが「疲れた」「目が痛い」と言った場合は、無理に筋トレを勧めず、ストレッチや眼球運動などのケアを提案できる柔軟性を持ってください。\n"); 
         sb.append("回答は熱血かつポジティブな口調（日本語）でお願いします。\n\n");
         
         sb.append("【ユーザー情報】\n");

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.DailyChartData;
+import com.example.demo.dto.ExerciseData;
 import com.example.demo.dto.TrainingLogForm;
 import com.example.demo.entity.BodyWeightRecord;
 import com.example.demo.entity.ExerciseBookmark;
@@ -89,14 +90,70 @@ public class TrainingController {
     public static class BatchTrainingLogForm {
         private List<TrainingLogForm> logs;
 
-        public List<TrainingLogForm> getLogs() {
-            return logs;
+        public List<TrainingLogForm> getLogs() { return logs; }
+        public void setLogs(List<TrainingLogForm> logs) { this.logs = logs; }
+    }
+
+    // --- ★AIコンディショニング機能 (ここから) ---
+
+    // 1. メニュー画面の表示
+    @GetMapping("/training/care")
+    public String showCareMenu(Authentication authentication, Model model) {
+        if (getCurrentUser(authentication) == null) return "redirect:/login";
+        return "training/care-menu";
+    }
+
+    // 2. 診断結果（処方箋）の表示
+    @PostMapping("/training/care/advice")
+    public String generateCareAdvice(
+            @RequestParam("symptom") String symptom,
+            Authentication authentication,
+            Model model) {
+        
+        User user = getCurrentUser(authentication);
+        if (user == null) return "redirect:/login";
+
+        // AIアドバイスの生成
+        String advice = aiCoachService.generateConditioningAdvice(user, symptom);
+        
+        // 症状に合わせたケア種目の選定（キーワードマッチング）
+        List<ExerciseData> careList = trainingDataService.getRecoveryExercises();
+        ExerciseData suggestedExercise = null;
+
+        if (careList != null && !careList.isEmpty()) {
+            String keyword = "ストレッチ"; // デフォルト
+            if (symptom.contains("目") || symptom.contains("眼")) keyword = "眼";
+            else if (symptom.contains("肩") || symptom.contains("首")) keyword = "フォームローラー"; 
+            else if (symptom.contains("腰") || symptom.contains("背中")) keyword = "キャット"; 
+            else if (symptom.contains("ダル") || symptom.contains("疲")) keyword = "ストレッチ";
+            else if (symptom.contains("眠") || symptom.contains("休")) keyword = "ホット";
+
+            final String target = keyword;
+            suggestedExercise = careList.stream()
+                .filter(e -> e.getFullName().contains(target))
+                .findFirst()
+                .orElse(careList.get(0));
         }
 
-        public void setLogs(List<TrainingLogForm> logs) {
-            this.logs = logs;
+        // 記録用フォームの準備
+        TrainingLogForm form = new TrainingLogForm();
+        form.setRecordDate(LocalDate.now());
+        form.setType("BODY_WEIGHT"); // 強度0でも記録できるよう体重カテゴリを借用
+        if (suggestedExercise != null) {
+            form.setExerciseName(suggestedExercise.getFullName() + "(ケア)");
+            form.setSets(1);
+            form.setReps(1);
+            form.setWeight(0.0);
         }
+
+        model.addAttribute("symptom", symptom);
+        model.addAttribute("aiAdvice", advice);
+        model.addAttribute("suggestedExercise", suggestedExercise);
+        model.addAttribute("trainingLogForm", form); 
+
+        return "training/care-result";
     }
+    // --- ★AIコンディショニング機能 (ここまで) ---
 
     @GetMapping("/training")
     public String showTrainingOptions(Authentication authentication, Model model) {
@@ -331,7 +388,14 @@ public class TrainingController {
             record.setWeight(form.getWeight());
             bodyWeightRecordRepository.save(record);
             savedCount = 1;
-            earnedXP = 10;
+            
+            // ★ここを変更: ケアなら50XP、通常体重記録なら10XP
+            if (form.getExerciseName() != null && form.getExerciseName().contains("(ケア)")) {
+                earnedXP = 50; 
+                trainingSummary = form.getExerciseName();
+            } else {
+                earnedXP = 10;
+            }
         }
 
         if (savedCount > 0 && exerciseIdentifier != null) {
@@ -356,8 +420,8 @@ public class TrainingController {
 
         missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
 
-        // ★AIアドバイス生成処理を復活
-        if (!"BODY_WEIGHT".equals(form.getType())) {
+        // ケア実施時または通常のトレーニング時にAIアドバイスを生成
+        if (!"BODY_WEIGHT".equals(form.getType()) || (form.getExerciseName() != null && form.getExerciseName().contains("(ケア)"))) {
             try {
                 String advice = aiCoachService.generateTrainingAdvice(currentUser, trainingSummary);
                 redirectAttributes.addFlashAttribute("aiAdvice", advice);
@@ -445,7 +509,6 @@ public class TrainingController {
             missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
             redirectAttributes.addFlashAttribute("successMessage", "マイセットの一括記録を完了し、合計 " + totalXp + " XPを獲得しました！");
             
-            // ★AIアドバイス生成処理を復活
             try {
                 String advice = aiCoachService.generateTrainingAdvice(currentUser, batchSummary.toString() + " などのメニュー");
                 redirectAttributes.addFlashAttribute("aiAdvice", advice);

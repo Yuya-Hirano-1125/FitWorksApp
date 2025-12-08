@@ -303,7 +303,26 @@
     <a id="tutorial-training-btn" th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
        <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i> トレーニングを開始 
     </a>
-    <a th:href="@{/ranking}" class="daily-mission-button" style="background: linear-gradient(45deg, #f1c40f, #f39c12); box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4); margin-top: 15px;">
+    
+    <div class="care-section" style="margin-top: 15px; text-align: center; margin-bottom: 15px;">
+        <p style="font-size: 0.85rem; color: #666; margin-bottom: 5px;">今日は疲れてる？そんな時は...</p>
+        <a th:href="@{/training/care}" class="btn-care" style="
+            display: inline-block;
+            width: 95%;
+            padding: 12px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #555;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        ">
+            ☕️ AIリフレッシュ＆ケア
+        </a>
+    </div>
+
+    <a th:href="@{/ranking}" class="daily-mission-button" style="background: linear-gradient(45deg, #f1c40f, #f39c12); box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4); margin-top: 0px;">
        <i class="fa-solid fa-trophy" style="margin-left: 5px;"></i> ランキングを見る 
     </a>
     <a th:href="@{/training/map}" class="daily-mission-button" style="background: linear-gradient(45deg, #4CAF50, #8BC34A); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); margin-top: 15px;">

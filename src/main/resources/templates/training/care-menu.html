@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIリフレッシュ＆ケア | FitWorks</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #4caf50;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-sub: #666666;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+
+        .care-container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+        }
+
+        /* ヘッダーエリア */
+        .care-header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+        .care-header h2 {
+            color: #444;
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .care-header p {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* 症状選択グリッド */
+        .symptom-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        /* 症状カードボタン */
+        .symptom-card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: 16px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .symptom-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .symptom-card:active {
+            transform: scale(0.98);
+        }
+
+        /* アイコン装飾 */
+        .icon-wrapper {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            transition: transform 0.3s;
+        }
+        .symptom-card:hover .icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* カテゴリ別カラー */
+        .type-eye .icon-wrapper { background: #e3f2fd; color: #1e88e5; }
+        .type-shoulder .icon-wrapper { background: #ffebee; color: #e53935; }
+        .type-waist .icon-wrapper { background: #fff3e0; color: #fb8c00; }
+        .type-tired .icon-wrapper { background: #f3e5f5; color: #8e24aa; }
+        .type-sleep .icon-wrapper { background: #eceff1; color: #455a64; }
+        .type-stress .icon-wrapper { background: #e0f2f1; color: #00897b; }
+
+        .card-title {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .card-desc {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        /* 区切り線 */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 30px 0;
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+        .divider::before { margin-right: 10px; }
+        .divider::after { margin-left: 10px; }
+
+        /* フッターリンク */
+        .footer-nav {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .btn-back {
+            display: inline-block;
+            padding: 10px 25px;
+            color: #666;
+            background: #fff;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: background 0.2s;
+        }
+        .btn-back:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="care-container">
+        <div class="care-header">
+            <h2>
+                <i class="fa-solid fa-notes-medical" style="color: #ff7043;"></i>
+                AIクリニック
+            </h2>
+            <p>今の不調を教えてください。<br>
+               あなた専属のAIトレーナーが、<br>
+               <strong>今すぐできる最適なケア</strong>を処方します。</p>
+        </div>
+
+        <form th:action="@{/training/care/advice}" method="post">
+            
+            <div class="divider">局所的な疲れ・痛み</div>
+
+            <div class="symptom-grid">
+                <button type="submit" name="symptom" value="眼精疲労・目の疲れ" class="symptom-card type-eye">
+                    <div class="icon-wrapper"><i class="fa-solid fa-eye"></i></div>
+                    <div class="card-title">目の疲れ</div>
+                    <div class="card-desc">PC・スマホの見すぎで<br>目がショボショボする</div>
+                </button>
+
+                <button type="submit" name="symptom" value="肩こり・首の痛み" class="symptom-card type-shoulder">
+                    <div class="icon-wrapper"><i class="fa-solid fa-user-injured"></i></div>
+                    <div class="card-title">肩・首こり</div>
+                    <div class="card-desc">ガチガチに固まって<br>重苦しい</div>
+                </button>
+
+                <button type="submit" name="symptom" value="腰痛・背中の張り" class="symptom-card type-waist">
+                    <div class="icon-wrapper"><i class="fa-solid fa-chair"></i></div>
+                    <div class="card-title">腰・背中</div>
+                    <div class="card-desc">座りっぱなしで<br>腰が痛い・張っている</div>
+                </button>
+            </div>
+
+            <div class="divider">全体的な不調・メンタル</div>
+
+            <div class="symptom-grid">
+                <button type="submit" name="symptom" value="全身のダルさ・倦怠感" class="symptom-card type-tired">
+                    <div class="icon-wrapper"><i class="fa-solid fa-battery-quarter"></i></div>
+                    <div class="card-title">なんとなくダルい</div>
+                    <div class="card-desc">やる気が出ない<br>体が鉛のように重い</div>
+                </button>
+
+                <button type="submit" name="symptom" value="睡眠不足・リラックスしたい" class="symptom-card type-sleep">
+                    <div class="icon-wrapper"><i class="fa-solid fa-moon"></i></div>
+                    <div class="card-title">眠れない・休みたい</div>
+                    <div class="card-desc">寝付きが悪い<br>リラックスしたい</div>
+                </button>
+
+                <button type="submit" name="symptom" value="ストレス解消・イライラ" class="symptom-card type-stress">
+                    <div class="icon-wrapper"><i class="fa-solid fa-wind"></i></div>
+                    <div class="card-title">ストレス解消</div>
+                    <div class="card-desc">イライラする<br>気分転換したい</div>
+                </button>
+            </div>
+
+        </form>
+
+        <div class="footer-nav">
+            <a href="/" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i> ホームに戻る
+            </a>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

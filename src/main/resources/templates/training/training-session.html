@@ -9,7 +9,6 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
 
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 	
 	<script th:src="@{/js/theme.js}"></script>
     <style>
@@ -281,7 +280,7 @@
         </p>
         
         <div id="ai-verification-container">
-            <video id="input_video" style="display:none"></video>
+            <video id="input_video" style="display:none" playsinline></video>
             <canvas id="output_canvas"></canvas>
             <div id="ai-status-overlay">待機中...</div>
             <div id="ai-rep-counter-overlay">0 回</div>
@@ -527,7 +526,8 @@
                     inputs[0].value = count;
                     
                     // バッジ表示
-                    document.getElementById('ai-verified-badge').style.display = 'inline-block';
+                    const badge = document.getElementById('ai-verified-badge');
+                    if(badge) badge.style.display = 'inline-block';
                 }
             };
         }
@@ -677,125 +677,182 @@
         }
 
         // =======================================================
-        // 3. AI Motion Tracking (MediaPipe)
+        // 3. AI Motion Tracking (完全改良版)
         // =======================================================
         const toggleAiBtn = document.getElementById('toggle-ai-camera');
         const aiContainer = document.getElementById('ai-verification-container');
-        const videoElement = document.getElementById('input_video');
-        const canvasElement = document.getElementById('output_canvas');
-        const aiStatus = document.getElementById('ai-status-overlay');
-        const aiRepCounter = document.getElementById('ai-rep-counter-overlay');
 
         if (toggleAiBtn && aiContainer) {
-            let camera = null;
+            // 変数をグローバルスコープで保持
+            let cameraStream = null;
             let pose = null;
-            let isCameraRunning = false;
             let repCount = 0;
-            let poseState = "UP"; // "UP" or "DOWN"
+            let poseState = "UP";
 
-            // 角度計算関数 (3点の座標から角度を求める)
-            function calculateAngle(a, b, c) {
-                const radians = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
-                let angle = Math.abs(radians * 180.0 / Math.PI);
-                if (angle > 180.0) angle = 360 - angle;
-                return angle;
+            // 角度計算関数 (ラジアン→度数法)
+            function calcAngle(a, b, c) {
+                const rad = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
+                let deg = Math.abs((rad * 180) / Math.PI);
+                if (deg > 180) deg = 360 - deg;
+                return deg;
             }
 
-            function onResults(results) {
-                if (!results.poseLandmarks) return;
+            // カメラ起動 & ループ開始処理
+            async function startAICamera() {
+                const video = document.getElementById("input_video");
+                const canvas = document.getElementById("output_canvas");
+                const status = document.getElementById("ai-status-overlay");
+                const counter = document.getElementById("ai-rep-counter-overlay");
 
-                const canvasCtx = canvasElement.getContext('2d');
-                canvasCtx.save();
-                canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                
-                // カメラ映像を描画
-                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-                
-                // 骨格を描画
-                drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS,
-                             {color: '#00FF00', lineWidth: 4});
-                drawLandmarks(canvasCtx, results.poseLandmarks,
-                            {color: '#FF0000', lineWidth: 2});
-
-                // --- カウントロジック (スクワット判定: 腰-膝-足首の角度) ---
-                const landmarks = results.poseLandmarks;
-                // 右足: 24(腰), 26(膝), 28(足首)
-                const rightHip = landmarks[24];
-                const rightKnee = landmarks[26];
-                const rightAnkle = landmarks[28];
-
-                // 信頼度が低い場合は計算しない
-                if (rightHip.visibility > 0.5 && rightKnee.visibility > 0.5 && rightAnkle.visibility > 0.5) {
-                    const angle = calculateAngle(rightHip, rightKnee, rightAnkle);
-                    
-                    // 状態遷移ロジック
-                    if (angle > 160) {
-                        poseState = "UP";
-                        aiStatus.innerText = "状態: 立位 (Start)";
-                        aiStatus.style.color = "#00e676";
-                    }
-                    if (angle < 90 && poseState === "UP") {
-                        poseState = "DOWN"; // 下がったと判定
-                        aiStatus.innerText = "状態: ボトム (OK!)";
-                        aiStatus.style.color = "#ffeb3b";
-                    }
-                    if (angle > 160 && poseState === "DOWN") {
-                        poseState = "UP"; // 戻った
-                        repCount++;
-                        aiRepCounter.innerText = repCount + " 回";
-                        
-                        // 入力フォームに反映
-                        window.updateCurrentSetReps(repCount);
-                        
-                        // 効果音などを鳴らすとさらに良い
-                        console.log("Rep counted!");
-                    }
-                } else {
-                    aiStatus.innerText = "全身を映してください";
-                    aiStatus.style.color = "#ff5252";
+                // --- 1. カメラストリームの取得 (標準API使用) ---
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: 640, height: 480 } // 480pで負荷軽減
+                    });
+                    video.srcObject = cameraStream;
+                    await video.play();
+                } catch (e) {
+                    console.error("Camera error:", e);
+                    alert("カメラの起動に失敗しました: " + e.message);
+                    return;
                 }
 
-                canvasCtx.restore();
+                // Canvasサイズをビデオに合わせる
+                canvas.width = 640;
+                canvas.height = 480;
+
+                // --- 2. Poseインスタンスの生成 (毎回新品を作る) ---
+                pose = new Pose({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+                });
+                
+                // 軽量設定 (modelComplexity: 0 が最重要)
+                pose.setOptions({
+                    modelComplexity: 0, // 0:軽量, 1:標準, 2:高精度
+                    smoothLandmarks: true,
+                    minTrackingConfidence: 0.5,
+                    minDetectionConfidence: 0.5,
+                });
+
+                // --- 3. 推論結果の処理 ---
+                pose.onResults((results) => {
+                    const ctx = canvas.getContext("2d");
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+                    // ★FPS制御: 2回に1回だけ処理して負荷を半減させる
+                    if (performance.now() % 2 > 1) return;
+
+                    if (!results.poseLandmarks) return;
+                    const lm = results.poseLandmarks;
+
+                    // 必要な関節点 (右半身で判定)
+                    const hip = lm[24];
+                    const knee = lm[26];
+                    const ankle = lm[28];
+
+                    // 描画 (骨格線)
+                    if(window.drawConnectors && window.drawLandmarks) {
+                        drawConnectors(ctx, lm, POSE_CONNECTIONS, {color: '#00FF00', lineWidth: 4});
+                        drawLandmarks(ctx, lm, {color: '#FF0000', lineWidth: 2});
+                    }
+
+                    // 全身が入っていない場合の警告
+                    if (hip.visibility < 0.5 || knee.visibility < 0.5 || ankle.visibility < 0.5) {
+                        status.innerText = "全身が映る位置に立ってください";
+                        status.style.color = "#ff5252";
+                        return;
+                    } else {
+                        // 角度計算
+                        const angle = calcAngle(hip, knee, ankle);
+
+                        // カウントロジック (スクワット)
+                        if (angle > 160) {
+                            poseState = "UP";
+                            status.innerText = "状態: 立位 (Start)";
+                            status.style.color = "#00e676";
+                        } 
+                        if (angle < 90 && poseState === "UP") {
+                            poseState = "DOWN";
+                            status.innerText = "状態: ボトム (OK!)";
+                            status.style.color = "#ffeb3b";
+                        }
+                        if (angle > 160 && poseState === "DOWN") {
+                            poseState = "UP";
+                            repCount++;
+                            counter.innerText = repCount + " 回";
+                            
+                            // フォームに入力
+                            if (typeof window.updateCurrentSetReps === 'function') {
+                                window.updateCurrentSetReps(repCount);
+                            }
+                            const badge = document.getElementById('ai-verified-badge');
+                            if(badge) badge.style.display = "inline-block";
+                        }
+                    }
+                });
+
+                // --- 4. 推論ループ ---
+                async function loop() {
+                    // ストリームが止まっていたらループ終了
+                    if (!cameraStream) return; 
+                    
+                    // ビデオが再生中でなければスキップ
+                    if(video.paused || video.ended) {
+                        requestAnimationFrame(loop);
+                        return;
+                    }
+                    
+                    // 推論実行
+                    await pose.send({ image: video });
+                    
+                    // 次のフレームへ
+                    requestAnimationFrame(loop);
+                }
+                loop();
             }
 
-            toggleAiBtn.addEventListener('click', () => {
-                if (!isCameraRunning) {
-                    aiContainer.style.display = 'block';
-                    toggleAiBtn.innerHTML = '<i class="fa-solid fa-stop"></i> カメラを停止';
+            // カメラ停止処理
+            function stopAICamera() {
+                const video = document.getElementById("input_video");
+
+                // ストリームを物理的に停止 (ライトを消す)
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach((track) => track.stop());
+                    cameraStream = null;
+                }
+                video.pause();
+                video.srcObject = null;
+
+                // メモリ解放
+                if (pose) {
+                    pose.close(); 
+                    pose = null;
+                }
+                
+                // カウントリセット (任意)
+                repCount = 0;
+                poseState = "UP";
+                document.getElementById("ai-rep-counter-overlay").innerText = "0 回";
+                document.getElementById("ai-status-overlay").innerText = "待機中...";
+            }
+
+            // ボタンクリック時の挙動
+            toggleAiBtn.addEventListener("click", async () => {
+                if (!cameraStream) {
+                    // 起動
+                    aiContainer.style.display = "block";
+                    toggleAiBtn.innerHTML = '<i class="fa-solid fa-stop"></i> カメラ停止';
                     toggleAiBtn.classList.remove('primary');
                     toggleAiBtn.classList.add('secondary');
-
-                    pose = new Pose({locateFile: (file) => {
-                        return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
-                    }});
-                    pose.setOptions({
-                        modelComplexity: 1,
-                        smoothLandmarks: true,
-                        minDetectionConfidence: 0.5,
-                        minTrackingConfidence: 0.5
-                    });
-                    pose.onResults(onResults);
-
-                    camera = new Camera(videoElement, {
-                        onFrame: async () => {
-                            await pose.send({image: videoElement});
-                        },
-                        width: 640,
-                        height: 480
-                    });
-                    camera.start();
-                    isCameraRunning = true;
-                    
-                    // Canvasサイズ調整
-                    canvasElement.width = 640;
-                    canvasElement.height = 480;
+                    await startAICamera();
                 } else {
-                    aiContainer.style.display = 'none';
-                    toggleAiBtn.innerHTML = '<i class="fa-solid fa-video"></i> AI自動カウントを起動';
+                    // 停止
+                    aiContainer.style.display = "none";
+                    toggleAiBtn.innerHTML = '<i class="fa-solid fa-video"></i> AI自動カウントを起動 (BETA)';
                     toggleAiBtn.classList.add('primary');
                     toggleAiBtn.classList.remove('secondary');
-                    if(camera) camera.stop();
-                    isCameraRunning = false;
+                    stopAICamera();
                 }
             });
         }
