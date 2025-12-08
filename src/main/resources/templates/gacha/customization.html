@@ -232,41 +232,77 @@
         <h3><i class="fa-solid fa-boxes-stacked"></i> アイテムボックス</h3>
         
         <div class="item-grid">
-            <div th:each="userItem : ${ownedItems}" class="item-card">
+            
+            <div class="item-card">
                 <div class="item-image-wrapper">
-                    <img th:src="${userItem.item.imagePath}" th:alt="${userItem.item.name}">
+                    <img th:src="@{/img/background/classroom.png}" alt="教室の背景">
                 </div>
                 
                 <div>
-                    <h4 th:text="${userItem.item.name}">アイテム名</h4>
+                    <h4>教室の背景</h4>
                     <p>
-                        <i th:if="${userItem.item.type.name() == 'BACKGROUND'}" class="fa-regular fa-image"></i>
-                        <i th:if="${userItem.item.type.name() == 'COSTUME'}" class="fa-solid fa-shirt"></i>
-                        <span th:text="${userItem.item.type == 'BACKGROUND' ? '背景' : '衣装'}"></span>
+                        <i class="fa-regular fa-image"></i>
+                        <span>背景</span>
                     </p>
                 </div>
 
-                <div th:if="${userItem.item.type.name() == 'BACKGROUND'}">
-                    <form th:if="${equippedBackground?.item.id != userItem.item.id}"
-                          th:action="@{/gacha/customize/equip/{itemId}(itemId=${userItem.item.id})}" method="post">
+                <div th:if="${equippedBackground?.item.id != 901}">
+                    <form th:action="@{/gacha/customize/equip/901}" method="post">
                         <button type="submit" class="button primary small">装備する</button>
                     </form>
-                    <span th:if="${equippedBackground?.item.id == userItem.item.id}" class="equip-badge">
-                        <i class="fa-solid fa-check"></i> 装備中
-                    </span>
+                </div>
+                 <span th:if="${equippedBackground?.item.id == 901}" class="equip-badge">
+                    <i class="fa-solid fa-check"></i> 装備中
+                </span>
+            </div>
+
+            <div class="item-card">
+                <div class="item-image-wrapper">
+                    <img th:src="@{/img/background/classroom.png}" alt="夕焼けの教室">
+                </div>
+                
+                <div>
+                    <h4>夕焼けの教室</h4>
+                    <p>
+                        <i class="fa-regular fa-image"></i>
+                        <span>背景</span>
+                    </p>
                 </div>
 
-                <div th:if="${userItem.item.type.name() == 'COSTUME'}">
-                    <form th:if="${equippedCostume?.item.id != userItem.item.id}"
-                          th:action="@{/gacha/customize/equip/{itemId}(itemId=${userItem.item.id})}" method="post">
+                <div th:if="${equippedBackground?.item.id != 902}">
+                    <form th:action="@{/gacha/customize/equip/902}" method="post">
+                        <button type="submit" class="button primary small">装備する</button>
+                    </form>
+                </div>
+                 <span th:if="${equippedBackground?.item.id == 902}" class="equip-badge">
+                    <i class="fa-solid fa-check"></i> 装備中
+                </span>
+            </div>
+
+            <div class="item-card">
+                <div class="item-image-wrapper">
+                    <img th:src="@{/img/background/classroom.png}" alt="スポーツウェア">
+                </div>
+                
+                <div>
+                    <h4>スポーツウェア</h4>
+                    <p>
+                        <i class="fa-solid fa-shirt"></i>
+                        <span>衣装</span>
+                    </p>
+                </div>
+
+                <div th:if="${equippedCostume?.item.id != 903}">
+                    <form th:action="@{/gacha/customize/equip/903}" method="post">
                         <button type="submit" class="button primary small">着替える</button>
                     </form>
-                    <span th:if="${equippedCostume?.item.id == userItem.item.id}" class="equip-badge">
-                        <i class="fa-solid fa-check"></i> 装備中
-                    </span>
                 </div>
+                <span th:if="${equippedCostume?.item.id == 903}" class="equip-badge">
+                    <i class="fa-solid fa-check"></i> 装備中
+                </span>
             </div>
-        </div>
+
+            </div>
     </div>
 
 </div>
