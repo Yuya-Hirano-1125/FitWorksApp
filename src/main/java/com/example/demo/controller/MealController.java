@@ -2,7 +2,9 @@ package com.example.demo.controller;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime; // 追加
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter; // 追加
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError; // 追加
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,20 +59,25 @@ public class MealController {
         }
 
         try {
-            // AIサービス呼び出し
+            // AIサービス呼び出し (AICoachService修正により gemini-1.5-flash を使用)
             String jsonResult = aiCoachService.analyzeMealImage(file);
 
             // JSONをMapに変換
             ObjectMapper mapper = new ObjectMapper();
             Map<String, Object> analysisData = mapper.readValue(jsonResult, Map.class);
-
-            // 解析結果をリダイレクト先に渡す
-            redirectAttributes.addFlashAttribute("analyzedData", analysisData);
-            redirectAttributes.addFlashAttribute("successMessage", "AI解析完了！内容を確認して記録してください。");
+            
+            // エラーチェック
+            if (analysisData.containsKey("error")) {
+                redirectAttributes.addFlashAttribute("error", analysisData.get("error"));
+            } else {
+                // 解析結果をリダイレクト先に渡す
+                redirectAttributes.addFlashAttribute("analyzedData", analysisData);
+                redirectAttributes.addFlashAttribute("successMessage", "AI解析完了！内容を確認して記録してください。");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "AI解析に失敗しました。もう一度試してください。");
+            redirectAttributes.addFlashAttribute("error", "AI解析データの読み込みに失敗しました。");
         }
 
         return "redirect:/log/meal";
@@ -123,7 +131,21 @@ public class MealController {
                 form.setFat(toDouble(data.get("fat")));
                 form.setCarbohydrate(toDouble(data.get("carbohydrate")));
                 model.addAttribute("aiComment", data.get("comment"));
-                form.setDate(today.toString()); 
+                form.setDate(today.toString());
+                
+                // ★修正: AI解析後は現在時刻を自動セット（入力漏れ防止）
+                LocalTime now = LocalTime.now();
+                form.setTime(now.format(DateTimeFormatter.ofPattern("HH:mm")));
+                
+                // ★修正: 時間帯に応じて食事タイプを自動選択
+                int hour = now.getHour();
+                if (hour >= 4 && hour < 10) {
+                    form.setMealType("朝食");
+                } else if (hour >= 10 && hour < 16) {
+                    form.setMealType("昼食");
+                } else if (hour >= 16 || hour < 4) {
+                    form.setMealType("夕食");
+                }
             }
         }
         model.addAttribute("mealLogForm", form);
@@ -137,20 +159,26 @@ public class MealController {
                               @AuthenticationPrincipal UserDetails userDetails,
                               RedirectAttributes redirectAttributes) { 
         
-        if (result.hasErrors()) return "redirect:/log/meal?error";
+        if (result.hasErrors()) {
+            // エラーログを出力（デバッグ用）
+            for (ObjectError error : result.getAllErrors()) {
+                System.out.println("Validation Error: " + error.getDefaultMessage());
+            }
+            return "redirect:/log/meal?error";
+        }
         
         User user = userService.findByUsername(userDetails.getUsername());
         MealRecord savedRecord = mealService.saveMealRecord(form, user);
         
-        // ★登録後のAIアドバイス生成処理
+        // ★高速化: 登録後の同期AIアドバイス生成を一時停止
+        /*
         try {
-            // 前回の修正でAICoachServiceに追加したメソッドを呼び出します
             String advice = aiCoachService.generateMealAdvice(user, form);
-            // FlashAttributeに入れることで、リダイレクト後の画面でのみ有効なデータとして渡します
             redirectAttributes.addFlashAttribute("aiAdvice", advice); 
         } catch (Exception e) {
             e.printStackTrace();
         }
+        */
 
         LocalDate date = savedRecord.getMealDateTime().toLocalDate();
         return "redirect:/log/meal?year=" + date.getYear() + "&month=" + date.getMonthValue();

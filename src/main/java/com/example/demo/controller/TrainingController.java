@@ -56,7 +56,7 @@ public class TrainingController {
     private final TrainingDataService trainingDataService;
     private final TrainingLogicService trainingLogicService;
     private final BodyWeightRecordRepository bodyWeightRecordRepository;
-    private final AICoachService aiCoachService; // 追加
+    private final AICoachService aiCoachService;
 
     @Autowired
     public TrainingController(UserService userService,
@@ -68,7 +68,7 @@ public class TrainingController {
                               TrainingDataService trainingDataService,
                               TrainingLogicService trainingLogicService,
                               BodyWeightRecordRepository bodyWeightRecordRepository,
-                              AICoachService aiCoachService) { // 追加
+                              AICoachService aiCoachService) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.trainingRecordRepository = trainingRecordRepository;
@@ -78,7 +78,7 @@ public class TrainingController {
         this.trainingDataService = trainingDataService;
         this.trainingLogicService = trainingLogicService;
         this.bodyWeightRecordRepository = bodyWeightRecordRepository;
-        this.aiCoachService = aiCoachService; // 初期化
+        this.aiCoachService = aiCoachService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -280,7 +280,7 @@ public class TrainingController {
         String exerciseIdentifier = null;
         int savedCount = 0;
         int earnedXP = 0;
-        String trainingSummary = ""; // AI用まとめ
+        String trainingSummary = ""; 
 
         if ("WEIGHT".equals(form.getType())) {
             exerciseIdentifier = form.getExerciseName();
@@ -356,7 +356,8 @@ public class TrainingController {
 
         missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
 
-        // ★追加: AIアドバイスの生成処理 (体重記録以外)
+        // ★高速化: 登録後の同期AIアドバイス生成を一時停止
+        /*
         if (!"BODY_WEIGHT".equals(form.getType())) {
             try {
                 String advice = aiCoachService.generateTrainingAdvice(currentUser, trainingSummary);
@@ -365,6 +366,7 @@ public class TrainingController {
                 System.out.println("AI Advice Error: " + e.getMessage());
             }
         }
+        */
 
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
@@ -380,7 +382,7 @@ public class TrainingController {
 
         int totalXp = 0;
         int totalSaved = 0;
-        StringBuilder batchSummary = new StringBuilder(); // AI用
+        StringBuilder batchSummary = new StringBuilder(); 
 
         if (batchForm.getLogs() != null) {
             for (TrainingLogForm form : batchForm.getLogs()) {
@@ -445,13 +447,15 @@ public class TrainingController {
             missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
             redirectAttributes.addFlashAttribute("successMessage", "マイセットの一括記録を完了し、合計 " + totalXp + " XPを獲得しました！");
             
-            // ★追加: AIアドバイスの生成処理 (一括記録)
+            // ★高速化: 登録後の同期AIアドバイス生成を一時停止
+            /*
             try {
                 String advice = aiCoachService.generateTrainingAdvice(currentUser, batchSummary.toString() + " などのメニュー");
                 redirectAttributes.addFlashAttribute("aiAdvice", advice);
             } catch (Exception e) {
                 System.out.println("AI Advice Error: " + e.getMessage());
             }
+            */
 
         } else {
             redirectAttributes.addFlashAttribute("message", "記録するデータがありませんでした。");

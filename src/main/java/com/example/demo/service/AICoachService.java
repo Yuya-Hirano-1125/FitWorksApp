@@ -2,6 +2,8 @@ package com.example.demo.service;
 
 import java.util.List;
 
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +21,22 @@ public class AICoachService {
 
     @Value("${gemini.api.key}")
     private String apiKey;
+
+    private Client client;
+
+    // 起動時に一度だけクライアントを初期化（高速化）
+    @PostConstruct
+    public void init() {
+        if (apiKey != null && !apiKey.isEmpty()) {
+            try {
+                this.client = Client.builder()
+                    .apiKey(apiKey)
+                    .build();
+            } catch (Exception e) {
+                System.err.println("Gemini Client Init Error: " + e.getMessage());
+            }
+        }
+    }
 
     /**
      * チャットでの相談に対する回答を生成する
@@ -38,14 +56,12 @@ public class AICoachService {
         sb.append("ユーザーがトレーニングを記録しました。この努力を盛大に褒めて、モチベーションを上げてください。\n");
         sb.append("【ユーザー】").append(user.getUsername()).append("さん\n");
         sb.append("【行ったトレーニング】").append(trainingSummary).append("\n");
-        
         sb.append("\nルール: 100文字以内で簡潔に。熱血かつポジティブに。絵文字(💪🔥など)を多用して。語尾にムキをつけてください。");
-
         return callGeminiApi(sb.toString());
     }
 
     /**
-     * ★追加: 食事記録に対するワンポイントアドバイスを生成する
+     * 食事記録に対するワンポイントアドバイスを生成する
      */
     public String generateMealAdvice(User user, MealLogForm form) {
         StringBuilder sb = new StringBuilder();
@@ -55,11 +71,7 @@ public class AICoachService {
         sb.append("【食事内容】").append(form.getContent()).append("\n");
         sb.append("【カロリー】").append(form.getCalories()).append("kcal\n");
         sb.append("【PFC】P:").append(form.getProtein()).append("g, F:").append(form.getFat()).append("g, C:").append(form.getCarbohydrate()).append("g\n");
-        
-        // Good Job!のデザインに合わせるため、前向きなメッセージを生成
-        sb.append("\nルール: 100文字以内。親しみやすい口調で。絵文字(🥗🍎など)を使って。語尾にムキをつけてください。");
-        sb.append("冒頭に「Good Job!」などの挨拶は不要です（アプリ画面側で表示するため）。すぐに本文から書き始めてください。");
-
+        sb.append("\nルール: 100文字以内。親しみやすい口調で。絵文字(🥗🍎など)を使って。語尾にムキをつけてください。冒頭の挨拶は不要です。");
         return callGeminiApi(sb.toString());
     }
 
@@ -68,9 +80,7 @@ public class AICoachService {
      */
     public String analyzeMealImage(MultipartFile imageFile) {
         try {
-            Client client = Client.builder()
-                .apiKey(apiKey)
-                .build();
+            if (this.client == null) return "{\"error\": \"AI機能が有効になっていません\"}";
 
             String mimeType = imageFile.getContentType();
             if (mimeType == null) mimeType = "image/jpeg";
@@ -92,18 +102,28 @@ public class AICoachService {
                 }
                 """;
             Part textPart = Part.fromText(promptText);
-
             Content content = Content.fromParts(textPart, imagePart);
 
-            GenerateContentResponse response = client.models.generateContent("gemini-2.0-flash", content, null);
+            // 高速な gemini-1.5-flash を使用
+            GenerateContentResponse response = client.models.generateContent("gemini-1.5-flash", content, null);
             
             String responseText = response.text();
             
-            return responseText.replaceAll("```json", "").replaceAll("```", "").trim();
+            // JSONのクリーニング処理
+            if (responseText.contains("```json")) {
+                responseText = responseText.substring(responseText.indexOf("```json") + 7);
+                if (responseText.contains("```")) {
+                    responseText = responseText.substring(0, responseText.indexOf("```"));
+                }
+            } else if (responseText.contains("```")) {
+                responseText = responseText.replace("```", "");
+            }
+            
+            return responseText.trim();
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "{\"error\": \"AI解析に失敗しました\"}";
+            return "{\"error\": \"AI解析に失敗しました: " + e.getMessage().replace("\"", "'") + "\"}";
         }
     }
 
@@ -112,7 +132,7 @@ public class AICoachService {
         sb.append("あなたはフィットネスアプリ『FitWorks』の専属AIトレーナーです。\n");
         sb.append("ユーザーの要望に合わせて、具体的で効果的なトレーニングメニューを提案してください。\n");
         sb.append("回答は熱血かつポジティブな口調（日本語）でお願いします。\n\n");
-
+        
         sb.append("【ユーザー情報】\n");
         sb.append("- 名前: ").append(user.getUsername()).append("\n");
         sb.append("- アプリ利用レベル: Lv.").append(user.getLevel()).append("\n");
@@ -132,15 +152,15 @@ public class AICoachService {
         sb.append("2. 200文字以内。\n");
         sb.append("3. 熱血かつポジティブに。絵文字(💪🔥など)を多用して。\n");
         sb.append("4. 語尾にムキをつけてください。\n");
-        sb.append("5. メニューを提案する際は、会話文とは明確に区別し、箇条書き（行頭に - をつける）で出力してください。ユーザーが抽出しやすいように配慮してください。\n");
+        sb.append("5. メニューを提案する際は、会話文とは明確に区別し、箇条書き（行頭に - をつける）で出力してください。\n");
 
         return sb.toString();
     }
 
     private String callGeminiApi(String prompt) {
         try {
-            Client client = Client.builder().apiKey(apiKey).build();
-            GenerateContentResponse response = client.models.generateContent("gemini-2.0-flash", prompt, null);
+            if (this.client == null) return "API Key未設定ムキ！";
+            GenerateContentResponse response = client.models.generateContent("gemini-1.5-flash", prompt, null);
             return response.text();
         } catch (Exception e) {
             e.printStackTrace();
