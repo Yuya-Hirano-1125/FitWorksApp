@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リフレッシュ＆ケア | FitWorks</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body {
+            background-color: #f9f9f9;
+        }
+        .care-container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            text-align: center; 
+        }
+        .care-header {
+            margin-bottom: 30px;
+        }
+        .care-header h2 {
+            color: #444;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .care-header p {
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        .symptom-btn {
+            display: flex;
+            align-items: center;
+            width: 100%; 
+            padding: 20px; 
+            margin-bottom: 15px;
+            border: none; 
+            border-radius: 18px; 
+            font-size: 1.1rem; 
+            font-weight: bold;
+            color: #fff; 
+            cursor: pointer; 
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-align: left; 
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .symptom-btn:active { 
+            transform: scale(0.98); 
+        }
+        .symptom-btn i {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            width: 30px;
+            text-align: center;
+        }
+        .symptom-btn::after { 
+            content: '\f054'; /* FontAwesome chevron-right */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute; 
+            right: 20px; 
+            opacity: 0.6; 
+            font-size: 0.9rem;
+        }
+        
+        /* ボタンごとの色分け */
+        .btn-eye { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-shoulder { background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%); color: #444 !important; }
+        .btn-shoulder i { color: #555; }
+        .btn-tired { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+        .btn-sleep { background: linear-gradient(135deg, #485563 0%, #29323c 100%); }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            color: #888;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="care-container">
+        <div class="care-header">
+            <h2><i class="fa-solid fa-mug-hot" style="color:#ffb300;"></i> AIクリニック</h2>
+            <p>今のあなたの不調を教えてください。<br>AIトレーナーが最適なケアを処方します。</p>
+        </div>
+
+        <form th:action="@{/training/care/advice}" method="post">
+            <button type="submit" name="symptom" value="眼精疲労" class="symptom-btn btn-eye">
+                <i class="fa-solid fa-eye"></i> 目がショボショボする...
+            </button>
+            <button type="submit" name="symptom" value="肩こり・背中の痛み" class="symptom-btn btn-shoulder">
+                <i class="fa-solid fa-person-arrow-down-to-line"></i> 肩や背中がバキバキ...
+            </button>
+            <button type="submit" name="symptom" value="全身のダルさ" class="symptom-btn btn-tired">
+                <i class="fa-solid fa-battery-quarter"></i> なんとなくダルい...
+            </button>
+            <button type="submit" name="symptom" value="睡眠不足・リラックス" class="symptom-btn btn-sleep">
+                <i class="fa-solid fa-moon"></i> よく眠れない / 休みたい
+            </button>
+        </form>
+
+        <a href="/" class="back-link">ホームに戻る</a>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

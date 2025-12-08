@@ -194,6 +194,25 @@ public class TrainingDataService {
             "腕の力ではなく、股関節の伸展（お尻の力）で振り上げる。"));
         EXERCISE_DATA_MAP.put("その他", others);
 
+        // --- ★追加: リカバリー・ケア ---
+        List<ExerciseData> care = new ArrayList<>();
+        care.add(new ExerciseData("フォームローラー(背中)", "全レベル",
+            "フォームローラーを背中の下に置き、上下に転がる。",
+            "背骨の矯正と起立筋の緊張緩和に効果的。呼吸を止めない。"));
+        care.add(new ExerciseData("眼球運動(8の字)", "全レベル",
+            "顔を動かさず、目だけで空中に大きな8の字を描く。右回り・左回りを行う。",
+            "デジタルデバイスによる眼精疲労の回復。眼輪筋をほぐす。"));
+        care.add(new ExerciseData("キャット＆カウ", "初級",
+            "四つん這いになり、息を吐きながら背中を丸め、吸いながら反らす。",
+            "自律神経を整え、背骨の柔軟性を高める。"));
+        care.add(new ExerciseData("動的ストレッチ(股関節)", "初級",
+            "壁に手を突き、片足を振り子のように前後左右に振る。",
+            "トレーニング前の怪我予防。股関節の可動域を広げる。"));
+        care.add(new ExerciseData("ホットアイケア", "全レベル",
+            "温めたタオルを目元に乗せて5分間リラックスする。",
+            "血流を促進し、副交感神経を優位にする。睡眠の質向上。"));
+        EXERCISE_DATA_MAP.put("リカバリー・ケア", care);
+
         // --- 有酸素 ---
         CARDIO_DATA_LIST.add(new ExerciseData("ウォーキング", "初級", 
             "背筋を伸ばし、大股でリズミカルに歩く。", 
@@ -219,6 +238,14 @@ public class TrainingDataService {
         CARDIO_DATA_LIST.add(new ExerciseData("トレッドミルインターバル", "上級", 
             "ダッシュと歩きを交互に繰り返す。", 
             "心肺機能を限界まで高める。傾斜をつけるとさらに効果的。"));
+        
+        // --- ★追加: 心肺機能強化系 ---
+        CARDIO_DATA_LIST.add(new ExerciseData("タバタ式バーピー", "上級",
+            "20秒全力バーピー＋10秒休憩を8セット。",
+            "短時間でVO2Max（最大酸素摂取量）を極限まで高める。"));
+        CARDIO_DATA_LIST.add(new ExerciseData("LSD (Long Slow Distance)", "中級",
+            "会話ができる程度のペースで60分以上走り続ける。",
+            "毛細血管を増やし、基礎的な持久力と回復力を高める。"));
     }
 
     public Map<String, List<ExerciseData>> getFreeWeightExercises() {
@@ -238,7 +265,6 @@ public class TrainingDataService {
     
     /**
      * 部位ごとの種目名リストを返す（Map<String, List<String>>）
-     * 以前はハードコードされていましたが、EXERCISE_DATA_MAPから生成するように統一しました。
      */
     public Map<String, List<String>> getFreeWeightExercisesByPart() {
         Map<String, List<String>> simpleMap = new LinkedHashMap<>();
@@ -251,9 +277,16 @@ public class TrainingDataService {
         return simpleMap;
     }
 
-    // 後方互換性のため（getFreeWeightExercisesByPartと同じものを返す）
+    // 後方互換性のため
     public Map<String, List<String>> getSimpleFreeWeightExercisesMap() {
         return getFreeWeightExercisesByPart();
+    }
+    
+    /**
+     * ★追加: ケア種目だけを取得するメソッド
+     */
+    public List<ExerciseData> getRecoveryExercises() {
+        return EXERCISE_DATA_MAP.getOrDefault("リカバリー・ケア", new ArrayList<>());
     }
 
     /**

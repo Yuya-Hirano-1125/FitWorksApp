@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.DailyChartData;
+import com.example.demo.dto.ExerciseData;
 import com.example.demo.dto.TrainingLogForm;
 import com.example.demo.entity.BodyWeightRecord;
 import com.example.demo.entity.ExerciseBookmark;
@@ -97,6 +98,68 @@ public class TrainingController {
             this.logs = logs;
         }
     }
+
+    // --- ★ここから追加: AIコンディショニング機能 ---
+
+    @GetMapping("/training/care")
+    public String showCareMenu(Authentication authentication, Model model) {
+        if (getCurrentUser(authentication) == null) return "redirect:/login";
+        return "training/care-menu"; // templates/training/care-menu.html へ遷移
+    }
+
+    @PostMapping("/training/care/advice")
+    public String generateCareAdvice(
+            @RequestParam("symptom") String symptom,
+            Authentication authentication,
+            Model model) {
+        
+        User user = getCurrentUser(authentication);
+        if (user == null) return "redirect:/login";
+
+        // 1. AIによるコンディショニングアドバイス生成
+        String advice = aiCoachService.generateConditioningAdvice(user, symptom);
+        
+        // 2. 症状に合わせたケア種目の選定（簡易ロジック）
+        List<ExerciseData> careList = trainingDataService.getRecoveryExercises();
+        ExerciseData suggestedExercise = null;
+
+        // キーワードマッチングで種目を絞り込む
+        if (careList != null && !careList.isEmpty()) {
+            String keyword = "";
+            if (symptom.contains("目") || symptom.contains("眼")) keyword = "眼";
+            else if (symptom.contains("肩") || symptom.contains("背中")) keyword = "フォームローラー";
+            else if (symptom.contains("腰")) keyword = "キャット";
+            else if (symptom.contains("ダル")) keyword = "ストレッチ";
+            else keyword = "ホット"; // デフォルト
+
+            final String target = keyword;
+            suggestedExercise = careList.stream()
+                .filter(e -> e.getFullName().contains(target))
+                .findFirst()
+                .orElse(careList.get(0)); // 見つからなければ最初のやつ
+        }
+
+        // 3. 実施した際の記録用データ（隠しパラメータ用）
+        // ※自重(BODY_WEIGHT)として記録することで、強度0でも記録できるようにする
+        TrainingLogForm form = new TrainingLogForm();
+        form.setRecordDate(LocalDate.now());
+        form.setType("BODY_WEIGHT"); 
+        if (suggestedExercise != null) {
+            form.setExerciseName(suggestedExercise.getFullName() + "(ケア)");
+            form.setSets(1);
+            form.setReps(1); // 1回やったことにする
+            form.setWeight(0.0);
+        }
+
+        model.addAttribute("symptom", symptom);
+        model.addAttribute("aiAdvice", advice);
+        model.addAttribute("suggestedExercise", suggestedExercise);
+        model.addAttribute("trainingLogForm", form); 
+
+        return "training/care-result"; // templates/training/care-result.html へ遷移
+    }
+
+    // --- ここまで追加 ---
 
     @GetMapping("/training")
     public String showTrainingOptions(Authentication authentication, Model model) {
@@ -345,6 +408,19 @@ public class TrainingController {
             earnedXP = baseDifficultyXp + additionalXp;
         }
 
+        // ★修正: ケアなどでBODY_WEIGHTとして保存しつつExerciseNameがある場合のXP付与ロジックを追加
+        if ("BODY_WEIGHT".equals(form.getType()) && form.getExerciseName() != null && form.getExerciseName().contains("(ケア)")) {
+            // ケア実施のボーナスXP（例えば50XP）
+            earnedXP = 50;
+            trainingSummary = form.getExerciseName(); // AIアドバイス用
+            
+            // 実際にはBodyWeightRecordではなくTrainingRecordとして保存した方が履歴に見やすいかもしれないが
+            // 既存ロジックを壊さないよう、ここではBodyWeightRecordとして体重0kgで保存しつつ、
+            // 別途ダミーのWEIGHTレコードを作るか、あるいはBodyWeightRecordにメモ欄があればよかった。
+            // 簡易対応として「体重記録」扱いにして、XPだけ加算する。
+            // ※より本格的にやるならTrainingRecordに"CARE"タイプを追加すべきだが、今回は既存DB構造を変えない方針。
+        }
+
         if (earnedXP > 0) {
             int newTotalXp = currentUser.getXp() + earnedXP;
             currentUser.setXp(newTotalXp);
@@ -356,8 +432,7 @@ public class TrainingController {
 
         missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
 
-        // ★AIアドバイス生成処理を復活
-        if (!"BODY_WEIGHT".equals(form.getType())) {
+        if (!"BODY_WEIGHT".equals(form.getType()) || (form.getExerciseName() != null && form.getExerciseName().contains("(ケア)"))) {
             try {
                 String advice = aiCoachService.generateTrainingAdvice(currentUser, trainingSummary);
                 redirectAttributes.addFlashAttribute("aiAdvice", advice);
