@@ -104,12 +104,12 @@ public class AICoachService {
             Part textPart = Part.fromText(promptText);
             Content content = Content.fromParts(textPart, imagePart);
 
-            // 高速な gemini-1.5-flash を使用
-            GenerateContentResponse response = client.models.generateContent("gemini-1.5-flash", content, null);
+            // ★Gemini 2.0 Flash を使用
+            GenerateContentResponse response = client.models.generateContent("gemini-2.0-flash", content, null);
             
             String responseText = response.text();
             
-            // JSONのクリーニング処理
+            // JSONクリーニング
             if (responseText.contains("```json")) {
                 responseText = responseText.substring(responseText.indexOf("```json") + 7);
                 if (responseText.contains("```")) {
@@ -160,7 +160,8 @@ public class AICoachService {
     private String callGeminiApi(String prompt) {
         try {
             if (this.client == null) return "API Key未設定ムキ！";
-            GenerateContentResponse response = client.models.generateContent("gemini-1.5-flash", prompt, null);
+            // ★Gemini 2.0 Flash を使用
+            GenerateContentResponse response = client.models.generateContent("gemini-2.0-flash", prompt, null);
             return response.text();
         } catch (Exception e) {
             e.printStackTrace();

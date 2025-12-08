@@ -8,13 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/training-log.css}"> 
-	
-	<script th:src="@{/js/theme.js}"></script>
+    <script th:src="@{/js/theme.js}"></script>
     <style>
         .header-icon-meal { color: #4CAF50; }
         .log-indicator-meal { color: #4CAF50 !important; }
-        
-        /* 埋め込みフォーム用の追加スタイル */
         .meal-form-container { text-align: left; padding: 0 5px; }
         .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
         .form-group { margin-bottom: 15px; }
@@ -31,45 +28,15 @@
         .p-input:focus { border-color: #3498db !important; }
         .f-input:focus { border-color: #e74c3c !important; }
         .c-input:focus { border-color: #f1c40f !important; }
-        .text-danger { color: #e74c3c; font-size: 0.85em; display: block; margin-top: 5px; }
         .btn-submit { width: 100%; margin-top: 20px; padding: 12px; font-size: 1.1em; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .btn-submit:hover { background-color: #45a049; }
-        
-        /* --- SNSシェアボタン用スタイル (追加) --- */
-        .sns-buttons-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-        .btn-sns {
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 0.85em;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-            display: inline-flex;
-            align-items: center;
-            border: none;
-        }
+        .sns-buttons-container { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .btn-sns { color: #fff; padding: 10px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.85em; cursor: pointer; transition: opacity 0.2s, transform 0.1s; display: inline-flex; align-items: center; border: none; }
         .btn-sns:hover { opacity: 0.9; transform: translateY(-1px); color: white; }
         .btn-sns i { margin-right: 5px; font-size: 1.1em; }
-
-        /* X (Twitter) */
         .btn-sns-x { background-color: #000; }
-        
-        /* LINE */
         .btn-sns-line { background-color: #06C755; }
-        
-        /* Instagram (グラデーション) */
-        .btn-sns-insta { 
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); 
-        }
+        .btn-sns-insta { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
     </style>
 </head>
 <body class="training-log-page">
@@ -81,6 +48,7 @@
     <p class="sub-heading" th:text="${username} + 'さんの食事を管理しましょう。'">食事記録カレンダー</p>
 
     <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
+    <div th:if="${error}" class="error-message" style="color:red; text-align:center; margin-bottom:10px;" th:text="${error}"></div>
     
     <div class="calendar-nav-container">
         <a th:href="@{/log/meal(year=${prevYear}, month=${prevMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></a>
@@ -117,22 +85,22 @@
     </div>
 </div>
 
-<div id="logModal" class="modal">
+<div id="logModal" class="modal" th:classappend="${mealLogForm.date != null} ? 'is-active' : ''">
     <div class="modal-content">
         <span class="close-button" onclick="closeLogModal()">&times;</span>
-        <h2 id="modalDateTitle" class="modal-title"></h2>
+        <h2 id="modalDateTitle" class="modal-title" th:text="${mealLogForm.date}"></h2>
         
         <div id="logViewArea"></div>
 
         <div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #4CAF50;">
-            <h3 style="font-size: 1rem; margin-top: 0; color: #2e7d32;"><i class="fa-solid fa-camera"></i> AIで画像を解析する</h3>
+            <h3 style="font-size: 1rem; margin-top: 0; color: #2e7d32;"><i class="fa-solid fa-camera"></i> 写真から自動入力</h3>
             <form th:action="@{/log/meal/analyze}" method="post" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center;" onsubmit="showLoading(this)">
                 <input type="file" name="mealImage" accept="image/*" class="form-control" style="font-size: 0.9em; padding: 8px;" required>
                 <button type="submit" class="button" style="background-color: #2e7d32; color: white; border: none; font-size: 0.9em; padding: 10px 15px; white-space: nowrap;">
                     解析
                 </button>
             </form>
-            <p style="font-size: 0.8em; color: #666; margin: 5px 0 0 0;">※解析結果が下のフォームに自動入力されます</p>
+            <p style="font-size: 0.8em; color: #666; margin: 5px 0 0 0;">※写真を選択して「解析」を押すと、内容・カロリー等が自動入力されます</p>
             <div th:if="${aiComment}" style="margin-top: 10px; font-weight: bold; color: #e65100;">
                 <i class="fa-solid fa-comment-dots"></i> <span th:text="${aiComment}"></span>
             </div>
@@ -145,7 +113,7 @@
                 
                 <div class="form-group">
                     <label for="dateInput"><i class="fa-regular fa-calendar"></i> 日付</label>
-                    <input type="date" id="dateInput" th:field="*{date}" class="form-control" readonly>
+                    <input type="date" id="dateInput" th:field="*{date}" class="form-control" required>
                 </div>
 
                 <div class="form-row">
@@ -171,7 +139,7 @@
 
                 <div class="form-group">
                     <label for="calories">🔥 総カロリー (kcal)</label>
-                    <input type="number" id="calories" th:field="*{calories}" class="form-control" placeholder="0" min="0" max="5000" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                    <input type="number" id="calories" th:field="*{calories}" class="form-control" placeholder="0" min="0" max="5000" required>
                 </div>
 
                 <div class="form-group">
@@ -180,15 +148,15 @@
                         <div class="macro-row">
                             <div class="macro-item">
                                 <label for="protein">P (タンパク質)</label>
-                                <input type="number" id="protein" th:field="*{protein}" class="form-control macro-input p-input" step="0.1" min="0" max="500" placeholder="0.0" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
+                                <input type="number" id="protein" th:field="*{protein}" class="form-control macro-input p-input" step="0.1" min="0" max="500" placeholder="0.0">
                             </div>
                             <div class="macro-item">
                                 <label for="fat">F (脂質)</label>
-                                <input type="number" id="fat" th:field="*{fat}" class="form-control macro-input f-input" step="0.1" min="0" max="500" placeholder="0.0" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
+                                <input type="number" id="fat" th:field="*{fat}" class="form-control macro-input f-input" step="0.1" min="0" max="500" placeholder="0.0">
                             </div>
                             <div class="macro-item">
                                 <label for="carbohydrate">C (炭水化物)</label>
-                                <input type="number" id="carbohydrate" th:field="*{carbohydrate}" class="form-control macro-input c-input" step="0.1" min="0" max="500" placeholder="0.0" oninput="this.value = this.value.replace(/[^0-9.]/g, '');">
+                                <input type="number" id="carbohydrate" th:field="*{carbohydrate}" class="form-control macro-input c-input" step="0.1" min="0" max="500" placeholder="0.0">
                             </div>
                         </div>
                     </div>
@@ -245,16 +213,11 @@
 </div>
 
 <script th:inline="javascript">
-    // 記録モーダルを開く関数（日付セットのみ）
+    // 記録モーダルを開く関数
     function openLogModal(dateString, isLogged) {
-        const [year, month, day] = dateString.split('-');
-        const displayDate = `${year}年${month}月${day}日`;
-        
-        // 日付をフォームにセット
         document.getElementById('dateInput').value = dateString;
-        document.getElementById('modalDateTitle').innerText = displayDate;
+        document.getElementById('modalDateTitle').innerText = dateString.replace(/-/g, '/');
         
-        // 記録済みメッセージの切り替え
         const logViewArea = document.getElementById('logViewArea');
         if (isLogged) {
             logViewArea.innerHTML = '<p style="font-weight: 700; color: #4CAF50; margin-bottom: 10px;">✅ この日は記録済みです。</p>';
@@ -262,20 +225,30 @@
             logViewArea.innerHTML = '<p style="color: #999; margin-bottom: 10px;">この日はまだ記録がありません。</p>';
         }
 
-        // モーダル表示
+        // 現在時刻をデフォルトセット
+        if(!document.getElementById('time').value) {
+            const now = new Date();
+            const timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('time').value = timeString;
+            
+            // 時間帯で種類を自動選択
+            const hour = now.getHours();
+            const mealTypeSelect = document.getElementById('mealType');
+            if(hour >= 4 && hour < 10) mealTypeSelect.value = "朝食";
+            else if(hour >= 10 && hour < 16) mealTypeSelect.value = "昼食";
+            else if(hour >= 16 || hour < 4) mealTypeSelect.value = "夕食";
+        }
+
         document.getElementById('logModal').classList.add('is-active');
     }
 
-    // 記録モーダルを閉じる関数
     function closeLogModal() {
         document.getElementById('logModal').classList.remove('is-active');
     }
 
-    // モーダル外クリックで閉じる処理
     window.onclick = function(event) {
         const modal = document.getElementById('logModal');
         const adviceModal = document.getElementById('aiAdviceModal');
-        
         if (modal && modal.classList.contains('is-active') && event.target === modal) {
             closeLogModal();
         }
@@ -284,25 +257,16 @@
         }
     }
 
-    // --- ローディング表示関数 (追加) ---
     function showLoading(form) {
         const btn = form.querySelector('button[type="submit"]');
         if (btn) {
             btn.disabled = true;
-            const originalText = btn.textContent;
-            // ボタンの幅を固定してガタつきを防ぐ（任意）
-            btn.style.width = btn.offsetWidth + 'px';
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 保存中...';
-            
-            // 安全策: 15秒後にボタンを復活させる
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }, 15000);
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 処理中...';
+            setTimeout(() => { btn.disabled = false; btn.innerHTML = '解析 / 保存'; }, 15000);
         }
     }
-
-    // --- SNSシェア機能 (追加) ---
+    
+    // --- SNSシェア機能 ---
     function getShareText() {
         const adviceText = document.getElementById('aiAdviceText').innerText;
         return `【FitWorks】食事記録完了！🥗\nAIトレーナー「${adviceText}」\n\n#FitWorks #食事管理 #ダイエット`;

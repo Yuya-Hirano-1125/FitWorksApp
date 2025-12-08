@@ -98,6 +98,7 @@ public class TrainingController {
         }
     }
 
+    // ... (途中省略: showTrainingOptionsなどのGETメソッドは変更なし) ...
     @GetMapping("/training")
     public String showTrainingOptions(Authentication authentication, Model model) {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
@@ -356,8 +357,7 @@ public class TrainingController {
 
         missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
 
-        // ★高速化: 登録後の同期AIアドバイス生成を一時停止
-        /*
+        // ★AIアドバイス生成処理を復活
         if (!"BODY_WEIGHT".equals(form.getType())) {
             try {
                 String advice = aiCoachService.generateTrainingAdvice(currentUser, trainingSummary);
@@ -366,7 +366,6 @@ public class TrainingController {
                 System.out.println("AI Advice Error: " + e.getMessage());
             }
         }
-        */
 
         LocalDate recordedDate = form.getRecordDate();
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
@@ -447,15 +446,13 @@ public class TrainingController {
             missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
             redirectAttributes.addFlashAttribute("successMessage", "マイセットの一括記録を完了し、合計 " + totalXp + " XPを獲得しました！");
             
-            // ★高速化: 登録後の同期AIアドバイス生成を一時停止
-            /*
+            // ★AIアドバイス生成処理を復活
             try {
                 String advice = aiCoachService.generateTrainingAdvice(currentUser, batchSummary.toString() + " などのメニュー");
                 redirectAttributes.addFlashAttribute("aiAdvice", advice);
             } catch (Exception e) {
                 System.out.println("AI Advice Error: " + e.getMessage());
             }
-            */
 
         } else {
             redirectAttributes.addFlashAttribute("message", "記録するデータがありませんでした。");
