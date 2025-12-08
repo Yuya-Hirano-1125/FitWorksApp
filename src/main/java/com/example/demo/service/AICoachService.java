@@ -162,7 +162,7 @@ public class AICoachService {
         try {
             if (this.client == null) return "API Key未設定ムキ！";
             // ★Gemini 2.0 Flash (試験運用版) を使用
-            GenerateContentResponse response = client.models.generateContent("gemini-2.0-flash", prompt, null);
+            GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", prompt, null);
             return response.text();
         } catch (Exception e) {
             e.printStackTrace();
