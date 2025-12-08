@@ -60,7 +60,7 @@ public class MealController {
         }
 
         try {
-            // AIサービス呼び出し (gemini-2.0-flash)
+            // AIサービス呼び出し
             String jsonResult = aiCoachService.analyzeMealImage(file);
 
             // JSONをMapに変換
