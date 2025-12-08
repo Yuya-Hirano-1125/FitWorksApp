@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,11 +40,17 @@ public class GachaService {
 
         GachaItem item = getRandomItem();
 
+        // ★ 日本時間（JST）で現在時刻を取得
+        ZonedDateTime nowJst = ZonedDateTime.now(ZoneId.of("Asia/Tokyo"));
+
+        // ★ 整ったフォーマットで保存
+        String formattedDate = nowJst.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
         GachaResult result = new GachaResult(
             userId,
             item.getName(),
             item.getRarity(),
-            LocalDateTime.now().toString()
+            formattedDate
         );
 
         repository.save(result);
