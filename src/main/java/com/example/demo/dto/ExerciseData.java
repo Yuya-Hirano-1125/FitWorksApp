@@ -18,6 +18,16 @@ public class ExerciseData {
     public String getHowTo() { return howTo; }
     public String getPoints() { return points; }
 
+    // ★重要: HTML側が "description" という名前でデータを求めてくるため、howToを返すメソッドを追加
+    public String getDescription() {
+        return howTo;
+    }
+
+    // ★重要: HTML側が "tips" という名前でデータを求めてくるため、pointsを返すメソッドを追加
+    public String getTips() {
+        return points;
+    }
+
     // 表示用にフルネームを返す
     public String getFullName() {
         return name + " (" + difficulty + ")";

@@ -2,543 +2,326 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>近くのトレーニング施設を探す | Geoapify</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>近くのジムを探す</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-	
-	<script th:src="@{/js/theme.js}"></script>
-	<style> 
-        /* 基本スタイル */ 
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script th:src="@{/js/theme.js}"></script>
+
+    <style> 
         body { 
-            margin: 0; 
-            padding: 0; 
+            margin: 0; padding: 0; 
             font-family: 'Noto Sans JP', Arial, sans-serif; 
             background-color: #f4f4f4; 
         } 
         .main-container { 
-            padding: 0; 
-            width: 100%; 
-            min-height: 100vh;
-            position: relative; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 20px;
+            width: 100%; min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; padding-top: 20px;
         } 
 
-        /* ヘッダー周り (base.css準拠) */
-        .page-header {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        /* 検索バーのスタイル */
         .search-container {
-            width: 90%;
-            max-width: 600px;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            gap: 10px;
-            z-index: 1002;
-            position: relative;
+            width: 90%; max-width: 600px;
+            margin-top: 10px; margin-bottom: 10px;
+            display: flex; gap: 10px;
         }
         .search-input {
-            flex-grow: 1;
-            padding: 12px;
-            border-radius: 25px;
-            border: 1px solid #ddd;
+            flex-grow: 1; padding: 12px;
+            border-radius: 25px; border: 1px solid #ddd;
             font-size: 1rem;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            outline: none;
         }
         .search-button {
             background: var(--primary-color, #ff69b4);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
+            color: white; border: none;
+            padding: 10px 20px; border-radius: 25px;
+            cursor: pointer; font-weight: bold;
             white-space: nowrap;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: transform 0.1s;
         }
-        .search-button:active {
-            transform: scale(0.95);
+        .search-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
 
-        /* 地図コンテナ */ 
-		#map-container { 
-		    width: 90%; 
-		    max-width: 1200px; 
-		    height: 50vh; 
-		    min-height: 300px;
-		    position: relative; 
-		    margin: 10px auto; 
-		    border-radius: 15px; 
-		    box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-		    z-index: 1; 
-		}
-        #map { 
-            width: 100%; 
-            height: 100%; 
+        #map-container { 
+            width: 90%; max-width: 1200px;
+            height: 50vh; min-height: 300px;
             border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin: 10px auto;
+            position: relative;
         }
+        #map { width: 100%; height: 100%; border-radius: 15px; z-index: 1; }
         
-        /* 地図上の中心マーカー */
         .map-center-marker {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 20px;
-            height: 20px;
-            margin-top: -10px;
-            margin-left: -10px;
-            z-index: 1000;
-            pointer-events: none;
-            color: #ff4444;
-            font-size: 20px;
+            position: absolute; top: 50%; left: 50%;
+            width: 20px; height: 20px;
+            margin-top: -10px; margin-left: -10px;
+            z-index: 1000; pointer-events: none;
+            font-size: 20px; color: #ff4444;
             text-align: center;
             line-height: 20px;
-            text-shadow: 0 0 2px white;
+            text-shadow: 0 0 3px white;
         }
-        
-        /* ステータスメッセージ */ 
+
         #status-message { 
-            padding: 8px 15px; 
-            background: linear-gradient(135deg, #f0f0f0, #ffffff); 
-            border: 1px solid #ddd; 
-            border-radius: 20px; 
-            margin-top: 10px;
-            font-weight: 700; 
-            font-size: 0.9em; 
-            color: #2c3e50; 
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
-            text-align: center; 
-            max-width: 90%; 
+            padding: 8px 15px; background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 20px; margin-top: 10px;
+            font-weight: 700; color: #2c3e50;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            font-size: 0.9rem;
         } 
 
-        /* 検索結果リストエリア */ 
         #places-list { 
-            width: 90%; 
-            max-width: 1200px; 
-            height: 300px; 
-            background: #fff; 
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); 
-            padding: 10px; 
-            box-sizing: border-box; 
-            overflow-y: auto; 
+            width: 90%; max-width: 1200px;
+            height: 300px; background: #fff;
+            padding: 10px; border-radius: 10px;
+            overflow-y: auto;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             margin-bottom: 20px;
-            border-radius: 10px;
         } 
-        #places-list h2 { 
-            font-size: 1.1em; 
-            color: #4CAF50; 
-            border-bottom: 2px solid #eee; 
-            padding-bottom: 5px; 
-            margin: 0 0 10px; 
-        } 
-        #gym-results-ul { 
-            list-style: none; 
-            padding: 0; 
-            margin: 0; 
+        
+        #places-list h2 {
+            font-size: 1.2rem; margin: 0 0 10px 0; color: #333; border-bottom: 2px solid #eee; padding-bottom: 5px;
         }
 
-        /* リストアイテムのレイアウト */
-		#gym-results-ul li {
-	        display: flex;               
-	        justify-content: space-between; 
-	        align-items: center;         
-	        border-bottom: 1px solid #eee; 
-	        padding: 12px 5px;           
-            cursor: pointer;
-	    }
-        #gym-results-ul li:hover { 
-            background-color: #f9f9f9; 
+        #gym-results-ul {
+            list-style: none; padding: 0; margin: 0;
         }
 
-	    /* 左側の情報エリア */
-	    .place-info {
-            display: flex;       
-            align-items: flex-start;
-	        padding-right: 10px;
-            flex: 1; 
-	    }
-
-        /* 番号部分 */
-        .place-index {
-            display: inline-block;
-            min-width: 30px; 
-            font-weight: bold;
-            color: var(--dark-text, #333);
-            flex-shrink: 0;
+        #gym-results-ul li {
+            display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid #eee;
+            padding: 12px 5px; cursor: pointer;
+            transition: background 0.2s;
+        }
+        #gym-results-ul li:hover {
+            background-color: #f9f9f9;
         }
 
-        /* 名前と住所をまとめるコンテナ */
-        .place-content {
-            display: flex;
-            flex-direction: column;
+        .place-info {
+            flex-grow: 1;
         }
-
-        /* 名前部分 */
         .place-name {
-            font-weight: bold;
-            color: var(--dark-text, #333);
-            line-height: 1.3;
+            font-weight: bold; font-size: 1rem; color: #333; display: block;
         }
-        
-        /* 住所部分 */
-        .place-address {
-            color: #7f8c8d;
-            font-size: 0.85em;
-            margin-top: 3px;
+        .place-dist {
+            font-size: 0.85rem; color: #888;
         }
 
-        /* ルートボタン */
-	    .route-btn {
-	        background-color: #4CAF50;    
-	        color: #fff;
-	        padding: 8px 16px;            
-	        border-radius: 20px;          
-	        font-size: 0.85rem;
-	        font-weight: bold;
-	        text-decoration: none;        
-	        white-space: nowrap;          
-	        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-	        display: inline-flex;
-	        align-items: center;
-	        gap: 5px;   
-            flex-shrink: 0; 
-	    }
-	    .route-btn:active {
-	        transform: scale(0.98);       
-	    }
+        .route-btn {
+            background-color: #4CAF50; color: #fff;
+            padding: 8px 16px; border-radius: 20px;
+            font-size: 0.85rem; font-weight: bold;
+            display: inline-flex; align-items: center;
+            gap: 5px; text-decoration: none;
+            white-space: nowrap;
+        }
+        .route-btn:hover {
+            background-color: #45a049;
+        }
     </style>  
- </head>
-<body class="map-page">
+</head>
+<body>
 
-    <header th:replace="fragments/header :: header"></header>
+<div class="main-container">
+    <div th:replace="~{fragments/header :: header}"></div>
 
-    <div class="main-container">
-        
-        <h1><i class="fa-solid fa-map-location-dot header-icon"></i> 近くのトレーニング施設を探す</h1>
-        <p class="sub-heading">地図の中心周辺を検索します</p>
+    <h1><i class="fa-solid fa-map-location-dot"></i> 近くのトレーニング施設を探す</h1>
+    <p style="color: #666; font-size: 0.9rem;">地図を動かして中心（<i class="fa-solid fa-plus" style="color:red;"></i>）から半径5km以内を検索します</p>
 
-        <div class="search-container">
-            <input type="text" id="keyword-input" class="search-input" placeholder="施設名で検索 (例: エニタイム, 市民体育館)">
-            <button onclick="performSearch()" class="search-button">この場所で検索</button>
-        </div>
+    <div class="search-container">
+        <input type="text" id="keyword-input" class="search-input" placeholder="例: chocoZAP, Anytime, JOYFIT">
+        <button onclick="performSearch()" id="search-btn" class="search-button">この場所で検索</button>
+    </div>
 
-        <div id="status-message">現在地を取得中です...</div>
-        <div id="map-container">
-            <div id="map"></div>
-            <div class="map-center-marker"><i class="fa-solid fa-plus"></i></div>
-        </div>
-        
-        <div id="places-list">
-            <h2>地図中心周辺の施設</h2>
-            <ul id="gym-results-ul"></ul>
-        </div>
-        
-        <div class="container" style="margin-bottom: 30px; text-align: center;">
-            <a th:href="@{/home}" class="button secondary">
-                <i class="fa-solid fa-house"></i> ホームに戻る
-            </a>
-        </div>
+    <div id="status-message">現在地を取得中です...</div>
+
+    <div id="map-container">
+        <div id="map"></div>
+        <div class="map-center-marker"><i class="fa-solid fa-plus"></i></div>
+    </div>
+
+    <div id="places-list">
+        <h2>地図中心周辺の施設</h2>
+        <ul id="gym-results-ul">
+            <li style="color:#888; justify-content:center;">検索ボタンを押してください</li>
+        </ul>
     </div>
     
-    <footer th:replace="fragments/footer :: footer"></footer>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // --- グローバル変数 ---
+    let map;
+    let markersLayer;
+    const defaultLocation = [35.681236, 139.767125]; 
+    
+    // ★検索半径の設定 (メートル) - ここを5000に変更しました
+    const SEARCH_RADIUS_METERS = 5000;
 
-    <script>
-        // ---- APIキー ----
-        const GEOAPIFY_MAP_KEY = "0885a429c02d4b11b66f23cebd50b365"; 
-        const GEOAPIFY_PLACES_KEY = "1b287cca41c24370a70eec923dc99ab9"; 
+    // --- 1. 初期化処理 ---
+    document.addEventListener('DOMContentLoaded', () => {
+        map = L.map('map').setView(defaultLocation, 14);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        markersLayer = L.layerGroup().addTo(map);
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    map.setView([lat, lng], 13); // 半径が広いのでズームを少し引く(13)
+                    updateStatus("現在地を表示しました。検索ボタンを押してください。");
+                    
+                    L.circleMarker([lat, lng], {
+                        radius: 8, fillColor: "#3388ff", color: "#fff", weight: 2, fillOpacity: 0.8
+                    }).addTo(map).bindPopup("現在地");
+                },
+                (error) => {
+                    updateStatus("現在地を取得できませんでした。デフォルト位置を表示します。");
+                }
+            );
+        } else {
+            updateStatus("お使いのブラウザは位置情報をサポートしていません。");
+        }
+    });
+
+    // --- 2. ステータス更新 ---
+    function updateStatus(msg) {
+        document.getElementById('status-message').textContent = msg;
+    }
+
+    // --- 3. 検索実行関数 ---
+    async function performSearch() {
+        const center = map.getCenter();
+        const keyword = document.getElementById('keyword-input').value.trim();
+        const searchBtn = document.getElementById('search-btn');
+        const resultsUl = document.getElementById('gym-results-ul');
+
+        searchBtn.disabled = true;
+        searchBtn.textContent = "検索中...";
+        updateStatus(`中心から半径${SEARCH_RADIUS_METERS/1000}km以内を検索しています...`);
+        resultsUl.innerHTML = '<li style="justify-content:center;"><i class="fa-solid fa-spinner fa-spin"></i> 検索中...</li>';
         
-        let map;
-        let currentLat = 35.681236; // デフォルト：東京
-        let currentLon = 139.767125;
-        let userLocation = null;
+        markersLayer.clearLayers();
 
-        const statusMessage = document.getElementById('status-message');
-        const gymMarkers = [];
-        
-        const gymIcon = L.icon({
-            iconUrl: `https://api.geoapify.com/v1/icon/?type=awesome&color=%23d9534f&icon=dumbbell&apiKey=${GEOAPIFY_MAP_KEY}`,
-            iconSize: [31, 46], 
-            iconAnchor: [15, 46], 
-            popupAnchor: [0, -46] 
-        });
-
-        function getLocationAndInitMap() {
-            if (!GEOAPIFY_MAP_KEY || !GEOAPIFY_PLACES_KEY) { 
-                statusMessage.textContent = "APIキー設定エラー";
-                initMap({ lat: currentLat, lon: currentLon });
-                return;
+        try {
+            // Overpass APIクエリ
+            // around:5000 (5km) に設定
+            let nameFilter = "";
+            if (keyword) {
+                nameFilter = `[~"name"~"${keyword}",i]`;
             }
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        currentLat = position.coords.latitude;
-                        currentLon = position.coords.longitude;
-                        userLocation = { lat: currentLat, lon: currentLon };
-                        
-                        statusMessage.textContent = "現在地を取得しました。周辺を検索中...";
-                        initMap({ lat: currentLat, lon: currentLon });
-                        searchNearbyPlaces();
-                    },
-                    (error) => {
-                        console.warn("Geolocation Warning:", error);
-                        handleLocationError(error);
-                    },
-                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+            const query = `
+                [out:json][timeout:25];
+                (
+                  node["leisure"="fitness_centre"]${nameFilter}(around:${SEARCH_RADIUS_METERS},${center.lat},${center.lng});
+                  way["leisure"="fitness_centre"]${nameFilter}(around:${SEARCH_RADIUS_METERS},${center.lat},${center.lng});
+                  node["sport"="fitness"]${nameFilter}(around:${SEARCH_RADIUS_METERS},${center.lat},${center.lng});
                 );
-            } else {
-                handleLocationError(null);
-            }
-        }
+                out center;
+            `;
 
-        function handleLocationError(error) {
-            statusMessage.textContent = "位置情報を取得できませんでした。東京駅周辺を表示します。";
-            initMap({ lat: currentLat, lon: currentLon });
-            searchNearbyPlaces();
-        }
-
-        function initMap(position) {
-            if(map) return;
-
-            map = L.map('map').setView([position.lat, position.lon], 14);
-	
-            L.tileLayer(
-                `https://maps.geoapify.com/v1/tile/carto/{z}/{x}/{y}.png?&apiKey=${GEOAPIFY_MAP_KEY}`,
-                {
-                    maxZoom: 20,
-                    attribution: 'Powered by Geoapify | © OpenStreetMap contributors'
-                }
-            ).addTo(map);
-
-            if (userLocation) {
-                L.marker([userLocation.lat, userLocation.lon], { 
-                    icon: L.divIcon({
-                        className: 'current-location-marker',
-                        html: '<div style="background-color:#007bff; width:12px; height:12px; border-radius:50%; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>',
-                        iconSize: [16, 16],
-                        iconAnchor: [8, 8]
-                    }) 
-                }) 
-                .bindPopup("<b>あなたの現在地</b>")
-                .addTo(map);
-            }
-
-            map.on('moveend', function() {
-                statusMessage.textContent = "地図中心で検索するには「検索」ボタンを押してください";
+            const response = await fetch('https://overpass-api.de/api/interpreter', {
+                method: 'POST',
+                body: query
             });
+
+            if (!response.ok) throw new Error("API Error");
+
+            const data = await response.json();
+            displayResults(data.elements, center);
+
+        } catch (error) {
+            console.error(error);
+            updateStatus("検索中にエラーが発生しました。");
+            resultsUl.innerHTML = '<li style="color:red; justify-content:center;">エラーが発生しました。再試行してください。</li>';
+        } finally {
+            searchBtn.disabled = false;
+            searchBtn.textContent = "この場所で検索";
+        }
+    }
+
+    // --- 4. 結果表示処理 ---
+    function displayResults(elements, center) {
+        const resultsUl = document.getElementById('gym-results-ul');
+        resultsUl.innerHTML = "";
+
+        if (elements.length === 0) {
+            updateStatus("この周辺に施設は見つかりませんでした。");
+            resultsUl.innerHTML = '<li style="justify-content:center;">見つかりませんでした。<br>地図を移動して再度検索してください。</li>';
+            return;
         }
 
-        function performSearch() {
-            const keyword = document.getElementById('keyword-input').value;
-            searchNearbyPlaces(keyword);
-        }
+        updateStatus(`${elements.length} 件の施設が見つかりました。`);
 
-		async function searchNearbyPlaces(keyword = "") {
-            if (map) {
-                const center = map.getCenter();
-                currentLat = center.lat;
-                currentLon = center.lng; 
-            }
+        // 距離順にソート (近い順)
+        const sortedElements = elements.map(element => {
+            const lat = element.lat || element.center.lat;
+            const lon = element.lon || element.center.lon;
+            const dist = getDistanceFromLatLonInKm(center.lat, center.lng, lat, lon);
+            return { ...element, lat, lon, dist };
+        }).sort((a, b) => a.dist - b.dist);
 
-            const radius = 10000; 
-			// フィットネスジム + スポーツセンター（複合施設を含む）
-			const searchCategory = "sport.fitness,sport.sports_centre";
-			
-            let url =
-			    `https://api.geoapify.com/v2/places?` +
-			    `categories=${searchCategory}` +
-			    `&filter=circle:${currentLon},${currentLat},${radius}` +
-			    `&bias=proximity:${currentLon},${currentLat}` +
-			    `&limit=60` + 
-			    `&lang=ja` + 
-			    `&apiKey=${GEOAPIFY_PLACES_KEY}`;
+        sortedElements.forEach(element => {
+            const name = element.tags.name || "名称不明のジム";
+            const distStr = element.dist.toFixed(2);
 
-            if (keyword && keyword.trim() !== "") {
-                url += `&name=${encodeURIComponent(keyword.trim())}`;
-                statusMessage.textContent = `「${keyword}」を検索中...`;
-            } else {
-                statusMessage.textContent = "周辺のトレーニング施設を検索中...";
-            }
+            // マーカー
+            const marker = L.marker([element.lat, element.lon])
+                .bindPopup(`<b>${name}</b><br>距離: ${distStr}km`)
+                .addTo(markersLayer);
 
-		    console.log("Requesting URL:", url);
-
-		    try {
-		        const response = await fetch(url);
-		        
-		        if (!response.ok) {
-		            statusMessage.textContent = `検索エラー: ${response.status}`;
-                    console.error("API Error:", await response.text());
-		            return;
-		        }
-
-		        const data = await response.json();
-                
-                // ▼▼▼ フィルタリングの緩和 ▼▼▼
-                // 「運動場」「武道館」「道場」なども検索対象として許可するため、除外リストから削除しました。
-                // 明らかにトレーニングジムと異なる業態のみを除外します。
-                const excludeKeywords = [
-                    "ヨガ", "yoga", "ピラティス", "pilates", "ダンス", "dance", "バレエ", 
-                    "整骨院", "接骨院", "鍼灸", "クリニック", "病院", "薬局", "dental"
-                ];
-                
-                let filteredFeatures = [];
-                if (data.features && Array.isArray(data.features)) {
-                    filteredFeatures = data.features.filter(feature => {
-                        const props = feature.properties || {};
-                        const name = (props.name || "").toLowerCase();
-                        
-                        if (!name) return true;
-
-                        for (const kw of excludeKeywords) {
-                            if (name.includes(kw.toLowerCase())) return false;
-                        }
-                        return true;
-                    });
-                }
-                // ▲▲▲ 修正ここまで ▲▲▲
-
-		        if (filteredFeatures.length === 0) {
-		            statusMessage.textContent = keyword ? `「${keyword}」は見つかりませんでした。` : "条件に合う施設は見つかりませんでした。";
-                    document.getElementById('gym-results-ul').innerHTML = '<li style="text-align:center; color:#777;">見つかりませんでした</li>';
-                    gymMarkers.forEach(marker => map.removeLayer(marker));
-		            return;
-		        }
-
-		        statusMessage.textContent = `${filteredFeatures.length} 件見つかりました！`;
-		        addPlacesToMap(filteredFeatures);
-
-		    } catch (error) {
-		        statusMessage.textContent = "通信エラーが発生しました。";
-		        console.error(error);
-		    }
-		}
-
-        function getPlaceName(props) {
-            if (props.name) return props.name;
-            if (props.address_line1) return props.address_line1;
-            return "トレーニング施設";
-        }
-
-        function formatJapaneseAddress(props) {
-            let parts = [];
-            if (props.state) parts.push(props.state);
-            if (props.county && props.county !== props.state && props.county !== props.city) {
-                parts.push(props.county);
-            }
-            if (props.city) {
-                const last = parts[parts.length - 1];
-                if (last !== props.city) parts.push(props.city);
-            }
-            const localArea = props.suburb || props.district || props.quarter;
-            if (localArea) {
-                const last = parts[parts.length - 1];
-                if (last !== localArea) parts.push(localArea);
-            }
-            if (props.street) {
-                const last = parts[parts.length - 1];
-                if (last !== props.street) parts.push(props.street);
-            }
-            if (props.housenumber) {
-                parts.push(props.housenumber);
-            }
-
-            let fullAddress = parts.join("");
-
-            if (fullAddress.length < 5 && (props.formatted || props.address_line2)) {
-                let raw = props.formatted || props.address_line2;
-                if (raw.includes(",")) {
-                     fullAddress = raw.split(",")
-                        .map(s => s.trim())
-                        .reverse()
-                        .filter(s => s !== "日本" && s !== "Japan")
-                        .join("");
-                } else {
-                    fullAddress = raw;
-                }
-            }
+            // リスト
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <div class="place-info">
+                    <span class="place-name">${name}</span>
+                    <span class="place-dist"><i class="fa-solid fa-location-arrow"></i> 直線距離: ${distStr} km</span>
+                </div>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${element.lat},${element.lon}" target="_blank" class="route-btn">
+                    <i class="fa-solid fa-diamond-turn-right"></i> ルート
+                </a>
+            `;
             
-            if (props.postcode) {
-                return "〒" + props.postcode.split(';')[0] + " " + fullAddress;
-            }
-            return fullAddress;
-        }
-
-        function addPlacesToMap(features) {
-            gymMarkers.forEach(marker => map.removeLayer(marker));
-            gymMarkers.length = 0;
-
-            const resultsList = document.getElementById('gym-results-ul');
-            resultsList.innerHTML = '';
-
-            features.forEach((feature, index) => {
-                const coordinates = feature.geometry.coordinates;
-                const lat = coordinates[1];
-                const lon = coordinates[0];
-
-                const name = getPlaceName(feature.properties);
-                const address = formatJapaneseAddress(feature.properties);
-
-                let googleMapsUrl;
-                if (userLocation) {
-                    googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lon}&destination=${lat},${lon}`;
-                } else {
-                    googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-                }
-
-                const popupContent = `
-                    <div style="max-width: 200px; padding: 5px;">
-                        <h4 style="margin: 0 0 5px; font-size: 1.1em; color: #2c3e50;">${name}</h4>
-                        <p style="margin: 0 0 10px; font-size: 0.9em; color: #7f8c8d;">${address}</p>
-                        <a href="${googleMapsUrl}" target="_blank"
-                           style="color: #4CAF50; text-decoration: none; font-weight: bold;">
-                           <i class="fa-solid fa-route"></i> ルート案内
-                        </a>
-                    </div>
-                `;
-
-                const marker = L.marker([lat, lon], { icon: gymIcon })
-                    .bindPopup(popupContent);
-
-                marker.addTo(map);
-                gymMarkers.push(marker);
-
-                const listItem = document.createElement('li');
-				listItem.innerHTML = `
-				    <div class="place-info">
-                        <span class="place-index">${index + 1}.</span>
-                        <div class="place-content">
-                            <span class="place-name">${name}</span>
-                            <small class="place-address">${address}</small>
-                        </div>
-				    </div>
-				    <a href="${googleMapsUrl}" target="_blank" class="route-btn">
-				        <i class="fa-solid fa-location-arrow"></i> ルート
-				    </a>
-				`;
-
-                resultsList.appendChild(listItem);
-
-                listItem.addEventListener('click', () => {
-                    map.flyTo([lat, lon], 15);
-                    marker.openPopup();
-                });
+            li.querySelector('.place-info').addEventListener('click', () => {
+                map.setView([element.lat, element.lon], 16);
+                marker.openPopup();
             });
-        }
 
-        window.onload = getLocationAndInitMap;
-    </script>
+            resultsUl.appendChild(li);
+        });
+    }
+
+    // 2点間の距離 (Haversine)
+    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+        const R = 6371; 
+        const dLat = deg2rad(lat2 - lat1);
+        const dLon = deg2rad(lon2 - lon1);
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        return R * c;
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI/180)
+    }
+</script>
+
 </body>
 </html>

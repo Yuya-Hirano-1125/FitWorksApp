@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>処方箋 | FitWorks</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body { background-color: #f0f4f8; }
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        
+        .result-header { text-align: center; margin-bottom: 20px; }
+        .result-header h2 { color: #333; font-size: 1.4rem; }
+        
+        .result-card {
+            background: #fff; 
+            border-radius: 20px; 
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            margin-bottom: 25px;
+        }
+        
+        .ai-bubble {
+            background: #e8f5e9; 
+            border-radius: 15px; 
+            padding: 18px;
+            position: relative; 
+            margin-bottom: 20px; 
+            color: #2e7d32;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        .ai-bubble::before {
+            content: '';
+            position: absolute;
+            top: -10px; left: 20px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid #e8f5e9;
+        }
+        
+        .exercise-box {
+            border: 2px dashed #a5d6a7; 
+            border-radius: 12px; 
+            padding: 15px; 
+            margin-top: 15px;
+            background-color: #fafafa;
+        }
+        .exercise-title {
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            color: #333;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .exercise-desc {
+            font-size: 0.9rem; 
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .exercise-tips {
+            background: #fff3e0; 
+            padding: 10px; 
+            border-radius: 8px; 
+            font-size: 0.85rem; 
+            color: #e65100;
+            display: flex;
+            align-items: flex-start;
+        }
+        .exercise-tips i { margin-right: 6px; margin-top: 3px; }
+
+        .btn-complete {
+            display: block; 
+            width: 100%; 
+            padding: 16px;
+            background: linear-gradient(45deg, #4caf50, #81c784);
+            color: white; 
+            border: none; 
+            border-radius: 50px;
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+            transition: transform 0.2s;
+        }
+        .btn-complete:active { transform: scale(0.98); }
+        
+        .note {
+            text-align: center; margin-top: 15px; 
+            font-size: 0.8rem; color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="container">
+        <div class="result-header">
+            <h2>AIトレーナーからの処方箋</h2>
+            <p style="font-size:0.9rem; color:#666;" th:text="'症状: ' + ${symptom}"></p>
+        </div>
+
+        <div class="result-card">
+            <div class="ai-bubble">
+                <strong style="display:block; margin-bottom:5px; color:#1b5e20;">
+                    <i class="fa-solid fa-robot"></i> アドバイス
+                </strong>
+                <span th:text="${aiAdvice != null ? aiAdvice : '現在AIサービスが混み合っていますが、こちらのケアがおすすめです！'}">読み込み中...</span>
+            </div>
+
+            <div class="exercise-box" th:if="${suggestedExercise != null}">
+                <div class="exercise-title">
+                    <i class="fa-solid fa-check-circle" style="color:#4caf50;"></i>
+                    <span th:text="${suggestedExercise.fullName}">種目名</span>
+                </div>
+                <p class="exercise-desc" th:text="${suggestedExercise.description}">
+                    やり方の説明
+                </p>
+                <div class="exercise-tips">
+                    <i class="fa-regular fa-lightbulb"></i>
+                    <span th:text="${suggestedExercise.tips}">コツ</span>
+                </div>
+            </div>
+            
+            <div class="exercise-box" th:if="${suggestedExercise == null}">
+                <p>ゆっくり深呼吸をして、目を閉じてリラックスしましょう。</p>
+            </div>
+        </div>
+
+        <form th:action="@{/training-log/save}" method="post" th:object="${trainingLogForm}">
+            <input type="hidden" th:field="*{recordDate}">
+            <input type="hidden" th:field="*{type}">
+            <input type="hidden" th:field="*{exerciseName}">
+            <input type="hidden" th:field="*{sets}">
+            <input type="hidden" th:field="*{reps}">
+            <input type="hidden" th:field="*{weight}">
+
+            <button type="submit" class="btn-complete">
+                <i class="fa-solid fa-heart-pulse"></i> ケアを実践して記録 (XP獲得)
+            </button>
+        </form>
+        
+        <p class="note">※無理に動く必要はありません。深呼吸だけでも立派なケアです。</p>
+        
+        <div style="text-align:center; margin-top:20px;">
+             <a th:href="@{/training/care}" style="color:#888; font-size:0.9rem;">戻る</a>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

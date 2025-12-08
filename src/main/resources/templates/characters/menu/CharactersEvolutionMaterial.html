@@ -2,109 +2,40 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>進化素材一覧 | FitWorks</title>
+    <title>素材一覧 | FitWorks</title>
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/characters/CharactersEvolutionMaterial.css}">
 </head>
 <body>
 <div class="main-container">
     <div class="header-section">
-        <h1>進化素材一覧</h1>
-        <p class="sub-heading">モンスター進化に必要な素材を確認できます</p>
+        <h1>素材一覧</h1>
+        <p class="sub-heading">ガチャから出る素材を確認できます</p>
     </div>
 
-    <!-- R素材 -->
-    <section class="material-section rarity-r">
-        <h2>R素材</h2>
-        <div class="material-list">
-            <div class="material-card">
-                <img th:src="@{/img/item/R-red.png}" alt="赤の結晶">
-                <p class="material-name">紅玉</p>
-                <p class="material-count">2/5</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/R-blue.png}" alt="青の結晶">
-                <p class="material-name">蒼玉</p>
-                <p class="material-count">1/5</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/R-green.png}" alt="緑の結晶">
-                <p class="material-name">翠玉</p>
-                <p class="material-count">4/5</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/R-yellow.png}" alt="黄の結晶">
-                <p class="material-name">聖玉</p>
-                <p class="material-count">3/5</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/R-purple.png}" alt="紫の結晶">
-                <p class="material-name">闇玉</p>
-                <p class="material-count">0/5</p>
-            </div>
-        </div>
+    <!-- デバッグ用：itemsの中身を直接表示 -->
+    <section class="debug-section">
+        <h2>デバッグ出力</h2>
+        <p th:text="${items}"></p>
     </section>
 
-    <!-- SR素材 -->
-    <section class="material-section rarity-sr">
-        <h2>SR素材</h2>
+    <!-- 素材一覧（全アイテムをループ表示） -->
+    <section class="material-section">
+        <h2>素材一覧</h2>
         <div class="material-list">
-            <div class="material-card">
-                <img th:src="@{/img/item/SR-red.png}" alt="赤の聖結晶">
-                <p class="material-name">赤の聖結晶</p>
-                <p class="material-count">1/3</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/SR-blue.png}" alt="青の聖結晶">
-                <p class="material-name">青の聖結晶</p>
-                <p class="material-count">2/3</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/SR-green.png}" alt="緑の聖結晶">
-                <p class="material-name">緑の聖結晶</p>
-                <p class="material-count">0/3</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/SR-yellow.png}" alt="黄の聖結晶">
-                <p class="material-name">黄の聖結晶</p>
-                <p class="material-count">3/3</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/SR-purple.png}" alt="紫の聖結晶">
-                <p class="material-name">紫の聖結晶</p>
-                <p class="material-count">1/3</p>
-            </div>
-        </div>
-    </section>
+            <!-- Controllerから渡された items をループ -->
+            <div th:each="item : ${items}" 
+                 th:class="'material-card rarity-' + ${item.type?.toLowerCase()}">
+                 
+                <!-- デバッグ用：ループが回っているか確認 -->
+                <p>DEBUG: <span th:text="${item.name}"></span> |
+                          <span th:text="${item.imagePath}"></span> |
+                          <span th:text="${item.count}"></span></p>
 
-    <!-- SSR素材 -->
-    <section class="material-section rarity-ssr">
-        <h2>SSR素材</h2>
-        <div class="material-list">
-            <div class="material-card">
-                <img th:src="@{/img/item/SSR-red.png}" alt="赤の至高結晶">
-                <p class="material-name">赫焔鱗</p>
-                <p class="material-count">0/2</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/SSR-blue.png}" alt="青の至高結晶">
-                <p class="material-name">氷華の杖</p>
-                <p class="material-count">1/2</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/SSR-green.png}" alt="緑の至高結晶">
-                <p class="material-name">緑晶灯</p>
-                <p class="material-count">2/2</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/SSR-yellow.png}" alt="黄の至高結晶">
-                <p class="material-name">夢紡ぎの枕</p>
-                <p class="material-count">1/2</p>
-            </div>
-            <div class="material-card">
-                <img th:src="@{/img/item/SSR-purple.png}" alt="紫の至高結晶">
-                <p class="material-name">月詠みの杖</p>
-                <p class="material-count">0/2</p>
+                <!-- 本来の表示 -->
+                <img th:src="${item.imagePath}" th:alt="${item.name}">
+                <p class="material-name" th:text="${item.name}"></p>
+                <p class="material-count" th:text="${item.count}"></p>
             </div>
         </div>
     </section>
