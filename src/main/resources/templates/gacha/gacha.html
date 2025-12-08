@@ -200,6 +200,13 @@
                 <tr><td><span class="rarity-badge rarity-R">R</span></td><td>布の鎧</td><td>8.94%</td></tr>
             </tbody>
         </table>
+        <!-- レア度ごとの合計確率（右寄せ） -->
+        <div class="rarity-summary">
+            <p>UR：2.35%</p>
+            <p>SSR：17.65%</p>
+            <p>SR：32.95%</p>
+            <p>R：44.70%</p>
+        </div>
         <!-- 合計確率を表示 -->
         <p class="total-rate">合計確率：100%</p>
     </div>
@@ -220,7 +227,7 @@
         border-collapse: collapse;
         font-size: 1.2rem;
         line-height: 1.6;
-        color: #fff; /* テーブル文字を白 */
+        color: #fff;
     }
     .rate-table th, .rate-table td {
         padding: 16px;
@@ -231,6 +238,15 @@
         color: var(--primary-color);
         font-weight: 700;
         font-size: 1.3rem;
+    }
+    .rarity-summary {
+        margin-top: 15px;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        text-align: right; /* 右寄せに変更 */
+    }
+    .rarity-summary p {
+        margin: 2px 0;
     }
     .total-rate {
         text-align: right;
