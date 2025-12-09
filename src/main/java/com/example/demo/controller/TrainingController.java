@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.DailyChartData;
+import com.example.demo.dto.ExerciseData; // ★追加：ExerciseData DTOのimport
 import com.example.demo.dto.TrainingLogForm;
 import com.example.demo.entity.BodyWeightRecord;
 import com.example.demo.entity.ExerciseBookmark;
@@ -99,6 +100,80 @@ public class TrainingController {
             this.logs = logs;
         }
     }
+    
+    // =======================================================
+    // ★追加: AIクリニック・ケアメニュー画面の表示
+    // =======================================================
+    @GetMapping("/training/care")
+    public String showCareMenu(Authentication authentication) {
+        if (getCurrentUser(authentication) == null) return "redirect:/login";
+        return "training/care-menu";
+    }
+
+    // =======================================================
+    // ★追加: AIクリニック・ケアアドバイスの処理（フォームPOSTハンドラ）
+    // =======================================================
+    @PostMapping("/training/care/advice")
+    public String getCareAdvice(
+            @RequestParam("symptom") String symptom,
+            Authentication authentication,
+            Model model) {
+
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) return "redirect:/login";
+
+        String aiAdvice = null;
+        ExerciseData suggestedExercise = null; // ExerciseData DTO
+
+        try {
+            // 1. 推奨するケア種目名を取得 (TrainingLogicServiceに依存)
+            String recommendedExerciseName = trainingLogicService.selectCareExercise(symptom);
+
+            // 2. AI Adviceを取得 (AICoachServiceに依存)
+            // ユーザー情報と症状、推奨種目名を渡す
+            aiAdvice = aiCoachService.generateCareAdvice(currentUser, symptom, recommendedExerciseName);
+            
+            // 3. 推奨種目の詳細データ (ExerciseData DTO) を取得
+            if (recommendedExerciseName != null) {
+                suggestedExercise = trainingDataService.getExerciseDataByName(recommendedExerciseName);
+            }
+            
+        } catch (Exception e) {
+            System.err.println("AI Care Advice Error: " + e.getMessage());
+            // AIサービスエラー時も画面遷移はさせる
+            aiAdvice = "現在AIサービスが混み合っています。ゆっくり深呼吸してリラックスしましょう。";
+        }
+
+        // 4. モデルにデータをセット（care-result.htmlで必要）
+        model.addAttribute("symptom", symptom);
+        model.addAttribute("aiAdvice", aiAdvice);
+        model.addAttribute("suggestedExercise", suggestedExercise); 
+        
+        // 5. 記録フォーム用のデータもセット
+        TrainingLogForm logForm = new TrainingLogForm();
+        logForm.setRecordDate(LocalDate.now());
+        logForm.setType("CARE"); // ケアログとして記録
+        if(suggestedExercise != null) {
+            logForm.setExerciseName(suggestedExercise.getFullName());
+            logForm.setSets(1);
+            logForm.setReps(10); 
+            logForm.setWeight(0.0);
+        } else {
+            // 種目が見つからない場合は、最低限の記録情報をセット
+            logForm.setExerciseName(symptom + "ケア");
+            logForm.setSets(1);
+            logForm.setReps(1);
+            logForm.setWeight(0.0);
+        }
+        model.addAttribute("trainingLogForm", logForm);
+
+        // 6. 結果画面へ遷移
+        return "training/care-result";
+    }
+    // =======================================================
+    // ★追加箇所 終わり
+    // =======================================================
+
 
     @GetMapping("/training")
     public String showTrainingOptions(Authentication authentication, Model model) {
@@ -284,10 +359,10 @@ public class TrainingController {
         int earnedXP = 0;
         String trainingSummary = ""; 
 
-        if ("WEIGHT".equals(form.getType())) {
+        if ("WEIGHT".equals(form.getType()) || "CARE".equals(form.getType())) { // CAREログもここで処理
             exerciseIdentifier = form.getExerciseName();
-            trainingSummary = form.getExerciseName() + " (筋トレ)";
-            if (form.getSetList() != null && !form.getSetList().isEmpty()) {
+            trainingSummary = form.getExerciseName() + ("CARE".equals(form.getType()) ? " (AIケア)" : " (筋トレ)");
+            if (form.getSetList() != null && !form.getSetList().isEmpty() && !"CARE".equals(form.getType())) { // CAREは一括処理しない
                 for (TrainingLogForm.SetDetail detail : form.getSetList()) {
                     if (detail.getWeight() != null || detail.getReps() != null) {
                         TrainingRecord record = new TrainingRecord();
@@ -343,6 +418,8 @@ public class TrainingController {
                 additionalXp = trainingLogicService.calculateTotalVolumeXp(form);
             } else if ("CARDIO".equals(form.getType()) && form.getDurationMinutes() != null) {
                 additionalXp = form.getDurationMinutes();
+            } else if ("CARE".equals(form.getType())) { // CAREログのXP計算（固定値または独自のロジック）
+                additionalXp = 20; // ケアログ固定XP仮設定
             }
             earnedXP = baseDifficultyXp + additionalXp;
         }
@@ -351,7 +428,7 @@ public class TrainingController {
             levelService.addXpAndCheckLevelUp(currentUser, earnedXP); // XP加算とレベルアップ処理
             userRepository.save(currentUser); // データベースに保存
 
-            String message = form.getRecordDate().toString() + " の記録を保存し、" + earnedXP + " XPを獲得しました！";
+            String message = form.getRecordDate().toString() + trainingSummary + " の記録を保存し、" + earnedXP + " XPを獲得しました！";
             redirectAttributes.addFlashAttribute("successMessage", message);
         } else {
             redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " の記録を保存しました！");
@@ -371,6 +448,10 @@ public class TrainingController {
         }
 
         LocalDate recordedDate = form.getRecordDate();
+        // CAREログ保存後のリダイレクト先を調整
+        if ("CARE".equals(form.getType())) {
+             return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
+        }
         return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
     }
     
