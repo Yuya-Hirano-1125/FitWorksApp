@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -23,7 +24,7 @@ public class MaterialController {
     // ログインユーザーごとの素材一覧を表示
     @GetMapping("/characters/menu/CharactersEvolutionMaterial")
     public String showMaterials(Model model, @AuthenticationPrincipal CustomUserDetails user) {
-        // ★ 修正: 未ログイン時はログインページへリダイレクト
+        // 未ログイン時はログインページへリダイレクト
         if (user == null) {
             return "redirect:/login";
         }
@@ -34,7 +35,7 @@ public class MaterialController {
         // Repositoryからユーザーの所持数を登録順で取得
         List<ItemCountDTO> items = itemRepository.findItemCountsByUserId(userId);
 
-        // デバッグ出力：取得件数と中身を確認
+        // デバッグ出力
         System.out.println("ログインユーザーID: " + userId);
         System.out.println("取得したアイテム数: " + items.size());
         for (ItemCountDTO item : items) {
@@ -44,8 +45,19 @@ public class MaterialController {
                 + ", rarity=" + item.getRarity());
         }
 
-        // テンプレートに渡す
-        model.addAttribute("items", items);
+        // レアリティごとにフィルタリングして渡す
+        model.addAttribute("itemsR", items.stream()
+                .filter(i -> "R".equals(i.getRarity()))
+                .collect(Collectors.toList()));
+        model.addAttribute("itemsSR", items.stream()
+                .filter(i -> "SR".equals(i.getRarity()))
+                .collect(Collectors.toList()));
+        model.addAttribute("itemsSSR", items.stream()
+                .filter(i -> "SSR".equals(i.getRarity()))
+                .collect(Collectors.toList()));
+        model.addAttribute("itemsUR", items.stream()
+                .filter(i -> "UR".equals(i.getRarity()))
+                .collect(Collectors.toList()));
 
         // Thymeleafテンプレートを返す
         return "characters/menu/CharactersEvolutionMaterial";
