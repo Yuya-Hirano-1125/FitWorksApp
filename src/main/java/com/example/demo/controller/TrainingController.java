@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.DailyChartData;
-import com.example.demo.dto.ExerciseData;
 import com.example.demo.dto.TrainingLogForm;
 import com.example.demo.entity.BodyWeightRecord;
 import com.example.demo.entity.ExerciseBookmark;
@@ -39,6 +38,7 @@ import com.example.demo.repository.MySetRepository;
 import com.example.demo.repository.TrainingRecordRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AICoachService;
+import com.example.demo.service.LevelService;
 import com.example.demo.service.MissionService;
 import com.example.demo.service.TrainingDataService;
 import com.example.demo.service.TrainingLogicService;
@@ -58,7 +58,8 @@ public class TrainingController {
     private final TrainingLogicService trainingLogicService;
     private final BodyWeightRecordRepository bodyWeightRecordRepository;
     private final AICoachService aiCoachService;
-
+    @Autowired
+    private LevelService levelService;
     @Autowired
     public TrainingController(UserService userService,
                               UserRepository userRepository,
@@ -89,81 +90,14 @@ public class TrainingController {
     
     public static class BatchTrainingLogForm {
         private List<TrainingLogForm> logs;
-        public List<TrainingLogForm> getLogs() { return logs; }
-        public void setLogs(List<TrainingLogForm> logs) { this.logs = logs; }
-    }
 
-    // --- ★AIクリニック（コンディショニング）機能 ---
-
-    @GetMapping("/training/care")
-    public String showCareMenu(Authentication authentication, Model model) {
-        if (getCurrentUser(authentication) == null) return "redirect:/login";
-        return "training/care-menu";
-    }
-
-    @PostMapping("/training/care/advice")
-    public String generateCareAdvice(
-            @RequestParam("symptom") String symptom,
-            Authentication authentication,
-            Model model) {
-        
-        User user = getCurrentUser(authentication);
-        if (user == null) return "redirect:/login";
-
-        // 1. AIによるアドバイス生成（★安全装置付き）
-        String advice;
-        try {
-            advice = aiCoachService.generateConditioningAdvice(user, symptom);
-        } catch (Exception e) {
-            e.printStackTrace();
-            // エラー時はデフォルトメッセージを設定
-            advice = "現在AIサービスが混み合っており、アドバイスを取得できませんでした。しかし、あなたの体調に合わせて以下のケアをおすすめします。無理せずリラックスして行ってくださいね。";
-        }
-        
-        // 2. 症状に合わせたケア種目の選定
-        List<ExerciseData> careList = trainingDataService.getRecoveryExercises();
-        ExerciseData suggestedExercise = null;
-
-        if (careList != null && !careList.isEmpty()) {
-            String keyword = "ストレッチ"; // デフォルト
-            
-            if (symptom.contains("目") || symptom.contains("眼")) {
-                keyword = "眼球"; 
-            } else if (symptom.contains("肩") || symptom.contains("首")) {
-                keyword = "首";
-            } else if (symptom.contains("腰") || symptom.contains("背中")) {
-                keyword = "キャット"; 
-            } else if (symptom.contains("ダル") || symptom.contains("倦怠感")) {
-                keyword = "チャイルド"; 
-            } else if (symptom.contains("眠") || symptom.contains("休")) {
-                keyword = "ホット"; 
-            } else if (symptom.contains("ストレス") || symptom.contains("イライラ")) {
-                keyword = "フォームローラー"; 
-            }
-
-            final String target = keyword;
-            suggestedExercise = careList.stream()
-                .filter(e -> e.getFullName().contains(target))
-                .findFirst()
-                .orElse(careList.get(0));
+        public List<TrainingLogForm> getLogs() {
+            return logs;
         }
 
-        TrainingLogForm form = new TrainingLogForm();
-        form.setRecordDate(LocalDate.now());
-        form.setType("BODY_WEIGHT"); 
-        if (suggestedExercise != null) {
-            form.setExerciseName(suggestedExercise.getFullName() + "(ケア)");
-            form.setSets(1);
-            form.setReps(1);
-            form.setWeight(0.0);
+        public void setLogs(List<TrainingLogForm> logs) {
+            this.logs = logs;
         }
-
-        model.addAttribute("symptom", symptom);
-        model.addAttribute("aiAdvice", advice);
-        model.addAttribute("suggestedExercise", suggestedExercise);
-        model.addAttribute("trainingLogForm", form); 
-
-        return "training/care-result";
     }
 
     @GetMapping("/training")
@@ -399,13 +333,7 @@ public class TrainingController {
             record.setWeight(form.getWeight());
             bodyWeightRecordRepository.save(record);
             savedCount = 1;
-            
-            if (form.getExerciseName() != null && form.getExerciseName().contains("(ケア)")) {
-                earnedXP = 50; 
-                trainingSummary = form.getExerciseName();
-            } else {
-                earnedXP = 10;
-            }
+            earnedXP = 10;
         }
 
         if (savedCount > 0 && exerciseIdentifier != null) {
@@ -420,17 +348,20 @@ public class TrainingController {
         }
 
         if (earnedXP > 0) {
-            int newTotalXp = currentUser.getXp() + earnedXP;
-            currentUser.setXp(newTotalXp);
-            userRepository.save(currentUser);
-            redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " の記録を保存し、" + earnedXP + " XPを獲得しました！");
+            levelService.addXpAndCheckLevelUp(currentUser, earnedXP); // XP加算とレベルアップ処理
+            userRepository.save(currentUser); // データベースに保存
+
+            String message = form.getRecordDate().toString() + " の記録を保存し、" + earnedXP + " XPを獲得しました！";
+            redirectAttributes.addFlashAttribute("successMessage", message);
         } else {
             redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " の記録を保存しました！");
         }
 
+
         missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
 
-        if (!"BODY_WEIGHT".equals(form.getType()) || (form.getExerciseName() != null && form.getExerciseName().contains("(ケア)"))) {
+        // ★AIアドバイス生成処理を復活
+        if (!"BODY_WEIGHT".equals(form.getType())) {
             try {
                 String advice = aiCoachService.generateTrainingAdvice(currentUser, trainingSummary);
                 redirectAttributes.addFlashAttribute("aiAdvice", advice);
@@ -510,21 +441,19 @@ public class TrainingController {
                 }
             }
         }
-
         if (totalSaved > 0) {
-            int newTotalXp = currentUser.getXp() + totalXp;
-            currentUser.setXp(newTotalXp);
-            userRepository.save(currentUser);
+            levelService.addXpAndCheckLevelUp(currentUser, totalXp); // XP加算＆レベルアップ
+            userRepository.save(currentUser); // 保存
             missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
+
             redirectAttributes.addFlashAttribute("successMessage", "マイセットの一括記録を完了し、合計 " + totalXp + " XPを獲得しました！");
-            
+
             try {
                 String advice = aiCoachService.generateTrainingAdvice(currentUser, batchSummary.toString() + " などのメニュー");
                 redirectAttributes.addFlashAttribute("aiAdvice", advice);
             } catch (Exception e) {
                 System.out.println("AI Advice Error: " + e.getMessage());
             }
-
         } else {
             redirectAttributes.addFlashAttribute("message", "記録するデータがありませんでした。");
         }
