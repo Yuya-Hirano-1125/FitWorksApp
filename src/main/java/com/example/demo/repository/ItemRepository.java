@@ -18,8 +18,9 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
 
     // --- 修正版メソッド（ユーザーごとの所持数を集計） ---
     // LEFT JOIN を使うことで、ユーザーがまだ持っていないアイテムも count=0 で返す
-    @Query("SELECT new com.example.demo.dto.ItemCountDTO(i.name, i.imagePath, COALESCE(COUNT(ui.id), 0)) " +
+    @Query("SELECT new com.example.demo.dto.ItemCountDTO(" +
+           "i.name, i.imagePath, COALESCE(COUNT(ui.id), 0), i.rarity) " +
            "FROM Item i LEFT JOIN UserItem ui ON i.id = ui.item.id AND ui.user.id = :userId " +
-           "GROUP BY i.id, i.name, i.imagePath")
+           "GROUP BY i.id, i.name, i.imagePath, i.rarity")
     List<ItemCountDTO> findItemCountsByUserId(@Param("userId") Long userId);
 }

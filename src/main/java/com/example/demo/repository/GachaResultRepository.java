@@ -17,7 +17,35 @@ public class GachaResultRepository {
 
     private final String DB_URL = "jdbc:sqlite:fitworks.db";
 
-    // ▼ 保存処理
+    public GachaResultRepository() {
+        createTableIfNotExists();
+    }
+
+    // ▼ テーブル自動生成
+    private void createTableIfNotExists() {
+        String sql = """
+            CREATE TABLE IF NOT EXISTS gacha_result (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                item_name TEXT NOT NULL,
+                rarity TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+        """;
+
+        try (Connection conn = DriverManager.getConnection(DB_URL);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.execute();
+            System.out.println("✔ gacha_result テーブル確認OK");
+
+        } catch (SQLException e) {
+            System.err.println("テーブル作成エラー:");
+            e.printStackTrace();
+        }
+    }
+
+    // ▼ 保存
     public void save(GachaResult result) {
 
         String sql = "INSERT INTO gacha_result (user_id, item_name, rarity, created_at) VALUES (?, ?, ?, ?)";
@@ -33,6 +61,7 @@ public class GachaResultRepository {
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
+            System.err.println("保存エラー:");
             e.printStackTrace();
         }
     }
@@ -64,9 +93,10 @@ public class GachaResultRepository {
             }
 
         } catch (SQLException e) {
+            System.err.println("検索エラー:");
             e.printStackTrace();
         }
 
         return list;
-    }//test
+    }
 }

@@ -144,4 +144,22 @@ public class TrainingLogicService {
         }
         return programList;
     }
+
+    // ★追加: 症状に合わせてケア種目を選択するメソッド
+    public String selectCareExercise(String symptom) {
+        if (symptom == null) return "深呼吸";
+        
+        if (symptom.contains("目") || symptom.contains("眼")) {
+            return "ホットアイケア";
+        } else if (symptom.contains("肩") || symptom.contains("首")) {
+            return "キャット＆カウ"; // 背骨周りとして推奨
+        } else if (symptom.contains("腰")) {
+            return "フォームローラー(背中)";
+        } else if (symptom.contains("足") || symptom.contains("脚")) {
+            return "動的ストレッチ(股関節)";
+        } else {
+            // デフォルト
+            return "ウォーキング"; 
+        }
+    }
 }

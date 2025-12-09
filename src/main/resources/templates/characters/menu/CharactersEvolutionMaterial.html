@@ -5,43 +5,104 @@
     <title>素材一覧 | FitWorks</title>
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/characters/CharactersEvolutionMaterial.css}">
+    <style>
+        .rarity-row {
+            margin-bottom: 40px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 20px;
+            text-align: center; /* 行全体を中央ぞろえ */
+        }
+        .rarity-row h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .material-list {
+            display: flex;
+            justify-content: center; /* 中央に寄せる */
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .material-card {
+            width: 140px;
+            text-align: center; /* カード内も中央ぞろえ */
+        }
+        .card-image-container img {
+            max-width: 100px;
+            margin: 0 auto; /* 画像も中央に */
+            display: block;
+        }
+    </style>
 </head>
 <body>
 <div class="main-container">
-    <div class="header-section">
+    <div class="header-section" style="text-align:center;">
         <h1>素材一覧</h1>
         <p class="sub-heading">ガチャから出る素材を確認できます</p>
     </div>
 
-    <!-- デバッグ用：itemsの中身を直接表示 -->
-    <section class="debug-section">
-        <h2>デバッグ出力</h2>
-        <p th:text="${items}"></p>
-    </section>
-
-    <!-- 素材一覧（全アイテムをループ表示） -->
-    <section class="material-section">
-        <h2>素材一覧</h2>
+    <!-- R -->
+    <div class="rarity-row">
+        <h2>R</h2>
         <div class="material-list">
-            <!-- Controllerから渡された items をループ -->
-            <div th:each="item : ${items}" 
-                 th:class="'material-card rarity-' + ${item.type?.toLowerCase()}">
-                 
-                <!-- デバッグ用：ループが回っているか確認 -->
-                <p>DEBUG: <span th:text="${item.name}"></span> |
-                          <span th:text="${item.imagePath}"></span> |
-                          <span th:text="${item.count}"></span></p>
-
-                <!-- 本来の表示 -->
-                <img th:src="${item.imagePath}" th:alt="${item.name}">
-                <p class="material-name" th:text="${item.name}"></p>
-                <p class="material-count" th:text="${item.count}"></p>
+            <div th:each="item : ${items}" th:if="${item.rarity == 'R'}" class="material-card">
+                <div class="card-image-container">
+                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
+                </div>
+                <p th:text="${item.name}"></p>
+                <p th:text="'所持数: ' + ${item.count}"></p>
             </div>
         </div>
+    </div>
+
+    <!-- SR -->
+    <div class="rarity-row">
+        <h2>SR</h2>
+        <div class="material-list">
+            <div th:each="item : ${items}" th:if="${item.rarity == 'SR'}" class="material-card">
+                <div class="card-image-container">
+                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
+                </div>
+                <p th:text="${item.name}"></p>
+                <p th:text="'所持数: ' + ${item.count}"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SSR -->
+    <div class="rarity-row">
+        <h2>SSR</h2>
+        <div class="material-list">
+            <div th:each="item : ${items}" th:if="${item.rarity == 'SSR'}" class="material-card">
+                <div class="card-image-container">
+                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
+                </div>
+                <p th:text="${item.name}"></p>
+                <p th:text="'所持数: ' + ${item.count}"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- UR -->
+    <div class="rarity-row">
+        <h2>UR</h2>
+        <div class="material-list">
+            <div th:each="item : ${items}" th:if="${item.rarity == 'UR'}" class="material-card">
+                <div class="card-image-container">
+                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
+                </div>
+                <p th:text="${item.name}"></p>
+                <p th:text="'所持数: ' + ${item.count}"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- items が空の場合 -->
+    <section th:if="${#lists.isEmpty(items)}" style="text-align:center;">
+        <p>素材がまだ登録されていません。</p>
     </section>
 
     <!-- 戻るボタン -->
-    <div class="back-btn-container">
+    <div class="back-btn-container" style="text-align:center;">
         <a th:href="@{/characters/menu/CharactersMenu}" class="button secondary">
             <i class="fa-solid fa-arrow-left"></i> メニューに戻る
         </a>

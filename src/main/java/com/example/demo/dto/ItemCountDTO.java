@@ -9,4 +9,5 @@ public class ItemCountDTO {
     private String name;       // アイテム名
     private String imagePath;  // アイテム画像のパス
     private Long count;        // 所持数
+    private String rarity;     // レア度 (R, SR, SSR, UR)
 }

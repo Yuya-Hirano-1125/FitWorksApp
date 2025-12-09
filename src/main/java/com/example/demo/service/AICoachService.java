@@ -76,7 +76,7 @@ public class AICoachService {
     }
     
     /**
-     * ★追加: 食事内容に基づいたトレーニング提案
+     * 食事内容に基づいたトレーニング提案
      */
     public String generateDietBasedTrainingAdvice(User user, MealLogForm mealForm) {
         StringBuilder sb = new StringBuilder();
@@ -102,7 +102,7 @@ public class AICoachService {
     }
 
     /**
-     * ★追加: コンディショニング・ケア提案
+     * コンディショニング・ケア提案
      */
     public String generateConditioningAdvice(User user, String conditionType) {
         StringBuilder sb = new StringBuilder();
@@ -117,6 +117,24 @@ public class AICoachService {
         sb.append("- 柔軟性向上: 動的ストレッチ、PNFストレッチ\n");
 
         sb.append("\nルール: 150文字以内。優しく、かつ専門的に。手順を簡潔に教える。語尾にムキをつける。");
+
+        return callGeminiApi(sb.toString());
+    }
+
+    /**
+     * ★追加: AIケアアドバイス生成
+     */
+    public String generateCareAdvice(User user, String symptom, String recommendedExerciseName) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("あなたはユーザーの体調を気遣う優しいAIトレーナーです。\n");
+        sb.append("ユーザーが「").append(symptom).append("」という不調を訴えています。\n");
+        sb.append("それに対して、「").append(recommendedExerciseName).append("」というケア方法を提案しました。\n");
+        sb.append("ユーザーに対して、労わりの言葉と、そのケアを行う際の簡単なコツを伝えてください。\n\n");
+        
+        sb.append("【ユーザー情報】\n");
+        sb.append("- 名前: ").append(user.getUsername()).append("\n");
+        
+        sb.append("\nルール: 150文字以内。非常に優しく、リラックスさせるような口調で。ただし語尾には必ず「ムキ」をつけてください（例: リラックスするムキ、無理は禁物ムキ）。");
 
         return callGeminiApi(sb.toString());
     }
@@ -177,7 +195,6 @@ public class AICoachService {
         StringBuilder sb = new StringBuilder();
         sb.append("あなたはフィットネスアプリ『FitWorks』の専属AIトレーナーです。\n");
         sb.append("ユーザーの要望に合わせて、具体的で効果的なトレーニングメニューを提案してください。\n");
-        // ★プロンプト強化
         sb.append("ユーザーが「疲れた」「目が痛い」と言った場合は、無理に筋トレを勧めず、ストレッチや眼球運動などのケアを提案できる柔軟性を持ってください。\n"); 
         sb.append("回答は熱血かつポジティブな口調（日本語）でお願いします。\n\n");
         
@@ -208,7 +225,6 @@ public class AICoachService {
     private String callGeminiApi(String prompt) {
         try {
             if (this.client == null) return "API Key未設定ムキ！";
-            // ★Gemini 2.0 Flash (試験運用版) を使用
             GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", prompt, null);
             return response.text();
         } catch (Exception e) {

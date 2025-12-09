@@ -56,25 +56,25 @@ public class GachaService {
 
         // ★ 確率テーブルを作成
         List<ProbabilityItem> table = List.of(
-            new ProbabilityItem("夢幻の鍵", "UR", "/img/ur.png", 2.35),
+            new ProbabilityItem("夢幻の鍵", "UR", "/img/item/UR-niji.png", 2.35),
 
-            new ProbabilityItem("赫焔鱗", "SSR", "/img/ssr.png", 3.53),
-            new ProbabilityItem("氷華の杖", "SSR", "/img/ssr.png", 3.53),
-            new ProbabilityItem("緑晶灯", "SSR", "/img/ssr.png", 3.53),
-            new ProbabilityItem("夢紡ぎの枕", "SSR", "/img/ssr.png", 3.53),
-            new ProbabilityItem("月詠みの杖", "SSR", "/img/ssr.png", 3.53),
+            new ProbabilityItem("赫焔鱗", "SSR", "/img/item/SSR-red.png", 3.53),
+            new ProbabilityItem("氷華の杖", "SSR", "/img/item/SSR-blue.png", 3.53),
+            new ProbabilityItem("緑晶灯", "SSR", "/img/item/SSR-green.png", 3.53),
+            new ProbabilityItem("夢紡ぎの枕", "SSR", "/img/item/SSR-yellow.png", 3.53),
+            new ProbabilityItem("月詠みの杖", "SSR", "/img/item/SSR-purple.png", 3.53),
 
-            new ProbabilityItem("赤の聖結晶", "SR", "/img/sr.png", 6.59),
-            new ProbabilityItem("青の聖結晶", "SR", "/img/sr.png", 6.59),
-            new ProbabilityItem("緑の聖結晶", "SR", "/img/sr.png", 6.59),
-            new ProbabilityItem("黄の聖結晶", "SR", "/img/sr.png", 6.59),
-            new ProbabilityItem("紫の聖結晶", "SR", "/img/sr.png", 6.59),
+            new ProbabilityItem("赤の聖結晶", "SR", "/img/item/SR-red.png", 6.59),
+            new ProbabilityItem("青の聖結晶", "SR", "/img/item/SR-blue.png", 6.59),
+            new ProbabilityItem("緑の聖結晶", "SR", "/img/item/SR-green.png", 6.59),
+            new ProbabilityItem("黄の聖結晶", "SR", "/img/item/SR-yellow.png", 6.59),
+            new ProbabilityItem("紫の聖結晶", "SR", "/img/item/SR-purple.png", 6.59),
 
-            new ProbabilityItem("紅玉", "R", "/img/r.png", 8.94),
-            new ProbabilityItem("蒼玉", "R", "/img/r.png", 8.94),
-            new ProbabilityItem("翠玉", "R", "/img/r.png", 8.94),
-            new ProbabilityItem("聖玉", "R", "/img/r.png", 8.94),
-            new ProbabilityItem("闇玉", "R", "/img/r.png", 8.94)
+            new ProbabilityItem("紅玉", "R", "/img/item/R-red.png", 8.94),
+            new ProbabilityItem("蒼玉", "R", "/img/item/R-blue.png", 8.94),
+            new ProbabilityItem("翠玉", "R", "/img/item/R-green.png", 8.94),
+            new ProbabilityItem("聖玉", "R", "/img/item/R-yellow.png", 8.94),
+            new ProbabilityItem("闇玉", "R", "/img/item/R-purple.png", 8.94)
         );
 
         double r = random.nextDouble() * 100;
