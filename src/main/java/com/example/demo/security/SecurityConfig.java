@@ -37,11 +37,13 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    // パスワードエンコーダー
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // 認証プロバイダ
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -50,19 +52,21 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    // CORS設定
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://localhost:3000")); 
+        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true); 
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
+    // CSRFトークンをレスポンスヘッダに追加するフィルタ
     private Filter csrfCookieFilter() {
         return (request, response, chain) -> {
             CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
@@ -73,62 +77,61 @@ public class SecurityConfig {
             try {
                 chain.doFilter(request, response);
             } catch (IOException | ServletException e) {
-                e.printStackTrace(); 
+                e.printStackTrace();
             }
         };
     }
 
+    // セキュリティフィルタチェーン
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+            // CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            // CSRF
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
             .addFilterAfter(csrfCookieFilter(), BasicAuthenticationFilter.class)
 
-            // --- セキュリティヘッダー設定 ---
+            // セキュリティヘッダー
             .headers(headers -> headers
-                .contentSecurityPolicy(csp -> csp
-                    .policyDirectives(
-                        "default-src 'self'; " + 
-                        // Script: 外部CDNを許可
-                        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; " + 
-                        // Style: 外部CSSを許可
-                        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; " + 
+                .contentSecurityPolicy(csp -> csp.policyDirectives(
+                        "default-src 'self'; " +
+                        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; " +
+                        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; " +
                         "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
-                        
-                        // ★修正ポイント: 画像読み込みを「https:」全体に許可（OpenStreetMapのタイルやピン画像を確実に表示させるため）
-                        "img-src 'self' data: https:; " + 
-                        
-                        // API接続: Overpass APIを許可
+                        "img-src 'self' data: https:; " +
                         "connect-src 'self' https://overpass-api.de; " +
                         "frame-ancestors 'self'"
-                    )
-                )
-                .referrerPolicy(referrer -> referrer
-                    .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                ))
+                .referrerPolicy(referrer -> referrer.policy(
+                    ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                // ★追加: HSTS（HTTPS強制・本番向け）
+                .httpStrictTransportSecurity(hsts -> hsts
+                    .includeSubDomains(true)
+                    .maxAgeInSeconds(31536000)
                 )
             )
-            // -----------------------------
 
+            // セッション管理
             .sessionManagement(session -> session
                 .sessionFixation().changeSessionId()
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
             )
+
+            // 認可設定
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/", "/login", "/register",
+                .requestMatchers("/", "/login", "/register",
                     "/forgot-password", "/verify-code", "/reset-password",
                     "/error", "/terms",
-                    "/api/public/**", 
+                    "/api/public/**",
                     "/css/**", "/js/**", "/images/**", "/img/**"
                 ).permitAll()
-                .requestMatchers(
-                    "/home", "/training/**", "/settings/**",
+                .requestMatchers("/home", "/training/**", "/settings/**",
                     "/community/**", "/log/**", "/characters/**",
                     "/daily-mission/**", "/ranking/**", "/ai-coach/**",
                     "/training-log/**",
@@ -137,6 +140,8 @@ public class SecurityConfig {
                 .requestMatchers("/gacha/**").authenticated()
                 .anyRequest().authenticated()
             )
+
+            // ログイン設定
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
@@ -144,6 +149,8 @@ public class SecurityConfig {
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
+
+            // ログアウト設定
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
                 .logoutSuccessUrl("/")
@@ -151,6 +158,18 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                 .permitAll()
             )
+
+            // ★追加: Remember-Me（ログイン保持）
+            .rememberMe(remember -> remember
+                .key("fitworks-remember-me-key")
+                .tokenValiditySeconds(7 * 24 * 60 * 60) // 7日
+                .userDetailsService(userDetailsService)
+            )
+
+            // ★追加: アクセス拒否時は専用ページへ
+            .exceptionHandling(ex -> ex.accessDeniedPage("/access-denied"))
+
+            // 認証プロバイダ
             .authenticationProvider(authenticationProvider());
 
         return http.build();
