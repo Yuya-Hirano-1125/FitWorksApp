@@ -194,7 +194,7 @@ public class TrainingDataService {
             "腕の力ではなく、股関節の伸展（お尻の力）で振り上げる。"));
         EXERCISE_DATA_MAP.put("その他", others);
 
-        // --- ★追加: リカバリー・ケア ---
+        // --- リカバリー・ケア ---
         List<ExerciseData> care = new ArrayList<>();
         care.add(new ExerciseData("フォームローラー(背中)", "全レベル",
             "フォームローラーを背中の下に置き、上下に転がる。",
@@ -238,8 +238,6 @@ public class TrainingDataService {
         CARDIO_DATA_LIST.add(new ExerciseData("トレッドミルインターバル", "上級", 
             "ダッシュと歩きを交互に繰り返す。", 
             "心肺機能を限界まで高める。傾斜をつけるとさらに効果的。"));
-        
-        // --- ★追加: 心肺機能強化系 ---
         CARDIO_DATA_LIST.add(new ExerciseData("タバタ式バーピー", "上級",
             "20秒全力バーピー＋10秒休憩を8セット。",
             "短時間でVO2Max（最大酸素摂取量）を極限まで高める。"));
@@ -282,17 +280,30 @@ public class TrainingDataService {
         return getFreeWeightExercisesByPart();
     }
     
-    /**
-     * ★追加: ケア種目だけを取得するメソッド
-     */
     public List<ExerciseData> getRecoveryExercises() {
         return EXERCISE_DATA_MAP.getOrDefault("リカバリー・ケア", new ArrayList<>());
     }
 
-    /**
-     * 部位のリスト（キーの一覧）だけを返す
-     */
     public List<String> getMuscleParts() {
         return new ArrayList<>(EXERCISE_DATA_MAP.keySet());
+    }
+
+    // ★追加: 名前からExerciseDataを取得するメソッド
+    public ExerciseData getExerciseDataByName(String name) {
+        // フリーウェイトから検索
+        for (List<ExerciseData> list : EXERCISE_DATA_MAP.values()) {
+            for (ExerciseData ex : list) {
+                if (ex.getFullName().equals(name)) {
+                    return ex;
+                }
+            }
+        }
+        // 有酸素から検索
+        for (ExerciseData ex : CARDIO_DATA_LIST) {
+            if (ex.getFullName().equals(name)) {
+                return ex;
+            }
+        }
+        return null;
     }
 }

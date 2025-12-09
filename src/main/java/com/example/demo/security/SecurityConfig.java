@@ -1,7 +1,7 @@
 package com.example.demo.security;
 
 import java.io.IOException;
-import java.util.List; // 追加
+import java.util.List;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.ServletException;
@@ -19,11 +19,11 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
-import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter; // 追加
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.cors.CorsConfiguration; // 追加
-import org.springframework.web.cors.CorsConfigurationSource; // 追加
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // 追加
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.demo.service.CustomUserDetailsService;
 
@@ -51,13 +51,13 @@ public class SecurityConfig {
     }
 
     /**
-     * 【追加】CORS設定
-     * 信頼できるドメインからのみのリ
+     * CORS設定
+     * 信頼できるドメインからのみのリクエストを許可
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // 開発中は localhost:3000 (React等) を許可、本番では自社ドメインのみにする
+        // 開発中は localhost:3000 (React等) を許可
         configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://localhost:3000")); 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
@@ -93,7 +93,6 @@ public class SecurityConfig {
             // --- CSRF対策 ---
             .csrf(csrf -> csrf
                 // JSからCookieを読み取れるようにする（SPA/Ajax用）
-                // ※注意: XSS脆弱性があるとCSRFトークンが盗まれるリスクがあるため、XSS対策が必須
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
@@ -105,15 +104,17 @@ public class SecurityConfig {
                 // 許可されたソースからのみスクリプト等の読み込みを許可
                 .contentSecurityPolicy(csp -> csp
                     .policyDirectives(
-                        "default-src 'self'; " + 
-                        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " + // 'unsafe-inline'はロード画面の実装等で必要なため許可。外部CDNがある場合はここに追加
-                        // ★修正: Google Fonts と Font Awesome (cdnjs) のCSSを許可
-                        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; " + 
-                        // ★追加: フォントファイルの読み込み元を許可 (Google Fonts, Font Awesome)
-                        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
-                        "img-src 'self' data:; " + // data: は画像アップロードプレビュー等で必要
-                        "connect-src 'self'; " +
-                        "frame-ancestors 'self'" // クリックジャッキング対策
+                    		"default-src 'self'; " + 
+                                    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; " + 
+                                    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; " + 
+                                    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+                                    
+                                    // ★修正: unpkg.com を追加（ピン画像用）
+                                    // https://tile.openstreetmap.org (地図用) と https://unpkg.com (ピン画像用) の両方を許可
+                                    "img-src 'self' data: https://tile.openstreetmap.org https://unpkg.com; " + 
+                                    
+                                    "connect-src 'self' https://overpass-api.de; " +
+                                    "frame-ancestors 'self'"
                     )
                 )
                 // リファラーポリシー: プライバシー保護のため、外部サイトへの遷移時にURLパラメータ等を送らない
@@ -131,7 +132,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 // ログイン時にセッションIDを変更し、セッション固定攻撃を防ぐ
                 .sessionFixation().changeSessionId()
-                // 同時ログイン数の制限（必要に応じて）
+                // 同時ログイン数の制限
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
             )
