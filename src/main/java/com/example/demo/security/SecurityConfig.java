@@ -50,18 +50,13 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    /**
-     * CORS設定
-     * 信頼できるドメインからのみのリクエストを許可
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // 開発中は localhost:3000 (React等) を許可
         configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://localhost:3000")); 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true); // Cookie送信を許可
+        configuration.setAllowCredentials(true); 
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -78,7 +73,7 @@ public class SecurityConfig {
             try {
                 chain.doFilter(request, response);
             } catch (IOException | ServletException e) {
-                e.printStackTrace(); // 本番ではロガーを使用することを推奨
+                e.printStackTrace(); 
             }
         };
     }
@@ -87,81 +82,61 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // --- CORS設定の適用 ---
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-            // --- CSRF対策 ---
             .csrf(csrf -> csrf
-                // JSからCookieを読み取れるようにする（SPA/Ajax用）
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
             .addFilterAfter(csrfCookieFilter(), BasicAuthenticationFilter.class)
 
-            // --- セキュリティヘッダーの強化 (重要) ---
+            // --- セキュリティヘッダー設定 ---
             .headers(headers -> headers
-                // XSS対策: コンテンツセキュリティポリシー (CSP)
-                // 許可されたソースからのみスクリプト等の読み込みを許可
                 .contentSecurityPolicy(csp -> csp
                     .policyDirectives(
-                    		"default-src 'self'; " + 
-                                    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; " + 
-                                    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; " + 
-                                    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
-                                    
-                                    // ★修正: unpkg.com を追加（ピン画像用）
-                                    // https://tile.openstreetmap.org (地図用) と https://unpkg.com (ピン画像用) の両方を許可
-                                    "img-src 'self' data: https://tile.openstreetmap.org https://unpkg.com; " + 
-                                    
-                                    "connect-src 'self' https://overpass-api.de; " +
-                                    "frame-ancestors 'self'"
+                        "default-src 'self'; " + 
+                        // Script: 外部CDNを許可
+                        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; " + 
+                        // Style: 外部CSSを許可
+                        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; " + 
+                        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+                        
+                        // ★修正ポイント: 画像読み込みを「https:」全体に許可（OpenStreetMapのタイルやピン画像を確実に表示させるため）
+                        "img-src 'self' data: https:; " + 
+                        
+                        // API接続: Overpass APIを許可
+                        "connect-src 'self' https://overpass-api.de; " +
+                        "frame-ancestors 'self'"
                     )
                 )
-                // リファラーポリシー: プライバシー保護のため、外部サイトへの遷移時にURLパラメータ等を送らない
                 .referrerPolicy(referrer -> referrer
                     .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
                 )
-                // HSTS: HTTPS強制 (本番環境でのみ有効化推奨、開発中はコメントアウトでも可)
-                // .httpStrictTransportSecurity(hsts -> hsts
-                //     .includeSubDomains(true)
-                //     .maxAgeInSeconds(31536000)
-                // )
             )
+            // -----------------------------
 
-            // --- セッション管理 ---
             .sessionManagement(session -> session
-                // ログイン時にセッションIDを変更し、セッション固定攻撃を防ぐ
                 .sessionFixation().changeSessionId()
-                // 同時ログイン数の制限
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
             )
-
-            // --- アクセス制御 ---
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/", "/login", "/register",
                     "/forgot-password", "/verify-code", "/reset-password",
                     "/error", "/terms",
-                    // APIエンドポイントを許可する場合はここに追加
                     "/api/public/**", 
                     "/css/**", "/js/**", "/images/**", "/img/**"
                 ).permitAll()
-
-                // Authenticated routes
                 .requestMatchers(
                     "/home", "/training/**", "/settings/**",
                     "/community/**", "/log/**", "/characters/**",
                     "/daily-mission/**", "/ranking/**", "/ai-coach/**",
                     "/training-log/**",
-                    "/api/**" // APIへのアクセスも認証必須にする
+                    "/api/**"
                 ).authenticated()
-
                 .requestMatchers("/gacha/**").authenticated()
                 .anyRequest().authenticated()
             )
-
-            // --- フォームログイン ---
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
@@ -169,16 +144,13 @@ public class SecurityConfig {
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
-
-            // --- ログアウト ---
             .logout(logout -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST")) // POSTメソッドを強制
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                 .permitAll()
             )
-
             .authenticationProvider(authenticationProvider());
 
         return http.build();

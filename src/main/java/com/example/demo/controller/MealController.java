@@ -166,9 +166,10 @@ public class MealController {
             User user = userService.findByUsername(userDetails.getUsername());
             MealRecord savedRecord = mealService.saveMealRecord(form, user);
             
-            // ★AIアドバイス生成処理を復活
+            // ★AIアドバイス生成処理の修正箇所
             try {
-                String advice = aiCoachService.generateMealAdvice(user, form);
+                // 修正: 単なる食事アドバイス(generateMealAdvice)ではなく、トレーニング提案(generateDietBasedTrainingAdvice)を呼び出す
+                String advice = aiCoachService.generateDietBasedTrainingAdvice(user, form);
                 redirectAttributes.addFlashAttribute("aiAdvice", advice); 
             } catch (Exception e) {
                 e.printStackTrace();
