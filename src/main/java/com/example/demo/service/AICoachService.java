@@ -3,6 +3,8 @@ package com.example.demo.service;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.regex.Matcher; // ★追加
+import java.util.regex.Pattern; // ★追加
 import java.util.stream.Collectors;
 
 import jakarta.annotation.PostConstruct;
@@ -29,8 +31,9 @@ public class AICoachService {
 
     private Client client;
 
+    // ★修正: リトライ設定を強化
     private static final int MAX_RETRIES = 3;
-    private static final long RETRY_WAIT_MS = 2000;
+    private static final long DEFAULT_WAIT_MS = 5000; // 基本待機時間を5秒に変更
 
     @PostConstruct
     public void init() {
@@ -45,6 +48,7 @@ public class AICoachService {
         }
     }
 
+    // ... (generateCoachingAdvice ～ analyzeMealText までのメソッドは変更なし) ...
     public String generateCoachingAdvice(User user, List<TrainingRecord> history, String userMessage) {
         String systemPrompt = buildSystemPrompt(user, history);
         String fullPrompt = systemPrompt + "\n\nUser Question: " + userMessage;
@@ -96,9 +100,6 @@ public class AICoachService {
         return callGeminiApi(sb.toString());
     }
 
-    /**
-     * ★修正: 月間の食事内容に基づいたアドバイス（食事提案＋トレーニング提案）
-     */
     public String generateMonthlyDietAdvice(User user, List<MealRecord> records, YearMonth yearMonth) {
         int totalCalories = records.stream().mapToInt(MealRecord::getCalories).sum();
         
@@ -132,9 +133,6 @@ public class AICoachService {
         }
     }
 
-    /**
-     * ★修正: 週間レポート（食事提案＋トレーニング提案）
-     */
     public String generateWeeklyDietAdvice(User user, List<MealRecord> records, LocalDate start, LocalDate end) {
         int totalCalories = records.stream().mapToInt(MealRecord::getCalories).sum();
         double avgCalories = totalCalories / (double) records.size(); 
@@ -260,6 +258,10 @@ public class AICoachService {
         }
     }
 
+    /**
+     * ★修正: リトライロジックを強化
+     * エラーメッセージから「retry in X s」を読み取り、その時間分待機するように修正。
+     */
     private String generateContentWithRetry(Content content, String promptText) throws Exception {
         int attempt = 0;
         Exception lastException = null;
@@ -268,9 +270,9 @@ public class AICoachService {
             try {
                 GenerateContentResponse response;
                 if (content != null) {
-                    response = client.models.generateContent("gemini-2.5-flash", content, null);
+                    response = client.models.generateContent("gemini-2.0-flash-live", content, null);
                 } else {
-                    response = client.models.generateContent("gemini-2.5-flash", promptText, null);
+                    response = client.models.generateContent("gemini-2.0-flash-live", promptText, null);
                 }
                 return cleanJsonResult(response.text());
 
@@ -278,11 +280,25 @@ public class AICoachService {
                 if (e.getMessage().contains("429") || e.getMessage().contains("Quota exceeded")) {
                     lastException = e;
                     attempt++;
-                    System.out.println("Gemini API Rate Limit hit. Retrying... (" + attempt + "/" + MAX_RETRIES + ")");
+                    
+                    long waitTime = DEFAULT_WAIT_MS * attempt; // デフォルトは5秒, 10秒, 15秒...
+
+                    // エラーメッセージから待機時間を解析 ("Please retry in 41.72s" など)
+                    Matcher matcher = Pattern.compile("retry in ([0-9\\.]+)s").matcher(e.getMessage());
+                    if (matcher.find()) {
+                        try {
+                            double seconds = Double.parseDouble(matcher.group(1));
+                            waitTime = (long) (seconds * 1000) + 1000; // ミリ秒変換 + 余裕の1秒
+                        } catch (NumberFormatException nfe) {
+                            // 解析失敗時はデフォルト倍率を使用
+                        }
+                    }
+
+                    System.out.println("Gemini API Rate Limit hit. Retrying in " + waitTime + "ms... (" + attempt + "/" + MAX_RETRIES + ")");
                     
                     if (attempt < MAX_RETRIES) {
                         try {
-                            Thread.sleep(RETRY_WAIT_MS * attempt);
+                            Thread.sleep(waitTime);
                         } catch (InterruptedException ie) {
                             Thread.currentThread().interrupt();
                             throw new Exception("解析処理が中断されました。");
@@ -295,7 +311,7 @@ public class AICoachService {
         }
         
         System.err.println("Gemini API Retry Failed: " + lastException.getMessage());
-        return "{\"error\": \"現在アクセスが集中しており解析できません。少し時間を置いて再試行してください。\"}";
+        return "{\"error\": \"現在アクセスが集中しており解析できません。1分ほど待ってから再試行してください。\"}";
     }
 
     private String cleanJsonResult(String responseText) {
@@ -346,7 +362,7 @@ public class AICoachService {
     private String callGeminiApi(String prompt) {
         try {
             if (this.client == null) return "API Key未設定ムキ！";
-            GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", prompt, null);
+            GenerateContentResponse response = client.models.generateContent("gemini-2.0-flash-live", prompt, null);
             return response.text();
         } catch (Exception e) {
             e.printStackTrace();
