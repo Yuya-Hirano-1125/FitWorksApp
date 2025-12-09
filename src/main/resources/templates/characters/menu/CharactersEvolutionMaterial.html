@@ -41,71 +41,66 @@
     </div>
 
     <!-- R -->
-    <div class="rarity-row" th:if="${!#lists.isEmpty(items)}">
+    <div class="rarity-row" th:if="${itemsR != null and !#lists.isEmpty(itemsR)}">
         <h2>R</h2>
         <div class="material-list">
-            <div th:each="item : ${items}" th:if="${item.rarity == 'R'}">
-                <div class="material-card">
-                    <div class="card-image-container">
-                        <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
-                    </div>
-                    <p th:text="${item.name}"></p>
-                    <p th:text="'所持数: ' + ${item.count}"></p>
+            <div th:each="item : ${itemsR}" class="material-card">
+                <div class="card-image-container">
+                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
                 </div>
+                <p th:text="${item.name}"></p>
+                <p th:text="'所持数: ' + ${item.count}"></p>
             </div>
         </div>
     </div>
 
     <!-- SR -->
-    <div class="rarity-row" th:if="${!#lists.isEmpty(items)}">
+    <div class="rarity-row" th:if="${itemsSR != null and !#lists.isEmpty(itemsSR)}">
         <h2>SR</h2>
         <div class="material-list">
-            <div th:each="item : ${items}" th:if="${item.rarity == 'SR'}">
-                <div class="material-card">
-                    <div class="card-image-container">
-                        <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
-                    </div>
-                    <p th:text="${item.name}"></p>
-                    <p th:text="'所持数: ' + ${item.count}"></p>
+            <div th:each="item : ${itemsSR}" class="material-card">
+                <div class="card-image-container">
+                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
                 </div>
+                <p th:text="${item.name}"></p>
+                <p th:text="'所持数: ' + ${item.count}"></p>
             </div>
         </div>
     </div>
 
     <!-- SSR -->
-    <div class="rarity-row" th:if="${!#lists.isEmpty(items)}">
+    <div class="rarity-row" th:if="${itemsSSR != null and !#lists.isEmpty(itemsSSR)}">
         <h2>SSR</h2>
         <div class="material-list">
-            <div th:each="item : ${items}" th:if="${item.rarity == 'SSR'}">
-                <div class="material-card">
-                    <div class="card-image-container">
-                        <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
-                    </div>
-                    <p th:text="${item.name}"></p>
-                    <p th:text="'所持数: ' + ${item.count}"></p>
+            <div th:each="item : ${itemsSSR}" class="material-card">
+                <div class="card-image-container">
+                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
                 </div>
+                <p th:text="${item.name}"></p>
+                <p th:text="'所持数: ' + ${item.count}"></p>
             </div>
         </div>
     </div>
 
     <!-- UR -->
-    <div class="rarity-row" th:if="${!#lists.isEmpty(items)}">
+    <div class="rarity-row" th:if="${itemsUR != null and !#lists.isEmpty(itemsUR)}">
         <h2>UR</h2>
         <div class="material-list">
-            <div th:each="item : ${items}" th:if="${item.rarity == 'UR'}">
-                <div class="material-card">
-                    <div class="card-image-container">
-                        <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
-                    </div>
-                    <p th:text="${item.name}"></p>
-                    <p th:text="'所持数: ' + ${item.count}"></p>
+            <div th:each="item : ${itemsUR}" class="material-card">
+                <div class="card-image-container">
+                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
                 </div>
+                <p th:text="${item.name}"></p>
+                <p th:text="'所持数: ' + ${item.count}"></p>
             </div>
         </div>
     </div>
 
-    <!-- items が空の場合 -->
-    <section th:if="${#lists.isEmpty(items)}" style="text-align:center;">
+    <!-- 全部空の場合 -->
+    <section th:if="${(itemsR == null or #lists.isEmpty(itemsR)) and 
+                     (itemsSR == null or #lists.isEmpty(itemsSR)) and 
+                     (itemsSSR == null or #lists.isEmpty(itemsSSR)) and 
+                     (itemsUR == null or #lists.isEmpty(itemsUR))}" style="text-align:center;">
         <p>素材がまだ登録されていません。</p>
     </section>
 
