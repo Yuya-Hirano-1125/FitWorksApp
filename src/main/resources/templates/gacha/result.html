@@ -13,12 +13,14 @@
         .gacha-page .main-container {
             max-width: 600px;
         }
+
         .result-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
+
         .result-card {
             background: rgb(255, 255, 255);
             padding: 15px;
@@ -27,50 +29,80 @@
             text-align: center;
             animation: fadeIn 0.8s;
         }
+
         .result-card img {
             width: 80px;
             height: 80px;
             object-fit: contain;
             margin-bottom: 10px;
         }
+
+        /* ★★★★★ 文字色をレアリティごとに変更する CSS ★★★★★ */
+        .rarity-UR {
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .rarity-SSR {
+            color: #FFD700; /* 金色 */
+            font-weight: 700;
+        }
+
+        .rarity-SR {
+            color: #C0C0C0; /* シルバー */
+            font-weight: 700;
+        }
+
+        .rarity-R {
+            color: #CD7F32; /* ブロンズ */
+            font-weight: 700;
+        }
+
         .result-rarity {
             font-size: 14px;
-            color: var(--ai-accent-color);
             margin-top: 5px;
         }
     </style>
 </head>
 
 <body class="gacha-page">
-
 <div class="main-container">
+
     <h1><i class="fa-solid fa-gift"></i> ガチャ結果</h1>
     <p class="sub-heading">おめでとう！以下のアイテムを獲得しました！</p>
 
     <!-- ▼ ガチャ結果一覧 -->
     <div class="result-list">
+
+        <!-- ★ rarity に応じて class を動的に追加 -->
         <div class="result-card" th:each="item : ${results}">
             <img th:src="@{${item.imagePath}}" alt="result">
+
             <div class="result-name" th:text="${item.name}"></div>
-            <div class="result-rarity" th:text="${item.rarity}"></div>
+
+            <!-- ★ class に rarity-SSR / rarity-SR などが付く -->
+            <div class="result-rarity"
+                 th:text="${item.rarity}"
+                 th:classappend="' rarity-' + ${item.rarity}">
+            </div>
         </div>
+
     </div>
 
-    <!-- ▼ ボタン：userId を確実に引き継ぐ -->
+    <!-- ▼ ボタン：userId を引き継ぐ -->
     <div class="button-container" style="margin-top: 40px;">
 
-        <!-- ★ userId を渡してガチャトップへ戻す -->
         <a th:href="@{/gacha(userId=${userId})}" class="button primary">
             <i class="fa-solid fa-rotate-right"></i> もう一度引く
         </a>
 
-        <!-- ★ ホームにも userId を付ける必要はない（SecurityContext でOK） -->
         <a th:href="@{/home}" class="button secondary" style="margin-top: 20px;">
             <i class="fa-solid fa-house"></i> ホームに戻る
         </a>
 
     </div>
 </div>
-
 </body>
 </html>
