@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ガチャ結果 | FitWorks</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
@@ -10,34 +11,129 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
+        /* ▼ 色の変数が base.css にない場合のフォールバック（ある場合は無視されます） */
+        :root {
+            --primary-color: #00e676; /* ネオングリーン */
+            --bg-color: #121212;      /* 全体の背景色（ダーク） */
+            --text-color: #ffffff;    /* 全体の文字色（白） */
+            --ai-accent-color: #00b894; /* 少し濃い緑（文字用） */
+        }
+
+        body.gacha-page {
+            background-color: var(--bg-color, #121212);
+            color: var(--text-color, #ffffff);
+            font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
         .gacha-page .main-container {
             max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
         }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .sub-heading {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        /* ▼ グリッドレイアウトの設定 */
         .result-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px;
             margin-top: 20px;
         }
+
+        /* ▼▼▼ カードのデザイン変更箇所 ▼▼▼ */
         .result-card {
-            background: #2a2a2a;
+            background: #ffffff; /* ★背景を白に変更 */
+            color: #333333;      /* ★文字を濃いグレーに変更（白背景で見えるように） */
+            
             padding: 15px;
             border: 2px solid var(--primary-color);
             border-radius: 10px;
             text-align: center;
-            box-shadow: 0 0 15px rgba(0, 230, 118, 0.4);
+            
+            /* 緑色の光彩（影） */
+            box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+            
+            /* ふわっと表示するアニメーション */
             animation: fadeIn 0.8s;
+            transition: transform 0.2s;
         }
+
+        /* ホバー時に少し浮く演出 */
+        .result-card:hover {
+            transform: translateY(-3px);
+        }
+
         .result-card img {
             width: 80px;
             height: 80px;
             object-fit: contain;
             margin-bottom: 10px;
         }
+
+        .result-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
         .result-rarity {
-            font-size: 14px;
-            color: var(--ai-accent-color);
-            margin-top: 5px;
+            font-size: 13px;
+            /* 白背景でも読みやすいように、少し濃い色を指定するか太字にする */
+            color: var(--ai-accent-color, #00945e); 
+            font-weight: 600;
+        }
+
+        /* ▼ ボタン周りのスタイル */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.3s;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .button:hover {
+            opacity: 0.8;
+        }
+
+        .button.primary {
+            background-color: var(--primary-color);
+            color: #000; /* 緑背景に黒文字 */
+            box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);
+        }
+
+        .button.secondary {
+            background-color: #424242;
+            color: #fff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -48,28 +144,24 @@
     <h1><i class="fa-solid fa-gift"></i> ガチャ結果</h1>
     <p class="sub-heading">おめでとう！以下のアイテムを獲得しました！</p>
 
-    <!-- ▼ ガチャ結果一覧 -->
     <div class="result-list">
         <div class="result-card" th:each="item : ${results}">
             <img th:src="@{${item.imagePath}}" alt="result">
-            <div class="result-name" th:text="${item.name}"></div>
-            <div class="result-rarity" th:text="${item.rarity}"></div>
+            
+            <div class="result-name" th:text="${item.name}">プロテインA</div>
+            
+            <div class="result-rarity" th:text="${item.rarity}">★★★ (SSR)</div>
         </div>
     </div>
 
-    <!-- ▼ ボタン：userId を確実に引き継ぐ -->
-    <div class="button-container" style="margin-top: 40px;">
-
-        <!-- ★ userId を渡してガチャトップへ戻す -->
+    <div class="button-container">
         <a th:href="@{/gacha(userId=${userId})}" class="button primary">
             <i class="fa-solid fa-rotate-right"></i> もう一度引く
         </a>
 
-        <!-- ★ ホームにも userId を付ける必要はない（SecurityContext でOK） -->
-        <a th:href="@{/home}" class="button secondary" style="margin-top: 20px;">
+        <a th:href="@{/home}" class="button secondary">
             <i class="fa-solid fa-house"></i> ホームに戻る
         </a>
-
     </div>
 </div>
 
