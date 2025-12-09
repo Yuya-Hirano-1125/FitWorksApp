@@ -17,9 +17,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByResetPasswordToken(String resetPasswordToken);
     Optional<User> findByPhoneNumber(String phoneNumber);
     
-    // 元のメソッド（Top20）
-    List<User> findTop20ByOrderByLevelDescExperiencePointsDesc();
+    // 修正済み：Top20をXP順で取得
+    List<User> findTop20ByOrderByLevelDescXpDesc();
 
-    // ★追加: 全員をレベル・経験値の高い順に取得するメソッド（Top20を外して All に変更）
-    List<User> findAllByOrderByLevelDescExperiencePointsDesc();
+    // 修正済み：全ユーザーをXP順で取得
+    List<User> findAllByOrderByLevelDescXpDesc();
 }
