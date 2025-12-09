@@ -52,7 +52,7 @@ public class SecurityConfig {
 
     /**
      * 【追加】CORS設定
-     * 信頼できるドメインからのみのリクエストを許可します。
+     * 信頼できるドメインからのみのリ
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -107,7 +107,10 @@ public class SecurityConfig {
                     .policyDirectives(
                         "default-src 'self'; " + 
                         "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " + // 'unsafe-inline'はロード画面の実装等で必要なため許可。外部CDNがある場合はここに追加
-                        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " + 
+                        // ★修正: Google Fonts と Font Awesome (cdnjs) のCSSを許可
+                        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdnjs.cloudflare.com; " + 
+                        // ★追加: フォントファイルの読み込み元を許可 (Google Fonts, Font Awesome)
+                        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
                         "img-src 'self' data:; " + // data: は画像アップロードプレビュー等で必要
                         "connect-src 'self'; " +
                         "frame-ancestors 'self'" // クリックジャッキング対策
