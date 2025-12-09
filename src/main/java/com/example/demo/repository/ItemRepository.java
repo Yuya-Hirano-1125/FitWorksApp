@@ -11,16 +11,20 @@ import com.example.demo.entity.Item;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
     
-    // --- 既存メソッド（残す） ---
-    
-    // アイテムタイプで検索
-    List<Item> findByType(String type);
+    // --- アイテムタイプで検索（登録順で並べる） ---
+    @Query("SELECT i FROM Item i WHERE i.type = :type ORDER BY i.sortOrder ASC")
+    List<Item> findByType(@Param("type") String type);
 
-    // --- 修正版メソッド（ユーザーごとの所持数を集計） ---
+    // --- ユーザーごとの所持数を集計（登録順で並べる） ---
     // LEFT JOIN を使うことで、ユーザーがまだ持っていないアイテムも count=0 で返す
     @Query("SELECT new com.example.demo.dto.ItemCountDTO(" +
            "i.name, i.imagePath, COALESCE(COUNT(ui.id), 0), i.rarity) " +
            "FROM Item i LEFT JOIN UserItem ui ON i.id = ui.item.id AND ui.user.id = :userId " +
-           "GROUP BY i.id, i.name, i.imagePath, i.rarity")
+           "GROUP BY i.id, i.name, i.imagePath, i.rarity " +
+           "ORDER BY i.sortOrder ASC")
     List<ItemCountDTO> findItemCountsByUserId(@Param("userId") Long userId);
+
+    // --- 全アイテムを登録順で取得するメソッド ---
+    @Query("SELECT i FROM Item i ORDER BY i.sortOrder ASC")
+    List<Item> findAllOrderBySortOrder();
 }

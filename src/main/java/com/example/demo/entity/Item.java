@@ -29,7 +29,10 @@ public class Item {
 
     private String description; // アイテム説明（任意）
 
-    // ★ 新しく追加
     @Column(nullable = false)
     private String rarity; // レア度 (R, SR, SSR, UR)
+
+    // ★ 新しく追加: 並び順制御用カラム
+    @Column(name = "sort_order", nullable = false)
+    private Integer sortOrder; // 登録順や表示順を制御する番号
 }
