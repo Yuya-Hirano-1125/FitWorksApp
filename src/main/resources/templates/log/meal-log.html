@@ -82,9 +82,25 @@
     </div>
 
     <div style="text-align: center; margin: 20px 0;">
-        <a th:href="@{/log/meal/all}" class="button" style="background-color: #555; color: white; width: 100%; display: block; text-align: center;">
+        <a th:href="@{/log/meal/all}" class="button" style="background-color: #555; color: white; width: 100%; display: block; text-align: center; margin-bottom: 10px;">
             <i class="fa-solid fa-list"></i> 全記録をリストで見る
         </a>
+        
+        <div style="display: flex; gap: 10px;">
+            <form th:action="@{/log/meal/analyze-month}" method="post" onsubmit="showLoading(this)" style="flex: 1;">
+                <input type="hidden" name="year" th:value="${currentYearMonth.year}" />
+                <input type="hidden" name="month" th:value="${currentYearMonth.monthValue}" />
+                <button type="submit" class="button" style="background-color: #e67e22; color: white; width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    <i class="fa-solid fa-chart-pie"></i> 月間分析
+                </button>
+            </form>
+            
+            <form th:action="@{/log/meal/analyze-week}" method="post" onsubmit="showLoading(this)" style="flex: 1;">
+                <button type="submit" class="button" style="background-color: #9b59b6; color: white; width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    <i class="fa-solid fa-calendar-week"></i> 今週の分析
+                </button>
+            </form>
+            </div>
     </div>
 </div>
 
@@ -138,6 +154,11 @@
                 <div class="form-group">
                     <label for="content">食事内容</label>
                     <textarea id="content" th:field="*{content}" class="form-control" rows="2" placeholder="例: ご飯、焼き魚、味噌汁" required></textarea>
+                    
+                    <button type="submit" th:formaction="@{/log/meal/analyze-text}" formnovalidate 
+                            class="button" style="background-color: #3498db; color: white; width: 100%; margin-top: 10px; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                        <i class="fa-solid fa-robot"></i> 内容から栄養計算＆トレーニング提案
+                    </button>
                 </div>
 
                 <div class="form-group">
@@ -190,7 +211,7 @@
             <img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4CAF50; padding: 2px;">
         </div>
         
-        <h3 style="color: #4CAF50; margin-bottom: 15px; font-weight: bold;">Good Job!</h3>
+        <h3 style="color: #4CAF50; margin-bottom: 15px; font-weight: bold;">AI Trainer's Advice!</h3>
         
         <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; position: relative;">
             <i class="fa-solid fa-quote-left" style="color: #bcdbf3; font-size: 1.5em; position: absolute; top: 10px; left: 10px;"></i>

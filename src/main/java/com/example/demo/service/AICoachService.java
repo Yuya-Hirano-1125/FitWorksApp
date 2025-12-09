@@ -1,6 +1,9 @@
 package com.example.demo.service;
 
+import java.time.LocalDate; // ★追加
+import java.time.YearMonth;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.annotation.PostConstruct;
 
@@ -9,9 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.dto.MealLogForm;
+import com.example.demo.entity.MealRecord;
 import com.example.demo.entity.TrainingRecord;
 import com.example.demo.entity.User;
 import com.google.genai.Client;
+import com.google.genai.errors.ClientException;
 import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Part;
@@ -24,7 +29,9 @@ public class AICoachService {
 
     private Client client;
 
-    // 起動時に一度だけクライアントを初期化（高速化）
+    private static final int MAX_RETRIES = 3;
+    private static final long RETRY_WAIT_MS = 2000;
+
     @PostConstruct
     public void init() {
         if (apiKey != null && !apiKey.isEmpty()) {
@@ -38,18 +45,12 @@ public class AICoachService {
         }
     }
 
-    /**
-     * チャットでの相談に対する回答を生成する
-     */
     public String generateCoachingAdvice(User user, List<TrainingRecord> history, String userMessage) {
         String systemPrompt = buildSystemPrompt(user, history);
         String fullPrompt = systemPrompt + "\n\nUser Question: " + userMessage;
         return callGeminiApi(fullPrompt); 
     }
 
-    /**
-     * トレーニング記録に対するワンポイントアドバイスを生成する
-     */
     public String generateTrainingAdvice(User user, String trainingSummary) {
         StringBuilder sb = new StringBuilder();
         sb.append("あなたはフィットネスアプリの専属AIトレーナーです。\n");
@@ -60,9 +61,6 @@ public class AICoachService {
         return callGeminiApi(sb.toString());
     }
 
-    /**
-     * 食事記録に対するワンポイントアドバイスを生成する
-     */
     public String generateMealAdvice(User user, MealLogForm form) {
         StringBuilder sb = new StringBuilder();
         sb.append("あなたは栄養管理の専門家AIです。");
@@ -75,9 +73,6 @@ public class AICoachService {
         return callGeminiApi(sb.toString());
     }
     
-    /**
-     * 食事内容に基づいたトレーニング提案
-     */
     public String generateDietBasedTrainingAdvice(User user, MealLogForm mealForm) {
         StringBuilder sb = new StringBuilder();
         sb.append("あなたは専属AIトレーナーです。\n");
@@ -101,9 +96,72 @@ public class AICoachService {
         return callGeminiApi(sb.toString());
     }
 
+    public String generateMonthlyDietAdvice(User user, List<MealRecord> records, YearMonth yearMonth) {
+        int totalCalories = records.stream().mapToInt(MealRecord::getCalories).sum();
+        
+        String allContent = records.stream()
+                .map(MealRecord::getContent)
+                .filter(c -> c != null && !c.trim().isEmpty())
+                .limit(30)
+                .collect(Collectors.joining("、"));
+        
+        if (allContent.length() > 500) {
+            allContent = allContent.substring(0, 500) + "...";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("あなたは専属AIトレーナーです。\n");
+        sb.append("ユーザーの").append(yearMonth.getYear()).append("年").append(yearMonth.getMonthValue()).append("月の1ヶ月間の食事記録を分析し、総評と今後のトレーニング方針を提案してください。\n\n");
+        
+        sb.append("【ユーザー】").append(user.getUsername()).append("さん\n");
+        sb.append("【月間データ】\n");
+        sb.append("- 食べたもの(抜粋): ").append(allContent).append("\n");
+        sb.append("- 月間総摂取カロリー: ").append(totalCalories).append("kcal\n");
+        sb.append("- 記録回数: ").append(records.size()).append("回\n");
+        
+        sb.append("\nルール: 250文字以内。食べたものの傾向（ジャンクが多い、ヘルシーなど）を分析し、それを解消または活かすトレーニングを提案する。熱血かつポジティブに。語尾にムキをつける。");
+
+        try {
+            return generateContentWithRetry(null, sb.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "分析に失敗しましたムキ...";
+        }
+    }
+
     /**
-     * コンディショニング・ケア提案
+     * ★追加: 週間レポートとトレーニング提案
      */
+    public String generateWeeklyDietAdvice(User user, List<MealRecord> records, LocalDate start, LocalDate end) {
+        int totalCalories = records.stream().mapToInt(MealRecord::getCalories).sum();
+        double avgCalories = totalCalories / (double) records.size(); // 単純平均
+
+        String allContent = records.stream()
+                .map(MealRecord::getContent)
+                .filter(c -> c != null && !c.trim().isEmpty())
+                .limit(20) // 週間なので少なめでOK
+                .collect(Collectors.joining("、"));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("あなたは専属AIトレーナーです。\n");
+        sb.append("今週(").append(start).append("～").append(end).append(")の食事記録を分析し、週末や来週に向けた具体的なアクションプランを提案してください。\n\n");
+        
+        sb.append("【ユーザー】").append(user.getUsername()).append("さん\n");
+        sb.append("【週間データ】\n");
+        sb.append("- 主な食事: ").append(allContent).append("\n");
+        sb.append("- 合計カロリー: ").append(totalCalories).append("kcal\n");
+        sb.append("- 1食平均:約").append((int)avgCalories).append("kcal\n");
+        
+        sb.append("\nルール: 200文字以内。週単位の振り返りとして、食べ過ぎた場合のリカバリー方法や、良い傾向ならそれを伸ばす筋トレメニューを提案。熱血かつポジティブに。語尾にムキをつける。");
+
+        try {
+            return generateContentWithRetry(null, sb.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "分析に失敗しましたムキ...";
+        }
+    }
+
     public String generateConditioningAdvice(User user, String conditionType) {
         StringBuilder sb = new StringBuilder();
         sb.append("あなたはユーザーの体を気遣うコンディショニング専門のAIトレーナーです。\n");
@@ -121,9 +179,6 @@ public class AICoachService {
         return callGeminiApi(sb.toString());
     }
 
-    /**
-     * ★追加: AIケアアドバイス生成
-     */
     public String generateCareAdvice(User user, String symptom, String recommendedExerciseName) {
         StringBuilder sb = new StringBuilder();
         sb.append("あなたはユーザーの体調を気遣う優しいAIトレーナーです。\n");
@@ -139,9 +194,6 @@ public class AICoachService {
         return callGeminiApi(sb.toString());
     }
 
-    /**
-     * 食事画像を解析して栄養素を推定する
-     */
     public String analyzeMealImage(MultipartFile imageFile) {
         try {
             if (this.client == null) return "{\"error\": \"AI機能が有効になっていません\"}";
@@ -168,27 +220,93 @@ public class AICoachService {
             Part textPart = Part.fromText(promptText);
             Content content = Content.fromParts(textPart, imagePart);
 
-            // ★Gemini 2.0 Flash (試験運用版) を使用
-            GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", content, null);
-            
-            String responseText = response.text();
-            
-            // JSONクリーニング処理
-            if (responseText.contains("```json")) {
-                responseText = responseText.substring(responseText.indexOf("```json") + 7);
-                if (responseText.contains("```")) {
-                    responseText = responseText.substring(0, responseText.indexOf("```"));
-                }
-            } else if (responseText.contains("```")) {
-                responseText = responseText.replace("```", "");
-            }
-            
-            return responseText.trim();
+            return generateContentWithRetry(content, null);
 
         } catch (Exception e) {
             e.printStackTrace();
             return "{\"error\": \"AI解析に失敗しました: " + e.getMessage().replace("\"", "'") + "\"}";
         }
+    }
+
+    public String analyzeMealText(String textDescription) {
+        try {
+            if (this.client == null) return "{\"error\": \"AI機能が有効になっていません\"}";
+
+            String promptText = """
+                以下の食事内容の説明文から、栄養素を推定してください。
+                入力テキスト: "%s"
+
+                以下の情報をJSON形式で出力してください。Markdownのコードブロックは不要です。純粋なJSON文字列のみを返してください。
+                推測で構わないので、必ず数値を埋めてください。
+
+                {
+                    "content": "料理名（日本語で整理して）",
+                    "calories": カロリー(整数),
+                    "protein": タンパク質g(数値),
+                    "fat": 脂質g(数値),
+                    "carbohydrate": 炭水化物g(数値),
+                    "comment": "AIからの短いコメント（50文字以内）"
+                }
+                """.formatted(textDescription);
+
+            return generateContentWithRetry(null, promptText);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{\"error\": \"テキスト解析に失敗しました\"}";
+        }
+    }
+
+    private String generateContentWithRetry(Content content, String promptText) throws Exception {
+        int attempt = 0;
+        Exception lastException = null;
+
+        while (attempt < MAX_RETRIES) {
+            try {
+                GenerateContentResponse response;
+                if (content != null) {
+                    response = client.models.generateContent("gemini-2.5-flash", content, null);
+                } else {
+                    response = client.models.generateContent("gemini-2.5-flash", promptText, null);
+                }
+                return cleanJsonResult(response.text());
+
+            } catch (ClientException e) {
+                if (e.getMessage().contains("429") || e.getMessage().contains("Quota exceeded")) {
+                    lastException = e;
+                    attempt++;
+                    System.out.println("Gemini API Rate Limit hit. Retrying... (" + attempt + "/" + MAX_RETRIES + ")");
+                    
+                    if (attempt < MAX_RETRIES) {
+                        try {
+                            Thread.sleep(RETRY_WAIT_MS * attempt);
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            throw new Exception("解析処理が中断されました。");
+                        }
+                    }
+                } else {
+                    throw e;
+                }
+            }
+        }
+        
+        System.err.println("Gemini API Retry Failed: " + lastException.getMessage());
+        return "{\"error\": \"現在アクセスが集中しており解析できません。少し時間を置いて再試行してください。\"}";
+    }
+
+    private String cleanJsonResult(String responseText) {
+        if (responseText == null) return "{}";
+        String cleaned = responseText.trim();
+        if (cleaned.contains("```json")) {
+            cleaned = cleaned.substring(cleaned.indexOf("```json") + 7);
+            if (cleaned.contains("```")) {
+                cleaned = cleaned.substring(0, cleaned.indexOf("```"));
+            }
+        } else if (cleaned.contains("```")) {
+            cleaned = cleaned.replace("```", "");
+        }
+        return cleaned.trim();
     }
 
     private String buildSystemPrompt(User user, List<TrainingRecord> history) {
