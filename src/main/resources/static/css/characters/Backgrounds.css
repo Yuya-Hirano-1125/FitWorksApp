@@ -1,334 +1,165 @@
-/* ========================================================= */
-/* BASE STYLE (提供されたCSSをTailwind環境に移植) */
-/* ========================================================= */
-
-/* --- CSS VARIABLES --- */
 :root {
-    --primary-color: #ff69b4;     /* さくらピンク (メインアクション) */
-    --secondary-color: #ffb6c1;   /* ライトピンク (サブ) */
-    --ai-accent-color: #87ceeb;   /* スカイブルー (AI強調/アクセント) */
-    --dark-text: #4a4a4a;         /* 濃いテキスト */
-    --light-bg: #fce4ec;          /* 薄いピンクの背景 (メイン背景) */
-    --container-bg: #ffffff;      /* カード背景 (白) */
+    /* スクリーンショットの雰囲気に合わせたピンク系テーマ */
+    --primary-color: #ec4899; /* ピンク */
+    --bg-color: #fce7f3;      /* 薄いピンク背景 */
+    --text-main: #374151;
+    --card-border: #fbcfe8;
 }
 
-/* --- ANIMATIONS: MOVEMENT & GLOW --- */
-@keyframes dreamyBackground {
-    0% { background-position: 0% 50%; background-color: #fce4ec; }
-    25% { background-position: 50% 75%; background-color: #f8bbd0; }
-    50% { background-position: 100% 50%; background-color: #e1bee7; }
-    75% { background-position: 50% 25%; background-color: #c5eff7; }
-    100% { background-position: 0% 50%; background-color: #fce4ec; }
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes softPulse {
-    0% { box-shadow: 0 0 10px rgba(255, 105, 180, 0.4); }
-    50% { box-shadow: 0 0 20px rgba(255, 160, 190, 0.7); }
-    100% { box-shadow: 0 0 10px rgba(255, 105, 180, 0.4); }
-}
-@keyframes gentleFloat {
-    0% { transform: translatey(0px); }
-    50% { transform: translatey(-8px); }
-    100% { transform: translatey(0px); }
-}
-@keyframes popIn {
-    0% { opacity: 0; transform: scale(0.95); }
-    100% { opacity: 1; transform: scale(1); }
-}
-
-
-/* --- CORE STRUCTURE --- */
 body {
-    /* よりドリーミーな背景グラデーションとアニメーション */
-    background: linear-gradient(135deg, #fce4ec, #f8bbd0, #e1bee7, #c5eff7); 
-    background-size: 400% 400%;
-    animation: dreamyBackground 30s ease infinite alternate; 
-    font-family: 'Poppins', 'Noto Sans JP', sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    background-color: var(--bg-color);
+    color: var(--text-main);
     min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-    color: var(--dark-text);
-    overflow-x: hidden;
-    padding-bottom: 80px; /* ボトムナビのスペース */
+    font-family: 'Noto Sans JP', sans-serif;
 }
 
 .main-container {
-    background: var(--container-bg);
-    padding: 45px 55px;
-    border-radius: 25px; 
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 5px var(--secondary-color);
-    transition: all 0.5s cubic-bezier(.25,.8,.25,1);
-    width: 100%;
-    box-sizing: border-box;
-    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards; 
-    max-width: 700px; 
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    padding-bottom: 4rem;
+}
+
+/* --- タイトルエリア --- */
+.page-header {
     text-align: center;
-
-    /* 戻るボタンの高さ分余白を確保 */
-    padding-bottom: 120px;
+    margin-bottom: 3rem;
+}
+.page-title {
+    color: var(--primary-color);
+    text-shadow: 2px 2px 0px rgba(255,255,255,0.8);
 }
 
-
-.main-container:hover {
-    transform: translateY(-1px) scale(1.01); 
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), 0 0 20px var(--primary-color), 0 0 0 8px var(--primary-color);
+/* --- セクション見出し --- */
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-left: 0.5rem;
+    border-left: 5px solid var(--primary-color);
 }
 
-/* ヘッダーセクション */
-.header-section {
+.section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #db2777; /* 少し濃いピンク */
+    margin-left: 0.75rem;
+}
+
+/* --- グリッドレイアウト --- */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+/* --- カードデザイン --- */
+.bg-card {
+    background: #4b5563; /* スクショのような濃いグレー */
+    color: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 3px solid transparent;
+}
+
+.bg-card:hover {
+    transform: translateY(-4px);
+}
+
+/* 選択中のスタイル */
+.bg-card.selected {
+    border-color: #f472b6; /* 明るいピンク枠 */
+    box-shadow: 0 0 15px rgba(236, 72, 153, 0.5);
+}
+
+.card-image-wrapper {
+    width: 100%;
+    aspect-ratio: 16/9;
+    position: relative;
+    background: #374151;
+}
+
+.card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ロック時のオーバーレイ */
+.card-lock-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 35px;
-    animation: fadeIn 0.8s ease-out forwards;
-}
-
-.header-section h1 {
-    color: var(--primary-color);
-    margin-bottom: 5px;
-    font-size: 45px; 
-    font-weight: 900; 
-    letter-spacing: 2px;
-    text-shadow: 0 0 20px rgba(255, 105, 180, 0.4); 
-    margin-top: 0.5rem; /* Tailwindのpt-8に相当する調整 */
-}
-.sub-heading {
-    color: var(--dark-text); 
-    opacity: 0.8; 
-    font-size: 18px; 
-    font-weight: 500;
-}
-
-/* ボタン共通スタイル */
-.button.secondary {
-    /* 戻るボタンのスタイルを二次ボタンに合わせる */
-    background: #ffffff; 
-    color: var(--dark-text);
-    border: 3px solid var(--secondary-color); 
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); 
-    font-size: 17px;
-    padding: 16px 35px;
-    font-weight: 700;
-    border-radius: 35px;
-    transition: all 0.4s cubic-bezier(.68,-0.55,.26,1.55);
-    display: inline-flex; /* iタグとの配置を調整 */
-    align-items: center;
     justify-content: center;
-}
-.button.secondary:hover {
-    /* ホバー時の設定は維持 */
-    animation: none;
-    background: #fffafa; 
-    border-color: var(--primary-color); 
-    box-shadow: 0 8px 20px rgba(255, 105, 180, 0.4); 
-    transform: translateY(-4px) scale(1.01) rotate(1deg);
+    color: #fbbf24; /* 金色の鍵アイコン */
+    z-index: 10;
 }
 
-/* ★ Card Styles (ふわふわテーマに最適化) */
-.background-section {
-    /* Tailwindのsectionスタイルを上書き */
-    background-color: var(--container-bg);
-    border-radius: 20px;
-    padding: 25px; /* カードリスト部分のパディングを調整 */
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); /* ソフトな影 */
-}
-
-.background-section h2 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--dark-text);
-    border-bottom: 2px solid var(--secondary-color);
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-/* --- ロック状態追加 --- */
-.background-card.locked {
-    opacity: 0.5;
-    pointer-events: none; /* 全体クリック不可にする場合 */
-}
-.background-card.locked .select-button {
-    background: gray;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-/* ロックアイコンの位置とスタイル */
-.lock-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 1.5rem;
-    color: rgba(0,0,0,0.7);
-}
-.background-card.locked {
-    opacity: 0.6; /* 全体を薄暗く */
-}
-.background-card.locked .select-button {
-    background: gray;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-.background-card {
-    /* カードの基本スタイル */
-    overflow: hidden;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.4s cubic-bezier(.25,.8,.25,1);
-    cursor: pointer;
-    background-color: #fff;
-    border: 4px solid transparent; /* 初期は透明な枠 */
-}
-
-.background-card:hover {
-    transform: translateY(-5px) scale(1.03); /* 大きく浮き上がる */
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-}
-.background-card.selected {
-    border-color: var(--primary-color); /* 選択時はプライマリカラーの枠 */
-    animation: softPulse 2s ease-in-out infinite alternate; /* 柔らかいパルス */
-}
-
-.card-image-container {
-    position: relative;
-    overflow: hidden;
-    background-color: #eee;
-}
-
-.card-image-container img {
-    /* 画像をファイル名に置き換えるため、placehold.coの代わりに実際のファイル名を使用 */
-    transition: transform 0.5s ease;
-}
-
-.background-card:hover .card-image-container img {
-    transform: scale(1.05);
-}
-
-.card-name-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+.card-body {
+    padding: 1rem;
+    text-align: center;
+    flex-grow: 1;
     display: flex;
-    align-items: flex-end;
-    padding: 12px;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-title {
+    font-weight: 700;
     font-size: 1rem;
-    font-weight: 700;
-    color: white;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    margin-bottom: 0.25rem;
+    color: #f3f4f6; /* 白っぽい文字 */
 }
 
-.card-status-area {
-    padding: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: var(--container-bg);
-}
-
+/* ボタン・リンク */
 .status-text {
-    color: var(--primary-color);
-    font-weight: 800;
-    font-size: 1rem;
-}
-.unlock-text {
-    color: #666;
     font-size: 0.9rem;
-    font-weight: 700;
-}
-.unlock-button {
-    display: inline-block;
-    padding: 10px 20px;
-    border-radius: 25px;
-    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-    color: #fff;
-    font-weight: 800;
-    font-size: 0.95rem;
-    border: none;
+    font-weight: bold;
+    text-decoration: underline;
     cursor: pointer;
-    box-shadow: 0 6px 15px rgba(255, 105, 180, 0.4);
-    transition: all 0.3s cubic-bezier(.68,-0.55,.26,1.55);
-    animation: gentleFloat 4s ease-in-out infinite alternate;
-}
-.unlock-button:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 10px 25px rgba(255, 105, 180, 0.6);
-    background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
 }
 
+.text-unlock-ready { color: #f472b6; } /* 解放可能：ピンク */
+.text-locked { color: #9ca3af; text-decoration: none; } /* ロック中：グレー */
+.text-selected { color: #34d399; text-decoration: none; } /* 選択中：緑 */
 
-/* 錠前アイコンの位置とスタイル */
-.lock-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* 中央に配置 */
-    font-size: 3rem;                  /* 大きめで目立つ */
-    color: #ffd700;                   /* ゴールド系の黄色 */
-    border-radius: 50%;               /* 丸背景 */
-    padding: 15px;                    /* アイコン周囲に余白 */
-    text-shadow: 0 0 12px rgba(255, 215, 0, 0.9); /* 光沢感を追加 */
-    pointer-events: none;             /* クリックを邪魔しない */
+/* --- 戻るボタン --- */
+.back-btn-area {
+    margin-top: 3rem;
+    text-align: center;
 }
 
-
-
-.background-card.locked {
-    opacity: 0.6; /* 全体を薄暗く */
-}
-.background-card.locked .select-button {
-    background: rgb(0, 255, 255);
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-
-.select-button {
-    /* 選択ボタンのスタイルをプライマリボタンから流用 */
-    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-    color: #ffffff; 
-    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.5);
-    font-weight: 700;
-    padding: 10px 15px;
-    border-radius: 30px;
-    transition: all 0.3s cubic-bezier(.68,-0.55,.26,1.55);
-    font-size: 0.9rem;
+.menu-back-btn {
+    display: inline-block;
     width: 100%;
+    max-width: 500px; /* 横幅を制限 */
+    padding: 1rem 2rem;
+    background-color: white;
+    border: 3px solid var(--primary-color); /* ピンクの枠線 */
+    color: var(--primary-color); /* ピンクの文字 */
+    font-weight: 800;
+    font-size: 1.1rem;
+    border-radius: 9999px; /* 丸みのあるピル型 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    text-decoration: none;
 }
 
-.select-button:hover {
+.menu-back-btn:hover {
+    background-color: #fdf2f8;
     transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(255, 105, 180, 0.8);
-    background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+    box-shadow: 0 6px 12px rgba(236, 72, 153, 0.15);
 }
 
-/* モバイル調整 */
-@media (max-width: 600px) {
-    .main-container {
-        padding: 35px 30px;
-        max-width: 98%;
-        animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.27) forwards;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1), 0 0 0 3px var(--secondary-color);
-    }
-    .header-section h1 {
-        font-size: 36px;
-    }
-    .sub-heading {
-        font-size: 16px;
-    }
-    .background-section {
-        padding: 15px;
-    }
-    .background-section h2 {
-        font-size: 1.3rem;
-    }
-    .background-card:hover {
-          transform: translateY(-2px) scale(1.02);
-    }
-}
+/* ポップアップ制御用 */
+.popup-hidden { display: none !important; }
