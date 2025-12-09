@@ -1,372 +1,243 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org"> 
-	<head>
-	    <meta charset="UTF-8">
-	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	    <title>背景一覧 | FitWorks</title>
-	    
-	    <!-- Google Fonts -->
-	    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
-	    
-	    <!-- Tailwind -->
-	    <script src="https://cdn.tailwindcss.com"></script>
-	    
-	    <!-- あなたのCSS -->
-	    <link rel="stylesheet" th:href="@{/css/characters/Backgrounds.css}">
-	    
-	    <!-- ★ Font Awesome 読み込み（これを追加） -->
-	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>背景一覧 | FitWorks</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-	    <style>
-	        .card-name-overlay { pointer-events: none; }
-	        .background-card.selected {
-	            border: 3px solid var(--primary-color);
-	            box-shadow: 0 0 10px var(--primary-color);
-	        }
-	        .status-text { color: var(--primary-color); font-weight: bold; }
-	        .select-button {
-	            padding: 0.5rem 1rem;
-	            border-radius: 0.5rem;
-	            background: var(--primary-color);
-	            color: #fff;
-	            font-weight: 700;
-	            transition: opacity .2s ease;
-	        }
-	        .select-button:hover { opacity: .9; }
-
-	        /* ★ 追加: ロック中でも解放ボタンはクリック可能にする */
-	        .background-card.locked {
-	            opacity: 0.6;
-	            pointer-events: none; /* 全体はクリック不可 */
-	            position: relative;
-	        }
-	        .background-card.locked .unlock-button {
-	            pointer-events: auto; /* ボタンだけクリック可能にする */
-	            position: relative;
-	            z-index: 10; /* 前面に出す */
-	        }
-	    </style>
-	</head>
+    <link rel="stylesheet" th:href="@{/css/characters/Backgrounds.css}">
+</head>
 
 <body class="font-sans">
 
-<div class="main-container"> 
-    
-    <div class="header-section">
-        <h1 class="flex items-center">
-            <i class="fa-solid fa-cloud mr-3 text-[var(--primary-color)] text-4xl"></i> 
-            背景一覧
-        </h1>
-        <p class="sub-heading">ホーム画面の背景をカスタマイズできます</p>
+    <div class="main-container"> 
+        
+        <div class="page-header">
+            <h1 class="page-title text-3xl font-extrabold flex items-center justify-center gap-2">
+                <i class="fa-solid fa-image"></i>
+                背景一覧
+            </h1>
+            <p class="text-gray-500 mt-2 text-sm font-bold">ホーム画面の背景カスタマイズ</p>
+        </div>
+
+        <div id="content-area"></div>
+
+        <div class="back-btn-area">
+            <a th:href="@{/characters/menu/CharactersMenu}" class="menu-back-btn">
+                メニューに戻る
+            </a>
+        </div>
+
     </div>
 
-    <section class="background-section">
-        <h2>背景選択</h2>
-        
-        <div id="background-list" class="grid grid-cols-2 sm:grid-cols-3 gap-6">
+    <div id="data-source" style="display: none;">
+        <div class="data-item" data-id="fire" data-category="nature" data-name="炎の世界" data-bg="fire-original" 
+             data-img-src="/img/background/fire-original.png" data-locked="false" data-unlock-level="0"></div>
 
-            
-			<!-- 🔥 炎の世界：常時解放 -->
-			<div id="card-fire" class="background-card" data-bg="fire-original" data-unlock="0">
-			    <div class="card-image-container aspect-video">
-			        <img th:src="@{/img/background/fire-original.png}" alt="炎の世界" class="w-full h-full object-cover cursor-pointer">
-			        <div class="card-name-overlay">炎の世界</div>
-			    </div>
-			    <div class="card-status-area">
-			        <button type="button" class="select-button">選択</button>
-			    </div>
-			</div>
+        <div class="data-item" data-id="water" data-category="nature" data-name="水の世界" data-bg="water-original" 
+             data-img-src="/img/background/water-original.png" data-locked="true" data-unlock-level="40"></div>
 
-			<!-- 💧 水の世界：Lv40で解放 -->
-			<div id="card-water" class="background-card locked" data-bg="water-original" data-unlock="40">
-			    <div class="card-image-container aspect-video">
-			        <img th:src="@{/img/background/water-original.png}" alt="水の世界" class="w-full h-full object-cover cursor-pointer">
-			        <div class="card-name-overlay">水の世界</div>
-			        <i class="fa-solid fa-lock lock-icon"></i>
-			    </div>
-			    <div class="card-status-area">
-			        <p class="unlock-text">必要レベル: 40</p>
-			    </div>
-			</div>
+        <div class="data-item" data-id="grass" data-category="nature" data-name="木の世界" data-bg="grass-original" 
+             data-img-src="/img/background/grass-original.png" data-locked="true" data-unlock-level="70"></div>
 
-			<!-- 🌳 木の世界：Lv70で解放 -->
-			<div id="card-grass" class="background-card locked" data-bg="grass-original" data-unlock="70">
-			    <div class="card-image-container aspect-video">
-			        <img th:src="@{/img/background/grass-original.png}" alt="木の世界" class="w-full h-full object-cover cursor-pointer">
-			        <div class="card-name-overlay">木の世界</div>
-			        <i class="fa-solid fa-lock lock-icon"></i>
-			    </div>
-			    <div class="card-status-area">
-			        <p class="unlock-text">必要レベル: 70</p>
-			    </div>
-			</div>
+        <div class="data-item" data-id="light" data-category="nature" data-name="光の世界" data-bg="cloud-sky" 
+             data-img-src="/img/background/light-original.png" data-locked="true" data-unlock-level="100"></div>
 
-			<!-- 🌟 光の世界：Lv100で解放 -->
-			<div id="card-cloud-sky" class="background-card locked" data-bg="cloud-sky" data-unlock="100">
-			    <div class="card-image-container aspect-video">
-			        <img th:src="@{/img/background/light-original.png}" alt="光の世界" class="w-full h-full object-cover cursor-pointer">
-			        <div class="card-name-overlay">光の世界</div>
-			        <i class="fa-solid fa-lock lock-icon"></i>
-			    </div>
-			    <div class="card-status-area">
-			        <p class="unlock-text">必要レベル: 100</p>
-			    </div>
-			</div>
+        <div class="data-item" data-id="dark" data-category="nature" data-name="闇の世界" data-bg="dark-castle" 
+             data-img-src="/img/background/dark-original.png" data-locked="true" data-unlock-level="130"></div>
 
-			<!-- 🌑 闇の世界：Lv130で解放 -->
-			<div id="card-dark-castle" class="background-card locked" data-bg="dark-castle" data-unlock="130">
-			    <div class="card-image-container aspect-video">
-			        <img th:src="@{/img/background/dark-original.png}" alt="闇の世界" class="w-full h-full object-cover cursor-pointer">
-			        <div class="card-name-overlay">闇の世界</div>
-			        <i class="fa-solid fa-lock lock-icon"></i>
-			    </div>
-			    <div class="card-status-area">
-			        <p class="unlock-text">必要レベル: 130</p>
-			    </div>
-			</div>
+        <div class="data-item" data-id="classroom" data-category="special" data-name="教室" data-bg="classroom" 
+             data-img-src="/img/background/classroom.png" data-locked="true" data-material="true"></div>
 
-			<!-- 🏫 教室：素材必要 -->
-			<div id="card-classroom" class="background-card locked" data-bg="classroom" data-material="true">
-			    <div class="card-image-container aspect-video">
-			        <img th:src="@{/img/background/classroom.png}" alt="教室" class="w-full h-full object-cover cursor-pointer">
-			        <div class="card-name-overlay">教室</div>
-			        <i class="fa-solid fa-lock lock-icon"></i>
-			    </div>
-			    <div class="card-status-area">
-			        <p class="unlock-text">素材が1つ必要です</p>
-			    </div>
-			</div>
+        <div class="data-item" data-id="gaming" data-category="special" data-name="ゲーミングルーム" data-bg="gaming-room" 
+             data-img-src="/img/background/gaming-room.png" data-locked="true" data-material="true"></div>
+             
+        <div class="data-item" data-id="server" data-category="special" data-name="サーバールーム" data-bg="server-room" 
+             data-img-src="/img/background/server-room.png" data-locked="true" data-material="true"></div>
+    </div>
 
-			<!-- 🎮 ゲーミングルーム：素材必要 -->
-			<div id="card-gaming-room" class="background-card locked" data-bg="gaming-room" data-material="true">
-			    <div class="card-image-container aspect-video">
-			        <img th:src="@{/img/background/gaming-room.png}" alt="ゲーミングルーム" class="w-full h-full object-cover cursor-pointer">
-			        <div class="card-name-overlay">ゲーミングルーム</div>
-			        <i class="fa-solid fa-lock lock-icon"></i>
-			    </div>
-			    <div class="card-status-area">
-			        <p class="unlock-text">素材が1つ必要です</p>
-			    </div>
-			</div>
 
-			<!-- 🌲 深い森：素材必要 -->
-			<div id="card-deep-forest" class="background-card locked" data-bg="deep-forest" data-material="true">
-			    <div class="card-image-container aspect-video">
-			        <img th:src="@{/img/background/deep-forest.png}" alt="深い森" class="w-full h-full object-cover cursor-pointer">
-			        <div class="card-name-overlay">深い森</div>
-			        <i class="fa-solid fa-lock lock-icon"></i>
-			    </div>
-			    <div class="card-status-area">
-			        <p class="unlock-text">素材が1つ必要です</p>
-			    </div>
-			</div>
+    <div id="unlock-popup" class="popup-hidden fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 text-center max-w-sm w-full">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">ロック解放</h3>
+            <p id="unlock-message" class="mb-6 text-gray-600 font-medium"></p>
+            <div class="flex gap-4 justify-center">
+                <button id="cancel-unlock" class="flex-1 py-2 bg-gray-200 text-gray-600 rounded-lg font-bold">キャンセル</button>
+                <button id="confirm-unlock" class="flex-1 py-2 bg-[var(--primary-color)] text-white rounded-lg font-bold shadow-md">解放する</button>
+            </div>
+        </div>
+    </div>
 
-			<!-- 🏙 街並み：素材必要 -->
-			<div id="card-town-view" class="background-card locked" data-bg="town-view" data-material="true">
-			    <div class="card-image-container aspect-video">
-			        <img th:src="@{/img/background/town-view.png}" alt="街並み" class="w-full h-full object-cover cursor-pointer">
-			        <div class="card-name-overlay">街並み</div>
-			        <i class="fa-solid fa-lock lock-icon"></i>
-			    </div>
-			    <div class="card-status-area">
-			        <p class="unlock-text">素材が1つ必要です</p>
-			    </div>
-			</div>
-
-			<!-- 💻 サーバールーム：素材必要 -->
-			<div id="card-server-room" class="background-card locked" data-bg="server-room" data-material="true">
-			    <div class="card-image-container aspect-video">
-			        <img th:src="@{/img/background/server-room.png}" alt="サーバールーム" class="w-full h-full object-cover cursor-pointer">
-			        <div class="card-name-overlay">サーバールーム</div>
-			        <i class="fa-solid fa-lock lock-icon"></i>
-			    </div>
-			    <div class="card-status-area">
-			        <p class="unlock-text">素材が1つ必要です</p>
-			    </div>
-			</div>
-
-			<!-- ❄️ 雪道：素材必要 -->
-			<div id="card-snow-road" class="background-card locked" data-bg="snow-road" data-material="true">
-			    <div class="card-image-container aspect-video">
-			        <img th:src="@{/img/background/snow-road.png}" alt="雪道" class="w-full h-full object-cover cursor-pointer">
-			        <div class="card-name-overlay">雪道</div>
-			        <i class="fa-solid fa-lock lock-icon"></i>
-			    </div>
-			    <div class="card-status-area">
-			        <p class="unlock-text">素材が1つ必要です</p>
-			    </div>
-			</div>
-
+    <script src="Backgrounds.js" defer></script>
     
-			<div class="back-btn-container fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-			    <a th:href="@{/characters/menu/CharactersMenu}" 
-			       class="button secondary w-full max-w-xl px-10 py-5 text-2xl font-bold rounded-lg 
-			              bg-[var(--primary-color)] text-white hover:opacity-90 shadow-lg transition text-center">
-			        <i class="fa-solid fa-arrow-left mr-3"></i> キャラクターメニューに戻る
-			    </a>
-			</div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const hasMaterial = true; 
+        const contentArea = document.getElementById('content-area');
 
+        // データ読み込み
+        const dataItems = document.querySelectorAll('#data-source .data-item');
+        const bgList = [];
+        
+        dataItems.forEach(item => {
+            let isLocked = item.dataset.locked === "true";
+            const unlockLevel = parseInt(item.dataset.unlockLevel || 0);
+            if (unlockLevel === 0) isLocked = false; 
 
+            bgList.push({
+                id: item.dataset.id,
+                category: item.dataset.category || 'other',
+                name: item.dataset.name,
+                bgCode: item.dataset.bg,
+                imgSrc: item.dataset.imgSrc,
+                locked: isLocked,
+                unlockLevel: unlockLevel,
+                needsMaterial: item.dataset.material === "true",
+                selected: false
+            });
+        });
+        
+        // 初期選択
+        bgList[0].selected = true;
 
-			<!-- 画像プレビュー用ポップアップ -->
-			<div id="popup" class="hidden fixed inset-0 z-[1000] bg-black/70 flex items-center justify-center p-4">
-			    <div class="flex flex-col items-center">
-			        <img id="popup-image" src="" alt="背景全体" class="max-w-[90vw] max-h-[80vh] rounded shadow-lg">
-			        <button id="close-popup" 
-			                class="mt-6 px-8 py-3 rounded-lg font-bold text-white 
-			                       bg-[var(--primary-color)] hover:opacity-90 
-			                       shadow-lg transition" type="button">
-			            閉じる
-			        </button>
-			    </div>
-			</div>
+        const categories = [
+            { id: 'nature', title: '自然・元素', icon: 'fa-leaf' },
+            { id: 'special', title: '日常・スペシャル', icon: 'fa-star' }
+        ];
 
-			<!-- 解放確認ポップアップ -->
-			<div id="unlock-popup" class="hidden fixed inset-0 z-[1000] bg-black/70 flex items-center justify-center p-4">
-			  <div class="bg-white rounded-lg shadow-lg p-6 text-center">
-			    <p id="unlock-message" class="mb-6 text-lg font-bold"></p>
-			    <div class="flex gap-6 justify-center">
-			      <button id="confirm-unlock" class="px-6 py-2 bg-[var(--primary-color)] text-white rounded-lg font-bold">はい</button>
-			      <button id="cancel-unlock" class="px-6 py-2 bg-gray-400 text-white rounded-lg font-bold">いいえ</button>
-			    </div>
-			  </div>
-			</div>
+        function renderAll() {
+            contentArea.innerHTML = ''; 
 
+            categories.forEach(cat => {
+                const items = bgList.filter(item => item.category === cat.id);
+                if (items.length === 0) return;
 
-	<script src="Backgrounds.js" defer></script>
-	<script>
-	document.addEventListener('DOMContentLoaded', () => {
+                const section = document.createElement('div');
+                section.className = 'mb-8';
+                
+                section.innerHTML = `
+                    <div class="section-header">
+                        <h2 class="section-title">${cat.title}</h2>
+                    </div>
+                    <div class="card-grid" id="grid-${cat.id}"></div>
+                `;
+                contentArea.appendChild(section);
+                const grid = section.querySelector(`#grid-${cat.id}`);
 
-	    const hasMaterial = true; // 素材があると仮定
+                items.forEach(bg => {
+                    const card = document.createElement('div');
+                    card.className = `bg-card ${bg.selected ? 'selected' : ''}`;
+                    
+                    let overlayHtml = '';
+                    let actionHtml = '';
 
-	    const backgroundList = document.getElementById('background-list');
-	    const popup = document.getElementById('popup');
-	    const popupImage = document.getElementById('popup-image');
-	    const closePopup = document.getElementById('close-popup');
+                    if (bg.locked) {
+                        let lockText = `Lv.${bg.unlockLevel}で解放`;
+                        let isUnlockable = false;
+                        
+                        if (bg.needsMaterial) {
+                            lockText = hasMaterial ? "解放可能" : "素材不足";
+                            if (hasMaterial) isUnlockable = true;
+                        } else if (bg.unlockLevel > 0) {
+                            lockText = `Lv.${bg.unlockLevel}で解放`;
+                        }
 
-	    // 解放確認ポップアップ要素
-	    const unlockPopup = document.getElementById('unlock-popup');
-	    const unlockMessage = document.getElementById('unlock-message');
-	    const confirmUnlock = document.getElementById('confirm-unlock');
-	    const cancelUnlock = document.getElementById('cancel-unlock');
+                        overlayHtml = `
+                            <div class="card-lock-overlay">
+                                <i class="fa-solid fa-lock text-2xl mb-1"></i>
+                                <span class="text-xs font-bold tracking-widest">LOCKED</span>
+                            </div>
+                        `;
 
-	    let targetUnlockCard = null; // 解放対象カードを保持
+                        if (isUnlockable) {
+                            actionHtml = `<span class="status-text text-unlock-ready unlock-trigger">解放する</span>`;
+                        } else {
+                            actionHtml = `<span class="status-text text-locked">${lockText}</span>`;
+                        }
 
-	    // 素材系カードに「解放」ボタンを出す
-	    if (hasMaterial) {
-	        document.querySelectorAll('.background-card.locked[data-material="true"]').forEach(card => {
-	            const statusArea = card.querySelector('.card-status-area');
-	            statusArea.innerHTML = '<button type="button" class="unlock-button">解放</button>';
-	        });
-	    }
+                    } else {
+                        if (bg.selected) {
+                            actionHtml = `<span class="status-text text-selected"><i class="fa-solid fa-check"></i> 適用中</span>`;
+                        } else {
+                            actionHtml = `<span class="status-text text-unlock-ready select-trigger">選択する</span>`;
+                        }
+                    }
 
-	    // 解放ボタンクリックでポップアップ表示
-	    backgroundList.addEventListener('click', (e) => {
-	        const unlockBtn = e.target.closest('.unlock-button');
-	        if (unlockBtn) {
-	            targetUnlockCard = unlockBtn.closest('.background-card');
-	            const bgName = targetUnlockCard.querySelector('.card-name-overlay').textContent;
-	            unlockMessage.textContent = `${bgName} を解放しますか？`;
-	            unlockPopup.classList.remove('hidden');
-	            return;
-	        }
-	    });
+                    card.innerHTML = `
+                        <div class="card-image-wrapper">
+                            <img src="${bg.imgSrc}" alt="${bg.name}" class="card-img">
+                            ${overlayHtml}
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">${bg.name}</h3>
+                            ${actionHtml}
+                        </div>
+                    `;
+                    
+                    // イベント付与
+                    const unlockTrigger = card.querySelector('.unlock-trigger');
+                    if (unlockTrigger) {
+                        unlockTrigger.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            openUnlockPopup(bg);
+                        });
+                    }
 
-	    // 「はい」クリック → 解放処理
-	    confirmUnlock.addEventListener('click', () => {
-	        if (targetUnlockCard) {
-	            targetUnlockCard.classList.remove('locked');
-	            targetUnlockCard.querySelector('.lock-icon')?.remove();
-	            targetUnlockCard.querySelector('.card-status-area').innerHTML =
-	                '<button type="button" class="select-button">選択</button>';
-	        }
-	        unlockPopup.classList.add('hidden');
-	        targetUnlockCard = null;
-	    });
+                    const selectTrigger = card.querySelector('.select-trigger');
+                    if (selectTrigger) {
+                        selectTrigger.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            selectBackground(bg);
+                        });
+                        // カード全体クリックでも反応させる
+                        card.style.cursor = 'pointer';
+                        card.addEventListener('click', () => selectBackground(bg));
+                    }
 
-	    // 「いいえ」クリック → キャンセル
-	    cancelUnlock.addEventListener('click', () => {
-	        unlockPopup.classList.add('hidden');
-	        targetUnlockCard = null;
-	    });
+                    grid.appendChild(card);
+                });
+            });
+        }
 
-	    // 画像クリックでプレビュー表示
-	    backgroundList.addEventListener('click', (e) => {
-	        const img = e.target.closest('.card-image-container img');
-	        if (img) {
-	            popupImage.src = img.src;
-	            popup.classList.remove('hidden');
-	        }
-	    });
+        function selectBackground(bg) {
+            bgList.forEach(b => b.selected = false);
+            bg.selected = true;
+            renderAll();
+        }
 
-	    // 閉じるボタン
-	    closePopup.addEventListener('click', () => {
-	        popup.classList.add('hidden');
-	        popupImage.src = '';
-	    });
+        const unlockPopup = document.getElementById('unlock-popup');
+        const unlockMessage = document.getElementById('unlock-message');
+        const confirmUnlockBtn = document.getElementById('confirm-unlock');
+        const cancelUnlockBtn = document.getElementById('cancel-unlock');
 
-	    // 背景クリックでも閉じる
-	    popup.addEventListener('click', (e) => {
-	        if (e.target === popup) {
-	            popup.classList.add('hidden');
-	            popupImage.src = '';
-	        }
-	    });
+        function openUnlockPopup(bg) {
+            unlockMessage.textContent = `「${bg.name}」を解放しますか？`;
+            unlockPopup.classList.remove('popup-hidden');
+            
+            const newConfirm = confirmUnlockBtn.cloneNode(true);
+            confirmUnlockBtn.parentNode.replaceChild(newConfirm, confirmUnlockBtn);
+            
+            newConfirm.addEventListener('click', () => {
+                bg.locked = false;
+                bg.needsMaterial = false;
+                unlockPopup.classList.add('popup-hidden');
+                renderAll(); 
+            });
+        }
 
-	    // 選択ボタンで背景適用（イベント委譲）
-	    backgroundList.addEventListener('click', (e) => {
-	        const selectBtn = e.target.closest('.select-button');
-	        if (!selectBtn) return;
+        cancelUnlockBtn.addEventListener('click', () => {
+            unlockPopup.classList.add('popup-hidden');
+        });
 
-	        e.preventDefault();
+        renderAll();
+    });
+    </script>
 
-	        // ✅ 選択したカードを取得
-	        const targetCard = selectBtn.closest('.background-card');
-
-			// 全カードの選択解除＆ステータスをリセット
-			document.querySelectorAll('.background-card').forEach(card => {
-			    card.classList.remove('selected');
-			    const statusArea = card.querySelector('.card-status-area');
-			    if (!statusArea) return;
-
-			    const unlockLevel = parseInt(card.dataset.unlock || 0, 10);
-			    const needsMaterial = card.dataset.material === "true";
-
-			    if (card.classList.contains('locked')) {
-			        if (unlockLevel > 0) {
-			            statusArea.innerHTML = `<p class="unlock-text">必要レベル: ${unlockLevel}</p>`;
-			        } else if (needsMaterial) {
-			            // ✅ 素材があるときは解放ボタン、ないときは解放文字
-			            if (hasMaterial) {
-			                statusArea.innerHTML = '<button type="button" class="unlock-button">解放</button>';
-			            } else {
-			                statusArea.innerHTML = '<p class="unlock-text">素材が1つ必要です</p>';
-			            }
-			        } else {
-			            statusArea.innerHTML = '<p class="unlock-text">ロック</p>';
-			        }
-			    } else {
-			        statusArea.innerHTML = '<button type="button" class="select-button">選択</button>';
-			    }
-			});
-
-			// ✅ 対象カードを適用中に変更
-			targetCard.classList.add('selected');
-			const targetStatus = targetCard.querySelector('.card-status-area');
-			if (targetStatus) {
-			    targetStatus.innerHTML = '<p class="status-text">適用中</p>';
-			}
-			});
-
-			// ここで実際の背景適用処理が必要なら、データ属性で識別して反映（例）
-			// const bgKey = targetCard.dataset.bg;
-			// applyBackground(bgKey); // 例えばページ背景の切り替えなど
-			});
-
-	</script>
-
-
-
-</div>
 </body>
 </html>
