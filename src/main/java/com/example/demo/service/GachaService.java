@@ -54,27 +54,54 @@ public class GachaService {
     // ----------- ランダム抽選（確率テーブル方式）-----------
     private GachaItem getRandomItem() {
 
-        // ★ 確率テーブルを作成
+        // ★ 画像パス定義
+        String urImg = "/img/item/UR-niji.png";
+
+        String[] ssrImgs = {
+            "/img/item/SSR-red.png",
+            "/img/item/SSR-blue.png",
+            "/img/item/SSR-green.png",
+            "/img/item/SSR-yellow.png",
+            "/img/item/SSR-purple.png"
+        };
+
+        String[] srImgs = {
+            "/img/item/SR-red.png",
+            "/img/item/SR-blue.png",
+            "/img/item/SR-green.png",
+            "/img/item/SR-yellow.png",
+            "/img/item/SR-purple.png"
+        };
+
+        String[] rImgs = {
+            "/img/item/R-red.png",
+            "/img/item/R-blue.png",
+            "/img/item/R-green.png",
+            "/img/item/R-yellow.png",
+            "/img/item/R-purple.png"
+        };
+
+        // ★ 確率テーブル
         List<ProbabilityItem> table = List.of(
-            new ProbabilityItem("夢幻の鍵", "UR", "/img/ur.png", 2.35),
+            new ProbabilityItem("夢幻の鍵", "UR", urImg, 2.35),
 
-            new ProbabilityItem("赫焔鱗", "SSR", "/img/ssr.png", 3.53),
-            new ProbabilityItem("氷華の杖", "SSR", "/img/ssr.png", 3.53),
-            new ProbabilityItem("緑晶灯", "SSR", "/img/ssr.png", 3.53),
-            new ProbabilityItem("夢紡ぎの枕", "SSR", "/img/ssr.png", 3.53),
-            new ProbabilityItem("月詠みの杖", "SSR", "/img/ssr.png", 3.53),
+            new ProbabilityItem("赫焔鱗", "SSR", ssrImgs[random.nextInt(ssrImgs.length)], 3.53),
+            new ProbabilityItem("氷華の杖", "SSR", ssrImgs[random.nextInt(ssrImgs.length)], 3.53),
+            new ProbabilityItem("緑晶灯", "SSR", ssrImgs[random.nextInt(ssrImgs.length)], 3.53),
+            new ProbabilityItem("夢紡ぎの枕", "SSR", ssrImgs[random.nextInt(ssrImgs.length)], 3.53),
+            new ProbabilityItem("月詠みの杖", "SSR", ssrImgs[random.nextInt(ssrImgs.length)], 3.53),
 
-            new ProbabilityItem("赤の聖結晶", "SR", "/img/sr.png", 6.59),
-            new ProbabilityItem("青の聖結晶", "SR", "/img/sr.png", 6.59),
-            new ProbabilityItem("緑の聖結晶", "SR", "/img/sr.png", 6.59),
-            new ProbabilityItem("黄の聖結晶", "SR", "/img/sr.png", 6.59),
-            new ProbabilityItem("紫の聖結晶", "SR", "/img/sr.png", 6.59),
+            new ProbabilityItem("赤の聖結晶", "SR", srImgs[random.nextInt(srImgs.length)], 6.59),
+            new ProbabilityItem("青の聖結晶", "SR", srImgs[random.nextInt(srImgs.length)], 6.59),
+            new ProbabilityItem("緑の聖結晶", "SR", srImgs[random.nextInt(srImgs.length)], 6.59),
+            new ProbabilityItem("黄の聖結晶", "SR", srImgs[random.nextInt(srImgs.length)], 6.59),
+            new ProbabilityItem("紫の聖結晶", "SR", srImgs[random.nextInt(srImgs.length)], 6.59),
 
-            new ProbabilityItem("紅玉", "R", "/img/r.png", 8.94),
-            new ProbabilityItem("蒼玉", "R", "/img/r.png", 8.94),
-            new ProbabilityItem("翠玉", "R", "/img/r.png", 8.94),
-            new ProbabilityItem("聖玉", "R", "/img/r.png", 8.94),
-            new ProbabilityItem("闇玉", "R", "/img/r.png", 8.94)
+            new ProbabilityItem("紅玉", "R", rImgs[random.nextInt(rImgs.length)], 8.94),
+            new ProbabilityItem("蒼玉", "R", rImgs[random.nextInt(rImgs.length)], 8.94),
+            new ProbabilityItem("翠玉", "R", rImgs[random.nextInt(rImgs.length)], 8.94),
+            new ProbabilityItem("聖玉", "R", rImgs[random.nextInt(rImgs.length)], 8.94),
+            new ProbabilityItem("闇玉", "R", rImgs[random.nextInt(rImgs.length)], 8.94)
         );
 
         double r = random.nextDouble() * 100;
@@ -87,7 +114,7 @@ public class GachaService {
             }
         }
 
-        // 万が一合計誤差があっても最後のアイテムを返す
+        // 念のため最後のアイテム
         ProbabilityItem last = table.get(table.size() - 1);
         return new GachaItem(last.name, last.rarity, last.image);
     }
@@ -97,12 +124,9 @@ public class GachaService {
 
         return List.of(
             Map.of("rarity", "UR", "name", "夢幻の鍵", "rate", "2.35%", "color", "#FF66FF"),
-
-            Map.of("rarity", "SSR", "name", "赫焔鱗 / 氷華の杖 / 緑晶灯 / 夢紡ぎの枕 / 月詠みの杖", "rate", "17.65%", "color", "#FFD700"),
-
-            Map.of("rarity", "SR", "name", "各種聖結晶5種", "rate", "32.95%", "color", "#C0C0C0"),
-
-            Map.of("rarity", "R", "name", "紅玉 / 蒼玉 / 翠玉 / 聖玉 / 闇玉", "rate", "44.70%", "color", "#B87333")
+            Map.of("rarity", "SSR", "name", "SSR武具5種", "rate", "17.65%", "color", "#FFD700"),
+            Map.of("rarity", "SR", "name", "聖結晶5種", "rate", "32.95%", "color", "#C0C0C0"),
+            Map.of("rarity", "R", "name", "属性玉5種", "rate", "44.70%", "color", "#B87333")
         );
     }
 
