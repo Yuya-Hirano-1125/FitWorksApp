@@ -23,81 +23,101 @@ public class GachaService {
 
     private final Random random = new Random();
 
-    // ▼ 複数回ガチャ
+    // ----------- 複数回ガチャ -----------
     public List<GachaItem> roll(int count, Long userId) {
-
         List<GachaItem> results = new ArrayList<>();
-
         for (int i = 0; i < count; i++) {
             results.add(drawGacha(userId));
         }
-
         return results;
     }
 
-    // ▼ 単発ガチャ + DB保存
+    // ----------- 単発ガチャ + DB保存 -----------
     public GachaItem drawGacha(Long userId) {
 
         GachaItem item = getRandomItem();
 
-        // ★ 日本時間（JST）で現在時刻を取得
         ZonedDateTime nowJst = ZonedDateTime.now(ZoneId.of("Asia/Tokyo"));
-
-        // ★ 整ったフォーマットで保存
         String formattedDate = nowJst.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         GachaResult result = new GachaResult(
-            userId,
-            item.getName(),
-            item.getRarity(),
-            formattedDate
+                userId,
+                item.getName(),
+                item.getRarity(),
+                formattedDate
         );
 
         repository.save(result);
-
         return item;
     }
 
-    // ▼ ランダム抽選
+    // ----------- ランダム抽選（確率テーブル方式）-----------
     private GachaItem getRandomItem() {
 
-        int r = random.nextInt(100);
+        // ★ 確率テーブルを作成
+        List<ProbabilityItem> table = List.of(
+            new ProbabilityItem("夢幻の鍵", "UR", "/img/ur.png", 2.35),
 
-        if (r < 5) {
-            return new GachaItem("超レア・プログラム", "SSR", "/img/ssr.png");
-        } else if (r < 25) {
-            return new GachaItem("レア・プログラム", "SR", "/img/sr.png");
-        } else {
-            return new GachaItem("ノーマル・プログラム", "R", "/img/r.png");
+            new ProbabilityItem("赫焔鱗", "SSR", "/img/ssr.png", 3.53),
+            new ProbabilityItem("氷華の杖", "SSR", "/img/ssr.png", 3.53),
+            new ProbabilityItem("緑晶灯", "SSR", "/img/ssr.png", 3.53),
+            new ProbabilityItem("夢紡ぎの枕", "SSR", "/img/ssr.png", 3.53),
+            new ProbabilityItem("月詠みの杖", "SSR", "/img/ssr.png", 3.53),
+
+            new ProbabilityItem("赤の聖結晶", "SR", "/img/sr.png", 6.59),
+            new ProbabilityItem("青の聖結晶", "SR", "/img/sr.png", 6.59),
+            new ProbabilityItem("緑の聖結晶", "SR", "/img/sr.png", 6.59),
+            new ProbabilityItem("黄の聖結晶", "SR", "/img/sr.png", 6.59),
+            new ProbabilityItem("紫の聖結晶", "SR", "/img/sr.png", 6.59),
+
+            new ProbabilityItem("紅玉", "R", "/img/r.png", 8.94),
+            new ProbabilityItem("蒼玉", "R", "/img/r.png", 8.94),
+            new ProbabilityItem("翠玉", "R", "/img/r.png", 8.94),
+            new ProbabilityItem("聖玉", "R", "/img/r.png", 8.94),
+            new ProbabilityItem("闇玉", "R", "/img/r.png", 8.94)
+        );
+
+        double r = random.nextDouble() * 100;
+        double cumulative = 0;
+
+        for (ProbabilityItem p : table) {
+            cumulative += p.rate;
+            if (r < cumulative) {
+                return new GachaItem(p.name, p.rarity, p.image);
+            }
         }
+
+        // 万が一合計誤差があっても最後のアイテムを返す
+        ProbabilityItem last = table.get(table.size() - 1);
+        return new GachaItem(last.name, last.rarity, last.image);
     }
 
-    // ▼ 提供割合
+    // ----------- 提供割合表示用 -----------
     public List<Map<String, Object>> getProbabilityList() {
 
-        List<Map<String, Object>> list = new ArrayList<>();
+        return List.of(
+            Map.of("rarity", "UR", "name", "夢幻の鍵", "rate", "2.35%", "color", "#FF66FF"),
 
-        list.add(Map.of(
-                "rarity", "SSR",
-                "name", "超レア・プログラム",
-                "rate", "5%",
-                "color", "#FFD700"
-        ));
+            Map.of("rarity", "SSR", "name", "赫焔鱗 / 氷華の杖 / 緑晶灯 / 夢紡ぎの枕 / 月詠みの杖", "rate", "17.65%", "color", "#FFD700"),
 
-        list.add(Map.of(
-                "rarity", "SR",
-                "name", "レア・プログラム",
-                "rate", "20%",
-                "color", "#C0C0C0"
-        ));
+            Map.of("rarity", "SR", "name", "各種聖結晶5種", "rate", "32.95%", "color", "#C0C0C0"),
 
-        list.add(Map.of(
-                "rarity", "R",
-                "name", "ノーマル・プログラム",
-                "rate", "75%",
-                "color", "#B87333"
-        ));
+            Map.of("rarity", "R", "name", "紅玉 / 蒼玉 / 翠玉 / 聖玉 / 闇玉", "rate", "44.70%", "color", "#B87333")
+        );
+    }
 
-        return list;
+    // ----------- 内部クラス：確率付きアイテム -----------
+    static class ProbabilityItem {
+        String name;
+        String rarity;
+        String image;
+        double rate;
+
+        ProbabilityItem(String name, String rarity, String image, double rate) {
+            this.name = name;
+            this.rarity = rarity;
+            this.image = image;
+            this.rate = rate;
+        }
     }
 }

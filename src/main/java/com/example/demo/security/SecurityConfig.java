@@ -1,6 +1,7 @@
 package com.example.demo.security;
 
 import java.io.IOException;
+import java.util.List; // 追加
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.ServletException;
@@ -9,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,7 +19,11 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter; // 追加
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration; // 追加
+import org.springframework.web.cors.CorsConfigurationSource; // 追加
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // 追加
 
 import com.example.demo.service.CustomUserDetailsService;
 
@@ -47,72 +51,109 @@ public class SecurityConfig {
     }
 
     /**
-     * CSRFトークンをレスポンスヘッダーにも載せるフィルター
+     * 【追加】CORS設定
+     * 信頼できるドメインからのみのリクエストを許可します。
      */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // 開発中は localhost:3000 (React等) を許可、本番では自社ドメインのみにする
+        configuration.setAllowedOrigins(List.of("http://localhost:8080", "http://localhost:3000")); 
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true); // Cookie送信を許可
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     private Filter csrfCookieFilter() {
         return (request, response, chain) -> {
             CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
-
             HttpServletResponse httpResponse = (HttpServletResponse) response;
-
             if (csrfToken != null) {
                 httpResponse.setHeader(csrfToken.getHeaderName(), csrfToken.getToken());
             }
-
             try {
                 chain.doFilter(request, response);
             } catch (IOException | ServletException e) {
-                e.printStackTrace();
+                e.printStackTrace(); // 本番ではロガーを使用することを推奨
             }
         };
     }
 
     @Bean
-    @SuppressWarnings("deprecation")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // --- CORS ---
-            .cors(Customizer.withDefaults())
+            // --- CORS設定の適用 ---
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-            // --- CSRF（安全に Cookie 設定） ---
+            // --- CSRF対策 ---
             .csrf(csrf -> csrf
+                // JSからCookieを読み取れるようにする（SPA/Ajax用）
+                // ※注意: XSS脆弱性があるとCSRFトークンが盗まれるリスクがあるため、XSS対策が必須
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
             )
             .addFilterAfter(csrfCookieFilter(), BasicAuthenticationFilter.class)
 
+            // --- セキュリティヘッダーの強化 (重要) ---
+            .headers(headers -> headers
+                // XSS対策: コンテンツセキュリティポリシー (CSP)
+                // 許可されたソースからのみスクリプト等の読み込みを許可
+                .contentSecurityPolicy(csp -> csp
+                    .policyDirectives(
+                        "default-src 'self'; " + 
+                        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " + // 'unsafe-inline'はロード画面の実装等で必要なため許可。外部CDNがある場合はここに追加
+                        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " + 
+                        "img-src 'self' data:; " + // data: は画像アップロードプレビュー等で必要
+                        "connect-src 'self'; " +
+                        "frame-ancestors 'self'" // クリックジャッキング対策
+                    )
+                )
+                // リファラーポリシー: プライバシー保護のため、外部サイトへの遷移時にURLパラメータ等を送らない
+                .referrerPolicy(referrer -> referrer
+                    .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                )
+                // HSTS: HTTPS強制 (本番環境でのみ有効化推奨、開発中はコメントアウトでも可)
+                // .httpStrictTransportSecurity(hsts -> hsts
+                //     .includeSubDomains(true)
+                //     .maxAgeInSeconds(31536000)
+                // )
+            )
+
+            // --- セッション管理 ---
+            .sessionManagement(session -> session
+                // ログイン時にセッションIDを変更し、セッション固定攻撃を防ぐ
+                .sessionFixation().changeSessionId()
+                // 同時ログイン数の制限（必要に応じて）
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
+            )
+
             // --- アクセス制御 ---
             .authorizeHttpRequests(auth -> auth
-
-                // 🔓 認証不要のパス
                 .requestMatchers(
                     "/", "/login", "/register",
                     "/forgot-password", "/verify-code", "/reset-password",
                     "/error", "/terms",
-
-                    // 静的ファイル
+                    // APIエンドポイントを許可する場合はここに追加
+                    "/api/public/**", 
                     "/css/**", "/js/**", "/images/**", "/img/**"
                 ).permitAll()
 
-                // 🔒 必ずログインが必要なページ
+                // Authenticated routes
                 .requestMatchers(
-                    "/home",
-                    "/training", "/training/**",
-                    "/settings", "/change-password",
-                    "/community/**",
-                    "/log/**",
-                    "/characters/**",
-                    "/daily-mission/**",
-                    "/ranking/**",
-                    "/ai-coach/**",
-                    "/training-log/**"
+                    "/home", "/training/**", "/settings/**",
+                    "/community/**", "/log/**", "/characters/**",
+                    "/daily-mission/**", "/ranking/**", "/ai-coach/**",
+                    "/training-log/**",
+                    "/api/**" // APIへのアクセスも認証必須にする
                 ).authenticated()
 
-                // 🔒 ガチャは必ず“ログイン後のみ”
                 .requestMatchers("/gacha/**").authenticated()
-
-                // その他はすべて認証必要
                 .anyRequest().authenticated()
             )
 
@@ -127,14 +168,13 @@ public class SecurityConfig {
 
             // --- ログアウト ---
             .logout(logout -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST")) // POSTメソッドを強制
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                 .permitAll()
             )
 
-            // --- 認証プロバイダ ---
             .authenticationProvider(authenticationProvider());
 
         return http.build();

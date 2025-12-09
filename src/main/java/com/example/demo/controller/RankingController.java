@@ -24,7 +24,7 @@ public class RankingController {
     public String index(Model model) {
         // ★ 変更: Top20ではなく、全員取得するメソッドを呼び出し
         // List<User> rankingList = userRepository.findTop20ByOrderByLevelDescExperiencePointsDesc();
-        List<User> rankingList = userRepository.findAllByOrderByLevelDescExperiencePointsDesc();
+        List<User> rankingList = userRepository.findAllByOrderByLevelDescXpDesc();
         
         model.addAttribute("rankingList", rankingList);
         return "misc/ranking"; 
