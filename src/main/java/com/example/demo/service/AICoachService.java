@@ -270,9 +270,9 @@ public class AICoachService {
             try {
                 GenerateContentResponse response;
                 if (content != null) {
-                    response = client.models.generateContent("gemini-2.0-flash-live", content, null);
+                    response = client.models.generateContent("gemini-2.5-flash", content, null);
                 } else {
-                    response = client.models.generateContent("gemini-2.0-flash-live", promptText, null);
+                    response = client.models.generateContent("gemini-2.5-flash", promptText, null);
                 }
                 return cleanJsonResult(response.text());
 
@@ -362,7 +362,7 @@ public class AICoachService {
     private String callGeminiApi(String prompt) {
         try {
             if (this.client == null) return "API Key未設定ムキ！";
-            GenerateContentResponse response = client.models.generateContent("gemini-2.0-flash-live", prompt, null);
+            GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", prompt, null);
             return response.text();
         } catch (Exception e) {
             e.printStackTrace();
