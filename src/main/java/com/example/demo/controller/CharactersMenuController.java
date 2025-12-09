@@ -24,14 +24,17 @@ public class CharactersMenuController {
         return "characters/menu/CharactersUnlock"; 
     }
 
-    // 進化素材画面へ遷移（素材一覧は存在しないのでこちらを使う）
+    /*
+    // 進化素材画面へ遷移（素材一覧は MaterialController に統合済み）
     @GetMapping("/characters/menu/CharactersEvolutionMaterial")
     public String showCharactersEvolutionMaterial() {
         return "characters/menu/CharactersEvolutionMaterial"; 
     }
- // --- 背景一覧画面へ遷移 ---
+    */
+
+    // --- 背景一覧画面へ遷移 ---
     @GetMapping("/characters/menu/Backgrounds")
     public String showBackgrounds() {
-    	return "characters/menu/Backgrounds"; 
+        return "characters/menu/Backgrounds"; 
     }
 }
