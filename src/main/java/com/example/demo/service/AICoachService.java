@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import java.time.LocalDate; // ★追加
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -96,6 +96,9 @@ public class AICoachService {
         return callGeminiApi(sb.toString());
     }
 
+    /**
+     * ★修正: 月間の食事内容に基づいたアドバイス（食事提案＋トレーニング提案）
+     */
     public String generateMonthlyDietAdvice(User user, List<MealRecord> records, YearMonth yearMonth) {
         int totalCalories = records.stream().mapToInt(MealRecord::getCalories).sum();
         
@@ -111,7 +114,7 @@ public class AICoachService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("あなたは専属AIトレーナーです。\n");
-        sb.append("ユーザーの").append(yearMonth.getYear()).append("年").append(yearMonth.getMonthValue()).append("月の1ヶ月間の食事記録を分析し、総評と今後のトレーニング方針を提案してください。\n\n");
+        sb.append("ユーザーの").append(yearMonth.getYear()).append("年").append(yearMonth.getMonthValue()).append("月の1ヶ月間の食事記録を分析し、総評と、それに合わせた【おすすめのトレーニング】および【おすすめの食事メニュー】を提案してください。\n\n");
         
         sb.append("【ユーザー】").append(user.getUsername()).append("さん\n");
         sb.append("【月間データ】\n");
@@ -119,7 +122,7 @@ public class AICoachService {
         sb.append("- 月間総摂取カロリー: ").append(totalCalories).append("kcal\n");
         sb.append("- 記録回数: ").append(records.size()).append("回\n");
         
-        sb.append("\nルール: 250文字以内。食べたものの傾向（ジャンクが多い、ヘルシーなど）を分析し、それを解消または活かすトレーニングを提案する。熱血かつポジティブに。語尾にムキをつける。");
+        sb.append("\nルール: 300文字以内。食べたものの傾向を分析し、不足栄養素を補う【食事】と、カロリー収支に合わせた【トレーニング】を具体的に提案する。熱血かつポジティブに。語尾にムキをつける。");
 
         try {
             return generateContentWithRetry(null, sb.toString());
@@ -130,21 +133,21 @@ public class AICoachService {
     }
 
     /**
-     * ★追加: 週間レポートとトレーニング提案
+     * ★修正: 週間レポート（食事提案＋トレーニング提案）
      */
     public String generateWeeklyDietAdvice(User user, List<MealRecord> records, LocalDate start, LocalDate end) {
         int totalCalories = records.stream().mapToInt(MealRecord::getCalories).sum();
-        double avgCalories = totalCalories / (double) records.size(); // 単純平均
+        double avgCalories = totalCalories / (double) records.size(); 
 
         String allContent = records.stream()
                 .map(MealRecord::getContent)
                 .filter(c -> c != null && !c.trim().isEmpty())
-                .limit(20) // 週間なので少なめでOK
+                .limit(20)
                 .collect(Collectors.joining("、"));
 
         StringBuilder sb = new StringBuilder();
         sb.append("あなたは専属AIトレーナーです。\n");
-        sb.append("今週(").append(start).append("～").append(end).append(")の食事記録を分析し、週末や来週に向けた具体的なアクションプランを提案してください。\n\n");
+        sb.append("今週(").append(start).append("～").append(end).append(")の食事記録を分析し、週末や来週に向けた【食事】と【トレーニング】のアクションプランを提案してください。\n\n");
         
         sb.append("【ユーザー】").append(user.getUsername()).append("さん\n");
         sb.append("【週間データ】\n");
@@ -152,7 +155,7 @@ public class AICoachService {
         sb.append("- 合計カロリー: ").append(totalCalories).append("kcal\n");
         sb.append("- 1食平均:約").append((int)avgCalories).append("kcal\n");
         
-        sb.append("\nルール: 200文字以内。週単位の振り返りとして、食べ過ぎた場合のリカバリー方法や、良い傾向ならそれを伸ばす筋トレメニューを提案。熱血かつポジティブに。語尾にムキをつける。");
+        sb.append("\nルール: 250文字以内。週単位の振り返りとして、リカバリーのための【食事調整】や、さらに伸ばすための【トレーニング】を提案。熱血かつポジティブに。語尾にムキをつける。");
 
         try {
             return generateContentWithRetry(null, sb.toString());

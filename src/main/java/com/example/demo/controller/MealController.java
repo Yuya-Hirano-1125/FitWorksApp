@@ -6,7 +6,7 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
-import java.time.temporal.TemporalAdjusters; // ★追加
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -172,7 +172,7 @@ public class MealController {
         return "redirect:/log/meal?year=" + year + "&month=" + month;
     }
 
-    // ★追加: 週間データの分析処理 (今週を対象とする)
+    // 週間データの分析処理 (今週を対象とする)
     @PostMapping("/analyze-week")
     public String analyzeWeeklyDiet(@AuthenticationPrincipal UserDetails userDetails,
                                     RedirectAttributes redirectAttributes) {
@@ -184,7 +184,7 @@ public class MealController {
             LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
             LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
 
-            // 全件取得してフィルタリング (MealServiceに週間取得用メソッドがないため)
+            // 全件取得してフィルタリング
             List<MealRecord> allRecords = mealService.getMealRecordsByUser(user);
             List<MealRecord> weeklyRecords = allRecords.stream()
                 .filter(r -> {
