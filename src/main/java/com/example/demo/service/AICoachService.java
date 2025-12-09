@@ -3,8 +3,8 @@ package com.example.demo.service;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
-import java.util.regex.Matcher; // ★追加
-import java.util.regex.Pattern; // ★追加
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.PostConstruct;
@@ -31,9 +31,12 @@ public class AICoachService {
 
     private Client client;
 
-    // ★修正: リトライ設定を強化
-    private static final int MAX_RETRIES = 3;
-    private static final long DEFAULT_WAIT_MS = 5000; // 基本待機時間を5秒に変更
+    // ★修正: gemini-2.5-flash (または preview/exp が必要ならそちら)
+    private static final String MODEL_ID = "gemini-2.5-flash"; 
+    
+    // ★修正: 待機時間をさらに余裕を持たせる (429対策)
+    private static final int MAX_RETRIES = 5;
+    private static final long MIN_WAIT_MS = 20000; // 最低20秒待機
 
     @PostConstruct
     public void init() {
@@ -48,7 +51,6 @@ public class AICoachService {
         }
     }
 
-    // ... (generateCoachingAdvice ～ analyzeMealText までのメソッドは変更なし) ...
     public String generateCoachingAdvice(User user, List<TrainingRecord> history, String userMessage) {
         String systemPrompt = buildSystemPrompt(user, history);
         String fullPrompt = systemPrompt + "\n\nUser Question: " + userMessage;
@@ -258,10 +260,6 @@ public class AICoachService {
         }
     }
 
-    /**
-     * ★修正: リトライロジックを強化
-     * エラーメッセージから「retry in X s」を読み取り、その時間分待機するように修正。
-     */
     private String generateContentWithRetry(Content content, String promptText) throws Exception {
         int attempt = 0;
         Exception lastException = null;
@@ -269,32 +267,40 @@ public class AICoachService {
         while (attempt < MAX_RETRIES) {
             try {
                 GenerateContentResponse response;
+                // ★修正: gemini-2.5-flash を使用
                 if (content != null) {
-                    response = client.models.generateContent("gemini-2.5-flash", content, null);
+                    response = client.models.generateContent(MODEL_ID, content, null);
                 } else {
-                    response = client.models.generateContent("gemini-2.5-flash", promptText, null);
+                    response = client.models.generateContent(MODEL_ID, promptText, null);
                 }
                 return cleanJsonResult(response.text());
 
             } catch (ClientException e) {
-                if (e.getMessage().contains("429") || e.getMessage().contains("Quota exceeded")) {
+                // 429: Rate Limit, 503: Service Unavailable, 404: Not Found
+                if (e.getMessage().contains("429") || e.getMessage().contains("Quota exceeded") || 
+                    e.getMessage().contains("503") || e.getMessage().contains("404")) {
+                    
                     lastException = e;
                     attempt++;
                     
-                    long waitTime = DEFAULT_WAIT_MS * attempt; // デフォルトは5秒, 10秒, 15秒...
+                    long waitTime = MIN_WAIT_MS; // デフォルト待機 (20秒)
 
-                    // エラーメッセージから待機時間を解析 ("Please retry in 41.72s" など)
+                    // エラーメッセージから待機時間を解析 ("retry in 45.4s")
                     Matcher matcher = Pattern.compile("retry in ([0-9\\.]+)s").matcher(e.getMessage());
                     if (matcher.find()) {
                         try {
                             double seconds = Double.parseDouble(matcher.group(1));
-                            waitTime = (long) (seconds * 1000) + 1000; // ミリ秒変換 + 余裕の1秒
+                            // 指定時間 + 3秒のマージン
+                            waitTime = (long) (seconds * 1000) + 3000; 
                         } catch (NumberFormatException nfe) {
-                            // 解析失敗時はデフォルト倍率を使用
+                            // 無視
                         }
+                    } else {
+                         // 解析不能なら、回数に応じて待機時間を増やす (20s, 40s, 60s...)
+                         waitTime = MIN_WAIT_MS * attempt;
                     }
 
-                    System.out.println("Gemini API Rate Limit hit. Retrying in " + waitTime + "ms... (" + attempt + "/" + MAX_RETRIES + ")");
+                    System.out.println("Gemini API Error (" + e.getMessage() + "). Retrying in " + waitTime + "ms... (" + attempt + "/" + MAX_RETRIES + ")");
                     
                     if (attempt < MAX_RETRIES) {
                         try {
@@ -305,7 +311,7 @@ public class AICoachService {
                         }
                     }
                 } else {
-                    throw e;
+                    throw e; // その他のエラーは即スロー
                 }
             }
         }
@@ -362,11 +368,12 @@ public class AICoachService {
     private String callGeminiApi(String prompt) {
         try {
             if (this.client == null) return "API Key未設定ムキ！";
-            GenerateContentResponse response = client.models.generateContent("gemini-2.5-flash", prompt, null);
+            // ★修正: MODEL_ID定数を使用
+            GenerateContentResponse response = client.models.generateContent(MODEL_ID, prompt, null);
             return response.text();
         } catch (Exception e) {
             e.printStackTrace();
-            return "エラーが発生しましたムキ！";
+            return "エラーが発生しましたムキ！(" + e.getMessage() + ")";
         }
     }
 }
