@@ -1,425 +1,206 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>キャラクター解放画面</title>
 
-    <!-- CSS -->
     <link rel="stylesheet" th:href="@{/css/characters/CharactersStorage.css}">
-	<link rel="stylesheet" th:href="@{/css/base.css}">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-	
-	<script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <script th:src="@{/js/theme.js}"></script>
 </head>
-  <div>
-	<div id="lock-message" class="hidden">
-			        このキャラクターはロックされています。レベルが足りません。
-	</div>
+<body>
+    <div id="lock-message" class="hidden">
+        このキャラクターはロックされています。レベルが足りません。
+    </div>
+    
     <header>
         <h1>キャラクター解放</h1>
-        <p class="user-level">現在のレベル: <span id="current-level">1</span></p>
+        <p class="user-level">現在のレベル: <span id="current-level" th:text="${currentLevel}">1</span></p>
     </header>
-	<div class="character-list-wrapper">
-	            <div class="character-groups-container">
-					<div class="attribute-group">
-	        				<h2 class="attribute-heading fire-color">🔥 炎属性</h2>
-	        				<div class="character-list-container" id="character-container-fire">
-			
-							<!--★１炎タイプの卵 -->
-							<a th:href="@{/characters/dracoegg}" class="character-link">
-            					<div class="character-card fire" data-attribute="fire" data-unlocked-level="1">
-                				<div class="card-content">
-                    			<div class="evolution-tag">★1</div>
-                    			<img class="character-img" data-src="/img/character/0.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="炎の卵">
-                    			<p class="character-name">エンバーハート</p>
-                    			<p class="required-level">Lv.1 解放</p>
-                				</div>
-                				<div class="lock-overlay">
-                    			<span class="lock-icon">🔒</span>
-                    			<p class="lock-text">LOCKED</p>
-                    			<p class="lock-required-level">Lv.<span class="required-level-display">1</span>で解放</p>
-                				</div>
-            					</div>
-            					</a>
-			
-			<!--★2炎タイプの1進化目 -->
-		<a th:href="@{/characters/draco}" class="character-link"> 
-            <div class="character-card fire" data-attribute="fire" data-unlocked-level="10">
-                <div class="card-content">
-                    <div class="evolution-tag">★2</div>
-                    <img class="character-img" data-src="/img/character/10.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ドラコ">
-                    <p class="character-name">ドラコ</p>
-                    <p class="required-level">Lv.10 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">10</span>で解放</p>
-                </div>
-            </div>
-        </a>
-		
-		<!--★3炎タイプの2進化目 -->
-		<a th:href="@{/characters/dracos}" class="character-link">
-            <div class="character-card fire" data-attribute="fire" data-unlocked-level="20">
-                <div class="card-content">
-                    <div class="evolution-tag">★3</div>
-                    <img class="character-img" data-src="/img/character/20.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ドラコス">
-                    <p class="character-name">ドラコス</p>
-                    <p class="required-level">Lv.20 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">20</span>で解放</p>
-                </div>
-			
-            </div>
-		</a>
-		
-		<!--★4炎タイプの最終進化 -->
-		<a th:href="@{/characters/dragonoid}" class="character-link">
-            <div class="character-card fire" data-attribute="fire" data-unlocked-level="30">
-                <div class="card-content">
-                    <div class="evolution-tag">★4</div>
-                    <img class="character-img" data-src="/img/character/30.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ドラグノイド">
-                    <p class="character-name">ドラグノイド</p>
-                    <p class="required-level">Lv.30 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">30</span>で解放</p>
-                </div>
-            </div>
-		</a>
-		    		</div>
-				</div>
-		
-		<div class="attribute-group">
-		        <h2 class="attribute-heading water-color">💧 水属性</h2>
-		        <div class="character-list-container" id="character-container-water">
-		<!--★1水タイプの卵 -->
-		<a th:href="@{/characters/dollyegg}" class="character-link">
-            <div class="character-card water" data-attribute="water" data-unlocked-level="40">
-                <div class="card-content">
-                    <div class="evolution-tag">★1</div>
-                    <img class="character-img" data-src="/img/character/40.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ルーナドロップ">
-                    <p class="character-name">ルーナドロップ</p>
-                    <p class="required-level">Lv.40 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">40</span>で解放</p>
-                </div>
-            </div>
-		</a>
-		
-		<!--★2水タイプの1進化目 -->
-		<a th:href="@{/characters/dolly}" class="character-link">
-            <div class="character-card water" data-attribute="water" data-unlocked-level="50">
-                <div class="card-content">
-                    <div class="evolution-tag">★2</div>
-                    <img class="character-img" data-src="/img/character/50.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ドリー">
-                    <p class="character-name">ドリー</p>
-                    <p class="required-level">Lv.50 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">50</span>で解放</p>
-                </div>
-            </div>
-         </a>
-		 
-		 <!--★3水タイプの2進化目 -->
-		 <a th:href="@{/characters/dolphy}" class="character-link">  
-            <div class="character-card water" data-attribute="water" data-unlocked-level="60">
-                <div class="card-content">
-                    <div class="evolution-tag">★3</div>
-                    <img class="character-img" data-src="/img/character/60.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ドルフィ">
-                    <p class="character-name">ドルフィ</p>
-                    <p class="required-level">Lv.60 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">60</span>で解放</p>
-                </div>
-            </div>
-		</a>
-		
-		<!--★4水タイプの最終進化 -->
-		<a th:href="@{/characters/dolphinas}" class="character-link">
-            <div class="character-card water" data-attribute="water" data-unlocked-level="70">
-                <div class="card-content">
-                    <div class="evolution-tag">★4</div>
-                    <img class="character-img" data-src="/img/character/70.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ドルフィナス">
-                    <p class="character-name">ドルフィナス</p>
-                    <p class="required-level">Lv.70 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">70</span>で解放</p>
-                </div>
-            </div>
-         </a>
-	     </div>
-	</div>
-		 
-	<div class="attribute-group">
-	        <h2 class="attribute-heading grass-color">🌿 草属性</h2>
-	        <div class="character-list-container" id="character-container-grass">
-		 <!--★1草タイプの卵 -->
-		 <a th:href="@{/characters/shiruegg}" class="character-link">  
-            <div class="character-card grass" data-attribute="grass" data-unlocked-level="80">
-                <div class="card-content">
-                    <div class="evolution-tag">★1</div>
-                    <img class="character-img" data-src="/img/character/80.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="フォリアン">
-                    <p class="character-name">フォリアン</p>
-                    <p class="required-level">Lv.80 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">80</span>で解放</p>
-                </div>
-            </div>
-          </a>
-		  
-		  <!--★2草タイプの1進化目 -->
-		  <a th:href="@{/characters/shiru}" class="character-link">  
-            <div class="character-card grass" data-attribute="grass" data-unlocked-level="90">
-                <div class="card-content">
-                    <div class="evolution-tag">★2</div>
-                    <img class="character-img" data-src="/img/character/90.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="シル">
-                    <p class="character-name">シル</p>
-                    <p class="required-level">Lv.90 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">90</span>で解放</p>
-                </div>
-            </div>
-           </a>
-		   
-		   <!--★3草タイプの2進化目 -->
-		   <a th:href="@{/characters/shirufa}" class="character-link">
-            <div class="character-card grass" data-attribute="grass" data-unlocked-level="100">
-                <div class="card-content">
-                    <div class="evolution-tag">★3</div>
-                    <img class="character-img" data-src="/img/character/100.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="シルファ">
-                    <p class="character-name">シルファ</p>
-                    <p class="required-level">Lv.100 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">100</span>で解放</p>
-                </div>
-            </div>
-			</a>
-            
-			<!--★4草タイプの最終進化 -->
-			<a th:href="@{/characters/shirufina}" class="character-link">
-            <div class="character-card grass" data-attribute="grass" data-unlocked-level="110">
-                <div class="card-content">
-                    <div class="evolution-tag">★4</div>
-                    <img class="character-img" data-src="/img/character/110.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="シルフィナ">
-                    <p class="character-name">シルフィナ</p>
-                    <p class="required-level">Lv.110 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">110</span>で解放</p>
-                </div>
-            </div>
-			</a>
-			</div>
-		</div>
-			
-		<div class="attribute-group">
-		        <h2 class="attribute-heading light-color">✨ 光属性</h2>
-		        <div class="character-list-container" id="character-container-light">
-			<!--★1光タイプの卵 -->
-			<a th:href="@{/characters/merryegg}" class="character-link">
-            <div class="character-card light" data-attribute="light" data-unlocked-level="120">
-                <div class="card-content">
-                    <div class="evolution-tag">★1</div>
-                    <img class="character-img" data-src="/img/character/120.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ハローネスト">
-                    <p class="character-name">ハローネスト</p>
-                    <p class="required-level">Lv.120 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">120</span>で解放</p>
-                </div>
-            </div>
-			</a>
 
-			<!--★2光タイプの1進化目 -->
-			<a th:href="@{/characters/merry}" class="character-link">
-            <div class="character-card light" data-attribute="light" data-unlocked-level="130">
-                <div class="card-content">
-                    <div class="evolution-tag">★2</div>
-                    <img class="character-img" data-src="/img/character/130.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="メリー">
-                    <p class="character-name">メリー</p>
-                    <p class="required-level">Lv.130 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">130</span>で解放</p>
-                </div>
-            </div>
-			</a>
+    <div class="character-list-wrapper">
+        <div class="character-groups-container">
 
-			<!--★3光タイプの2進化目 -->
-			<a th:href="@{/characters/meriru}" class="character-link">
-            <div class="character-card light" data-attribute="light" data-unlocked-level="140">
-                <div class="card-content">
-                    <div class="evolution-tag">★3</div>
-                    <img class="character-img" data-src="/img/character/140.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="メリル">
-                    <p class="character-name">メリル</p>
-                    <p class="required-level">Lv.140 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">140</span>で解放</p>
-                </div>
-            </div>
-			</a>
+            <div class="attribute-group">
+                <h2 class="attribute-heading fire-color">🔥 炎属性</h2>
+                <div class="character-list-container" id="character-container-fire">
+                    <th:block th:each="chara : ${charaList}">
+                        <th:block th:if="${chara.attribute == 'fire'}">
+                            
+                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
+                                
+                                <div class="character-card" 
+                                     th:classappend="${!chara.isUnlocked} ? 'locked-card-style'"
+                                     th:data-attribute="${chara.attribute}" 
+                                     th:data-unlocked-level="${chara.requiredLevel}">
+                                    
+                                    <div class="card-content">
+                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">★1</div>
+                                        
+                                        <img class="character-img" 
+                                             th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" 
+                                             th:alt="${chara.name}">
+                                        
+                                        <p class="character-name" th:text="${chara.name}">名称未設定</p>
+                                        
+                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.1 解放</p>
+                                    </div>
 
-			<!--★4光タイプの最終進化 -->
-			<a th:href="@{/characters/merinoa}" class="character-link">
-            <div class="character-card light" data-attribute="light" data-unlocked-level="150">
-                <div class="card-content">
-                    <div class="evolution-tag">★4</div>
-                    <img class="character-img" data-src="/img/character/150.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="メリノア">
-                    <p class="character-name">メリノア</p>
-                    <p class="required-level">Lv.150 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">150</span>で解放</p>
+                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
+                                        <span class="lock-icon">🔒</span>
+                                        <p class="lock-text">LOCKED</p>
+                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">1</span>で解放</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </th:block>
+                    </th:block>
                 </div>
             </div>
-			</a>
-			</div>
-		</div>
 
-		<div class="attribute-group">
-		        <h2 class="attribute-heading dark-color">🌑 闇属性</h2>
-		        <div class="character-list-container" id="character-container-dark">
-			<!--★1闇タイプの卵 -->
-			<a th:href="@{/characters/robiegg}" class="character-link">
-			<div class="character-card dark" data-attribute="dark" data-unlocked-level="160">
-                <div class="card-content">
-                    <div class="evolution-tag">★1</div>
-                    <img class="character-img" data-src="/img/character/160.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ネビュリス">
-                    <p class="character-name">ネビュリス</p>
-                    <p class="required-level">Lv.160 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">160</span>で解放</p>
+            <div class="attribute-group">
+                <h2 class="attribute-heading water-color">💧 水属性</h2>
+                <div class="character-list-container" id="character-container-water">
+                    <th:block th:each="chara : ${charaList}">
+                        <th:block th:if="${chara.attribute == 'water'}">
+                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
+                                <div class="character-card" th:classappend="${!chara.isUnlocked} ? 'locked-card-style'">
+                                    <div class="card-content">
+                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">★1</div>
+                                        <img class="character-img" th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" th:alt="${chara.name}">
+                                        <p class="character-name" th:text="${chara.name}">名称未設定</p>
+                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.1 解放</p>
+                                    </div>
+                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
+                                        <span class="lock-icon">🔒</span>
+                                        <p class="lock-text">LOCKED</p>
+                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">1</span>で解放</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </th:block>
+                    </th:block>
                 </div>
             </div>
-			</a>
 
-			<!--★2闇タイプの1進化目 -->
-			<a th:href="@{/characters/robi}" class="character-link">
-            <div class="character-card dark" data-attribute="dark" data-unlocked-level="170">
-                <div class="card-content">
-                    <div class="evolution-tag">★2</div>
-                     <img class="character-img" data-src="/img/character/170.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ロービ">
-                    <p class="character-name">ロービ</p>
-                    <p class="required-level">Lv.170 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">170</span>で解放</p>
+            <div class="attribute-group">
+                <h2 class="attribute-heading wind-color">🍃 草属性</h2>
+                <div class="character-list-container" id="character-container-wind">
+                    <th:block th:each="chara : ${charaList}">
+                        <th:block th:if="${chara.attribute == 'grass' or chara.attribute == 'wind'}">
+                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
+                                <div class="character-card" th:classappend="${!chara.isUnlocked} ? 'locked-card-style'">
+                                    <div class="card-content">
+                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">★1</div>
+                                        <img class="character-img" th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" th:alt="${chara.name}">
+                                        <p class="character-name" th:text="${chara.name}">名称未設定</p>
+                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.1 解放</p>
+                                    </div>
+                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
+                                        <span class="lock-icon">🔒</span>
+                                        <p class="lock-text">LOCKED</p>
+                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">1</span>で解放</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </th:block>
+                    </th:block>
                 </div>
             </div>
-			</a>
 
-			<!--★3闇タイプの2進化目 -->
-			<a th:href="@{/characters/robus}" class="character-link">
-            <div class="character-card dark" data-attribute="dark" data-unlocked-level="180">
-                <div class="card-content">
-                    <div class="evolution-tag">★3</div>
-                    <img class="character-img" data-src="/img/character/180.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ローバス">
-                    <p class="character-name">ローバス</p>
-                    <p class="required-level">Lv.180 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">180</span>で解放</p>
-                </div>
-            </div>
-			</a>
-			
-			<!--★4闇タイプの最終進化 -->
-			<a th:href="@{/characters/robius}" class="character-link">
-            <div class="character-card dark" data-attribute="dark" data-unlocked-level="190">
-                <div class="card-content">
-                    <div class="evolution-tag">★4</div>
-                    <img class="character-img" data-src="/img/character/190.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="ロービアス">
-                    <p class="character-name">ロービアス</p>
-                    <p class="required-level">Lv.190 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">190</span>で解放</p>
+            <div class="attribute-group">
+                <h2 class="attribute-heading light-color">✨ 光属性</h2>
+                <div class="character-list-container" id="character-container-light">
+                    <th:block th:each="chara : ${charaList}">
+                        <th:block th:if="${chara.attribute == 'light'}">
+                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
+                                <div class="character-card" th:classappend="${!chara.isUnlocked} ? 'locked-card-style'">
+                                    <div class="card-content">
+                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">★1</div>
+                                        <img class="character-img" th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" th:alt="${chara.name}">
+                                        <p class="character-name" th:text="${chara.name}">名称未設定</p>
+                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.1 解放</p>
+                                    </div>
+                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
+                                        <span class="lock-icon">🔒</span>
+                                        <p class="lock-text">LOCKED</p>
+                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">1</span>で解放</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </th:block>
+                    </th:block>
                 </div>
             </div>
-			</a>
-			</div>
-		</div>
-           
-		<div class="attribute-group">
-		        <h2 class="attribute-heading secret-color">??? シークレット</h2>
-		        <div class="character-list-container" id="character-container-secret"> 
-			<a th:hreff="@{/characters/info/}" class="character-link">
-            <div class="character-card dark" data-attribute="dark" data-unlocked-level="250">
-                <div class="card-content">
-                    <div class="evolution-tag">???</div>
-                    <img class="character-img" data-src="/img/placeholder_final.png" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="シークレット">
-                    <p class="character-name">シークレット</p>
-                    <p class="required-level">Lv.250 解放</p>
-                </div>
-                <div class="lock-overlay">
-                    <span class="lock-icon">🔒</span>
-                    <p class="lock-text">LOCKED</p>
-                    <p class="lock-required-level">Lv.<span class="required-level-display">250</span>で解放</p>
+
+            <div class="attribute-group">
+                <h2 class="attribute-heading dark-color">🌙 闇属性</h2>
+                <div class="character-list-container" id="character-container-dark">
+                    <th:block th:each="chara : ${charaList}">
+                        <th:block th:if="${chara.attribute == 'dark'}">
+                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
+                                <div class="character-card" th:classappend="${!chara.isUnlocked} ? 'locked-card-style'">
+                                    <div class="card-content">
+                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">★1</div>
+                                        <img class="character-img" th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" th:alt="${chara.name}">
+                                        <p class="character-name" th:text="${chara.name}">名称未設定</p>
+                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.1 解放</p>
+                                    </div>
+                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
+                                        <span class="lock-icon">🔒</span>
+                                        <p class="lock-text">LOCKED</p>
+                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">1</span>で解放</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </th:block>
+                    </th:block>
                 </div>
             </div>
-			</a>
-			</div>
-		</div>
-		</div>
-      
+
+            <div class="attribute-group">
+                <h2 class="attribute-heading secret-color">??? シークレット</h2>
+                <div class="character-list-container" id="character-container-secret">
+                    <th:block th:each="chara : ${charaList}">
+                        <th:block th:if="${chara.attribute == 'secret'}">
+                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
+                                <div class="character-card dark" 
+                                     th:classappend="${!chara.isUnlocked} ? 'locked-card-style'"
+                                     data-attribute="dark">
+                                    <div class="card-content">
+                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">???</div>
+                                        <img class="character-img" 
+                                             th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_final.png'" 
+                                             th:alt="${chara.name}">
+                                        <p class="character-name" th:text="${chara.name}">シークレット</p>
+                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.250 解放</p>
+                                    </div>
+                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
+                                        <span class="lock-icon">🔒</span>
+                                        <p class="lock-text">LOCKED</p>
+                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">250</span>で解放</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </th:block>
+                    </th:block>
+                </div>
+            </div>
+
         </div>
     </div>
-	<div class="back-btn-container">
-			            <a th:href="@{/characters/menu/CharactersMenu}" class="button secondary">
-			                <i class="fa-solid fa-house"></i> キャラクターメニューに戻る
-			            </a>
-			</div>
+    
+    <div class="back-btn-container">
+        <a th:href="@{/characters}" class="btn-back">
+            <i class="fa-solid fa-reply"></i> キャラクターメニューへ戻る
+        </a>
+    </div>
 
-	 <!-- JS は最後に1つだけ -->
-	    <script src="/js/CharacterStorage.js"></script>
-	</body>
-	</html>
+    <script>
+        // 必要に応じてJS処理を追加
+    </script>
+</body>
+</html>

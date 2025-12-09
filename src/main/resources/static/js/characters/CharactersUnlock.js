@@ -305,4 +305,75 @@ window.debugAddMaterial = function(type, rank, amount) {
         window.gameState.stones[type][rank] += amount;
         updateUI();
     }
-};
+	document.addEventListener('DOMContentLoaded', () => {
+	    
+	    // ==========================================
+	    // デバッグ機能 (windowオブジェクトに登録してHTMLから呼べるようにする)
+	    // ==========================================
+	    
+	    // 現在のレベル（初期値）
+	    // 本来はサーバーから取得した値をセットすべきですが、
+	    // デバッグ用なので一旦HTMLの表示から取得するか、初期値1とします。
+	    let currentLevel = parseInt(document.getElementById('current-level').innerText) || 1;
+
+	    // レベルを加算する関数
+	    window.addLevel = function(amount) {
+	        currentLevel += amount;
+	        updateLevelDisplay();
+	        alert(`デバッグ: レベルが ${currentLevel} になりました！`);
+	    };
+
+	    // 素材を追加する関数 (今回はコンソール表示のみ)
+	    window.debugAddMaterial = function(type, rank, amount) {
+	        console.log(`デバッグ: ${type}属性のランク${rank}素材を ${amount}個 追加しました（仮想）`);
+	        alert(`${type}素材(+${amount})を追加しました！`);
+	    };
+
+	    // 画面表示を更新する内部関数
+	    function updateLevelDisplay() {
+	        const levelSpan = document.getElementById('current-level');
+	        if(levelSpan) {
+	            levelSpan.innerText = currentLevel;
+	        }
+	        
+	        // レベルが変わったので、ロック状態の見た目も更新チェック
+	        // (注意: 実際のロック解除はサーバー通信が必要ですが、
+	        //  ここでは見た目上の「条件満たしてる感」を出すためにクラスを操作します)
+	        checkRequirements();
+	    }
+
+	    // 必要レベルを満たしているかチェックして表示を変える
+	    function checkRequirements() {
+	        document.querySelectorAll('.js-card').forEach(card => {
+	            const reqLevel = parseInt(card.dataset.reqLevel) || 0;
+	            const reqLevelElement = card.querySelector('.js-req-level');
+	            
+	            if (reqLevelElement) {
+	                if (currentLevel >= reqLevel) {
+	                    reqLevelElement.style.color = '#2ecc71'; // 緑色 (OK)
+	                    reqLevelElement.innerHTML = `<i class="fa-solid fa-check"></i> Lv.${reqLevel}`;
+	                } else {
+	                    reqLevelElement.style.color = ''; // 元の色に戻す
+	                    reqLevelElement.innerHTML = `<i class="fa-solid fa-crown"></i> Lv.${reqLevel}`;
+	                }
+	            }
+	            
+	            // 進化ボタンの活性化制御
+	            // (注: すでに解放済みのボタンには .js-evolve-btn がない場合もあるのでチェック)
+	            const btn = card.querySelector('.js-evolve-btn');
+	            if (btn && !btn.innerText.includes('GET済み')) { // GET済みでない場合のみ
+	                if (currentLevel >= reqLevel) {
+	                    btn.classList.remove('disabled');
+	                    btn.disabled = false;
+	                } else {
+	                    btn.classList.add('disabled');
+	                    btn.disabled = true;
+	                }
+	            }
+	        });
+	    }
+
+	    // 初期化時に一度チェックを実行
+	    checkRequirements();
+	});
+	}
