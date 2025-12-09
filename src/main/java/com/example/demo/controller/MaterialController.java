@@ -23,10 +23,15 @@ public class MaterialController {
     // ログインユーザーごとの素材一覧を表示
     @GetMapping("/characters/menu/CharactersEvolutionMaterial")
     public String showMaterials(Model model, @AuthenticationPrincipal CustomUserDetails user) {
+        // ★ 修正: 未ログイン時はログインページへリダイレクト
+        if (user == null) {
+            return "redirect:/login";
+        }
+
         // ログインユーザーのIDを取得
         Long userId = user.getId();
 
-        // Repositoryからユーザーの所持数を取得
+        // Repositoryからユーザーの所持数を登録順で取得
         List<ItemCountDTO> items = itemRepository.findItemCountsByUserId(userId);
 
         // デバッグ出力：取得件数と中身を確認

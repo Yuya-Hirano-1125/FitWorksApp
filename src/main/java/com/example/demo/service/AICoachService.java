@@ -1,8 +1,10 @@
 package com.example.demo.service;
 
-import java.time.LocalDate; // ★追加
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.regex.Matcher; // ★追加
+import java.util.regex.Pattern; // ★追加
 import java.util.stream.Collectors;
 
 import jakarta.annotation.PostConstruct;
@@ -29,8 +31,9 @@ public class AICoachService {
 
     private Client client;
 
+    // ★修正: リトライ設定を強化
     private static final int MAX_RETRIES = 3;
-    private static final long RETRY_WAIT_MS = 2000;
+    private static final long DEFAULT_WAIT_MS = 5000; // 基本待機時間を5秒に変更
 
     @PostConstruct
     public void init() {
@@ -45,6 +48,7 @@ public class AICoachService {
         }
     }
 
+    // ... (generateCoachingAdvice ～ analyzeMealText までのメソッドは変更なし) ...
     public String generateCoachingAdvice(User user, List<TrainingRecord> history, String userMessage) {
         String systemPrompt = buildSystemPrompt(user, history);
         String fullPrompt = systemPrompt + "\n\nUser Question: " + userMessage;
@@ -111,7 +115,7 @@ public class AICoachService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("あなたは専属AIトレーナーです。\n");
-        sb.append("ユーザーの").append(yearMonth.getYear()).append("年").append(yearMonth.getMonthValue()).append("月の1ヶ月間の食事記録を分析し、総評と今後のトレーニング方針を提案してください。\n\n");
+        sb.append("ユーザーの").append(yearMonth.getYear()).append("年").append(yearMonth.getMonthValue()).append("月の1ヶ月間の食事記録を分析し、総評と、それに合わせた【おすすめのトレーニング】および【おすすめの食事メニュー】を提案してください。\n\n");
         
         sb.append("【ユーザー】").append(user.getUsername()).append("さん\n");
         sb.append("【月間データ】\n");
@@ -119,7 +123,7 @@ public class AICoachService {
         sb.append("- 月間総摂取カロリー: ").append(totalCalories).append("kcal\n");
         sb.append("- 記録回数: ").append(records.size()).append("回\n");
         
-        sb.append("\nルール: 250文字以内。食べたものの傾向（ジャンクが多い、ヘルシーなど）を分析し、それを解消または活かすトレーニングを提案する。熱血かつポジティブに。語尾にムキをつける。");
+        sb.append("\nルール: 300文字以内。食べたものの傾向を分析し、不足栄養素を補う【食事】と、カロリー収支に合わせた【トレーニング】を具体的に提案する。熱血かつポジティブに。語尾にムキをつける。");
 
         try {
             return generateContentWithRetry(null, sb.toString());
@@ -129,22 +133,19 @@ public class AICoachService {
         }
     }
 
-    /**
-     * ★追加: 週間レポートとトレーニング提案
-     */
     public String generateWeeklyDietAdvice(User user, List<MealRecord> records, LocalDate start, LocalDate end) {
         int totalCalories = records.stream().mapToInt(MealRecord::getCalories).sum();
-        double avgCalories = totalCalories / (double) records.size(); // 単純平均
+        double avgCalories = totalCalories / (double) records.size(); 
 
         String allContent = records.stream()
                 .map(MealRecord::getContent)
                 .filter(c -> c != null && !c.trim().isEmpty())
-                .limit(20) // 週間なので少なめでOK
+                .limit(20)
                 .collect(Collectors.joining("、"));
 
         StringBuilder sb = new StringBuilder();
         sb.append("あなたは専属AIトレーナーです。\n");
-        sb.append("今週(").append(start).append("～").append(end).append(")の食事記録を分析し、週末や来週に向けた具体的なアクションプランを提案してください。\n\n");
+        sb.append("今週(").append(start).append("～").append(end).append(")の食事記録を分析し、週末や来週に向けた【食事】と【トレーニング】のアクションプランを提案してください。\n\n");
         
         sb.append("【ユーザー】").append(user.getUsername()).append("さん\n");
         sb.append("【週間データ】\n");
@@ -152,7 +153,7 @@ public class AICoachService {
         sb.append("- 合計カロリー: ").append(totalCalories).append("kcal\n");
         sb.append("- 1食平均:約").append((int)avgCalories).append("kcal\n");
         
-        sb.append("\nルール: 200文字以内。週単位の振り返りとして、食べ過ぎた場合のリカバリー方法や、良い傾向ならそれを伸ばす筋トレメニューを提案。熱血かつポジティブに。語尾にムキをつける。");
+        sb.append("\nルール: 250文字以内。週単位の振り返りとして、リカバリーのための【食事調整】や、さらに伸ばすための【トレーニング】を提案。熱血かつポジティブに。語尾にムキをつける。");
 
         try {
             return generateContentWithRetry(null, sb.toString());
@@ -257,6 +258,10 @@ public class AICoachService {
         }
     }
 
+    /**
+     * ★修正: リトライロジックを強化
+     * エラーメッセージから「retry in X s」を読み取り、その時間分待機するように修正。
+     */
     private String generateContentWithRetry(Content content, String promptText) throws Exception {
         int attempt = 0;
         Exception lastException = null;
@@ -275,11 +280,25 @@ public class AICoachService {
                 if (e.getMessage().contains("429") || e.getMessage().contains("Quota exceeded")) {
                     lastException = e;
                     attempt++;
-                    System.out.println("Gemini API Rate Limit hit. Retrying... (" + attempt + "/" + MAX_RETRIES + ")");
+                    
+                    long waitTime = DEFAULT_WAIT_MS * attempt; // デフォルトは5秒, 10秒, 15秒...
+
+                    // エラーメッセージから待機時間を解析 ("Please retry in 41.72s" など)
+                    Matcher matcher = Pattern.compile("retry in ([0-9\\.]+)s").matcher(e.getMessage());
+                    if (matcher.find()) {
+                        try {
+                            double seconds = Double.parseDouble(matcher.group(1));
+                            waitTime = (long) (seconds * 1000) + 1000; // ミリ秒変換 + 余裕の1秒
+                        } catch (NumberFormatException nfe) {
+                            // 解析失敗時はデフォルト倍率を使用
+                        }
+                    }
+
+                    System.out.println("Gemini API Rate Limit hit. Retrying in " + waitTime + "ms... (" + attempt + "/" + MAX_RETRIES + ")");
                     
                     if (attempt < MAX_RETRIES) {
                         try {
-                            Thread.sleep(RETRY_WAIT_MS * attempt);
+                            Thread.sleep(waitTime);
                         } catch (InterruptedException ie) {
                             Thread.currentThread().interrupt();
                             throw new Exception("解析処理が中断されました。");
@@ -292,7 +311,7 @@ public class AICoachService {
         }
         
         System.err.println("Gemini API Retry Failed: " + lastException.getMessage());
-        return "{\"error\": \"現在アクセスが集中しており解析できません。少し時間を置いて再試行してください。\"}";
+        return "{\"error\": \"現在アクセスが集中しており解析できません。1分ほど待ってから再試行してください。\"}";
     }
 
     private String cleanJsonResult(String responseText) {
