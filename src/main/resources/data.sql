@@ -12,9 +12,9 @@ INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('黄の聖�
 INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('紫の聖結晶', '/img/item/SR-purple.png', '素材', 'SR');
 
 INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('赫焔鱗', '/img/item/SSR-red.png', '素材', 'SSR');
-INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('氷華の杖', '/img/item/SSR-blue.png', '武器', 'SSR');
-INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('緑晶灯', '/img/item/SSR-green.png', '装飾', 'SSR');
-INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('夢紡ぎの枕', '/img/item/SSR-yellow.png', '装飾', 'SSR');
-INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('月詠みの杖', '/img/item/SSR-purple.png', '武器', 'SSR');
+INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('氷華の杖', '/img/item/SSR-blue.png', '素材', 'SSR');
+INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('緑晶灯', '/img/item/SSR-green.png', '素材', 'SSR');
+INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('夢紡ぎの枕', '/img/item/SSR-yellow.png', '素材', 'SSR');
+INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('月詠みの杖', '/img/item/SSR-purple.png', '素材', 'SSR');
 
-INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('虹の神結晶', '/img/item/UR-niji.png', '素材', 'UR');
+INSERT OR IGNORE INTO item (name, image_path, type, rarity) VALUES ('夢幻の鍵', '/img/item/UR-niji.png', '素材', 'UR');
