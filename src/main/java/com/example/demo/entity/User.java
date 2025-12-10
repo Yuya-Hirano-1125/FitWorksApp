@@ -21,7 +21,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "users") // テーブル名を指定することを推奨（予約語回避のため）
+@Table(name = "users")
 public class User {
 
     @Id
@@ -41,17 +41,19 @@ public class User {
     @Column(unique = true)
     private String phoneNumber;
 
-    // ★追加: 認証プロバイダ（デフォルトはLOCAL）
     @Enumerated(EnumType.STRING)
     private AuthProvider provider = AuthProvider.LOCAL;
 
-    // ★追加: 外部サービスのユーザーID (LINEのuserId, Appleのsubなど)
     private String providerId;
 
     private Integer level = 1;
 
     private LocalDate lastMissionCompletionDate;
     private Boolean isRewardClaimedToday = false;
+
+    // ★追加: 現在装備している称号
+    @Enumerated(EnumType.STRING)
+    private AppTitle equippedTitle;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "equipped_background_item_id")
@@ -120,7 +122,6 @@ public class User {
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
-    // ★追加分のGetter/Setter
     public AuthProvider getProvider() { return provider; }
     public void setProvider(AuthProvider provider) { this.provider = provider; }
 
@@ -138,6 +139,15 @@ public class User {
 
     public Boolean getIsRewardClaimedToday() { return isRewardClaimedToday; }
     public void setIsRewardClaimedToday(Boolean isRewardClaimedToday) { this.isRewardClaimedToday = isRewardClaimedToday; }
+
+    // ★追加: 称号のGetter/Setter
+    public AppTitle getEquippedTitle() { return equippedTitle; }
+    public void setEquippedTitle(AppTitle equippedTitle) { this.equippedTitle = equippedTitle; }
+
+    // ★追加: 画面表示用のヘルパーメソッド
+    public String getDisplayTitle() {
+        return equippedTitle != null ? equippedTitle.getDisplayName() : "なし";
+    }
 
     public Item getEquippedBackgroundItem() { return equippedBackgroundItem; }
     public void setEquippedBackgroundItem(Item equippedBackgroundItem) { this.equippedBackgroundItem = equippedBackgroundItem; }

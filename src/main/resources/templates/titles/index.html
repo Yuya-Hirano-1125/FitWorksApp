@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>称号コレクション | FitWorks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/title.css}">
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+    <div class="main-container">
+        <div th:replace="~{fragments/header :: header}"></div>
+
+        <h1><i class="fa-solid fa-crown"></i> 称号コレクション</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">
+            条件を達成して称号を獲得し、プロフィールを飾りましょう！
+        </p>
+
+        <div th:if="${successMessage}" class="message success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="message error" th:text="${errorMessage}"></div>
+
+        <div class="current-title-section">
+            <span class="label">現在の称号:</span>
+            <div class="title-badge equipped" 
+                 th:if="${equippedTitle != null}"
+                 th:classappend="${equippedTitle.rarity}" 
+                 th:text="${equippedTitle.displayName}">
+                 駆け出し
+            </div>
+            <div th:if="${equippedTitle == null}" class="no-title">なし</div>
+            
+            <form th:action="@{/titles/equip}" method="post" style="display:inline;" th:if="${equippedTitle != null}">
+                <button type="submit" class="btn-unequip">外す</button>
+            </form>
+        </div>
+
+        <div class="title-grid">
+            <div th:each="title : ${allTitles}" 
+                 th:with="isUnlocked=${unlockedTitles.contains(title)}, isEquipped=${title == equippedTitle}"
+                 class="title-card" 
+                 th:classappend="${isUnlocked ? 'unlocked' : 'locked'}">
+                
+                <div class="title-header">
+                    <span class="rarity-badge" th:classappend="${title.rarity}" th:text="${title.rarity}">COMMON</span>
+                    <span class="status-icon" th:if="${isEquipped}"><i class="fa-solid fa-check-circle"></i> 装備中</span>
+                    <span class="status-icon" th:if="${!isUnlocked}"><i class="fa-solid fa-lock"></i> 未獲得</span>
+                </div>
+
+                <div class="title-name" th:text="${title.displayName}">称号名</div>
+                <div class="title-desc" th:text="${title.description}">説明文</div>
+
+                <form th:if="${isUnlocked and !isEquipped}" th:action="@{/titles/equip}" method="post">
+                    <input type="hidden" name="title" th:value="${title}">
+                    <button type="submit" class="btn-equip">装備する</button>
+                </form>
+                
+                <button th:if="${isEquipped}" class="btn-equip equipped" disabled>装備中</button>
+                <button th:if="${!isUnlocked}" class="btn-equip locked" disabled>条件未達成</button>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <a th:href="@{/home}" class="button secondary"><i class="fa-solid fa-house"></i> ホームに戻る</a>
+        </div>
+        
+        <div th:replace="~{fragments/footer :: footer}"></div>
+    </div>
+</body>
+</html>

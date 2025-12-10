@@ -36,6 +36,10 @@ public class TrainingRecord {
 
     // フリーウェイト用フィールド
     private String exerciseName;
+    
+    // ★追加: 部位 (称号機能判定用: "胸", "背中", "脚" など)
+    private String bodyPart; 
+    
     private Integer sets;
     private Integer reps;
     private Double weight; // kg
