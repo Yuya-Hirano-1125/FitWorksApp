@@ -55,7 +55,7 @@ public class User {
     private Boolean notificationAiSuggestion = true;
     private Boolean notificationProgressReport = false;
     
-    // ★追加: 生活リズムに合わせた通知時間 (デフォルトは12:00)
+    // 生活リズムに合わせた通知時間 (デフォルトは12:00)
     private LocalTime lifestyleReminderTime = LocalTime.of(12, 0);
 
     private String theme = "default";
@@ -63,7 +63,9 @@ public class User {
     private String resetPasswordToken;
     private LocalDateTime tokenExpiration;
     
-    // ★追加: フレンド機能 (自分自身を参照する多対多)
+    // --- フレンド機能 ---
+    
+    // 1. 承認済みのフレンド (相互)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_friends",
@@ -71,6 +73,15 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
     private Set<User> friends = new HashSet<>();
+
+    // 2. 自分宛に届いているフレンド申請 (承認待ち)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "friend_requests",
+        joinColumns = @JoinColumn(name = "receiver_id"),
+        inverseJoinColumns = @JoinColumn(name = "sender_id")
+    )
+    private Set<User> receivedFriendRequests = new HashSet<>();
 
     public User() {
         if (this.level == null) this.level = 1;
@@ -126,7 +137,6 @@ public class User {
     public Boolean isNotificationProgressReport() { return notificationProgressReport != null ? notificationProgressReport : false; }
     public void setNotificationProgressReport(Boolean notificationProgressReport) { this.notificationProgressReport = notificationProgressReport; }
 
-    // ★追加: 生活リズム通知時間のGetter/Setter
     public LocalTime getLifestyleReminderTime() { return lifestyleReminderTime != null ? lifestyleReminderTime : LocalTime.of(12, 0); }
     public void setLifestyleReminderTime(LocalTime lifestyleReminderTime) { this.lifestyleReminderTime = lifestyleReminderTime; }
 
@@ -139,14 +149,16 @@ public class User {
     public LocalDateTime getTokenExpiration() { return tokenExpiration; }
     public void setTokenExpiration(LocalDateTime tokenExpiration) { this.tokenExpiration = tokenExpiration; }
 
-    // ★追加: フレンドリストのGetter/Setter
+    // --- フレンド関連メソッド ---
     public Set<User> getFriends() { return friends; }
     public void setFriends(Set<User> friends) { this.friends = friends; }
-    
-    // フレンド追加用ヘルパーメソッド
-    public void addFriend(User friend) {
-        this.friends.add(friend);
-    }
+    public void addFriend(User friend) { this.friends.add(friend); }
+    public void removeFriend(User friend) { this.friends.remove(friend); }
+
+    public Set<User> getReceivedFriendRequests() { return receivedFriendRequests; }
+    public void setReceivedFriendRequests(Set<User> receivedFriendRequests) { this.receivedFriendRequests = receivedFriendRequests; }
+    public void addReceivedFriendRequest(User sender) { this.receivedFriendRequests.add(sender); }
+    public void removeReceivedFriendRequest(User sender) { this.receivedFriendRequests.remove(sender); }
 
     // --- レベルアップ関連メソッド ---
 
@@ -157,7 +169,6 @@ public class User {
 
     public void addXp(int earnedXp) {
         this.xp += earnedXp;
-
         while (true) {
             int requiredXp = calculateRequiredXp();
             if (this.xp >= requiredXp) {

@@ -111,23 +111,20 @@
             text-align: center;
         }
 
-        /* --- ★ここから追加: チュートリアル用のCSS --- */
-        /* スポットライト（強調表示用の枠） */
+        /* --- チュートリアル用のCSS --- */
         .tutorial-spotlight {
             position: absolute;
             z-index: 9998;
             border-radius: 8px;
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            pointer-events: none; /* クリックを透過 */
+            pointer-events: none;
             opacity: 0;
-            /* 画面外を暗くするための巨大な影 */
             box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
         }
         .tutorial-spotlight.active {
             opacity: 1;
         }
 
-        /* RPG風メッセージボックス */
         .tutorial-rpg-box {
             position: absolute;
             z-index: 9999;
@@ -144,7 +141,6 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s, top 0.4s, left 0.4s;
-            /* 中央寄せのための基準 */
             transform: translateX(-50%);
         }
         .tutorial-rpg-box.active {
@@ -152,7 +148,6 @@
             visibility: visible;
         }
 
-        /* キャラクターアイコンエリア */
         .rpg-char-area {
             flex-shrink: 0;
             width: 80px;
@@ -167,7 +162,6 @@
             height: 100%;
             object-fit: cover;
         }
-        /* 喋っている風のアニメーション */
         .rpg-char-area img.talking {
             animation: talk-bounce 0.2s infinite alternate;
         }
@@ -176,7 +170,6 @@
             to { transform: scale(1.05); }
         }
 
-        /* テキストエリア */
         .rpg-content {
             flex-grow: 1;
             display: flex;
@@ -191,10 +184,9 @@
         .rpg-text-area {
             font-size: 0.95em;
             line-height: 1.5;
-            min-height: 3em; /* ガタつき防止 */
+            min-height: 3em;
         }
 
-        /* 操作ボタン */
         .rpg-controls {
             display: flex;
             justify-content: flex-end;
@@ -224,7 +216,6 @@
             background: #45a049;
         }
 
-        /* 指差しアイコン */
         .tutorial-pointer {
             position: absolute;
             z-index: 10000;
@@ -235,7 +226,7 @@
             text-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
         .tutorial-pointer::before {
-            content: '\f0a6'; /* FontAwesome Hand Point Up */
+            content: '\f0a6'; 
             font-family: "Font Awesome 6 Free";
             font-weight: 900;
         }
@@ -244,7 +235,6 @@
             to { transform: translateY(-10px); }
         }
 
-        /* バックドロップ（クリック防止用） */
         .tutorial-backdrop {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -305,7 +295,6 @@
     </a>
     
     <div class="care-section" style="margin-top: 15px; text-align: center; margin-bottom: 15px;">
-      
         <a th:href="@{/training/care}" class="btn-care" style="
             display: inline-block;
             width: 95%;
@@ -322,9 +311,10 @@
         </a>
     </div>
 
-    <a th:href="@{/ranking}" class="daily-mission-button" style="background: linear-gradient(45deg, #f1c40f, #f39c12); box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4); margin-top: 0px;">
-       <i class="fa-solid fa-trophy" style="margin-left: 5px;"></i> ランキングを見る 
+    <a th:href="@{/friends}" class="daily-mission-button" style="background: linear-gradient(45deg, #a18cd1 0%, #fbc2eb 100%); box-shadow: 0 6px 20px rgba(251, 194, 235, 0.4); margin-top: 0px;">
+       <i class="fa-solid fa-user-group" style="margin-left: 5px;"></i> フレンド 
     </a>
+    
     <a th:href="@{/training/map}" class="daily-mission-button" style="background: linear-gradient(45deg, #4CAF50, #8BC34A); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); margin-top: 15px;">
        <i class="fa-solid fa-map-location-dot" style="margin-left: 5px;"></i> 近くのトレーニング施設を探す 
     </a>
@@ -338,17 +328,14 @@
         <i class="fa-solid fa-gift"></i>
         <span>ガチャ</span>
     </a>
-    
     <a th:href="@{/community}" class="nav-item">
         <i class="fa-solid fa-comments"></i>
         <span>掲示板</span>
     </a>
-    
     <a th:href="@{/training-log}" class="nav-item">
         <i class="fa-solid fa-calendar-days"></i>
         <span>トレーニング記録</span>
     </a>
-    
 	<a th:href="@{/characters/menu/CharactersMenu}" class="nav-item">
 	    <i class="fa-solid fa-user-astronaut"></i>
 	    <span>キャラクター</span>
@@ -357,7 +344,6 @@
         <i class="fa-solid fa-utensils"></i>
         <span>食事記録</span>
     </a>
-    
     <a th:href="@{/settings}" class="nav-item">
         <i class="fa-solid fa-gear"></i>
         <span>設定</span>
@@ -371,11 +357,9 @@
     <div class="rpg-char-area">
         <img id="rpg-char-img" th:src="@{/img/AIcoach.png}" alt="AI Coach">
     </div>
-    
     <div class="rpg-content">
         <div class="rpg-name-tag">AIコーチ</div>
         <div class="rpg-text-area" id="rpg-text"></div>
-        
         <div class="rpg-controls">
             <button class="rpg-btn rpg-btn-skip" onclick="endRpgTutorial()">スキップ</button>
             <button class="rpg-btn rpg-btn-next" id="rpg-next-btn" onclick="nextRpgStep()">
@@ -388,36 +372,14 @@
 <div id="tutorial-backdrop" class="tutorial-backdrop"></div>
 
 <script>
-    /* チュートリアルデータ */
     const rpgSteps = [
-        {
-            targetId: null, // 最初は全体
-            text: "こんにちは！FitWorksへようこそ！\nここでは運動をRPG感覚で楽しむことができます。"
-        },
-        {
-            targetId: 'tutorial-training-btn',
-            text: "まず見てほしいのはここ！\n「トレーニングを開始」ボタンです。"
-        },
-        {
-            targetId: 'tutorial-training-btn',
-            text: "ここから日々の運動を記録して、\nXP（経験値）を稼ぎましょう！"
-        },
-        {
-            targetId: 'tutorial-xp-area',
-            text: "獲得したXPはここに溜まります。\nレベルアップすると、何かいいことがあるかも…？"
-        },
-        {
-            targetId: 'tutorial-char-display',
-            text: "あなたの相棒も一緒に成長します。\n進化したり、着せ替えも楽しめますよ！"
-        },
-        {
-            targetId: 'tutorial-mission-btn',
-            text: "毎日更新されるミッションもお忘れなく。\nクリアでガチャチケットをゲット！"
-        },
-        {
-            targetId: 'tutorial-ai-btn',
-            text: "困ったことや相談があれば、\nいつでも私（AIコーチ）を呼んでくださいね！"
-        }
+        { targetId: null, text: "こんにちは！FitWorksへようこそ！\nここでは運動をRPG感覚で楽しむことができます。" },
+        { targetId: 'tutorial-training-btn', text: "まず見てほしいのはここ！\n「トレーニングを開始」ボタンです。" },
+        { targetId: 'tutorial-training-btn', text: "ここから日々の運動を記録して、\nXP（経験値）を稼ぎましょう！" },
+        { targetId: 'tutorial-xp-area', text: "獲得したXPはここに溜まります。\nレベルアップすると、何かいいことがあるかも…？" },
+        { targetId: 'tutorial-char-display', text: "あなたの相棒も一緒に成長します。\n進化したり、着せ替えも楽しめますよ！" },
+        { targetId: 'tutorial-mission-btn', text: "毎日更新されるミッションもお忘れなく。\nクリアでガチャチケットをゲット！" },
+        { targetId: 'tutorial-ai-btn', text: "困ったことや相談があれば、\nいつでも私（AIコーチ）を呼んでくださいね！" }
     ];
 
     let currentRpgStep = 0;
@@ -429,7 +391,6 @@
         if (!localStorage.getItem(STORAGE_KEY_RPG)) {
             setTimeout(() => startRpgTutorial(), 800);
         }
-        
         window.addEventListener('resize', updateSpotlightPosition);
         window.addEventListener('scroll', updateSpotlightPosition);
     });
@@ -439,9 +400,7 @@
         document.getElementById('tutorial-spotlight').classList.add('active');
         document.getElementById('tutorial-rpg-box').classList.add('active');
         document.getElementById('tutorial-backdrop').classList.add('active');
-        
         updateRpgView();
-        
         startUpdateLoop();
     }
 
@@ -451,7 +410,6 @@
         const charImg = document.getElementById('rpg-char-img');
         const nextBtn = document.getElementById('rpg-next-btn');
 
-        // 1. テキスト更新
         textBox.innerHTML = '';
         if (typeWriterInterval) clearInterval(typeWriterInterval);
         
@@ -470,12 +428,10 @@
             }
         }, 40);
 
-        // 2. ボタン表示
         nextBtn.innerHTML = (currentRpgStep === rpgSteps.length - 1) 
             ? '完了 <i class="fa-solid fa-check"></i>' 
             : '次へ <i class="fa-solid fa-caret-right"></i>';
 
-        // 3. 移動 (初回)
         moveSpotlight(step.targetId);
     }
 
@@ -498,7 +454,6 @@
 
         if (!targetId) {
             pointer.style.display = 'none';
-            // ターゲット無し: 画面中央へ
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
             spotlight.style.width = '0';
@@ -507,13 +462,11 @@
             spotlight.style.left = (scrollLeft + window.innerWidth/2) + 'px';
             return;
         } else {
-            // ターゲットあり
             pointer.style.display = 'block';
         }
 
         const targetEl = document.getElementById(targetId);
         if (targetEl) {
-            // スクロールして見せる
             targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
             updateSpotlightPosition();
         }
@@ -536,22 +489,18 @@
                  const rect = targetEl.getBoundingClientRect();
                  const padding = 10;
                  
-                 // スポットライト位置
                  spotlight.style.width = (rect.width + padding * 2) + 'px';
                  spotlight.style.height = (rect.height + padding * 2) + 'px';
                  spotlight.style.top = (rect.top + scrollTop - padding) + 'px';
                  spotlight.style.left = (rect.left + scrollLeft - padding) + 'px';
                  
-                 // 指差し
                  pointer.style.display = 'block';
                  pointer.style.top = (rect.bottom + scrollTop + 10) + 'px';
                  pointer.style.left = (rect.left + scrollLeft + rect.width / 2 - 20) + 'px';
                  
-                 // メッセージボックス位置
                  const boxHeight = msgBox.offsetHeight;
                  let boxTop = (rect.top + scrollTop - padding - boxHeight - 20);
                  
-                 // 上に見切れる場合は下に表示
                  if (boxTop < scrollTop + 10) {
                      boxTop = (rect.bottom + scrollTop + padding + 20);
                  }
@@ -565,7 +514,6 @@
                  setDefaultPosition(spotlight, msgBox, scrollTop, scrollLeft);
              }
         } else {
-            // ターゲット指定なし
             pointer.style.display = 'none';
             setDefaultPosition(spotlight, msgBox, scrollTop, scrollLeft);
         }
@@ -602,7 +550,6 @@
         pointer.style.display = 'none';
 
         stopUpdateLoop();
-        
         localStorage.setItem(STORAGE_KEY_RPG, 'true');
     }
 </script>

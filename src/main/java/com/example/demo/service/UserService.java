@@ -35,7 +35,7 @@ public class UserService {
     private JavaMailSender mailSender;
 
     @Autowired
-    private SmsService smsService; // SMS送信用
+    private SmsService smsService;
 
     @Value("${app.base-url}")
     private String baseUrl;
@@ -46,10 +46,9 @@ public class UserService {
         this.trainingRecordRepository = trainingRecordRepository;
     }
     
-    // --- ユーザー登録処理 (電話番号対応) ---
+    // --- ユーザー登録処理 ---
     @Transactional
     public void registerNewUser(String username, String email, String phoneNumber, String rawPassword) {
-        // 1. 重複チェック
         if (userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("そのユーザー名は既に使用されています。");
         }
@@ -60,61 +59,45 @@ public class UserService {
             throw new IllegalArgumentException("その電話番号は既に使用されています。");
         }
 
-        // 2. ユーザー作成
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setEmail(email);
         newUser.setPhoneNumber(phoneNumber);
         newUser.setPassword(passwordEncoder.encode(rawPassword));
-        
         newUser.setLevel(1);
         newUser.setExperiencePoints(0);
         newUser.setTheme("default");
 
-        // 3. 保存
         userRepository.save(newUser);
-
-        // 4. 登録完了メール送信 (任意)
         sendRegistrationEmail(newUser.getEmail(), newUser.getUsername());
     }
 
-    // --- パスワードリセット (SMS認証版) ---
+    // --- パスワードリセット関連 (省略せず記述) ---
     @Transactional
     public boolean processForgotPasswordBySms(String phoneNumber) {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            
-            // 6桁の数字コードを生成
             String code = String.format("%06d", new Random().nextInt(999999));
-            
-            // 認証コードを一時的に保存 (有効期限10分)
             user.setResetPasswordToken(code);
             user.setTokenExpiration(LocalDateTime.now().plusMinutes(10));
             userRepository.save(user);
-            
-            // SMS送信
             smsService.sendVerificationCode(user.getPhoneNumber(), code);
-            
             return true;
         } else {
-            System.out.println("電話番号が見つかりません: " + phoneNumber);
             return false;
         }
     }
 
-    // --- パスワードリセット (メールリンク版) ---
     @Transactional
     public boolean processForgotPassword(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            
             String token = UUID.randomUUID().toString();
             user.setResetPasswordToken(token);
             user.setTokenExpiration(LocalDateTime.now().plusHours(24));
             userRepository.save(user);
-            
             String resetLink = baseUrl + "/reset-password?token=" + token;
             sendResetEmail(user.getEmail(), resetLink);
             return true;
@@ -122,7 +105,6 @@ public class UserService {
         return false;
     }
 
-    // --- 共通: トークン検証とパスワード更新 ---
     public User getByResetPasswordToken(String token) {
         return userRepository.findByResetPasswordToken(token)
                 .filter(u -> u.getTokenExpiration() != null && u.getTokenExpiration().isAfter(LocalDateTime.now()))
@@ -137,64 +119,103 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // --- ★追加: フレンド機能関連 ---
-    
-    /**
-     * ユーザー名でフレンドを追加する (相互フォローとして登録)
-     */
-    @Transactional
-    public boolean addFriendByUsername(String currentUsername, String targetUsername) {
-        if (currentUsername.equals(targetUsername)) {
-            return false; // 自分自身は追加できない
+    // --- ★追加: フレンド機能 ---
+
+    // 1. フレンド検索
+    public List<User> searchUsers(String currentUsername, String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new ArrayList<>();
         }
-        
-        Optional<User> currentUserOpt = userRepository.findByUsername(currentUsername);
-        Optional<User> targetUserOpt = userRepository.findByUsername(targetUsername);
+        List<User> users = userRepository.findByUsernameContainingIgnoreCase(keyword);
+        // 自分自身を除外
+        return users.stream()
+                .filter(u -> !u.getUsername().equals(currentUsername))
+                .collect(Collectors.toList());
+    }
 
-        if (currentUserOpt.isPresent() && targetUserOpt.isPresent()) {
-            User currentUser = currentUserOpt.get();
-            User targetUser = targetUserOpt.get();
+    // 2. フレンド申請送信
+    @Transactional
+    public boolean sendFriendRequest(String currentUsername, Long targetUserId) {
+        Optional<User> senderOpt = userRepository.findByUsername(currentUsername);
+        Optional<User> receiverOpt = userRepository.findById(targetUserId);
 
-            // 既にフレンドでないか確認などが必要であればここに追加
-            // 今回はSetを使用しているため重複登録は自動で防がれる
+        if (senderOpt.isPresent() && receiverOpt.isPresent()) {
+            User sender = senderOpt.get();
+            User receiver = receiverOpt.get();
 
-            // 相互に追加
-            currentUser.addFriend(targetUser);
-            targetUser.addFriend(currentUser);
+            // 自分自身への申請不可
+            if (sender.getId().equals(receiver.getId())) return false;
 
-            userRepository.save(currentUser);
-            userRepository.save(targetUser);
+            // 既にフレンドなら何もしない
+            if (sender.getFriends().contains(receiver)) return false;
+
+            // 既に申請済みなら何もしない
+            if (receiver.getReceivedFriendRequests().contains(sender)) return false;
+
+            // 相手の「受信リクエスト」に自分を追加
+            receiver.addReceivedFriendRequest(sender);
+            userRepository.save(receiver);
             return true;
         }
         return false;
     }
 
-    /**
-     * 自分とフレンドを含めたランキングリストを取得する
-     */
+    // 3. フレンド申請承認
+    @Transactional
+    public void approveFriendRequest(String currentUsername, Long senderId) {
+        Optional<User> receiverOpt = userRepository.findByUsername(currentUsername);
+        Optional<User> senderOpt = userRepository.findById(senderId);
+
+        if (receiverOpt.isPresent() && senderOpt.isPresent()) {
+            User receiver = receiverOpt.get();
+            User sender = senderOpt.get();
+
+            if (receiver.getReceivedFriendRequests().contains(sender)) {
+                receiver.removeReceivedFriendRequest(sender);
+                
+                receiver.addFriend(sender);
+                sender.addFriend(receiver);
+
+                userRepository.save(receiver);
+                userRepository.save(sender);
+            }
+        }
+    }
+
+    // 4. フレンド申請拒否
+    @Transactional
+    public void rejectFriendRequest(String currentUsername, Long senderId) {
+        Optional<User> receiverOpt = userRepository.findByUsername(currentUsername);
+        Optional<User> senderOpt = userRepository.findById(senderId);
+
+        if (receiverOpt.isPresent() && senderOpt.isPresent()) {
+            User receiver = receiverOpt.get();
+            User sender = senderOpt.get();
+
+            receiver.removeReceivedFriendRequest(sender);
+            userRepository.save(receiver);
+        }
+    }
+
+    // 5. フレンド内ランキング取得
     public List<User> getFriendRanking(String username) {
         Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isEmpty()) {
-            return new ArrayList<>();
-        }
+        if (userOpt.isEmpty()) return new ArrayList<>();
+        
         User currentUser = userOpt.get();
         Set<User> friends = currentUser.getFriends();
         
-        // 自分自身もリストに加える（表示用コピーを作成）
         List<User> rankingList = new ArrayList<>(friends);
         rankingList.add(currentUser);
-        
-        // 重複排除（念のため）
         rankingList = rankingList.stream().distinct().collect(Collectors.toList());
 
-        // レベル降順 -> XP降順 でソート
         rankingList.sort(Comparator.comparingInt(User::getLevel).reversed()
                 .thenComparing(Comparator.comparingInt(User::getXp).reversed()));
         
         return rankingList;
     }
 
-    // --- ヘルパーメソッド (メール送信) ---
+    // --- その他ヘルパーメソッド ---
     private void sendRegistrationEmail(String toEmail, String username) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
@@ -221,7 +242,6 @@ public class UserService {
         }
     }
 
-    // --- 既存の参照用メソッド ---
     public User findByUsername(String username) {
         return userRepository.findByUsername(username).orElse(null);
     }
@@ -235,7 +255,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // --- その他のロジック (ミッション等) ---
     public boolean changePassword(String username, String oldPassword, String newPassword) {
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) return false;

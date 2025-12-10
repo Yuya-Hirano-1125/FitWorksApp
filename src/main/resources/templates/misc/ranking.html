@@ -12,7 +12,6 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
-        /* --- ランキング固有のスタイル調整 --- */
         .ranking-list { 
             list-style: none; 
             padding: 0; 
@@ -113,43 +112,18 @@
             color: var(--primary-color);
         }
         
-        /* ★追加: フレンド追加フォーム用のスタイル */
-        .friend-add-section {
-            margin-bottom: 25px; 
-            padding: 20px; 
-            background: #fff;
-            border-radius: 20px; 
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
         }
-        .friend-form {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-        .friend-input {
-            padding: 10px 15px;
+        .view-selector {
+            padding: 8px 12px;
             border-radius: 10px;
-            border: 2px solid #ddd;
-            width: 250px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        .friend-input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-        .msg-success { color: #2ecc71; font-weight: bold; margin-top: 10px; }
-        .msg-error { color: #e74c3c; font-weight: bold; margin-top: 10px; }
-
-        @media (max-width: 600px) {
-            .ranking-item { padding: 12px; }
-            .rank-badge { width: 35px; height: 35px; font-size: 1rem; margin-right: 12px; }
-            .user-name { font-size: 1rem; }
-            .friend-input { width: 100%; }
+            border: 2px solid var(--primary-color);
+            background: #fff;
+            font-weight: bold;
+            color: var(--dark-text);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -157,25 +131,21 @@
 
     <div class="main-container">
         
-        <div class="ranking-header">
-            <h1>
-                <i class="fa-solid fa-trophy header-icon"></i>フレンドランキング
-            </h1>
-            <p class="sub-heading">フレンドと競い合ってモチベーションアップ！</p>
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="ranking-header" style="margin:0;">
+                <h1 style="font-size: 1.5rem;">
+                    <i class="fa-solid fa-trophy header-icon"></i>ランキング
+                </h1>
+            </div>
+            
+            <select class="view-selector" onchange="location.href=this.value" 
+                    style="padding: 8px; border-radius: 10px; border: 2px solid #3498db;">
+                <option value="/friends">フレンド管理</option>
+                <option value="/ranking" selected>フレンドランキング</option>
+            </select>
         </div>
 
-        <div class="friend-add-section">
-            <h3><i class="fa-solid fa-user-plus"></i> フレンドを追加</h3>
-            <p style="font-size: 0.9rem; color: #666;">ユーザー名を入力してフレンドに追加しましょう</p>
-            
-            <form th:action="@{/ranking/add}" method="post" class="friend-form">
-                <input type="text" name="targetUsername" class="friend-input" placeholder="ユーザー名を入力..." required>
-                <button type="submit" class="button primary">追加</button>
-            </form>
-            
-            <div th:if="${successMessage}" class="msg-success" th:text="${successMessage}"></div>
-            <div th:if="${errorMessage}" class="msg-error" th:text="${errorMessage}"></div>
-        </div>
+        <p class="sub-heading" style="margin-bottom: 20px;">フレンドと競い合おう！</p>
 
         <ul class="ranking-list">
             <li th:each="user, stat : ${rankingList}" 
@@ -198,13 +168,13 @@
             </li>
             
             <li th:if="${#lists.isEmpty(rankingList)}" style="text-align: center; color: #666; padding: 20px;">
-                まだフレンドがいません。上のフォームからフレンドを追加してみましょう！
+                まだフレンドがいません。フレンド管理画面から追加しましょう！
             </li>
         </ul>
 
         <div class="button-container">
-            <a th:href="@{/home}" class="button secondary">
-                <i class="fa-solid fa-house"></i> ホームに戻る
+            <a th:href="@{/friends}" class="button secondary">
+                <i class="fa-solid fa-arrow-left"></i> フレンド画面へ
             </a>
         </div>
 
