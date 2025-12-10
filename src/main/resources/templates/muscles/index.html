@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイ・マッスル・パートナー | FitWorks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        .muscle-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding-bottom: 80px;
+        }
+        .muscle-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+        .muscle-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-color);
+        }
+        .muscle-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            background: var(--ai-bubble);
+            width: 80px; height: 80px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+        }
+        .muscle-part-badge {
+            background: #666; color: white;
+            padding: 3px 10px; border-radius: 10px;
+            font-size: 0.8rem; margin-bottom: 5px;
+        }
+        .muscle-name {
+            font-weight: 800; font-size: 1.3rem; margin-bottom: 5px;
+            color: #333;
+        }
+        .level-info {
+            font-weight: bold; color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+        .xp-bar-bg {
+            width: 100%; height: 10px; background: #eee;
+            border-radius: 5px; overflow: hidden; margin-bottom: 15px;
+        }
+        .xp-bar-fill {
+            height: 100%; background: linear-gradient(90deg, #ff9966, #ff5e62);
+            border-radius: 5px;
+        }
+        .rename-form {
+            width: 100%; display: flex; gap: 5px;
+        }
+        .rename-input {
+            flex: 1; padding: 5px; border: 1px solid #ddd; border-radius: 5px;
+        }
+        .rename-btn {
+            background: var(--secondary-color); color: white;
+            border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div th:replace="~{fragments/header :: header}"></div>
+
+        <h1><i class="fa-solid fa-dumbbell"></i> マッスルパートナー</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">
+            トレーニングをして、あなたの筋肉たちを育てましょう！
+        </p>
+
+        <div th:if="${successMessage}" style="color: green; text-align: center; margin-bottom: 15px;" th:text="${successMessage}"></div>
+
+        <div class="muscle-grid">
+            <div th:each="muscle : ${muscles}" class="muscle-card">
+                <div class="muscle-part-badge" th:text="${muscle.targetPart}">胸</div>
+                
+                <div class="muscle-icon">
+                    <i class="fa-solid" 
+                       th:classappend="${muscle.targetPart == '胸' ? 'fa-shield-heart' : 
+                                       (muscle.targetPart == '脚' ? 'fa-person-running' : 
+                                       (muscle.targetPart == '腕' ? 'fa-hand-fist' : 'fa-child-reaching'))}"></i>
+                </div>
+
+                <div class="muscle-name" th:text="${muscle.customName}">胸筋太郎</div>
+                <div class="level-info" th:text="'Lv.' + ${muscle.level}">Lv.1</div>
+
+                <div class="xp-bar-bg">
+                    <div class="xp-bar-fill" th:style="'width:' + ${muscle.progressPercent} + '%;'"></div>
+                </div>
+                <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;" 
+                     th:text="'Next Lv: ' + ${muscle.xp} + ' / ' + ${muscle.requiredXp} + ' XP'"></div>
+
+                <form th:action="@{/muscles/rename}" method="post" class="rename-form">
+                    <input type="hidden" name="id" th:value="${muscle.id}">
+                    <input type="text" name="newName" class="rename-input" placeholder="名前を変更" required>
+                    <button type="submit" class="rename-btn"><i class="fa-solid fa-pen"></i></button>
+                </form>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <a th:href="@{/home}" class="button secondary"><i class="fa-solid fa-house"></i> ホームに戻る</a>
+        </div>
+        
+        <div th:replace="~{fragments/footer :: footer}"></div>
+    </div>
+</body>
+</html>

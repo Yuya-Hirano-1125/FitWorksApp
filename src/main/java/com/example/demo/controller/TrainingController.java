@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.DailyChartData;
-import com.example.demo.dto.ExerciseData; // ★追加：ExerciseData DTOのimport
+import com.example.demo.dto.ExerciseData;
 import com.example.demo.dto.TrainingLogForm;
 import com.example.demo.entity.BodyWeightRecord;
 import com.example.demo.entity.ExerciseBookmark;
@@ -41,6 +41,7 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AICoachService;
 import com.example.demo.service.LevelService;
 import com.example.demo.service.MissionService;
+import com.example.demo.service.MuscleService; // 追加
 import com.example.demo.service.TrainingDataService;
 import com.example.demo.service.TrainingLogicService;
 import com.example.demo.service.UserService;
@@ -59,8 +60,11 @@ public class TrainingController {
     private final TrainingLogicService trainingLogicService;
     private final BodyWeightRecordRepository bodyWeightRecordRepository;
     private final AICoachService aiCoachService;
+    private final MuscleService muscleService; // 追加
+
     @Autowired
     private LevelService levelService;
+
     @Autowired
     public TrainingController(UserService userService,
                               UserRepository userRepository,
@@ -71,7 +75,8 @@ public class TrainingController {
                               TrainingDataService trainingDataService,
                               TrainingLogicService trainingLogicService,
                               BodyWeightRecordRepository bodyWeightRecordRepository,
-                              AICoachService aiCoachService) {
+                              AICoachService aiCoachService,
+                              MuscleService muscleService) { // コンストラクタに追加
         this.userService = userService;
         this.userRepository = userRepository;
         this.trainingRecordRepository = trainingRecordRepository;
@@ -82,6 +87,7 @@ public class TrainingController {
         this.trainingLogicService = trainingLogicService;
         this.bodyWeightRecordRepository = bodyWeightRecordRepository;
         this.aiCoachService = aiCoachService;
+        this.muscleService = muscleService; // 初期化
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -91,18 +97,12 @@ public class TrainingController {
     
     public static class BatchTrainingLogForm {
         private List<TrainingLogForm> logs;
-
-        public List<TrainingLogForm> getLogs() {
-            return logs;
-        }
-
-        public void setLogs(List<TrainingLogForm> logs) {
-            this.logs = logs;
-        }
+        public List<TrainingLogForm> getLogs() { return logs; }
+        public void setLogs(List<TrainingLogForm> logs) { this.logs = logs; }
     }
     
     // =======================================================
-    // ★追加: AIクリニック・ケアメニュー画面の表示
+    // AIクリニック・ケアメニュー画面
     // =======================================================
     @GetMapping("/training/care")
     public String showCareMenu(Authentication authentication) {
@@ -110,9 +110,6 @@ public class TrainingController {
         return "training/care-menu";
     }
 
-    // =======================================================
-    // ★追加: AIクリニック・ケアアドバイスの処理（フォームPOSTハンドラ）
-    // =======================================================
     @PostMapping("/training/care/advice")
     public String getCareAdvice(
             @RequestParam("symptom") String symptom,
@@ -123,57 +120,40 @@ public class TrainingController {
         if (currentUser == null) return "redirect:/login";
 
         String aiAdvice = null;
-        ExerciseData suggestedExercise = null; // ExerciseData DTO
+        ExerciseData suggestedExercise = null;
 
         try {
-            // 1. 推奨するケア種目名を取得 (TrainingLogicServiceに依存)
             String recommendedExerciseName = trainingLogicService.selectCareExercise(symptom);
-
-            // 2. AI Adviceを取得 (AICoachServiceに依存)
-            // ユーザー情報と症状、推奨種目名を渡す
             aiAdvice = aiCoachService.generateCareAdvice(currentUser, symptom, recommendedExerciseName);
-            
-            // 3. 推奨種目の詳細データ (ExerciseData DTO) を取得
             if (recommendedExerciseName != null) {
                 suggestedExercise = trainingDataService.getExerciseDataByName(recommendedExerciseName);
             }
-            
         } catch (Exception e) {
             System.err.println("AI Care Advice Error: " + e.getMessage());
-            // AIサービスエラー時も画面遷移はさせる
             aiAdvice = "現在AIサービスが混み合っています。ゆっくり深呼吸してリラックスしましょう。";
         }
 
-        // 4. モデルにデータをセット（care-result.htmlで必要）
         model.addAttribute("symptom", symptom);
         model.addAttribute("aiAdvice", aiAdvice);
         model.addAttribute("suggestedExercise", suggestedExercise); 
         
-        // 5. 記録フォーム用のデータもセット
         TrainingLogForm logForm = new TrainingLogForm();
         logForm.setRecordDate(LocalDate.now());
-        logForm.setType("CARE"); // ケアログとして記録
+        logForm.setType("CARE"); 
         if(suggestedExercise != null) {
             logForm.setExerciseName(suggestedExercise.getFullName());
             logForm.setSets(1);
             logForm.setReps(10); 
             logForm.setWeight(0.0);
         } else {
-            // 種目が見つからない場合は、最低限の記録情報をセット
             logForm.setExerciseName(symptom + "ケア");
             logForm.setSets(1);
             logForm.setReps(1);
             logForm.setWeight(0.0);
         }
         model.addAttribute("trainingLogForm", logForm);
-
-        // 6. 結果画面へ遷移
         return "training/care-result";
     }
-    // =======================================================
-    // ★追加箇所 終わり
-    // =======================================================
-
 
     @GetMapping("/training")
     public String showTrainingOptions(Authentication authentication, Model model) {
@@ -359,10 +339,19 @@ public class TrainingController {
         int earnedXP = 0;
         String trainingSummary = ""; 
 
-        if ("WEIGHT".equals(form.getType()) || "CARE".equals(form.getType())) { // CAREログもここで処理
+        // ★追加: 筋肉育成用変数
+        String targetPart = "その他";
+        int muscleXp = 0;
+
+        if ("WEIGHT".equals(form.getType()) || "CARE".equals(form.getType())) {
             exerciseIdentifier = form.getExerciseName();
             trainingSummary = form.getExerciseName() + ("CARE".equals(form.getType()) ? " (AIケア)" : " (筋トレ)");
-            if (form.getSetList() != null && !form.getSetList().isEmpty() && !"CARE".equals(form.getType())) { // CAREは一括処理しない
+            
+            // ★部位を特定
+            targetPart = trainingDataService.findPartByExerciseName(exerciseIdentifier);
+            if("CARE".equals(form.getType())) targetPart = "その他";
+
+            if (form.getSetList() != null && !form.getSetList().isEmpty() && !"CARE".equals(form.getType())) {
                 for (TrainingLogForm.SetDetail detail : form.getSetList()) {
                     if (detail.getWeight() != null || detail.getReps() != null) {
                         TrainingRecord record = new TrainingRecord();
@@ -401,6 +390,9 @@ public class TrainingController {
             trainingSummary = form.getCardioType() + " (有酸素運動)";
             trainingRecordRepository.save(record);
             savedCount = 1;
+            
+            // ★有酸素
+            targetPart = "有酸素";
         } else if ("BODY_WEIGHT".equals(form.getType())) {
             BodyWeightRecord record = new BodyWeightRecord();
             record.setUser(currentUser);
@@ -418,15 +410,26 @@ public class TrainingController {
                 additionalXp = trainingLogicService.calculateTotalVolumeXp(form);
             } else if ("CARDIO".equals(form.getType()) && form.getDurationMinutes() != null) {
                 additionalXp = form.getDurationMinutes();
-            } else if ("CARE".equals(form.getType())) { // CAREログのXP計算（固定値または独自のロジック）
-                additionalXp = 20; // ケアログ固定XP仮設定
+            } else if ("CARE".equals(form.getType())) {
+                additionalXp = 20;
             }
             earnedXP = baseDifficultyXp + additionalXp;
+            
+            // ★筋肉育成XP計算
+            muscleXp = Math.max(10, earnedXP / 2);
         }
 
         if (earnedXP > 0) {
-            levelService.addXpAndCheckLevelUp(currentUser, earnedXP); // XP加算とレベルアップ処理
-            userRepository.save(currentUser); // データベースに保存
+            levelService.addXpAndCheckLevelUp(currentUser, earnedXP);
+            userRepository.save(currentUser);
+
+            // ★筋肉育成処理
+            if (muscleXp > 0 && targetPart != null) {
+                String levelUpMsg = muscleService.addExperience(currentUser, targetPart, muscleXp);
+                if (levelUpMsg != null) {
+                    redirectAttributes.addFlashAttribute("muscleLevelUpMessage", levelUpMsg);
+                }
+            }
 
             String message = form.getRecordDate().toString() + trainingSummary + " の記録を保存し、" + earnedXP + " XPを獲得しました！";
             redirectAttributes.addFlashAttribute("successMessage", message);
@@ -434,10 +437,8 @@ public class TrainingController {
             redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " の記録を保存しました！");
         }
 
-
         missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
 
-        // ★AIアドバイス生成処理を復活
         if (!"BODY_WEIGHT".equals(form.getType())) {
             try {
                 String advice = aiCoachService.generateTrainingAdvice(currentUser, trainingSummary);
@@ -448,7 +449,6 @@ public class TrainingController {
         }
 
         LocalDate recordedDate = form.getRecordDate();
-        // CAREログ保存後のリダイレクト先を調整
         if ("CARE".equals(form.getType())) {
              return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
         }
@@ -473,6 +473,11 @@ public class TrainingController {
                     form.setRecordDate(recordDate);
                 }
 
+                // ★バッチ処理でも筋肉XPを加算するために変数を用意
+                String targetPart = "その他";
+                int muscleXp = 0;
+                int itemXp = 0;
+
                 if ("CARDIO".equals(form.getType())) {
                     if (form.getDurationMinutes() != null && form.getDurationMinutes() > 0) {
                         TrainingRecord record = new TrainingRecord();
@@ -489,10 +494,10 @@ public class TrainingController {
                         batchSummary.append(form.getExerciseName());
                         
                         int baseXp = trainingLogicService.getExperiencePoints(form.getExerciseName());
-                        totalXp += (baseXp + form.getDurationMinutes());
+                        itemXp = (baseXp + form.getDurationMinutes());
+                        targetPart = "有酸素";
                     }
-                } 
-                else {
+                } else {
                     if (form.getSetList() != null && !form.getSetList().isEmpty()) {
                         int savedCount = 0;
                         for (TrainingLogForm.SetDetail detail : form.getSetList()) {
@@ -516,15 +521,25 @@ public class TrainingController {
 
                             int baseXp = trainingLogicService.getExperiencePoints(form.getExerciseName());
                             int volXp = trainingLogicService.calculateTotalVolumeXp(form);
-                            totalXp += (baseXp + volXp);
+                            itemXp = (baseXp + volXp);
+                            targetPart = trainingDataService.findPartByExerciseName(form.getExerciseName());
                         }
                     }
                 }
+                
+                totalXp += itemXp;
+                
+                // ★筋肉XP加算
+                muscleXp = Math.max(10, itemXp / 2);
+                if(totalSaved > 0) {
+                    muscleService.addExperience(currentUser, targetPart, muscleXp);
+                }
             }
         }
+        
         if (totalSaved > 0) {
-            levelService.addXpAndCheckLevelUp(currentUser, totalXp); // XP加算＆レベルアップ
-            userRepository.save(currentUser); // 保存
+            levelService.addXpAndCheckLevelUp(currentUser, totalXp);
+            userRepository.save(currentUser);
             missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
 
             redirectAttributes.addFlashAttribute("successMessage", "マイセットの一括記録を完了し、合計 " + totalXp + " XPを獲得しました！");

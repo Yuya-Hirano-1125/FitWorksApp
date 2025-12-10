@@ -68,6 +68,30 @@
             text-shadow: 0 0 3px white;
         }
 
+        /* ★追加: 現在地に戻るボタンのスタイル */
+        .current-location-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000; /* マップより手前に表示 */
+            background-color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+        .current-location-btn:hover {
+            background-color: #f0f0f0;
+        }
+
         #status-message { 
             padding: 8px 15px; background: #fff;
             border: 1px solid #ddd;
@@ -146,6 +170,10 @@
     <div id="map-container">
         <div id="map"></div>
         <div class="map-center-marker"><i class="fa-solid fa-plus"></i></div>
+        
+        <button id="current-loc-btn" class="current-location-btn" title="現在地に戻る" onclick="backToCurrentLocation()">
+            <i class="fa-solid fa-crosshairs"></i>
+        </button>
     </div>
 
     <div id="places-list">
@@ -164,7 +192,10 @@
     let markersLayer;
     const defaultLocation = [35.681236, 139.767125]; 
     
-    // ★検索半径の設定 (メートル) - ここを5000に変更しました
+    // ★追加: 現在地を保持する変数
+    let currentLocation = null;
+    
+    // 検索半径の設定 (メートル)
     const SEARCH_RADIUS_METERS = 5000;
 
     // --- 1. 初期化処理 ---
@@ -177,14 +208,20 @@
 
         markersLayer = L.layerGroup().addTo(map);
 
+        // 位置情報の取得
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
-                    map.setView([lat, lng], 13); // 半径が広いのでズームを少し引く(13)
+                    
+                    // ★追加: 現在地を保存
+                    currentLocation = [lat, lng];
+                    
+                    map.setView([lat, lng], 13); // 半径が広いのでズームを少し引く
                     updateStatus("現在地を表示しました。検索ボタンを押してください。");
                     
+                    // 現在地マーカーを表示
                     L.circleMarker([lat, lng], {
                         radius: 8, fillColor: "#3388ff", color: "#fff", weight: 2, fillOpacity: 0.8
                     }).addTo(map).bindPopup("現在地");
@@ -197,6 +234,38 @@
             updateStatus("お使いのブラウザは位置情報をサポートしていません。");
         }
     });
+
+    // --- ★追加: 現在地に戻る機能 ---
+    function backToCurrentLocation() {
+        if (currentLocation) {
+            map.setView(currentLocation, 13);
+            updateStatus("現在地に戻りました。");
+        } else {
+            // 現在地がまだ取得できていない場合、再取得を試みる
+            updateStatus("現在地を取得中...");
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        currentLocation = [lat, lng];
+                        map.setView(currentLocation, 13);
+                        updateStatus("現在地を表示しました。");
+                        
+                        // マーカーも再描画（念のため）
+                        L.circleMarker([lat, lng], {
+                            radius: 8, fillColor: "#3388ff", color: "#fff", weight: 2, fillOpacity: 0.8
+                        }).addTo(map).bindPopup("現在地");
+                    },
+                    (error) => {
+                        updateStatus("現在地を取得できませんでした。");
+                    }
+                );
+            } else {
+                updateStatus("位置情報が利用できません。");
+            }
+        }
+    }
 
     // --- 2. ステータス更新 ---
     function updateStatus(msg) {
@@ -219,7 +288,6 @@
 
         try {
             // Overpass APIクエリ
-            // around:5000 (5km) に設定
             let nameFilter = "";
             if (keyword) {
                 nameFilter = `[~"name"~"${keyword}",i]`;

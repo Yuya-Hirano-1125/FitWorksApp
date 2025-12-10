@@ -8,287 +8,74 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
-	
 	<script th:src="@{/js/theme.js}"></script>
     <style>
-        /* 経験値バーのスタイル */
-        .xp-bar {
-            width: 100%;
-            height: 25px;
-            background: #ddd;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-top: 8px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
-        }
-        .xp-progress {
-            height: 100%;
-            background: linear-gradient(90deg, #4caf50, #81c784);
-            color: #fff;
-            font-size: 12px;
-            font-weight: bold;
-            text-align: center;
-            line-height: 25px;
-            border-radius: 12px;
-            transition: width 1s ease-in-out;
-        }
-
-        /* キャラクターエリア全体の配置 */
-        .character-section {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            margin-top: 50px;
-        }
-
-        /* キャラクター表示エリア（背景・正方形） */
-        .character-display {
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            
-            width: 400px;
-            height: 400px;
-            
-            /* 背景画像 */
-            background-image: url('/img/background/fire-original.png');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: cover;
-            
-            border-radius: 25px;
-            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
-            
-            margin: 0 auto;
-            text-decoration: none;
-            padding-bottom: 10px;
-            box-sizing: border-box;
-        }
-
-        /* アニメーション定義 */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-50px); }
-            100% { transform: translateY(0px); }
-        }
-
-        /* キャラクター画像のスタイル */
-        .character-display img {
-            width: auto;
-            height: 85%;
-            max-width: 95%;
-            object-fit: contain;
-            
-            /* ふわふわアニメーションと濃い影 */
-            animation: float 3s ease-in-out infinite;
-            filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9));
-        }
-
-        /* 着せ替えボタン */
-        .customize-button {
-            position: absolute;
-            top: 0;
-            right: 20px;
-            background-color: #ffb300;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 0.9em;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            transition: transform 0.1s;
-            z-index: 10;
-        }
-        .customize-button:hover {
-            transform: scale(1.05);
-        }
-        .customize-button i {
-            margin-right: 5px;
-        }
-        .bottom-nav .nav-item {
-            flex-grow: 1;
-            text-align: center;
-        }
-
-        /* --- チュートリアル用のCSS --- */
-        .tutorial-spotlight {
-            position: absolute;
-            z-index: 9998;
-            border-radius: 8px;
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            pointer-events: none;
-            opacity: 0;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6);
-        }
-        .tutorial-spotlight.active {
-            opacity: 1;
-        }
-
-        .tutorial-rpg-box {
-            position: absolute;
-            z-index: 9999;
-            width: 90%;
-            max-width: 500px;
-            background: rgb(255, 255, 255);
-            border: 2px solid #fff;
-            border-radius: 15px;
-            padding: 15px;
-            display: flex;
-            gap: 15px;
-            color: #fff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, top 0.4s, left 0.4s;
-            transform: translateX(-50%);
-        }
-        .tutorial-rpg-box.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .rpg-char-area {
-            flex-shrink: 0;
-            width: 80px;
-            height: 80px;
-            background: #fff;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid #4CAF50;
-        }
-        .rpg-char-area img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .rpg-char-area img.talking {
-            animation: talk-bounce 0.2s infinite alternate;
-        }
-        @keyframes talk-bounce {
-            from { transform: scale(1); }
-            to { transform: scale(1.05); }
-        }
-
-        .rpg-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .rpg-name-tag {
-            font-size: 0.9em;
-            color: rgb(255, 235, 252);
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .rpg-text-area {
-            font-size: 0.95em;
-            line-height: 1.5;
-            min-height: 3em;
-        }
-
-        .rpg-controls {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .rpg-btn {
-            background: transparent;
-            border: 1px solid #aaa;
-            color: #ccc;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.85em;
-        }
-        .rpg-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-        }
-        .rpg-btn-next {
-            background: #4CAF50;
-            border-color: #4CAF50;
-            color: #fff;
-            font-weight: bold;
-        }
-        .rpg-btn-next:hover {
-            background: #45a049;
-        }
-
-        .tutorial-pointer {
-            position: absolute;
-            z-index: 10000;
-            font-size: 2.5rem;
-            color: #f1c40f;
-            display: none;
-            animation: point-move 1s infinite alternate;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-        .tutorial-pointer::before {
-            content: '\f0a6'; 
-            font-family: "Font Awesome 6 Free";
-            font-weight: 900;
-        }
-        @keyframes point-move {
-            from { transform: translateY(0); }
-            to { transform: translateY(-10px); }
-        }
-
-        .tutorial-backdrop {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 9990;
-            display: none;
-        }
-        .tutorial-backdrop.active {
-            display: block;
-        }
+        .xp-bar { width: 100%; height: 25px; background: #ddd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
+        .xp-progress { height: 100%; background: linear-gradient(90deg, #4caf50, #81c784); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
+        .character-section { position: relative; display: flex; justify-content: center; margin-top: 50px; }
+        .character-display { display: flex; justify-content: center; align-items: flex-end; width: 400px; height: 400px; background-image: url('/img/background/fire-original.png'); background-repeat: no-repeat; background-position: center; background-size: cover; border-radius: 25px; box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3); margin: 0 auto; text-decoration: none; padding-bottom: 10px; box-sizing: border-box; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-50px); } 100% { transform: translateY(0px); } }
+        .character-display img { width: auto; height: 85%; max-width: 95%; object-fit: contain; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9)); }
+        .customize-button { position: absolute; top: 0; right: 20px; background-color: #ffb300; color: white; padding: 8px 12px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: transform 0.1s; z-index: 10; }
+        .customize-button:hover { transform: scale(1.05); }
+        .bottom-nav .nav-item { flex-grow: 1; text-align: center; }
+        /* Tutorial styles */
+        .tutorial-spotlight { position: absolute; z-index: 9998; border-radius: 8px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; opacity: 0; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6); }
+        .tutorial-spotlight.active { opacity: 1; }
+        .tutorial-rpg-box { position: absolute; z-index: 9999; width: 90%; max-width: 500px; background: rgb(255, 255, 255); border: 2px solid #fff; border-radius: 15px; padding: 15px; display: flex; gap: 15px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: opacity 0.3s, top 0.4s, left 0.4s; transform: translateX(-50%); }
+        .tutorial-rpg-box.active { opacity: 1; visibility: visible; }
+        .rpg-char-area { flex-shrink: 0; width: 80px; height: 80px; background: #fff; border-radius: 50%; overflow: hidden; border: 3px solid #4CAF50; }
+        .rpg-char-area img { width: 100%; height: 100%; object-fit: cover; }
+        .rpg-char-area img.talking { animation: talk-bounce 0.2s infinite alternate; }
+        @keyframes talk-bounce { from { transform: scale(1); } to { transform: scale(1.05); } }
+        .rpg-content { flex-grow: 1; display: flex; flex-direction: column; }
+        .rpg-name-tag { font-size: 0.9em; color: rgb(255, 235, 252); font-weight: bold; margin-bottom: 5px; }
+        .rpg-text-area { font-size: 0.95em; line-height: 1.5; min-height: 3em; }
+        .rpg-controls { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+        .rpg-btn { background: transparent; border: 1px solid #aaa; color: #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.85em; }
+        .rpg-btn-next { background: #4CAF50; border-color: #4CAF50; color: #fff; font-weight: bold; }
+        .tutorial-pointer { position: absolute; z-index: 10000; font-size: 2.5rem; color: #f1c40f; display: none; animation: point-move 1s infinite alternate; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        .tutorial-pointer::before { content: '\f0a6'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+        @keyframes point-move { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+        .tutorial-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9990; display: none; }
+        .tutorial-backdrop.active { display: block; }
     </style>
 </head>
 <body class="home-page">
 
 <div class="main-container" style="position: relative;"> 
-    <button class="help-icon-btn" onclick="startRpgTutorial(true)" aria-label="ヘルプ（チュートリアル）">
+    <button class="help-icon-btn" onclick="startRpgTutorial(true)" aria-label="ヘルプ">
         <i class="fa-solid fa-circle-question"></i>
     </button>
 
     <div class="app-logo-display">
         <img th:src="@{/img/applogo.jpg}" alt="App Logo" />
-        
         <div id="tutorial-xp-area">
             <div class="xp-daily-header"></div>
-            
             <div class="xp-bar-container">
                 <span th:text="'レベル ' + ${level} + ' (XP: ' + ${experiencePoints} + '/' + ${requiredXp} + ')'"></span>
                 <div class="xp-bar">
-                    <div class="xp-progress"
-                         th:style="'width:' + ${progressPercent} + '%;'"
-                         th:text="${progressPercent} + '%'">
-                    </div>
+                    <div class="xp-progress" th:style="'width:' + ${progressPercent} + '%;'" th:text="${progressPercent} + '%'"></div>
                 </div>
             </div>
         </div>
     </div>
     
     <a id="tutorial-mission-btn" th:href="@{/daily-mission}" class="daily-mission-button">
-       <i class="fa-solid fa-list-check"></i> デイリーミッション(ガチャ報酬）
+       <i class="fa-solid fa-list-check"></i> デイリーミッション
     </a>
     
     <div class="character-section">
         <a id="tutorial-char-display" th:href="@{/character}" class="character-display">
-            <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character Image" />
+            <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
         </a>
-        
         <a th:href="@{/gacha/customize}" class="customize-button">
             <i class="fa-solid fa-shirt"></i> 着せ替え
         </a>
     </div>
     
     <h1>FitWorksへようこそ</h1>
-    <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！今日のトレーニングを始めましょう。'">
-        あなたのフィットネス・ジャーニーをサポートします。
-    </p>
+    <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！'">...</p>
     
     <a id="tutorial-training-btn" th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
        <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i> トレーニングを開始 
@@ -296,16 +83,10 @@
     
     <div class="care-section" style="margin-top: 15px; text-align: center; margin-bottom: 15px;">
         <a th:href="@{/training/care}" class="btn-care" style="
-            display: inline-block;
-            width: 95%;
-            padding: 12px;
+            display: inline-block; width: 95%; padding: 12px;
             background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            color: #555;
-            font-weight: bold;
-            text-decoration: none;
-            border-radius: 50px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
+            color: #555; font-weight: bold; text-decoration: none;
+            border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         ">
             ☕️ AIリフレッシュ＆ケア
         </a>
@@ -315,8 +96,12 @@
        <i class="fa-solid fa-user-group" style="margin-left: 5px;"></i> フレンド 
     </a>
     
+    <a th:href="@{/muscles}" class="daily-mission-button" style="background: linear-gradient(45deg, #FF8008, #FFC837); box-shadow: 0 6px 20px rgba(255, 200, 55, 0.4); margin-top: 15px;">
+       <i class="fa-solid fa-child-reaching" style="margin-left: 5px;"></i> マッスルパートナー育成
+    </a>
+    
     <a th:href="@{/training/map}" class="daily-mission-button" style="background: linear-gradient(45deg, #4CAF50, #8BC34A); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); margin-top: 15px;">
-       <i class="fa-solid fa-map-location-dot" style="margin-left: 5px;"></i> 近くのトレーニング施設を探す 
+       <i class="fa-solid fa-map-location-dot" style="margin-left: 5px;"></i> 近くのトレーニング施設 
     </a>
 	<a id="tutorial-ai-btn" th:href="@{/ai-coach}" class="daily-mission-button" style="background: linear-gradient(45deg, #6a11cb, #2575fc); box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4); margin-top: 15px;">
 	   <i class="fa-solid fa-robot" style="margin-left: 5px;"></i> AIチャット 
@@ -324,73 +109,45 @@
 </div>
 
 <nav id="tutorial-menu-nav" class="bottom-nav">
-    <a th:href="@{/gacha}" class="nav-item">
-        <i class="fa-solid fa-gift"></i>
-        <span>ガチャ</span>
-    </a>
-    <a th:href="@{/community}" class="nav-item">
-        <i class="fa-solid fa-comments"></i>
-        <span>掲示板</span>
-    </a>
-    <a th:href="@{/training-log}" class="nav-item">
-        <i class="fa-solid fa-calendar-days"></i>
-        <span>トレーニング記録</span>
-    </a>
-	<a th:href="@{/characters/menu/CharactersMenu}" class="nav-item">
-	    <i class="fa-solid fa-user-astronaut"></i>
-	    <span>キャラクター</span>
-	</a>    
-    <a th:href="@{/log/meal}" class="nav-item">
-        <i class="fa-solid fa-utensils"></i>
-        <span>食事記録</span>
-    </a>
-    <a th:href="@{/settings}" class="nav-item">
-        <i class="fa-solid fa-gear"></i>
-        <span>設定</span>
-    </a>
+    <a th:href="@{/gacha}" class="nav-item"><i class="fa-solid fa-gift"></i><span>ガチャ</span></a>
+    <a th:href="@{/community}" class="nav-item"><i class="fa-solid fa-comments"></i><span>掲示板</span></a>
+    <a th:href="@{/training-log}" class="nav-item"><i class="fa-solid fa-calendar-days"></i><span>記録</span></a>
+	<a th:href="@{/characters/menu/CharactersMenu}" class="nav-item"><i class="fa-solid fa-user-astronaut"></i><span>キャラ</span></a>    
+    <a th:href="@{/log/meal}" class="nav-item"><i class="fa-solid fa-utensils"></i><span>食事</span></a>
+    <a th:href="@{/settings}" class="nav-item"><i class="fa-solid fa-gear"></i><span>設定</span></a>
 </nav>
 
 <div id="tutorial-spotlight" class="tutorial-spotlight"></div>
 <div id="tutorial-pointer" class="tutorial-pointer"></div>
-
 <div id="tutorial-rpg-box" class="tutorial-rpg-box">
-    <div class="rpg-char-area">
-        <img id="rpg-char-img" th:src="@{/img/AIcoach.png}" alt="AI Coach">
-    </div>
+    <div class="rpg-char-area"><img id="rpg-char-img" th:src="@{/img/AIcoach.png}" alt="AI Coach"></div>
     <div class="rpg-content">
         <div class="rpg-name-tag">AIコーチ</div>
         <div class="rpg-text-area" id="rpg-text"></div>
         <div class="rpg-controls">
             <button class="rpg-btn rpg-btn-skip" onclick="endRpgTutorial()">スキップ</button>
-            <button class="rpg-btn rpg-btn-next" id="rpg-next-btn" onclick="nextRpgStep()">
-                次へ <i class="fa-solid fa-caret-right"></i>
-            </button>
+            <button class="rpg-btn rpg-btn-next" id="rpg-next-btn" onclick="nextRpgStep()">次へ</button>
         </div>
     </div>
 </div>
-
 <div id="tutorial-backdrop" class="tutorial-backdrop"></div>
 
 <script>
     const rpgSteps = [
-        { targetId: null, text: "こんにちは！FitWorksへようこそ！\nここでは運動をRPG感覚で楽しむことができます。" },
-        { targetId: 'tutorial-training-btn', text: "まず見てほしいのはここ！\n「トレーニングを開始」ボタンです。" },
-        { targetId: 'tutorial-training-btn', text: "ここから日々の運動を記録して、\nXP（経験値）を稼ぎましょう！" },
-        { targetId: 'tutorial-xp-area', text: "獲得したXPはここに溜まります。\nレベルアップすると、何かいいことがあるかも…？" },
-        { targetId: 'tutorial-char-display', text: "あなたの相棒も一緒に成長します。\n進化したり、着せ替えも楽しめますよ！" },
-        { targetId: 'tutorial-mission-btn', text: "毎日更新されるミッションもお忘れなく。\nクリアでガチャチケットをゲット！" },
-        { targetId: 'tutorial-ai-btn', text: "困ったことや相談があれば、\nいつでも私（AIコーチ）を呼んでくださいね！" }
+        { targetId: null, text: "こんにちは！FitWorksへようこそ！" },
+        { targetId: 'tutorial-training-btn', text: "まずは「トレーニングを開始」ボタンから運動を記録！" },
+        { targetId: 'tutorial-xp-area', text: "運動するとXPが溜まります。" },
+        { targetId: 'tutorial-char-display', text: "レベルアップでキャラが進化することも！" },
+        { targetId: 'tutorial-mission-btn', text: "デイリーミッションも忘れずに。" },
+        { targetId: 'tutorial-ai-btn', text: "困ったらAIコーチに相談してくださいね！" }
     ];
-
     let currentRpgStep = 0;
     let typeWriterInterval;
     let updateLoopId; 
     const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v11'; 
 
     document.addEventListener('DOMContentLoaded', function() {
-        if (!localStorage.getItem(STORAGE_KEY_RPG)) {
-            setTimeout(() => startRpgTutorial(), 800);
-        }
+        if (!localStorage.getItem(STORAGE_KEY_RPG)) { setTimeout(() => startRpgTutorial(), 800); }
         window.addEventListener('resize', updateSpotlightPosition);
         window.addEventListener('scroll', updateSpotlightPosition);
     });
@@ -409,64 +166,37 @@
         const textBox = document.getElementById('rpg-text');
         const charImg = document.getElementById('rpg-char-img');
         const nextBtn = document.getElementById('rpg-next-btn');
-
         textBox.innerHTML = '';
         if (typeWriterInterval) clearInterval(typeWriterInterval);
-        
         charImg.classList.add('talking');
-        
         let i = 0;
         const chars = [...step.text]; 
         typeWriterInterval = setInterval(() => {
-            if (i < chars.length) {
-                const char = chars[i];
-                textBox.innerHTML += (char === '\n') ? '<br>' : char;
-                i++;
-            } else {
-                clearInterval(typeWriterInterval);
-                charImg.classList.remove('talking');
-            }
+            if (i < chars.length) { textBox.innerHTML += (chars[i] === '\n') ? '<br>' : chars[i]; i++; } 
+            else { clearInterval(typeWriterInterval); charImg.classList.remove('talking'); }
         }, 40);
-
-        nextBtn.innerHTML = (currentRpgStep === rpgSteps.length - 1) 
-            ? '完了 <i class="fa-solid fa-check"></i>' 
-            : '次へ <i class="fa-solid fa-caret-right"></i>';
-
+        nextBtn.innerHTML = (currentRpgStep === rpgSteps.length - 1) ? '完了' : '次へ';
         moveSpotlight(step.targetId);
     }
 
     function startUpdateLoop() {
         if (updateLoopId) cancelAnimationFrame(updateLoopId);
-        const loop = () => {
-            updateSpotlightPosition();
-            updateLoopId = requestAnimationFrame(loop);
-        };
+        const loop = () => { updateSpotlightPosition(); updateLoopId = requestAnimationFrame(loop); };
         loop();
     }
-
-    function stopUpdateLoop() {
-        if (updateLoopId) cancelAnimationFrame(updateLoopId);
-    }
+    function stopUpdateLoop() { if (updateLoopId) cancelAnimationFrame(updateLoopId); }
 
     function moveSpotlight(targetId) {
         const spotlight = document.getElementById('tutorial-spotlight');
         const pointer = document.getElementById('tutorial-pointer');
-
-        if (!targetId) {
+        const targetEl = document.getElementById(targetId);
+        if (!targetId || !targetEl) {
             pointer.style.display = 'none';
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-            spotlight.style.width = '0';
-            spotlight.style.height = '0';
-            spotlight.style.top = (scrollTop + window.innerHeight/2) + 'px';
-            spotlight.style.left = (scrollLeft + window.innerWidth/2) + 'px';
-            return;
+            spotlight.style.width = '0'; spotlight.style.height = '0';
+            spotlight.style.top = (window.pageYOffset + window.innerHeight/2) + 'px';
+            spotlight.style.left = (window.pageXOffset + window.innerWidth/2) + 'px';
         } else {
             pointer.style.display = 'block';
-        }
-
-        const targetEl = document.getElementById(targetId);
-        if (targetEl) {
             targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
             updateSpotlightPosition();
         }
@@ -474,81 +204,36 @@
     
     function updateSpotlightPosition() {
         const step = rpgSteps[currentRpgStep];
+        if (!step || !step.targetId) return;
+        const targetEl = document.getElementById(step.targetId);
+        if(!targetEl) return;
+        const rect = targetEl.getBoundingClientRect();
+        const scrollY = window.pageYOffset; const scrollX = window.pageXOffset;
         const spotlight = document.getElementById('tutorial-spotlight');
         const pointer = document.getElementById('tutorial-pointer');
         const msgBox = document.getElementById('tutorial-rpg-box');
-        
-        if (!spotlight.classList.contains('active')) return;
-
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-
-        if (step && step.targetId) {
-             const targetEl = document.getElementById(step.targetId);
-             if(targetEl) {
-                 const rect = targetEl.getBoundingClientRect();
-                 const padding = 10;
-                 
-                 spotlight.style.width = (rect.width + padding * 2) + 'px';
-                 spotlight.style.height = (rect.height + padding * 2) + 'px';
-                 spotlight.style.top = (rect.top + scrollTop - padding) + 'px';
-                 spotlight.style.left = (rect.left + scrollLeft - padding) + 'px';
-                 
-                 pointer.style.display = 'block';
-                 pointer.style.top = (rect.bottom + scrollTop + 10) + 'px';
-                 pointer.style.left = (rect.left + scrollLeft + rect.width / 2 - 20) + 'px';
-                 
-                 const boxHeight = msgBox.offsetHeight;
-                 let boxTop = (rect.top + scrollTop - padding - boxHeight - 20);
-                 
-                 if (boxTop < scrollTop + 10) {
-                     boxTop = (rect.bottom + scrollTop + padding + 20);
-                 }
-                 
-                 msgBox.style.top = boxTop + 'px';
-                 let boxLeft = (rect.left + scrollLeft + rect.width / 2);
-                 msgBox.style.left = boxLeft + 'px';
-                 
-             } else {
-                 pointer.style.display = 'none';
-                 setDefaultPosition(spotlight, msgBox, scrollTop, scrollLeft);
-             }
-        } else {
-            pointer.style.display = 'none';
-            setDefaultPosition(spotlight, msgBox, scrollTop, scrollLeft);
-        }
-    }
-    
-    function setDefaultPosition(spotlight, msgBox, scrollTop, scrollLeft) {
-        spotlight.style.width = '0';
-        spotlight.style.height = '0';
-        spotlight.style.top = (scrollTop + window.innerHeight/2) + 'px';
-        spotlight.style.left = (scrollLeft + window.innerWidth/2) + 'px';
-        
-        msgBox.style.top = (scrollTop + 100) + 'px';
-        msgBox.style.left = '50%'; 
+        spotlight.style.width = (rect.width + 20) + 'px';
+        spotlight.style.height = (rect.height + 20) + 'px';
+        spotlight.style.top = (rect.top + scrollY - 10) + 'px';
+        spotlight.style.left = (rect.left + scrollX - 10) + 'px';
+        pointer.style.top = (rect.bottom + scrollY + 10) + 'px';
+        pointer.style.left = (rect.left + scrollX + rect.width/2 - 20) + 'px';
+        let boxTop = rect.top + scrollY - msgBox.offsetHeight - 20;
+        if (boxTop < scrollY + 10) boxTop = rect.bottom + scrollY + 30;
+        msgBox.style.top = boxTop + 'px';
+        msgBox.style.left = (rect.left + scrollX + rect.width/2) + 'px';
     }
 
     function nextRpgStep() {
-        if (currentRpgStep < rpgSteps.length - 1) {
-            currentRpgStep++;
-            updateRpgView();
-        } else {
-            endRpgTutorial();
-        }
+        if (currentRpgStep < rpgSteps.length - 1) { currentRpgStep++; updateRpgView(); }
+        else { endRpgTutorial(); }
     }
 
     function endRpgTutorial() {
-        const box = document.getElementById('tutorial-rpg-box');
-        const spot = document.getElementById('tutorial-spotlight');
-        const pointer = document.getElementById('tutorial-pointer');
-        const backdrop = document.getElementById('tutorial-backdrop');
-        
-        box.classList.remove('active');
-        spot.classList.remove('active');
-        if(backdrop) backdrop.classList.remove('active'); 
-        pointer.style.display = 'none';
-
+        document.getElementById('tutorial-rpg-box').classList.remove('active');
+        document.getElementById('tutorial-spotlight').classList.remove('active');
+        document.getElementById('tutorial-backdrop').classList.remove('active');
+        document.getElementById('tutorial-pointer').style.display = 'none';
         stopUpdateLoop();
         localStorage.setItem(STORAGE_KEY_RPG, 'true');
     }
