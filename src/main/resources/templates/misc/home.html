@@ -24,11 +24,10 @@
         .title-button { position: absolute; top: 0; left: 20px; background-color: #9c27b0; color: white; padding: 8px 12px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: transform 0.1s; z-index: 10; }
         .title-button:hover { transform: scale(1.05); }
 
-        /* ★★★ 称号バッジ (キラキラver - ゆっくり) ★★★ */
+        /* 称号バッジ (キラキラver - ゆっくり) */
         .user-title-badge {
             display: inline-block;
             position: relative;
-            /* 高級感のあるグラデーション背景 */
             background: linear-gradient(135deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%);
             background-size: 200% 200%;
             color: #fff;
@@ -38,16 +37,13 @@
             font-weight: 900;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            /* 影と枠線で立体感 */
             box-shadow: 0 5px 15px rgba(215, 109, 119, 0.5), inset 0 0 10px rgba(255,255,255,0.3);
             border: 2px solid rgba(255, 255, 255, 0.8);
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             overflow: hidden;
-            /* 背景アニメーション */
             animation: gradientMove 5s ease infinite, popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* キラッと光るエフェクト */
         .user-title-badge::after {
             content: '';
             position: absolute;
@@ -57,18 +53,15 @@
             height: 100%;
             background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
             transform: skewX(-25deg);
-            /* ★修正: 5秒かけてゆっくり繰り返す */
             animation: shine 5s infinite;
         }
         
-        /* 称号のアイコン */
         .user-title-badge i {
             margin-right: 8px;
-            color: #ffd700; /* 金色のアイコン */
+            color: #ffd700;
             filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.8));
         }
 
-        /* アニメーション定義 */
         @keyframes gradientMove {
             0% { background-position: 0% 50% }
             50% { background-position: 100% 50% }
@@ -77,7 +70,6 @@
 
         @keyframes shine {
             0% { left: -100%; }
-            /* ★修正: 40%まで時間をかけて移動させることで、光がゆっくり通るように変更 */
             40% { left: 200%; }
             100% { left: 200%; }
         }
@@ -135,7 +127,7 @@
        <i class="fa-solid fa-list-check"></i> デイリーミッション
     </a>
     
-    <div style="text-align: center; margin-top: 20px; min-height: 50px;">
+    <div id="tutorial-title-display" style="text-align: center; margin-top: 20px; min-height: 50px;">
         <span class="user-title-badge" 
               th:if="${userTitle != null and userTitle != 'なし'}">
               <i class="fa-solid fa-crown"></i> <span th:text="${userTitle}"></span>
@@ -147,11 +139,11 @@
             <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
         </a>
         
-        <a th:href="@{/titles}" class="title-button">
+        <a id="tutorial-title-btn" th:href="@{/titles}" class="title-button">
             <i class="fa-solid fa-crown"></i> 称号
         </a>
 
-        <a th:href="@{/gacha/customize}" class="customize-button">
+        <a id="tutorial-customize-btn" th:href="@{/gacha/customize}" class="customize-button">
             <i class="fa-solid fa-shirt"></i> 着せ替え
         </a>
     </div>
@@ -164,7 +156,7 @@
     </a>
     
     <div class="care-section" style="margin-top: 15px; text-align: center; margin-bottom: 15px;">
-        <a th:href="@{/training/care}" class="btn-care" style="
+        <a id="tutorial-care-btn" th:href="@{/training/care}" class="btn-care" style="
             display: inline-block; width: 95%; padding: 12px;
             background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
             color: #555; font-weight: bold; text-decoration: none;
@@ -174,15 +166,15 @@
         </a>
     </div>
 
-    <a th:href="@{/friends}" class="daily-mission-button" style="background: linear-gradient(45deg, #a18cd1 0%, #fbc2eb 100%); box-shadow: 0 6px 20px rgba(251, 194, 235, 0.4); margin-top: 0px;">
+    <a id="tutorial-friends-btn" th:href="@{/friends}" class="daily-mission-button" style="background: linear-gradient(45deg, #a18cd1 0%, #fbc2eb 100%); box-shadow: 0 6px 20px rgba(251, 194, 235, 0.4); margin-top: 0px;">
        <i class="fa-solid fa-user-group" style="margin-left: 5px;"></i> フレンド 
     </a>
     
-    <a th:href="@{/muscles}" class="daily-mission-button" style="background: linear-gradient(45deg, #FF8008, #FFC837); box-shadow: 0 6px 20px rgba(255, 200, 55, 0.4); margin-top: 15px;">
+    <a id="tutorial-muscles-btn" th:href="@{/muscles}" class="daily-mission-button" style="background: linear-gradient(45deg, #FF8008, #FFC837); box-shadow: 0 6px 20px rgba(255, 200, 55, 0.4); margin-top: 15px;">
        <i class="fa-solid fa-child-reaching" style="margin-left: 5px;"></i> マッスルパートナー育成
     </a>
     
-    <a th:href="@{/training/map}" class="daily-mission-button" style="background: linear-gradient(45deg, #4CAF50, #8BC34A); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); margin-top: 15px;">
+    <a id="tutorial-map-btn" th:href="@{/training/map}" class="daily-mission-button" style="background: linear-gradient(45deg, #4CAF50, #8BC34A); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); margin-top: 15px;">
        <i class="fa-solid fa-map-location-dot" style="margin-left: 5px;"></i> 近くのトレーニング施設 
     </a>
 	<a id="tutorial-ai-btn" th:href="@{/ai-coach}" class="daily-mission-button" style="background: linear-gradient(45deg, #6a11cb, #2575fc); box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4); margin-top: 15px;">
@@ -191,12 +183,12 @@
 </div>
 
 <nav id="tutorial-menu-nav" class="bottom-nav">
-    <a th:href="@{/gacha}" class="nav-item"><i class="fa-solid fa-gift"></i><span>ガチャ</span></a>
-    <a th:href="@{/community}" class="nav-item"><i class="fa-solid fa-comments"></i><span>掲示板</span></a>
-    <a th:href="@{/training-log}" class="nav-item"><i class="fa-solid fa-calendar-days"></i><span>記録</span></a>
-	<a th:href="@{/characters/menu/CharactersMenu}" class="nav-item"><i class="fa-solid fa-user-astronaut"></i><span>キャラ</span></a>    
-    <a th:href="@{/log/meal}" class="nav-item"><i class="fa-solid fa-utensils"></i><span>食事</span></a>
-    <a th:href="@{/settings}" class="nav-item"><i class="fa-solid fa-gear"></i><span>設定</span></a>
+    <a id="nav-gacha" th:href="@{/gacha}" class="nav-item"><i class="fa-solid fa-gift"></i><span>ガチャ</span></a>
+    <a id="nav-community" th:href="@{/community}" class="nav-item"><i class="fa-solid fa-comments"></i><span>掲示板</span></a>
+    <a id="nav-log" th:href="@{/training-log}" class="nav-item"><i class="fa-solid fa-calendar-days"></i><span>記録</span></a>
+    <a id="nav-char" th:href="@{/characters/menu/CharactersMenu}" class="nav-item"><i class="fa-solid fa-user-astronaut"></i><span>キャラ</span></a>    
+    <a id="nav-meal" th:href="@{/log/meal}" class="nav-item"><i class="fa-solid fa-utensils"></i><span>食事</span></a>
+    <a id="nav-settings" th:href="@{/settings}" class="nav-item"><i class="fa-solid fa-gear"></i><span>設定</span></a>
 </nav>
 
 <div id="tutorial-spotlight" class="tutorial-spotlight"></div>
@@ -216,17 +208,33 @@
 
 <script>
     const rpgSteps = [
-        { targetId: null, text: "こんにちは！FitWorksへようこそ！" },
-        { targetId: 'tutorial-training-btn', text: "まずは「トレーニングを開始」ボタンから運動を記録！" },
-        { targetId: 'tutorial-xp-area', text: "運動するとXPが溜まります。" },
-        { targetId: 'tutorial-char-display', text: "レベルアップでキャラが進化することも！" },
-        { targetId: 'tutorial-mission-btn', text: "デイリーミッションも忘れずに。" },
-        { targetId: 'tutorial-ai-btn', text: "困ったらAIコーチに相談してくださいね！" }
+        { targetId: null, text: "こんにちは！FitWorksへようこそ！\n一緒に最強のトレーナーを目指しましょう！" },
+        { targetId: 'tutorial-xp-area', text: "ここがあなたの「レベル」と「XP」です。\n運動を記録すると経験値が溜まります！" },
+        { targetId: 'tutorial-mission-btn', text: "「デイリーミッション」は毎日更新されます。\n達成して報酬をゲットしましょう。" },
+        { targetId: 'tutorial-title-display', text: "ここには現在装備している「称号」が表示されます。\n強さの証をアピールしましょう！" },
+        { targetId: 'tutorial-char-display', text: "あなたのパートナーです。\nレベルが上がると進化するかも…！？" },
+        { targetId: 'tutorial-title-btn', text: "【新機能】獲得した称号はここで変更できます。\n色々な条件を達成して集めてくださいね。" },
+        { targetId: 'tutorial-customize-btn', text: "ガチャで手に入れたアイテムで\nキャラクターを着せ替えることができます。" },
+        { targetId: 'tutorial-training-btn', text: "基本はここ！「トレーニングを開始」ボタンから\n日々の運動を記録してください。" },
+        { targetId: 'tutorial-care-btn', text: "疲れた時は「AIリフレッシュ」。\nあなたの体調に合わせたケアを提案します。" },
+        { targetId: 'tutorial-friends-btn', text: "「フレンド」機能で仲間と励まし合ったり\nランキングで競い合うことができます。" },
+        { targetId: 'tutorial-muscles-btn', text: "「マッスルパートナー」では、あなたの\n筋肉の成長度合いを可視化できます！" },
+        { targetId: 'tutorial-map-btn', text: "近くのジムや公園を探したいときは\nこのマップ機能を使ってください。" },
+        { targetId: 'tutorial-ai-btn', text: "トレーニングの悩みや相談があれば\nいつでもAIコーチにお任せください！" },
+        { targetId: 'nav-gacha', text: "下のメニューも紹介しますね。\n「ガチャ」では装備アイテムが手に入ります。" },
+        { targetId: 'nav-community', text: "「掲示板」では、他のユーザーと\n情報交換や雑談を楽しめます。" },
+        { targetId: 'nav-log', text: "「記録」画面では、過去の履歴や\n体重の推移をグラフで確認できます。" },
+        { targetId: 'nav-char', text: "「キャラ」メニューからは、図鑑を見たり\nパートナーの詳細を確認できます。" },
+        { targetId: 'nav-meal', text: "トレーニングと同じくらい大事な\n「食事」の記録もここから行えます。" },
+        { targetId: 'nav-settings', text: "「設定」ではアカウント情報の変更や\n通知の設定などが可能です。" },
+        { targetId: null, text: "説明は以上です。\nさあ、トレーニングの旅を始めましょう！" }
     ];
+    
     let currentRpgStep = 0;
     let typeWriterInterval;
     let updateLoopId; 
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v11'; 
+    // バージョンを更新して再表示させる (v13)
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v13'; 
 
     document.addEventListener('DOMContentLoaded', function() {
         if (!localStorage.getItem(STORAGE_KEY_RPG)) { setTimeout(() => startRpgTutorial(), 800); }
@@ -271,37 +279,67 @@
     function moveSpotlight(targetId) {
         const spotlight = document.getElementById('tutorial-spotlight');
         const pointer = document.getElementById('tutorial-pointer');
-        const targetEl = document.getElementById(targetId);
+        
+        let targetEl = null;
+        if (targetId) {
+            targetEl = document.getElementById(targetId);
+            // ターゲットが存在しない場合（バッジ未獲得時など）はスキップせず、
+            // そのまま画面中央に表示するようにフォールバックさせる
+        }
+
         if (!targetId || !targetEl) {
             pointer.style.display = 'none';
             spotlight.style.width = '0'; spotlight.style.height = '0';
             spotlight.style.top = (window.pageYOffset + window.innerHeight/2) + 'px';
             spotlight.style.left = (window.pageXOffset + window.innerWidth/2) + 'px';
+            // メッセージボックスを中央下へ
+            const msgBox = document.getElementById('tutorial-rpg-box');
+            msgBox.style.top = (window.pageYOffset + window.innerHeight/2 + 50) + 'px';
+            msgBox.style.left = (window.pageXOffset + window.innerWidth/2) + 'px';
         } else {
             pointer.style.display = 'block';
             targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            updateSpotlightPosition();
+            // スクロール完了を待たずに位置更新を開始しているが、
+            // loopで追従するため問題なし
         }
     }
     
     function updateSpotlightPosition() {
         const step = rpgSteps[currentRpgStep];
-        if (!step || !step.targetId) return;
+        const msgBox = document.getElementById('tutorial-rpg-box');
+        
+        if (!step || !step.targetId) {
+             // ターゲットなしの時の位置調整（画面中央下）
+            const scrollY = window.pageYOffset; 
+            const scrollX = window.pageXOffset;
+             msgBox.style.top = (scrollY + window.innerHeight/2 + 50) + 'px';
+             msgBox.style.left = (scrollX + window.innerWidth/2) + 'px';
+             return;
+        }
+        
         const targetEl = document.getElementById(step.targetId);
         if(!targetEl) return;
+        
         const rect = targetEl.getBoundingClientRect();
         const scrollY = window.pageYOffset; const scrollX = window.pageXOffset;
         const spotlight = document.getElementById('tutorial-spotlight');
         const pointer = document.getElementById('tutorial-pointer');
-        const msgBox = document.getElementById('tutorial-rpg-box');
+        
         spotlight.style.width = (rect.width + 20) + 'px';
         spotlight.style.height = (rect.height + 20) + 'px';
         spotlight.style.top = (rect.top + scrollY - 10) + 'px';
         spotlight.style.left = (rect.left + scrollX - 10) + 'px';
         pointer.style.top = (rect.bottom + scrollY + 10) + 'px';
         pointer.style.left = (rect.left + scrollX + rect.width/2 - 20) + 'px';
+        
+        // 吹き出しの位置調整
         let boxTop = rect.top + scrollY - msgBox.offsetHeight - 20;
-        if (boxTop < scrollY + 10) boxTop = rect.bottom + scrollY + 30;
+        
+        // 画面上部にはみ出す場合、またはナビゲーションバーの場合は下に表示
+        if (boxTop < scrollY + 10 || (step.targetId.startsWith('nav-'))) {
+             boxTop = rect.bottom + scrollY + 30;
+        }
+
         msgBox.style.top = boxTop + 'px';
         msgBox.style.left = (rect.left + scrollX + rect.width/2) + 'px';
     }
