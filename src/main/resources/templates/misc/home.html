@@ -13,7 +13,7 @@
         .xp-bar { width: 100%; height: 25px; background: #ddd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
         .xp-progress { height: 100%; background: linear-gradient(90deg, #4caf50, #81c784); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
         
-        .character-section { position: relative; display: flex; justify-content: center; margin-top: 30px; /* マージン調整 */ }
+        .character-section { position: relative; display: flex; justify-content: center; margin-top: 30px; }
         .character-display { display: flex; justify-content: center; align-items: flex-end; width: 400px; height: 400px; background-image: url('/img/background/fire-original.png'); background-repeat: no-repeat; background-position: center; background-size: cover; border-radius: 25px; box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3); margin: 0 auto; text-decoration: none; padding-bottom: 10px; box-sizing: border-box; }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-50px); } 100% { transform: translateY(0px); } }
         .character-display img { width: auto; height: 85%; max-width: 95%; object-fit: contain; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9)); }
@@ -24,21 +24,62 @@
         .title-button { position: absolute; top: 0; left: 20px; background-color: #9c27b0; color: white; padding: 8px 12px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: transform 0.1s; z-index: 10; }
         .title-button:hover { transform: scale(1.05); }
 
-        /* ★称号バッジのスタイル（さらに大きく修正） */
+        /* ★★★ 称号バッジ (キラキラver - ゆっくり) ★★★ */
         .user-title-badge {
             display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            /* サイズを大きく */
-            font-size: 1.3em; 
-            padding: 8px 20px;
-            border-radius: 30px;
+            position: relative;
+            /* 高級感のあるグラデーション背景 */
+            background: linear-gradient(135deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%);
+            background-size: 200% 200%;
+            color: #fff;
+            font-size: 1.2em; 
+            padding: 8px 25px;
+            border-radius: 50px;
             font-weight: 900;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            /* 影と枠線で立体感 */
+            box-shadow: 0 5px 15px rgba(215, 109, 119, 0.5), inset 0 0 10px rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.8);
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            border: 3px solid rgba(255,255,255,0.4);
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            /* 背景アニメーション */
+            animation: gradientMove 5s ease infinite, popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* キラッと光るエフェクト */
+        .user-title-badge::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            /* ★修正: 5秒かけてゆっくり繰り返す */
+            animation: shine 5s infinite;
+        }
+        
+        /* 称号のアイコン */
+        .user-title-badge i {
+            margin-right: 8px;
+            color: #ffd700; /* 金色のアイコン */
+            filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.8));
+        }
+
+        /* アニメーション定義 */
+        @keyframes gradientMove {
+            0% { background-position: 0% 50% }
+            50% { background-position: 100% 50% }
+            100% { background-position: 0% 50% }
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            /* ★修正: 40%まで時間をかけて移動させることで、光がゆっくり通るように変更 */
+            40% { left: 200%; }
+            100% { left: 200%; }
         }
         
         @keyframes popIn {
@@ -48,7 +89,7 @@
 
         .bottom-nav .nav-item { flex-grow: 1; text-align: center; }
         
-        /* Tutorial styles (省略なし) */
+        /* Tutorial styles */
         .tutorial-spotlight { position: absolute; z-index: 9998; border-radius: 8px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; opacity: 0; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6); }
         .tutorial-spotlight.active { opacity: 1; }
         .tutorial-rpg-box { position: absolute; z-index: 9999; width: 90%; max-width: 500px; background: rgb(255, 255, 255); border: 2px solid #fff; border-radius: 15px; padding: 15px; display: flex; gap: 15px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: opacity 0.3s, top 0.4s, left 0.4s; transform: translateX(-50%); }
@@ -94,10 +135,10 @@
        <i class="fa-solid fa-list-check"></i> デイリーミッション
     </a>
     
-    <div style="text-align: center; margin-top: 15px; min-height: 40px;">
+    <div style="text-align: center; margin-top: 20px; min-height: 50px;">
         <span class="user-title-badge" 
-              th:if="${userTitle != null and userTitle != 'なし'}" 
-              th:text="${userTitle}">
+              th:if="${userTitle != null and userTitle != 'なし'}">
+              <i class="fa-solid fa-crown"></i> <span th:text="${userTitle}"></span>
         </span>
     </div>
     
