@@ -2,6 +2,9 @@ package com.example.demo.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +13,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 
 @Entity
@@ -45,13 +50,27 @@ public class User {
     @JoinColumn(name = "equipped_costume_item_id")
     private Item equippedCostumeItem;
 
+    // --- 通知設定 ---
     private Boolean notificationTrainingReminder = true;
     private Boolean notificationAiSuggestion = true;
     private Boolean notificationProgressReport = false;
+    
+    // ★追加: 生活リズムに合わせた通知時間 (デフォルトは12:00)
+    private LocalTime lifestyleReminderTime = LocalTime.of(12, 0);
+
     private String theme = "default";
 
     private String resetPasswordToken;
     private LocalDateTime tokenExpiration;
+    
+    // ★追加: フレンド機能 (自分自身を参照する多対多)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_friends",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
+    private Set<User> friends = new HashSet<>();
 
     public User() {
         if (this.level == null) this.level = 1;
@@ -60,6 +79,7 @@ public class User {
         if (this.notificationAiSuggestion == null) this.notificationAiSuggestion = true;
         if (this.notificationProgressReport == null) this.notificationProgressReport = false;
         if (this.theme == null) this.theme = "default";
+        if (this.lifestyleReminderTime == null) this.lifestyleReminderTime = LocalTime.of(12, 0);
     }
 
     // --- Getter / Setter ---
@@ -106,6 +126,10 @@ public class User {
     public Boolean isNotificationProgressReport() { return notificationProgressReport != null ? notificationProgressReport : false; }
     public void setNotificationProgressReport(Boolean notificationProgressReport) { this.notificationProgressReport = notificationProgressReport; }
 
+    // ★追加: 生活リズム通知時間のGetter/Setter
+    public LocalTime getLifestyleReminderTime() { return lifestyleReminderTime != null ? lifestyleReminderTime : LocalTime.of(12, 0); }
+    public void setLifestyleReminderTime(LocalTime lifestyleReminderTime) { this.lifestyleReminderTime = lifestyleReminderTime; }
+
     public String getTheme() { return theme != null ? theme : "default"; }
     public void setTheme(String theme) { this.theme = theme; }
 
@@ -114,6 +138,15 @@ public class User {
 
     public LocalDateTime getTokenExpiration() { return tokenExpiration; }
     public void setTokenExpiration(LocalDateTime tokenExpiration) { this.tokenExpiration = tokenExpiration; }
+
+    // ★追加: フレンドリストのGetter/Setter
+    public Set<User> getFriends() { return friends; }
+    public void setFriends(Set<User> friends) { this.friends = friends; }
+    
+    // フレンド追加用ヘルパーメソッド
+    public void addFriend(User friend) {
+        this.friends.add(friend);
+    }
 
     // --- レベルアップ関連メソッド ---
 
@@ -145,8 +178,7 @@ public class User {
         return requiredXp == 0 ? 0 : (int) (((double) xp / requiredXp) * 100);
     }
 
-	public void setExperiencePoints(int i) {
-		// TODO 自動生成されたメソッド・スタブ
-		
-	}
+    public void setExperiencePoints(int i) {
+        this.xp = i;
+    }
 }

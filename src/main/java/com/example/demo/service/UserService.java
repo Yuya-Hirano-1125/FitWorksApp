@@ -2,9 +2,14 @@ package com.example.demo.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -130,6 +135,63 @@ public class UserService {
         user.setResetPasswordToken(null);
         user.setTokenExpiration(null);
         userRepository.save(user);
+    }
+
+    // --- ★追加: フレンド機能関連 ---
+    
+    /**
+     * ユーザー名でフレンドを追加する (相互フォローとして登録)
+     */
+    @Transactional
+    public boolean addFriendByUsername(String currentUsername, String targetUsername) {
+        if (currentUsername.equals(targetUsername)) {
+            return false; // 自分自身は追加できない
+        }
+        
+        Optional<User> currentUserOpt = userRepository.findByUsername(currentUsername);
+        Optional<User> targetUserOpt = userRepository.findByUsername(targetUsername);
+
+        if (currentUserOpt.isPresent() && targetUserOpt.isPresent()) {
+            User currentUser = currentUserOpt.get();
+            User targetUser = targetUserOpt.get();
+
+            // 既にフレンドでないか確認などが必要であればここに追加
+            // 今回はSetを使用しているため重複登録は自動で防がれる
+
+            // 相互に追加
+            currentUser.addFriend(targetUser);
+            targetUser.addFriend(currentUser);
+
+            userRepository.save(currentUser);
+            userRepository.save(targetUser);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 自分とフレンドを含めたランキングリストを取得する
+     */
+    public List<User> getFriendRanking(String username) {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) {
+            return new ArrayList<>();
+        }
+        User currentUser = userOpt.get();
+        Set<User> friends = currentUser.getFriends();
+        
+        // 自分自身もリストに加える（表示用コピーを作成）
+        List<User> rankingList = new ArrayList<>(friends);
+        rankingList.add(currentUser);
+        
+        // 重複排除（念のため）
+        rankingList = rankingList.stream().distinct().collect(Collectors.toList());
+
+        // レベル降順 -> XP降順 でソート
+        rankingList.sort(Comparator.comparingInt(User::getLevel).reversed()
+                .thenComparing(Comparator.comparingInt(User::getXp).reversed()));
+        
+        return rankingList;
     }
 
     // --- ヘルパーメソッド (メール送信) ---
