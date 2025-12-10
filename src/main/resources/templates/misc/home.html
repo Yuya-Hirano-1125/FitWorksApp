@@ -8,18 +8,47 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
-	<script th:src="@{/js/theme.js}"></script>
+    <script th:src="@{/js/theme.js}"></script>
     <style>
         .xp-bar { width: 100%; height: 25px; background: #ddd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
         .xp-progress { height: 100%; background: linear-gradient(90deg, #4caf50, #81c784); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
-        .character-section { position: relative; display: flex; justify-content: center; margin-top: 50px; }
+        
+        .character-section { position: relative; display: flex; justify-content: center; margin-top: 30px; /* マージン調整 */ }
         .character-display { display: flex; justify-content: center; align-items: flex-end; width: 400px; height: 400px; background-image: url('/img/background/fire-original.png'); background-repeat: no-repeat; background-position: center; background-size: cover; border-radius: 25px; box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3); margin: 0 auto; text-decoration: none; padding-bottom: 10px; box-sizing: border-box; }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-50px); } 100% { transform: translateY(0px); } }
         .character-display img { width: auto; height: 85%; max-width: 95%; object-fit: contain; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9)); }
+        
+        /* ボタン類 */
         .customize-button { position: absolute; top: 0; right: 20px; background-color: #ffb300; color: white; padding: 8px 12px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: transform 0.1s; z-index: 10; }
         .customize-button:hover { transform: scale(1.05); }
+        .title-button { position: absolute; top: 0; left: 20px; background-color: #9c27b0; color: white; padding: 8px 12px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: transform 0.1s; z-index: 10; }
+        .title-button:hover { transform: scale(1.05); }
+
+        /* ★称号バッジのスタイル（さらに大きく修正） */
+        .user-title-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            /* サイズを大きく */
+            font-size: 1.3em; 
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border: 3px solid rgba(255,255,255,0.4);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
         .bottom-nav .nav-item { flex-grow: 1; text-align: center; }
-        /* Tutorial styles */
+        
+        /* Tutorial styles (省略なし) */
         .tutorial-spotlight { position: absolute; z-index: 9998; border-radius: 8px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; opacity: 0; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6); }
         .tutorial-spotlight.active { opacity: 1; }
         .tutorial-rpg-box { position: absolute; z-index: 9999; width: 90%; max-width: 500px; background: rgb(255, 255, 255); border: 2px solid #fff; border-radius: 15px; padding: 15px; display: flex; gap: 15px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: opacity 0.3s, top 0.4s, left 0.4s; transform: translateX(-50%); }
@@ -65,17 +94,29 @@
        <i class="fa-solid fa-list-check"></i> デイリーミッション
     </a>
     
+    <div style="text-align: center; margin-top: 15px; min-height: 40px;">
+        <span class="user-title-badge" 
+              th:if="${userTitle != null and userTitle != 'なし'}" 
+              th:text="${userTitle}">
+        </span>
+    </div>
+    
     <div class="character-section">
         <a id="tutorial-char-display" th:href="@{/character}" class="character-display">
             <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
         </a>
+        
+        <a th:href="@{/titles}" class="title-button">
+            <i class="fa-solid fa-crown"></i> 称号
+        </a>
+
         <a th:href="@{/gacha/customize}" class="customize-button">
             <i class="fa-solid fa-shirt"></i> 着せ替え
         </a>
     </div>
     
     <h1>FitWorksへようこそ</h1>
-    <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！'">...</p>
+    <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！'"></p>
     
     <a id="tutorial-training-btn" th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
        <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i> トレーニングを開始 
