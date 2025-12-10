@@ -8,6 +8,45 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <script th:src="@{/js/theme.js}"></script>
     <style>
+        /* --- ヒートマップ表示エリア --- */
+        .avatar-section {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        .avatar-container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            margin: 0 auto;
+        }
+
+        /* SVGパーツの共通スタイル */
+        .muscle-part {
+            fill: #e0e0e0; /* デフォルト色（グレー） */
+            stroke: #fff;
+            stroke-width: 2;
+            transition: all 0.5s ease-in-out;
+            transform-box: fill-box; /* 変形の基準をパーツ自身に */
+            transform-origin: center; /* 中心から拡大 */
+            cursor: pointer;
+        }
+
+        /* ホバー時のエフェクト */
+        .muscle-part:hover {
+            filter: brightness(1.1);
+        }
+
+        /* レベルが高いときの発光エフェクト */
+        .glowing {
+            filter: drop-shadow(0 0 8px rgba(255, 94, 98, 0.6));
+        }
+
+        /* --- 既存スタイル --- */
         .muscle-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -70,6 +109,20 @@
             background: var(--secondary-color); color: white;
             border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;
         }
+        
+        /* ツールチップ */
+        #tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
@@ -77,10 +130,36 @@
         <div th:replace="~{fragments/header :: header}"></div>
 
         <h1><i class="fa-solid fa-dumbbell"></i> マッスルパートナー</h1>
-        <p style="text-align: center; color: #666; margin-bottom: 20px;">
-            トレーニングをして、あなたの筋肉たちを育てましょう！
-        </p>
+        
+        <div class="avatar-section">
+            <h3>現在の筋肉ステータス</h3>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">レベルに応じて筋肉が大きく、赤く発光します！</p>
+            
+            <div class="avatar-container">
+                <svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="100" cy="30" r="20" fill="#ddd" />
+                    
+                    <path id="part-shoulders" class="muscle-part" d="M60,60 Q100,50 140,60 L150,80 L50,80 Z" 
+                          data-part-name="肩" />
+                    
+                    <path id="part-chest" class="muscle-part" d="M65,80 Q100,120 135,80 L130,65 Q100,75 70,65 Z" 
+                          data-part-name="胸" />
+                    
+                    <g id="part-arms" class="muscle-part" data-part-name="腕">
+                        <path d="M50,80 L40,150 L60,150 L65,80 Z" /> <path d="M150,80 L160,150 L140,150 L135,80 Z" /> </g>
+                    
+                    <path id="part-abs" class="muscle-part" d="M70,120 L130,120 L125,160 L75,160 Z" 
+                          data-part-name="腹筋" />
+                    
+                    <path id="part-back" class="muscle-part" d="M55,60 L45,100 L155,100 L145,60 Z" 
+                          style="opacity: 0.3; z-index: -1;" data-part-name="背中" />
 
+                    <g id="part-legs" class="muscle-part" data-part-name="脚">
+                        <path d="M75,160 L60,280 L90,280 L95,160 Z" /> <path d="M125,160 L140,280 L110,280 L105,160 Z" /> </g>
+                </svg>
+                <div id="tooltip"></div>
+            </div>
+        </div>
         <div th:if="${successMessage}" style="color: green; text-align: center; margin-bottom: 15px;" th:text="${successMessage}"></div>
 
         <div class="muscle-grid">
@@ -91,7 +170,10 @@
                     <i class="fa-solid" 
                        th:classappend="${muscle.targetPart == '胸' ? 'fa-shield-heart' : 
                                        (muscle.targetPart == '脚' ? 'fa-person-running' : 
-                                       (muscle.targetPart == '腕' ? 'fa-hand-fist' : 'fa-child-reaching'))}"></i>
+                                       (muscle.targetPart == '腕' ? 'fa-hand-fist' : 
+                                       (muscle.targetPart == '背中' ? 'fa-child' : 
+                                       (muscle.targetPart == '肩' ? 'fa-user-plus' : 
+                                       (muscle.targetPart == '腹筋' ? 'fa-table-cells' : 'fa-child-reaching')))))}"></i>
                 </div>
 
                 <div class="muscle-name" th:text="${muscle.customName}">胸筋太郎</div>
@@ -117,5 +199,78 @@
         
         <div th:replace="~{fragments/footer :: footer}"></div>
     </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // サーバー側の筋肉リストをJavaScriptオブジェクトとして取得
+        const muscleData = /*[[${muscles}]]*/ [];
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const tooltip = document.getElementById('tooltip');
+
+            muscleData.forEach(muscle => {
+                // 部位名に対応するSVG要素のIDを特定
+                let svgId = null;
+                switch(muscle.targetPart) {
+                    case '胸': svgId = 'part-chest'; break;
+                    case '背中': svgId = 'part-back'; break;
+                    case '脚': svgId = 'part-legs'; break;
+                    case '腕': svgId = 'part-arms'; break;
+                    case '腹筋': svgId = 'part-abs'; break;
+                    case '肩': svgId = 'part-shoulders'; break;
+                }
+
+                if(svgId) {
+                    const el = document.getElementById(svgId);
+                    if(el) {
+                        applyMuscleStyle(el, muscle.level);
+                        
+                        // マウスオーバーイベント (PC用)
+                        el.addEventListener('mousemove', (e) => {
+                            showTooltip(e, `${muscle.targetPart}: Lv.${muscle.level}`);
+                        });
+                        el.addEventListener('mouseleave', hideTooltip);
+                    }
+                }
+            });
+
+            function applyMuscleStyle(element, level) {
+                // 1. 色の変化 (レベルが高いほど赤く)
+                // レベル1=グレー, レベル10=鮮やかな赤, レベル20=発光する赤
+                const intensity = Math.min((level - 1) / 20, 1); // 0.0 ~ 1.0
+                
+                // ベースの色 (グレー #e0e0e0) から 赤 (#ff3333) へ補間
+                const r = Math.round(224 + (255 - 224) * intensity);
+                const g = Math.round(224 + (51 - 224) * intensity);
+                const b = Math.round(224 + (51 - 224) * intensity);
+                
+                element.style.fill = `rgb(${r}, ${g}, ${b})`;
+
+                // 2. サイズの変化 (レベルが高いほど大きく)
+                // scale(1.0) ~ scale(1.3)
+                const scale = 1 + Math.min(level * 0.03, 0.3); 
+                element.style.transform = `scale(${scale})`;
+
+                // 3. 発光エフェクト (Lv10以上)
+                if (level >= 10) {
+                    element.classList.add('glowing');
+                }
+            }
+
+            function showTooltip(e, text) {
+                tooltip.textContent = text;
+                tooltip.style.opacity = '1';
+                // マウス位置の少し上へ
+                const rect = document.querySelector('.avatar-container').getBoundingClientRect();
+                tooltip.style.left = (e.clientX - rect.left + 10) + 'px';
+                tooltip.style.top = (e.clientY - rect.top - 30) + 'px';
+            }
+
+            function hideTooltip() {
+                tooltip.style.opacity = '0';
+            }
+        });
+        /*]]>*/
+    </script>
 </body>
 </html>
