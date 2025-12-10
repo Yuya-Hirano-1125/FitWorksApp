@@ -28,6 +28,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
+    // ★追加: ソーシャルログイン用 (OAuth2 Client)
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
     // JSON
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
@@ -48,7 +51,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // --- Gemini AI SDK ---
+    // --- External Services ---
     implementation 'com.google.genai:google-genai:1.28.0'
     implementation 'com.twilio.sdk:twilio:9.14.0'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
@@ -57,6 +60,3 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-
-

@@ -46,7 +46,15 @@ public class UserService {
         this.trainingRecordRepository = trainingRecordRepository;
     }
     
-    // --- ユーザー登録処理 ---
+    // --- ★修正: 互換性のためのラッパーメソッド ---
+    // AuthControllerがこのシグネチャ(引数3つ)で呼び出しているため追加
+    @Transactional
+    public void registerUser(String username, String password, String email) {
+        // 電話番号はnullとして処理
+        registerNewUser(username, email, null, password);
+    }
+
+    // --- ユーザー登録処理 (既存) ---
     @Transactional
     public void registerNewUser(String username, String email, String phoneNumber, String rawPassword) {
         if (userRepository.findByUsername(username).isPresent()) {
@@ -72,7 +80,7 @@ public class UserService {
         sendRegistrationEmail(newUser.getEmail(), newUser.getUsername());
     }
 
-    // --- パスワードリセット関連 (省略せず記述) ---
+    // --- パスワードリセット関連 ---
     @Transactional
     public boolean processForgotPasswordBySms(String phoneNumber) {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
@@ -82,6 +90,8 @@ public class UserService {
             user.setResetPasswordToken(code);
             user.setTokenExpiration(LocalDateTime.now().plusMinutes(10));
             userRepository.save(user);
+            
+            // ★重要: ここで SmsService の sendVerificationCode を呼んでいます
             smsService.sendVerificationCode(user.getPhoneNumber(), code);
             return true;
         } else {
@@ -119,21 +129,18 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // --- ★追加: フレンド機能 ---
-
-    // 1. フレンド検索
+    // --- フレンド機能 ---
     public List<User> searchUsers(String currentUsername, String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return new ArrayList<>();
         }
+        // ★ここでのエラーはUserRepositoryの修正で直ります
         List<User> users = userRepository.findByUsernameContainingIgnoreCase(keyword);
-        // 自分自身を除外
         return users.stream()
                 .filter(u -> !u.getUsername().equals(currentUsername))
                 .collect(Collectors.toList());
     }
 
-    // 2. フレンド申請送信
     @Transactional
     public boolean sendFriendRequest(String currentUsername, Long targetUserId) {
         Optional<User> senderOpt = userRepository.findByUsername(currentUsername);
@@ -142,17 +149,10 @@ public class UserService {
         if (senderOpt.isPresent() && receiverOpt.isPresent()) {
             User sender = senderOpt.get();
             User receiver = receiverOpt.get();
-
-            // 自分自身への申請不可
             if (sender.getId().equals(receiver.getId())) return false;
-
-            // 既にフレンドなら何もしない
             if (sender.getFriends().contains(receiver)) return false;
-
-            // 既に申請済みなら何もしない
             if (receiver.getReceivedFriendRequests().contains(sender)) return false;
 
-            // 相手の「受信リクエスト」に自分を追加
             receiver.addReceivedFriendRequest(sender);
             userRepository.save(receiver);
             return true;
@@ -160,7 +160,6 @@ public class UserService {
         return false;
     }
 
-    // 3. フレンド申請承認
     @Transactional
     public void approveFriendRequest(String currentUsername, Long senderId) {
         Optional<User> receiverOpt = userRepository.findByUsername(currentUsername);
@@ -172,17 +171,14 @@ public class UserService {
 
             if (receiver.getReceivedFriendRequests().contains(sender)) {
                 receiver.removeReceivedFriendRequest(sender);
-                
                 receiver.addFriend(sender);
                 sender.addFriend(receiver);
-
                 userRepository.save(receiver);
                 userRepository.save(sender);
             }
         }
     }
 
-    // 4. フレンド申請拒否
     @Transactional
     public void rejectFriendRequest(String currentUsername, Long senderId) {
         Optional<User> receiverOpt = userRepository.findByUsername(currentUsername);
@@ -191,13 +187,11 @@ public class UserService {
         if (receiverOpt.isPresent() && senderOpt.isPresent()) {
             User receiver = receiverOpt.get();
             User sender = senderOpt.get();
-
             receiver.removeReceivedFriendRequest(sender);
             userRepository.save(receiver);
         }
     }
 
-    // 5. フレンド内ランキング取得
     public List<User> getFriendRanking(String username) {
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) return new ArrayList<>();
@@ -215,7 +209,7 @@ public class UserService {
         return rankingList;
     }
 
-    // --- その他ヘルパーメソッド ---
+    // --- その他ヘルパー ---
     private void sendRegistrationEmail(String toEmail, String username) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();

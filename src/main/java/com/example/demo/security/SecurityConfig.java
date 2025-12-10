@@ -32,9 +32,12 @@ import com.example.demo.service.CustomUserDetailsService;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final CustomOAuth2UserService customOAuth2UserService; // ★追加
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(CustomUserDetailsService userDetailsService,
+                          CustomOAuth2UserService customOAuth2UserService) {
         this.userDetailsService = userDetailsService;
+        this.customOAuth2UserService = customOAuth2UserService;
     }
 
     // パスワードエンコーダー
@@ -66,7 +69,7 @@ public class SecurityConfig {
         return source;
     }
 
-    // CSRFトークンをレスポンスヘッダに追加するフィルタ
+    // CSRFトークンフィルタ
     private Filter csrfCookieFilter() {
         return (request, response, chain) -> {
             CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
@@ -89,14 +92,17 @@ public class SecurityConfig {
         http
             // CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            // CSRF
+            
+            // CSRF (SMS APIのために一部無効化するか、トークンを含める必要がありますが、ここでは一旦全体有効)
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                // SMS認証エンドポイントはCSRF除外する場合の例（必要に応じてコメントアウト解除）
+                // .ignoringRequestMatchers("/api/auth/**") 
             )
             .addFilterAfter(csrfCookieFilter(), BasicAuthenticationFilter.class)
 
-            // セキュリティヘッダー
+            // ヘッダー設定
             .headers(headers -> headers
                 .contentSecurityPolicy(csp -> csp.policyDirectives(
                         "default-src 'self'; " +
@@ -109,7 +115,6 @@ public class SecurityConfig {
                 ))
                 .referrerPolicy(referrer -> referrer.policy(
                     ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                // ★追加: HSTS（HTTPS強制・本番向け）
                 .httpStrictTransportSecurity(hsts -> hsts
                     .includeSubDomains(true)
                     .maxAgeInSeconds(31536000)
@@ -125,7 +130,12 @@ public class SecurityConfig {
 
             // 認可設定
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/register",
+                // ★追加: SMS認証APIとOAuth2関連パスを許可
+                .requestMatchers("/api/auth/send-otp", "/api/auth/verify-otp").permitAll()
+                .requestMatchers("/login/**", "/oauth2/**").permitAll()
+                
+                // 既存の許可リスト
+                .requestMatchers("/", "/register",
                     "/forgot-password", "/verify-code", "/reset-password",
                     "/error", "/terms",
                     "/api/public/**",
@@ -141,7 +151,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
 
-            // ログイン設定
+            // フォームログイン
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
@@ -149,8 +159,17 @@ public class SecurityConfig {
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
+            
+            // ★追加: OAuth2ログイン (LINE / Apple)
+            .oauth2Login(oauth2 -> oauth2
+                .loginPage("/login") // 既存のログインページを共有
+                .userInfoEndpoint(userInfo -> userInfo
+                    .userService(customOAuth2UserService) // ユーザー情報取得時のカスタム処理
+                )
+                .defaultSuccessUrl("/home", true)
+            )
 
-            // ログアウト設定
+            // ログアウト
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
                 .logoutSuccessUrl("/")
@@ -159,17 +178,14 @@ public class SecurityConfig {
                 .permitAll()
             )
 
-            // ★追加: Remember-Me（ログイン保持）
+            // Remember-Me
             .rememberMe(remember -> remember
                 .key("fitworks-remember-me-key")
-                .tokenValiditySeconds(7 * 24 * 60 * 60) // 7日
+                .tokenValiditySeconds(7 * 24 * 60 * 60)
                 .userDetailsService(userDetailsService)
             )
 
-            // ★追加: アクセス拒否時は専用ページへ
             .exceptionHandling(ex -> ex.accessDeniedPage("/access-denied"))
-
-            // 認証プロバイダ
             .authenticationProvider(authenticationProvider());
 
         return http.build();

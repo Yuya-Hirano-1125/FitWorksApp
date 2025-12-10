@@ -8,6 +8,8 @@ import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,8 +18,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "users") // テーブル名を指定することを推奨（予約語回避のため）
 public class User {
 
     @Id
@@ -36,6 +40,13 @@ public class User {
 
     @Column(unique = true)
     private String phoneNumber;
+
+    // ★追加: 認証プロバイダ（デフォルトはLOCAL）
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider = AuthProvider.LOCAL;
+
+    // ★追加: 外部サービスのユーザーID (LINEのuserId, Appleのsubなど)
+    private String providerId;
 
     private Integer level = 1;
 
@@ -65,7 +76,6 @@ public class User {
     
     // --- フレンド機能 ---
     
-    // 1. 承認済みのフレンド (相互)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_friends",
@@ -74,7 +84,6 @@ public class User {
     )
     private Set<User> friends = new HashSet<>();
 
-    // 2. 自分宛に届いているフレンド申請 (承認待ち)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "friend_requests",
@@ -91,6 +100,7 @@ public class User {
         if (this.notificationProgressReport == null) this.notificationProgressReport = false;
         if (this.theme == null) this.theme = "default";
         if (this.lifestyleReminderTime == null) this.lifestyleReminderTime = LocalTime.of(12, 0);
+        if (this.provider == null) this.provider = AuthProvider.LOCAL;
     }
 
     // --- Getter / Setter ---
@@ -109,6 +119,13 @@ public class User {
 
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    // ★追加分のGetter/Setter
+    public AuthProvider getProvider() { return provider; }
+    public void setProvider(AuthProvider provider) { this.provider = provider; }
+
+    public String getProviderId() { return providerId; }
+    public void setProviderId(String providerId) { this.providerId = providerId; }
 
     public Integer getLevel() { return level != null ? level : 1; }
     public void setLevel(Integer level) { this.level = level; }
@@ -149,7 +166,6 @@ public class User {
     public LocalDateTime getTokenExpiration() { return tokenExpiration; }
     public void setTokenExpiration(LocalDateTime tokenExpiration) { this.tokenExpiration = tokenExpiration; }
 
-    // --- フレンド関連メソッド ---
     public Set<User> getFriends() { return friends; }
     public void setFriends(Set<User> friends) { this.friends = friends; }
     public void addFriend(User friend) { this.friends.add(friend); }
@@ -159,8 +175,6 @@ public class User {
     public void setReceivedFriendRequests(Set<User> receivedFriendRequests) { this.receivedFriendRequests = receivedFriendRequests; }
     public void addReceivedFriendRequest(User sender) { this.receivedFriendRequests.add(sender); }
     public void removeReceivedFriendRequest(User sender) { this.receivedFriendRequests.remove(sender); }
-
-    // --- レベルアップ関連メソッド ---
 
     public int calculateRequiredXp() {
         int currentLevel = getLevel();
@@ -180,16 +194,12 @@ public class User {
         }
     }
 
-    public int getExperiencePoints() {
-        return getXp(); // 互換性のために残す
-    }
+    public int getExperiencePoints() { return getXp(); }
 
     public int getProgressPercent() {
         int requiredXp = calculateRequiredXp();
         return requiredXp == 0 ? 0 : (int) (((double) xp / requiredXp) * 100);
     }
 
-    public void setExperiencePoints(int i) {
-        this.xp = i;
-    }
+    public void setExperiencePoints(int i) { this.xp = i; }
 }
