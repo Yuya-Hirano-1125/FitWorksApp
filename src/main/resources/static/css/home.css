@@ -602,3 +602,138 @@
 .rpg-btn-next:hover {
     transform: scale(1.05);
 }
+
+/* ========================================================= */
+/* Welcome Header Styles (もっと可愛く・大きく Ver.) */
+/* ========================================================= */
+
+.welcome-header.cute-style {
+    position: relative;
+    text-align: center;
+    margin: 15px 0 30px 0;
+    padding: 20px 10px;
+    
+    /* 背景：白ベースに薄いピンクの枠線で「ふわふわ」感を出す */
+    background: rgba(255, 255, 255, 0.9);
+    border: 4px solid #ffdde1; /* パステルピンクの枠線 */
+    border-radius: 30px; /* 角を丸く */
+    
+    box-shadow: 0 8px 20px rgba(255, 182, 193, 0.3); /* ピンク色の優しい影 */
+    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 「FitWorksへようこそ」の部分 */
+.app-title-text {
+    font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+    font-size: 1.2rem; /* 少し控えめにして名前を際立たせる */
+    font-weight: 800;
+    color: #ff9a9e; /* 濃いピンク */
+    margin: 0 0 5px 0;
+    letter-spacing: 0.1em;
+}
+
+/* メッセージボックスのレイアウト */
+.welcome-message-box {
+    display: flex;
+    flex-direction: column; /* スマホで見やすいように縦並びも考慮 */
+    justify-content: center;
+    align-items: center;
+    line-height: 1.2;
+}
+
+/* 「ようこそ」「さん！」の文字 */
+.welcome-prefix, .welcome-suffix {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #888;
+    margin-top: 5px;
+}
+
+/* 装飾アイコン（✨と💕） */
+.deco-icon {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+.deco-icon.left {
+    top: -10px;
+    left: 10px;
+    animation-delay: 0s;
+}
+
+.deco-icon.right {
+    bottom: -10px;
+    right: 10px;
+    animation-delay: 1.5s;
+    font-size: 1.8rem;
+}
+
+/* ふわふわ浮くアニメーション */
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(10deg); }
+}
+
+/* ========================================================= */
+/* User Name Highlight (Super Pop Ver.)                     */
+/* ========================================================= */
+
+/* 名前を囲むラッパー（配置調整） */
+.name-wrapper {
+    display: inline-block;
+    margin: 5px 10px;
+    position: relative;
+    z-index: 10;
+}
+
+/* ユーザー名のスタイル（超特大・レインボーアニメーション） */
+.user-name-highlight {
+    display: inline-block;
+    font-family: 'Poppins', 'Noto Sans JP', sans-serif; /* 英字フォントも混ぜて太さを強調 */
+    font-size: .5rem; /* ★スマホでもかなり大きく */
+    line-height: 1.1;
+    font-weight: 900;
+    
+    /* 鮮やかな3色グラデーション */
+    background: linear-gradient(90deg, #FF0080, #FF8C00, #40E0D0, #FF0080);
+    background-size: 300% auto; /* グラデーションを流すためのサイズ設定 */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    /* アニメーション：色が流れる ＆ 弾む */
+    animation: 
+        rainbowFlow 4s linear infinite,
+        popBounce 2s ease-in-out infinite;
+
+    /* 光沢感のある影（ネオン風） */
+    filter: drop-shadow(0 0 8px rgba(255, 0, 128, 0.4));
+    
+    padding: 0 5px;
+    letter-spacing: 0.02em;
+}
+
+/* 色が流れるアニメーション */
+@keyframes rainbowFlow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+/* 名前が弾むアニメーション */
+@keyframes popBounce {
+    0%, 100% { transform: scale(1) rotate(-2deg); }
+    50% { transform: scale(1.15) rotate(2deg); }
+}
+
+/* PC画面向けのさらに巨大な設定 */
+@media (min-width: 601px) {
+    .welcome-message-box {
+        flex-direction: row; /* PC画面では横並び */
+        align-items: baseline;
+    }
+    
+    .user-name-highlight {
+        font-size: 4.5rem; /* PCでは圧倒的な存在感に */
+        filter: drop-shadow(0 0 12px rgba(255, 0, 128, 0.5));
+    }
+}
