@@ -632,3 +632,42 @@
     /* アニメーション（任意）: ふわっと表示 */
     animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+/* ========================================================= */
+/* 追加: AIケアボタンのスタイルとアニメーション */
+/* ========================================================= */
+/* ========================================================= */
+/* 追加・修正: AIケアボタンのスタイル（他のボタンと動きを統一） */
+/* ========================================================= */
+
+.btn-care {
+    display: inline-block;
+    width: 95%;
+    padding: 12px;
+    
+    /* 背景色は維持 */
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    color: #555;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 50px;
+    
+    /* 影を他のボタンの強度に合わせる */
+    box-shadow: 0 6px 20px rgba(168, 237, 234, 0.4);
+    
+    /* ★ここが重要: 他のボタンと同じ「動き」の設定 */
+    transition: all 0.4s cubic-bezier(.68,-0.55,.26,1.55);
+    animation: gentleFloat 4s ease-in-out infinite alternate;
+}
+
+.btn-care:hover {
+    /* カーソルを合わせた時の動き */
+    transform: translateY(-5px) scale(1.03) rotate(1deg);
+    
+    /* 影を強調 */
+    box-shadow: 0 8px 25px rgba(168, 237, 234, 0.7), 0 0 15px rgba(255, 255, 255, 0.8);
+    
+    color: #333;
+    
+    /* ★ホバー時はふわふわアニメーションを一時停止（他のボタンと挙動を合わせる） */
+    animation: none;
+}
