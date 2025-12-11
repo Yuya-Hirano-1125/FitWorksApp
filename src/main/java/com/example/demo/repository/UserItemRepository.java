@@ -8,20 +8,26 @@ import com.example.demo.entity.User;
 import com.example.demo.entity.UserItem;
 
 public interface UserItemRepository extends JpaRepository<UserItem, Long> {
-    
-    // --- 既存メソッド（残す） ---
-    
-    // 特定のユーザーの所有アイテムをすべて取得
+
+    // ----------------------------------------
+    // ▼ User エンティティで検索（既存ユーザー向け）
+    // ----------------------------------------
+
+    // 特定のユーザーの所持アイテムを全て取得
     List<UserItem> findByUser(User user);
 
-    // 特定のユーザーが特定のアイテムを所有しているか確認
+    // ユーザーが特定の item を持っているか確認
     boolean existsByUserAndItemId(User user, Long itemId);
 
-    // --- 追加メソッド（userIdを直接指定できるようにする） ---
-    
-    // userIdで所有アイテム一覧を取得
+
+
+    // ----------------------------------------
+    // ▼ userId / itemId を指定して検索（より軽量）
+    // ----------------------------------------
+
+    // userId で所持アイテム一覧を取得
     List<UserItem> findByUserId(Long userId);
 
-    // userIdとitemIdで所有確認
+    // userId と itemId で所持確認
     boolean existsByUserIdAndItemId(Long userId, Long itemId);
 }
