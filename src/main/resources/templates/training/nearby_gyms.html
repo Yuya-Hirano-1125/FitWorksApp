@@ -185,6 +185,11 @@
     
     <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
+<div class="container" style="margin-bottom: 30px;">
+        <a th:href="@{/home}" class="button secondary">
+            <i class="fa-solid fa-house"></i> ホームに戻る
+        </a>
+    </div>
 
 <script>
     // --- グローバル変数 ---
@@ -390,6 +395,8 @@
         return deg * (Math.PI/180)
     }
 </script>
+
+
 
 </body>
 </html>
