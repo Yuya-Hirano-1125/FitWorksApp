@@ -34,6 +34,12 @@ public class UserItem {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
+    
+ // ★重要：ここを追加してください
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity = 0;
+    
+    
     // 取得日時
     @Column(name = "acquired_at", nullable = false, updatable = false)
     private LocalDateTime acquiredAt;

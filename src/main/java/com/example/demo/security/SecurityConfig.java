@@ -135,19 +135,16 @@ public class SecurityConfig {
                 .requestMatchers("/login/**", "/oauth2/**").permitAll()
                 
                 // 既存の許可リスト
-                .requestMatchers("/","/start", "/register",
+                .requestMatchers("/", "/register",
                     "/forgot-password", "/verify-code", "/reset-password",
                     "/error", "/terms",
                     "/api/public/**",
                     "/css/**", "/js/**", "/images/**", "/img/**"
                 ).permitAll()
-                .requestMatchers("/",                 // ★ここに追加 (ルートURL)
-                        "/start",
-                        "/home", "/training/**", "/settings/**",
+                .requestMatchers("/home", "/training/**", "/settings/**",
                     "/community/**", "/log/**", "/characters/**",
                     "/daily-mission/**", "/ranking/**", "/ai-coach/**",
                     "/training-log/**",
-                    "/reset-password",
                     "/api/**"
                 ).authenticated()
                 .requestMatchers("/gacha/**").authenticated()

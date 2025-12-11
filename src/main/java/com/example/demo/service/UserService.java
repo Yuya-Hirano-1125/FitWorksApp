@@ -46,21 +46,12 @@ public class UserService {
         this.trainingRecordRepository = trainingRecordRepository;
     }
     
- // 引数に String phoneNumber を追加
-    public User registerUser(String username, String email, String phoneNumber, String password) {
-        User user = new User();
-        user.setUsername(username);
-        user.setEmail(email);
-        
-        // ▼ 追加: 電話番号をセットする
-        user.setPhoneNumber(phoneNumber);
-        
-        user.setPassword(passwordEncoder.encode(password));
-        
-        // 必要であれば初期ロールやプロバイダーの設定（既存コードに合わせてください）
-        // 例: user.setProvider(AuthProvider.LOCAL);
-        
-        return userRepository.save(user);
+    // --- ★修正: 互換性のためのラッパーメソッド ---
+    // AuthControllerがこのシグネチャ(引数3つ)で呼び出しているため追加
+    @Transactional
+    public void registerUser(String username, String password, String email) {
+        // 電話番号はnullとして処理
+        registerNewUser(username, email, null, password);
     }
 
     // --- ユーザー登録処理 (既存) ---
@@ -333,18 +324,5 @@ public class UserService {
     public void addExp(User user, int xp) {
         user.addXp(xp);
         userRepository.save(user);
-    }
-    public boolean isUsernameTaken(String username) {
-        return userRepository.findByUsername(username).isPresent();
-    }
-
-    // メールアドレスの重複チェック
-    public boolean isEmailTaken(String email) {
-        return userRepository.findByEmail(email).isPresent();
-    }
-
-    // 電話番号の重複チェック
-    public boolean isPhoneNumberTaken(String phoneNumber) {
-        return userRepository.findByPhoneNumber(phoneNumber).isPresent();
     }
 }
