@@ -32,14 +32,19 @@ public class TitleController {
     public String index(Model model, Principal principal) {
         User user = userService.findByUsername(principal.getName());
         
-        // 画面表示時に最新のステータスで条件チェックを実行
-        titleService.checkAndUnlockTitles(user);
+        // 戻り値で新規獲得リストを受け取る
+        List<AppTitle> newTitles = titleService.checkAndUnlockTitles(user);
 
         List<AppTitle> unlockedTitles = titleService.getUnlockedTitles(user);
         
         model.addAttribute("allTitles", AppTitle.values());
         model.addAttribute("unlockedTitles", unlockedTitles);
         model.addAttribute("equippedTitle", user.getEquippedTitle());
+        
+        // 新規獲得がある場合のみモデルに追加
+        if (!newTitles.isEmpty()) {
+            model.addAttribute("newlyUnlockedTitles", newTitles);
+        }
         
         return "titles/index";
     }

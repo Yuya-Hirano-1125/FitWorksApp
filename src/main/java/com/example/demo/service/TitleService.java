@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.ArrayList; // 追加
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,39 +46,46 @@ public class TitleService {
     }
 
     // --- 条件チェック & 解放ロジック ---
+    // void から List<AppTitle> に変更し、新しく獲得した称号を返す
     @Transactional
-    public void checkAndUnlockTitles(User user) {
+    public List<AppTitle> checkAndUnlockTitles(User user) {
+        List<AppTitle> newlyUnlocked = new ArrayList<>(); // 新規獲得リスト
+
         // 1. 初回ログイン (BEGINNER) - 無条件で付与
-        unlockIfConditionMet(user, AppTitle.BEGINNER, true);
+        unlockIfConditionMet(user, AppTitle.BEGINNER, true, newlyUnlocked);
 
         // 2. レベル条件
         int level = user.getLevel();
-        unlockIfConditionMet(user, AppTitle.ROOKIE_TRAINER, level >= 5);
-        unlockIfConditionMet(user, AppTitle.INTERMEDIATE, level >= 10);
-        unlockIfConditionMet(user, AppTitle.VETERAN, level >= 30);
-        unlockIfConditionMet(user, AppTitle.ELITE, level >= 50);
-        unlockIfConditionMet(user, AppTitle.MUSCLE_GOD, level >= 100);
+        unlockIfConditionMet(user, AppTitle.ROOKIE_TRAINER, level >= 5, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.INTERMEDIATE, level >= 10, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.VETERAN, level >= 30, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.ELITE, level >= 50, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.MUSCLE_GOD, level >= 100, newlyUnlocked);
 
         // 3. トレーニング記録数
         long totalRecords = trainingRecordRepository.countByUser_Id(user.getId());
-        unlockIfConditionMet(user, AppTitle.FIRST_STEP, totalRecords >= 1);
-        unlockIfConditionMet(user, AppTitle.DILIGENT, totalRecords >= 50);
-        unlockIfConditionMet(user, AppTitle.IRON_MAN, totalRecords >= 100);
+        unlockIfConditionMet(user, AppTitle.FIRST_STEP, totalRecords >= 1, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.DILIGENT, totalRecords >= 50, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.IRON_MAN, totalRecords >= 100, newlyUnlocked);
         
         // 4. 部位別マスタリー
-        unlockIfConditionMet(user, AppTitle.CHEST_LOVER, trainingRecordRepository.countByUserAndBodyPartContaining(user, "胸") >= 10);
-        unlockIfConditionMet(user, AppTitle.BACK_DEMON, trainingRecordRepository.countByUserAndBodyPartContaining(user, "背中") >= 10);
-        unlockIfConditionMet(user, AppTitle.LEG_DAY_SURVIVOR, trainingRecordRepository.countByUserAndBodyPartContaining(user, "脚") >= 10);
-        unlockIfConditionMet(user, AppTitle.SHOULDER_KING, trainingRecordRepository.countByUserAndBodyPartContaining(user, "肩") >= 10);
-        unlockIfConditionMet(user, AppTitle.ARM_WRESTLER, trainingRecordRepository.countByUserAndBodyPartContaining(user, "腕") >= 10);
-        unlockIfConditionMet(user, AppTitle.ABS_OF_STEEL, trainingRecordRepository.countByUserAndBodyPartContaining(user, "腹筋") >= 10);
+        unlockIfConditionMet(user, AppTitle.CHEST_LOVER, trainingRecordRepository.countByUserAndBodyPartContaining(user, "胸") >= 10, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.BACK_DEMON, trainingRecordRepository.countByUserAndBodyPartContaining(user, "背中") >= 10, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.LEG_DAY_SURVIVOR, trainingRecordRepository.countByUserAndBodyPartContaining(user, "脚") >= 10, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.SHOULDER_KING, trainingRecordRepository.countByUserAndBodyPartContaining(user, "肩") >= 10, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.ARM_WRESTLER, trainingRecordRepository.countByUserAndBodyPartContaining(user, "腕") >= 10, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.ABS_OF_STEEL, trainingRecordRepository.countByUserAndBodyPartContaining(user, "腹筋") >= 10, newlyUnlocked);
+
+        return newlyUnlocked; // リストを返す
     }
 
-    private void unlockIfConditionMet(User user, AppTitle title, boolean condition) {
+    // 引数に newlyUnlocked リストを追加
+    private void unlockIfConditionMet(User user, AppTitle title, boolean condition, List<AppTitle> newlyUnlocked) {
         if (condition) {
             if (!userTitleRepository.existsByUserAndTitle(user, title)) {
                 UserTitle newTitle = new UserTitle(user, title);
                 userTitleRepository.save(newTitle);
+                newlyUnlocked.add(title); // リストに追加
             }
         }
     }
