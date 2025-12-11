@@ -11,52 +11,54 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script th:src="@{/js/theme.js}"></script>
-    
+
     <style>
-        /* SNSシェアボタン用スタイル */
-        .sns-buttons-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-        .btn-sns {
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 20px;
-            text-decoration: none;
+        /* 曜日ヘッダーに枠線を追加 */
+        .calendar-day-header {
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+            background-color: #f9f9f9;
             font-weight: bold;
-            font-size: 0.85em;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-            display: inline-flex;
-            align-items: center;
-            border: none;
-        }
-        .btn-sns:hover { opacity: 0.9; transform: translateY(-1px); color: white; }
-        .btn-sns i { margin-right: 5px; font-size: 1.1em; }
-
-        /* X (Twitter) */
-        .btn-sns-x { background-color: #000; }
-        
-        /* LINE */
-        .btn-sns-line { background-color: #06C755; }
-        
-        /* Instagram (グラデーション) */
-        .btn-sns-insta { 
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); 
         }
 
-        /* 曜日色分け */
-        .calendar-day-header.sat,
-        .calendar-day-cell.sat .day-number {
-            color: #007BFF; /* 土曜は青 */
+        /* 日付セルに枠線を追加 */
+        .calendar-day-cell {
+            border: 1px solid #ccc;
+            min-height: 60px;
+            text-align: center;
+            vertical-align: top;
+            background-color: #fff;
         }
+
+        /* 日曜は赤 */
         .calendar-day-header.sun,
         .calendar-day-cell.sun .day-number {
-            color: #FF3B30; /* 日曜は赤 */
+            color: #FF3B30;
+        }
+
+        /* 土曜は青 */
+        .calendar-day-header.sat,
+        .calendar-day-cell.sat .day-number {
+            color: #007BFF;
+        }
+
+        /* 平日は白背景＋黒文字 */
+        .calendar-day-header.weekday,
+        .calendar-day-cell.weekday .day-number {
+            background-color: #fff;
+            color: #000;
+        }
+
+        /* 今日のセルを強調 */
+        .calendar-day-cell.today {
+            background-color: #ffeeba;
+            border: 2px solid #ff9800;
+        }
+
+        /* ログ記録済みの印 */
+        .log-indicator {
+            color: gold;
         }
     </style>
 </head>
@@ -64,9 +66,7 @@
 <div class="main-container">
     
     <h1 style="margin-bottom: 5px;"><i class="header-icon fa-solid fa-calendar-days"></i>トレーニング記録</h1>
-    <p class="sub-heading" th:text="${username} + 'さんの頑張りをチェックしましょう。'">
-        トレーニング記録カレンダー
-    </p>
+    <p class="sub-heading" th:text="${username} + 'さんの頑張りをチェックしましょう。'">トレーニング記録カレンダー</p>
 
     <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
     
@@ -74,21 +74,21 @@
         <a th:href="@{/training-log(year=${prevYear}, month=${prevMonth})}" class="nav-arrow">
             <i class="fa-solid fa-chevron-left"></i>
         </a>
-        
         <h2 class="calendar-title" th:text="${currentYearMonth.year} + '年 ' + ${currentYearMonth.monthValue} + '月'"></h2>
-        
         <a th:href="@{/training-log(year=${nextYear}, month=${nextMonth})}" class="nav-arrow">
             <i class="fa-solid fa-chevron-right"></i>
         </a>
     </div>
 
     <div class="calendar-grid">
-        <!-- 日曜始まりの曜日ヘッダー -->
-        <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" 
-             th:classappend="${dayLabel == '土'} ? 'sat' : ((${dayLabel == '日'} ? 'sun' : ''))">
-             曜日
+        <!-- 曜日ヘッダー（日曜始まり） -->
+        <div class="calendar-day-header"
+             th:each="dayLabel : ${dayLabels}"
+             th:text="${dayLabel}"
+             th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')">
+            曜日
         </div>
-        
+
         <!-- 日付セル -->
         <th:block th:each="date : ${calendarDays}">
             <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''},
@@ -96,9 +96,11 @@
                           isToday=${date != null and date.isEqual(currentDate)},
                           isLogged=${date != null and loggedDates.containsKey(date)}"
                  class="calendar-day-cell"
-                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today' : '') + 
-                                                                    ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + 
-                                                                     ((${dayOfWeek == 'SUNDAY'} ? ' sun' : ''))))"
+                 th:classappend="${date == null} ? 'empty-day' : (
+                     (${isToday} ? 'today ' : '') +
+                     (${dayOfWeek == 'SATURDAY'} ? 'sat' : 
+                      (${dayOfWeek == 'SUNDAY'} ? 'sun' : 'weekday'))
+                 )"
                  th:attr="data-date=${date != null ? date.toString() : ''}"
                  th:onclick="${date != null} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
 
@@ -118,6 +120,7 @@
     </div>
 
 </div>
+
 
 
 
