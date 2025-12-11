@@ -40,6 +40,38 @@
         .btn-sns-x { background-color: #000; }
         .btn-sns-line { background-color: #06C755; }
         .btn-sns-insta { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+
+        /* ▼▼▼ 追加: 全画面ローディングオーバーレイのスタイル ▼▼▼ */
+        #global-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75); /* 背景を暗く */
+            z-index: 9999; /* 最前面に表示 */
+            display: none; /* 初期状態は非表示 */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+            backdrop-filter: blur(4px); /* 背景を少しぼかす */
+        }
+        .loading-spinner {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #4CAF50; /* マッチする色に変更可能 */
+        }
+        .loading-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .loading-sub-text {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body class="training-log-page">
@@ -247,6 +279,12 @@
     </div>
 </div>
 
+<div id="global-loading-overlay">
+    <div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    <div id="loading-main-text" class="loading-text">処理中...</div>
+    <div class="loading-sub-text">画面を閉じずにお待ちください</div>
+</div>
+
 <script th:inline="javascript">
     // 記録モーダルを開く関数
     function openLogModal(dateString, isLogged) {
@@ -292,13 +330,33 @@
         }
     }
 
+    // ▼▼▼ 修正: ローディング表示関数 ▼▼▼
     function showLoading(form) {
+        const overlay = document.getElementById('global-loading-overlay');
+        const mainText = document.getElementById('loading-main-text');
+        const action = form.getAttribute('action');
+        
+        // アクションURLに応じてメッセージを切り替え
+        if (action && (action.includes('analyze') || action.includes('calculate'))) {
+            mainText.innerText = 'AIが分析中です...';
+            // アイコンの色をAIっぽく青系にする
+            overlay.querySelector('.loading-spinner').style.color = '#87ceeb';
+        } else {
+            mainText.innerText = '記録を保存中です...';
+            overlay.querySelector('.loading-spinner').style.color = '#4CAF50';
+        }
+
+        // オーバーレイを表示
+        overlay.style.display = 'flex';
+
+        // ボタンの二重送信防止（既存の処理）
         const btn = form.querySelector('button[type="submit"]');
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 処理中...';
-            setTimeout(() => { btn.disabled = false; btn.innerHTML = '解析 / 保存'; }, 15000);
         }
+        
+        // 万が一レスポンスが帰ってこなかった場合の安全策は
+        // AI処理が長い場合を考慮して今回は入れません
     }
     
     // ----------------------------------------------------

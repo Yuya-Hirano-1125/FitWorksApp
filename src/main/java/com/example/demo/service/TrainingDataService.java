@@ -288,7 +288,6 @@ public class TrainingDataService {
         return new ArrayList<>(EXERCISE_DATA_MAP.keySet());
     }
 
-    // ★追加: 名前からExerciseDataを取得するメソッド
     public ExerciseData getExerciseDataByName(String name) {
         // フリーウェイトから検索
         for (List<ExerciseData> list : EXERCISE_DATA_MAP.values()) {
@@ -305,5 +304,23 @@ public class TrainingDataService {
             }
         }
         return null;
+    }
+
+    // ★追加: 種目名から「部位名」を取得するメソッド
+    public String findPartByExerciseName(String exerciseName) {
+        for (Map.Entry<String, List<ExerciseData>> entry : EXERCISE_DATA_MAP.entrySet()) {
+            for (ExerciseData ex : entry.getValue()) {
+                if (ex.getFullName().equals(exerciseName)) {
+                    return entry.getKey();
+                }
+            }
+        }
+        // 有酸素の場合は「有酸素」として返す
+        for (ExerciseData ex : CARDIO_DATA_LIST) {
+            if (ex.getFullName().equals(exerciseName)) {
+                return "有酸素";
+            }
+        }
+        return "その他";
     }
 }

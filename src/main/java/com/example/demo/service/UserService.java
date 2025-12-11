@@ -2,9 +2,14 @@ package com.example.demo.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +35,7 @@ public class UserService {
     private JavaMailSender mailSender;
 
     @Autowired
-    private SmsService smsService; // SMS送信用
+    private SmsService smsService;
 
     @Value("${app.base-url}")
     private String baseUrl;
@@ -41,10 +46,17 @@ public class UserService {
         this.trainingRecordRepository = trainingRecordRepository;
     }
     
-    // --- ユーザー登録処理 (電話番号対応) ---
+    // --- ★修正: 互換性のためのラッパーメソッド ---
+    // AuthControllerがこのシグネチャ(引数3つ)で呼び出しているため追加
+    @Transactional
+    public void registerUser(String username, String password, String email) {
+        // 電話番号はnullとして処理
+        registerNewUser(username, email, null, password);
+    }
+
+    // --- ユーザー登録処理 (既存) ---
     @Transactional
     public void registerNewUser(String username, String email, String phoneNumber, String rawPassword) {
-        // 1. 重複チェック
         if (userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("そのユーザー名は既に使用されています。");
         }
@@ -55,61 +67,47 @@ public class UserService {
             throw new IllegalArgumentException("その電話番号は既に使用されています。");
         }
 
-        // 2. ユーザー作成
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setEmail(email);
         newUser.setPhoneNumber(phoneNumber);
         newUser.setPassword(passwordEncoder.encode(rawPassword));
-        
         newUser.setLevel(1);
         newUser.setExperiencePoints(0);
         newUser.setTheme("default");
 
-        // 3. 保存
         userRepository.save(newUser);
-
-        // 4. 登録完了メール送信 (任意)
         sendRegistrationEmail(newUser.getEmail(), newUser.getUsername());
     }
 
-    // --- パスワードリセット (SMS認証版) ---
+    // --- パスワードリセット関連 ---
     @Transactional
     public boolean processForgotPasswordBySms(String phoneNumber) {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            
-            // 6桁の数字コードを生成
             String code = String.format("%06d", new Random().nextInt(999999));
-            
-            // 認証コードを一時的に保存 (有効期限10分)
             user.setResetPasswordToken(code);
             user.setTokenExpiration(LocalDateTime.now().plusMinutes(10));
             userRepository.save(user);
             
-            // SMS送信
+            // ★重要: ここで SmsService の sendVerificationCode を呼んでいます
             smsService.sendVerificationCode(user.getPhoneNumber(), code);
-            
             return true;
         } else {
-            System.out.println("電話番号が見つかりません: " + phoneNumber);
             return false;
         }
     }
 
-    // --- パスワードリセット (メールリンク版) ---
     @Transactional
     public boolean processForgotPassword(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            
             String token = UUID.randomUUID().toString();
             user.setResetPasswordToken(token);
             user.setTokenExpiration(LocalDateTime.now().plusHours(24));
             userRepository.save(user);
-            
             String resetLink = baseUrl + "/reset-password?token=" + token;
             sendResetEmail(user.getEmail(), resetLink);
             return true;
@@ -117,7 +115,6 @@ public class UserService {
         return false;
     }
 
-    // --- 共通: トークン検証とパスワード更新 ---
     public User getByResetPasswordToken(String token) {
         return userRepository.findByResetPasswordToken(token)
                 .filter(u -> u.getTokenExpiration() != null && u.getTokenExpiration().isAfter(LocalDateTime.now()))
@@ -132,7 +129,87 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // --- ヘルパーメソッド (メール送信) ---
+    // --- フレンド機能 ---
+    public List<User> searchUsers(String currentUsername, String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        // ★ここでのエラーはUserRepositoryの修正で直ります
+        List<User> users = userRepository.findByUsernameContainingIgnoreCase(keyword);
+        return users.stream()
+                .filter(u -> !u.getUsername().equals(currentUsername))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public boolean sendFriendRequest(String currentUsername, Long targetUserId) {
+        Optional<User> senderOpt = userRepository.findByUsername(currentUsername);
+        Optional<User> receiverOpt = userRepository.findById(targetUserId);
+
+        if (senderOpt.isPresent() && receiverOpt.isPresent()) {
+            User sender = senderOpt.get();
+            User receiver = receiverOpt.get();
+            if (sender.getId().equals(receiver.getId())) return false;
+            if (sender.getFriends().contains(receiver)) return false;
+            if (receiver.getReceivedFriendRequests().contains(sender)) return false;
+
+            receiver.addReceivedFriendRequest(sender);
+            userRepository.save(receiver);
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional
+    public void approveFriendRequest(String currentUsername, Long senderId) {
+        Optional<User> receiverOpt = userRepository.findByUsername(currentUsername);
+        Optional<User> senderOpt = userRepository.findById(senderId);
+
+        if (receiverOpt.isPresent() && senderOpt.isPresent()) {
+            User receiver = receiverOpt.get();
+            User sender = senderOpt.get();
+
+            if (receiver.getReceivedFriendRequests().contains(sender)) {
+                receiver.removeReceivedFriendRequest(sender);
+                receiver.addFriend(sender);
+                sender.addFriend(receiver);
+                userRepository.save(receiver);
+                userRepository.save(sender);
+            }
+        }
+    }
+
+    @Transactional
+    public void rejectFriendRequest(String currentUsername, Long senderId) {
+        Optional<User> receiverOpt = userRepository.findByUsername(currentUsername);
+        Optional<User> senderOpt = userRepository.findById(senderId);
+
+        if (receiverOpt.isPresent() && senderOpt.isPresent()) {
+            User receiver = receiverOpt.get();
+            User sender = senderOpt.get();
+            receiver.removeReceivedFriendRequest(sender);
+            userRepository.save(receiver);
+        }
+    }
+
+    public List<User> getFriendRanking(String username) {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isEmpty()) return new ArrayList<>();
+        
+        User currentUser = userOpt.get();
+        Set<User> friends = currentUser.getFriends();
+        
+        List<User> rankingList = new ArrayList<>(friends);
+        rankingList.add(currentUser);
+        rankingList = rankingList.stream().distinct().collect(Collectors.toList());
+
+        rankingList.sort(Comparator.comparingInt(User::getLevel).reversed()
+                .thenComparing(Comparator.comparingInt(User::getXp).reversed()));
+        
+        return rankingList;
+    }
+
+    // --- その他ヘルパー ---
     private void sendRegistrationEmail(String toEmail, String username) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
@@ -159,7 +236,6 @@ public class UserService {
         }
     }
 
-    // --- 既存の参照用メソッド ---
     public User findByUsername(String username) {
         return userRepository.findByUsername(username).orElse(null);
     }
@@ -173,7 +249,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // --- その他のロジック (ミッション等) ---
     public boolean changePassword(String username, String oldPassword, String newPassword) {
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) return false;

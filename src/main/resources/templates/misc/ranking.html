@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ランキング | FitWorks</title>
+    <title>フレンドランキング | FitWorks</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -12,9 +12,6 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
-        /* --- ランキング固有のスタイル調整 --- */
-        
-        /* リスト全体のスタイル */
         .ranking-list { 
             list-style: none; 
             padding: 0; 
@@ -22,21 +19,19 @@
             width: 100%;
         }
 
-        /* 個別のランキングカード */
         .ranking-item {
             display: flex; 
             align-items: center; 
-            background: var(--ai-bubble); /* base.cssの薄いグレー/白を使用 */
-            border-radius: 20px; /* base.cssに合わせて丸く */
+            background: var(--ai-bubble); 
+            border-radius: 20px; 
             padding: 15px 20px; 
             margin-bottom: 15px;
-            border: 2px solid transparent; /* 境界線の準備 */
+            border: 2px solid transparent; 
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
-        /* ホバー時の挙動 */
         .ranking-item:hover { 
             transform: translateX(5px) scale(1.01); 
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
@@ -44,7 +39,6 @@
             border-color: var(--secondary-color);
         }
 
-        /* 順位バッジ (共通) */
         .rank-badge {
             width: 45px; 
             height: 45px; 
@@ -61,39 +55,32 @@
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
         }
 
-        /* --- 上位3位の特別装飾 --- */
-        /* 1位: ゴールド */
         .rank-1 { 
             background: linear-gradient(135deg, #ffd700, #fff0a0); 
             color: #b8860b; 
             border: 2px solid #fff;
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
         }
-        /* 2位: シルバー */
         .rank-2 { 
             background: linear-gradient(135deg, #c0c0c0, #e0e0e0); 
             color: #707070; 
             border: 2px solid #fff;
         }
-        /* 3位: ブロンズ */
         .rank-3 { 
             background: linear-gradient(135deg, #cd7f32, #eab676); 
             color: #8b4513; 
             border: 2px solid #fff;
         }
 
-        /* 上位ランカーの行自体を強調（枠線など） */
         .ranking-item.top-rank { 
             background: #fff;
             border: 2px solid var(--secondary-color);
         }
-        /* 1位だけさらに特別感を出す */
         .ranking-item:has(.rank-1) {
             border-color: var(--primary-color);
-            background: #fff0f5; /* ほんのりピンク背景 */
+            background: #fff0f5; 
         }
 
-        /* ユーザー情報エリア */
         .user-info { 
             flex-grow: 1; 
             text-align: left;
@@ -112,7 +99,6 @@
             gap: 8px;
         }
 
-        /* レベルなどのタグ */
         .stat-tag { 
             background: var(--ai-accent-color); 
             color: white; 
@@ -125,12 +111,19 @@
             font-weight: 600;
             color: var(--primary-color);
         }
-
-        /* モバイル対応 */
-        @media (max-width: 600px) {
-            .ranking-item { padding: 12px; }
-            .rank-badge { width: 35px; height: 35px; font-size: 1rem; margin-right: 12px; }
-            .user-name { font-size: 1rem; }
+        
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
+        }
+        .view-selector {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 2px solid var(--primary-color);
+            background: #fff;
+            font-weight: bold;
+            color: var(--dark-text);
+            cursor: pointer;
         }
     </style>
 </head>
@@ -138,12 +131,21 @@
 
     <div class="main-container">
         
-        <div class="ranking-header">
-            <h1>
-                <i class="fa-solid fa-trophy header-icon"></i>ランキング
-            </h1>
-            <p class="sub-heading">トップランカーを目指してトレーニングしよう！</p>
+        <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="ranking-header" style="margin:0;">
+                <h1 style="font-size: 1.5rem;">
+                    <i class="fa-solid fa-trophy header-icon"></i>ランキング
+                </h1>
+            </div>
+            
+            <select class="view-selector" onchange="location.href=this.value" 
+                    style="padding: 8px; border-radius: 10px; border: 2px solid #3498db;">
+                <option value="/friends">フレンド管理</option>
+                <option value="/ranking" selected>フレンドランキング</option>
+            </select>
         </div>
+
+        <p class="sub-heading" style="margin-bottom: 20px;">フレンドと競い合おう！</p>
 
         <ul class="ranking-list">
             <li th:each="user, stat : ${rankingList}" 
@@ -164,11 +166,15 @@
                     </div>
                 </div>
             </li>
+            
+            <li th:if="${#lists.isEmpty(rankingList)}" style="text-align: center; color: #666; padding: 20px;">
+                まだフレンドがいません。フレンド管理画面から追加しましょう！
+            </li>
         </ul>
 
         <div class="button-container">
-            <a th:href="@{/home}" class="button secondary">
-                <i class="fa-solid fa-house"></i> ホームに戻る
+            <a th:href="@{/friends}" class="button secondary">
+                <i class="fa-solid fa-arrow-left"></i> フレンド画面へ
             </a>
         </div>
 

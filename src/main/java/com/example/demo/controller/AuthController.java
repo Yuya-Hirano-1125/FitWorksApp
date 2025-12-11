@@ -1,152 +1,134 @@
 package com.example.demo.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.demo.entity.AuthProvider;
 import com.example.demo.entity.User;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.security.CustomUserDetails;
+import com.example.demo.service.SmsService;
 import com.example.demo.service.UserService;
 
 @Controller
 public class AuthController {
 
-    private final UserService userService;
+    @Autowired
+    private UserService userService;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
+    @Autowired
+    private SmsService smsService;
 
-    @GetMapping("/")
-    public String showStartPage() { return "start"; }
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping("/login")
-    public String login() { return "auth/login"; }
+    public String login() {
+        return "auth/login";
+    }
 
-    // --- 新規登録 ---
     @GetMapping("/register")
-    public String registerForm() { return "auth/register"; }
+    public String register() {
+        return "auth/register";
+    }
 
     @PostMapping("/register")
-    public String registerUser(
-            @RequestParam("username") String username,
-            @RequestParam("email") String email,
-            @RequestParam("phoneNumber") String phoneNumber,
-            @RequestParam("password") String password,
-            @RequestParam("confirmPassword") String confirmPassword,
-            Model model) {
-
-        if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "パスワードが一致しません。");
-            return "auth/register";
-        }
-
+    public String registerUser(@RequestParam String username,
+                               @RequestParam String password,
+                               @RequestParam String email,
+                               Model model) {
         try {
-            userService.registerNewUser(username, email, phoneNumber, password);
-            return "redirect:/login?registered";
+            userService.registerUser(username, password, email);
+            return "redirect:/login";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             return "auth/register";
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("error", "登録中にエラーが発生しました。");
-            return "auth/register";
         }
     }
-
-    // --- パスワード忘れ ---
-    @GetMapping("/forgot-password")
-    public String forgotPasswordForm() { return "auth/forgot-password"; }
-
-    @PostMapping("/forgot-password")
-    public String processForgotPassword(
-            @RequestParam("phoneNumber") String phoneNumber,
-            RedirectAttributes redirectAttributes) {
-
-        boolean sent = userService.processForgotPasswordBySms(phoneNumber);
-
-        if (sent) {
-            redirectAttributes.addFlashAttribute("phoneNumber", phoneNumber);
-            return "redirect:/verify-code";
-        } else {
-            return "redirect:/forgot-password?error";
-        }
-    }
-
-    // --- コード確認 ---
-    @GetMapping("/verify-code")
-    public String verifyCodeForm() { return "auth/verify-code"; }
-
-    @PostMapping("/verify-code")
-    public String verifyCode(
-            @RequestParam("phoneNumber") String phoneNumber,
-            @RequestParam("code") String code,
-            Model model) {
-
-        User user = userService.getByResetPasswordToken(code);
-
-        if (user != null && user.getPhoneNumber().equals(phoneNumber)) {
-            model.addAttribute("token", code);
-            return "auth/reset-password";
-        } else {
-            model.addAttribute("error", "認証コードが無効か、期限切れです。");
-            model.addAttribute("phoneNumber", phoneNumber);
-            return "auth/verify-code";
-        }
-    }
-
-    // --- パスワード更新 ---
-    @PostMapping("/reset-password")
-    public String processResetPassword(
-            @RequestParam("token") String token,
-            @RequestParam("password") String password,
-            @RequestParam("confirmPassword") String confirmPassword,
-            Model model) {
-
-        User user = userService.getByResetPasswordToken(token);
-
-        if (user == null) {
-            model.addAttribute("error", "セッションが無効です。最初からやり直してください。");
-            return "auth/forgot-password";
-        }
-        if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "パスワードが一致しません。");
-            model.addAttribute("token", token);
-            return "auth/reset-password";
-        }
-
-        userService.updatePassword(user, password);
-        return "redirect:/login?resetSuccess";
-    }
-
-    // --- ホーム ---
+    
+    // --- ホーム画面表示 ---
     @GetMapping("/home")
-    public String home(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-
-        if (userDetails != null) {
-            User user = userService.findByUsername(userDetails.getUsername());
-
-            if (user != null) {
-                model.addAttribute("username", user.getUsername());
-                model.addAttribute("level", user.getLevel());
-                model.addAttribute("experiencePoints", user.getExperiencePoints());
-                model.addAttribute("requiredXp", user.calculateRequiredXp());
-                model.addAttribute("progressPercent", user.getProgressPercent());
-
-                // ★★★ ガチャ遷移に必要な userId を追加 ★★★
-                model.addAttribute("userId", user.getId());
-            } else {
-                model.addAttribute("username", userDetails.getUsername());
-            }
-
-        } else {
-            model.addAttribute("username", "ゲスト");
+    public String home(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        if (userDetails == null) {
+            return "redirect:/login";
         }
+        
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                                  .orElse(null);
+        
+        if (user == null) {
+            return "redirect:/logout";
+        }
+
+        model.addAttribute("username", user.getUsername());
+        model.addAttribute("level", user.getLevel());
+        model.addAttribute("experiencePoints", user.getXp());
+        model.addAttribute("requiredXp", user.calculateRequiredXp());
+        model.addAttribute("progressPercent", user.getProgressPercent());
+        
+        // ★追加: 称号を表示するためにモデルに格納
+        model.addAttribute("userTitle", user.getDisplayTitle());
 
         return "misc/home";
+    }
+
+    // --- SMS認証用 ---
+    @PostMapping("/api/auth/send-otp")
+    @ResponseBody
+    public ResponseEntity<?> sendOtp(@RequestParam String phoneNumber) {
+        try {
+            smsService.sendOtp(phoneNumber);
+            return ResponseEntity.ok("SMS sent successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send SMS: " + e.getMessage());
+        }
+    }
+ // クラス内に以下を追加してください
+    @GetMapping("/forgot-password")
+    public String forgotPassword() {
+        // templates/auth/forgot-password.html を表示する
+        return "auth/forgot-password";
+    }
+    @PostMapping("/api/auth/verify-otp")
+    @ResponseBody
+    public ResponseEntity<?> verifyOtp(@RequestParam String phoneNumber, 
+                                       @RequestParam String code, 
+                                       HttpServletRequest request) {
+        if (smsService.verifyOtp(phoneNumber, code)) {
+            User user = userRepository.findByPhoneNumber(phoneNumber)
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setPhoneNumber(phoneNumber);
+                    newUser.setProvider(AuthProvider.PHONE);
+                    newUser.setUsername("phone_" + phoneNumber.substring(phoneNumber.length() - 4)); 
+                    return userRepository.save(newUser);
+                });
+
+            CustomUserDetails userDetails = new CustomUserDetails(user);
+            UsernamePasswordAuthenticationToken authToken = 
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+            HttpSession session = request.getSession(true);
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, SecurityContextHolder.getContext());
+
+            return ResponseEntity.ok("Login successful");
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid verification code");
     }
 }

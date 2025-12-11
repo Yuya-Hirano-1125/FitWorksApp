@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フレンド管理 | FitWorks</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        .page-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
+        }
+        .view-selector {
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 2px solid var(--primary-color);
+            background: #fff;
+            font-weight: bold;
+            color: var(--dark-text);
+            cursor: pointer;
+        }
+        
+        .friend-nav {
+            display: flex; gap: 10px; margin-bottom: 20px;
+        }
+        .nav-btn {
+            flex: 1; padding: 10px; text-align: center;
+            background: #eee; border-radius: 10px;
+            text-decoration: none; color: #666; font-weight: bold;
+            border: 2px solid transparent;
+        }
+        .nav-btn.active {
+            background: #fff; border-color: var(--primary-color); color: var(--primary-color);
+        }
+
+        .user-list { list-style: none; padding: 0; }
+        .user-card {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-avatar { 
+            width: 40px; height: 40px; background: #ddd; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        .search-box {
+            display: flex; gap: 10px; margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="page-header">
+            <h1><i class="fa-solid fa-user-group"></i> フレンド</h1>
+            
+            <select class="view-selector" onchange="location.href=this.value">
+                <option value="/friends" selected>フレンド管理</option>
+                <option value="/ranking">フレンドランキング</option>
+            </select>
+        </div>
+
+        <div class="friend-nav">
+            <a th:href="@{/friends}" class="nav-btn" 
+               th:classappend="${currentSection == 'list'} ? 'active' : ''">一覧</a>
+            <a th:href="@{/friends/search}" class="nav-btn" 
+               th:classappend="${currentSection == 'search'} ? 'active' : ''">検索</a>
+        </div>
+
+        <div th:if="${successMessage}" style="color: green; margin-bottom: 10px;" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" style="color: red; margin-bottom: 10px;" th:text="${errorMessage}"></div>
+
+        <div th:if="${currentSection == 'list'}">
+            
+            <div th:if="${!#lists.isEmpty(requests)}" style="margin-bottom: 30px;">
+                <h3 style="color: #e67e22;"><i class="fa-solid fa-envelope"></i> 承認待ち</h3>
+                <ul class="user-list">
+                    <li th:each="req : ${requests}" class="user-card" style="border: 1px solid #e67e22;">
+                        <div class="user-info">
+                            <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+                            <span th:text="${req.username}" style="font-weight: bold;">User</span>
+                        </div>
+                        <div style="display: flex; gap: 5px;">
+                            <form th:action="@{/friends/approve/{id}(id=${req.id})}" method="post">
+                                <button class="button primary" style="padding: 5px 10px; font-size: 0.8rem;">承認</button>
+                            </form>
+                            <form th:action="@{/friends/reject/{id}(id=${req.id})}" method="post">
+                                <button class="button secondary" style="padding: 5px 10px; font-size: 0.8rem;">拒否</button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <h3><i class="fa-solid fa-users"></i> フレンドリスト</h3>
+            <ul class="user-list">
+                <li th:each="friend : ${friends}" class="user-card">
+                    <div class="user-info">
+                        <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+                        <div>
+                            <div th:text="${friend.username}" style="font-weight: bold;">User</div>
+                            <div style="font-size: 0.8rem; color: #666;" th:text="'Lv.' + ${friend.level}">Lv.10</div>
+                        </div>
+                    </div>
+                    <span style="color: var(--primary-color); font-size: 0.8rem;">フレンド</span>
+                </li>
+                <li th:if="${#lists.isEmpty(friends)}" style="text-align: center; color: #888;">
+                    まだフレンドがいません。「検索」から探してみよう！
+                </li>
+            </ul>
+        </div>
+
+        <div th:if="${currentSection == 'search'}">
+            <form th:action="@{/friends/search}" method="get" class="search-box">
+                <input type="text" name="keyword" class="search-input" placeholder="ユーザー名で検索..." th:value="${keyword}">
+                <button type="submit" class="button primary"><i class="fa-solid fa-search"></i></button>
+            </form>
+
+            <ul class="user-list">
+                <li th:each="user : ${searchResults}" class="user-card">
+                    <div class="user-info">
+                        <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+                        <span th:text="${user.username}">User</span>
+                    </div>
+                    
+                    <form th:action="@{/friends/request/{id}(id=${user.id})}" method="post">
+                        <button class="button secondary" style="padding: 5px 15px; font-size: 0.9rem;">申請</button>
+                    </form>
+                </li>
+                <li th:if="${searchResults != null && #lists.isEmpty(searchResults)}" style="text-align: center; color: #888;">
+                    ユーザーが見つかりませんでした。
+                </li>
+            </ul>
+        </div>
+
+        <div class="button-container">
+            <a th:href="@{/home}" class="button secondary">
+                <i class="fa-solid fa-house"></i> ホームに戻る
+            </a>
+        </div>
+    </div>
+</body>
+</html>
