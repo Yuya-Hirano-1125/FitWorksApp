@@ -602,3 +602,33 @@
 .rpg-btn-next:hover {
     transform: scale(1.05);
 }
+.sub-heading {
+    text-align: center;
+    color: #555;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 700;
+    margin-bottom: 25px;
+    letter-spacing: 0.05em;
+}
+
+.username-display {
+    /* 英数字はPoppins、日本語はNoto Sans JPを使用 */
+    font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+    
+    /* 文字サイズを大きくして太くする */
+    font-size: 1.6em;
+    font-weight: 900;
+    
+    /* 色をメインカラー（ピンク系）に変更 */
+    color: var(--primary-color, #ff69b4);
+    
+    /* 少し影をつけて浮き出させる */
+    text-shadow: 2px 2px 0px rgba(255, 255, 255, 1), 
+                 3px 3px 5px rgba(0, 0, 0, 0.15);
+                 
+    margin: 0 4px;
+    display: inline-block;
+    
+    /* アニメーション（任意）: ふわっと表示 */
+    animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
