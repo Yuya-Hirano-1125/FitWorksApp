@@ -4,11 +4,10 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -564,26 +563,50 @@ public class TrainingController {
     }
 
     @GetMapping("/training-log")
-    public String showTrainingLog(Authentication authentication, @RequestParam(value = "year", required = false) Integer year, @RequestParam(value = "month", required = false) Integer month, Model model) {
+    public String showTrainingLog(Authentication authentication,
+                                  @RequestParam(value = "year", required = false) Integer year,
+                                  @RequestParam(value = "month", required = false) Integer month,
+                                  Model model) {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
+
         LocalDate today = LocalDate.now();
         YearMonth targetYearMonth;
         if (year != null && month != null) {
-            try { targetYearMonth = YearMonth.of(year, month); } catch (Exception e) { targetYearMonth = YearMonth.from(today); }
-        } else { targetYearMonth = YearMonth.from(today); }
+            try {
+                targetYearMonth = YearMonth.of(year, month);
+            } catch (Exception e) {
+                targetYearMonth = YearMonth.from(today);
+            }
+        } else {
+            targetYearMonth = YearMonth.from(today);
+        }
+
         LocalDate firstOfMonth = targetYearMonth.atDay(1);
         LocalDate lastOfMonth = targetYearMonth.atEndOfMonth();
-        List<TrainingRecord> records = trainingRecordRepository.findByUser_IdAndRecordDateBetween(currentUser.getId(), firstOfMonth, lastOfMonth);
-        Map<LocalDate, Boolean> loggedDates = records.stream().collect(Collectors.toMap(TrainingRecord::getRecordDate, r -> true, (a, b) -> a));
+
+        List<TrainingRecord> records =
+                trainingRecordRepository.findByUser_IdAndRecordDateBetween(currentUser.getId(), firstOfMonth, lastOfMonth);
+        Map<LocalDate, Boolean> loggedDates =
+                records.stream().collect(Collectors.toMap(TrainingRecord::getRecordDate, r -> true, (a, b) -> a));
+
         List<BodyWeightRecord> weightRecords = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
-        for(BodyWeightRecord wr : weightRecords) { if (wr.getDate() != null && !wr.getDate().isBefore(firstOfMonth) && !wr.getDate().isAfter(lastOfMonth)) { loggedDates.put(wr.getDate(), true); } }
+        for (BodyWeightRecord wr : weightRecords) {
+            if (wr.getDate() != null && !wr.getDate().isBefore(firstOfMonth) && !wr.getDate().isAfter(lastOfMonth)) {
+                loggedDates.put(wr.getDate(), true);
+            }
+        }
+
         List<LocalDate> calendarDays = new ArrayList<>();
+        // 日曜始まりに修正
         int paddingDays = firstOfMonth.getDayOfWeek().getValue() % 7;
-        if (paddingDays == 0) paddingDays = 7;
-        paddingDays = (paddingDays == 7) ? 0 : paddingDays;
-        for (int i = 0; i < paddingDays; i++) { calendarDays.add(null); }
-        for (int i = 1; i <= targetYearMonth.lengthOfMonth(); i++) { calendarDays.add(targetYearMonth.atDay(i)); }
+        for (int i = 0; i < paddingDays; i++) {
+            calendarDays.add(null);
+        }
+        for (int i = 1; i <= targetYearMonth.lengthOfMonth(); i++) {
+            calendarDays.add(targetYearMonth.atDay(i));
+        }
+
         model.addAttribute("currentDate", today);
         model.addAttribute("currentYearMonth", targetYearMonth);
         model.addAttribute("calendarDays", calendarDays);
@@ -593,11 +616,14 @@ public class TrainingController {
         model.addAttribute("prevMonth", targetYearMonth.minusMonths(1).getMonthValue());
         model.addAttribute("nextYear", targetYearMonth.plusMonths(1).getYear());
         model.addAttribute("nextMonth", targetYearMonth.plusMonths(1).getMonthValue());
-        List<String> dayLabels = new ArrayList<>();
-        for (DayOfWeek day : DayOfWeek.values()) { dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE)); }
+
+        // 曜日ラベルを固定で日曜始まりに
+        List<String> dayLabels = Arrays.asList("日", "月", "火", "水", "木", "金", "土");
         model.addAttribute("dayLabels", dayLabels);
+
         return "log/training-log";
     }
+
 
     @GetMapping("/training-log/all")
     public String showAllTrainingLog(Authentication authentication, @RequestParam(value = "period", defaultValue = "day") String period, Model model) {
