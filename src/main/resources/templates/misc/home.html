@@ -148,10 +148,9 @@
         </a>
     </div>
     
-	<h1>FitWorksへようこそ</h1>
-	    <p class="sub-heading">
-	        ようこそ、<span class="username-display" th:text="${username}">ユーザー</span>さん！
-	    </p>
+    <h1>FitWorksへようこそ</h1>
+    <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！'"></p>
+    
     <a id="tutorial-training-btn" th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
        <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i> トレーニングを開始 
     </a>
