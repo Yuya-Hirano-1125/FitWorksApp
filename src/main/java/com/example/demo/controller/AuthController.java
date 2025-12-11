@@ -98,7 +98,12 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send SMS: " + e.getMessage());
         }
     }
-
+ // クラス内に以下を追加してください
+    @GetMapping("/forgot-password")
+    public String forgotPassword() {
+        // templates/auth/forgot-password.html を表示する
+        return "auth/forgot-password";
+    }
     @PostMapping("/api/auth/verify-otp")
     @ResponseBody
     public ResponseEntity<?> verifyOtp(@RequestParam String phoneNumber, 
