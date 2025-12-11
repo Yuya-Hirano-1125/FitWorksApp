@@ -10,8 +10,8 @@
     <link rel="stylesheet" th:href="@{/css/training-log.css}"> 
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <script th:src="@{/js/theme.js}"></script>
+    
     <style>
         /* SNSシェアボタン用スタイル */
         .sns-buttons-container {
@@ -38,15 +38,21 @@
         .btn-sns:hover { opacity: 0.9; transform: translateY(-1px); color: white; }
         .btn-sns i { margin-right: 5px; font-size: 1.1em; }
 
-        /* X (Twitter) */
         .btn-sns-x { background-color: #000; }
-        
-        /* LINE */
         .btn-sns-line { background-color: #06C755; }
-        
-        /* Instagram (グラデーション) */
         .btn-sns-insta { 
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); 
+        }
+
+        /* 曜日ヘッダーと日付セルの色分け */
+        .calendar-day-header.sat,
+        .calendar-day-cell.sat .day-number {
+            color: #007BFF; /* 青 */
+        }
+
+        .calendar-day-header.sun,
+        .calendar-day-cell.sun .day-number {
+            color: #FF3B30; /* 赤 */
         }
     </style>
 </head>
@@ -73,6 +79,7 @@
     </div>
 
     <div class="calendar-grid">
+        <!-- 日曜始まりに対応 -->
         <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" 
              th:classappend="${dayLabel == '土'} ? 'sat' : ((${dayLabel == '日'} ? 'sun' : ''))">
              曜日
@@ -98,7 +105,7 @@
             </div>
         </th:block>
     </div>
-
+	
     <div style="text-align: center; margin: 20px 0;">
         <a th:href="@{/training-log/all}" class="button" style="background-color: #555; color: white; width: 100%; display: block; text-align: center;">
             <i class="fa-solid fa-list"></i> 全記録をリストで見る
