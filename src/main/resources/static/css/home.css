@@ -638,36 +638,47 @@
 /* ========================================================= */
 /* 追加・修正: AIケアボタンのスタイル（他のボタンと動きを統一） */
 /* ========================================================= */
+/* ========================================================= */
+/* 修正: AIケアボタンのスタイル（他のボタンと動き・形状を完全統一） */
+/* ========================================================= */
 
 .btn-care {
-    display: inline-block;
-    width: 95%;
-    padding: 12px;
-    
-    /* 背景色は維持 */
-    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-    color: #555;
-    font-weight: bold;
+    /* --- daily-mission-button と同じ基本構造 --- */
+    display: block;               /* inline-block から block に変更 */
     text-decoration: none;
-    border-radius: 50px;
+    border-radius: 35px;          /* 50px から 35px に変更して形状を統一 */
+    font-weight: 800;
+    padding: 14px 25px;           /* パディングを統一 */
+    font-size: 17px;              /* フォントサイズを統一 */
+    letter-spacing: 0.8px;
+    border: none;
     
-    /* 影を他のボタンの強度に合わせる */
+    /* --- AIケアボタン独自の色設定 --- */
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    color: #555;                  /* 背景が明るいので文字は暗く */
+    
+    /* 影の強さは合わせつつ、色はボタンに合わせる */
     box-shadow: 0 6px 20px rgba(168, 237, 234, 0.4);
     
-    /* ★ここが重要: 他のボタンと同じ「動き」の設定 */
+    /* --- ★動きの設定（daily-mission-buttonと完全一致）--- */
+    /* 特殊なイージング（動きの加速・減速）をコピー */
     transition: all 0.4s cubic-bezier(.68,-0.55,.26,1.55);
-    animation: gentleFloat 4s ease-in-out infinite alternate;
+    
+    /* ふわふわ浮く動き + フェードインをコピー */
+    animation: gentleFloat 4s ease-in-out infinite alternate, fadeIn 0.7s ease-out forwards;
+    
+    /* 配置調整 */
+    width: 95%;
+    margin: 0 auto; /* 中央寄せ */
 }
 
 .btn-care:hover {
-    /* カーソルを合わせた時の動き */
-    transform: translateY(-5px) scale(1.03) rotate(1deg);
+    /* --- ホバー時の動き（daily-mission-buttonと完全一致）--- */
+    animation: none; /* 浮遊アニメーションを止める */
+    transform: translateY(-5px) scale(1.03) rotate(1deg); /* 浮き上がり・拡大・少し回転 */
     
-    /* 影を強調 */
-    box-shadow: 0 8px 25px rgba(168, 237, 234, 0.7), 0 0 15px rgba(255, 255, 255, 0.8);
-    
+    /* --- ホバー時の色変化 --- */
     color: #333;
-    
-    /* ★ホバー時はふわふわアニメーションを一時停止（他のボタンと挙動を合わせる） */
-    animation: none;
+    /* 影を強調（色は独自） */
+    box-shadow: 0 8px 25px rgba(168, 237, 234, 0.9), 0 0 15px rgba(255, 255, 255, 0.8);
 }
