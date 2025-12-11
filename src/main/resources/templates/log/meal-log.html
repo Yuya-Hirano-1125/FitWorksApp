@@ -13,65 +13,84 @@
     
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        .header-icon-meal { color: #4CAF50; }
-        .log-indicator-meal { color: #4CAF50 !important; }
-        .meal-form-container { text-align: left; padding: 0 5px; }
-        .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: #555; font-size: 0.9em; }
-        .form-group.half { flex: 1; }
-        .form-control { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1em; background-color: #fff; }
-        .form-control:focus { border-color: #4CAF50; outline: none; }
-        .form-control[readonly] { background-color: #f3f3f3; color: #777; cursor: not-allowed; }
-        .macro-section { background-color: #f9f9f9; border: 1px dashed #ccc; border-radius: 10px; padding: 15px; }
-        .macro-row { display: flex; gap: 10px; justify-content: space-between; }
-        .macro-item { flex: 1; text-align: center; }
-        .macro-item label { font-size: 0.85em; color: #777; margin-bottom: 3px; }
-        .macro-input { text-align: center; font-weight: bold; }
-        .p-input:focus { border-color: #3498db !important; }
-        .f-input:focus { border-color: #e74c3c !important; }
-        .c-input:focus { border-color: #f1c40f !important; }
-        .btn-submit { width: 100%; margin-top: 20px; padding: 12px; font-size: 1.1em; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-submit:hover { background-color: #45a049; }
-        .sns-buttons-container { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
-        .btn-sns { color: #fff; padding: 10px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.85em; cursor: pointer; transition: opacity 0.2s, transform 0.1s; display: inline-flex; align-items: center; border: none; }
-        .btn-sns:hover { opacity: 0.9; transform: translateY(-1px); color: white; }
-        .btn-sns i { margin-right: 5px; font-size: 1.1em; }
-        .btn-sns-x { background-color: #000; }
-        .btn-sns-line { background-color: #06C755; }
-        .btn-sns-insta { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+		.header-icon-meal { color: #4CAF50; }
+		.log-indicator-meal { color: #4CAF50 !important; }
+		.meal-form-container { text-align: left; padding: 0 5px; }
+		.form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+		.form-group { margin-bottom: 15px; }
+		.form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: #555; font-size: 0.9em; }
+		.form-group.half { flex: 1; }
+		.form-control { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1em; background-color: #fff; }
+		.form-control:focus { border-color: #4CAF50; outline: none; }
+		.form-control[readonly] { background-color: #f3f3f3; color: #777; cursor: not-allowed; }
+		.macro-section { background-color: #f9f9f9; border: 1px dashed #ccc; border-radius: 10px; padding: 15px; }
+		.macro-row { display: flex; gap: 10px; justify-content: space-between; }
+		.macro-item { flex: 1; text-align: center; }
+		.macro-item label { font-size: 0.85em; color: #777; margin-bottom: 3px; }
+		.macro-input { text-align: center; font-weight: bold; }
+		.p-input:focus { border-color: #3498db !important; }
+		.f-input:focus { border-color: #e74c3c !important; }
+		.c-input:focus { border-color: #f1c40f !important; }
+		.btn-submit { width: 100%; margin-top: 20px; padding: 12px; font-size: 1.1em; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+		.btn-submit:hover { background-color: #45a049; }
+		.sns-buttons-container { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+		.btn-sns { color: #fff; padding: 10px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.85em; cursor: pointer; transition: opacity 0.2s, transform 0.1s; display: inline-flex; align-items: center; border: none; }
+		.btn-sns:hover { opacity: 0.9; transform: translateY(-1px); color: white; }
+		.btn-sns i { margin-right: 5px; font-size: 1.1em; }
+		.btn-sns-x { background-color: #000; }
+		.btn-sns-line { background-color: #06C755; }
+		.btn-sns-insta { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
 
-        /* ▼▼▼ 追加: 全画面ローディングオーバーレイのスタイル ▼▼▼ */
-        #global-loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.75); /* 背景を暗く */
-            z-index: 9999; /* 最前面に表示 */
-            display: none; /* 初期状態は非表示 */
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #fff;
-            text-align: center;
-            backdrop-filter: blur(4px); /* 背景を少しぼかす */
-        }
-        .loading-spinner {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            color: #4CAF50; /* マッチする色に変更可能 */
-        }
-        .loading-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .loading-sub-text {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
+		/* --- カレンダー関連のスタイル --- */
+
+		/* 曜日ヘッダーに枠線を追加 */
+		.calendar-day-header {
+		    border: 1px solid #ccc;
+		    padding: 5px;
+		    text-align: center;
+		    background-color: #f9f9f9;
+		    font-weight: bold;
+		}
+
+		/* 日付セルに枠線を追加 */
+		.calendar-day-cell {
+		    border: 1px solid #ccc;
+		    min-height: 60px;
+		    text-align: center;
+		    vertical-align: top;
+		    background-color: #fff;
+		}
+
+		/* 日曜は赤 */
+		.calendar-day-header.sun,
+		.calendar-day-cell.sun .day-number {
+		    color: #FF3B30;
+		}
+
+		/* 土曜は青 */
+		.calendar-day-header.sat,
+		.calendar-day-cell.sat .day-number {
+		    color: #007BFF;
+		}
+
+		/* 平日は白背景＋黒文字 (カレンダーセルのデフォルトが白のため、ほとんどの要素では不要だが明示的に定義) */
+		.calendar-day-header.weekday,
+		.calendar-day-cell.weekday .day-number {
+		    background-color: #fff;
+		    color: #000;
+		}
+
+		/* 今日のセルを強調 */
+		.calendar-day-cell.today {
+		    background-color: #ffeeba;
+		    border: 2px solid #ff9800;
+		}
+
+		/* ログ記録済みの印 */
+		/* 食事記録用のログインジケーターの色が優先されるため、このコードは食事記録ページでは上書きされますが、トレーニング記録ページでは適用されます。 */
+		.log-indicator {
+		    color: gold;
+		}
     </style>
 </head>
 <body class="training-log-page">
