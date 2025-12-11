@@ -11,15 +11,26 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.entity.Item;
+import com.example.demo.entity.User;
+import com.example.demo.entity.UserItem;
 import com.example.demo.model.GachaItem;
 import com.example.demo.model.GachaResult;
 import com.example.demo.repository.GachaResultRepository;
+import com.example.demo.repository.ItemRepository;
+import com.example.demo.repository.UserItemRepository;
 
 @Service
 public class GachaService {
 
     @Autowired
-    private GachaResultRepository repository;
+    private GachaResultRepository gachaResultRepo;
+
+    @Autowired
+    private ItemRepository itemRepo;
+
+    @Autowired
+    private UserItemRepository userItemRepo;
 
     private final Random random = new Random();
 
@@ -32,29 +43,47 @@ public class GachaService {
         return results;
     }
 
-    // ----------- 単発ガチャ + DB保存 -----------
+    // ----------- 単発ガチャ（履歴 + 所持 同時保存）-----------
     public GachaItem drawGacha(Long userId) {
 
-        GachaItem item = getRandomItem();
+        // ① ガチャ抽選してアイテム決定
+        GachaItem gachaItem = getRandomItem();
 
+        // ② SQLiteへ履歴を保存
         ZonedDateTime nowJst = ZonedDateTime.now(ZoneId.of("Asia/Tokyo"));
         String formattedDate = nowJst.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         GachaResult result = new GachaResult(
                 userId,
-                item.getName(),
-                item.getRarity(),
+                gachaItem.getName(),
+                gachaItem.getRarity(),
                 formattedDate
         );
+        gachaResultRepo.save(result);
 
-        repository.save(result);
-        return item;
+        // ③ Item エンティティを取得
+        Item item = itemRepo.findByName(gachaItem.getName());
+        if (item == null) {
+            System.err.println("★ Item テーブルに一致するアイテムがありません：" + gachaItem.getName());
+            return gachaItem; // 所持アイテム追加はスキップ
+        }
+
+        // ④ UserItem（所持アイテム）に保存
+        UserItem userItem = new UserItem();
+        User user = new User();
+        user.setId(userId);
+
+        userItem.setUser(user);
+        userItem.setItem(item);
+
+        userItemRepo.save(userItem);
+
+        return gachaItem;
     }
 
     // ----------- ランダム抽選（確率テーブル方式）-----------
     private GachaItem getRandomItem() {
 
-        // ★ 確率テーブルを作成
         List<ProbabilityItem> table = List.of(
             new ProbabilityItem("夢幻の鍵", "UR", "/img/item/UR-niji.png", 2.35),
 
@@ -87,7 +116,6 @@ public class GachaService {
             }
         }
 
-        // 万が一合計誤差があっても最後のアイテムを返す
         ProbabilityItem last = table.get(table.size() - 1);
         return new GachaItem(last.name, last.rarity, last.image);
     }
@@ -97,12 +125,9 @@ public class GachaService {
 
         return List.of(
             Map.of("rarity", "UR", "name", "夢幻の鍵", "rate", "2.35%", "color", "#FF66FF"),
-
-            Map.of("rarity", "SSR", "name", "赫焔鱗 / 氷華の杖 / 緑晶灯 / 夢紡ぎの枕 / 月詠みの杖", "rate", "17.65%", "color", "#FFD700"),
-
-            Map.of("rarity", "SR", "name", "各種聖結晶5種", "rate", "32.95%", "color", "#C0C0C0"),
-
-            Map.of("rarity", "R", "name", "紅玉 / 蒼玉 / 翠玉 / 聖玉 / 闇玉", "rate", "44.70%", "color", "#B87333")
+            Map.of("rarity", "SSR", "name", "SSR 5種", "rate", "17.65%", "color", "#FFD700"),
+            Map.of("rarity", "SR", "name", "SR 5種", "rate", "32.95%", "color", "#C0C0C0"),
+            Map.of("rarity", "R", "name", "R 5種", "rate", "44.70%", "color", "#B87333")
         );
     }
 

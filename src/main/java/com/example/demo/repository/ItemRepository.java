@@ -10,13 +10,13 @@ import com.example.demo.dto.ItemCountDTO;
 import com.example.demo.entity.Item;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    
+
     // --- アイテムタイプで検索（登録順で並べる） ---
     @Query("SELECT i FROM Item i WHERE i.type = :type ORDER BY i.sortOrder ASC")
     List<Item> findByType(@Param("type") String type);
 
+
     // --- ユーザーごとの所持数を集計（登録順で並べる） ---
-    // LEFT JOIN を使うことで、ユーザーがまだ持っていないアイテムも count=0 で返す
     @Query("SELECT new com.example.demo.dto.ItemCountDTO(" +
            "i.name, i.imagePath, " +
            "COALESCE(SUM(CASE WHEN ui.id IS NOT NULL THEN 1 ELSE 0 END), 0), " +
@@ -27,7 +27,12 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
            "ORDER BY i.sortOrder ASC")
     List<ItemCountDTO> findItemCountsByUserId(@Param("userId") Long userId);
 
-    // --- 全アイテムを登録順で取得するメソッド ---
+
+    // --- 全アイテムを sortOrder 順で取得 ---
     @Query("SELECT i FROM Item i ORDER BY i.sortOrder ASC")
     List<Item> findAllOrderBySortOrder();
+
+
+    // --- ★ 追加：アイテム名で検索 ---
+    Item findByName(String name);
 }
