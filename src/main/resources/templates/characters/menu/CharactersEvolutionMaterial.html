@@ -23,13 +23,69 @@
             gap: 20px;
         }
         .material-card {
-            width: 140px;
+            width: 160px;
             text-align: center;
+            border: 2px solid #ccc;       /* デフォルト枠線 */
+            border-radius: 12px;
+            padding: 12px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;           /* 疑似要素用に必要 */
+            overflow: hidden;
+        }
+        .material-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        /* レアリティごとの枠色 */
+        .material-card.r { border-color: gray; }
+        .material-card.sr { border-color: dodgerblue; }
+        .material-card.ssr { border-color: gold; }
+
+        /* URだけ虹色が動き続ける枠（2pxに統一） */
+        .material-card.ur {
+            border: 2px solid transparent;
+        }
+        .material-card.ur::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 12px;
+            padding: 2px;
+            background: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet);
+            background-size: 400% 400%;
+            animation: rainbowBorder 5s linear infinite;
+            -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+        }
+
+        @keyframes rainbowBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .card-image-container {
+            background-color: white;
+            padding: 8px;
+            border-radius: 8px;
         }
         .card-image-container img {
             max-width: 100px;
             margin: 0 auto;
             display: block;
+            background-color: white;
+            border-radius: 4px;
+        }
+        .material-card p {
+            margin: 6px 0;
+            font-weight: bold;
+            color: #333;
         }
     </style>
 </head>
@@ -44,7 +100,7 @@
     <div class="rarity-row" th:if="${itemsR != null and !#lists.isEmpty(itemsR)}">
         <h2>R</h2>
         <div class="material-list">
-            <div th:each="item : ${itemsR}" class="material-card">
+            <div th:each="item : ${itemsR}" class="material-card r">
                 <div class="card-image-container">
                     <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
                 </div>
@@ -58,7 +114,7 @@
     <div class="rarity-row" th:if="${itemsSR != null and !#lists.isEmpty(itemsSR)}">
         <h2>SR</h2>
         <div class="material-list">
-            <div th:each="item : ${itemsSR}" class="material-card">
+            <div th:each="item : ${itemsSR}" class="material-card sr">
                 <div class="card-image-container">
                     <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
                 </div>
@@ -72,7 +128,7 @@
     <div class="rarity-row" th:if="${itemsSSR != null and !#lists.isEmpty(itemsSSR)}">
         <h2>SSR</h2>
         <div class="material-list">
-            <div th:each="item : ${itemsSSR}" class="material-card">
+            <div th:each="item : ${itemsSSR}" class="material-card ssr">
                 <div class="card-image-container">
                     <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
                 </div>
@@ -86,7 +142,7 @@
     <div class="rarity-row" th:if="${itemsUR != null and !#lists.isEmpty(itemsUR)}">
         <h2>UR</h2>
         <div class="material-list">
-            <div th:each="item : ${itemsUR}" class="material-card">
+            <div th:each="item : ${itemsUR}" class="material-card ur">
                 <div class="card-image-container">
                     <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
                 </div>
@@ -105,7 +161,7 @@
     </section>
 
     <!-- 戻るボタン -->
-    <div class="back-btn-container" style="text-align:center;">
+    <div class="back-btn-container" style="text-align:center; margin-top:20px;">
         <a th:href="@{/characters/menu/CharactersMenu}" class="button secondary">
             <i class="fa-solid fa-arrow-left"></i> メニューに戻る
         </a>
