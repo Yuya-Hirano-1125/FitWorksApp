@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>認証コード入力 | FitWorks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/auth.css}">
 </head>
@@ -26,6 +27,11 @@
             <button type="submit" class="button primary">次へ</button>
         </div>
     </form>
-</div>
+
+    <p class="login-link">
+        電話番号を間違えましたか？<br>
+        <a th:href="@{/forgot-password}">電話番号入力に戻る</a>
+    </p>
+    </div>
 </body>
 </html>

@@ -49,6 +49,15 @@
 			input::-ms-clear {
 			    display: none;
 			}
+			/* エラーメッセージ用のスタイル */
+			.field-error {
+			    color: #ff4d4d; /* 赤色 */
+			    font-size: 0.85rem;
+			    margin-top: 5px;
+			    margin-bottom: 0;
+			    display: block;
+			    font-weight: bold;
+			}
 		</style>
 </head>
 <body>
@@ -59,18 +68,27 @@
     <p th:if="${error}" class="error-message" th:text="${error}"></p>
     
     <form th:action="@{/register}" method="post">
-        <div class="form-group">
-            <label for="new-username">ユーザー名</label>
-            <input type="text" id="new-username" name="username" required placeholder="ユーザー名を入力" autocomplete="off">
-        </div>
-        <div class="form-group">
-            <label for="email">メールアドレス</label>
-            <input type="email" id="email" name="email" required placeholder="contact@example.com" autocomplete="off">
-        </div>
-        <div class="form-group">
-            <label for="phoneNumber">電話番号</label>
-            <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="例: 09012345678" autocomplete="tel">
-        </div>
+		<div class="form-group">
+		    <label for="username">ユーザー名</label>
+		    <input type="text" id="username" name="username" 
+		           th:value="${username}" required placeholder="ユーザー名">
+		    
+		    <span th:if="${usernameError}" th:text="${usernameError}" class="field-error"></span>
+		</div>
+		<div class="form-group">
+		    <label for="email">メールアドレス</label>
+		    <input type="email" id="email" name="email" 
+		           th:value="${email}" required placeholder="メールアドレス">
+		    
+		    <span th:if="${emailError}" th:text="${emailError}" class="field-error"></span>
+		</div>
+		<div class="form-group">
+		    <label for="phone-number">電話番号</label>
+		    <input type="tel" id="phone-number" name="phoneNumber" 
+		           th:value="${phoneNumber}" required placeholder="09012345678">
+		    
+		    <span th:if="${phoneError}" th:text="${phoneError}" class="field-error"></span>
+		</div>
 		<div class="form-group">
 		    <label for="new-password">パスワード</label>
 		    
@@ -91,13 +109,13 @@
 		        <li id="criteria-special" class="criterion unmet"><i class="fa-solid fa-xmark"></i> 記号（!@#$%^& など）を含める</li>
 		    </ul>
 		</div>
-        <div class="form-group">
-            <label for="confirm-password">パスワード（確認）</label>
-			<div class="password-wrapper">
-			        <input type="password" id="confirm-password" name="confirmPassword" required placeholder="パスワードを再度入力" autocomplete="off">
-			        <i class="fa-solid fa-eye toggle-password-icon" onclick="togglePasswordVisibility('confirm-password', this)"></i>
-			    </div>
-        </div>        
+		<div class="form-group">
+		    <label for="confirm-password">パスワード（確認）</label>
+		    <div class="password-wrapper">
+		         <input type="password" id="confirm-password" name="confirmPassword" ...>
+		         </div>
+		    <span th:if="${passwordError}" th:text="${passwordError}" class="field-error"></span>
+		</div>       
         <div class="button-container">
             <button type="submit" class="button primary">アカウントを作成</button>
         </div>
