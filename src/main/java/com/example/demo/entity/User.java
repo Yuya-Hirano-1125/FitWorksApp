@@ -95,7 +95,7 @@ public class User {
 
  // --- チップ機能 ---
     @Column(name = "chip")
-    private int chipCount;
+    private Integer chipCount;
 
     public User() {
         if (this.level == null) this.level = 1;
@@ -205,6 +205,7 @@ public class User {
         }
     }
 
+    
     public int getExperiencePoints() { return getXp(); }
 
     public int getProgressPercent() {
@@ -215,18 +216,25 @@ public class User {
     public void setExperiencePoints(int i) { this.xp = i; }
 
  // --- チップ関連 ---
-    public int getChipCount() { return chipCount; }
-    public void setChipCount(int chipCount) { this.chipCount = chipCount; }
+    public Integer getChipCount() { 
+        return chipCount != null ? chipCount : 0; 
+    }
 
-    // チップを加算
+    public void setChipCount(Integer chipCount) { 
+        this.chipCount = chipCount; 
+    }
+ // チップを加算
     public void addChips(int chips) {
-        if (chips > 0) this.chipCount += chips;
+        if (chips > 0) {
+            if (chipCount == null) chipCount = 0;
+            chipCount += chips;
+        }
     }
 
     // チップを消費
     public boolean useChips(int chips) {
-        if (chips > 0 && this.chipCount >= chips) {
-            this.chipCount -= chips;
+        if (chips > 0 && chipCount != null && chipCount >= chips) {
+            chipCount -= chips;
             return true;
         }
         return false;
