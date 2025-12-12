@@ -32,7 +32,7 @@ import com.example.demo.service.CustomUserDetailsService;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
-    private final CustomOAuth2UserService customOAuth2UserService; // ★追加
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     public SecurityConfig(CustomUserDetailsService userDetailsService,
                           CustomOAuth2UserService customOAuth2UserService) {
@@ -93,12 +93,10 @@ public class SecurityConfig {
             // CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             
-            // CSRF (SMS APIのために一部無効化するか、トークンを含める必要がありますが、ここでは一旦全体有効)
+            // CSRF
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                // SMS認証エンドポイントはCSRF除外する場合の例（必要に応じてコメントアウト解除）
-                // .ignoringRequestMatchers("/api/auth/**") 
             )
             .addFilterAfter(csrfCookieFilter(), BasicAuthenticationFilter.class)
 
@@ -130,11 +128,11 @@ public class SecurityConfig {
 
             // 認可設定
             .authorizeHttpRequests(auth -> auth
-                // ★追加: SMS認証APIとOAuth2関連パスを許可
+                // ★SMS認証APIとOAuth2関連パスを許可
                 .requestMatchers("/api/auth/send-otp", "/api/auth/verify-otp").permitAll()
                 .requestMatchers("/login/**", "/oauth2/**").permitAll()
                 
-                // 既存の許可リスト
+                // ★ルートパス("/") を許可リストに追加
                 .requestMatchers("/", "/register",
                     "/forgot-password", "/verify-code", "/reset-password",
                     "/error", "/terms",
@@ -160,11 +158,11 @@ public class SecurityConfig {
                 .permitAll()
             )
             
-            // ★追加: OAuth2ログイン (LINE / Apple)
+            // OAuth2ログイン (LINE / Apple)
             .oauth2Login(oauth2 -> oauth2
-                .loginPage("/login") // 既存のログインページを共有
+                .loginPage("/login")
                 .userInfoEndpoint(userInfo -> userInfo
-                    .userService(customOAuth2UserService) // ユーザー情報取得時のカスタム処理
+                    .userService(customOAuth2UserService)
                 )
                 .defaultSuccessUrl("/home", true)
             )
@@ -172,7 +170,7 @@ public class SecurityConfig {
             // ログアウト
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/") // ログアウト後もルート(start.html)に戻る
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                 .permitAll()

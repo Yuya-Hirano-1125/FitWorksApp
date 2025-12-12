@@ -6,7 +6,9 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -35,6 +37,17 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
+    // --- スタート画面（ルートパス） ---
+    @GetMapping("/")
+    public String index(Authentication authentication) {
+        // 既にログインしているユーザーがアクセスした場合はホームへリダイレクトさせる（任意）
+        if (authentication != null && authentication.isAuthenticated() && 
+           !(authentication instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/home";
+        }
+        return "start";
+    }
 
     @GetMapping("/login")
     public String login() {
@@ -98,12 +111,13 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send SMS: " + e.getMessage());
         }
     }
- // クラス内に以下を追加してください
+
     @GetMapping("/forgot-password")
     public String forgotPassword() {
         // templates/auth/forgot-password.html を表示する
         return "auth/forgot-password";
     }
+
     @PostMapping("/api/auth/verify-otp")
     @ResponseBody
     public ResponseEntity<?> verifyOtp(@RequestParam String phoneNumber, 
