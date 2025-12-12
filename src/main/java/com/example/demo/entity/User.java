@@ -95,7 +95,7 @@ public class User {
 
  // --- チップ機能 ---
     @Column(name = "chip")
-    private int chipCount = 0;
+    private int chipCount;
 
     public User() {
         if (this.level == null) this.level = 1;
