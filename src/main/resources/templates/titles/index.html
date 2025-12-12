@@ -98,7 +98,10 @@
             background-color: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: center;
-            align-items: center;
+            /* 変更: 中央寄せ(center)から上部寄せ(flex-start)に変更 */
+            align-items: flex-start;
+            /* 追加: 上部に適度な余白を追加 */
+            padding-top: 60px;
             z-index: 10000;
             animation: fadeIn 0.4s;
         }

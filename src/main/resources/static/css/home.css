@@ -602,3 +602,83 @@
 .rpg-btn-next:hover {
     transform: scale(1.05);
 }
+.sub-heading {
+    text-align: center;
+    color: #555;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 700;
+    margin-bottom: 25px;
+    letter-spacing: 0.05em;
+}
+
+.username-display {
+    /* 英数字はPoppins、日本語はNoto Sans JPを使用 */
+    font-family: 'Poppins', 'Noto Sans JP', sans-serif;
+    
+    /* 文字サイズを大きくして太くする */
+    font-size: 1.6em;
+    font-weight: 900;
+    
+    /* 色をメインカラー（ピンク系）に変更 */
+    color: var(--primary-color, #ff69b4);
+    
+    /* 少し影をつけて浮き出させる */
+    text-shadow: 2px 2px 0px rgba(255, 255, 255, 1), 
+                 3px 3px 5px rgba(0, 0, 0, 0.15);
+                 
+    margin: 0 4px;
+    display: inline-block;
+    
+    /* アニメーション（任意）: ふわっと表示 */
+    animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+/* ========================================================= */
+/* 追加: AIケアボタンのスタイルとアニメーション */
+/* ========================================================= */
+/* ========================================================= */
+/* 追加・修正: AIケアボタンのスタイル（他のボタンと動きを統一） */
+/* ========================================================= */
+/* ========================================================= */
+/* 修正: AIケアボタンのスタイル（他のボタンと動き・形状を完全統一） */
+/* ========================================================= */
+
+.btn-care {
+    /* --- daily-mission-button と同じ基本構造 --- */
+    display: block;               /* inline-block から block に変更 */
+    text-decoration: none;
+    border-radius: 35px;          /* 50px から 35px に変更して形状を統一 */
+    font-weight: 800;
+    padding: 14px 25px;           /* パディングを統一 */
+    font-size: 17px;              /* フォントサイズを統一 */
+    letter-spacing: 0.8px;
+    border: none;
+    
+    /* --- AIケアボタン独自の色設定 --- */
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    color: #555;                  /* 背景が明るいので文字は暗く */
+    
+    /* 影の強さは合わせつつ、色はボタンに合わせる */
+    box-shadow: 0 6px 20px rgba(168, 237, 234, 0.4);
+    
+    /* --- ★動きの設定（daily-mission-buttonと完全一致）--- */
+    /* 特殊なイージング（動きの加速・減速）をコピー */
+    transition: all 0.4s cubic-bezier(.68,-0.55,.26,1.55);
+    
+    /* ふわふわ浮く動き + フェードインをコピー */
+    animation: gentleFloat 4s ease-in-out infinite alternate, fadeIn 0.7s ease-out forwards;
+    
+    /* 配置調整 */
+    width: 95%;
+    margin: 0 auto; /* 中央寄せ */
+}
+
+.btn-care:hover {
+    /* --- ホバー時の動き（daily-mission-buttonと完全一致）--- */
+    animation: none; /* 浮遊アニメーションを止める */
+    transform: translateY(-5px) scale(1.03) rotate(1deg); /* 浮き上がり・拡大・少し回転 */
+    
+    /* --- ホバー時の色変化 --- */
+    color: #333;
+    /* 影を強調（色は独自） */
+    box-shadow: 0 8px 25px rgba(168, 237, 234, 0.9), 0 0 15px rgba(255, 255, 255, 0.8);
+}

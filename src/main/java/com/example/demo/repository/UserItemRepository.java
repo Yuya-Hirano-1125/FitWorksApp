@@ -1,6 +1,7 @@
 package com.example.demo.repository;
 
 import java.util.List;
+import java.util.Optional; // ★追加
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -30,4 +31,7 @@ public interface UserItemRepository extends JpaRepository<UserItem, Long> {
 
     // userId と itemId で所持確認
     boolean existsByUserIdAndItemId(Long userId, Long itemId);
+    
+ // ユーザーIDとアイテムIDで、具体的な所持データ（個数など）を取得します
+    Optional<UserItem> findByUserIdAndItemId(Long userId, Long itemId);
 }

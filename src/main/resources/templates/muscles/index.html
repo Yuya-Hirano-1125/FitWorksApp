@@ -16,37 +16,74 @@
             margin-bottom: 30px;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            overflow: hidden; /* SVGのはみ出し防止 */
         }
         
         .avatar-container {
             position: relative;
-            width: 300px;
-            height: 400px;
+            width: 100%;
+            max-width: 360px;
+            height: 520px; /* 高さを確保 */
             margin: 0 auto;
+            perspective: 1000px;
         }
 
-        /* SVGパーツの共通スタイル */
+        /* SVG本体のスタイル */
+        .body-shape {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15));
+            /* 全体がふわふわ浮くアニメーション */
+            animation: bodyFloat 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes bodyFloat {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-8px); }
+        }
+
+        /* 筋肉パーツ（パス）の共通スタイル */
         .muscle-part {
-            fill: #e0e0e0; /* デフォルト色（グレー） */
-            stroke: #fff;
+            fill: #e0e0e0; /* InBody風のベースカラー（薄いグレー） */
+            stroke: #fff;  /* パーツの区切りを白線で */
             stroke-width: 2;
-            transition: all 0.5s ease-in-out;
-            transform-box: fill-box; /* 変形の基準をパーツ自身に */
-            transform-origin: center; /* 中心から拡大 */
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* 変形の基準点を自身の中心に */
+            transform-box: fill-box;
+            transform-origin: center;
             cursor: pointer;
         }
 
+        /* 頭部などのベースパーツ */
+        .muscle-base {
+            fill: #ccc;
+            stroke: #fff;
+            stroke-width: 2;
+        }
+
         /* ホバー時のエフェクト */
-        .muscle-part:hover {
-            filter: brightness(1.1);
+        .muscle-group:hover .muscle-part {
+            filter: brightness(0.9); /* 少し暗くして強調 */
+            transform: scale(1.02);
+            z-index: 10;
         }
 
-        /* レベルが高いときの発光エフェクト */
+        /* レベルが高いときの発光エフェクト (JSでクラス付与) */
         .glowing {
-            filter: drop-shadow(0 0 8px rgba(255, 94, 98, 0.6));
+            /* 赤く発光するドロップシャドウ */
+            filter: drop-shadow(0 0 10px rgba(255, 60, 60, 0.7));
+            animation: musclePulse 2s infinite alternate;
         }
 
-        /* --- 既存スタイル --- */
+        @keyframes musclePulse {
+            0% { filter: drop-shadow(0 0 8px rgba(255, 60, 60, 0.5)); transform: scale(var(--current-scale, 1.05)); }
+            100% { filter: drop-shadow(0 0 18px rgba(255, 40, 40, 0.9)); transform: scale(calc(var(--current-scale, 1.05) * 1.02)); }
+        }
+
+        /* --- 以下、既存スタイル --- */
         .muscle-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -113,15 +150,19 @@
         /* ツールチップ */
         #tooltip {
             position: absolute;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.8rem;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.2s;
             z-index: 100;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -133,29 +174,49 @@
         
         <div class="avatar-section">
             <h3>現在の筋肉ステータス</h3>
-            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">レベルに応じて筋肉が大きく、赤く発光します！</p>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">レベルに応じて筋肉が強化され、色が変化します！</p>
             
             <div class="avatar-container">
-                <svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="100" cy="30" r="20" fill="#ddd" />
-                    
-                    <path id="part-shoulders" class="muscle-part" d="M60,60 Q100,50 140,60 L150,80 L50,80 Z" 
-                          data-part-name="肩" />
-                    
-                    <path id="part-chest" class="muscle-part" d="M65,80 Q100,120 135,80 L130,65 Q100,75 70,65 Z" 
-                          data-part-name="胸" />
-                    
-                    <g id="part-arms" class="muscle-part" data-part-name="腕">
-                        <path d="M50,80 L40,150 L60,150 L65,80 Z" /> <path d="M150,80 L160,150 L140,150 L135,80 Z" /> </g>
-                    
-                    <path id="part-abs" class="muscle-part" d="M70,120 L130,120 L125,160 L75,160 Z" 
-                          data-part-name="腹筋" />
-                    
-                    <path id="part-back" class="muscle-part" d="M55,60 L45,100 L155,100 L145,60 Z" 
-                          style="opacity: 0.3; z-index: -1;" data-part-name="背中" />
+                <svg class="body-shape" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="muscleShine" x1="0%" y1="0%" x2="100%" y2="50%">
+                            <stop offset="0%" style="stop-color:rgba(255,255,255,0.3);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:rgba(255,255,255,0);stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
 
-                    <g id="part-legs" class="muscle-part" data-part-name="脚">
-                        <path d="M75,160 L60,280 L90,280 L95,160 Z" /> <path d="M125,160 L140,280 L110,280 L105,160 Z" /> </g>
+                    <circle class="muscle-base" cx="200" cy="50" r="30" />
+                    <rect class="muscle-base" x="185" y="78" width="30" height="15" />
+
+                    <g id="part-shoulders" class="muscle-group" data-part-name="肩">
+                        <path class="muscle-part" d="M185,93 L130,95 Q115,100 115,125 L135,130 L185,110 Z" />
+                        <path class="muscle-part" d="M215,93 L270,95 Q285,100 285,125 L265,130 L215,110 Z" />
+                    </g>
+
+                    <g id="part-back" class="muscle-group" data-part-name="背中">
+                        <path class="muscle-part" d="M185,110 L145,135 L155,190 L185,200 Z" />
+                        <path class="muscle-part" d="M215,110 L255,135 L245,190 L215,200 Z" />
+                    </g>
+
+                    <g id="part-arms" class="muscle-group" data-part-name="腕">
+                        <path class="muscle-part" d="M115,125 L105,200 L95,280 L125,280 L135,200 L140,135 Z" />
+                        <path class="muscle-part" d="M285,125 L295,200 L305,280 L275,280 L265,200 L260,135 Z" />
+                    </g>
+
+                    <g id="part-chest" class="muscle-group" data-part-name="胸">
+                        <path class="muscle-part" d="M185,93 L215,93 L240,115 L230,165 L200,170 L170,165 L160,115 Z" />
+                    </g>
+
+                    <g id="part-abs" class="muscle-group" data-part-name="腹筋">
+                        <path class="muscle-part" d="M170,165 L230,165 L225,250 L200,260 L175,250 Z" />
+                    </g>
+
+                    <g id="part-legs" class="muscle-group" data-part-name="脚">
+                        <path class="muscle-part" d="M175,250 L200,260 L195,320 L185,450 L160,550 L130,550 L140,400 L135,300 L155,200 Z" />
+                        <path class="muscle-part" d="M225,250 L200,260 L205,320 L215,450 L240,550 L270,550 L260,400 L265,300 L245,200 Z" />
+                    </g>
+                    
+                    <rect x="0" y="0" width="400" height="600" fill="url(#muscleShine)" style="pointer-events: none; mix-blend-mode: soft-light;" />
                 </svg>
                 <div id="tooltip"></div>
             </div>
@@ -225,9 +286,9 @@
                     if(el) {
                         applyMuscleStyle(el, muscle.level);
                         
-                        // マウスオーバーイベント (PC用)
+                        // マウスオーバーイベント
                         el.addEventListener('mousemove', (e) => {
-                            showTooltip(e, `${muscle.targetPart}: Lv.${muscle.level}`);
+                            showTooltip(e, `${muscle.targetPart}: Lv.${muscle.level} (${muscle.customName})`);
                         });
                         el.addEventListener('mouseleave', hideTooltip);
                     }
@@ -235,21 +296,39 @@
             });
 
             function applyMuscleStyle(element, level) {
-                // 1. 色の変化 (レベルが高いほど赤く)
-                // レベル1=グレー, レベル10=鮮やかな赤, レベル20=発光する赤
-                const intensity = Math.min((level - 1) / 20, 1); // 0.0 ~ 1.0
-                
-                // ベースの色 (グレー #e0e0e0) から 赤 (#ff3333) へ補間
-                const r = Math.round(224 + (255 - 224) * intensity);
-                const g = Math.round(224 + (51 - 224) * intensity);
-                const b = Math.round(224 + (51 - 224) * intensity);
-                
-                element.style.fill = `rgb(${r}, ${g}, ${b})`;
+                // 対象がグループ(<g>)の場合は、内部の全パス(<path>)にスタイルを適用する
+                const targets = (element.tagName.toLowerCase() === 'g') 
+                                ? element.querySelectorAll('path') 
+                                : [element];
 
-                // 2. サイズの変化 (レベルが高いほど大きく)
-                // scale(1.0) ~ scale(1.3)
-                const scale = 1 + Math.min(level * 0.03, 0.3); 
-                element.style.transform = `scale(${scale})`;
+                // 1. 色の変化 (レベル1=薄いグレー -> レベル20=鮮やかな赤/オレンジ)
+                // InBody風なので、最初はグレー(#e0e0e0)からスタートし、鍛えると色がつくように調整
+                const maxLevel = 20;
+                const ratio = Math.min((level - 1) / maxLevel, 1); // 0.0 ~ 1.0
+
+                // 開始色: #e0e0e0 (224, 224, 224)
+                // 終了色: #ff4757 (255, 71, 87) - FitWorksの赤系
+                const startR = 224, startG = 224, startB = 224;
+                const endR = 255, endG = 71, endB = 87;
+
+                const r = Math.round(startR + (endR - startR) * ratio);
+                const g = Math.round(startG + (endG - startG) * ratio);
+                const b = Math.round(startB + (endB - startB) * ratio);
+                
+                const color = `rgb(${r}, ${g}, ${b})`;
+
+                // 2. サイズの変化 (筋肉の肥大化)
+                const scale = 1 + (ratio * 0.15); // 控えめだが確実に大きくなる
+
+                targets.forEach(target => {
+                    target.style.fill = color;
+                    // 個々のパーツの中心から拡大
+                    target.style.transform = `scale(${scale})`;
+                    
+                    if(level >= 10) {
+                        target.style.setProperty('--current-scale', scale);
+                    }
+                });
 
                 // 3. 発光エフェクト (Lv10以上)
                 if (level >= 10) {
@@ -260,10 +339,16 @@
             function showTooltip(e, text) {
                 tooltip.textContent = text;
                 tooltip.style.opacity = '1';
-                // マウス位置の少し上へ
-                const rect = document.querySelector('.avatar-container').getBoundingClientRect();
-                tooltip.style.left = (e.clientX - rect.left + 10) + 'px';
-                tooltip.style.top = (e.clientY - rect.top - 30) + 'px';
+                
+                const containerRect = document.querySelector('.avatar-container').getBoundingClientRect();
+                
+                let x = e.clientX - containerRect.left + 15;
+                let y = e.clientY - containerRect.top - 10;
+
+                if (x > containerRect.width - 100) x -= 120;
+
+                tooltip.style.left = x + 'px';
+                tooltip.style.top = y + 'px';
             }
 
             function hideTooltip() {
