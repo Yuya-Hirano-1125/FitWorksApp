@@ -77,7 +77,6 @@ public class User {
     private LocalDateTime tokenExpiration;
     
     // --- フレンド機能 ---
-    
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_friends",
@@ -94,6 +93,10 @@ public class User {
     )
     private Set<User> receivedFriendRequests = new HashSet<>();
 
+ // --- チップ機能 ---
+    @Column(name = "chip")
+    private int chipCount = 0;
+
     public User() {
         if (this.level == null) this.level = 1;
         if (this.isRewardClaimedToday == null) this.isRewardClaimedToday = false;
@@ -106,7 +109,6 @@ public class User {
     }
 
     // --- Getter / Setter ---
-
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -140,11 +142,9 @@ public class User {
     public Boolean getIsRewardClaimedToday() { return isRewardClaimedToday; }
     public void setIsRewardClaimedToday(Boolean isRewardClaimedToday) { this.isRewardClaimedToday = isRewardClaimedToday; }
 
-    // ★追加: 称号のGetter/Setter
     public AppTitle getEquippedTitle() { return equippedTitle; }
     public void setEquippedTitle(AppTitle equippedTitle) { this.equippedTitle = equippedTitle; }
 
-    // ★追加: 画面表示用のヘルパーメソッド
     public String getDisplayTitle() {
         return equippedTitle != null ? equippedTitle.getDisplayName() : "なし";
     }
@@ -186,6 +186,7 @@ public class User {
     public void addReceivedFriendRequest(User sender) { this.receivedFriendRequests.add(sender); }
     public void removeReceivedFriendRequest(User sender) { this.receivedFriendRequests.remove(sender); }
 
+    // --- XP関連 ---
     public int calculateRequiredXp() {
         int currentLevel = getLevel();
         return 1000 + (currentLevel - 1) * 200;
@@ -212,4 +213,22 @@ public class User {
     }
 
     public void setExperiencePoints(int i) { this.xp = i; }
+
+ // --- チップ関連 ---
+    public int getChipCount() { return chipCount; }
+    public void setChipCount(int chipCount) { this.chipCount = chipCount; }
+
+    // チップを加算
+    public void addChips(int chips) {
+        if (chips > 0) this.chipCount += chips;
+    }
+
+    // チップを消費
+    public boolean useChips(int chips) {
+        if (chips > 0 && this.chipCount >= chips) {
+            this.chipCount -= chips;
+            return true;
+        }
+        return false;
+    }
 }

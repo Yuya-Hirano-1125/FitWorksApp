@@ -325,4 +325,31 @@ public class UserService {
         user.addXp(xp);
         userRepository.save(user);
     }
+    // --- チップ関連処理 ---
+    @Transactional
+    public void addChips(String username, int chips) {
+        userRepository.findByUsername(username).ifPresent(user -> {
+            user.addChips(chips); // Userエンティティのメソッドで加算
+            userRepository.save(user); // DBに保存
+        });
+    }
+
+    @Transactional
+    public boolean useChips(String username, int cost) {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isEmpty()) return false;
+        User user = optionalUser.get();
+        boolean success = user.useChips(cost); // 消費処理
+        if (success) {
+            userRepository.save(user); // 消費後の残高を保存
+        }
+        return success;
+    }
+
+    public int getChipCount(String username) {
+        return userRepository.findByUsername(username)
+            .map(User::getChipCount)
+            .orElse(0);
+    }
+
 }

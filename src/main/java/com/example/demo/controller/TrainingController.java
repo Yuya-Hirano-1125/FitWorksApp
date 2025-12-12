@@ -430,10 +430,20 @@ public class TrainingController {
                 }
             }
 
-            String message = form.getRecordDate().toString() + trainingSummary + " の記録を保存し、" + earnedXP + " XPを獲得しました！";
+            // ★チップ計算と保存
+            int earnedChips = trainingLogicService.calculateChipReward(exerciseIdentifier);
+            if (earnedChips > 0) {
+                userService.addChips(currentUser.getUsername(), earnedChips);
+            }
+
+            // ★メッセージにチップ数を追加
+            String message = form.getRecordDate().toString() + trainingSummary 
+                           + " の記録を保存し、" + earnedXP + " XPと " 
+                           + earnedChips + " 枚のチップを獲得しました！";
             redirectAttributes.addFlashAttribute("successMessage", message);
         } else {
-            redirectAttributes.addFlashAttribute("successMessage", form.getRecordDate().toString() + " の記録を保存しました！");
+            redirectAttributes.addFlashAttribute("successMessage", 
+                form.getRecordDate().toString() + " の記録を保存しました！");
         }
 
         missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
