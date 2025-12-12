@@ -205,6 +205,7 @@ public class User {
         }
     }
 
+    
     public int getExperiencePoints() { return getXp(); }
 
     public int getProgressPercent() {
