@@ -381,17 +381,17 @@
         <p class="sub-heading">進化素材をあつめよう！</p>
     </div>
 
-	<div class="status-bar">
-	    <div class="shaker-display">
-	        <i class="fa-solid fa-martini-glass-citrus shaker-icon"></i>
-	        <div class="shaker-info">
-	            <span class="shaker-count-label">所持チップ:</span>
-	            <span class="shaker-count-value" th:text="${chipCount}">0</span>
-	            <span class="shaker-unit">枚</span>
-	        </div>
-	    </div>
-	</div>
-	
+    <div class="status-bar">
+        <div class="shaker-display">
+            <i class="fa-solid fa-martini-glass-citrus shaker-icon"></i>
+            <div class="shaker-info">
+                <span class="shaker-count-label">所持チップ:</span>
+                <span class="shaker-count-value" th:text="${chipCount}">0</span>
+                <span class="shaker-unit">枚</span>
+            </div>
+        </div>
+    </div>
+    
     <div class="gacha-stage">
         <div class="stage-bg-effect"></div>
         <i class="fa-solid fa-gifts gacha-main-icon"></i>
@@ -403,13 +403,22 @@
         </div>
     </div>
 
+    <!-- chipCountをJSで参照できるように埋め込み -->
+    <input type="hidden" id="chipCount" th:value="${chipCount}" />
+
     <div class="action-area">
-        <a th:href="@{/gacha/animation(userId=${userId}, count=1)}" class="gacha-btn btn-single">
+        <a href="#"
+           th:href="@{/gacha/animation(userId=${userId}, count=1)}"
+           class="gacha-btn btn-single"
+           onclick="return checkChips(1)">
             <span class="btn-label">1回引く</span>
             <span class="btn-cost">消費: 1個</span>
         </a>
         
-        <a th:href="@{/gacha/animation(userId=${userId}, count=6)}" class="gacha-btn btn-multi">
+        <a href="#"
+           th:href="@{/gacha/animation(userId=${userId}, count=6)}"
+           class="gacha-btn btn-multi"
+           onclick="return checkChips(5)">
             <span class="btn-label">6連引く！</span>
             <span class="btn-cost">消費: 5個 (お得!)</span>
         </a>
@@ -439,27 +448,25 @@
             </thead>
             <tbody>
                 <!-- UR -->
-				<tr>
-				    <td><span class="rarity-badge rarity-UR">UR</span></td>
-				    <td class="rarity-UR-text">夢幻の鍵</td>
-				    <td class="rarity-UR-text">1.00%</td>
-				</tr>
+                <tr>
+                    <td><span class="rarity-badge rarity-UR">UR</span></td>
+                    <td class="rarity-UR-text">夢幻の鍵</td>
+                    <td class="rarity-UR-text">1.00%</td>
+                </tr>
 
-
-
-                <!-- SSR (5アイテムで合計5.00% → 1.00%ずつ) -->
+                <!-- SSR -->
                 <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>赫焔鱗</td><td>1.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>氷華の杖</td><td>1.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>緑晶灯</td><td>1.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>夢紡ぎの枕</td><td>1.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>月詠みの杖</td><td>1.00%</td></tr>
-                <!-- SR (5アイテムで合計34.00% → 6.80%ずつ) -->
+                <!-- SR -->
                 <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>赤の聖結晶</td><td>6.80%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>青の聖結晶</td><td>6.80%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>緑の聖結晶</td><td>6.80%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>黄の聖結晶</td><td>6.80%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>紫の聖結晶</td><td>6.80%</td></tr>
-                <!-- R (5アイテムで合計60.00% → 12.00%ずつ) -->
+                <!-- R -->
                 <tr><td><span class="rarity-badge rarity-R">R</span></td><td>紅玉</td><td>12.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-R">R</span></td><td>蒼玉</td><td>12.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-R">R</span></td><td>翠玉</td><td>12.00%</td></tr>
@@ -476,7 +483,6 @@
     </div>
 </div>
 
-
 <script>
     const modal = document.getElementById("rateModal");
     const openBtn = document.getElementById("openModal");
@@ -485,6 +491,16 @@
     openBtn.onclick = () => { modal.style.display = "block"; }
     closeBtn.onclick = () => { modal.style.display = "none"; }
     window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
+
+    // ★追加: チップ不足チェック
+    function checkChips(cost) {
+        const chipCount = parseInt(document.getElementById("chipCount").value, 10);
+        if (isNaN(chipCount) || chipCount < cost) {
+            alert("チップ数が足りません！");
+            return false; // 遷移キャンセル
+        }
+        return true;
+    }
 </script>
 
 </body>
