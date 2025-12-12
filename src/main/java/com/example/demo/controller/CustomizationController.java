@@ -41,7 +41,7 @@ public class CustomizationController {
         List<UserItem> ownedItems = customizationService.getOwnedItems(user);
         model.addAttribute("ownedItems", ownedItems);
 
-        return "gacha/customization"; // Thymeleafテンプレート名
+        return "forward:/gacha/customization"; // Thymeleafテンプレート名
     }
 
     /** アイテムを装備する */

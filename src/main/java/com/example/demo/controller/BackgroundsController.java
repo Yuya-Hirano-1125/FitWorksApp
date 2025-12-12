@@ -34,12 +34,12 @@ public class BackgroundsController {
         //    (このメソッドは、実際の認証ロジックに合わせて UserServiceに実装が必要です)
         User currentUser = userService.getLoggedInUser(); 
         
-        int currentLevel = 1; // 初期値として1を設定
+        int currentLevel = 100; // 初期値として1を設定
         
         if (currentUser != null) {
             // 2. Userエンティティの getLevel() メソッドを使ってレベルを取得
             //    エンティティには getLevel() があるため、そのまま利用します。
-            currentLevel = currentUser.getLevel(); 
+        	currentLevel = currentUser.getLevel(); 
         } else {
             // ユーザーが見つからない場合の処理（例: ログインページへリダイレクトなど）
             System.err.println("ログインユーザー情報が見つかりません。");
@@ -49,6 +49,6 @@ public class BackgroundsController {
         // 3. 取得したレベルをThymeleafテンプレートに渡す
         model.addAttribute("currentLevel", currentLevel);
         
-        return "characters/Backgrounds";
+        return "forward:/characters/menu/Backgrounds";
     }
 }

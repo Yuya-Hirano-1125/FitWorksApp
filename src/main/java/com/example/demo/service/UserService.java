@@ -30,6 +30,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final TrainingRecordRepository trainingRecordRepository; 
     private final PasswordEncoder passwordEncoder; 
+    
 
     @Autowired
     private JavaMailSender mailSender;
@@ -345,10 +346,11 @@ public class UserService {
 
         // --- デバッグ/仮実装として、ここでは一時的に固定のユーザー名で検索します ---
         // 実際の認証システムに接続後、この行は削除または修正してください。
-        String loggedInUsername = "test_user_for_backgrounds"; // 仮のユーザー名
+        String loggedInUsername = "test"; // 仮のユーザー名
 
         // findByUsername メソッドはすでに存在するのでそれを利用します。
         return userRepository.findByUsername(loggedInUsername).orElse(null);
         // ----------------------------------------------------------------------
     }
+    
 }

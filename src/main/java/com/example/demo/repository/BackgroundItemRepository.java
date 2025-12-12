@@ -29,5 +29,5 @@ public interface BackgroundItemRepository extends JpaRepository<BackgroundItem, 
      * @param requiredLevel 必要なレベル
      * @return 必要なレベル以下の BackgroundItem エンティティのリスト
      */
-    List<BackgroundItem> findByRequiredLevelLessThanEqual(int requiredLevel);
+    List<BackgroundItem> findByRequiredLevelLessThanEqual(int currentLevel);
 }

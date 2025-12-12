@@ -24,11 +24,11 @@
                 背景一覧
             </h1>
             <p class="text-gray-500 mt-2 text-sm font-bold">ホーム画面の背景カスタマイズ</p>
-            <div id="current-level-display" class="mt-4 text-center">
-                <span class="text-lg font-extrabold text-[var(--primary-color)] bg-yellow-100 px-4 py-1 rounded-full shadow-md">
-                    現在のレベル: <span id="user-level">--</span>
-                </span>
-            </div>
+			<div id="current-level-display" class="mt-4 text-center">
+			    <span class="text-lg font-extrabold text-[var(--primary-color)] bg-yellow-100 px-4 py-1 rounded-full shadow-md">
+			        現在のレベル: <span th:text="${currentLevel}"></span>
+			        </span>
+			</div>
             </div>
 
         <div id="content-area"></div>
@@ -84,9 +84,8 @@
     <script th:inline="javascript"> 
     document.addEventListener('DOMContentLoaded', () => {
         // -----------------------------------------------------
-        // ✅ 修正: コントローラーから渡された currentLevel の値を使用
-        const currentLevel = /*[[${Level}]]*/ 12;
-        document.getElementById('user-level').textContent = currentLevel || 1; // 値がない場合はデフォルトで1を表示
+		// 【元に戻す箇所】
+		const currentLevel = /*[[${currentLevel}]]*/ 12; // またはDBから渡るはずの正しいキー名
         // -----------------------------------------------------
 		
         const hasMaterial = true; 
