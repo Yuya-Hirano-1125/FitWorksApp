@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.dto.MissionStatusDto;
 import com.example.demo.entity.User;
 import com.example.demo.repository.TrainingRecordRepository;
+import com.example.demo.repository.UserItemRepository; // ★追加
 import com.example.demo.repository.UserRepository;
 
 @Service
@@ -33,6 +34,9 @@ public class UserService {
 
     @Autowired
     private JavaMailSender mailSender;
+    
+    @Autowired
+    private UserItemRepository userItemRepository;
 
     @Autowired
     private SmsService smsService;
@@ -53,6 +57,8 @@ public class UserService {
         // 電話番号はnullとして処理
         registerNewUser(username, email, null, password);
     }
+    
+    
 
     // --- ユーザー登録処理 (既存) ---
     @Transactional

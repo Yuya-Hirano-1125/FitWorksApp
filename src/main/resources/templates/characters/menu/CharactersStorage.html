@@ -2,205 +2,84 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>キャラクター解放画面</title>
-
+    <title>キャラクター保管庫</title>
     <link rel="stylesheet" th:href="@{/css/characters/CharactersStorage.css}">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
-    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        .storage-tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
+        .tab-btn { padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; background: #eee; font-weight: bold; }
+        .tab-btn.active { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; }
+        .character-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .character-card { text-align: center; border: 3px solid #ccc; border-radius: 12px; padding: 10px; background: white; }
+        .character-img { width: 80px; height: 80px; object-fit: contain; margin: 0 auto; display: block; }
+        /* 属性別色 */
+        .character-card.fire { border-color: #ff7675; }
+        .character-card.water { border-color: #74b9ff; }
+        .character-card.grass { border-color: #55efc4; }
+        .character-card.light { border-color: #ffeaa7; }
+        .character-card.dark { border-color: #a29bfe; }
+    </style>
 </head>
 <body>
-    <div id="lock-message" class="hidden">
-        このキャラクターはロックされています。レベルが足りません。
-    </div>
-    
     <header>
-        <h1>キャラクター解放</h1>
-        <p class="user-level">現在のレベル: <span id="current-level" th:text="${currentLevel}">1</span></p>
+        <h1>キャラクター保管庫</h1>
+        <p class=\"user-level\">Lv.<span th:text="${currentLevel}">1</span></p>
     </header>
 
+    <div class="storage-tabs">
+        <button class="tab-btn active" data-target="all">ALL</button>
+        <button class="tab-btn" data-target="fire"><i class="fa-solid fa-fire"></i> 火</button>
+        <button class="tab-btn" data-target="water"><i class="fa-solid fa-droplet"></i> 水</button>
+        <button class="tab-btn" data-target="grass"><i class="fa-solid fa-leaf"></i> 草</button>
+        <button class="tab-btn" data-target="light"><i class="fa-solid fa-sun"></i> 光</button>
+        <button class="tab-btn" data-target="dark"><i class="fa-solid fa-moon"></i> 闇</button>
+    </div>
+
     <div class="character-list-wrapper">
-        <div class="character-groups-container">
-
-            <div class="attribute-group">
-                <h2 class="attribute-heading fire-color">🔥 炎属性</h2>
-                <div class="character-list-container" id="character-container-fire">
-                    <th:block th:each="chara : ${charaList}">
-                        <th:block th:if="${chara.attribute == 'fire'}">
-                            
-                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
-                                
-                                <div class="character-card" 
-                                     th:classappend="${!chara.isUnlocked} ? 'locked-card-style'"
-                                     th:data-attribute="${chara.attribute}" 
-                                     th:data-unlocked-level="${chara.requiredLevel}">
-                                    
-                                    <div class="card-content">
-                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">★1</div>
-                                        
-                                        <img class="character-img" 
-                                             th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" 
-                                             th:alt="${chara.name}">
-                                        
-                                        <p class="character-name" th:text="${chara.name}">名称未設定</p>
-                                        
-                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.1 解放</p>
-                                    </div>
-
-                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
-                                        <span class="lock-icon">🔒</span>
-                                        <p class="lock-text">LOCKED</p>
-                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">1</span>で解放</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </th:block>
-                    </th:block>
+        <div id="storage-container" class="character-grid">
+            <th:block th:each="chara : ${charaList}">
+                <div class="character-card storage-item" 
+                     th:classappend="${chara.attribute}" 
+                     th:data-attribute="${chara.attribute}" 
+                     th:style="${!chara.isUnlocked} ? 'opacity: 0.6; background: #eee;' : ''">
+                    
+                    <div class="evolution-tag" th:text="${chara.evolutionTag}">★1</div>
+                    <img class="character-img" 
+                         th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" 
+                         th:alt="${chara.name}"
+                         onerror="this.src='https://placehold.co/100x100?text=No+Img';">
+                    
+                    <p class="character-name" th:text="${chara.name}">Name</p>
+                    
+                    <p class="required-level" th:if="${!chara.isUnlocked}" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'" style="color:red; font-size:0.8em;"></p>
+                    <p class="required-level" th:if="${chara.isUnlocked}" style="color:green; font-weight:bold; font-size:0.8em;">所持済み</p>
                 </div>
-            </div>
-
-            <div class="attribute-group">
-                <h2 class="attribute-heading water-color">💧 水属性</h2>
-                <div class="character-list-container" id="character-container-water">
-                    <th:block th:each="chara : ${charaList}">
-                        <th:block th:if="${chara.attribute == 'water'}">
-                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
-                                <div class="character-card" th:classappend="${!chara.isUnlocked} ? 'locked-card-style'">
-                                    <div class="card-content">
-                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">★1</div>
-                                        <img class="character-img" th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" th:alt="${chara.name}">
-                                        <p class="character-name" th:text="${chara.name}">名称未設定</p>
-                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.1 解放</p>
-                                    </div>
-                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
-                                        <span class="lock-icon">🔒</span>
-                                        <p class="lock-text">LOCKED</p>
-                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">1</span>で解放</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </th:block>
-                    </th:block>
-                </div>
-            </div>
-
-            <div class="attribute-group">
-                <h2 class="attribute-heading wind-color">🍃 草属性</h2>
-                <div class="character-list-container" id="character-container-wind">
-                    <th:block th:each="chara : ${charaList}">
-                        <th:block th:if="${chara.attribute == 'grass' or chara.attribute == 'wind'}">
-                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
-                                <div class="character-card" th:classappend="${!chara.isUnlocked} ? 'locked-card-style'">
-                                    <div class="card-content">
-                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">★1</div>
-                                        <img class="character-img" th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" th:alt="${chara.name}">
-                                        <p class="character-name" th:text="${chara.name}">名称未設定</p>
-                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.1 解放</p>
-                                    </div>
-                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
-                                        <span class="lock-icon">🔒</span>
-                                        <p class="lock-text">LOCKED</p>
-                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">1</span>で解放</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </th:block>
-                    </th:block>
-                </div>
-            </div>
-
-            <div class="attribute-group">
-                <h2 class="attribute-heading light-color">✨ 光属性</h2>
-                <div class="character-list-container" id="character-container-light">
-                    <th:block th:each="chara : ${charaList}">
-                        <th:block th:if="${chara.attribute == 'light'}">
-                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
-                                <div class="character-card" th:classappend="${!chara.isUnlocked} ? 'locked-card-style'">
-                                    <div class="card-content">
-                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">★1</div>
-                                        <img class="character-img" th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" th:alt="${chara.name}">
-                                        <p class="character-name" th:text="${chara.name}">名称未設定</p>
-                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.1 解放</p>
-                                    </div>
-                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
-                                        <span class="lock-icon">🔒</span>
-                                        <p class="lock-text">LOCKED</p>
-                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">1</span>で解放</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </th:block>
-                    </th:block>
-                </div>
-            </div>
-
-            <div class="attribute-group">
-                <h2 class="attribute-heading dark-color">🌙 闇属性</h2>
-                <div class="character-list-container" id="character-container-dark">
-                    <th:block th:each="chara : ${charaList}">
-                        <th:block th:if="${chara.attribute == 'dark'}">
-                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
-                                <div class="character-card" th:classappend="${!chara.isUnlocked} ? 'locked-card-style'">
-                                    <div class="card-content">
-                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">★1</div>
-                                        <img class="character-img" th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" th:alt="${chara.name}">
-                                        <p class="character-name" th:text="${chara.name}">名称未設定</p>
-                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.1 解放</p>
-                                    </div>
-                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
-                                        <span class="lock-icon">🔒</span>
-                                        <p class="lock-text">LOCKED</p>
-                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">1</span>で解放</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </th:block>
-                    </th:block>
-                </div>
-            </div>
-
-            <div class="attribute-group">
-                <h2 class="attribute-heading secret-color">??? シークレット</h2>
-                <div class="character-list-container" id="character-container-secret">
-                    <th:block th:each="chara : ${charaList}">
-                        <th:block th:if="${chara.attribute == 'secret'}">
-                            <a th:href="@{'/characters/info/' + ${chara.id}}" class="character-link">
-                                <div class="character-card dark" 
-                                     th:classappend="${!chara.isUnlocked} ? 'locked-card-style'"
-                                     data-attribute="dark">
-                                    <div class="card-content">
-                                        <div class="evolution-tag" th:text="${chara.evolutionTag}">???</div>
-                                        <img class="character-img" 
-                                             th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_final.png'" 
-                                             th:alt="${chara.name}">
-                                        <p class="character-name" th:text="${chara.name}">シークレット</p>
-                                        <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'">Lv.250 解放</p>
-                                    </div>
-                                    <div class="lock-overlay" th:if="${!chara.isUnlocked}">
-                                        <span class="lock-icon">🔒</span>
-                                        <p class="lock-text">LOCKED</p>
-                                        <p class="lock-required-level">Lv.<span class="required-level-display" th:text="${chara.requiredLevel}">250</span>で解放</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </th:block>
-                    </th:block>
-                </div>
-            </div>
-
+            </th:block>
         </div>
     </div>
     
-    <div class="back-btn-container">
-        <a th:href="@{/characters}" class="btn-back">
-            <i class="fa-solid fa-reply"></i> キャラクターメニューへ戻る
-        </a>
+    <div class="back-btn-container" style="text-align:center; margin:20px;">
+        <a th:href="@{/characters}" class="btn-back"><i class="fa-solid fa-reply"></i> メニューへ戻る</a>
     </div>
 
     <script>
-        // 必要に応じてJS処理を追加
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const items = document.querySelectorAll('.storage-item');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const target = tab.getAttribute('data-target');
+                    items.forEach(item => {
+                        const attr = item.getAttribute('data-attribute');
+                        if (target === 'all' || attr === target) item.style.display = 'block';
+                        else item.style.display = 'none';
+                    });
+                });
+            });
+        });
     </script>
 </body>
 </html>
