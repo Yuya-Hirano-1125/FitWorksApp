@@ -325,4 +325,30 @@ public class UserService {
         user.addXp(xp);
         userRepository.save(user);
     }
+    // UserService.java に追加するメソッド
+
+    /**
+     * ログイン中のユーザーオブジェクトを取得する。
+     * * 【重要】
+     * 実際の本番環境では、Spring Securityなどを使用して、
+     * 現在認証されているユーザーのIDやユーザー名を取得するロジックを
+     * ここに実装する必要があります。
+     * * @return ログイン中のUserオブジェクト。認証されていない場合はnullを返す。
+     */
+    public User getLoggedInUser() {
+        // --- ★ここにSpring Security連携ロジックを実装します★ ---
+        
+        // 1. Spring Securityのコンテキストから認証情報を取得
+        //    例: String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // 2. 認証情報（ユーザー名など）を使って、UserRepositoryからUserエンティティを検索
+
+        // --- デバッグ/仮実装として、ここでは一時的に固定のユーザー名で検索します ---
+        // 実際の認証システムに接続後、この行は削除または修正してください。
+        String loggedInUsername = "test_user_for_backgrounds"; // 仮のユーザー名
+
+        // findByUsername メソッドはすでに存在するのでそれを利用します。
+        return userRepository.findByUsername(loggedInUsername).orElse(null);
+        // ----------------------------------------------------------------------
+    }
 }
