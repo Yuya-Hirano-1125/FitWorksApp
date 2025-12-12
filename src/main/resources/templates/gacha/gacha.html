@@ -212,6 +212,7 @@
             gap: 20px;
             margin-bottom: 30px;
             padding: 0 10px;
+            position: relative; /* 親要素を基準に配置 */
         }
 
         .gacha-btn {
@@ -370,6 +371,19 @@
             text-align: right; font-weight: 900; margin-top: 10px; 
             font-size: 1rem; color: var(--accent-pink);
         }
+        .chip-error-box {
+        border: 2px solid #e74c3c;           /* 赤枠 */
+        background-color: #ffe6e6;           /* 薄い赤背景 */
+        color: #c0392b;                      /* 濃い赤文字 */
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-align: center;
+        margin: 10px auto 15px auto;
+        font-size: 1em;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        max-width: 300px;
+        }
     </style>
 </head>
 
@@ -406,6 +420,11 @@
     <!-- chipCountをJSで参照できるように埋め込み -->
     <input type="hidden" id="chipCount" th:value="${chipCount}" />
 
+	<!-- ★追加: チップ不足メッセージボックス -->
+	<div id="chipErrorBox" class="chip-error-box" style="display: none;">
+	    チップが足りません。
+	</div>
+	
     <div class="action-area">
         <a href="#"
            th:href="@{/gacha/animation(userId=${userId}, count=1)}"
@@ -484,23 +503,31 @@
 </div>
 
 <script>
-    const modal = document.getElementById("rateModal");
-    const openBtn = document.getElementById("openModal");
-    const closeBtn = document.getElementById("closeModal");
+	const modal = document.getElementById("rateModal");
+	    const openBtn = document.getElementById("openModal");
+	    const closeBtn = document.getElementById("closeModal");
 
-    openBtn.onclick = () => { modal.style.display = "block"; }
-    closeBtn.onclick = () => { modal.style.display = "none"; }
-    window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
+	    openBtn.onclick = () => { modal.style.display = "block"; }
+	    closeBtn.onclick = () => { modal.style.display = "none"; }
+	    window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
 
-    // ★追加: チップ不足チェック
-    function checkChips(cost) {
-        const chipCount = parseInt(document.getElementById("chipCount").value, 10);
-        if (isNaN(chipCount) || chipCount < cost) {
-            alert("チップ数が足りません！");
-            return false; // 遷移キャンセル
-        }
-        return true;
-    }
+	    // ★修正: チップ不足チェック → 赤枠ポップアップ表示
+	    function checkChips(cost) {
+	        const chipCount = parseInt(document.getElementById("chipCount").value, 10);
+	        if (isNaN(chipCount) || chipCount < cost) {
+	            showChipError();
+	            return false;
+	        }
+	        return true;
+	    }
+
+	    function showChipError() {
+	        const box = document.getElementById("chipErrorBox");
+	        box.style.display = "block";
+	        setTimeout(() => {
+	            box.style.display = "none";
+	        }, 3000); // 3秒後に自動で消える
+	    }
 </script>
 
 </body>
