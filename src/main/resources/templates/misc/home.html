@@ -161,6 +161,25 @@
     <a id="tutorial-training-btn" th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
        <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i> トレーニングを開始 
     </a>
+
+    <div id="tutorial-record-btn" class="record-container" style="margin-top: 15px;">
+        <button onclick="toggleRecordMenu()" class="daily-mission-button main-record-btn" style="width: 100%; cursor: pointer; background: linear-gradient(45deg, #2196F3, #03A9F4); box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);">
+           <i class="fa-solid fa-pen-to-square" style="margin-left: 5px;"></i> 記録をつける
+        </button>
+        
+        <div id="record-options" class="record-options">
+            <a th:href="@{/training-log}" class="record-option-item training-log-opt">
+                <i class="fa-solid fa-calendar-days"></i><br>筋トレ履歴
+            </a>
+            <a th:href="@{/log/meal}" class="record-option-item meal-opt">
+                <i class="fa-solid fa-utensils"></i><br>食事記録
+            </a>
+        </div>
+    </div>
+    
+    <a id="tutorial-supple-btn" th:href="@{/supplement-guide}" class="daily-mission-button" style="background: linear-gradient(45deg, #FFC107, #FF9800); box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4); margin-top: 15px;">
+       <i class="fa-solid fa-book-medical" style="margin-left: 5px;"></i> サプリ飲み方ガイド 
+    </a>
     
     <div class="care-section" style="margin-top: 15px; text-align: center; margin-bottom: 15px;">
         <a id="tutorial-care-btn" th:href="@{/training/care}" class="btn-care" style="
@@ -214,6 +233,11 @@
 <div id="tutorial-backdrop" class="tutorial-backdrop"></div>
 
 <script>
+    function toggleRecordMenu() {
+        const options = document.getElementById('record-options');
+        options.classList.toggle('open');
+    }
+
     const rpgSteps = [
         { targetId: null, text: "こんにちは！FitWorksへようこそ！\n一緒に最強のトレーナーを目指しましょう！" },
         { targetId: 'tutorial-xp-area', text: "ここがあなたの「レベル」と「XP」です。\n運動を記録すると経験値が溜まります！" },
@@ -223,6 +247,8 @@
         { targetId: 'tutorial-title-btn', text: "【新機能】獲得した称号はここで変更できます。\n色々な条件を達成して集めてくださいね。" },
         { targetId: 'tutorial-customize-btn', text: "ガチャで手に入れたアイテムで\nキャラクターを着せ替えることができます。" },
         { targetId: 'tutorial-training-btn', text: "基本はここ！「トレーニングを開始」ボタンから\n日々の運動を記録してください。" },
+        { targetId: 'tutorial-record-btn', text: "【新機能】ここから「筋トレ履歴」や「食事記録」\nへ素早くアクセスできます。" },
+        { targetId: 'tutorial-supple-btn', text: "【新機能】サプリメントの最適な飲み方や\nタイミングを知りたい時はここをチェック！" },
         { targetId: 'tutorial-care-btn', text: "疲れた時は「AIリフレッシュ」。\nあなたの体調に合わせたケアを提案します。" },
         { targetId: 'tutorial-friends-btn', text: "「フレンド」機能で仲間と励まし合ったり\nランキングで競い合うことができます。" },
         { targetId: 'tutorial-muscles-btn', text: "「マッスルパートナー」では、あなたの\n筋肉の成長度合いを可視化できます！" },
@@ -240,8 +266,8 @@
     let currentRpgStep = 0;
     let typeWriterInterval;
     let updateLoopId; 
-    // バージョンを更新して再表示させる (v13)
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v13'; 
+    // バージョンを更新して再表示させる (v14)
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v14'; 
 
     document.addEventListener('DOMContentLoaded', function() {
         if (!localStorage.getItem(STORAGE_KEY_RPG)) { setTimeout(() => startRpgTutorial(), 800); }

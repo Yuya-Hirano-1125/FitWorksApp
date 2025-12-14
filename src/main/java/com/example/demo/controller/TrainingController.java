@@ -40,7 +40,7 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AICoachService;
 import com.example.demo.service.LevelService;
 import com.example.demo.service.MissionService;
-import com.example.demo.service.MuscleService; // 追加
+import com.example.demo.service.MuscleService;
 import com.example.demo.service.TrainingDataService;
 import com.example.demo.service.TrainingLogicService;
 import com.example.demo.service.UserService;
@@ -59,7 +59,7 @@ public class TrainingController {
     private final TrainingLogicService trainingLogicService;
     private final BodyWeightRecordRepository bodyWeightRecordRepository;
     private final AICoachService aiCoachService;
-    private final MuscleService muscleService; // 追加
+    private final MuscleService muscleService;
 
     @Autowired
     private LevelService levelService;
@@ -75,7 +75,7 @@ public class TrainingController {
                               TrainingLogicService trainingLogicService,
                               BodyWeightRecordRepository bodyWeightRecordRepository,
                               AICoachService aiCoachService,
-                              MuscleService muscleService) { // コンストラクタに追加
+                              MuscleService muscleService) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.trainingRecordRepository = trainingRecordRepository;
@@ -86,7 +86,7 @@ public class TrainingController {
         this.trainingLogicService = trainingLogicService;
         this.bodyWeightRecordRepository = bodyWeightRecordRepository;
         this.aiCoachService = aiCoachService;
-        this.muscleService = muscleService; // 初期化
+        this.muscleService = muscleService;
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -98,6 +98,15 @@ public class TrainingController {
         private List<TrainingLogForm> logs;
         public List<TrainingLogForm> getLogs() { return logs; }
         public void setLogs(List<TrainingLogForm> logs) { this.logs = logs; }
+    }
+
+    // =======================================================
+    // ▼ 追加: サプリメントガイド画面
+    // =======================================================
+    @GetMapping("/supplement-guide")
+    public String showSupplementGuide(Authentication authentication) {
+        if (getCurrentUser(authentication) == null) return "redirect:/login";
+        return "misc/supplement-guide";
     }
     
     // =======================================================
@@ -338,7 +347,6 @@ public class TrainingController {
         int earnedXP = 0;
         String trainingSummary = ""; 
 
-        // ★追加: 筋肉育成用変数
         String targetPart = "その他";
         int muscleXp = 0;
 
@@ -346,7 +354,6 @@ public class TrainingController {
             exerciseIdentifier = form.getExerciseName();
             trainingSummary = form.getExerciseName() + ("CARE".equals(form.getType()) ? " (AIケア)" : " (筋トレ)");
             
-            // ★部位を特定
             targetPart = trainingDataService.findPartByExerciseName(exerciseIdentifier);
             if("CARE".equals(form.getType())) targetPart = "その他";
 
@@ -390,7 +397,6 @@ public class TrainingController {
             trainingRecordRepository.save(record);
             savedCount = 1;
             
-            // ★有酸素
             targetPart = "有酸素";
         } else if ("BODY_WEIGHT".equals(form.getType())) {
             BodyWeightRecord record = new BodyWeightRecord();
@@ -414,7 +420,6 @@ public class TrainingController {
             }
             earnedXP = baseDifficultyXp + additionalXp;
             
-            // ★筋肉育成XP計算
             muscleXp = Math.max(10, earnedXP / 2);
         }
 
@@ -422,7 +427,6 @@ public class TrainingController {
             levelService.addXpAndCheckLevelUp(currentUser, earnedXP);
             userRepository.save(currentUser);
 
-            // ★筋肉育成処理
             if (muscleXp > 0 && targetPart != null) {
                 String levelUpMsg = muscleService.addExperience(currentUser, targetPart, muscleXp);
                 if (levelUpMsg != null) {
@@ -430,13 +434,11 @@ public class TrainingController {
                 }
             }
 
-            // ★チップ計算と保存
             int earnedChips = trainingLogicService.calculateChipReward(exerciseIdentifier);
             if (earnedChips > 0) {
                 userService.addChips(currentUser.getUsername(), earnedChips);
             }
 
-            // ★メッセージにチップ数を追加
             String message = form.getRecordDate().toString() + trainingSummary 
                            + " の記録を保存し、" + earnedXP + " XPと " 
                            + earnedChips + " 枚のチップを獲得しました！";
@@ -482,7 +484,6 @@ public class TrainingController {
                     form.setRecordDate(recordDate);
                 }
 
-                // ★バッチ処理でも筋肉XPを加算するために変数を用意
                 String targetPart = "その他";
                 int muscleXp = 0;
                 int itemXp = 0;
@@ -538,7 +539,6 @@ public class TrainingController {
                 
                 totalXp += itemXp;
                 
-                // ★筋肉XP加算
                 muscleXp = Math.max(10, itemXp / 2);
                 if(totalSaved > 0) {
                     muscleService.addExperience(currentUser, targetPart, muscleXp);
@@ -627,13 +627,11 @@ public class TrainingController {
         model.addAttribute("nextYear", targetYearMonth.plusMonths(1).getYear());
         model.addAttribute("nextMonth", targetYearMonth.plusMonths(1).getMonthValue());
 
-        // 曜日ラベルを固定で日曜始まりに
         List<String> dayLabels = Arrays.asList("日", "月", "火", "水", "木", "金", "土");
         model.addAttribute("dayLabels", dayLabels);
 
         return "log/training-log";
     }
-
 
     @GetMapping("/training-log/all")
     public String showAllTrainingLog(Authentication authentication, @RequestParam(value = "period", defaultValue = "day") String period, Model model) {
