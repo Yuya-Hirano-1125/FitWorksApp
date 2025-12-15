@@ -133,20 +133,25 @@
         display: flex;
         position: fixed;
         bottom: 0;
-        left: 0;
-        right: 0;
-        height: 80px; 
+        
+        /* --- ★変更箇所: メインエリアの幅に合わせる設定 --- */
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 700px; /* メインコンテナと同じ最大幅 */
+        /* ------------------------------------------- */
+        
+        height: 75px; 
         background-color: #ffffff;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1), 0 -8px 0 0 var(--secondary-color); 
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.03); 
         justify-content: space-around;
         align-items: center;
         z-index: 1000;
-        padding: 0 8px; 
-        border-top: none; 
+        padding: 0 0px; 
+        border-top: 1px solid #e0e0e0; 
         animation: fadeIn 0.4s ease-out forwards;
-        transform: translateY(0);
         animation-fill-mode: forwards;
-        border-radius: 15px 15px 0 0; 
+        border-radius: 0; 
     }
     
     .nav-item {
@@ -155,47 +160,31 @@
         align-items: center;
         justify-content: center;
         text-decoration: none;
-        color: #ffffff; 
-        font-size: 12px;
-        font-weight: 800;
-        padding: 8px 4px;
-        margin: 4px;
-        border-radius: 12px; 
-        flex-grow: 1;
-        flex-basis: 0;
-        min-width: 0;
-        transition: all 0.3s cubic-bezier(.42, 0, .58, 1.2); 
+        color: #8e8e8e; /* グレー文字 */
+        font-size: 10px; /* 少し小さめに */
+        font-weight: 600;
+        padding: 5px 0;
+        margin: 0;
+        border-radius: 0; 
+        flex: 1; /* 均等配置 */
+        transition: color 0.2s ease; 
         text-shadow: none;
+        background: transparent !important; /* 背景色なし */
+        box-shadow: none !important; /* 影なし */
     }
 
     .nav-item i {
-        font-size: 1.6em; 
-        margin-bottom: 2px;
+        font-size: 1.8em; /* アイコン大きく */
+        margin-bottom: 4px;
+        color: inherit !important;
     }
 
-    .bottom-nav a:nth-child(1).nav-item {
-        background: linear-gradient(135deg, var(--primary-color), #ff99c8);
-        box-shadow: 0 4px 10px rgba(255, 105, 180, 0.6);
-    }
-    .bottom-nav a:nth-child(2).nav-item {
-        background: linear-gradient(135deg, var(--ai-accent-color), #4dd0e1);
-        box-shadow: 0 4px 10px rgba(135, 206, 235, 0.6);
-    }
-    .bottom-nav a:nth-child(3).nav-item {
-        background: linear-gradient(135deg, #4CAF50, #8BC34A);
-        box-shadow: 0 4px 10px rgba(76, 175, 80, 0.6);
-    }
-    .bottom-nav a:nth-child(4).nav-item {
-        background: linear-gradient(135deg, #f1c40f, #f39c12);
-        box-shadow: 0 4px 10px rgba(241, 196, 15, 0.6);
-    }
-    .bottom-nav a:nth-child(5).nav-item {
-        background: linear-gradient(135deg, #9c27b0, #ba68c8);
-        box-shadow: 0 4px 10px rgba(156, 39, 176, 0.6);
-    }
-    .bottom-nav a:nth-child(6).nav-item {
-        background: linear-gradient(135deg, #bdbdbd, #757575);
-        box-shadow: 0 4px 10px rgba(117, 117, 117, 0.6);
+    .nav-item:hover, .nav-item.active {
+        color: #4CAF50; /* ホバー時は緑（アクセント） */
+        text-shadow: none; 
+        transform: none !important; /* アニメーションオフ */
+        box-shadow: none !important; 
+        background-color: transparent !important;
     }
     
     .nav-item span {
@@ -203,42 +192,13 @@
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%; 
-        color: #ffffff;
+        color: inherit;
     }
     
-    .nav-item:hover, .nav-item.active {
-        color: #ffffff; 
-        text-shadow: none; 
-        transform: translateY(-4px) scale(1.08); 
-        box-shadow: 0 0 20px rgba(255, 105, 180, 0.5), 0 8px 15px rgba(0, 0, 0, 0.2); 
-    }
-    
-    .nav-item.training-start-nav {
-        position: relative;
-        top: -40px; 
-        width: 90px; 
-        height: 90px; 
-        border-radius: 50%;
-        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-        box-shadow: 0 10px 25px rgba(255, 105, 180, 0.6);
-        color: #ffffff;
-        padding: 18px 40px;
-        font-size: 19px;
-        border: none;
-        animation: gentleFloat 3s ease-in-out infinite alternate, softPulse 4s ease-in-out infinite alternate; 
-        flex-grow: 0; 
-        flex-basis: auto;
-    }
-    .nav-item.training-start-nav i {
-        font-size: 38px; 
-        color: #ffffff;
-        margin-bottom: 2px;
-        animation: iconWiggle 2.5s ease-in-out infinite alternate; 
-    }
-    
-    .nav-item.training-start-nav:hover {
-        transform: translateY(-45px) scale(1.12) rotate(-2deg); 
-        box-shadow: 0 0 50px rgba(255, 105, 180, 1.0), 0 0 0 8px rgba(255, 105, 180, 0.3); 
+    /* 以前の派手な背景色スタイルを無効化 */
+    .bottom-nav a:nth-child(n).nav-item {
+        background: transparent;
+        box-shadow: none;
     }
 
     .button-container.home-desktop-buttons {
@@ -252,105 +212,47 @@
     }
     
     .bottom-nav {
+        /* デスクトップ表示でもシンプルに */
         display: flex !important; 
         position: static; 
-        bottom: auto;
-        left: auto;
-        right: auto;
-        height: auto;
-        background-color: transparent; 
-        box-shadow: none; 
-        border-top: none; 
-        border-radius: 0;
         justify-content: center; 
         align-items: center;
-        padding: 30px 0; 
+        padding: 20px 0; 
         margin-top: 30px;
-        z-index: auto;
-        animation: fadeIn 0.7s ease-out forwards;
+        border-top: 1px solid #eee;
     }
     
     .nav-item {
-        flex-direction: row; 
-        padding: 15px 25px;
-        border-radius: 35px;
-        width: auto;
-        background-color: transparent !important;
-        border: none !important; 
-        color: #ffffff; 
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); 
-        margin: 0 12px;
-        animation: gentleFloat 4s ease-in-out infinite alternate; 
-        font-size: 16px;
-        font-weight: 700;
-        text-shadow: none;
-        transition: all 0.4s cubic-bezier(.25,.8,.25,1); 
-    }
-
-    .bottom-nav a:nth-child(1).nav-item {
-        background: linear-gradient(45deg, var(--primary-color), #ff99c8);
-        box-shadow: 0 8px 15px rgba(255, 105, 180, 0.6);
-    }
-    .bottom-nav a:nth-child(2).nav-item {
-        background: linear-gradient(45deg, var(--ai-accent-color), #4dd0e1);
-        box-shadow: 0 8px 15px rgba(135, 206, 235, 0.6);
-    }
-    .bottom-nav a:nth-child(3).nav-item {
-        background: linear-gradient(45deg, #4CAF50, #8BC34A);
-        box-shadow: 0 8px 15px rgba(76, 175, 80, 0.6);
-    }
-    .bottom-nav a:nth-child(4).nav-item {
-        background: linear-gradient(45deg, #f1c40f, #f39c12);
-        box-shadow: 0 8px 15px rgba(241, 196, 15, 0.6);
-    }
-    .bottom-nav a:nth-child(5).nav-item {
-        background: linear-gradient(45deg, #9c27b0, #ba68c8);
-        box-shadow: 0 8px 15px rgba(156, 39, 176, 0.6);
-    }
-    .bottom-nav a:nth-child(6).nav-item {
-        background: linear-gradient(45deg, #bdbdbd, #757575);
-        box-shadow: 0 8px 15px rgba(117, 117, 117, 0.6);
+        flex-direction: column; 
+        padding: 10px 20px;
+        margin: 0 10px;
+        color: #888; 
+        font-size: 14px;
+        transition: all 0.2s;
+        border-radius: 10px;
+        background: transparent !important;
+        box-shadow: none !important;
     }
 
     .nav-item i {
-        font-size: 18px;
-        color: #ffffff !important; 
-        margin-right: 8px;
-        margin-bottom: 0;
-        animation: none;
-    }
-    .nav-item:hover, .nav-item.active {
-        transform: translateY(-8px) scale(1.03) !important;
-        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 255, 255, 0.5); 
-        color: #ffffff;
-        filter: brightness(1.1); 
+        font-size: 24px;
+        color: #888 !important; 
+        margin-bottom: 5px;
+        margin-right: 0;
     }
     
-    .nav-item.training-start-nav {
-        position: static;
-        width: auto;
-        height: auto;
-        top: auto;
-        border-radius: 35px;
-        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-        box-shadow: 0 10px 25px rgba(255, 105, 180, 0.6);
-        color: #ffffff;
-        padding: 18px 40px;
-        font-size: 19px;
-        border: none;
-        animation: gentleFloat 4s ease-in-out infinite alternate;
-        margin: 0 12px;
+    .nav-item:hover {
+        transform: translateY(-3px) !important;
+        color: var(--primary-color);
     }
-    .nav-item.training-start-nav:hover {
-        transform: translateY(-6px) scale(1.03) !important;
-        box-shadow: 0 18px 45px rgba(255, 105, 180, 0.9), 0 0 25px var(--primary-color);
+    .nav-item:hover i {
+        color: var(--primary-color) !important;
     }
-    .nav-item.training-start-nav i {
-        font-size: 22px;
-        color: #ffffff;
-        margin-right: 10px;
-        margin-bottom: 0;
-        animation: iconWiggle 2s ease-in-out infinite alternate;
+    
+    /* 以前の派手な背景色スタイルを無効化 */
+    .bottom-nav a:nth-child(n).nav-item {
+        background: transparent;
+        box-shadow: none;
     }
 }
 
@@ -385,50 +287,20 @@
     background: transparent; 
     z-index: 9000;
     display: none;
-    
-    /* ★重要: クリックをブロックして、下のボタンを押せないようにする */
     pointer-events: auto; 
 }
 .tutorial-backdrop.active {
     display: block;
 }
 
-/* スポットライト */
-.tutorial-focus-ring {
-    position: absolute; 
-    border: 3px dashed #ffeb3b; 
-    border-radius: 12px;
-    
-    box-shadow: 0 0 20px rgba(255, 235, 59, 1), 
-                0 0 0 9999px rgba(0, 0, 0, 0.5); 
-                
-    z-index: 9001; 
-    pointer-events: none; 
-    transition: opacity 0.2s ease-out; 
-    
-    display: none;
-    opacity: 0;
-}
-.tutorial-focus-ring.active {
-    display: block;
-    opacity: 1;
-    animation: scopePulse 2.5s infinite;
-}
-@keyframes scopePulse {
-    0% { transform: scale(1); border-color: #ffeb3b; }
-    50% { transform: scale(1.02); border-color: #fff; }
-    100% { transform: scale(1); border-color: #ffeb3b; }
-}
-
-/* チュートリアル用のスポットライト（home.htmlとの連携） */
 .tutorial-spotlight {
-    position: absolute; /* ★absoluteでスクロール追従 */
+    position: absolute; 
     top: 0;
     left: 0;
     width: 0;
     height: 0;
     border-radius: 10px; 
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5) !important; 
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6) !important; 
     z-index: 9998;
     pointer-events: none;
     opacity: 0;
@@ -438,39 +310,24 @@
     opacity: 1;
 }
 
-/* RPGメッセージボックス (ターゲット付近に表示) */
 .tutorial-rpg-box {
-    /* ★ fixedではなくabsoluteにしてJSで制御する */
     position: absolute;
-    
-    /* 初期値 (JSで上書きされる) */
     top: 50%;
     left: 50%;
     transform: translateX(-50%);
-    
     width: 95vw; 
     max-width: 600px; 
-    
-    /* ★明るい背景 (0.85) */
     background: rgba(255, 255, 255, 0.95);
-    
     color: #333333;
-    
     border: 3px solid var(--primary-color);
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    
     border-radius: 20px;
     padding: 15px 20px;
-    
-    /* ★バックドロップ(9000)より手前に表示して操作可能にする */
     z-index: 10000;
-    
     display: flex;
     align-items: flex-start; 
     gap: 15px; 
-    
     opacity: 0;
-    /* 位置アニメーションはJSループで行うためCSS transitionはopacityのみ推奨だが、滑らかさのためにtransformも残す */
     transition: opacity 0.3s ease-out;
 }
 
@@ -486,7 +343,6 @@
     opacity: 1;
 }
 
-/* キャラクターアイコンエリア */
 .rpg-char-icon, .rpg-char-area {
     width: 70px; 
     height: 70px;
@@ -509,7 +365,6 @@
     }
 }
 
-/* メッセージコンテンツエリア */
 .rpg-content {
     flex: 1; 
     min-width: 0; 
@@ -530,7 +385,6 @@
     box-shadow: none; 
 }
 
-/* メッセージテキスト */
 .rpg-text-area {
     font-size: 0.95rem; 
     line-height: 1.5;
@@ -544,17 +398,6 @@
     .rpg-text-area {
         font-size: 0.85rem; 
     }
-}
-
-.rpg-next-cursor {
-    display: inline-block;
-    color: var(--primary-color); 
-    margin-left: 5px;
-    animation: cursorBounce 0.8s infinite;
-}
-@keyframes cursorBounce {
-    0%, 100% { transform: translateY(0); opacity: 1; }
-    50% { transform: translateY(3px); opacity: 0.5; }
 }
 
 .rpg-controls {
@@ -611,81 +454,30 @@
     letter-spacing: 0.05em;
 }
 
-.username-display {
-    /* 英数字はPoppins、日本語はNoto Sans JPを使用 */
-    font-family: 'Poppins', 'Noto Sans JP', sans-serif;
-    
-    /* 文字サイズを大きくして太くする */
-    font-size: 1.6em;
-    font-weight: 900;
-    
-    /* 色をメインカラー（ピンク系）に変更 */
-    color: var(--primary-color, #ff69b4);
-    
-    /* 少し影をつけて浮き出させる */
-    text-shadow: 2px 2px 0px rgba(255, 255, 255, 1), 
-                 3px 3px 5px rgba(0, 0, 0, 0.15);
-                 
-    margin: 0 4px;
-    display: inline-block;
-    
-    /* アニメーション（任意）: ふわっと表示 */
-    animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-/* ========================================================= */
-/* 追加: AIケアボタンのスタイルとアニメーション */
-/* ========================================================= */
-/* ========================================================= */
-/* 追加・修正: AIケアボタンのスタイル（他のボタンと動きを統一） */
-/* ========================================================= */
-/* ========================================================= */
-/* 修正: AIケアボタンのスタイル（他のボタンと動き・形状を完全統一） */
-/* ========================================================= */
-
 .btn-care {
-    /* --- daily-mission-button と同じ基本構造 --- */
-    display: block;               /* inline-block から block に変更 */
+    display: block; 
     text-decoration: none;
-    border-radius: 35px;          /* 50px から 35px に変更して形状を統一 */
+    border-radius: 35px;
     font-weight: 800;
-    padding: 14px 25px;           /* パディングを統一 */
-    font-size: 17px;              /* フォントサイズを統一 */
+    padding: 14px 25px; 
+    font-size: 17px; 
     letter-spacing: 0.8px;
     border: none;
-    
-    /* --- AIケアボタン独自の色設定 --- */
     background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-    color: #555;                  /* 背景が明るいので文字は暗く */
-    
-    /* 影の強さは合わせつつ、色はボタンに合わせる */
+    color: #555; 
     box-shadow: 0 6px 20px rgba(168, 237, 234, 0.4);
-    
-    /* --- ★動きの設定（daily-mission-buttonと完全一致）--- */
-    /* 特殊なイージング（動きの加速・減速）をコピー */
     transition: all 0.4s cubic-bezier(.68,-0.55,.26,1.55);
-    
-    /* ふわふわ浮く動き + フェードインをコピー */
     animation: gentleFloat 4s ease-in-out infinite alternate, fadeIn 0.7s ease-out forwards;
-    
-    /* 配置調整 */
     width: 95%;
-    margin: 0 auto; /* 中央寄せ */
+    margin: 0 auto; 
 }
 
 .btn-care:hover {
-    /* --- ホバー時の動き（daily-mission-buttonと完全一致）--- */
-    animation: none; /* 浮遊アニメーションを止める */
-    transform: translateY(-5px) scale(1.03) rotate(1deg); /* 浮き上がり・拡大・少し回転 */
-    
-    /* --- ホバー時の色変化 --- */
+    animation: none; 
+    transform: translateY(-5px) scale(1.03) rotate(1deg); 
     color: #333;
-    /* 影を強調（色は独自） */
     box-shadow: 0 8px 25px rgba(168, 237, 234, 0.9), 0 0 15px rgba(255, 255, 255, 0.8);
 }
-
-/* ========================================================= */
-/* ▼ 追加: 記録メニュー＆サプリボタン用スタイル */
-/* ========================================================= */
 
 .record-container {
     position: relative;
@@ -695,22 +487,19 @@
 
 .record-options {
 	display: flex;
-	    justify-content: space-between;
-	    gap: 15px;
-	    max-height: 0;
-	    overflow: hidden;
-	    transition: max-height 0.4s ease-out, opacity 0.3s ease;
-	    opacity: 0;
-	    margin-top: 0;
-	    
-	    /* ========== ★ 追加・修正部分 ========== */
-	    padding: 0 15px; /* 左右に15pxの余白を追加 */
-	    box-sizing: border-box; /* paddingを含めて幅を計算させる（念のため） */
-	    /* ================================== */
+    justify-content: space-between;
+    gap: 15px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, opacity 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+    padding: 0 15px; 
+    box-sizing: border-box; 
 }
 
 .record-options.open {
-    max-height: 150px; /* 十分な高さを確保 */
+    max-height: 150px; 
     opacity: 1;
     margin-top: 15px;
 }
@@ -740,17 +529,14 @@
     margin-bottom: 8px;
 }
 
-/* 筋トレ履歴ボタン色 */
 .training-log-opt {
-    background: linear-gradient(135deg, #ab47bc, #8e24aa); /* 紫系 */
+    background: linear-gradient(135deg, #ab47bc, #8e24aa); 
 }
 
-/* 食事ボタン色 */
 .meal-opt {
     background: linear-gradient(135deg, #42a5f5, #4dd0e1);
 }
 
-/* メイン記録ボタン（矢印アニメーション等追加可能） */
 .main-record-btn:active {
     transform: scale(0.98);
 }
