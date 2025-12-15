@@ -6,35 +6,99 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/characters/CharactersUnlock.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <style>
-        .attribute-heading { font-size: 1.5rem; margin: 20px 0; }
-        .fire-color { color: #ff7675; border-bottom: 2px solid #ff7675; }
-        .water-color { color: #74b9ff; border-bottom: 2px solid #74b9ff; }
-        .grass-color { color: #55efc4; border-bottom: 2px solid #55efc4; }
-        .light-color { color: #ffeaa7; border-bottom: 2px solid #ffeaa7; }
-        .dark-color { color: #a29bfe; border-bottom: 2px solid #a29bfe; }
-        .secret-color { color: #dfe6e9; border-bottom: 2px solid #dfe6e9; font-style: italic; }
-        .character-card { display: inline-block; margin: 10px; text-align: center; }
-        .character-img-wrapper { width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; overflow: hidden; border: 3px solid #ccc; }
-        .character-img { width: 100%; height: 100%; object-fit: cover; }
-        .requirements { font-size: 0.9rem; margin-top: 5px; }
-    </style>
+	<style>
+	    .attribute-heading { font-size: 1.5rem; margin: 20px 0; }
+	    .fire-color { color: #ff7675; border-bottom: 2px solid #ff7675; }
+	    .water-color { color: #74b9ff; border-bottom: 2px solid #74b9ff; }
+	    .grass-color { color: #55efc4; border-bottom: 2px solid #55efc4; }
+	    .light-color { color: #ffeaa7; border-bottom: 2px solid #ffeaa7; }
+	    .dark-color { color: #a29bfe; border-bottom: 2px solid #a29bfe; }
+	    .secret-color { color: #dfe6e9; border-bottom: 2px solid #dfe6e9; font-style: italic; }
+	    .character-card { display: inline-block; margin: 10px; text-align: center; }
+	    .character-img-wrapper { width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; overflow: hidden; border: 3px solid #ccc; }
+	    .character-img { width: 100%; height: 100%; object-fit: cover; }
+	    .requirements { font-size: 0.9rem; margin-top: 5px; }
+
+	    /* ===== モーダル用CSS ===== */
+	    .modal {
+	        display: none; /* 初期は非表示 */
+	        position: fixed;
+	        z-index: 1000;
+	        left: 0; top: 0;
+	        width: 100%; height: 100%;
+	        background-color: rgba(0,0,0,0.5); /* 背景を半透明に */
+	    }
+	    .modal-content {
+	        background: #fff;
+	        margin: 15% auto;
+	        padding: 20px;
+	        border-radius: 8px;
+	        width: 320px;
+	        text-align: center;
+	        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+	        animation: fadeIn 0.3s ease-in-out;
+	    }
+	    .modal-content h3 {
+	        margin-bottom: 10px;
+	        font-size: 1.2rem;
+	        color: #333;
+	    }
+	    .modal-content p {
+	        font-size: 0.95rem;
+	        margin: 10px 0;
+	        color: #444;
+	    }
+	    .close {
+	        float: right;
+	        font-size: 1.5rem;
+	        cursor: pointer;
+	        color: #888;
+	    }
+	    .close:hover {
+	        color: #000;
+	    }
+	    .btn-confirm {
+	        margin-top: 15px;
+	        padding: 8px 16px;
+	        background: #4caf50;
+	        color: #fff;
+	        border: none;
+	        border-radius: 4px;
+	        cursor: pointer;
+	    }
+	    .btn-confirm:hover {
+	        background: #45a049;
+	    }
+
+	    /* フェードインアニメーション */
+	    @keyframes fadeIn {
+	        from { opacity: 0; transform: scale(0.9); }
+	        to { opacity: 1; transform: scale(1); }
+	    }
+	</style>
+
 </head>
 
 <body>
-    <!-- ヘッダー -->
-    <header>
-        <h1>キャラクター解放画面</h1>
-        <div class="status-bar">
-            <div class="status-item">
-                <i class="fa-solid fa-crown" style="color:#ffeb3b;"></i>
-                Lv.<span th:text="${userLevel}">1</span>
-            </div>
-            <div class="status-item">
-                <i class="fa-solid fa-gem"></i> 素材管理
-            </div>
-        </div>
-    </header>
+	<!-- ヘッダー -->
+	<header>
+	    <h1>キャラクター解放画面</h1>
+	    <div class="status-bar">
+	        <!-- ユーザーレベル表示 -->
+	        <div class="status-item">
+	            <i class="fa-solid fa-crown" style="color:#ffeb3b;"></i>
+	            Lv.<span th:text="${userLevel}">1</span>
+	        </div>
+
+	        <!-- 素材管理ボタン -->
+	        <div class="status-item">
+	            <a th:href="@{/materials}" class="material-link">
+	                <i class="fa-solid fa-gem"></i> 素材管理
+	            </a>
+	        </div>
+	    </div>
+	</header>
+
 
     <!-- メッセージ表示 -->
     <div class="message-container" style="max-width: 800px; margin: 10px auto;">
@@ -46,23 +110,113 @@
         </div>
     </div>
 
-    <!-- 炎属性 -->
-    <div class="pass-section">
-        <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
-        <div class="char-list">
-            <div th:each="chara : ${fireChars}" class="character-card fire">
-                <div class="character-img-wrapper">
-                    <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-                </div>
-                <p class="character-name" th:text="${chara.name}">キャラ名</p>
-                <span class="character-rarity" th:text="${chara.rarity}">★</span>
-                <div class="requirements">
-                    <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-                    <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="pass-section">
+	    <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
+	    <div class="char-list">
+	        <div th:each="chara : ${fireChars}" class="character-card fire">
+	            <div class="character-img-wrapper">
+	                <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+	            </div>
+	            <p class="character-name" th:text="${chara.name}">キャラ名</p>
+	            <span class="character-rarity" th:text="${chara.rarity}">★</span>
+	            <div class="requirements">
+	                <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+	                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+	            </div>
+
+	            <!-- 解放ボタン or 開放済み表示 -->
+	            <div class="unlock-action">
+	                <!-- エンバーハートは最初から解放済み -->
+	                <span th:if="${chara.name == 'エンバーハート'}" class="unlocked-label">
+	                    ✅ 開放済み
+	                </span>
+
+	                <!-- それ以外は解放ボタン -->
+	                <button th:if="${chara.name != 'エンバーハート'}"
+	                        type="button"
+	                        class="btn-unlock"
+	                        th:attr="data-id=${chara.id},data-level=${chara.requiredLevel},data-cost=${chara.unlockCost},data-material=${chara.attribute}"
+	                        onclick="openModal(this)">
+	                    <i class="fa-solid fa-lock-open"></i> 解放
+	                </button>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+	<!-- モーダル -->
+	<div id="unlockModal" class="modal">
+	    <div class="modal-content">
+	        <span class="close" onclick="closeModal()">&times;</span>
+	        <h3>解放条件</h3>
+	        <!-- ★ここに条件が表示される -->
+	        <p id="modalText">ここに条件が表示されます</p>
+	        <form id="unlockForm" th:action="@{/characters/unlock}" method="post">
+	            <input type="hidden" name="characterId" id="modalCharacterId">
+	            <input type="hidden" name="cost" id="modalCost">
+	            <input type="hidden" name="materialType" id="modalMaterial">
+	            <button type="submit" class="btn-confirm">解放する</button>
+	        </form>
+	    </div>
+	</div>
+
+	<style>
+	.modal {
+	    display: none; /* 初期は非表示 */
+	    position: fixed;
+	    z-index: 1000;
+	    left: 0; top: 0;
+	    width: 100%; height: 100%;
+	    background-color: rgba(0,0,0,0.5);
+	}
+	.modal-content {
+	    background: #fff;
+	    margin: 15% auto;
+	    padding: 20px;
+	    border-radius: 8px;
+	    width: 300px;
+	    text-align: center;
+	}
+	.close {
+	    float: right;
+	    font-size: 1.5rem;
+	    cursor: pointer;
+	}
+	.btn-confirm {
+	    margin-top: 15px;
+	    padding: 8px 16px;
+	    background: #4caf50;
+	    color: #fff;
+	    border: none;
+	    border-radius: 4px;
+	}
+	</style>
+
+	<script>
+	function openModal(button) {
+	    const level = button.getAttribute("data-level");
+	    const cost = button.getAttribute("data-cost");
+	    const material = button.getAttribute("data-material");
+	    const id = button.getAttribute("data-id");
+
+	    // ★テキストをセット
+	    document.getElementById("modalText").innerText =
+	        `このキャラを解放するには Lv.${level} 以上 と ${material} 素材 ${cost} 個 が必要です。`;
+
+	    // hidden項目に値をセット
+	    document.getElementById("modalCharacterId").value = id;
+	    document.getElementById("modalCost").value = cost;
+	    document.getElementById("modalMaterial").value = material;
+
+	    // モーダル表示
+	    document.getElementById("unlockModal").style.display = "block";
+	}
+
+	function closeModal() {
+	    document.getElementById("unlockModal").style.display = "none";
+	}
+	</script>
+
 
     <!-- 水属性 -->
     <div class="pass-section">

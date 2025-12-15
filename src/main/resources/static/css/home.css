@@ -694,14 +694,19 @@
 }
 
 .record-options {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease-out, opacity 0.3s ease;
-    opacity: 0;
-    margin-top: 0;
+	display: flex;
+	    justify-content: space-between;
+	    gap: 15px;
+	    max-height: 0;
+	    overflow: hidden;
+	    transition: max-height 0.4s ease-out, opacity 0.3s ease;
+	    opacity: 0;
+	    margin-top: 0;
+	    
+	    /* ========== ★ 追加・修正部分 ========== */
+	    padding: 0 15px; /* 左右に15pxの余白を追加 */
+	    box-sizing: border-box; /* paddingを含めて幅を計算させる（念のため） */
+	    /* ================================== */
 }
 
 .record-options.open {
