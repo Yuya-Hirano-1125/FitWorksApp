@@ -151,7 +151,6 @@
         /* 追加: 挨拶文のスタイル */
         .home-greeting-container {
             text-align: center;
-            /* キャラクターとの被りを防ぐため余白を大きくする */
             margin-top: 60px;
             margin-bottom: 25px;
         }
@@ -268,7 +267,7 @@
             <a th:href="@{/log/meal}" class="record-option-item meal-opt">
                 <i class="fa-solid fa-utensils"></i><br>食事記録
             </a>
-            <a th:href="@{/training-log/form/body-weight(date=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')})}" class="record-option-item weight-opt">
+            <a th:href="@{/training-log/form/body-weight}" class="record-option-item weight-opt">
                 <i class="fa-solid fa-weight-scale"></i><br>体重記録
             </a>
         </div>

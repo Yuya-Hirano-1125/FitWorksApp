@@ -100,18 +100,12 @@ public class TrainingController {
         public void setLogs(List<TrainingLogForm> logs) { this.logs = logs; }
     }
 
-    // =======================================================
-    // ▼ 追加: サプリメントガイド画面
-    // =======================================================
     @GetMapping("/supplement-guide")
     public String showSupplementGuide(Authentication authentication) {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
         return "misc/supplement-guide";
     }
     
-    // =======================================================
-    // AIクリニック・ケアメニュー画面
-    // =======================================================
     @GetMapping("/training/care")
     public String showCareMenu(Authentication authentication) {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
@@ -459,6 +453,11 @@ public class TrainingController {
             }
         }
 
+        if ("BODY_WEIGHT".equals(form.getType())) {
+            LocalDate d = form.getRecordDate();
+            return "redirect:/training-log/form/body-weight?year=" + d.getYear() + "&month=" + d.getMonthValue();
+        }
+
         LocalDate recordedDate = form.getRecordDate();
         if ("CARE".equals(form.getType())) {
              return "redirect:/training-log?year=" + recordedDate.getYear() + "&month=" + recordedDate.getMonthValue();
@@ -696,12 +695,69 @@ public class TrainingController {
         model.addAttribute("trainingLogForm", form); 
         return "log/training-log-form-cardio";
     }
+    
     @GetMapping("/training-log/form/body-weight")
-    public String showBodyWeightLogForm(@RequestParam("date") LocalDate date, Model model) {
-        TrainingLogForm form = new TrainingLogForm(); 
-        form.setRecordDate(date); 
-        form.setType("BODY_WEIGHT"); 
-        model.addAttribute("trainingLogForm", form); 
+    public String showBodyWeightLogForm(
+            @RequestParam(value = "date", required = false) LocalDate date,
+            @RequestParam(value = "year", required = false) Integer year,
+            @RequestParam(value = "month", required = false) Integer month,
+            Authentication authentication,
+            Model model) {
+        
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) return "redirect:/login";
+
+        // 表示する年月を決定
+        LocalDate baseDate = (date != null) ? date : LocalDate.now();
+        YearMonth targetYearMonth;
+        if (year != null && month != null) {
+            targetYearMonth = YearMonth.of(year, month);
+        } else {
+            targetYearMonth = YearMonth.from(baseDate);
+        }
+
+        LocalDate firstOfMonth = targetYearMonth.atDay(1);
+        LocalDate lastOfMonth = targetYearMonth.atEndOfMonth();
+
+        // 既存の体重記録を取得
+        List<BodyWeightRecord> allRecords = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
+        Map<LocalDate, BodyWeightRecord> weightMap = allRecords.stream()
+                .filter(r -> r.getDate() != null && !r.getDate().isBefore(firstOfMonth) && !r.getDate().isAfter(lastOfMonth))
+                .collect(Collectors.toMap(BodyWeightRecord::getDate, r -> r, (a, b) -> b));
+
+        // カレンダーの日付リスト作成
+        List<LocalDate> calendarDays = new ArrayList<>();
+        int paddingDays = firstOfMonth.getDayOfWeek().getValue() % 7;
+        for (int i = 0; i < paddingDays; i++) { calendarDays.add(null); }
+        for (int i = 1; i <= targetYearMonth.lengthOfMonth(); i++) { calendarDays.add(targetYearMonth.atDay(i)); }
+
+        model.addAttribute("currentDate", LocalDate.now());
+        model.addAttribute("selectedDate", date); // 指定があればモーダルを開くトリガーに
+        model.addAttribute("currentYearMonth", targetYearMonth);
+        model.addAttribute("calendarDays", calendarDays);
+        model.addAttribute("weightMap", weightMap);
+        model.addAttribute("username", currentUser.getUsername());
+        
+        model.addAttribute("prevYear", targetYearMonth.minusMonths(1).getYear());
+        model.addAttribute("prevMonth", targetYearMonth.minusMonths(1).getMonthValue());
+        model.addAttribute("nextYear", targetYearMonth.plusMonths(1).getYear());
+        model.addAttribute("nextMonth", targetYearMonth.plusMonths(1).getMonthValue());
+
+        model.addAttribute("dayLabels", Arrays.asList("日", "月", "火", "水", "木", "金", "土"));
+        
+        // フォーム初期化
+        TrainingLogForm form = new TrainingLogForm();
+        form.setType("BODY_WEIGHT");
+        if (date != null) {
+            form.setRecordDate(date);
+            if (weightMap.containsKey(date)) {
+                form.setWeight(weightMap.get(date).getWeight());
+            }
+        } else {
+            form.setRecordDate(LocalDate.now());
+        }
+        model.addAttribute("trainingLogForm", form);
+
         return "log/training-log-form-body-weight";
     }
 }
