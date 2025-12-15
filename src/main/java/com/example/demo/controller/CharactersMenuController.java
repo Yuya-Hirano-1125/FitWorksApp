@@ -38,3 +38,5 @@ public class CharactersMenuController {
         return "characters/menu/Backgrounds"; 
     }
 }
+    
+   

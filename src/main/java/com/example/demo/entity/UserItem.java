@@ -13,11 +13,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
-import lombok.Data;
-
 @Entity
 @Table(name = "user_items")
-@Data
 public class UserItem {
 
     @Id
@@ -34,12 +31,10 @@ public class UserItem {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
-    
- // ★重要：ここを追加してください
+    // 所持数
     @Column(name = "quantity", nullable = false)
     private Integer quantity = 0;
-    
-    
+
     // 取得日時
     @Column(name = "acquired_at", nullable = false, updatable = false)
     private LocalDateTime acquiredAt;
@@ -48,5 +43,47 @@ public class UserItem {
     @PrePersist
     protected void onCreate() {
         this.acquiredAt = LocalDateTime.now();
+    }
+
+    // --- Getter / Setter ---
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
+
+    // ★ UserService から呼べるように count を quantity にマッピング
+    public int getCount() {
+        return quantity != null ? quantity : 0;
+    }
+
+    public void setCount(int count) {
+        this.quantity = count;
+    }
+
+    public LocalDateTime getAcquiredAt() {
+        return acquiredAt;
+    }
+
+    public void setAcquiredAt(LocalDateTime acquiredAt) {
+        this.acquiredAt = acquiredAt;
     }
 }

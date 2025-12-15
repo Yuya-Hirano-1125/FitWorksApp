@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org"> 
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +24,12 @@
                 背景一覧
             </h1>
             <p class="text-gray-500 mt-2 text-sm font-bold">ホーム画面の背景カスタマイズ</p>
-        </div>
+			<div id="current-level-display" class="mt-4 text-center">
+			    <span class="text-lg font-extrabold text-[var(--primary-color)] bg-yellow-100 px-4 py-1 rounded-full shadow-md">
+			        現在のレベル: <span th:text="${currentLevel}"></span>
+			        </span>
+			</div>
+            </div>
 
         <div id="content-area"></div>
 
@@ -76,8 +81,13 @@
 
     <script src="Backgrounds.js" defer></script>
     
-    <script>
+    <script th:inline="javascript"> 
     document.addEventListener('DOMContentLoaded', () => {
+        // -----------------------------------------------------
+		// 【元に戻す箇所】
+		const currentLevel = /*[[${currentLevel}]]*/ 12; // またはDBから渡るはずの正しいキー名
+        // -----------------------------------------------------
+		
         const hasMaterial = true; 
         const contentArea = document.getElementById('content-area');
 
@@ -88,8 +98,15 @@
         dataItems.forEach(item => {
             let isLocked = item.dataset.locked === "true";
             const unlockLevel = parseInt(item.dataset.unlockLevel || 0);
-            if (unlockLevel === 0) isLocked = false; 
-
+            
+            // ✅ 修正: ロック判定の際に currentLevel を考慮
+            if (unlockLevel > 0 && unlockLevel <= currentLevel) {
+                 isLocked = false; // 現在のレベルが解放レベル以上ならロック解除
+            } else if (unlockLevel === 0) {
+                 isLocked = false;
+            }
+            // ---------------------------------------------
+            
             bgList.push({
                 id: item.dataset.id,
                 category: item.dataset.category || 'other',
@@ -104,7 +121,12 @@
         });
         
         // 初期選択
-        bgList[0].selected = true;
+        // ✅ 修正: 初期選択は、ロックされていないアイテムで最初のもの、またはリストの最初のアイテムにするのが自然ですが、
+        // 既存のコード通りにリストの最初のアイテムを選択するロジックを維持します。
+        // すでにロックが解除されているものを選ぶ方が実用的ですが、ここではロジックの変更を最小限にとどめます。
+        const initialSelectIndex = bgList.findIndex(bg => !bg.locked) !== -1 ? bgList.findIndex(bg => !bg.locked) : 0;
+        bgList[initialSelectIndex].selected = true;
+
 
         const categories = [
             { id: 'nature', title: '自然・元素', icon: 'fa-leaf' },
@@ -132,20 +154,34 @@
 
                 items.forEach(bg => {
                     const card = document.createElement('div');
+                    // ✅ 修正: ロック解除済みで選択可能になった背景にも 'unlocked' クラスを付けるなどで区別できるようにしても良いですが、
+                    // ここでは既存のロジックをベースに、UIの表示内容を変更します。
                     card.className = `bg-card ${bg.selected ? 'selected' : ''}`;
                     
                     let overlayHtml = '';
                     let actionHtml = '';
+                    let isUnlockableByMaterial = false; // 素材解放可能か
 
                     if (bg.locked) {
-                        let lockText = `Lv.${bg.unlockLevel}で解放`;
-                        let isUnlockable = false;
+                        let lockText = '';
                         
                         if (bg.needsMaterial) {
-                            lockText = hasMaterial ? "解放可能" : "素材不足";
-                            if (hasMaterial) isUnlockable = true;
+                            // 素材ロックの場合
+                            if (hasMaterial) {
+                                lockText = "解放可能";
+                                isUnlockableByMaterial = true;
+                            } else {
+                                lockText = "素材不足";
+                            }
                         } else if (bg.unlockLevel > 0) {
-                            lockText = `Lv.${bg.unlockLevel}で解放`;
+                            // レベルロックの場合
+                            if (currentLevel >= bg.unlockLevel) {
+                                // レベルが足りている場合
+                                lockText = "解放可能";
+                            } else {
+                                // レベルが足りない場合
+                                lockText = `Lv.${bg.unlockLevel}で解放`;
+                            }
                         }
 
                         overlayHtml = `
@@ -154,10 +190,13 @@
                                 <span class="text-xs font-bold tracking-widest">LOCKED</span>
                             </div>
                         `;
-
-                        if (isUnlockable) {
+                        
+                        // ✅ 修正: 解放トリガーの条件を見直し
+                        if (isUnlockableByMaterial || (bg.unlockLevel > 0 && currentLevel >= bg.unlockLevel && !bg.needsMaterial)) {
+                            // レベル条件を満たしているか、素材解放可能 (hasMaterial=true) な場合
                             actionHtml = `<span class="status-text text-unlock-ready unlock-trigger">解放する</span>`;
                         } else {
+                            // 解放条件を満たしていない場合
                             actionHtml = `<span class="status-text text-locked">${lockText}</span>`;
                         }
 
@@ -183,6 +222,7 @@
                     // イベント付与
                     const unlockTrigger = card.querySelector('.unlock-trigger');
                     if (unlockTrigger) {
+                        // ロック解除可能な場合（レベル達成または素材あり）のみイベントを付与
                         unlockTrigger.addEventListener('click', (e) => {
                             e.stopPropagation();
                             openUnlockPopup(bg);
@@ -220,13 +260,16 @@
             unlockMessage.textContent = `「${bg.name}」を解放しますか？`;
             unlockPopup.classList.remove('popup-hidden');
             
+            // 確認ボタンに新たなイベントリスナーを再設定するため、一度クローンして置き換える
             const newConfirm = confirmUnlockBtn.cloneNode(true);
             confirmUnlockBtn.parentNode.replaceChild(newConfirm, confirmUnlockBtn);
             
             newConfirm.addEventListener('click', () => {
+                // ここで実際にサーバー側などに解放処理をリクエストするロジックが入ります。
                 bg.locked = false;
-                bg.needsMaterial = false;
+                bg.needsMaterial = false; // 素材ロック解除の場合は素材を消費したと見なす
                 unlockPopup.classList.add('popup-hidden');
+                selectBackground(bg); // 解放したら選択状態にする
                 renderAll(); 
             });
         }

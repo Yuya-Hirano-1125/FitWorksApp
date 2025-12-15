@@ -274,7 +274,7 @@
             color: #777;
             text-decoration: none;
             font-weight: 700;
-            margin-bottom: 20px;
+            /* margin-bottom: 20px;  削除 */
             transition: color 0.2s;
         }
         .back-nav:hover {
@@ -305,8 +305,6 @@
     <div th:replace="fragments/header :: header"></div>
 
     <div class="guide-container" style="margin-top: 60px;">
-        <a href="/" class="back-nav"><i class="fa-solid fa-arrow-left"></i> ホームに戻る</a>
-        
         <h1 class="page-title">
             サプリメントガイド
         </h1>
@@ -513,6 +511,10 @@
         <div id="no-result" style="text-align:center; display:none; color:#888; margin-top:30px;">
             <i class="fa-regular fa-face-sad-tear" style="font-size: 3rem; margin-bottom: 15px; color:#ddd;"></i><br>
             該当するサプリメントが見つかりませんでした。
+        </div>
+
+        <div style="margin-top: 40px; text-align: center;">
+            <a href="/" class="back-nav"><i class="fa-solid fa-arrow-left"></i> ホームに戻る</a>
         </div>
     </div>
 

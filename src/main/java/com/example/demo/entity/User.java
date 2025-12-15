@@ -46,7 +46,7 @@ public class User {
 
     private String providerId;
 
-    private Integer level = 1;
+    private Integer level = 999;
 
     private LocalDate lastMissionCompletionDate;
     private Boolean isRewardClaimedToday = false;
@@ -186,7 +186,7 @@ public class User {
     public void addReceivedFriendRequest(User sender) { this.receivedFriendRequests.add(sender); }
     public void removeReceivedFriendRequest(User sender) { this.receivedFriendRequests.remove(sender); }
 
-    // --- XP関連 ---
+ // --- XP関連 ---
     public int calculateRequiredXp() {
         int currentLevel = getLevel();
         return 1000 + (currentLevel - 1) * 200;
@@ -205,15 +205,19 @@ public class User {
         }
     }
 
-    
-    public int getExperiencePoints() { return getXp(); }
+    public int getExperiencePoints() {
+        return getXp();
+    }
+
+    // ★ここに追加するのが正解
+    public void setExperiencePoints(int xp) {
+        this.xp = xp;
+    }
 
     public int getProgressPercent() {
         int requiredXp = calculateRequiredXp();
         return requiredXp == 0 ? 0 : (int) (((double) xp / requiredXp) * 100);
     }
-
-    public void setExperiencePoints(int i) { this.xp = i; }
 
  // --- チップ関連 ---
     public Integer getChipCount() { 
@@ -223,7 +227,8 @@ public class User {
     public void setChipCount(Integer chipCount) { 
         this.chipCount = chipCount; 
     }
- // チップを加算
+
+    // チップを加算
     public void addChips(int chips) {
         if (chips > 0) {
             if (chipCount == null) chipCount = 0;
