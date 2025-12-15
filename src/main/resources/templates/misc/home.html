@@ -29,20 +29,22 @@
         .help-menu-dropdown {
             display: none;
             position: absolute;
-            top: 50px;
-            left: 10px;
+            top: 60px;
+            right: 20px;
+            left: auto;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             padding: 10px;
             z-index: 2000;
-            width: 200px;
+            width: 220px;
             flex-direction: column;
             gap: 10px;
         }
         .help-menu-dropdown.active { display: flex; }
-        .help-menu-item { display: block; padding: 10px; background: #f0f0f0; color: #333; text-decoration: none; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9em; transition: background 0.2s; border: none; width: 100%; cursor: pointer; }
-        .help-menu-item:hover { background: #e0e0e0; }
+        
+        .help-menu-item { display: block; padding: 10px; text-decoration: none; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9em; transition: transform 0.2s; border: none; width: 100%; cursor: pointer; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box; }
+        .help-menu-item:hover { transform: scale(1.03); }
 
         .user-title-badge {
             display: inline-block;
@@ -93,16 +95,16 @@
 <body class="home-page">
 
 <div class="main-container" style="position: relative;"> 
-    <button id="help-btn" class="help-icon-btn" onclick="toggleHelpMenu()" aria-label="ヘルプメニュー">
-        <i class="fa-solid fa-circle-question"></i>
+    <button id="help-btn" class="help-label-btn" onclick="toggleHelpMenu()">
+        <span style="font-size: 1.2em;">🔰</span> ヘルプ
     </button>
     
     <div id="help-menu" class="help-menu-dropdown">
-        <button class="help-menu-item" onclick="startRpgTutorial(true); toggleHelpMenu();">
+        <button class="help-menu-item tutorial-opt" onclick="startRpgTutorial(true); toggleHelpMenu();">
             <i class="fa-solid fa-play"></i> チュートリアル
         </button>
-        <a th:href="@{/supplement-guide}" class="help-menu-item">
-            <i class="fa-solid fa-book-medical"></i> サプリ飲み方ガイド
+        <a th:href="@{/supplement-guide}" class="help-menu-item supple-opt">
+            <i class="fa-solid fa-book-medical"></i> サプリの飲み方
         </a>
     </div>
 
@@ -146,7 +148,7 @@
         </a>
     </div>
     
-    <h1>FitWorksへようこそ</h1>
+    <h1>FitWorksへようこそ！</h1>
     <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！'"></p>
     
     <a id="tutorial-training-btn" th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
@@ -245,7 +247,7 @@
         { targetId: 'tutorial-customize-btn', text: "ガチャで手に入れたアイテムで\nキャラクターを着せ替えることができます。" },
         { targetId: 'tutorial-training-btn', text: "基本はここ！「トレーニングを開始」ボタンから\n日々の運動を記録してください。" },
         { targetId: 'tutorial-record-btn', text: "【新機能】ここから「筋トレ履歴」や「食事記録」\nへ素早くアクセスできます。" },
-        { targetId: 'help-btn', text: "【新機能】「サプリ飲み方ガイド」や「チュートリアルの再生」は\nこのヘルプメニューの中にあります。" },
+        { targetId: 'help-btn', text: "【新機能】「サプリの飲み方」や「チュートリアルの再生」は\nこのヘルプメニューの中にあります。" },
         { targetId: 'tutorial-care-btn', text: "疲れた時は「AIリフレッシュ」。\nあなたの体調に合わせたケアを提案します。" },
         { targetId: 'tutorial-friends-btn', text: "「フレンド」機能は下のメニューに移動しました。\n仲間と励まし合ったりランキングで競い合えます。" },
         { targetId: 'tutorial-muscles-btn', text: "「マッスルパートナー」も下のメニューから！\nあなたの筋肉の成長度合いを可視化できます！" },
