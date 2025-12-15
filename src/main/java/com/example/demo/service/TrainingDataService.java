@@ -13,311 +13,326 @@ import com.example.demo.dto.ExerciseData;
 @Service
 public class TrainingDataService {
 
-    private static final Map<String, List<ExerciseData>> EXERCISE_DATA_MAP = new LinkedHashMap<>();
-    private static final List<ExerciseData> CARDIO_DATA_LIST = new ArrayList<>();
+    private final Map<String, List<ExerciseData>> exerciseMap = new LinkedHashMap<>();
+    private final List<ExerciseData> cardioList = new ArrayList<>();
 
-    // コンストラクタまたは静的ブロックでデータを初期化
-    static {
-        initializeExercises();
+    public TrainingDataService() {
+        initializeData();
     }
 
-    private static void initializeExercises() {
-        // --- 胸 ---
+    private void initializeData() {
+        // ==========================================
+        // 胸 (Chest)
+        // ==========================================
         List<ExerciseData> chest = new ArrayList<>();
-        chest.add(new ExerciseData("プッシュアップ", "初級", 
-            "手幅を肩幅よりやや広めにとり、頭からかかとまで一直線にする。胸が床につくまで下ろし、押し上げる。", 
-            "腰を反らさない。肩甲骨を寄せる意識で行う。"));
-        chest.add(new ExerciseData("膝つきプッシュアップ", "初級", 
-            "膝を床についた状態でプッシュアップを行う。負荷が軽いのでフォーム習得に最適。", 
-            "お尻が突き出ないように、膝から頭までを一直線に保つ。"));
-        chest.add(new ExerciseData("チェストプレスマシン", "初級", 
-            "マシンに座り、グリップを胸の高さに合わせて握る。前方に押し出し、ゆっくり戻す。", 
-            "背中をシートにしっかりつけ、肩が上がらないように注意する。"));
-        chest.add(new ExerciseData("チェストフライ", "初級", 
-            "マシンまたはダンベルを使用。腕を大きく開き、胸の前で閉じる動作を行う。", 
-            "肘の角度を固定し、胸の収縮を感じながら行う。"));
-        chest.add(new ExerciseData("ベンチプレス", "中級", 
-            "ベンチに仰向けになり、バーベルを肩幅より広めに握る。胸のトップまで下ろし、押し上げる。", 
-            "肩甲骨を寄せて胸を張る（ブリッジ）。お尻を浮かせない。"));
-        chest.add(new ExerciseData("ダンベルプレス", "中級", 
-            "両手にダンベルを持ち、ベンチに仰向けになる。胸の横から真上に押し上げる。", 
-            "バーベルより可動域を広く取れる。ダンベル同士を当てないように制御する。"));
-        chest.add(new ExerciseData("ダンベルフライ", "中級", 
-            "仰向けになり、肘を軽く曲げた状態で腕を左右に開いていく。胸のストレッチを感じたら戻す。", 
-            "腕だけで戻さず、胸の筋肉で抱きかかえるように動作する。"));
-        chest.add(new ExerciseData("インクラインベンチプレス", "中級", 
-            "ベンチの角度を30〜45度に設定し、斜め上方向にプレスする。大胸筋上部を狙う。", 
-            "脇を開きすぎない。バーを鎖骨のあたりに下ろす。"));
-        chest.add(new ExerciseData("ディップス", "上級", 
-            "平行棒を握り、体を持ち上げる。前傾姿勢を取りながら肘を曲げて体を沈め、押し戻す。", 
-            "前傾姿勢を維持することで胸に効く（直立だと腕に効く）。深く下ろしすぎると肩を痛めるので注意。"));
-        chest.add(new ExerciseData("ケーブルクロスオーバー", "中級", 
-            "ケーブルマシンのハンドルを握り、胸の前で合わせるように腕を閉じる。", 
-            "肘の角度を固定し、胸の収縮を意識する。フィニッシュで手首を交差させるとより収縮する。"));
-        EXERCISE_DATA_MAP.put("胸", chest);
+        // バーベル
+        chest.add(new ExerciseData("ベンチプレス", "大胸筋", "バーベル", "ベンチに仰向けになり、バーベルを胸の位置まで下ろし、垂直に押し上げる胸トレの王道種目。"));
+        chest.add(new ExerciseData("インクライン・ベンチプレス", "大胸筋上部", "バーベル", "ベンチの背もたれを30-45度に起こして行うベンチプレス。鎖骨付近を狙ってバーを下ろす。"));
+        chest.add(new ExerciseData("デクライン・ベンチプレス", "大胸筋下部", "バーベル", "頭側が低くなるように傾斜をつけて行うプレス。大胸筋下部のラインを作るのに有効。"));
+        chest.add(new ExerciseData("ワイドグリップ・ベンチプレス", "大胸筋外側", "バーベル", "手幅を通常より広くして行う。可動域は狭くなるが大胸筋へのストレッチが強くかかる。"));
+        chest.add(new ExerciseData("ナローグリップ・ベンチプレス", "大胸筋内側・三頭", "バーベル", "手幅を肩幅より狭くして行う。上腕三頭筋と大胸筋内側への刺激が強まる。"));
+        chest.add(new ExerciseData("リバースグリップ・ベンチプレス", "大胸筋上部", "バーベル", "逆手でバーを持って行うプレス。大胸筋上部への刺激が増すが、セーフティバーの使用を推奨。"));
+        chest.add(new ExerciseData("ランドマインプレス", "大胸筋上部", "バーベル", "バーベルの片側を固定し、反対側を片手または両手で斜め上に押し出す。肩と胸上部に効く。"));
+        chest.add(new ExerciseData("フロアプレス", "大胸筋", "バーベル", "床に寝て行うベンチプレス。可動域が制限されるため、三頭筋への負荷が高まり、肩への負担が減る。"));
+        chest.add(new ExerciseData("ギロチンプレス", "大胸筋上部", "バーベル", "首の近く（頸動脈付近）にバーを下ろす危険だが効果的な種目。必ず軽い重量で慎重に行うこと。"));
+        // ダンベル
+        chest.add(new ExerciseData("ダンベルプレス", "大胸筋", "ダンベル", "可動域を広くとれる基本種目。トップで胸を寄せる意識を持つと収縮感が高まる。"));
+        chest.add(new ExerciseData("インクライン・ダンベルプレス", "大胸筋上部", "ダンベル", "傾斜をつけたベンチで行うダンベルプレス。大胸筋上部の厚みを作るのに最適。"));
+        chest.add(new ExerciseData("デクライン・ダンベルプレス", "大胸筋下部", "ダンベル", "頭側を低くして行うプレス。胸の下部の輪郭を強調する。"));
+        chest.add(new ExerciseData("ダンベルフライ", "大胸筋", "ダンベル", "肘を少し曲げ、円を描くようにダンベルを開閉する。ストレッチ種目の代表格。"));
+        chest.add(new ExerciseData("インクライン・ダンベルフライ", "大胸筋上部", "ダンベル", "上部狙いのフライ。ストレッチポジションでしっかり胸を張る。"));
+        chest.add(new ExerciseData("デクライン・ダンベルフライ", "大胸筋下部", "ダンベル", "下部狙いのフライ。"));
+        chest.add(new ExerciseData("ダンベル・プルオーバー", "大胸筋・広背筋", "ダンベル", "ベンチに仰向けになり、ダンベルを頭の後ろへ下ろしてから胸の上へ戻す。胸郭を広げる効果も。"));
+        chest.add(new ExerciseData("スクイーズプレス", "大胸筋内側", "ダンベル", "ダンベル同士を押し付け合いながらプレス動作を行う。常に胸の内側に力が入る。"));
+        chest.add(new ExerciseData("アラウンド・ザ・ワールド", "大胸筋", "ダンベル", "ベンチに寝て、掌を上に向け、円を描くようにダンベルを頭上から腰横まで移動させる。"));
+        // マシン
+        chest.add(new ExerciseData("チェストプレス(マシン)", "大胸筋", "マシン", "軌道が固定されており安全に高重量を扱える。初心者から上級者までおすすめ。"));
+        chest.add(new ExerciseData("インクライン・チェストプレス", "大胸筋上部", "マシン", "上部狙いのマシンプレス。"));
+        chest.add(new ExerciseData("デクライン・チェストプレス", "大胸筋下部", "マシン", "下部狙いのマシンプレス。"));
+        chest.add(new ExerciseData("ペックデックフライ", "大胸筋内側", "マシン", "座った状態で腕を閉じる動作を行う。胸の収縮を感じやすい種目。"));
+        chest.add(new ExerciseData("リアデルト/ペックフライ", "大胸筋", "マシン", "ペックフライ機能を使用。肘をパッドに当てて閉じるタイプが多い。"));
+        chest.add(new ExerciseData("スミス・ベンチプレス", "大胸筋", "スミスマシン", "軌道が固定されたバーベルプレス。バランスを崩す心配がなく胸への意識に集中できる。"));
+        chest.add(new ExerciseData("スミス・インクラインプレス", "大胸筋上部", "スミスマシン", "スミスマシンを用いた上部狙いのプレス。"));
+        chest.add(new ExerciseData("ハンマーストレングス・プレス", "大胸筋", "マシン", "片腕ずつ独立して動くマシン。左右差の解消や収縮感に優れる。"));
+        // ケーブル・自重
+        chest.add(new ExerciseData("ケーブルクロスオーバー(ハイ)", "大胸筋下部", "ケーブル", "高い位置から斜め下へ引き寄せる。下部の輪郭形成に有効。"));
+        chest.add(new ExerciseData("ケーブルクロスオーバー(ミドル)", "大胸筋中部", "ケーブル", "真横から胸の前へ引き寄せる。パンプアップに最適。"));
+        chest.add(new ExerciseData("ケーブルクロスオーバー(ロー)", "大胸筋上部", "ケーブル", "低い位置から斜め上へ引き上げる。上部の盛り上がりを作る。"));
+        chest.add(new ExerciseData("プッシュアップ(腕立て伏せ)", "大胸筋", "自重", "基本の自重種目。体幹を真っ直ぐ保ち、胸を床に近づける。"));
+        chest.add(new ExerciseData("インクライン・プッシュアップ", "大胸筋下部", "自重", "手が高い位置（ベンチ等）にある腕立て伏せ。負荷が軽く初心者向け。"));
+        chest.add(new ExerciseData("デクライン・プッシュアップ", "大胸筋上部", "自重", "足が高い位置にある腕立て伏せ。負荷が高く上部に効く。"));
+        chest.add(new ExerciseData("ディップス(大胸筋狙い)", "大胸筋下部", "自重/加重", "「上半身のスクワット」と呼ばれる。前傾姿勢で行うことで胸下部に強烈な刺激が入る。"));
+        chest.add(new ExerciseData("スベンドプレス", "大胸筋内側", "プレート", "プレートを両手で挟み込み、胸の前で押し出す。収縮感を高める仕上げ種目。"));
+        exerciseMap.put("胸", chest);
 
-        // --- 背中 ---
+        // ==========================================
+        // 背中 (Back)
+        // ==========================================
         List<ExerciseData> back = new ArrayList<>();
-        back.add(new ExerciseData("ラットプルダウン", "初級", 
-            "バーを肩幅より広めに握り、鎖骨に向かって引き下ろす。", 
-            "腕ではなく背中で引く。胸を張り、肩甲骨を下げる意識で。"));
-        back.add(new ExerciseData("シーテッドロー", "初級", 
-            "マシンに座り、ハンドルを腹部に向かって引く。", 
-            "上体を倒しすぎない。引くときに肩甲骨を寄せる。"));
-        back.add(new ExerciseData("バックエクステンション", "初級", 
-            "器具にうつ伏せになり、上体を起こす。脊柱起立筋を鍛える。", 
-            "反動を使わず、ゆっくり行う。反りすぎに注意。"));
-        back.add(new ExerciseData("ワンハンドローイング", "中級", 
-            "片手と片膝をベンチにつき、反対の手でダンベルを引き上げる。", 
-            "背中は平らに保つ。ダンベルを腰の方へ引くイメージで。"));
-        back.add(new ExerciseData("ベントオーバーロー", "中級", 
-            "立った状態で前傾姿勢をとり、バーベルを腹部へ引き上げる。", 
-            "腰を丸めない（重要）。ニーグリップをしっかり効かせる。"));
-        back.add(new ExerciseData("チンアップ(懸垂)", "中級", 
-            "バーにぶら下がり、顎がバーを超えるまで体を引き上げる。", 
-            "反動を使わない。下ろすときも力を抜かずにゆっくり下ろす。"));
-        back.add(new ExerciseData("デッドリフト", "上級", 
-            "床に置いたバーベルを、背筋を伸ばしたまま直立するまで引き上げる。", 
-            "「腰で引く」のではなく「足で地面を押す」イメージ。背中が丸まると怪我の原因になる。"));
-        back.add(new ExerciseData("Tバーロー", "中級", 
-            "Tバーマシンのハンドルを握り、前傾姿勢で胸に向かって引き上げる。", 
-            "背中の厚みを作るのに効果的。上体の角度を固定する。"));
-        EXERCISE_DATA_MAP.put("背中", back);
+        back.add(new ExerciseData("デッドリフト", "背中全体", "バーベル", "床からバーベルを引き上げる全身運動。背中の厚みと全体の筋力アップに最強の種目。"));
+        back.add(new ExerciseData("ベントオーバーロウ", "広背筋・僧帽筋", "バーベル", "前傾姿勢でバーベルを腹部へ引き上げる。背中の厚みを作る基本種目。"));
+        back.add(new ExerciseData("イェイツロウ", "広背筋下部", "バーベル", "逆手で行うベントオーバーロウ。上体をやや起こし気味に行う。"));
+        back.add(new ExerciseData("ワンハンド・ダンベルロウ", "広背筋", "ダンベル", "ベンチに片手片膝をつき、片手でダンベルを引き上げる。可動域を広く取れる。"));
+        back.add(new ExerciseData("懸垂(プルアップ)", "広背筋", "自重/加重", "順手で行う懸垂。背中の広がりを作るのに最も効果的な自重種目。"));
+        back.add(new ExerciseData("チンアップ(逆手懸垂)", "広背筋・二頭筋", "自重/加重", "逆手で行う懸垂。二頭筋の関与が増えるが、広背筋下部にも効きやすい。"));
+        back.add(new ExerciseData("ラットプルダウン(フロント)", "広背筋", "マシン", "マシンでバーを鎖骨付近に引き下ろす。背中の広がりを作る基本種目。"));
+        back.add(new ExerciseData("ラットプルダウン(ビハインド)", "広背筋・大円筋", "マシン", "首の後ろにバーを下ろす。背中の上部や細かい筋肉に効くが、肩の柔軟性が必要。"));
+        back.add(new ExerciseData("ラットプルダウン(Vバー)", "広背筋中部", "マシン", "パラレルグリップで行う。背中の厚みや下部への刺激が入りやすい。"));
+        back.add(new ExerciseData("シーテッド・ケーブルロウ", "僧帽筋・広背筋", "ケーブル", "座った状態でケーブルを腹部へ引き寄せる。肩甲骨を寄せる意識で厚みを作る。"));
+        back.add(new ExerciseData("Tバーロウ", "広背筋・僧帽筋", "バーベル", "専用マシンまたはランドマインを使用し、足の間にあるバーを引き上げる。"));
+        back.add(new ExerciseData("ランドマインロウ", "広背筋", "バーベル", "バーの片側を固定して片手で行うロウイング。軌道が安定し収縮させやすい。"));
+        back.add(new ExerciseData("ラックプル", "脊柱起立筋", "バーベル", "膝の高さ程度から行うデッドリフト。背中の筋肉に負荷を集中できる。"));
+        back.add(new ExerciseData("グッドモーニング", "脊柱起立筋・ハム", "バーベル", "バーベルを担ぎ、お辞儀をするように上体を倒す。脊柱起立筋とハムストリングスを強化。"));
+        back.add(new ExerciseData("シールロウ", "広背筋中部", "バーベル/ダンベル", "ベンチにうつ伏せになり、床からバーを引き上げる。腰への負担がなく背中に集中できる。"));
+        back.add(new ExerciseData("メドウズロウ", "広背筋", "バーベル", "ランドマインのバーの先端を横から握り、肘を外に開くように引く。背中の上部・外側に効く。"));
+        back.add(new ExerciseData("シュラッグ(バーベル)", "僧帽筋上部", "バーベル", "肩をすくめる動作で僧帽筋上部を鍛える。首周りの厚みを作る。"));
+        back.add(new ExerciseData("シュラッグ(ダンベル)", "僧帽筋上部", "ダンベル", "ダンベルで行うシュラッグ。バーベルより可動域を広く取れる。"));
+        back.add(new ExerciseData("ストレートアーム・プルダウン", "広背筋", "ケーブル", "肘を伸ばしたままケーブルを太ももまで下ろす。広背筋をアイソレートして鍛えられる。"));
+        back.add(new ExerciseData("フェイスプル", "僧帽筋・リアデルト", "ケーブル", "ケーブルを顔の高さへ引き寄せる。肩の後ろや僧帽筋中部、ローテーターカフに有効。"));
+        back.add(new ExerciseData("バックエクステンション", "脊柱起立筋", "自重/マシン", "背筋台で上体を起こす。脊柱起立筋の基本種目。"));
+        back.add(new ExerciseData("インバーテッドロウ", "広背筋", "自重", "「斜め懸垂」。鉄棒やスミスマシンのバーにぶら下がり、体を斜めにして引き上げる。"));
+        back.add(new ExerciseData("プルオーバー(マシン)", "広背筋", "マシン", "ノーチラスマシンなどで肘パッドを押し下げる。広背筋全体に強いストレッチと収縮を与える。"));
+        back.add(new ExerciseData("ハイロウ(マシン)", "広背筋上部", "マシン", "斜め上から引き下ろす軌道を持つマシン。広背筋と大円筋を狙いやすい。"));
+        back.add(new ExerciseData("スーパーマン", "脊柱起立筋", "自重", "床にうつ伏せになり、手足を同時に持ち上げる。自宅でできる背筋運動。"));
+        exerciseMap.put("背中", back);
 
-        // --- 脚 ---
+        // ==========================================
+        // 脚 (Legs)
+        // ==========================================
         List<ExerciseData> legs = new ArrayList<>();
-        legs.add(new ExerciseData("エアスクワット", "初級", 
-            "自重で行うスクワット。足を肩幅に開き、太ももが平行になるまで腰を下ろす。", 
-            "膝がつま先より前に出過ぎないように。背筋を伸ばす。"));
-        legs.add(new ExerciseData("レッグプレス", "初級", 
-            "マシンに座り、フットプレートを足で押す。", 
-            "膝を伸ばしきらない（ロックしない）。お尻が浮かないようにする。"));
-        legs.add(new ExerciseData("レッグエクステンション", "初級", 
-            "マシンに座り、パッドを足首に当てて膝を伸ばす。大腿四頭筋に集中。", 
-            "蹴り上げるのではなく、筋肉の収縮で持ち上げる。"));
-        legs.add(new ExerciseData("レッグカール", "初級", 
-            "マシンにうつ伏せになり、かかとをお尻に近づけるように膝を曲げる。", 
-            "反動を使わず、ハムストリングスの収縮を感じる。"));
-        legs.add(new ExerciseData("スクワット", "中級", 
-            "バーベルを担いで行うスクワット。下半身全体の筋力強化。", 
-            "腹圧をしっかりかける。目線は少し前へ。深くしゃがむほど効果が高いが柔軟性に合わせて。"));
-        legs.add(new ExerciseData("ランジ", "中級", 
-            "ダンベルを持ち、片足を大きく前に踏み出して腰を落とす。交互に行う。", 
-            "上半身をまっすぐに保つ。前の足のかかとで踏ん張って戻る。"));
-        legs.add(new ExerciseData("ブルガリアンスクワット", "上級", 
-            "片足を後ろのベンチに乗せ、片足だけでスクワットを行う。", 
-            "非常に負荷が高い。膝が内側に入らないように注意。バランスをとるため体幹も使う。"));
-        legs.add(new ExerciseData("ルーマニアンデッドリフト", "中級", 
-            "膝を軽く曲げた状態で固定し、股関節を支点に上体を倒してハムストリングスを伸ばす。", 
-            "バーベルは常に体に沿わせる。背中を丸めない。ももの裏側のストレッチを感じる。"));
-        legs.add(new ExerciseData("カーフレイズ", "初級", 
-            "つま先立ちになり、ふくらはぎを収縮させて戻す。", 
-            "可動域を大きくとる。段差を使うとより効果的。"));
-        legs.add(new ExerciseData("ヒップスラスト", "中級", 
-            "ベンチに肩甲骨を乗せ、バーベルを腰に乗せてお尻を持ち上げる。", 
-            "お尻（大臀筋）を強く収縮させる。腰を反りすぎない。"));
-        EXERCISE_DATA_MAP.put("脚", legs);
+        legs.add(new ExerciseData("バーベル・スクワット", "大腿四頭筋・全体", "バーベル", "「キング・オブ・エクササイズ」。下半身全体を強烈に鍛える。"));
+        legs.add(new ExerciseData("フロントスクワット", "大腿四頭筋", "バーベル", "体の前でバーを保持して行うスクワット。上体が起きるため大腿四頭筋への負荷が高い。"));
+        legs.add(new ExerciseData("ハックスクワット", "大腿四頭筋", "マシン", "背もたれに寄りかかって行うスクワット。腰への負担を減らし四頭筋を攻めることができる。"));
+        legs.add(new ExerciseData("レッグプレス", "大腿四頭筋・臀部", "マシン", "高重量を扱えるマシン種目。足の位置で効く部位を変化させられる。"));
+        legs.add(new ExerciseData("レッグエクステンション", "大腿四頭筋", "マシン", "座って膝を伸ばす単関節種目。大腿四頭筋をアイソレートして鍛える。"));
+        legs.add(new ExerciseData("レッグカール(ライイング)", "ハムストリングス", "マシン", "うつ伏せで膝を曲げる。ハムストリングスの基本種目。"));
+        legs.add(new ExerciseData("レッグカール(シーテッド)", "ハムストリングス", "マシン", "座って膝を曲げる。ストレッチポジションでの負荷がかかりやすい。"));
+        legs.add(new ExerciseData("ルーマニアンデッドリフト", "ハム・臀部", "バーベル/ダンベル", "膝をあまり曲げず、お尻を突き出しながらバーを下ろす。もも裏とお尻のストレッチ種目。"));
+        legs.add(new ExerciseData("ランジ", "大腿四頭筋・臀部", "ダンベル/自重", "片足を前に踏み込む。バランス感覚と下半身の筋力を養う。"));
+        legs.add(new ExerciseData("ウォーキングランジ", "下半身全体", "自重/ダンベル", "前に進みながら行うランジ。心拍数も上がり脂肪燃焼効果も高い。"));
+        legs.add(new ExerciseData("ブルガリアンスクワット", "大腿四頭筋・臀部", "ダンベル/自重", "片足をベンチに乗せて行うスクワット。お尻と前ももに強烈に効く。"));
+        legs.add(new ExerciseData("ゴブレットスクワット", "大腿四頭筋", "ダンベル/KB", "胸の前でダンベル等を抱えて行うスクワット。フォーム習得やアップに最適。"));
+        legs.add(new ExerciseData("スモウスクワット", "内転筋・臀部", "ダンベル/バーベル", "足を大きく広げて行うスクワット。内ももとお尻に効く。"));
+        legs.add(new ExerciseData("ヒップスラスト", "大臀筋", "バーベル/マシン", "ベンチに背中を乗せ、腰にバーベルを乗せてお尻を持ち上げる。最強のお尻トレ。"));
+        legs.add(new ExerciseData("カーフレイズ", "下腿三頭筋", "マシン/自重", "つま先立ちを繰り返す。ふくらはぎを鍛える。"));
+        legs.add(new ExerciseData("アダクション", "内転筋", "マシン", "足を閉じる動作で内ももを鍛える。"));
+        legs.add(new ExerciseData("アブダクション", "中臀筋", "マシン", "足を開く動作でお尻の横（中臀筋）を鍛える。"));
+        legs.add(new ExerciseData("ピストルスクワット", "下半身全体", "自重", "片足で行うスクワット。高い筋力とバランス能力が必要な高難易度自重トレ。"));
+        legs.add(new ExerciseData("シシースクワット", "大腿四頭筋", "自重", "上体を後ろに倒しながら膝を前に出す特殊なスクワット。四頭筋のストレッチに特化。"));
+        legs.add(new ExerciseData("ステップアップ", "大腿四頭筋・臀部", "台/ダンベル", "台に片足で登る動作。お尻と太ももの引き締めに。"));
+        legs.add(new ExerciseData("グルートブリッジ", "大臀筋", "自重", "仰向けになり膝を立ててお尻を持ち上げる。ヒップスラストの簡易版。"));
+        legs.add(new ExerciseData("ケーブル・プルスルー", "ハム・臀部", "ケーブル", "股の間からケーブルを引き出す。お尻の引き締めに効果的。"));
+        legs.add(new ExerciseData("ケトルベル・スイング", "ハム・臀部", "ケトルベル", "股関節の爆発的な伸展を使う全身運動。有酸素効果も高い。"));
+        legs.add(new ExerciseData("シングルレッグ・デッドリフト", "ハム・体幹", "ダンベル/KB", "片足立ちで行うデッドリフト。バランス力ともも裏の強化。"));
+        legs.add(new ExerciseData("ゼルチャースクワット", "大腿四頭筋・体幹", "バーベル", "肘でバーベルを抱えて行うスクワット。体幹への負荷が非常に高い。"));
+        exerciseMap.put("脚", legs);
 
-        // --- 肩 ---
+        // ==========================================
+        // 肩 (Shoulders)
+        // ==========================================
         List<ExerciseData> shoulders = new ArrayList<>();
-        shoulders.add(new ExerciseData("サイドレイズ", "初級", 
-            "ダンベルを持ち、肘を軽く曲げて横に開くように持ち上げる。", 
-            "小指側から上げるイメージで。肩より高く上げない。反動を使わない。"));
-        shoulders.add(new ExerciseData("ショルダープレス", "中級", 
-            "ダンベルを耳の横で構え、真上に押し上げる。", 
-            "腰を反らさない。肘を伸ばしきったところで一瞬止める。"));
-        shoulders.add(new ExerciseData("フロントレイズ", "初級", 
-            "ダンベルを体の前に持ち、肩の高さまで持ち上げる。", 
-            "三角筋前部を意識。体を揺らさない。"));
-        shoulders.add(new ExerciseData("オーバーヘッドプレス", "中級", 
-            "立ってバーベルを持ち、頭上へ押し上げる。体幹の強さも必要。", 
-            "顎を引いてバーの軌道を確保する。腹圧を高めて体を安定させる。"));
-        shoulders.add(new ExerciseData("リアデルトフライ", "初級", 
-            "前傾姿勢になり、ダンベルを横に開く。肩の後ろ側を鍛える。", 
-            "肩甲骨を寄せすぎないようにすると肩の後ろに効きやすい。"));
-        shoulders.add(new ExerciseData("アーノルドプレス", "中級", 
-            "手のひらが自分に向くようにダンベルを持ち、回転させながら押し上げる。", 
-            "可動域が広く、肩全体を刺激できる。スムーズな回転を意識。"));
-        EXERCISE_DATA_MAP.put("肩", shoulders);
+        shoulders.add(new ExerciseData("ミリタリープレス", "三角筋全体", "バーベル", "立ってバーベルを頭上に押し上げる。肩の筋力と体幹を鍛える基本種目。"));
+        shoulders.add(new ExerciseData("ショルダープレス(ダンベル)", "三角筋前・中部", "ダンベル", "ダンベルを頭上に押し上げる。可動域が広く、左右のバランスを整えられる。"));
+        shoulders.add(new ExerciseData("アーノルドプレス", "三角筋前・中部", "ダンベル", "手首を回転させながら行うプレス。三角筋前部から中部まで広く刺激が入る。"));
+        shoulders.add(new ExerciseData("サイドレイズ", "三角筋中部", "ダンベル", "腕を横に開く。肩幅（メロン肩）を作るための最重要種目。"));
+        shoulders.add(new ExerciseData("ケーブル・サイドレイズ", "三角筋中部", "ケーブル", "ケーブルで行うサイドレイズ。動作中常に負荷が抜けにくい。"));
+        shoulders.add(new ExerciseData("フロントレイズ", "三角筋前部", "ダンベル/バーベル", "腕を前に上げる。三角筋前部を個別に鍛える。"));
+        shoulders.add(new ExerciseData("リアデルトフライ", "三角筋後部", "ダンベル", "前傾姿勢で腕を横に開く。肩の後ろ側を鍛え、立体感を出す。"));
+        shoulders.add(new ExerciseData("フェイスプル", "三角筋後部", "ケーブル", "ケーブルを顔に向かって引く。リアデルトとローテーターカフに有効。"));
+        shoulders.add(new ExerciseData("アップライトロウ", "三角筋中部・僧帽筋", "バーベル", "バーベルを顎の下まで引き上げる。肩と僧帽筋を同時に鍛える。"));
+        shoulders.add(new ExerciseData("ショルダープレス(マシン)", "三角筋前・中部", "マシン", "安全に高重量を扱えるプレス系種目。"));
+        shoulders.add(new ExerciseData("リアデルトフライ(マシン)", "三角筋後部", "マシン", "ペックデックマシンの逆向き使用。簡単にリアデルトに効かせられる。"));
+        shoulders.add(new ExerciseData("ハンドスタンドプッシュアップ", "三角筋全体", "自重", "逆立ち腕立て伏せ。自重で行う最強の肩トレ。"));
+        shoulders.add(new ExerciseData("パイクプッシュアップ", "三角筋前部", "自重", "腰を高く上げ「くの字」になって行う腕立て伏せ。肩に体重を乗せる。"));
+        shoulders.add(new ExerciseData("プッシュプレス", "三角筋・瞬発力", "バーベル", "下半身の反動を使ってバーベルを挙げる。瞬発力向上と高重量トレーニングに。"));
+        shoulders.add(new ExerciseData("ビハインドネックプレス", "三角筋中部", "バーベル", "首の後ろからバーを挙げる。三角筋中部に効くが、肩関節への負担に注意。"));
+        shoulders.add(new ExerciseData("ランドマインプレス(片手)", "三角筋前部", "バーベル", "片手で行う斜め上へのプレス。肩への負担が比較的少なく安全。"));
+        shoulders.add(new ExerciseData("Zプレス", "三角筋・体幹", "バーベル/ダンベル", "床に座って行うプレス。下半身の踏ん張りが使えないため体幹と肩の純粋な筋力が必要。"));
+        shoulders.add(new ExerciseData("ボトムアッププレス", "三角筋・安定性", "ケトルベル", "ケトルベルを逆さにして行うプレス。握力と肩の安定性を極限まで高める。"));
+        shoulders.add(new ExerciseData("インクライン・サイドレイズ", "三角筋中部", "ダンベル", "インクラインベンチに横向きに寝て行うレイズ。初動の負荷を高める。"));
+        shoulders.add(new ExerciseData("Yレイズ", "三角筋中部・僧帽筋", "ダンベル", "Yの字に腕を上げる。僧帽筋下部と三角筋中部に効く。"));
+        shoulders.add(new ExerciseData("シュラッグ", "僧帽筋", "ダンベル/バーベル", "肩をすくめる動作。首回りの迫力を出す。"));
+        shoulders.add(new ExerciseData("キューバンプレス", "ローテーターカフ", "ダンベル", "アップライトロウとプレスを組み合わせた動き。肩のインナーマッスル強化。"));
+        shoulders.add(new ExerciseData("ヘイロー(Halo)", "肩周り柔軟性", "ケトルベル/プレート", "頭の周りで重りを回す。肩甲骨の可動域向上とウォーミングアップに最適。"));
+        exerciseMap.put("肩", shoulders);
 
-        // --- 腕 ---
+        // ==========================================
+        // 腕 (Arms)
+        // ==========================================
         List<ExerciseData> arms = new ArrayList<>();
-        arms.add(new ExerciseData("ダンベルカール", "初級", 
-            "ダンベルを持ち、肘を固定して曲げる。", 
-            "肘の位置を動かさない。下ろすときもゆっくりと。"));
-        arms.add(new ExerciseData("ハンマーカール", "初級", 
-            "手のひらを内側に向けたままカールを行う。", 
-            "上腕二頭筋の外側と前腕に効く。手首を固定する。"));
-        arms.add(new ExerciseData("トライセプスエクステンション", "初級", 
-            "ダンベルを頭の後ろに構え、肘を伸ばして持ち上げる。", 
-            "肘を開きすぎない。二の腕（上腕三頭筋）の収縮を感じる。"));
-        arms.add(new ExerciseData("アームカール", "初級", 
-            "バーベルまたはダンベルで肘を曲げる基本的な種目。", 
-            "反動を使わず、筋肉の収縮を感じる。"));
-        arms.add(new ExerciseData("バーベルカール", "中級", 
-            "バーベルを用いて高重量でカールを行う。", 
-            "体の反動（チーティング）を使わないように壁に背をつけて行うのも良い。"));
-        arms.add(new ExerciseData("スカルクラッシャー", "中級", 
-            "ベンチに仰向けになり、バーベルを額のあたりへ下ろして伸ばす。", 
-            "上腕三頭筋に強い負荷がかかる。肘の位置を固定する。"));
-        EXERCISE_DATA_MAP.put("腕", arms);
+        // 二頭
+        arms.add(new ExerciseData("バーベルカール", "上腕二頭筋", "バーベル", "高重量を扱える二頭筋の基本種目。"));
+        arms.add(new ExerciseData("ダンベルカール", "上腕二頭筋", "ダンベル", "左右独立して行うカール。手首を捻る動作を入れると収縮感が増す。"));
+        arms.add(new ExerciseData("インクライン・ダンベルカール", "上腕二頭筋(長頭)", "ダンベル", "傾斜ベンチに寝て行う。ストレッチ時に強い負荷がかかる。"));
+        arms.add(new ExerciseData("プリチャーカール", "上腕二頭筋(短頭)", "EZバー/ダンベル", "肘を台に固定して行う。反動を使わずに二頭筋を孤立させる。"));
+        arms.add(new ExerciseData("ハンマーカール", "上腕筋", "ダンベル", "縦持ちで行うカール。上腕筋と前腕を鍛え、腕の厚みを出す。"));
+        arms.add(new ExerciseData("ケーブルカール", "上腕二頭筋", "ケーブル", "動作中常に負荷がかかり続ける。仕上げに最適。"));
+        arms.add(new ExerciseData("コンセントレーションカール", "上腕二頭筋", "ダンベル", "座って膝に肘を当てて行う。収縮を意識しやすい。"));
+        arms.add(new ExerciseData("スパイダーカール", "上腕二頭筋(短頭)", "ダンベル/EZバー", "インクラインベンチにうつ伏せになって行う。収縮ポジションでの負荷が強い。"));
+        arms.add(new ExerciseData("ドラッグカール", "上腕二頭筋(長頭)", "バーベル", "バーを体に沿わせるように引き上げる。長頭に強い刺激が入る。"));
+        arms.add(new ExerciseData("ゾットマンカール", "上腕二頭筋・前腕", "ダンベル", "上げる時は普通に、下ろす時は逆手で。二頭と前腕を同時に鍛える。"));
+        arms.add(new ExerciseData("リバースカール", "前腕・上腕筋", "バーベル", "逆手で行うカール。前腕と上腕筋をターゲットにする。"));
+        arms.add(new ExerciseData("21カール", "上腕二頭筋", "バーベル", "可動域を下半分・上半分・全体に分けて7回ずつ行う追い込み法。"));
+        // 三頭
+        arms.add(new ExerciseData("ナローベンチプレス", "上腕三頭筋", "バーベル", "手幅を狭くしたベンチプレス。三頭筋全体に高重量で負荷をかけられる。"));
+        arms.add(new ExerciseData("スカルクラッシャー", "上腕三頭筋", "EZバー/ダンベル", "仰向けになり、額に向かってバーを下ろす。三頭筋の基本種目。"));
+        arms.add(new ExerciseData("プレスダウン", "上腕三頭筋", "ケーブル", "ケーブルを押し下げる。バーやロープなどアタッチメントで刺激が変わる。"));
+        arms.add(new ExerciseData("フレンチプレス", "上腕三頭筋(長頭)", "ダンベル/EZバー", "頭の後ろで重量を上げ下げする。長頭（二の腕の内側）によく効く。"));
+        arms.add(new ExerciseData("キックバック", "上腕三頭筋", "ダンベル", "前傾姿勢で肘を伸ばす。収縮感が強く、軽い重量でも効かせられる。"));
+        arms.add(new ExerciseData("ディップス(三頭筋狙い)", "上腕三頭筋", "自重/加重", "体を立てて行うディップス。三頭筋への負荷が集中する。"));
+        arms.add(new ExerciseData("ベンチディップス", "上腕三頭筋", "自重", "ベンチに手をついて行うディップス。自宅でも行いやすい。"));
+        arms.add(new ExerciseData("オーバーヘッドエクステンション", "上腕三頭筋(長頭)", "ケーブル/ダンベル", "頭上からケーブルを引く。ストレッチ刺激が強い。"));
+        arms.add(new ExerciseData("テイトプレス", "上腕三頭筋", "ダンベル", "ベンチに寝て、ダンベルを胸の内側に向かって下ろす独特な種目。"));
+        arms.add(new ExerciseData("JMプレス", "上腕三頭筋", "バーベル/スミス", "プレスとエクステンションの中間のような動き。高重量で三頭を破壊する。"));
+        arms.add(new ExerciseData("ダイヤモンド・プッシュアップ", "上腕三頭筋", "自重", "手でダイヤ型を作って行う腕立て伏せ。三頭筋に強く効く。"));
+        // 前腕
+        arms.add(new ExerciseData("リストカール", "前腕屈筋群", "ダンベル/バーベル", "手首を巻き込む動き。前腕の内側を太くする。"));
+        arms.add(new ExerciseData("リバース・リストカール", "前腕伸筋群", "ダンベル/バーベル", "手の甲側に手首を返す動き。前腕の外側を鍛える。"));
+        arms.add(new ExerciseData("ファーマーズウォーク", "前腕・握力", "ダンベル/KB", "重いダンベルを持って歩く。握力と体幹、全身の連動性を鍛える。"));
+        arms.add(new ExerciseData("プレートピンチ", "握力", "プレート", "プレートをつまんで持つ。ピンチ力を鍛える。"));
+        exerciseMap.put("腕", arms);
 
-        // --- 腹筋 ---
+        // ==========================================
+        // 腹筋 (Abs)
+        // ==========================================
         List<ExerciseData> abs = new ArrayList<>();
-        abs.add(new ExerciseData("クランチ", "初級", 
-            "仰向けで膝を立て、おへそを覗き込むように上体を丸める。", 
-            "腰を床から離さない。息を吐きながら収縮させる。"));
-        abs.add(new ExerciseData("レッグレイズ", "中級", 
-            "仰向けで足を揃え、床と垂直になるまで上げ下げする。", 
-            "腰が浮かないように手をお尻の下に敷くと良い。下ろすときに耐える。"));
-        abs.add(new ExerciseData("ロシアンツイスト", "中級", 
-            "上体を起こして座り、重りを持って左右に体をねじる。", 
-            "腹斜筋に効く。足は浮かせたまま行うと強度アップ。"));
-        abs.add(new ExerciseData("プランク", "初級", 
-            "肘とつま先で体を支え、板のように真っ直ぐキープする。", 
-            "お尻が上がったり下がったりしない。腹筋に常に力を入れる。"));
-        abs.add(new ExerciseData("アブローラー(膝つき)", "中級", 
-            "ローラーを握り、膝をついて前方に転がし、戻る。", 
-            "腰を反らすと痛めるので、猫背気味をキープする。限界まで行ったら戻る。"));
-        abs.add(new ExerciseData("ハンギングレッグレイズ", "上級", 
-            "バーにぶら下がり、足を足の付け根から持ち上げる。", 
-            "腹筋下部に強烈に効く。体が揺れないように制御する。"));
-        EXERCISE_DATA_MAP.put("腹筋", abs);
+        abs.add(new ExerciseData("クランチ", "腹直筋上部", "自重", "膝を立てて寝転がり、肩甲骨が浮くまで上体を丸める基本種目。"));
+        abs.add(new ExerciseData("レッグレイズ", "腹直筋下部", "自重", "仰向けで足を上下させる。下っ腹に効く。腰が浮かないように注意。"));
+        abs.add(new ExerciseData("シットアップ", "腹直筋", "自重", "足を押さえて上体を完全に起こす。腹筋全体と股関節屈筋群を使う。"));
+        abs.add(new ExerciseData("プランク", "体幹", "自重", "肘とつま先で体を支えて静止する。体幹の安定性を高める。"));
+        abs.add(new ExerciseData("サイドプランク", "腹斜筋", "自重", "横向きで体を支えるプランク。脇腹（腹斜筋）を鍛える。"));
+        abs.add(new ExerciseData("ハンギング・レッグレイズ", "腹直筋下部", "自重", "バーにぶら下がって足を持ち上げる。強度の高い下部種目。"));
+        abs.add(new ExerciseData("アブローラー(膝コロ)", "腹直筋全体", "器具", "膝をついてローラーを転がす。腹筋に対し非常に強い負荷がかかる。"));
+        abs.add(new ExerciseData("アブローラー(立ちコロ)", "腹直筋全体", "器具", "立って行うアブローラー。最高強度の腹筋種目の一つ。"));
+        abs.add(new ExerciseData("ロシアンツイスト", "腹斜筋", "自重/加重", "上体を起こして座り、左右に体を捻る。くびれ作りに有効。"));
+        abs.add(new ExerciseData("ケーブル・クランチ", "腹直筋", "ケーブル", "ケーブルを抱えて上体を丸める。加重しやすく筋肥大に向く。"));
+        abs.add(new ExerciseData("ウッドチョッパー", "腹斜筋", "ケーブル", "木こりのようにケーブルを斜めに引く。回旋動作を鍛える。"));
+        abs.add(new ExerciseData("ドラゴンフラッグ", "腹直筋全体", "自重", "ブルース・リーが行っていた超高強度種目。背中だけを接点に体を一直線にする。"));
+        abs.add(new ExerciseData("Vシット", "腹直筋", "自重", "手足を同時に上げてV字を作る。瞬発的な腹筋力が必要。"));
+        abs.add(new ExerciseData("マウンテンクライマー", "腹直筋・有酸素", "自重", "腕立て伏せの姿勢で足を交互に引き寄せる。脂肪燃焼効果も高い。"));
+        abs.add(new ExerciseData("バイシクルクランチ", "腹斜筋", "自重", "自転車を漕ぐように足を動かしながら対角の肘と膝を近づける。"));
+        abs.add(new ExerciseData("リバースクランチ", "腹直筋下部", "自重", "膝を胸に引き寄せ、お尻を浮かせる。骨盤の後傾動作を意識する。"));
+        abs.add(new ExerciseData("トゥ・トゥ・バー(Toes to Bar)", "腹直筋全体", "自重", "ぶら下がった状態からつま先をバーにタッチさせる。クロスフィットで人気。"));
+        abs.add(new ExerciseData("Lシット", "体幹・屈筋", "自重", "体を支えて足を前に伸ばしL字で静止する。体操選手のような体幹が必要。"));
+        abs.add(new ExerciseData("パロフプレス", "対回旋筋(体幹)", "ケーブル/バンド", "横からの負荷に耐えながら手を前に伸ばす。捻じれを防ぐ「アンチローテーション」種目。"));
+        abs.add(new ExerciseData("アブドミナルクランチ(マシン)", "腹直筋", "マシン", "マシンで腹筋を行う。初心者でも効かせやすい。"));
+        abs.add(new ExerciseData("ロータリートルソー", "腹斜筋", "マシン", "座って体を捻るマシン。脇腹を集中的に鍛える。"));
+        abs.add(new ExerciseData("ランドマインツイスト", "腹斜筋", "バーベル", "バーベルの端を持って左右に振る。腹斜筋と全身の連動性を鍛える。"));
+        abs.add(new ExerciseData("デッドバグ", "体幹", "自重", "仰向けで手足を対角に動かす。腰痛予防やドローインの練習に最適。"));
+        abs.add(new ExerciseData("バードドッグ", "体幹", "自重", "四つん這いで手足を対角に伸ばす。背面の体幹安定性を高める。"));
+        abs.add(new ExerciseData("ヒールタッチ", "腹斜筋", "自重", "仰向けで膝を立て、体を横に曲げてかかとに触れる。地味だが脇腹に効く。"));
+        abs.add(new ExerciseData("フラッグ(人間鯉のぼり)", "体幹全体", "自重", "柱を掴んで体を横に浮かす超高難易度パフォーマンス種目。"));
+        exerciseMap.put("腹筋", abs);
 
-        // --- その他 ---
-        List<ExerciseData> others = new ArrayList<>();
-        others.add(new ExerciseData("バーピー", "中級", 
-            "スクワット、腕立て伏せ、ジャンプを連続で行う全身運動。", 
-            "リズミカルに行う。心拍数を上げるのに最適。"));
-        others.add(new ExerciseData("ケトルベルスイング", "中級", 
-            "ケトルベルを股下から前方へ振り上げる。", 
-            "腕の力ではなく、股関節の伸展（お尻の力）で振り上げる。"));
-        EXERCISE_DATA_MAP.put("その他", others);
-
-        // --- リカバリー・ケア ---
-        List<ExerciseData> care = new ArrayList<>();
-        care.add(new ExerciseData("フォームローラー(背中)", "全レベル",
-            "フォームローラーを背中の下に置き、上下に転がる。",
-            "背骨の矯正と起立筋の緊張緩和に効果的。呼吸を止めない。"));
-        care.add(new ExerciseData("眼球運動(8の字)", "全レベル",
-            "顔を動かさず、目だけで空中に大きな8の字を描く。右回り・左回りを行う。",
-            "デジタルデバイスによる眼精疲労の回復。眼輪筋をほぐす。"));
-        care.add(new ExerciseData("キャット＆カウ", "初級",
-            "四つん這いになり、息を吐きながら背中を丸め、吸いながら反らす。",
-            "自律神経を整え、背骨の柔軟性を高める。"));
-        care.add(new ExerciseData("動的ストレッチ(股関節)", "初級",
-            "壁に手を突き、片足を振り子のように前後左右に振る。",
-            "トレーニング前の怪我予防。股関節の可動域を広げる。"));
-        care.add(new ExerciseData("ホットアイケア", "全レベル",
-            "温めたタオルを目元に乗せて5分間リラックスする。",
-            "血流を促進し、副交感神経を優位にする。睡眠の質向上。"));
-        EXERCISE_DATA_MAP.put("リカバリー・ケア", care);
-
-        // --- 有酸素 ---
-        CARDIO_DATA_LIST.add(new ExerciseData("ウォーキング", "初級", 
-            "背筋を伸ばし、大股でリズミカルに歩く。", 
-            "腕を大きく振る。呼吸を止めない。最低20分以上続けると脂肪燃焼効果が高い。"));
-        CARDIO_DATA_LIST.add(new ExerciseData("サイクリング", "初級", 
-            "エアロバイクなどを一定のペースで漕ぐ。", 
-            "膝への負担が少ない。背中を丸めすぎない。負荷を軽くしすぎず、適度な抵抗で。"));
-        CARDIO_DATA_LIST.add(new ExerciseData("エリプティカル", "初級", 
-            "クロストレーナーを使用。手足を同時に動かす。", 
-            "関節への負担が少ない。大きく動かすことで全身運動になる。"));
-        CARDIO_DATA_LIST.add(new ExerciseData("ランニング", "中級", 
-            "会話ができる程度のペース（ニコニコペース）で走る。", 
-            "着地の衝撃を和らげるシューズを選ぶ。無理のない距離から始める。"));
-        CARDIO_DATA_LIST.add(new ExerciseData("水泳", "中級", 
-            "全身を使う有酸素運動。クロールや平泳ぎなど。", 
-            "水の抵抗で筋力もつく。関節への負担がほぼゼロ。"));
-        CARDIO_DATA_LIST.add(new ExerciseData("ローイング", "中級", 
-            "ボート漕ぎマシンを使用。全身の筋肉を使う。", 
-            "脚で押してから腕で引くリズムを大切に。背中を丸めない。"));
-        CARDIO_DATA_LIST.add(new ExerciseData("HIIT(タバタ式)", "上級", 
-            "20秒全力運動＋10秒休憩を8セット繰り返す高強度インターバル。", 
-            "短時間で極めて高い脂肪燃焼効果があるが、心拍数が急上昇するため体調に注意。"));
-        CARDIO_DATA_LIST.add(new ExerciseData("トレッドミルインターバル", "上級", 
-            "ダッシュと歩きを交互に繰り返す。", 
-            "心肺機能を限界まで高める。傾斜をつけるとさらに効果的。"));
-        CARDIO_DATA_LIST.add(new ExerciseData("タバタ式バーピー", "上級",
-            "20秒全力バーピー＋10秒休憩を8セット。",
-            "短時間でVO2Max（最大酸素摂取量）を極限まで高める。"));
-        CARDIO_DATA_LIST.add(new ExerciseData("LSD (Long Slow Distance)", "中級",
-            "会話ができる程度のペースで60分以上走り続ける。",
-            "毛細血管を増やし、基礎的な持久力と回復力を高める。"));
+        // ==========================================
+        // 有酸素運動 (Cardio)
+        // ==========================================
+        cardioList.add(new ExerciseData("ランニング(屋外)", "全身", "自重", "屋外を走る。景色が変わるため気分転換にも良い。"));
+        cardioList.add(new ExerciseData("ランニング(トレッドミル)", "全身", "マシン", "ジムのランニングマシン。ペース管理がしやすく天候に左右されない。"));
+        cardioList.add(new ExerciseData("ジョギング", "全身", "自重", "会話ができる程度のペースで走る。脂肪燃焼やリカバリーに。"));
+        cardioList.add(new ExerciseData("ダッシュ/スプリント", "全身", "自重", "全速力で走る。心肺機能と瞬発力を高める無酸素運動に近い有酸素。"));
+        cardioList.add(new ExerciseData("ウォーキング(傾斜あり)", "全身", "マシン", "トレッドミルで傾斜をつけて歩く。膝への負担を抑えつつ消費カロリーを稼げる。"));
+        cardioList.add(new ExerciseData("ウォーキング(屋外)", "全身", "自重", "最も手軽な有酸素運動。通勤や散歩で日常的に取り入れたい。"));
+        cardioList.add(new ExerciseData("エアロバイク", "下半身", "マシン", "自転車漕ぎマシン。膝や腰への負担が少なく長時間行いやすい。"));
+        cardioList.add(new ExerciseData("リカンベントバイク", "下半身", "マシン", "背もたれ付きのバイク。腰に不安がある人でも安心。"));
+        cardioList.add(new ExerciseData("スピンバイク(HIIT)", "下半身", "マシン", "高強度のバイク運動。短時間で追い込みたい時に最適。"));
+        cardioList.add(new ExerciseData("クロストレーナー", "全身", "マシン", "手足を使って楕円軌道で動く。関節への衝撃が少なく全身運動になる。"));
+        cardioList.add(new ExerciseData("ローイングエルゴメーター", "全身", "マシン", "ボート漕ぎ運動。背中や全身の筋肉を使い、非常に高いカロリー消費を誇る。"));
+        cardioList.add(new ExerciseData("ステアクライマー", "下半身", "マシン", "無限に階段を登るマシン。お尻や脚の引き締めに効果絶大。"));
+        cardioList.add(new ExerciseData("アサルトバイク", "全身", "マシン", "手でハンドルを押し引きしながら漕ぐバイク。地獄のようなキツさで有名。"));
+        cardioList.add(new ExerciseData("スキーエルゴ(SkiErg)", "全身", "マシン", "スキーのストックを突く動作を行う。上半身メインの珍しい有酸素マシン。"));
+        cardioList.add(new ExerciseData("縄跳び", "全身", "器具", "シンプルだが強度の高いジャンプ運動。ふくらはぎの強化と心肺機能向上に。"));
+        cardioList.add(new ExerciseData("二重跳び", "全身", "器具", "縄跳びの強度を高めたバージョン。瞬発力が必要。"));
+        cardioList.add(new ExerciseData("HIIT(バーピー等)", "全身", "自重", "高強度インターバルトレーニング。短時間で脂肪燃焼と持久力アップを狙う。"));
+        cardioList.add(new ExerciseData("タバタ式トレーニング", "全身", "自重", "20秒全力・10秒休憩を8セット繰り返す。究極の時短トレーニング。"));
+        cardioList.add(new ExerciseData("バーピー", "全身", "自重", "腕立て伏せからジャンプを繰り返す全身運動。１種目で全身を追い込める。"));
+        cardioList.add(new ExerciseData("水泳(クロール)", "全身", "プール", "水の抵抗を利用した全身運動。関節への負担が少なく消費カロリーが高い。"));
+        cardioList.add(new ExerciseData("水泳(平泳ぎ)", "全身", "プール", "比較的長く泳ぎ続けやすい泳法。股関節の柔軟性も使う。"));
+        cardioList.add(new ExerciseData("水中ウォーキング", "全身", "プール", "水の中を歩く。水圧によるマッサージ効果や適度な抵抗がある。"));
+        cardioList.add(new ExerciseData("ボクササイズ(サンドバッグ)", "全身", "器具", "パンチやキックを打ち込む。ストレス発散と脂肪燃焼に最適。"));
+        cardioList.add(new ExerciseData("シャドーボクシング", "全身", "自重", "鏡に向かってパンチを打つ。器具なしで場所を選ばずできる。"));
+        cardioList.add(new ExerciseData("踏み台昇降", "下半身", "台", "台を昇り降りする。自宅でテレビを見ながらできる有酸素運動。"));
+        cardioList.add(new ExerciseData("バトルロープ", "全身", "器具", "太いロープを波打たせる。上半身の筋持久力と心肺機能を猛烈に鍛える。"));
+        cardioList.add(new ExerciseData("ジャンピングジャック", "全身", "自重", "手足を開閉しながらジャンプする。ウォーミングアップによく使われる。"));
+        cardioList.add(new ExerciseData("スケーティングジャンプ", "下半身", "自重", "スケート選手のように左右にジャンプする。横方向の動きとお尻の強化に。"));
+        cardioList.add(new ExerciseData("スレッドプッシュ(ソリ押し)", "全身", "器具", "重りを載せたソリを押して走る。下半身のパワーと心肺機能を極限まで高める。"));
+        cardioList.add(new ExerciseData("ケトルベル・スイング(有酸素)", "全身", "ケトルベル", "軽量のKBで高回数行うことで、有酸素運動としての効果を発揮する。"));
+        cardioList.add(new ExerciseData("ターキッシュゲットアップ", "全身", "ケトルベル", "仰向けからKBを持ったまま立ち上がる。全身の連動性と体幹を鍛える機能的動作。"));
     }
 
+    // --- Getter Methods ---
+
+    // 全てのフリーウェイト/マシン種目を部位ごとのMapで取得
     public Map<String, List<ExerciseData>> getFreeWeightExercises() {
-        return EXERCISE_DATA_MAP;
+        return exerciseMap;
     }
 
-    public List<ExerciseData> getCardioExercises() {
-        return CARDIO_DATA_LIST;
-    }
-
-    // 文字列リストを返す（Controller互換用）
-    public List<String> getSimpleCardioExercisesList() {
-        return CARDIO_DATA_LIST.stream()
-                .map(ExerciseData::getFullName)
-                .collect(Collectors.toList());
+    // ドロップダウン表示用 (StringのMap)
+    public Map<String, List<String>> getFreeWeightExercisesByPart() {
+        return exerciseMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().stream()
+                                .map(ExerciseData::getName)
+                                .collect(Collectors.toList()),
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
     }
     
-    /**
-     * 部位ごとの種目名リストを返す（Map<String, List<String>>）
-     */
-    public Map<String, List<String>> getFreeWeightExercisesByPart() {
-        Map<String, List<String>> simpleMap = new LinkedHashMap<>();
-        for (Map.Entry<String, List<ExerciseData>> entry : EXERCISE_DATA_MAP.entrySet()) {
-            List<String> simpleList = entry.getValue().stream()
-                .map(ExerciseData::getFullName)
-                .collect(Collectors.toList());
-            simpleMap.put(entry.getKey(), simpleList);
-        }
-        return simpleMap;
-    }
-
-    // 後方互換性のため
+    // MySet作成フォームなどで使用する簡易Map
     public Map<String, List<String>> getSimpleFreeWeightExercisesMap() {
         return getFreeWeightExercisesByPart();
     }
-    
-    public List<ExerciseData> getRecoveryExercises() {
-        return EXERCISE_DATA_MAP.getOrDefault("リカバリー・ケア", new ArrayList<>());
-    }
 
+    // 部位のリストを取得
     public List<String> getMuscleParts() {
-        return new ArrayList<>(EXERCISE_DATA_MAP.keySet());
+        return new ArrayList<>(exerciseMap.keySet());
     }
 
+    // 有酸素運動の全リストを取得 (ExerciseData型)
+    public List<ExerciseData> getCardioExercises() {
+        return cardioList;
+    }
+    
+    // 有酸素運動の簡易リスト (String型)
+    public List<String> getSimpleCardioExercisesList() {
+        return cardioList.stream()
+                .map(ExerciseData::getName)
+                .collect(Collectors.toList());
+    }
+
+    // 種目名からExerciseDataを取得する便利メソッド
     public ExerciseData getExerciseDataByName(String name) {
         // フリーウェイトから検索
-        for (List<ExerciseData> list : EXERCISE_DATA_MAP.values()) {
+        for (List<ExerciseData> list : exerciseMap.values()) {
             for (ExerciseData ex : list) {
-                if (ex.getFullName().equals(name)) {
+                if (ex.getName().equals(name) || ex.getFullName().equals(name)) {
                     return ex;
                 }
             }
         }
         // 有酸素から検索
-        for (ExerciseData ex : CARDIO_DATA_LIST) {
-            if (ex.getFullName().equals(name)) {
+        for (ExerciseData ex : cardioList) {
+            if (ex.getName().equals(name) || ex.getFullName().equals(name)) {
                 return ex;
             }
         }
         return null;
     }
-
-    // ★追加: 種目名から「部位名」を取得するメソッド
-    public String findPartByExerciseName(String exerciseName) {
-        for (Map.Entry<String, List<ExerciseData>> entry : EXERCISE_DATA_MAP.entrySet()) {
+    
+    // 種目名から部位を逆引きするメソッド
+    public String findPartByExerciseName(String name) {
+        for (Map.Entry<String, List<ExerciseData>> entry : exerciseMap.entrySet()) {
             for (ExerciseData ex : entry.getValue()) {
-                if (ex.getFullName().equals(exerciseName)) {
+                if (ex.getName().equals(name) || ex.getFullName().equals(name)) {
                     return entry.getKey();
                 }
             }
         }
-        // 有酸素の場合は「有酸素」として返す
-        for (ExerciseData ex : CARDIO_DATA_LIST) {
-            if (ex.getFullName().equals(exerciseName)) {
+        // 有酸素判定
+        for (ExerciseData ex : cardioList) {
+            if (ex.getName().equals(name) || ex.getFullName().equals(name)) {
                 return "有酸素";
             }
         }

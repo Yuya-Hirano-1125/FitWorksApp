@@ -1,272 +1,221 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>種目一覧 | FitWorks</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-    
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        .exercise-list-page .main-container {
-            max-width: 900px;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 80px;
         }
-        .exercise-section h2 {
-            color: var(--ai-accent-color);
-            border-bottom: 3px solid var(--secondary-color);
-            padding-bottom: 5px;
-            margin-top: 40px;
-            text-align: left;
-            font-size: 28px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        /* 1列表示で見やすくする */
-        .exercise-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .exercise-detail-card {
-            background-color: #ffffff;
-            border: 1px solid #ddd;
-            border-left: 6px solid var(--primary-color);
-            border-radius: 8px;
-            padding: 20px;
-            text-align: left;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .exercise-detail-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-        }
-        
-        .exercise-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-            border-bottom: 1px dashed #eee;
+        h2 {
+            margin-top: 30px;
+            color: #444;
+            border-bottom: 2px solid #ddd;
             padding-bottom: 10px;
         }
-        
-        .exercise-header h3 {
-            margin: 0;
-            color: var(--dark-text);
-            font-size: 1.3rem;
-            font-weight: 800;
+        .exercise-list {
+            list-style: none;
+            padding: 0;
+        }
+        .exercise-item {
+            background: white;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            border-left: 5px solid #007bff;
+            transition: transform 0.2s;
         }
-
-        /* 解説セクションのスタイル */
-        .exercise-content {
-            margin-top: 10px;
+        .exercise-item:hover {
+            transform: translateX(5px);
         }
-        .info-row {
-            margin-bottom: 12px;
-            line-height: 1.6;
+        .exercise-info {
+            flex-grow: 1;
         }
-        .info-label {
-            display: block;
+        .exercise-name {
             font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 3px;
-            font-size: 0.95rem;
+            font-size: 1.1em;
+            color: #333;
+            display: block;
         }
-        .info-text {
-            color: #555;
-            margin: 0;
-            font-size: 0.95rem;
+        .exercise-details {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 4px;
         }
-
         .bookmark-btn {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1.6rem;
+            font-size: 1.5em;
             color: #ccc;
+            transition: color 0.2s;
             padding: 5px;
-            transition: transform 0.2s, color 0.2s;
-            margin-left: 15px;
+        }
+        .bookmark-btn.active {
+            color: #FFC107; /* Gold */
         }
         .bookmark-btn:hover {
-            transform: scale(1.1);
+            transform: scale(1.2);
         }
-        .bookmark-active {
-            color: gold;
+        
+        /* 検索バーのスタイル */
+        .search-container {
+            position: sticky;
+            top: 70px; /* ヘッダーの高さ考慮 */
+            background-color: #f4f7f6; /* 背景色に合わせて調整 */
+            padding: 15px 0;
+            z-index: 99;
         }
-
-        /* 難易度バッジ */
-        .level-badge {
-            font-size: 0.7em;
-            padding: 4px 10px;
-            border-radius: 12px;
-            color: white;
-            font-weight: normal;
-            vertical-align: middle;
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            outline: none;
+            transition: all 0.3s;
         }
-        .level-beginner { background-color: #28a745; } /* 緑 */
-        .level-intermediate { background-color: #fd7e14; } /* オレンジ */
-        .level-advanced { background-color: #dc3545; } /* 赤 */
-
-        @media (max-width: 600px) {
-            .exercise-detail-card {
-                padding: 15px;
-            }
-            .exercise-header h3 {
-                font-size: 1.1rem;
-            }
+        .search-box:focus {
+            border-color: #007bff;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
         }
-		/* --- 追加: ページ内リンクナビゲーション --- */
-		.shortcut-nav {
-		    display: flex;
-		    flex-wrap: wrap;
-		    gap: 10px;
-		    justify-content: center; /* 中央寄せ */
-		    margin-bottom: 30px;
-		}
-
-		.shortcut-btn {
-		    display: inline-block;
-		    background-color: #fff;
-		    border: 2px solid var(--secondary-color); /* ピンクの枠線 */
-		    color: var(--dark-text);
-		    padding: 8px 20px;
-		    border-radius: 50px; /* 丸くする */
-		    text-decoration: none;
-		    font-weight: bold;
-		    font-size: 0.9rem;
-		    transition: all 0.3s ease;
-		    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-		}
-
-		.shortcut-btn:hover {
-		    background-color: var(--secondary-color);
-		    color: #fff; /* ホバー時は白文字に */
-		    transform: translateY(-3px); /* ぴょこっと浮く */
-		    box-shadow: 0 6px 12px rgba(255, 182, 193, 0.4);
-		}
-		/* --------------------------------------- */
+        
+        /* 検索結果なしの表示 */
+        .no-results {
+            text-align: center;
+            color: #888;
+            margin-top: 20px;
+            display: none;
+        }
     </style>
 </head>
-<body class="exercise-list-page">
-<div class="main-container">
-    <h1><i class="fa-solid fa-book-open header-icon"></i> トレーニング種目図鑑</h1>
-    <p class="sub-heading">
-        正しいフォームとポイントを理解して、効果的なトレーニングを行いましょう。
-    </p>
-	
-	<div class="shortcut-nav">
-	        <a th:each="entry, stat : ${freeWeightExercisesByPart}"
-	           th:href="@{'#part-' + ${stat.index}}"
-	           th:text="${entry.key}"
-	           class="shortcut-btn">
-	           部位名
-	        </a>
-	        
-	        <a href="#part-cardio" class="shortcut-btn">
-	            <i class="fa-solid fa-running"></i> 有酸素運動
-	        </a>
-	    </div>
+<body>
 
-    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}" style="margin-bottom: 20px;"></div>
-    <div th:if="${message}" class="alert alert-info" th:text="${message}" style="margin-bottom: 20px;"></div>
+<div th:replace="fragments/header :: header"></div>
 
-	<div class="exercise-section" th:each="entry, stat : ${freeWeightExercisesByPart}">
-	    <h2 th:id="'part-' + ${stat.index}" th:text="${entry.key}">部位名</h2>
-        
-        <div class="exercise-grid">
-            <div class="exercise-detail-card" th:each="exercise : ${entry.value}">
-                <div class="exercise-header">
-                    <h3>
-                        <span th:text="${exercise.name}">種目名</span>
-                        
-                        <span th:if="${exercise.difficulty == '初級'}" class="level-badge level-beginner">初級</span>
-                        <span th:if="${exercise.difficulty == '中級'}" class="level-badge level-intermediate">中級</span>
-                        <span th:if="${exercise.difficulty == '上級'}" class="level-badge level-advanced">上級</span>
-                    </h3>
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+        <h1 style="margin: 0;">全種目図鑑</h1>
+        <a th:href="@{/training}" class="button" style="width: auto; background-color: #6c757d; color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; text-decoration: none;">
+            <i class="fa-solid fa-arrow-left"></i> 戻る
+        </a>
+    </div>
 
-                    <form th:action="@{/training/bookmark/toggle}" method="post">
-                        <input type="hidden" name="exerciseName" th:value="${exercise.fullName}">
-                        <input type="hidden" name="type" value="free-weight">
-                        
-                        <button type="submit" class="bookmark-btn" title="ブックマーク">
-                            <i th:class="${bookmarkedNames != null && bookmarkedNames.contains(exercise.fullName) ? 'fa-solid fa-bookmark bookmark-active' : 'fa-regular fa-bookmark'}"></i>
-                        </button>
-                    </form>
-                </div>
-
-                <div class="exercise-content">
-                    <div class="info-row">
-                        <span class="info-label"><i class="fa-solid fa-person-running"></i> やり方</span>
-                        <p class="info-text" th:text="${exercise.howTo}">ここにやり方が表示されます。</p>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label"><i class="fa-solid fa-circle-check"></i> ポイント</span>
-                        <p class="info-text" th:text="${exercise.points}">ここにポイントが表示されます。</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="search-container">
+        <input type="text" id="exerciseSearchInput" class="search-box" placeholder="🔍 種目名、部位、器具で検索..." onkeyup="filterExercises()">
     </div>
     
-    <div class="exercise-section">
-        <h2 id="part-cardio"><i class="fa-solid fa-running"></i> 有酸素運動</h2>
-        
-        <div class="exercise-grid">
-            <div class="exercise-detail-card" th:each="exercise : ${cardioExercises}">
-                <div class="exercise-header">
-                    <h3>
-                        <span th:text="${exercise.name}">種目名</span>
-                        
-                        <span th:if="${exercise.difficulty == '初級'}" class="level-badge level-beginner">初級</span>
-                        <span th:if="${exercise.difficulty == '中級'}" class="level-badge level-intermediate">中級</span>
-                        <span th:if="${exercise.difficulty == '上級'}" class="level-badge level-advanced">上級</span>
-                    </h3>
+    <div id="noResultsMessage" class="no-results">
+        <p>一致する種目が見つかりません。</p>
+    </div>
 
-                    <form th:action="@{/training/bookmark/toggle}" method="post">
-                        <input type="hidden" name="exerciseName" th:value="${exercise.fullName}">
-                        <input type="hidden" name="type" value="cardio">
-                        
-                        <button type="submit" class="bookmark-btn" title="ブックマーク">
-                            <i th:class="${bookmarkedNames != null && bookmarkedNames.contains(exercise.fullName) ? 'fa-solid fa-bookmark bookmark-active' : 'fa-regular fa-bookmark'}"></i>
+    <div id="exerciseListContainer">
+        <div th:each="entry : ${freeWeightExercisesByPart}" class="category-section">
+            <h2 th:text="${entry.key}" class="category-title" th:data-keywords="${entry.key}">部位名</h2>
+            <ul class="exercise-list">
+                <li th:each="exercise : ${entry.value}" class="exercise-item">
+                    <div class="exercise-info">
+                        <span class="exercise-name" th:text="${exercise.name}">ベンチプレス</span>
+                        <span class="exercise-details">
+                            <i class="fa-solid fa-bullseye"></i> <span th:text="${exercise.targetMuscle}">大胸筋</span> | 
+                            <i class="fa-solid fa-toolbox"></i> <span th:text="${exercise.equipment}">バーベル</span>
+                        </span>
+                    </div>
+                    
+                    <form th:action="@{/training/bookmark/toggle}" method="post" style="display:inline;">
+                        <input type="hidden" name="exerciseName" th:value="${exercise.name}"/>
+                        <input type="hidden" name="type" value="WEIGHT"/>
+                        <button type="submit" class="bookmark-btn" th:classappend="${#lists.contains(bookmarkedNames, exercise.name)} ? 'active'">
+                            <i th:class="${#lists.contains(bookmarkedNames, exercise.name)} ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
                         </button>
                     </form>
-                </div>
+                </li>
+            </ul>
+        </div>
 
-                <div class="exercise-content">
-                    <div class="info-row">
-                        <span class="info-label"><i class="fa-solid fa-person-running"></i> やり方</span>
-                        <p class="info-text" th:text="${exercise.howTo}">説明</p>
+        <div class="category-section">
+            <h2 class="category-title" data-keywords="有酸素 カーディオ">有酸素運動</h2>
+            <ul class="exercise-list">
+                <li th:each="exercise : ${cardioExercises}" class="exercise-item">
+                    <div class="exercise-info">
+                        <span class="exercise-name" th:text="${exercise.name}">ランニング</span>
+                        <span class="exercise-details">
+                            <i class="fa-solid fa-heart-pulse"></i> <span th:text="${exercise.targetMuscle}">全身</span> | 
+                            <i class="fa-solid fa-toolbox"></i> <span th:text="${exercise.equipment}">マシン</span>
+                        </span>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label"><i class="fa-solid fa-circle-check"></i> ポイント</span>
-                        <p class="info-text" th:text="${exercise.points}">ポイント</p>
-                    </div>
-                </div>
-            </div>
+                    
+                    <form th:action="@{/training/bookmark/toggle}" method="post" style="display:inline;">
+                        <input type="hidden" name="exerciseName" th:value="${exercise.name}"/>
+                        <input type="hidden" name="type" value="CARDIO"/>
+                        <button type="submit" class="bookmark-btn" th:classappend="${#lists.contains(bookmarkedNames, exercise.name)} ? 'active'">
+                            <i th:class="${#lists.contains(bookmarkedNames, exercise.name)} ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+                        </button>
+                    </form>
+                </li>
+            </ul>
         </div>
     </div>
-
-    <div class="button-container" style="margin-top: 40px; text-align: center;">
-        <a th:href="@{/training/bookmarks}" class="button primary">
-            <i class="fa-solid fa-bookmark"></i> ブックマーク一覧へ
-        </a>
-		<a th:href="@{/training}" class="button secondary">
-		            <i class="fa-solid fa-arrow-rotate-left"></i> メニュー選択に戻る
-		        </a>
-    </div>
-
 </div>
+
+<div th:replace="fragments/footer :: footer"></div>
+
+<script>
+    function filterExercises() {
+        const input = document.getElementById('exerciseSearchInput');
+        const filter = input.value.toLowerCase().replace(/\s+/g, ''); // スペース除去して小文字化
+        const container = document.getElementById('exerciseListContainer');
+        const categories = container.getElementsByClassName('category-section');
+        let totalVisibleItems = 0;
+
+        for (let i = 0; i < categories.length; i++) {
+            const category = categories[i];
+            const items = category.getElementsByClassName('exercise-item');
+            let hasVisibleItem = false;
+
+            for (let j = 0; j < items.length; j++) {
+                const item = items[j];
+                const name = item.querySelector('.exercise-name').textContent || "";
+                const details = item.querySelector('.exercise-details').textContent || "";
+                // 検索対象のテキストを結合
+                const textValue = (name + details).toLowerCase().replace(/\s+/g, '');
+
+                if (textValue.includes(filter)) {
+                    item.style.display = "";
+                    hasVisibleItem = true;
+                    totalVisibleItems++;
+                } else {
+                    item.style.display = "none";
+                }
+            }
+
+            // カテゴリ内のアイテムが全て非表示なら、カテゴリタイトルも消す
+            if (hasVisibleItem) {
+                category.style.display = "";
+            } else {
+                category.style.display = "none";
+            }
+        }
+        
+        // 何も見つからなかった場合のメッセージ表示
+        const noResultsMsg = document.getElementById('noResultsMessage');
+        if (totalVisibleItems === 0) {
+            noResultsMsg.style.display = "block";
+        } else {
+            noResultsMsg.style.display = "none";
+        }
+    }
+</script>
+
 </body>
 </html>
