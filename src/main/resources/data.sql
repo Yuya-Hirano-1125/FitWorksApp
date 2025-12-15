@@ -76,4 +76,4 @@ VALUES (190, 'ロービアス', 'dark', '★4', 190, 25, '/img/character/190.png
 
 -- シークレット (Secret/Dark)
 INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
-VALUES (250, 'シークレット', 'dark', '???', 250, 50, '/img/placeholder_final.png');
+VALUES (250, 'シークレット', 'secret', '???', 250, 50, '/img/placeholder_final.png');
