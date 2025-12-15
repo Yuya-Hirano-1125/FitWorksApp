@@ -11,8 +11,9 @@
  
 .xp-daily-header { 
     width: 100%; 
-    margin-bottom: 30px; 
-    padding: 12px 0; 
+    /* 隙間を狭くする調整 */
+    margin-bottom: 10px; 
+    padding: 5px 0; 
     border-bottom: 2px dashed var(--secondary-color); 
 } 
  
@@ -351,4 +352,10 @@
     margin: 0 2px;
     text-decoration: underline wavy #ffb300;
     text-underline-offset: 3px;
+}
+
+.home-greeting-sub {
+    font-size: 0.9rem;
+    color: #888;
+    font-weight: 600;
 }
