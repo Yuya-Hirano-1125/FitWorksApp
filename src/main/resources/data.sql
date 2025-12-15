@@ -21,3 +21,59 @@ INSERT OR IGNORE INTO item (name, image_path, type, rarity, sort_order) VALUES (
 
 -- UR（ウルトラレア）素材
 INSERT OR IGNORE INTO item (name, image_path, type, rarity, sort_order) VALUES ('夢幻の鍵', '/img/item/UR-niji.png', '素材', 'UR', 16);
+
+-- ▼ キャラクターデータ (charactersテーブル)
+
+-- 炎属性 (Fire)
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (0, 'エンバーハート', 'fire', '★1', 1, 0, '/img/character/0.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (10, 'ドラコ', 'fire', '★2', 10, 5, '/img/character/10.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (20, 'ドラコス', 'fire', '★3', 20, 10, '/img/character/20.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (30, 'ドラグノイド', 'fire', '★4', 30, 20, '/img/character/30.png');
+
+-- 水属性 (Water)
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (40, 'ルーナドロップ', 'water', '★1', 40, 10, '/img/character/40.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (50, 'ドリー', 'water', '★2', 50, 15, '/img/character/50.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (60, 'ドルフィ', 'water', '★3', 60, 20, '/img/character/60.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (70, 'ドルフィナス', 'water', '★4', 70, 25, '/img/character/70.png');
+
+-- 草属性 (Grass)
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (80, 'フォリアン', 'grass', '★1', 80, 10, '/img/character/80.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (90, 'シル', 'grass', '★2', 90, 15, '/img/character/90.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (100, 'シルファ', 'grass', '★3', 100, 20, '/img/character/100.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (110, 'シルフィナ', 'grass', '★4', 110, 25, '/img/character/110.png');
+
+-- 光属性 (Light)
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (120, 'ハローネスト', 'light', '★1', 120, 10, '/img/character/120.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (130, 'メリー', 'light', '★2', 130, 15, '/img/character/130.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (140, 'メリル', 'light', '★3', 140, 20, '/img/character/140.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (150, 'メリノア', 'light', '★4', 150, 25, '/img/character/150.png');
+
+-- 闇属性 (Dark)
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (160, 'ネビュリス', 'dark', '★1', 160, 10, '/img/character/160.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (170, 'ロービ', 'dark', '★2', 170, 15, '/img/character/170.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (180, 'ローバス', 'dark', '★3', 180, 20, '/img/character/180.png');
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (190, 'ロービアス', 'dark', '★4', 190, 25, '/img/character/190.png');
+
+-- シークレット (Secret/Dark)
+INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, img_url)
+VALUES (250, 'シークレット', 'dark', '???', 250, 50, '/img/placeholder_final.png');
