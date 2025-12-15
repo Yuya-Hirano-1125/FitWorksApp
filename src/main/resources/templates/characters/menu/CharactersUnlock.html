@@ -7,148 +7,160 @@
     <link rel="stylesheet" th:href="@{/css/characters/CharactersUnlock.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        .character-img-wrapper {
-            position: relative; width: 100px; height: 100px;
-            margin: 0 auto 10px; background: #eee;
-            border-radius: 50%; overflow: hidden; border: 3px solid #ccc;
-        }
-        .character-img { width: 100%; height: 100%; object-fit: cover; }
-        .character-img.locked-silhouette {
-            filter: brightness(0) opacity(0.8); -webkit-filter: brightness(0) opacity(0.8);
-        }
-        .img-placeholder {
-            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-            font-size: 3rem; color: #fff; background-color: #888;
-        }
-        /* アイコン背景色 */
-        .character-card.fire .img-placeholder { background: linear-gradient(135deg, #ff9a9e, #fecfef); color: #d63031; }
-        .character-card.water .img-placeholder { background: linear-gradient(120deg, #89f7fe, #66a6ff); color: #0984e3; }
-        .character-card.grass .img-placeholder { background: linear-gradient(120deg, #d4fc79, #96e6a1); color: #00b894; }
-        .character-card.light .img-placeholder { background: linear-gradient(120deg, #f6d365, #fda085); color: #e17055; }
-        .character-card.dark .img-placeholder { background: linear-gradient(to top, #cfd9df, #e2ebf0); color: #636e72; }
-        
-        .evolve-btn.locked-sequence { background-color: #333; color: #777; cursor: not-allowed; border: 1px solid #555; }
-        .material-count.lack { color: #ff4757; font-weight: bold; }
-        /* 属性ヘッダー */
+        .attribute-heading { font-size: 1.5rem; margin: 20px 0; }
         .fire-color { color: #ff7675; border-bottom: 2px solid #ff7675; }
         .water-color { color: #74b9ff; border-bottom: 2px solid #74b9ff; }
         .grass-color { color: #55efc4; border-bottom: 2px solid #55efc4; }
         .light-color { color: #ffeaa7; border-bottom: 2px solid #ffeaa7; }
         .dark-color { color: #a29bfe; border-bottom: 2px solid #a29bfe; }
+        .secret-color { color: #dfe6e9; border-bottom: 2px solid #dfe6e9; font-style: italic; }
+        .character-card { display: inline-block; margin: 10px; text-align: center; }
+        .character-img-wrapper { width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; overflow: hidden; border: 3px solid #ccc; }
+        .character-img { width: 100%; height: 100%; object-fit: cover; }
+        .requirements { font-size: 0.9rem; margin-top: 5px; }
     </style>
 </head>
+
 <body>
+    <!-- ヘッダー -->
     <header>
-        <h1>CRYSTAL PATH</h1>
+        <h1>キャラクター解放画面</h1>
         <div class="status-bar">
-            <div class="status-item"><i class="fa-solid fa-crown" style="color:#ffeb3b;"></i> Lv.<span th:text="${userLevel}">1</span></div>
-            <div class="status-item"><i class="fa-solid fa-gem"></i> 素材管理</div>
+            <div class="status-item">
+                <i class="fa-solid fa-crown" style="color:#ffeb3b;"></i>
+                Lv.<span th:text="${userLevel}">1</span>
+            </div>
+            <div class="status-item">
+                <i class="fa-solid fa-gem"></i> 素材管理
+            </div>
         </div>
     </header>
-    
+
+    <!-- メッセージ表示 -->
     <div class="message-container" style="max-width: 800px; margin: 10px auto;">
-        <div th:if="${message}" style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px;"><span th:text="${message}"></span></div>
-        <div th:if="${error}" style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px;"><span th:text="${error}"></span></div>
-    </div>
-
-    <div class="battle-pass-wrapper">
-        <div class="pass-section">
-            <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
-            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
-                <th:block th:replace="::characterNode(0L, -1L, 'fire')"></th:block>
-                <th:block th:replace="::characterNode(10L, 0L, 'fire')"></th:block>
-                <th:block th:replace="::characterNode(20L, 10L, 'fire')"></th:block>
-                <th:block th:replace="::characterNode(30L, 20L, 'fire')"></th:block>
-            </div></div>
+        <div th:if="${message}" class="alert success">
+            <span th:text="${message}"></span>
         </div>
-        <div class="pass-section">
-            <h2 class="attribute-heading water-color"><i class="fa-solid fa-droplet"></i> 水属性</h2>
-            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
-                <th:block th:replace="::characterNode(40L, -1L, 'water')"></th:block>
-                <th:block th:replace="::characterNode(50L, 40L, 'water')"></th:block>
-                <th:block th:replace="::characterNode(60L, 50L, 'water')"></th:block>
-                <th:block th:replace="::characterNode(70L, 60L, 'water')"></th:block>
-            </div></div>
-        </div>
-        <div class="pass-section">
-            <h2 class="attribute-heading grass-color"><i class="fa-solid fa-leaf"></i> 草属性</h2>
-            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
-                <th:block th:replace="::characterNode(80L, -1L, 'grass')"></th:block>
-                <th:block th:replace="::characterNode(90L, 80L, 'grass')"></th:block>
-                <th:block th:replace="::characterNode(100L, 90L, 'grass')"></th:block>
-                <th:block th:replace="::characterNode(110L, 100L, 'grass')"></th:block>
-            </div></div>
-        </div>
-        <div class="pass-section">
-            <h2 class="attribute-heading light-color"><i class="fa-solid fa-sun"></i> 光属性</h2>
-            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
-                <th:block th:replace="::characterNode(120L, -1L, 'light')"></th:block>
-                <th:block th:replace="::characterNode(130L, 120L, 'light')"></th:block>
-                <th:block th:replace="::characterNode(140L, 130L, 'light')"></th:block>
-                <th:block th:replace="::characterNode(150L, 140L, 'light')"></th:block>
-            </div></div>
-        </div>
-        <div class="pass-section">
-            <h2 class="attribute-heading dark-color"><i class="fa-solid fa-moon"></i> 闇属性</h2>
-            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
-                <th:block th:replace="::characterNode(160L, -1L, 'dark')"></th:block>
-                <th:block th:replace="::characterNode(170L, 160L, 'dark')"></th:block>
-                <th:block th:replace="::characterNode(180L, 170L, 'dark')"></th:block>
-                <th:block th:replace="::characterNode(190L, 180L, 'dark')"></th:block>
-            </div></div>
-        </div>
-        <div class="pass-section">
-            <h2 class="attribute-heading dark-color" style="color:#555;"><i class="fa-solid fa-question"></i> シークレット</h2>
-            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
-                <th:block th:replace="::characterNode(250L, -1L, 'dark')"></th:block>
-            </div></div>
+        <div th:if="${error}" class="alert error">
+            <span th:text="${error}"></span>
         </div>
     </div>
 
-    <div class="back-btn-container">
-        <a th:href="@{/characters}" class="btn-back"><i class="fa-solid fa-reply"></i> 戻る</a>
-    </div>
-
-    <th:block th:fragment="characterNode(id, prevId, matKey)">
-        <div class="pass-node" th:if="${charMap != null and charMap.containsKey(id)}"
-             th:with="chara=${charMap.get(id)}, isUnlocked=${unlockedIds.contains(id)}, isPrevUnlocked=${prevId == -1L or unlockedIds.contains(prevId)}">
-            <div class="node-marker">
-                 <i th:if="${isUnlocked}" class="fa-solid fa-check" style="color:#fff;"></i>
-                 <i th:unless="${isUnlocked}" class="fa-solid fa-lock"></i>
-            </div>
-            <div class="character-card js-card" th:classappend="${isUnlocked ? 'claimed ' + matKey : 'locked-card ' + matKey}">
+    <!-- 炎属性 -->
+    <div class="pass-section">
+        <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
+        <div class="char-list">
+            <div th:each="chara : ${fireChars}" class="character-card fire">
                 <div class="character-img-wrapper">
-                    <div class="evolution-tag" th:text="${chara.rarity}">★</div>
-                    <img class="character-img" th:classappend="${!isUnlocked} ? 'locked-silhouette'" th:src="@{${chara.imgUrl}}" th:alt="${chara.name}"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="img-placeholder" style="display:none;" th:classappend="${!isUnlocked} ? 'locked-silhouette'">
-                        <i class="fa-solid" th:classappend="${matKey == 'fire' ? 'fa-fire' : (matKey == 'water' ? 'fa-droplet' : (matKey == 'grass' ? 'fa-leaf' : (matKey == 'light' ? 'fa-sun' : (matKey == 'dark' ? 'fa-moon' : 'fa-user-secret'))))}"></i>
-                    </div>
+                    <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
                 </div>
-                <div class="card-content">
-                    <p class="character-name" th:text="${chara.name}">Name</p>
-                    <div class="requirements-box">
-                        <div class="req-row" th:classappend="${userLevel < chara.requiredLevel} ? 'lack' : ''">
-                            <i class="fa-solid fa-crown"></i> Lv.<span th:text="${chara.requiredLevel}">1</span>
-                        </div>
-                        <div class="req-row material-count" th:if="${chara.unlockCost > 0}" th:classappend="${(userMaterials[matKey] ?: 0) < chara.unlockCost} ? 'lack' : ''">
-                            <i class="fa-solid fa-gem"></i> <span th:text="${userMaterials[matKey] ?: 0}">0</span> / <span th:text="${chara.unlockCost}">5</span>
-                        </div>
-                        <div class="req-row" th:if="${chara.unlockCost == 0}">初期所持</div>
-                    </div>
-                    <button th:if="${isUnlocked}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                    <th:block th:unless="${isUnlocked}">
-                        <form th:if="${isPrevUnlocked}" th:action="@{/characters/unlock}" method="post">
-                            <input type="hidden" name="characterId" th:value="${chara.id}">
-                            <input type="hidden" name="cost" th:value="${chara.unlockCost}">
-                            <input type="hidden" name="materialType" th:value="${matKey}">
-                            <button type="submit" class="evolve-btn" th:disabled="${userLevel < chara.requiredLevel or (userMaterials[matKey] ?: 0) < chara.unlockCost}">進化</button>
-                        </form>
-                        <button th:unless="${isPrevUnlocked}" type="button" class="evolve-btn locked-sequence" disabled><i class="fa-solid fa-lock"></i> ロック</button>
-                    </th:block>
+                <p class="character-name" th:text="${chara.name}">キャラ名</p>
+                <span class="character-rarity" th:text="${chara.rarity}">★</span>
+                <div class="requirements">
+                    <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+                    <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
                 </div>
             </div>
         </div>
-    </th:block>
-</body>
-</html>
+    </div>
+
+    <!-- 水属性 -->
+    <div class="pass-section">
+        <h2 class="attribute-heading water-color"><i class="fa-solid fa-droplet"></i> 水属性</h2>
+        <div class="char-list">
+            <div th:each="chara : ${waterChars}" class="character-card water">
+                <div class="character-img-wrapper">
+                    <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                </div>
+                <p class="character-name" th:text="${chara.name}">キャラ名</p>
+                <span class="character-rarity" th:text="${chara.rarity}">★</span>
+                <div class="requirements">
+                    <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+                    <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 草属性 -->
+    <div class="pass-section">
+        <h2 class="attribute-heading grass-color"><i class="fa-solid fa-leaf"></i> 草属性</h2>
+        <div class="char-list">
+            <div th:each="chara : ${grassChars}" class="character-card grass">
+                <div class="character-img-wrapper">
+                    <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                </div>
+                <p class="character-name" th:text="${chara.name}">キャラ名</p>
+                <span class="character-rarity" th:text="${chara.rarity}">★</span>
+                <div class="requirements">
+                    <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+                    <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 光属性 -->
+    <div class="pass-section">
+        <h2 class="attribute-heading light-color"><i class="fa-solid fa-sun"></i> 光属性</h2>
+        <div class="char-list">
+            <div th:each="chara : ${lightChars}" class="character-card light">
+                <div class="character-img-wrapper">
+                    <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                </div>
+                <p class="character-name" th:text="${chara.name}">キャラ名</p>
+                <span class="character-rarity" th:text="${chara.rarity}">★</span>
+                <div class="requirements">
+                    <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+                    <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 闇属性 -->
+    <div class="pass-section">
+        <h2 class="attribute-heading dark-color"><i class="fa-solid fa-moon"></i> 闇属性</h2>
+        <div class="char-list">
+            <div th:each="chara : ${darkChars}" class="character-card dark">
+                <div class="character-img-wrapper">
+                    <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                </div>
+                <p class="character-name" th:text="${chara.name}">キャラ名</p>
+                <span class="character-rarity" th:text="${chara.rarity}">★</span>
+                <div class="requirements">
+                    <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+                    <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<!-- シークレット属性 -->
+	<div class="pass-section">
+	    <h2 class="attribute-heading secret-color">
+	        <i class="fa-solid fa-star"></i> シークレット属性
+	    </h2>
+	    <div class="char-list">
+	        <div th:each="chara : ${secretChars}" class="character-card secret">
+	            <div class="character-img-wrapper">
+	                <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+	            </div>
+	            <p class="character-name" th:text="${chara.name}">キャラ名</p>
+	            <span class="character-rarity" th:text="${chara.rarity}">★</span>
+	            <div class="requirements">
+	                <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+	                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
+
+	    <!-- 戻るボタン -->
+	    <div class="back-btn-container" style="margin:20px;">
+	        <a th:href="@{/characters}" class="btn-back"><i class="fa-solid fa-reply"></i> 戻る</a>
+	    </div>
+	</body>
+	</html>
+
