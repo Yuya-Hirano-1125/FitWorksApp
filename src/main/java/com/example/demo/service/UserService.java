@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.MissionStatusDto;
 import com.example.demo.entity.User;
+import com.example.demo.entity.UserItem;
 import com.example.demo.repository.TrainingRecordRepository;
 import com.example.demo.repository.UserItemRepository; // ★追加
 import com.example.demo.repository.UserRepository;
@@ -356,6 +357,16 @@ public class UserService {
         return userRepository.findByUsername(username)
             .map(User::getChipCount)
             .orElse(0);
+    }
+    public int getUserLevel(String username) {
+        return userRepository.findByUsername(username)
+                .map(User::getLevel)
+                .orElse(1); // ユーザーが見つからない場合はLv.1
+    }
+    public int getUserMaterialCount(String username, String materialType) {
+        return userItemRepository.findByUser_UsernameAndItem_Type(username, materialType)
+                .map(UserItem::getCount)
+                .orElse(0);
     }
 
 }

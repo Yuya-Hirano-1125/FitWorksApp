@@ -1,13 +1,15 @@
 package com.example.demo.repository;
 
 import java.util.List;
-import java.util.Optional; // ★追加
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserItem;
 
+@Repository
 public interface UserItemRepository extends JpaRepository<UserItem, Long> {
 
     // ----------------------------------------
@@ -20,7 +22,8 @@ public interface UserItemRepository extends JpaRepository<UserItem, Long> {
     // ユーザーが特定の item を持っているか確認
     boolean existsByUserAndItemId(User user, Long itemId);
 
-
+    // ユーザー名とアイテムのタイプで所持数を取得（素材管理用）
+    Optional<UserItem> findByUser_UsernameAndItem_Type(String username, String type);
 
     // ----------------------------------------
     // ▼ userId / itemId を指定して検索（より軽量）
@@ -31,7 +34,7 @@ public interface UserItemRepository extends JpaRepository<UserItem, Long> {
 
     // userId と itemId で所持確認
     boolean existsByUserIdAndItemId(Long userId, Long itemId);
-    
- // ユーザーIDとアイテムIDで、具体的な所持データ（個数など）を取得します
+
+    // ユーザーIDとアイテムIDで、具体的な所持データ（個数など）を取得
     Optional<UserItem> findByUserIdAndItemId(Long userId, Long itemId);
 }

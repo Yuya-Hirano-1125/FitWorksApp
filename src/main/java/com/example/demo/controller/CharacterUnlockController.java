@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.security.Principal;
 import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
@@ -9,14 +10,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.entity.CharacterEntity;
 import com.example.demo.repository.CharacterRepository;
+import com.example.demo.service.UserService;
 
 @Controller
 public class CharacterUnlockController {
 
     private final CharacterRepository repository;
+    private final UserService userService;
 
-    public CharacterUnlockController(CharacterRepository repository) {
+    public CharacterUnlockController(CharacterRepository repository, UserService userService) {
         this.repository = repository;
+        this.userService = userService;
     }
 
     /**
@@ -26,7 +30,8 @@ public class CharacterUnlockController {
     public String unlockCharacter(@RequestParam Long characterId,
                                   @RequestParam int cost,
                                   @RequestParam String materialType,
-                                  RedirectAttributes redirectAttributes) {
+                                  RedirectAttributes redirectAttributes,
+                                  Principal principal) {
 
         // DBから対象キャラクターを取得
         Optional<CharacterEntity> optChara = repository.findById(characterId);
@@ -37,18 +42,19 @@ public class CharacterUnlockController {
 
         CharacterEntity chara = optChara.get();
 
-        // ===== デバッグログで画像パス確認 =====
+        // ===== デバッグログ =====
         System.out.println("DEBUG: ImagePath=" + chara.getImagePath());
 
-        // TODO: ユーザー情報を取得して素材やレベルをチェックする処理を追加
-        int userLevel = getDummyUserLevel();
-        int userMaterialCount = getDummyUserMaterialCount(materialType);
+        // --- ユーザー情報をDBから取得 ---
+        String username = principal.getName();
+        int userLevel = userService.getUserLevel(username); // DBからレベル取得
+        int userMaterialCount = userService.getUserMaterialCount(username, materialType); // DBから素材数取得
 
         // 判定処理
         boolean canUnlock = (userLevel >= chara.getRequiredLevel() && userMaterialCount >= cost);
 
         if (canUnlock) {
-            // TODO: 実際にはユーザーの素材を減算し、キャラを解放済みに更新する処理を追加
+            // TODO: 素材を減算し、キャラを解放済みに更新する処理を追加
             redirectAttributes.addFlashAttribute(
                 "message",
                 String.format("%s を進化しました！ (必要Lv:%d / 必要素材:%d)",
@@ -68,27 +74,5 @@ public class CharacterUnlockController {
 
         // 一覧画面にリダイレクト
         return "redirect:/characters";
-    }
-
-    /**
-     * 仮のユーザーレベル取得（後でUserEntityに置き換え）
-     */
-    private int getDummyUserLevel() {
-        return 50;
-    }
-
-    /**
-     * 仮の素材数取得（後でUserEntityに置き換え）
-     */
-    private int getDummyUserMaterialCount(String materialType) {
-        switch (materialType) {
-            case "fire": return 20;
-            case "water": return 15;
-            case "grass": return 10;
-            case "light": return 5;
-            case "dark": return 8;
-            case "secret": return 1;
-            default: return 0;
-        }
     }
 }

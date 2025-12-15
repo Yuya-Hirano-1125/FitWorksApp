@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -9,18 +10,21 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.example.demo.entity.CharacterEntity;
 import com.example.demo.repository.CharacterRepository;
+import com.example.demo.service.UserService;
 
 @Controller
 public class CharacterViewController {
 
     private final CharacterRepository repository;
+    private final UserService userService;
 
-    public CharacterViewController(CharacterRepository repository) {
+    public CharacterViewController(CharacterRepository repository, UserService userService) {
         this.repository = repository;
+        this.userService = userService;
     }
 
     @GetMapping("/characters")
-    public String showCharacters(Model model) {
+    public String showCharacters(Model model, Principal principal) {
         // 全キャラクター一覧を取得
         List<CharacterEntity> characters = repository.findAll();
 
@@ -69,8 +73,15 @@ public class CharacterViewController {
                 .filter(c -> "secret".equals(c.getAttribute()) || "シークレット".equals(c.getName()))
                 .toList());
 
-        // 仮のユーザーデータ
-        model.addAttribute("userLevel", 50);
+        // --- ユーザーデータをDBから取得 ---
+        int userLevel = 1;
+        if (principal != null) {
+            String username = principal.getName();
+            userLevel = userService.getUserLevel(username); // DBからレベル取得
+        }
+        model.addAttribute("userLevel", userLevel);
+
+        // 素材や解放済みキャラは仮のまま（後でDB連動に変更可能）
         model.addAttribute("userMaterials", Map.of(
                 "fire", 20,
                 "water", 15,
