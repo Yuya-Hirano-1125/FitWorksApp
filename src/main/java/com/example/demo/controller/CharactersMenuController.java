@@ -27,7 +27,7 @@ public class CharactersMenuController {
         // 1. ユーザーの現在のレベルを取得
         // ★本来はDBから取得: int userLevel = userService.getUserLevel(currentUser);
         // ★ここでは動作確認のためダミー値を設定します
-        int userLevel = 7; 
+        int userLevel = 33; 
         model.addAttribute("userLevel", userLevel);
 
         // 2. すべての背景アイテムのリストを取得（解放レベル情報を含む）

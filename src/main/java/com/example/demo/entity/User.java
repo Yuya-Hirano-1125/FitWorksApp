@@ -46,7 +46,7 @@ public class User {
 
     private String providerId;
 
-    private Integer level = 123;
+    private Integer level = 999;
 
     private LocalDate lastMissionCompletionDate;
     private Boolean isRewardClaimedToday = false;
