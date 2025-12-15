@@ -13,7 +13,6 @@
         .xp-bar { width: 100%; height: 25px; background: #ddd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
         .xp-progress { height: 100%; background: linear-gradient(90deg, #4caf50, #81c784); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
         
-        /* 隙間を極限まで狭く (margin-top: 0) */
         .character-section { position: relative; display: flex; justify-content: center; margin-top: 0px; }
         
         .daily-mission-button { margin-bottom: 5px !important; }
@@ -46,24 +45,20 @@
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-50px); } 100% { transform: translateY(0px); } }
         .character-display img { width: auto; height: 85%; max-width: 95%; object-fit: contain; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9)); }
         
-        /* サイドボタン群: 位置を少し下げる (top: 40px) */
         .character-side-buttons {
             position: absolute;
             display: flex;
             flex-direction: column;
             gap: 12px;
             z-index: 10;
-            
-            /* 上辺から少し下げる */
             top: 40px;
-            /* 枠外の右側に配置 */
             right: -125px; 
         }
 
         @media (max-width: 650px) {
             .character-side-buttons {
                 right: 10px;
-                top: 50px; /* モバイルでも少し下げる */
+                top: 50px; 
             }
         }
 
@@ -152,6 +147,45 @@
         @keyframes point-move { from { transform: translateY(0); } to { transform: translateY(-10px); } }
         .tutorial-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9990; display: none; }
         .tutorial-backdrop.active { display: block; }
+
+        /* 追加: 挨拶文のスタイル */
+        .home-greeting-container {
+            text-align: center;
+            /* キャラクターとの被りを防ぐため余白を大きくする */
+            margin-top: 60px;
+            margin-bottom: 25px;
+        }
+        .home-app-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 900;
+            font-size: 2.8rem;
+            font-style: italic;
+            margin: 0;
+            background: linear-gradient(45deg, #ff69b4, #ffb300);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 2px 4px 10px rgba(255, 105, 180, 0.2);
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+        .home-greeting-text {
+            font-family: 'Noto Sans JP', sans-serif;
+            color: #555;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        .home-username {
+            color: #ff69b4;
+            font-size: 1.2rem;
+            font-weight: 900;
+            margin: 0 2px;
+            text-decoration: underline wavy #ffb300;
+            text-underline-offset: 3px;
+        }
     </style>
 </head>
 <body class="home-page">
@@ -211,8 +245,12 @@
         </div>
     </div>
     
-    <h1>FitWorksへようこそ</h1>
-    <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！'"></p>
+    <div class="home-greeting-container">
+        <h1 class="home-app-title">FitWorks</h1>
+        <p class="home-greeting-text">
+            こんにちは、<span class="home-username" th:text="${username}"></span>さん！
+        </p>
+    </div>
     
     <a id="tutorial-training-btn" th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
        <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i> トレーニングを開始 
@@ -253,15 +291,10 @@
 
     <nav id="tutorial-menu-nav" class="bottom-nav">
         <a id="nav-gacha" th:href="@{/gacha}" class="nav-item"><i class="fa-solid fa-gift"></i><span>ガチャ</span></a>
-        
         <a id="tutorial-friends-btn" th:href="@{/friends}" class="nav-item"><i class="fa-solid fa-user-group"></i><span>フレンド</span></a>
-        
         <a id="nav-community" th:href="@{/community}" class="nav-item"><i class="fa-solid fa-comments"></i><span>掲示板</span></a>
-        
         <a id="nav-char" th:href="@{/characters/menu/CharactersMenu}" class="nav-item"><i class="fa-solid fa-user-astronaut"></i><span>キャラ</span></a>    
-        
         <a id="tutorial-muscles-btn" th:href="@{/muscles}" class="nav-item"><i class="fa-solid fa-child-reaching"></i><span>マッスル</span></a>
-
         <a id="nav-settings" th:href="@{/settings}" class="nav-item"><i class="fa-solid fa-gear"></i><span>設定</span></a>
     </nav>
 </div>
