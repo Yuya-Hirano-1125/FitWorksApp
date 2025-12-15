@@ -45,7 +45,7 @@ public class BackgroundItem {
      * この背景をアンロックするために必要なユーザーレベル
      * 0 の場合は最初から解放済み
      */
-    private int userlevel;
+    private int userLevel;
 
     /**
      * この背景のアンロックに特定の素材が必要か否か

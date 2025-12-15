@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.entity.User;
-import com.example.demo.entity.UserItem;
 import com.example.demo.model.GachaItem;
 import com.example.demo.repository.ItemRepository; // 追加
 import com.example.demo.repository.UserItemRepository; // 追加
@@ -34,33 +33,24 @@ public class GachaController {
         this.itemRepository = itemRepository;
     }
 
-    // 1. ガチャ画面
+ // 1. ガチャ画面
     @GetMapping("/gacha")
     public String index(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         // ログインユーザー情報の取得
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
             Long userId = user.getId();
-            
+
             model.addAttribute("userId", userId); // HTMLでのリンク生成に使用
 
-            // ★追加: シェイカーの所持数を取得して表示
-            // ※アイテム名はDBに登録されている正確な名前を指定してください
-            String shakerItemName = "プロテインシェイカー"; 
-            
-            // ユーザーの所持アイテムリストからシェイカーを探す
-            List<UserItem> userItems = userItemRepository.findByUserId(userId);
-            int shakerCount = userItems.stream()
-                .filter(ui -> ui.getItem().getName().equals(shakerItemName))
-                .mapToInt(UserItem::getQuantity)
-                .findFirst()
-                .orElse(0); // 持っていない場合は0
+            // ★修正: usersテーブルのchipカラムを直接参照
+            int chipCount = user.getChipCount();  // Userエンティティのgetter
+            model.addAttribute("chipCount", chipCount);
 
-            model.addAttribute("shakerCount", shakerCount);
         } else {
-            // 未ログイン時は0またはダミーを表示
-            model.addAttribute("shakerCount", 0);
-            model.addAttribute("userId", 0);
+            // 未ログイン時は0を表示
+            model.addAttribute("chipCount", 0);
+            model.addAttribute("userId", 0L);
         }
 
         model.addAttribute("probabilityList", gachaService.getProbabilityList());
@@ -75,12 +65,11 @@ public class GachaController {
         return "gacha/gacha_animation";
     }
 
-    // 3. ガチャ結果
+ // 3. ガチャ結果画面
     @GetMapping("/gacha/roll")
-    public String roll(
-            @RequestParam("count") int count,
-            @AuthenticationPrincipal UserDetails userDetails,
-            Model model) {
+    public String roll(@RequestParam("count") int count,
+                       @AuthenticationPrincipal UserDetails userDetails,
+                       Model model) {
 
         if (userDetails == null) {
             return "redirect:/login";
@@ -89,12 +78,25 @@ public class GachaController {
         User user = userService.findByUsername(userDetails.getUsername());
         Long userId = user.getId();
 
-        // ここでシェイカー消費ロジックが必要な場合はServiceに実装する
-        // gachaService.consumeShaker(userId, count); 
+        // ★チップ消費ロジック
+        int cost = (count == 1) ? 1 : 5; // 1回なら1枚、6連なら5枚
+        boolean success = user.useChips(cost);
 
+        if (!success) {
+            // チップ不足ならガチャできない
+            model.addAttribute("errorMessage", "チップが不足しています！");
+            return "gacha/error"; // エラーページを用意するか、同じ画面に戻す
+        }
+
+        // 消費後の状態を保存
+        userService.save(user);
+
+        // ガチャ結果を生成
         List<GachaItem> results = gachaService.roll(count, userId);
-
         model.addAttribute("results", results);
+
+        // 最新のチップ数を渡す
+        model.addAttribute("chipCount", user.getChipCount());
 
         return "gacha/result";
     }

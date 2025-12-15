@@ -24,10 +24,10 @@ public interface BackgroundItemRepository extends JpaRepository<BackgroundItem, 
     
     /**
      * 【追加機能の例】解放レベルが特定のレベル以下の背景アイテムのみを取得する。
-     * フィールド名（requiredLevel）に基づき、Spring Data JPAがクエリを自動生成します。
-     *
-     * @param requiredLevel 必要なレベル
-     * @return 必要なレベル以下の BackgroundItem エンティティのリスト
+     * フィールド名（userLevel）に基づき、Spring Data JPAがクエリを自動生成します。
+     * * @param currentLevel ユーザーの現在のレベル
+     * @return 必要なレベル（userLevel）以下の BackgroundItem エンティティのリスト
      */
-    List<BackgroundItem> findByRequiredLevelLessThanEqual(int currentLevel);
+    // ⬇️ 修正箇所: 'RequiredLevel' を 'UserLevel' に変更 
+    List<BackgroundItem> findByUserLevelLessThanEqual(int currentLevel);
 }

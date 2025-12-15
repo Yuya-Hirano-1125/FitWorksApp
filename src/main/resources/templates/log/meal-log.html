@@ -60,6 +60,12 @@
 		    vertical-align: top;
 		    background-color: #fff;
 		}
+		/* 平日は黒文字 */
+		.calendar-day-header.weekday,
+		.calendar-day-cell.weekday .day-number {
+		    color: #000;   /* 黒文字 */
+		    background-color: #fff; /* 白背景（必要なら） */
+		}
 
 		/* 日曜は赤 */
 		.calendar-day-header.sun,
@@ -111,8 +117,12 @@
     </div>
 
     <div class="calendar-grid">
-        <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" 
-             th:classappend="${dayLabel == '土'} ? 'sat' : ((${dayLabel == '日'} ? 'sun' : ''))">曜日</div>
+		<div class="calendar-day-header" 
+		     th:each="dayLabel : ${dayLabels}" 
+		     th:text="${dayLabel}" 
+		     th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')">
+		    曜日
+		</div>
         
         <th:block th:each="date : ${calendarDays}">
             <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''},

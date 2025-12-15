@@ -17,6 +17,9 @@ public class TrainingLogicService {
 
     @Autowired
     private TrainingDataService trainingDataService;
+    @Autowired
+    private UserService userService;
+
 
     // 定数
     private static final int XP_BEGINNER = 300;
@@ -36,6 +39,32 @@ public class TrainingLogicService {
             return XP_BEGINNER;
         }
         return XP_BEGINNER;
+    }
+    
+    /**
+     * 種目から獲得できるベースXPに基づき、獲得チップ数を計算する。
+     * (このメソッドはTrainingControllerなどから呼び出されます)
+     * * @param exerciseFullName トレーニング種目名 (難易度タグを含む)
+     * @return 獲得チップ数 (int)
+     */
+    public int calculateChipReward(String exerciseFullName) {
+        // 最初に種目の難易度に応じたベースXPを取得する
+        int baseXp = getExperiencePoints(exerciseFullName);
+
+        // XP値とチップの対応付け
+        if (baseXp == XP_ADVANCED) {
+            // 上級 (1000 XP) -> 5 チップ
+            return 5;
+        } else if (baseXp == XP_INTERMEDIATE) {
+            // 中級 (500 XP) -> 3 チップ
+            return 3;
+        } else if (baseXp == XP_BEGINNER) {
+            // 初級 (300 XP) -> 1 チップ
+            return 1;
+        }
+        
+        // それ以外 (0 XPまたはその他の難易度) の場合はチップなし
+        return 0;
     }
 
     public int calculateTotalVolumeXp(TrainingLogForm form) {
@@ -161,5 +190,17 @@ public class TrainingLogicService {
             // デフォルト
             return "ウォーキング"; 
         }
+    }
+    // --- チップ付与処理 ---
+    /**
+     * トレーニング終了後に獲得したチップをユーザーに付与してDBに保存する
+     * @param username ユーザー名
+     * @param exerciseFullName 種目名
+     * @return 獲得チップ数
+     */
+    public int rewardUserWithChips(String username, String exerciseFullName) {
+        int chips = calculateChipReward(exerciseFullName);
+        userService.addChips(username, chips); // UserServiceを使って保存
+        return chips;
     }
 }

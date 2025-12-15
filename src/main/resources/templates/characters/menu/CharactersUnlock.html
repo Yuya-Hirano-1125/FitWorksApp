@@ -2,710 +2,153 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>進化の軌跡</title>
-    <link rel="stylesheet" th:href="@{/css/base.css}" href="base.css">
-    <link rel="stylesheet" th:href="@{/css/characters/CharactersUnlock.css}" href="CharactersUnlock.css">
+    <title>進化の軌跡 - CRYSTAL PATH</title>
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/characters/CharactersUnlock.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        .character-img-wrapper {
+            position: relative; width: 100px; height: 100px;
+            margin: 0 auto 10px; background: #eee;
+            border-radius: 50%; overflow: hidden; border: 3px solid #ccc;
+        }
+        .character-img { width: 100%; height: 100%; object-fit: cover; }
+        .character-img.locked-silhouette {
+            filter: brightness(0) opacity(0.8); -webkit-filter: brightness(0) opacity(0.8);
+        }
+        .img-placeholder {
+            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: #fff; background-color: #888;
+        }
+        /* アイコン背景色 */
+        .character-card.fire .img-placeholder { background: linear-gradient(135deg, #ff9a9e, #fecfef); color: #d63031; }
+        .character-card.water .img-placeholder { background: linear-gradient(120deg, #89f7fe, #66a6ff); color: #0984e3; }
+        .character-card.grass .img-placeholder { background: linear-gradient(120deg, #d4fc79, #96e6a1); color: #00b894; }
+        .character-card.light .img-placeholder { background: linear-gradient(120deg, #f6d365, #fda085); color: #e17055; }
+        .character-card.dark .img-placeholder { background: linear-gradient(to top, #cfd9df, #e2ebf0); color: #636e72; }
+        
+        .evolve-btn.locked-sequence { background-color: #333; color: #777; cursor: not-allowed; border: 1px solid #555; }
+        .material-count.lack { color: #ff4757; font-weight: bold; }
+        /* 属性ヘッダー */
+        .fire-color { color: #ff7675; border-bottom: 2px solid #ff7675; }
+        .water-color { color: #74b9ff; border-bottom: 2px solid #74b9ff; }
+        .grass-color { color: #55efc4; border-bottom: 2px solid #55efc4; }
+        .light-color { color: #ffeaa7; border-bottom: 2px solid #ffeaa7; }
+        .dark-color { color: #a29bfe; border-bottom: 2px solid #a29bfe; }
+    </style>
 </head>
 <body>
-
     <header>
         <h1>CRYSTAL PATH</h1>
         <div class="status-bar">
-            <div class="status-item">
-                <i class="fa-solid fa-crown" style="color:#ffeb3b;"></i> 
-                Lv.<span id="current-level">1</span>
-            </div>
+            <div class="status-item"><i class="fa-solid fa-crown" style="color:#ffeb3b;"></i> Lv.<span th:text="${userLevel}">1</span></div>
+            <div class="status-item"><i class="fa-solid fa-gem"></i> 素材管理</div>
         </div>
     </header>
     
-    <div class="message-container" style="max-width: 800px; margin: 10px auto; padding: 0 10px;">
-        <div th:if="${message}" style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-            <i class="fa-solid fa-check-circle"></i> <span th:text="${message}"></span>
-        </div>
-        <div th:if="${error}" style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-            <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${error}"></span>
-        </div>
+    <div class="message-container" style="max-width: 800px; margin: 10px auto;">
+        <div th:if="${message}" style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px;"><span th:text="${message}"></span></div>
+        <div th:if="${error}" style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px;"><span th:text="${error}"></span></div>
     </div>
 
     <div class="battle-pass-wrapper">
-
         <div class="pass-section">
             <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
-            <div class="pass-track-container">
-                <div class="pass-track">
-                    <div class="track-line"></div>
-                    <div class="track-line-progress" id="progress-fire"></div>
-
-                    <div class="pass-node claimed">
-                        <div class="node-marker"><i class="fa-solid fa-heart"></i></div>
-                        <div class="character-card fire js-card" data-req-level="1" data-cost="0" data-type="fire">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★1</div>
-                                <img class="character-img" th:src="@{/img/character/0.png}" src="/img/character/0.png" alt="エンバーハート">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">エンバーハート</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level">Lv.1</div>
-                                    <div class="req-row js-req-material">初期所持</div>
-                                </div>
-                                <button class="evolve-btn disabled js-evolve-btn" type="button">GET済み</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(10L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(10L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card fire js-card" 
-                             th:classappend="${!unlockedIds.contains(10L)} ? 'locked-card'" 
-                             data-req-level="10" data-cost="5" data-type="fire">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★2</div>
-                                <img class="character-img" th:src="@{/img/character/10.png}" src="/img/character/10.png" alt="ドラコ">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ドラコ</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.10</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                
-                                <form th:if="${!unlockedIds.contains(10L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="10">
-                                    <input type="hidden" name="cost" value="5">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(10L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(10L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.10</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(20L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(20L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card fire js-card" 
-                             th:classappend="${!unlockedIds.contains(20L)} ? 'locked-card'"
-                             data-req-level="20" data-cost="10" data-type="fire">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★3</div>
-                                <img class="character-img" th:src="@{/img/character/20.png}" src="/img/character/20.png" alt="ドラコス">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ドラコス</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.20</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(20L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="20">
-                                    <input type="hidden" name="cost" value="10">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(20L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(20L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.20</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(30L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(30L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card fire js-card" 
-                             th:classappend="${!unlockedIds.contains(30L)} ? 'locked-card'"
-                             data-req-level="30" data-cost="20" data-type="fire">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★4</div>
-                                <img class="character-img" th:src="@{/img/character/30.png}" src="/img/character/30.png" alt="ドラグノイド">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ドラグノイド</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.30</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(30L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="30">
-                                    <input type="hidden" name="cost" value="20">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(30L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(30L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.30</p></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
+                <th:block th:replace="::characterNode(0L, -1L, 'fire')"></th:block>
+                <th:block th:replace="::characterNode(10L, 0L, 'fire')"></th:block>
+                <th:block th:replace="::characterNode(20L, 10L, 'fire')"></th:block>
+                <th:block th:replace="::characterNode(30L, 20L, 'fire')"></th:block>
+            </div></div>
         </div>
-
         <div class="pass-section">
             <h2 class="attribute-heading water-color"><i class="fa-solid fa-droplet"></i> 水属性</h2>
-            <div class="pass-track-container">
-                <div class="pass-track">
-                    <div class="track-line"></div>
-                    <div class="track-line-progress" id="progress-water"></div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(40L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(40L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card water js-card" 
-                             th:classappend="${!unlockedIds.contains(40L)} ? 'locked-card'"
-                             data-req-level="40" data-cost="10" data-type="water">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★1</div>
-                                <img class="character-img" th:src="@{/img/character/40.png}" src="/img/character/40.png" alt="ルーナドロップ">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ルーナドロップ</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.40</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(40L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="40">
-                                    <input type="hidden" name="cost" value="10">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(40L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(40L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.40</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(50L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(50L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card water js-card" 
-                             th:classappend="${!unlockedIds.contains(50L)} ? 'locked-card'"
-                             data-req-level="50" data-cost="15" data-type="water">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★2</div>
-                                <img class="character-img" th:src="@{/img/character/50.png}" src="/img/character/50.png" alt="ドリー">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ドリー</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.50</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(50L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="50">
-                                    <input type="hidden" name="cost" value="15">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(50L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(50L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.50</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(60L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(60L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card water js-card" 
-                             th:classappend="${!unlockedIds.contains(60L)} ? 'locked-card'"
-                             data-req-level="60" data-cost="20" data-type="water">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★3</div>
-                                <img class="character-img" th:src="@{/img/character/60.png}" src="/img/character/60.png" alt="ドルフィ">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ドルフィ</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.60</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(60L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="60">
-                                    <input type="hidden" name="cost" value="20">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(60L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(60L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.60</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(70L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(70L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card water js-card" 
-                             th:classappend="${!unlockedIds.contains(70L)} ? 'locked-card'"
-                             data-req-level="70" data-cost="25" data-type="water">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★4</div>
-                                <img class="character-img" th:src="@{/img/character/70.png}" src="/img/character/70.png" alt="ドルフィナス">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ドルフィナス</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.70</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(70L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="70">
-                                    <input type="hidden" name="cost" value="25">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(70L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(70L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.70</p></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
+                <th:block th:replace="::characterNode(40L, -1L, 'water')"></th:block>
+                <th:block th:replace="::characterNode(50L, 40L, 'water')"></th:block>
+                <th:block th:replace="::characterNode(60L, 50L, 'water')"></th:block>
+                <th:block th:replace="::characterNode(70L, 60L, 'water')"></th:block>
+            </div></div>
         </div>
-
         <div class="pass-section">
             <h2 class="attribute-heading grass-color"><i class="fa-solid fa-leaf"></i> 草属性</h2>
-            <div class="pass-track-container">
-                <div class="pass-track">
-                    <div class="track-line"></div>
-                    <div class="track-line-progress" id="progress-grass"></div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(80L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(80L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card grass js-card" 
-                             th:classappend="${!unlockedIds.contains(80L)} ? 'locked-card'"
-                             data-req-level="80" data-cost="10" data-type="grass">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★1</div>
-                                <img class="character-img" th:src="@{/img/character/80.png}" src="/img/character/80.png" alt="フォリアン">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">フォリアン</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.80</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(80L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="80">
-                                    <input type="hidden" name="cost" value="10">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(80L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(80L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.80</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(90L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(90L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card grass js-card" 
-                             th:classappend="${!unlockedIds.contains(90L)} ? 'locked-card'"
-                             data-req-level="90" data-cost="15" data-type="grass">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★2</div>
-                                <img class="character-img" th:src="@{/img/character/90.png}" src="/img/character/90.png" alt="シル">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">シル</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.90</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(90L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="90">
-                                    <input type="hidden" name="cost" value="15">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(90L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(90L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.90</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(100L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(100L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card grass js-card" 
-                             th:classappend="${!unlockedIds.contains(100L)} ? 'locked-card'"
-                             data-req-level="100" data-cost="20" data-type="grass">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★3</div>
-                                <img class="character-img" th:src="@{/img/character/100.png}" src="/img/character/100.png" alt="シルファ">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">シルファ</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.100</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(100L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="100">
-                                    <input type="hidden" name="cost" value="20">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(100L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(100L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.100</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(110L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(110L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card grass js-card" 
-                             th:classappend="${!unlockedIds.contains(110L)} ? 'locked-card'"
-                             data-req-level="110" data-cost="25" data-type="grass">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★4</div>
-                                <img class="character-img" th:src="@{/img/character/110.png}" src="/img/character/110.png" alt="シルフィナ">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">シルフィナ</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.110</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(110L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="110">
-                                    <input type="hidden" name="cost" value="25">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(110L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(110L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.110</p></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
+                <th:block th:replace="::characterNode(80L, -1L, 'grass')"></th:block>
+                <th:block th:replace="::characterNode(90L, 80L, 'grass')"></th:block>
+                <th:block th:replace="::characterNode(100L, 90L, 'grass')"></th:block>
+                <th:block th:replace="::characterNode(110L, 100L, 'grass')"></th:block>
+            </div></div>
         </div>
-
         <div class="pass-section">
             <h2 class="attribute-heading light-color"><i class="fa-solid fa-sun"></i> 光属性</h2>
-            <div class="pass-track-container">
-                <div class="pass-track">
-                    <div class="track-line"></div>
-                    <div class="track-line-progress" id="progress-light"></div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(120L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(120L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card light js-card" 
-                             th:classappend="${!unlockedIds.contains(120L)} ? 'locked-card'"
-                             data-req-level="120" data-cost="10" data-type="light">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★1</div>
-                                <img class="character-img" th:src="@{/img/character/120.png}" src="/img/character/120.png" alt="ハローネスト">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ハローネスト</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.120</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(120L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="120">
-                                    <input type="hidden" name="cost" value="10">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(120L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(120L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.120</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(130L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(130L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card light js-card" 
-                             th:classappend="${!unlockedIds.contains(130L)} ? 'locked-card'"
-                             data-req-level="130" data-cost="15" data-type="light">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★2</div>
-                                <img class="character-img" th:src="@{/img/character/130.png}" src="/img/character/130.png" alt="メリー">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">メリー</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.130</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(130L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="130">
-                                    <input type="hidden" name="cost" value="15">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(130L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(130L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.130</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(140L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(140L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card light js-card" 
-                             th:classappend="${!unlockedIds.contains(140L)} ? 'locked-card'"
-                             data-req-level="140" data-cost="20" data-type="light">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★3</div>
-                                <img class="character-img" th:src="@{/img/character/140.png}" src="/img/character/140.png" alt="メリル">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">メリル</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.140</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(140L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="140">
-                                    <input type="hidden" name="cost" value="20">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(140L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(140L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.140</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(150L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(150L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card light js-card" 
-                             th:classappend="${!unlockedIds.contains(150L)} ? 'locked-card'"
-                             data-req-level="150" data-cost="25" data-type="light">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★4</div>
-                                <img class="character-img" th:src="@{/img/character/150.png}" src="/img/character/150.png" alt="メリノア">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">メリノア</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.150</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(150L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="150">
-                                    <input type="hidden" name="cost" value="25">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(150L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(150L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.150</p></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
+                <th:block th:replace="::characterNode(120L, -1L, 'light')"></th:block>
+                <th:block th:replace="::characterNode(130L, 120L, 'light')"></th:block>
+                <th:block th:replace="::characterNode(140L, 130L, 'light')"></th:block>
+                <th:block th:replace="::characterNode(150L, 140L, 'light')"></th:block>
+            </div></div>
         </div>
-
         <div class="pass-section">
             <h2 class="attribute-heading dark-color"><i class="fa-solid fa-moon"></i> 闇属性</h2>
-            <div class="pass-track-container">
-                <div class="pass-track">
-                    <div class="track-line"></div>
-                    <div class="track-line-progress" id="progress-dark"></div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(160L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(160L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card dark js-card" 
-                             th:classappend="${!unlockedIds.contains(160L)} ? 'locked-card'"
-                             data-req-level="160" data-cost="10" data-type="dark">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★1</div>
-                                <img class="character-img" th:src="@{/img/character/160.png}" src="/img/character/160.png" alt="ネビュリス">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ネビュリス</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.160</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(160L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="160">
-                                    <input type="hidden" name="cost" value="10">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(160L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(160L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.160</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(170L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(170L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card dark js-card" 
-                             th:classappend="${!unlockedIds.contains(170L)} ? 'locked-card'"
-                             data-req-level="170" data-cost="15" data-type="dark">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★2</div>
-                                <img class="character-img" th:src="@{/img/character/170.png}" src="/img/character/170.png" alt="ロービ">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ロービ</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.170</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(170L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="170">
-                                    <input type="hidden" name="cost" value="15">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(170L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(170L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.170</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(180L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(180L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card dark js-card" 
-                             th:classappend="${!unlockedIds.contains(180L)} ? 'locked-card'"
-                             data-req-level="180" data-cost="20" data-type="dark">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★3</div>
-                                <img class="character-img" th:src="@{/img/character/180.png}" src="/img/character/180.png" alt="ローバス">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ローバス</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.180</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(180L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="180">
-                                    <input type="hidden" name="cost" value="20">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(180L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(180L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.180</p></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(190L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(190L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card dark js-card" 
-                             th:classappend="${!unlockedIds.contains(190L)} ? 'locked-card'"
-                             data-req-level="190" data-cost="25" data-type="dark">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">★4</div>
-                                <img class="character-img" th:src="@{/img/character/190.png}" src="/img/character/190.png" alt="ロービアス">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">ロービアス</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.190</div>
-                                    <div class="req-row js-req-material">必要素材</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(190L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="190">
-                                    <input type="hidden" name="cost" value="25">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">進化</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(190L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(190L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.190</p></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
+                <th:block th:replace="::characterNode(160L, -1L, 'dark')"></th:block>
+                <th:block th:replace="::characterNode(170L, 160L, 'dark')"></th:block>
+                <th:block th:replace="::characterNode(180L, 170L, 'dark')"></th:block>
+                <th:block th:replace="::characterNode(190L, 180L, 'dark')"></th:block>
+            </div></div>
         </div>
-
         <div class="pass-section">
-            <h2 class="attribute-heading dark-color" style="color:#fff; text-shadow:2px 2px 0 #888;"><i class="fa-solid fa-question"></i> シークレット</h2>
-            <div class="pass-track-container">
-                <div class="pass-track">
-                    <div class="track-line" style="opacity:0.3;"></div>
-
-                    <div class="pass-node">
-                        <div class="node-marker">
-                             <i th:if="${!unlockedIds.contains(250L)}" class="fa-solid fa-lock"></i>
-                             <i th:if="${unlockedIds.contains(250L)}" class="fa-solid fa-check" style="color:#fff;"></i>
-                        </div>
-                        <div class="character-card dark js-card" 
-                             th:classappend="${!unlockedIds.contains(250L)} ? 'locked-card'"
-                             data-req-level="250" data-cost="50" data-type="dark">
-                            <div class="character-img-wrapper">
-                                <div class="evolution-tag">???</div>
-                                <img class="character-img" th:src="@{/img/placeholder_final.png}" src="/img/placeholder_final.png" alt="シークレット">
-                            </div>
-                            <div class="card-content">
-                                <p class="character-name">シークレット</p>
-                                <div class="requirements-box">
-                                    <div class="req-row js-req-level"><i class="fa-solid fa-crown"></i> Lv.250</div>
-                                    <div class="req-row js-req-material">特別解放</div>
-                                </div>
-                                <form th:if="${!unlockedIds.contains(250L)}" th:action="@{/characters/unlock}" method="post">
-                                    <input type="hidden" name="characterId" value="250">
-                                    <input type="hidden" name="cost" value="50">
-                                    <button type="submit" class="evolve-btn disabled js-evolve-btn">解放する</button>
-                                </form>
-                                <button th:if="${unlockedIds.contains(250L)}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
-                            </div>
-                            <div class="lock-overlay" th:if="${!unlockedIds.contains(250L)}"><p class="lock-text">未開放</p><p class="lock-required-level">必要: Lv.250</p></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <h2 class="attribute-heading dark-color" style="color:#555;"><i class="fa-solid fa-question"></i> シークレット</h2>
+            <div class="pass-track-container"><div class="pass-track"><div class="track-line"></div>
+                <th:block th:replace="::characterNode(250L, -1L, 'dark')"></th:block>
+            </div></div>
         </div>
-
     </div>
 
     <div class="back-btn-container">
-        <a th:href="@{/characters}" class="btn-back">
-            <i class="fa-solid fa-reply"></i> キャラクターメニューへ戻る
-        </a>
+        <a th:href="@{/characters}" class="btn-back"><i class="fa-solid fa-reply"></i> 戻る</a>
     </div>
 
-    <div style="position:fixed; bottom:80px; right:10px; opacity:0.8; z-index:9999;">
-        <div class="ff-window" style="padding:10px; background:linear-gradient(to bottom, #74b9ff, #0984e3); border:2px solid #fff;">
-            <div style="font-size:12px; margin-bottom:5px; font-weight:bold;">デバッグ魔法</div>
-            <button onclick="window.addLevel(10)" class="evolve-btn" style="font-size:10px; width:auto; padding:4px;">Lv+10</button>
-            <button onclick="window.debugAddMaterial('fire', 'r', 5)" class="evolve-btn" style="font-size:10px; width:auto; padding:4px;">炎素材+5</button>
-            <button onclick="location.reload()" class="evolve-btn" style="background:#ff7675; font-size:10px; width:auto; padding:4px;">リセット</button>
+    <th:block th:fragment="characterNode(id, prevId, matKey)">
+        <div class="pass-node" th:if="${charMap != null and charMap.containsKey(id)}"
+             th:with="chara=${charMap.get(id)}, isUnlocked=${unlockedIds.contains(id)}, isPrevUnlocked=${prevId == -1L or unlockedIds.contains(prevId)}">
+            <div class="node-marker">
+                 <i th:if="${isUnlocked}" class="fa-solid fa-check" style="color:#fff;"></i>
+                 <i th:unless="${isUnlocked}" class="fa-solid fa-lock"></i>
+            </div>
+            <div class="character-card js-card" th:classappend="${isUnlocked ? 'claimed ' + matKey : 'locked-card ' + matKey}">
+                <div class="character-img-wrapper">
+                    <div class="evolution-tag" th:text="${chara.rarity}">★</div>
+                    <img class="character-img" th:classappend="${!isUnlocked} ? 'locked-silhouette'" th:src="@{${chara.imgUrl}}" th:alt="${chara.name}"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="img-placeholder" style="display:none;" th:classappend="${!isUnlocked} ? 'locked-silhouette'">
+                        <i class="fa-solid" th:classappend="${matKey == 'fire' ? 'fa-fire' : (matKey == 'water' ? 'fa-droplet' : (matKey == 'grass' ? 'fa-leaf' : (matKey == 'light' ? 'fa-sun' : (matKey == 'dark' ? 'fa-moon' : 'fa-user-secret'))))}"></i>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p class="character-name" th:text="${chara.name}">Name</p>
+                    <div class="requirements-box">
+                        <div class="req-row" th:classappend="${userLevel < chara.requiredLevel} ? 'lack' : ''">
+                            <i class="fa-solid fa-crown"></i> Lv.<span th:text="${chara.requiredLevel}">1</span>
+                        </div>
+                        <div class="req-row material-count" th:if="${chara.unlockCost > 0}" th:classappend="${(userMaterials[matKey] ?: 0) < chara.unlockCost} ? 'lack' : ''">
+                            <i class="fa-solid fa-gem"></i> <span th:text="${userMaterials[matKey] ?: 0}">0</span> / <span th:text="${chara.unlockCost}">5</span>
+                        </div>
+                        <div class="req-row" th:if="${chara.unlockCost == 0}">初期所持</div>
+                    </div>
+                    <button th:if="${isUnlocked}" class="evolve-btn" type="button" style="background:#888; cursor:default;">GET済み</button>
+                    <th:block th:unless="${isUnlocked}">
+                        <form th:if="${isPrevUnlocked}" th:action="@{/characters/unlock}" method="post">
+                            <input type="hidden" name="characterId" th:value="${chara.id}">
+                            <input type="hidden" name="cost" th:value="${chara.unlockCost}">
+                            <input type="hidden" name="materialType" th:value="${matKey}">
+                            <button type="submit" class="evolve-btn" th:disabled="${userLevel < chara.requiredLevel or (userMaterials[matKey] ?: 0) < chara.unlockCost}">進化</button>
+                        </form>
+                        <button th:unless="${isPrevUnlocked}" type="button" class="evolve-btn locked-sequence" disabled><i class="fa-solid fa-lock"></i> ロック</button>
+                    </th:block>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <script th:src="@{/js/characters/CharactersUnlock.js}" src="CharactersUnlock.js"></script>
+    </th:block>
 </body>
 </html>

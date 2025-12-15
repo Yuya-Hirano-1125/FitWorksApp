@@ -682,3 +682,70 @@
     /* 影を強調（色は独自） */
     box-shadow: 0 8px 25px rgba(168, 237, 234, 0.9), 0 0 15px rgba(255, 255, 255, 0.8);
 }
+
+/* ========================================================= */
+/* ▼ 追加: 記録メニュー＆サプリボタン用スタイル */
+/* ========================================================= */
+
+.record-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.record-options {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out, opacity 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+}
+
+.record-options.open {
+    max-height: 150px; /* 十分な高さを確保 */
+    opacity: 1;
+    margin-top: 15px;
+}
+
+.record-option-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: white;
+    padding: 15px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.record-option-item:hover {
+    transform: scale(1.05);
+}
+
+.record-option-item i {
+    font-size: 1.8em;
+    margin-bottom: 8px;
+}
+
+/* 筋トレ履歴ボタン色 */
+.training-log-opt {
+    background: linear-gradient(135deg, #ab47bc, #8e24aa); /* 紫系 */
+}
+
+/* 食事ボタン色 */
+.meal-opt {
+    background: linear-gradient(135deg, #42a5f5, #4dd0e1);
+}
+
+/* メイン記録ボタン（矢印アニメーション等追加可能） */
+.main-record-btn:active {
+    transform: scale(0.98);
+}
