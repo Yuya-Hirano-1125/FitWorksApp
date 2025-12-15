@@ -1,0 +1,3231 @@
+ | jackaaaaaaaaaaaaaaa | 2025-12-15
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-15
+ | src/main/resources/templates/misc/home.html
+ | 
+ | mamo-spec | 2025-12-15
+ | jackaaaaaaaaaaaaaaa | 2025-12-15
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | mamo-spec | 2025-12-15
+ | src/main/resources/static/img/gacha_animation.gif
+ | 
+ | mamo-spec | 2025-12-15
+ | src/main/resources/static/img/gacha_animation.gif
+ | src/main/resources/static/img/gacha_animation1.gif
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-15
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-15
+ | src/main/resources/templates/misc/home.html
+ | 
+ | sotsuken | 2025-12-15
+ | sotsuken | 2025-12-15
+ | src/main/java/com/example/demo/controller/CharacterUnlockController.java
+ | src/main/java/com/example/demo/controller/CharacterViewController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/entity/UserItem.java
+ | src/main/java/com/example/demo/repository/UserItemRepository.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/templates/characters/menu/CharactersUnlock.html
+ | 
+ | sotsuken | 2025-12-15
+ | src/main/resources/static/css/home.css
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-15
+ | src/main/resources/templates/misc/supplement-guide.html
+ | 
+ | katupan | 2025-12-15
+ | katupan | 2025-12-15
+ | src/main/java/com/example/demo/controller/CharactersMenuController.java
+ | src/main/java/com/example/demo/controller/CustomizationController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-15
+ | frontend/package-lock.json
+ | 
+ | ryota-17 | 2025-12-15
+ | src/main/java/com/example/demo/repository/BackgroundItemRepository.java
+ | 
+ | ryota-17 | 2025-12-15
+ | ryota-17 | 2025-12-15
+ | src/main/java/com/example/demo/controller/CharactersMenuController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/BackgroundItemRepository.java
+ | 
+ | sotsuken | 2025-12-15
+ | src/main/resources/data.sql
+ | 
+ | sotsuken | 2025-12-15
+ | src/main/resources/data.sql
+ | 
+ | sotsuken | 2025-12-15
+ | sotsuken | 2025-12-15
+ | src/main/java/com/example/demo/controller/CharacterUnlockController.java
+ | src/main/java/com/example/demo/controller/CharacterViewController.java
+ | src/main/java/com/example/demo/entity/CharacterEntity.java
+ | src/main/java/com/example/demo/repository/CharacterRepository.java
+ | src/main/resources/data.sql
+ | src/main/resources/static/css/characters/CharactersUnlock.css
+ | src/main/resources/templates/characters/menu/CharactersMenu.html
+ | src/main/resources/templates/characters/menu/CharactersUnlock.html
+ | 
+ | ryota-17 | 2025-12-15
+ | ryota-17 | 2025-12-15
+ | jackaaaaaaaaaaaaaaa | 2025-12-15
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-14
+ | src/main/resources/templates/misc/supplement-guide.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-14
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-14
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/misc/supplement-guide.html
+ | 
+ | sora0 | 2025-12-14
+ | src/main/resources/static/favicon.ico
+ | 
+ | sora0 | 2025-12-14
+ | src/main/resources/static/Favicon.ico
+ | src/main/resources/static/favicon.ico
+ | src/main/resources/static/img/icon.png
+ | src/main/resources/templates/start.html
+ | 
+ | sora0 | 2025-12-14
+ | .dbeaver/.data-sources.json.bak
+ | .dbeaver/data-sources.json
+ | src/main/resources/static/Favicon.ico
+ | src/main/resources/static/favicon.ico
+ | src/main/resources/static/icon.png
+ | src/main/resources/templates/start.html
+ | 
+ | ryota-17 | 2025-12-12
+ | src/main/java/com/example/demo/controller/BackgroundsController.java
+ | src/main/java/com/example/demo/controller/CustomizationController.java
+ | src/main/java/com/example/demo/entity/BackgroundItem.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/BackgroundItemRepository.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/templates/characters/menu/Backgrounds.html
+ | 
+ | sotsuken | 2025-12-12
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | katupan | 2025-12-12
+ | katupan | 2025-12-12
+ | src/main/java/com/example/demo/controller/CharacterStorageController.java
+ | src/main/java/com/example/demo/controller/CharacterUnlockController.java
+ | src/main/java/com/example/demo/entity/Character.java
+ | src/main/java/com/example/demo/entity/UserCharacter.java
+ | src/main/java/com/example/demo/model/CharacterUnlockStatus.java
+ | src/main/java/com/example/demo/repository/UserCharacterRepository.java
+ | src/main/java/com/example/demo/service/CharacterService.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/data.sql
+ | src/main/resources/templates/characters/menu/CharactersStorage.html
+ | src/main/resources/templates/characters/menu/CharactersUnlock.html
+ | 
+ | sotsuken | 2025-12-12
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | sotsuken | 2025-12-12
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | ryota-17 | 2025-12-12
+ | src/main/resources/templates/characters/menu/Backgrounds.html
+ | 
+ | sotsuken | 2025-12-12
+ | src/main/java/com/example/demo/entity/User.java
+ | 
+ | sotsuken | 2025-12-12
+ | src/main/java/com/example/demo/entity/User.java
+ | 
+ | sotsuken | 2025-12-12
+ | sotsuken | 2025-12-12
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | 
+ | sotsuken | 2025-12-12
+ | src/main/resources/templates/training/care-menu.html
+ | 
+ | sotsuken | 2025-12-12
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | sotsuken | 2025-12-12
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | src/main/java/com/example/demo/service/TrainingLogicService.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | 
+ | sotsuken | 2025-12-12
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-12
+ | src/main/resources/templates/misc/home.html
+ | 
+ | ryota-17 | 2025-12-12
+ | ryota-17 | 2025-12-12
+ | src/main/java/com/example/demo/controller/BackgroundsController.java
+ | src/main/java/com/example/demo/controller/CharactersMenuController.java
+ | src/main/java/com/example/demo/repository/BackgroundItemRepository.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/templates/characters/menu/Backgrounds.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-12
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-12
+ | src/main/resources/templates/muscles/index.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-12
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | src/main/resources/templates/titles/index.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | src/main/resources/templates/muscles/index.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | src/main/resources/static/css/home.css
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | src/main/resources/static/css/home.css
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | Angel-French | 2025-12-11
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | mamo-spec | 2025-12-11
+ | src/main/resources/application.properties
+ | 
+ | mamo-spec | 2025-12-11
+ | Angel-French | 2025-12-11
+ | Angel-French | 2025-12-11
+ | .dbeaver/data-sources.json
+ | .dbeaver/project-settings.json
+ | 
+ | mamo-spec | 2025-12-11
+ | src/main/resources/application.properties
+ | 
+ | mamo-spec | 2025-12-11
+ | src/main/resources/application.properties
+ | 
+ | mamo-spec | 2025-12-11
+ | src/main/resources/application.properties
+ | 
+ | katupan | 2025-12-11
+ | katupan | 2025-12-11
+ | src/main/java/com/example/demo/controller/CharacterUnlockController.java
+ | src/main/java/com/example/demo/entity/Character.java
+ | src/main/java/com/example/demo/entity/UserCharacter.java
+ | src/main/java/com/example/demo/entity/UserItem.java
+ | src/main/java/com/example/demo/model/UserCharacter.java
+ | src/main/java/com/example/demo/repository/UserCharacterRepository.java
+ | src/main/java/com/example/demo/repository/UserItemRepository.java
+ | src/main/java/com/example/demo/service/CharacterService.java
+ | src/main/resources/application.properties
+ | src/main/resources/data.sql
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | src/main/resources/application.properties
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | yourdb.db?charset=UTF-8
+ | 
+ | Angel-French | 2025-12-11
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | Angel-French | 2025-12-11
+ | Angel-French | 2025-12-11
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/templates/auth/forgot-password.html
+ | src/main/resources/templates/auth/register.html
+ | src/main/resources/templates/auth/verify-code.html
+ | 
+ | sotsuken | 2025-12-11
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | sotsuken | 2025-12-11
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | sotsuken | 2025-12-11
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | 
+ | mamo-spec | 2025-12-11
+ | mamo-spec | 2025-12-11
+ | src/main/java/com/example/demo/repository/ItemRepository.java
+ | src/main/java/com/example/demo/repository/UserItemRepository.java
+ | src/main/java/com/example/demo/service/GachaService.java
+ | 
+ | sotsuken | 2025-12-11
+ | src/main/resources/templates/log/training-log.html
+ | 
+ | sotsuken | 2025-12-11
+ | sotsuken | 2025-12-11
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/log/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | src/main/resources/application.properties
+ | 
+ | sotsuken | 2025-12-11
+ | sotsuken | 2025-12-11
+ | src/main/resources/templates/log/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | Dockerfile
+ | docker-compose.yml
+ | src/main/java/com/example/demo/controller/TitleController.java
+ | src/main/java/com/example/demo/service/TitleService.java
+ | src/main/resources/templates/titles/index.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-11
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-10
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-10
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-10
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-10
+ | src/main/java/com/example/demo/controller/TitleController.java
+ | src/main/java/com/example/demo/entity/AppTitle.java
+ | src/main/java/com/example/demo/entity/TrainingRecord.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/entity/UserTitle.java
+ | src/main/java/com/example/demo/repository/TrainingRecordRepository.java
+ | src/main/java/com/example/demo/repository/UserTitleRepository.java
+ | src/main/java/com/example/demo/service/TitleService.java
+ | src/main/resources/static/css/title.css
+ | src/main/resources/templates/titles/index.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-10
+ | src/main/resources/templates/muscles/index.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-10
+ | build.gradle
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/entity/AuthProvider.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | src/main/java/com/example/demo/security/CustomOAuth2UserService.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/java/com/example/demo/service/SmsService.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/application.properties
+ | src/main/resources/templates/auth/login.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-10
+ | src/main/java/com/example/demo/controller/MuscleController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/entity/UserMuscle.java
+ | src/main/java/com/example/demo/repository/UserMuscleRepository.java
+ | src/main/java/com/example/demo/service/MuscleService.java
+ | src/main/java/com/example/demo/service/TrainingDataService.java
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/muscles/index.html
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-10
+ | src/main/java/com/example/demo/controller/FriendController.java
+ | src/main/java/com/example/demo/controller/RankingController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/templates/friends/index.html
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/misc/ranking.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-10
+ | src/main/java/com/example/demo/controller/RankingController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/service/NotificationService.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/templates/misc/ranking.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/resources/templates/log/meal-log.html
+ | src/main/resources/templates/log/training-log.html
+ | 
+ | sotsuken | 2025-12-09
+ | src/main/java/com/example/demo/repository/ItemRepository.java
+ | 
+ | sotsuken | 2025-12-09
+ | sotsuken | 2025-12-09
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | 
+ | sotsuken | 2025-12-09
+ | sotsuken | 2025-12-09
+ | src/main/java/com/example/demo/controller/MaterialController.java
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | 
+ | mamo-spec | 2025-12-09
+ | mamo-spec | 2025-12-09
+ | src/main/resources/templates/gacha/result.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/application.properties
+ | 
+ | sotsuken | 2025-12-09
+ | src/main/java/com/example/demo/controller/MaterialController.java
+ | src/main/java/com/example/demo/entity/Item.java
+ | src/main/java/com/example/demo/repository/ItemRepository.java
+ | src/main/resources/data.sql
+ | 
+ | mamo-spec | 2025-12-09
+ | src/main/resources/templates/gacha/result.html
+ | 
+ | mamo-spec | 2025-12-09
+ | src/main/resources/templates/gacha/result.html
+ | 
+ | mamo-spec | 2025-12-09
+ | src/main/resources/templates/gacha/result.html
+ | 
+ | mamo-spec | 2025-12-09
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | mamo-spec | 2025-12-09
+ | src/main/resources/templates/gacha/result.html
+ | 
+ | mamo-spec | 2025-12-09
+ | src/main/resources/templates/gacha/result.html
+ | 
+ | mamo-spec | 2025-12-09
+ | src/main/resources/templates/gacha/result.html
+ | 
+ | sotsuken | 2025-12-09
+ | sotsuken | 2025-12-09
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/java/com/example/demo/service/CustomUserDetailsService.java
+ | 
+ | katupan | 2025-12-09
+ | katupan | 2025-12-09
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | katupan | 2025-12-09
+ | src/main/java/com/example/demo/controller/CharacterStorageController.java
+ | src/main/java/com/example/demo/controller/CharacterUnlockController.java
+ | src/main/java/com/example/demo/controller/CharactersStorageController.java
+ | src/main/java/com/example/demo/model/CharacterUnlockStatus.java
+ | src/main/java/com/example/demo/model/UserCharacter.java
+ | src/main/java/com/example/demo/repository/UserCharacterRepository.java
+ | src/main/java/com/example/demo/service/CharacterService.java
+ | src/main/resources/static/js/characters/CharactersUnlock.js
+ | src/main/resources/templates/characters/menu/CharactersStorage.html
+ | src/main/resources/templates/characters/menu/CharactersUnlock.html
+ | 
+ | ryota-17 | 2025-12-09
+ | ryota-17 | 2025-12-09
+ | src/main/resources/templates/gacha/customization.html
+ | 
+ | ryota-17 | 2025-12-09
+ | src/main/resources/templates/gacha/customization.html
+ | 
+ | ryota-17 | 2025-12-09
+ | src/main/resources/static/css/characters/Backgrounds.css
+ | src/main/resources/templates/characters/menu/Backgrounds.html
+ | src/main/resources/templates/characters/menu/CharactersStorage.html
+ | src/main/resources/templates/gacha/customization.html
+ | 
+ | sotsuken | 2025-12-09
+ | src/main/resources/data.sql
+ | 
+ | mamo-spec | 2025-12-09
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/java/com/example/demo/controller/CharactersMenuController.java
+ | src/main/java/com/example/demo/controller/MaterialController.java
+ | src/main/java/com/example/demo/dto/ItemCountDTO.java
+ | src/main/java/com/example/demo/entity/Item.java
+ | src/main/java/com/example/demo/repository/ItemRepository.java
+ | src/main/java/com/example/demo/security/CustomUserDetails.java
+ | src/main/java/com/example/demo/security/FitWorksUserDetailsService.java
+ | src/main/java/com/example/demo/service/GachaService.java
+ | src/main/resources/data.sql
+ | src/main/resources/static/css/characters/CharactersEvolutionMaterial.css
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | 
+ | mamo-spec | 2025-12-09
+ | src/main/java/com/example/demo/repository/GachaResultRepository.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | 
+ | sotsuken | 2025-12-09
+ | sotsuken | 2025-12-09
+ | src/main/java/com/example/demo/controller/CharactersMenuController.java
+ | src/main/java/com/example/demo/controller/MaterialController.java
+ | src/main/java/com/example/demo/dto/ItemCountDTO.java
+ | src/main/java/com/example/demo/entity/Item.java
+ | src/main/java/com/example/demo/repository/ItemRepository.java
+ | src/main/java/com/example/demo/security/CustomUserDetails.java
+ | src/main/java/com/example/demo/security/FitWorksUserDetailsService.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/resources/data.sql
+ | src/main/resources/static/css/characters/CharactersEvolutionMaterial.css
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | 
+ | mamo-spec | 2025-12-09
+ | mamo-spec | 2025-12-09
+ | src/main/java/com/example/demo/service/GachaService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | 
+ | mamo-spec | 2025-12-09
+ | src/main/java/com/example/demo/service/GachaService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | mamo-spec | 2025-12-09
+ | src/main/java/com/example/demo/service/GachaService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/java/com/example/demo/service/TrainingDataService.java
+ | src/main/java/com/example/demo/service/TrainingLogicService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | frontend/frontend/package-lock.json
+ | frontend/frontend/package.json
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | frontend/frontend/index.html
+ | frontend/frontend/package-lock.json
+ | frontend/frontend/package.json
+ | frontend/frontend/public/index.html
+ | frontend/frontend/src/App.js
+ | frontend/frontend/src/index.js
+ | frontend/frontend/src/index.jsx
+ | frontend/frontend/vite.config.js
+ | frontend/package.json
+ | frontend/public/index.html
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/resources/application.properties
+ | 
+ | ryota-17 | 2025-12-09
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | sotsuken | 2025-12-09
+ | src/main/java/com/example/demo/controller/RankingController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | src/main/java/com/example/demo/service/LevelService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-09
+ | frontend/frontend/index.html
+ | frontend/frontend/package-lock.json
+ | frontend/frontend/package.json
+ | frontend/frontend/src/App.jsx
+ | frontend/frontend/src/index.jsx
+ | frontend/frontend/vite.config.js
+ | frontend/public/index.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | 
+ | mamo-spec | 2025-12-08
+ | ryota-17 | 2025-12-08
+ | src/main/resources/templates/gacha/customization.html
+ | 
+ | mamo-spec | 2025-12-08
+ | src/main/java/com/example/demo/service/GachaService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/resources/templates/characters/menu/CharactersStorage.html
+ | 
+ | sotsuken | 2025-12-08
+ | src/main/resources/templates/characters/menu/Backgrounds.html
+ | 
+ | ryota-17 | 2025-12-08
+ | ryota-17 | 2025-12-08
+ | src/main/resources/templates/gacha/customization.html
+ | 
+ | sotsuken | 2025-12-08
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | 
+ | sotsuken | 2025-12-08
+ | sotsuken | 2025-12-08
+ | src/main/java/com/example/demo/controller/MaterialController.java
+ | src/main/java/com/example/demo/dto/ItemCountDTO.java
+ | src/main/java/com/example/demo/entity/Item.java
+ | src/main/java/com/example/demo/entity/UserItem.java
+ | src/main/java/com/example/demo/repository/ItemRepository.java
+ | src/main/java/com/example/demo/repository/UserItemRepository.java
+ | src/main/resources/application.properties
+ | src/main/resources/data.sql
+ | src/main/resources/templates/characters/menu/Backgrounds.html
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/training/care-menu.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/dto/ExerciseData.java
+ | src/main/resources/templates/training/care-menu.html
+ | src/main/resources/templates/training/care-result.html
+ | 
+ | mamo-spec | 2025-12-08
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/resources/templates/care-result.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/training/care-menu.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/java/com/example/demo/service/TrainingDataService.java
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/training/care-menu.html
+ | 
+ | mamo-spec | 2025-12-08
+ | src/main/java/com/example/demo/service/GachaService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/resources/templates/log/meal-log.html
+ | src/main/resources/templates/log/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/resources/templates/training/training.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/resources/templates/training/nearby_gyms.html
+ | src/main/resources/templates/training/training-session.html
+ | 
+ | sotsuken | 2025-12-08
+ | src/main/resources/static/css/characters/CharactersEvolutionMaterial.css
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | 
+ | sotsuken | 2025-12-08
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/application.properties
+ | 
+ | sotsuken | 2025-12-08
+ | src/main/resources/static/css/characters/CharactersEvolutionMaterial.css
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | src/main/resources/templates/characters/menu/CharactersMenu.html
+ | 
+ | ryota-17 | 2025-12-08
+ | ryota-17 | 2025-12-08
+ | src/main/resources/templates/characters/shirufina.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | 
+ | sotsuken | 2025-12-08
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/application.properties
+ | 
+ | sotsuken | 2025-12-08
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/application.properties
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-08
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | 
+ | sora0 | 2025-12-07
+ | src/main/resources/static/css/daily-mission.css
+ | src/main/resources/templates/gacha/customization.html
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-07
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | src/main/resources/templates/log/meal-log.html
+ | src/main/resources/templates/log/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-07
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/templates/log/meal-log.html
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-06
+ | src/main/java/com/example/demo/dto/MealLogForm.java
+ | src/main/java/com/example/demo/dto/TrainingLogForm.java
+ | src/main/resources/templates/log/meal-log.html
+ | src/main/resources/templates/log/training-log-form-body-weight.html
+ | src/main/resources/templates/log/training-log-form-cardio.html
+ | src/main/resources/templates/log/training-log-form-weight.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-06
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-06
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-05
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/java/com/example/demo/service/TrainingDataService.java
+ | src/main/resources/templates/log/training-log.html
+ | 
+ | Angel-French | 2025-12-05
+ | Angel-French | 2025-12-05
+ | src/main/resources/templates/misc/ranking.html
+ | 
+ | sotsuken | 2025-12-05
+ | src/main/java/com/example/demo/controller/CommunityController.java
+ | 
+ | sotsuken | 2025-12-05
+ | sotsuken | 2025-12-05
+ | src/main/java/com/example/demo/repository/DailyMissionStatusRepository.java
+ | src/main/java/com/example/demo/service/MissionService.java
+ | 
+ | Angel-French | 2025-12-05
+ | Angel-French | 2025-12-05
+ | src/main/java/com/example/demo/controller/CommunityController.java
+ | src/main/java/com/example/demo/repository/PostRepository.java
+ | 
+ | sotsuken | 2025-12-05
+ | sotsuken | 2025-12-05
+ | src/main/java/com/example/demo/entity/DailyMissionStatus.java
+ | src/main/java/com/example/demo/service/MissionService.java
+ | 
+ | Angel-French | 2025-12-05
+ | src/main/resources/static/css/auth.css
+ | src/main/resources/templates/auth/forgot-password.html
+ | 
+ | Angel-French | 2025-12-05
+ | Angel-French | 2025-12-05
+ | src/main/resources/static/css/characters/CharactersMenu.css
+ | src/main/resources/templates/characters/menu/CharactersMenu.html
+ | 
+ | sotsuken | 2025-12-05
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | 
+ | sotsuken | 2025-12-05
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | 
+ | sotsuken | 2025-12-05
+ | sotsuken | 2025-12-05
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/java/com/example/demo/repository/CommunityRepository.java
+ | src/main/java/com/example/demo/service/CommunityService.java
+ | src/main/java/com/example/demo/service/MissionService.java
+ | src/main/resources/templates/misc/daily-mission.html
+ | 
+ | mamo-spec | 2025-12-05
+ | Angel-French | 2025-12-05
+ | src/main/resources/static/css/characters/CharactersMenu.css
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/java/com/example/demo/repository/GachaResultRepository.java
+ | 
+ | Angel-French | 2025-12-05
+ | src/main/java/com/example/demo/controller/CommunityController.java
+ | src/main/java/com/example/demo/entity/Post.java
+ | src/main/resources/templates/community/detail.html
+ | src/main/resources/templates/community/index.html
+ | 
+ | mamo-spec | 2025-12-05
+ | Angel-French | 2025-12-05
+ | Angel-French | 2025-12-05
+ | src/main/java/com/example/demo/controller/CommunityController.java
+ | src/main/java/com/example/demo/entity/Post.java
+ | src/main/java/com/example/demo/repository/PostRepository.java
+ | src/main/resources/static/css/training-log.css
+ | src/main/resources/templates/community/detail.html
+ | src/main/resources/templates/community/index.html
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/model/GachaResult.java
+ | src/main/java/com/example/demo/repository/GachaResultRepository.java
+ | src/main/java/com/example/demo/service/GachaService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-05
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/resources/templates/gacha/gacha_animation.html
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/resources/templates/gacha/gacha_animation.html
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/resources/templates/gacha/result.html
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-05
+ | src/main/java/com/example/demo/controller/AICoachRestController.java
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/java/com/example/demo/service/GachaService.java
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | sotsuken | 2025-12-05
+ | sotsuken | 2025-12-05
+ | src/main/java/com/example/demo/controller/CommunityController.java
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/entity/DailyMissionStatus.java
+ | src/main/java/com/example/demo/repository/DailyMissionStatusRepository.java
+ | src/main/java/com/example/demo/service/MissionService.java
+ | src/main/resources/static/index.html
+ | src/main/resources/templates/community/index.html
+ | src/main/resources/templates/misc/daily-mission.html
+ | 
+ | mamo-spec | 2025-12-05
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/java/com/example/demo/model/GachaResult.java
+ | src/main/java/com/example/demo/repository/GachaResultRepository.java
+ | src/main/java/com/example/demo/service/GachaService.java
+ | src/main/java/com/example/demo/service/MissionService.java
+ | 
+ | katupan | 2025-12-05
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/service/TrainingDataService.java
+ | src/main/resources/static/css/characters/CharactersUnlock.css
+ | src/main/resources/static/css/training-list.css
+ | src/main/resources/templates/characters/menu/CharactersUnlock.html
+ | src/main/resources/templates/training/training-list.html
+ | src/main/resources/templates/training/training.html
+ | 
+ | Angel-French | 2025-12-05
+ | Angel-French | 2025-12-05
+ | src/main/resources/static/css/auth.css
+ | src/main/resources/static/css/base.css
+ | src/main/resources/templates/auth/forgot-password.html
+ | src/main/resources/templates/misc/ranking.html
+ | 
+ | mamo-spec | 2025-12-05
+ | sotsuken | 2025-12-05
+ | src/main/resources/static/img/item/R-blue.png
+ | src/main/resources/static/img/item/R-green.png
+ | src/main/resources/static/img/item/R-purple.png
+ | src/main/resources/static/img/item/R-red.png
+ | src/main/resources/static/img/item/R-yellow.png
+ | src/main/resources/static/img/item/SR-blue.png
+ | src/main/resources/static/img/item/SR-green.png
+ | src/main/resources/static/img/item/SR-purple.png
+ | src/main/resources/static/img/item/SR-red.png
+ | src/main/resources/static/img/item/SR-yellow.png
+ | src/main/resources/static/img/item/SSR-blue.png
+ | src/main/resources/static/img/item/SSR-green.png
+ | src/main/resources/static/img/item/SSR-purple.png
+ | src/main/resources/static/img/item/SSR-red.png
+ | src/main/resources/static/img/item/SSR-yellow.png
+ | src/main/resources/static/img/item/UR-niji.png
+ | 
+ | sotsuken | 2025-12-05
+ | src/main/resources/static/css/characters/Backgrounds.css
+ | src/main/resources/templates/characters/menu/Backgrounds.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-04
+ | src/main/resources/templates/training/training-session.html
+ | 
+ | Angel-French | 2025-12-04
+ | Angel-French | 2025-12-04
+ | src/main/resources/static/js/password.js
+ | 
+ | mamo-spec | 2025-12-04
+ | katupan | 2025-12-04
+ | src/main/resources/static/css/characters/CharactersUnlock.css
+ | src/main/resources/static/js/characters/CharactersUnlock.js
+ | src/main/resources/templates/characters/menu/CharactersUnlock.html
+ | 
+ | mamo-spec | 2025-12-04
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/java/com/example/demo/service/GachaService.java
+ | 
+ | mamo-spec | 2025-12-04
+ | src/main/java/com/example/demo/model/GachaResult.java
+ | src/main/java/com/example/demo/repository/GachaResultRepository.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-04
+ | src/main/java/com/example/demo/controller/RankingController.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | 
+ | mamo-spec | 2025-12-04
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/java/com/example/demo/service/GachaService.java
+ | 
+ | Angel-French | 2025-12-04
+ | Angel-French | 2025-12-04
+ | src/main/resources/static/js/password.js
+ | src/main/resources/templates/auth/login.html
+ | src/main/resources/templates/auth/register.html
+ | src/main/resources/templates/settings/change-password.html
+ | 
+ | sotsuken | 2025-12-04
+ | src/main/resources/templates/characters/menu/Backgrounds.html
+ | 
+ | sotsuken | 2025-12-04
+ | src/main/resources/templates/characters/menu/Backgrounds.html
+ | 
+ | sotsuken | 2025-12-04
+ | src/main/java/com/example/demo/controller/CharactersMenuController.java
+ | src/main/resources/static/css/characters/Backgrounds.css
+ | src/main/resources/static/js/characters/Backgrounds.js
+ | src/main/resources/templates/characters/menu/Backgrounds.html
+ | src/main/resources/templates/characters/menu/CharactersMenu.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-04
+ | build.gradle
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | src/main/java/com/example/demo/service/SmsService.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/application.properties
+ | src/main/resources/templates/auth/forgot-password.html
+ | src/main/resources/templates/auth/register.html
+ | src/main/resources/templates/auth/verify-code.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-04
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/application.properties
+ | src/main/resources/templates/auth/reset-password.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | build.gradle
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/training/training-session.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/templates/training/myset-form.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/java/com/example/demo/controller/SpaController.java
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | docker-compose.yml
+ | 
+ | katupan | 2025-12-03
+ | src/main/resources/static/css/characters/CharactersUnlock.css
+ | src/main/resources/static/js/characters/CharactersUnlock.js
+ | src/main/resources/templates/characters/menu/CharactersUnlock.html
+ | 
+ | Angel-French | 2025-12-03
+ | Angel-French | 2025-12-03
+ | src/main/resources/templates/settings/settings.html
+ | src/main/resources/templates/training/exercise-list.html
+ | src/main/resources/templates/training/training-session.html
+ | src/main/resources/templates/training/training.html
+ | 
+ | mamo-spec | 2025-12-03
+ | src/main/resources/static/css/characters/CharactersMenu.css
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | mamo-spec | 2025-12-03
+ | src/main/resources/static/css/characters/CharactersMenu.css
+ | 
+ | Angel-French | 2025-12-03
+ | katupan | 2025-12-03
+ | src/main/resources/static/css/characters/CharactersUnlock.css
+ | src/main/resources/static/js/characters/CharactersUnlock.js
+ | src/main/resources/templates/characters/menu/CharactersUnlock.html
+ | 
+ | Angel-French | 2025-12-03
+ | src/main/resources/static/css/base.css
+ | src/main/resources/templates/training/exercise-list.html
+ | src/main/resources/templates/training/myset-form.html
+ | src/main/resources/templates/training/myset-list.html
+ | src/main/resources/templates/training/training-session.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | sotsuken | 2025-12-03
+ | sotsuken | 2025-12-03
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | katupan | 2025-12-03
+ | katupan | 2025-12-03
+ | src/main/resources/static/css/characters/CharactersUnlock.css
+ | src/main/resources/static/js/characters/CharactersUnlock.js
+ | src/main/resources/templates/characters/menu/CharactersUnlock.html
+ | 
+ | sotsuken | 2025-12-03
+ | sotsuken | 2025-12-03
+ | src/main/resources/static/css/characters/CharactersEvolutionMaterial.css
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | sotsuken | 2025-12-03
+ | src/main/java/com/example/demo/controller/CharactersMenuController.java
+ | src/main/resources/templates/characters/menu/CharactersEvolutionMaterial.html
+ | src/main/resources/templates/characters/menu/CharactersMenu.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | sotsuken | 2025-12-03
+ | src/main/resources/static/img/item/R-blue.png
+ | src/main/resources/static/img/item/R-green.png
+ | src/main/resources/static/img/item/R-purple.png
+ | src/main/resources/static/img/item/R-red.png
+ | src/main/resources/static/img/item/R-yellow.png
+ | src/main/resources/static/img/item/SR-blue.png
+ | src/main/resources/static/img/item/SR-green.png
+ | src/main/resources/static/img/item/SR-purple.png
+ | src/main/resources/static/img/item/SR-red.png
+ | src/main/resources/static/img/item/SR-yellow.png
+ | src/main/resources/static/img/item/SSR-blue.png
+ | src/main/resources/static/img/item/SSR-green.png
+ | src/main/resources/static/img/item/SSR-purple.png
+ | src/main/resources/static/img/item/SSR-red.png
+ | src/main/resources/static/img/item/SSR-yellow.png
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/java/com/example/demo/controller/MealController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/resources/templates/log/meal-log-all.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/resources/templates/log/meal-log-form.html
+ | src/main/resources/templates/log/meal-log.html
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/templates/log/meal-log-form.html
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-03
+ | src/main/resources/templates/log/meal-log-form.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-02
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | katupan | 2025-12-02
+ | src/main/resources/static/js/characters/CharactersUnlock.js
+ | src/main/resources/templates/characters/menu/CharactersStorage.html
+ | 
+ | katupan | 2025-12-02
+ | src/main/java/com/example/demo/controller/CharactersMenuController.java
+ | src/main/java/com/example/demo/controller/CharactersStorageController.java
+ | src/main/resources/static/css/CharactersMenu.css
+ | src/main/resources/static/css/characters/CharactersMenu.css
+ | src/main/resources/static/css/characters/CharactersStorage.css
+ | src/main/resources/static/css/characters/CharactersUnlock.css
+ | src/main/resources/static/js/characters/CharacterStorage.js
+ | src/main/resources/static/js/characters/CharactersUnlock.js
+ | src/main/resources/templates/characters/menu/CharactersMenu.html
+ | src/main/resources/templates/characters/menu/CharactersStorage.html
+ | src/main/resources/templates/characters/menu/CharactersUnlock.html
+ | src/main/resources/templates/characters/menu/Storage.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-02
+ | jackaaaaaaaaaaaaaaa | 2025-12-02
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | Angel-French | 2025-12-02
+ | src/main/resources/templates/community/index.html
+ | 
+ | Angel-French | 2025-12-02
+ | src/main/resources/templates/misc/home.html
+ | 
+ | Angel-French | 2025-12-02
+ | src/main/resources/templates/gacha/gacha.html
+ | src/main/resources/templates/misc/home.html
+ | 
+ | Angel-French | 2025-12-02
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | src/main/resources/templates/gacha/result.html
+ | src/main/resources/templates/settings/settings.html
+ | 
+ | Angel-French | 2025-12-02
+ | src/main/resources/static/css/base.css
+ | src/main/resources/static/css/home.css
+ | 
+ | katupan | 2025-12-02
+ | katupan | 2025-12-02
+ | src/main/java/com/example/demo/controller/CharactersMenuController.java
+ | src/main/java/com/example/demo/controller/CharactersStorageController.java
+ | src/main/resources/static/css/CharactersMenu.css
+ | src/main/resources/templates/characters/menu/CharactersMenu.html
+ | src/main/resources/templates/characters/menu/Storage.html
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-02
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/log/training-log-form-body-weight.html
+ | src/main/resources/templates/log/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-02
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/log/training-log-all.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-02
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/dto/DailyChartData.java
+ | src/main/java/com/example/demo/entity/BodyWeightRecord.java
+ | src/main/java/com/example/demo/repository/BodyWeightRecordRepository.java
+ | src/main/resources/templates/log/training-log-all.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-02
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/dto/ExerciseData.java
+ | src/main/java/com/example/demo/service/TrainingDataService.java
+ | src/main/java/com/example/demo/service/TrainingLogicService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-02
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/training/exercise-list.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-02
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/entity/MySet.java
+ | src/main/java/com/example/demo/repository/MySetRepository.java
+ | src/main/resources/templates/training/myset-form.html
+ | src/main/resources/templates/training/myset-list.html
+ | src/main/resources/templates/training/training.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-02
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/entity/ExerciseBookmark.java
+ | src/main/java/com/example/demo/repository/ExerciseBookmarkRepository.java
+ | src/main/resources/templates/training/bookmark-list.html
+ | src/main/resources/templates/training/exercise-list.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-02
+ | src/main/resources/templates/training/training.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-01
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/repository/MealRecordRepository.java
+ | src/main/java/com/example/demo/service/MealService.java
+ | src/main/resources/templates/log/meal-log-form.html
+ | src/main/resources/templates/log/meal-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-12-01
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/java/com/example/demo/service/GachaService.java
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-29
+ | jackaaaaaaaaaaaaaaa | 2025-11-29
+ | Dockerfile
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-29
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-29
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-29
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-29
+ | src/main/java/com/example/demo/controller/SettingController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/service/NotificationService.java
+ | src/main/resources/templates/settings/settings.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-29
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-29
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/application.properties
+ | src/main/resources/templates/training/training-session.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | Dockerfile
+ | 
+ | sora0 | 2025-11-28
+ | src/main/resources/static/img/character/yami1.png
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | .env
+ | Dockerfile
+ | Procfile
+ | docker-compose.yml
+ | src/main/resources/application.properties
+ | system.properties
+ | 
+ | katupan | 2025-11-28
+ | src/main/resources/static/css/Storage.css
+ | src/main/resources/static/js/CharacterStorage.js
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | Angel-French | 2025-11-28
+ | src/main/resources/templates/settings/faq.html
+ | 
+ | Angel-French | 2025-11-28
+ | src/main/java/com/example/demo/controller/SettingController.java
+ | src/main/resources/templates/misc/faq.html
+ | src/main/resources/templates/settings/faq.html
+ | 
+ | Angel-French | 2025-11-28
+ | Angel-French | 2025-11-28
+ | src/main/java/com/example/demo/controller/SettingController.java
+ | src/main/resources/templates/settings/privacy.html
+ | src/main/resources/templates/settings/terms.html
+ | 
+ | ryota-17 | 2025-11-28
+ | ryota-17 | 2025-11-28
+ | src/main/resources/static/css/monster-dex.css
+ | src/main/resources/templates/characters/dolly.html
+ | src/main/resources/templates/characters/dollyegg.html
+ | src/main/resources/templates/characters/dolphinas.html
+ | src/main/resources/templates/characters/dolphy.html
+ | src/main/resources/templates/characters/draco.html
+ | src/main/resources/templates/characters/dracoegg.html
+ | src/main/resources/templates/characters/dracos.html
+ | src/main/resources/templates/characters/dragonoid.html
+ | src/main/resources/templates/characters/merinoa.html
+ | src/main/resources/templates/characters/meriru.html
+ | src/main/resources/templates/characters/merry.html
+ | src/main/resources/templates/characters/merryegg.html
+ | src/main/resources/templates/characters/robi.html
+ | src/main/resources/templates/characters/robiegg.html
+ | src/main/resources/templates/characters/robius.html
+ | src/main/resources/templates/characters/robus.html
+ | src/main/resources/templates/characters/shiru.html
+ | src/main/resources/templates/characters/shiruegg.html
+ | src/main/resources/templates/characters/shirufa.html
+ | src/main/resources/templates/characters/shirufina.html
+ | 
+ | Angel-French | 2025-11-28
+ | Angel-French | 2025-11-28
+ | src/main/java/com/example/demo/controller/SettingController.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/resources/templates/misc/terms.html
+ | src/main/resources/templates/settings/settings.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | src/main/resources/templates/start.html
+ | 
+ | Angel-French | 2025-11-28
+ | Angel-French | 2025-11-28
+ | src/main/resources/templates/error.html
+ | src/main/resources/templates/gacha/gacha.html
+ | src/main/resources/templates/log/meal-log-form.html
+ | 
+ | katupan | 2025-11-28
+ | src/main/resources/static/css/Storage.css
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | Angel-French | 2025-11-28
+ | Angel-French | 2025-11-28
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/resources/templates/error.html
+ | 
+ | katupan | 2025-11-28
+ | src/main/resources/static/css/Storage.css
+ | src/main/resources/static/js/CharacterStorage.js
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | src/main/resources/templates/misc/home.html
+ | 
+ | katupan | 2025-11-28
+ | katupan | 2025-11-28
+ | src/main/resources/static/img/character/120.png
+ | src/main/resources/static/img/character/130.png
+ | src/main/resources/static/img/character/140.png
+ | src/main/resources/static/img/character/150.png
+ | src/main/resources/static/img/character/40.png
+ | src/main/resources/static/img/character/50.png
+ | src/main/resources/static/img/character/60.png
+ | src/main/resources/static/img/character/70.png
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/templates/misc/home.html
+ | 
+ | ryota-17 | 2025-11-28
+ | ryota-17 | 2025-11-28
+ | src/main/resources/templates/characters/dolly.html
+ | src/main/resources/templates/characters/dollyegg.html
+ | src/main/resources/templates/characters/dolphinas.html
+ | src/main/resources/templates/characters/dolphy.html
+ | src/main/resources/templates/characters/draco.html
+ | src/main/resources/templates/characters/dracoegg.html
+ | src/main/resources/templates/characters/dracos.html
+ | src/main/resources/templates/characters/dragonoid.html
+ | src/main/resources/templates/characters/merinoa.html
+ | src/main/resources/templates/characters/meriru.html
+ | src/main/resources/templates/characters/merry.html
+ | src/main/resources/templates/characters/merryegg.html
+ | src/main/resources/templates/characters/robi.html
+ | src/main/resources/templates/characters/robiegg.html
+ | src/main/resources/templates/characters/robius.html
+ | src/main/resources/templates/characters/robus.html
+ | src/main/resources/templates/characters/shiru.html
+ | src/main/resources/templates/characters/shiruegg.html
+ | src/main/resources/templates/characters/shirufa.html
+ | src/main/resources/templates/characters/shirufina.html
+ | 
+ | katupan | 2025-11-28
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | katupan | 2025-11-28
+ | katupan | 2025-11-28
+ | src/main/java/com/example/demo/controller/CharacterController.java
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | src/main/resources/templates/misc/home.html
+ | 
+ | katupan | 2025-11-28
+ | src/main/resources/static/img/background/classroom.png
+ | src/main/resources/static/img/background/dark-original.png
+ | src/main/resources/static/img/background/deep-forest.png
+ | src/main/resources/static/img/background/fire-original.png
+ | src/main/resources/static/img/background/gaming-room.png
+ | src/main/resources/static/img/background/grass-original.png
+ | src/main/resources/static/img/background/light-original.png
+ | src/main/resources/static/img/background/server-room.png
+ | src/main/resources/static/img/background/snow-road.png
+ | src/main/resources/static/img/background/town-view.png
+ | src/main/resources/static/img/background/water-original.png
+ | 
+ | ryota-17 | 2025-11-28
+ | ryota-17 | 2025-11-28
+ | src/main/resources/templates/characters/robi.html
+ | src/main/resources/templates/characters/robiegg.html
+ | src/main/resources/templates/characters/robius.html
+ | src/main/resources/templates/characters/robus.html
+ | 
+ | katupan | 2025-11-28
+ | src/main/java/com/example/demo/controller/CharacterController.java
+ | src/main/resources/static/js/CharacterStorage.js
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-28
+ | src/main/resources/static/css/settings.css
+ | src/main/resources/static/img/character/100.png
+ | src/main/resources/static/img/character/110.png
+ | src/main/resources/static/img/character/120.png
+ | src/main/resources/static/img/character/130.png
+ | src/main/resources/static/img/character/140.png
+ | src/main/resources/static/img/character/150.png
+ | src/main/resources/static/img/character/160.png
+ | src/main/resources/static/img/character/170.png
+ | src/main/resources/static/img/character/180.png
+ | src/main/resources/static/img/character/190.png
+ | src/main/resources/static/img/character/20.png
+ | src/main/resources/static/img/character/30.png
+ | src/main/resources/static/img/character/40.png
+ | src/main/resources/static/img/character/50.png
+ | src/main/resources/static/img/character/60.png
+ | src/main/resources/static/img/character/70.png
+ | src/main/resources/static/img/character/80.png
+ | src/main/resources/static/img/character/90.png
+ | src/main/resources/templates/misc/home.html
+ | 
+ | ryota-17 | 2025-11-28
+ | katupan | 2025-11-28
+ | src/main/resources/static/css/Storage.css
+ | src/main/resources/static/js/CharacterStorage.js
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | ryota-17 | 2025-11-28
+ | ryota-17 | 2025-11-28
+ | src/main/resources/templates/characters/merinoa.html
+ | src/main/resources/templates/characters/meriru.html
+ | src/main/resources/templates/characters/merry.html
+ | src/main/resources/templates/characters/merryegg.html
+ | 
+ | katupan | 2025-11-28
+ | katupan | 2025-11-28
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | katup | 2025-11-27
+ | src/main/resources/templates/characters/Storage.html
+ | src/main/resources/templates/misc/home.html
+ | 
+ | katup | 2025-11-27
+ | src/main/java/com/example/demo/controller/CharacterController.java
+ | src/main/resources/templates/characters/Storage.html
+ | src/main/resources/templates/characters/dolphy.html
+ | 
+ | katupan | 2025-11-27
+ | src/main/resources/static/img/character/0.png
+ | src/main/resources/static/img/character/10.png
+ | src/main/resources/static/js/CharacterStorage.js
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | ryota-17 | 2025-11-27
+ | ryota-17 | 2025-11-27
+ | src/main/resources/templates/characters/dolphinas.html
+ | src/main/resources/templates/characters/shiru.html
+ | src/main/resources/templates/characters/shiruegg.html
+ | src/main/resources/templates/characters/shirufa.html
+ | src/main/resources/templates/characters/shirufina.html
+ | 
+ | katupan | 2025-11-27
+ | src/main/resources/static/img/character/hi0.png
+ | src/main/resources/static/img/character/hikari0.png
+ | src/main/resources/static/img/character/kusa0.png
+ | src/main/resources/static/img/character/mizu0.png
+ | src/main/resources/static/img/character/yami0.png
+ | src/main/resources/static/img/item/Protain-Bar-Blue.png
+ | src/main/resources/static/img/item/Protain-Bar-Green.png
+ | src/main/resources/static/img/item/Protain-Bar-Red.png
+ | src/main/resources/static/img/item/Protain-Blue.png
+ | src/main/resources/static/img/item/Protain-Green.png
+ | src/main/resources/static/img/item/Protain-Red.png
+ | src/main/resources/static/img/item/Protain-Shaker.png
+ | 
+ | katupan | 2025-11-27
+ | katupan | 2025-11-27
+ | src/main/resources/templates/characters/Storage.html
+ | src/main/resources/templates/misc/home.html
+ | 
+ | ryota-17 | 2025-11-27
+ | src/main/resources/templates/characters/doiphy.html
+ | src/main/resources/templates/characters/dolly.html
+ | src/main/resources/templates/characters/dollyegg.html
+ | src/main/resources/templates/characters/dolphinas.html
+ | src/main/resources/templates/characters/draco.html
+ | src/main/resources/templates/characters/dracoegg.html
+ | src/main/resources/templates/characters/dracos.html
+ | src/main/resources/templates/characters/dragonoid.html
+ | 
+ | katupan | 2025-11-27
+ | src/main/resources/static/img/character/yami1.png
+ | src/main/resources/static/img/character/yami2.png
+ | src/main/resources/static/img/character/yami3.png
+ | 
+ | katupan | 2025-11-27
+ | katupan | 2025-11-27
+ | src/main/resources/static/img/character/hi1.png
+ | src/main/resources/static/img/character/hi2.png
+ | src/main/resources/static/img/character/hi3.png
+ | src/main/resources/static/img/character/hikari1.png
+ | src/main/resources/static/img/character/hikari2.png
+ | src/main/resources/static/img/character/hikari3.png
+ | src/main/resources/static/img/character/kusa1.png
+ | src/main/resources/static/img/character/kusa2.png
+ | src/main/resources/static/img/character/kusa3.png
+ | src/main/resources/static/img/character/mizu1.png
+ | src/main/resources/static/img/character/mizu2.png
+ | src/main/resources/static/img/character/mizu3.png
+ | src/main/resources/static/img/hi0.png
+ | src/main/resources/static/img/hi1.png
+ | src/main/resources/static/img/hi2.png
+ | src/main/resources/static/img/hi3.png
+ | src/main/resources/static/img/hikari1.png
+ | src/main/resources/static/img/hikari2.png
+ | src/main/resources/static/img/hikari3.png
+ | src/main/resources/static/img/kusa1.png
+ | src/main/resources/static/img/kusa2.png
+ | src/main/resources/static/img/kusa3.png
+ | src/main/resources/static/img/mizu1.png
+ | src/main/resources/static/img/mizu2.png
+ | src/main/resources/static/img/mizu3.png
+ | src/main/resources/templates/characters/Storage.html
+ | src/main/resources/templates/characters/draco.html
+ | src/main/resources/templates/misc/home.html
+ | 
+ | sotsuken | 2025-11-27
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | katupan | 2025-11-27
+ | ryota-17 | 2025-11-27
+ | katupan | 2025-11-27
+ | katupan | 2025-11-27
+ | src/main/resources/templates/characters/Storage.html
+ | src/main/resources/templates/characters/draco.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/resources/static/css/base.css
+ | src/main/resources/static/js/theme.js
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | src/main/resources/templates/auth/forgot-password.html
+ | src/main/resources/templates/auth/login.html
+ | src/main/resources/templates/auth/register.html
+ | src/main/resources/templates/characters/Storage.html
+ | src/main/resources/templates/characters/draco.html
+ | src/main/resources/templates/community/detail.html
+ | src/main/resources/templates/community/index.html
+ | src/main/resources/templates/gacha/customization.html
+ | src/main/resources/templates/gacha/gacha.html
+ | src/main/resources/templates/gacha/result.html
+ | src/main/resources/templates/log/meal-log-all.html
+ | src/main/resources/templates/log/meal-log-form.html
+ | src/main/resources/templates/log/training-log-all.html
+ | src/main/resources/templates/log/training-log.html
+ | src/main/resources/templates/misc/daily-mission.html
+ | src/main/resources/templates/misc/faq.html
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/misc/ranking.html
+ | src/main/resources/templates/settings/change-password.html
+ | src/main/resources/templates/settings/delete-account.html
+ | src/main/resources/templates/settings/edit-email.html
+ | src/main/resources/templates/settings/edit-username.html
+ | src/main/resources/templates/settings/goodbye.html
+ | src/main/resources/templates/settings/settings-updated.html
+ | src/main/resources/templates/settings/settings.html
+ | src/main/resources/templates/start.html
+ | src/main/resources/templates/training/exercise-list.html
+ | src/main/resources/templates/training/nearby_gyms.html
+ | src/main/resources/templates/training/training-session.html
+ | src/main/resources/templates/training/training.html
+ | 
+ | ryota-17 | 2025-11-27
+ | ryota-17 | 2025-11-27
+ | src/main/resources/static/css/monster-dex.css
+ | src/main/resources/static/img/hi0.png
+ | src/main/resources/templates/characters/dracoegg.html
+ | src/main/resources/templates/characters/dracos.html
+ | src/main/resources/templates/characters/dragonoid.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/resources/static/css/base.css
+ | src/main/resources/templates/settings/settings.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | 
+ | katupan | 2025-11-27
+ | katupan | 2025-11-27
+ | src/main/java/com/example/demo/controller/CharacterController.java
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | 
+ | ryota-17 | 2025-11-27
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/static/img/AIcoach.png
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | 
+ | ryota-17 | 2025-11-27
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | 
+ | ryota-17 | 2025-11-27
+ | katupan | 2025-11-27
+ | src/main/resources/static/css/Storage.css
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | ryota-17 | 2025-11-27
+ | ryota-17 | 2025-11-27
+ | src/main/resources/templates/characters/draco.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | 
+ | ryota-17 | 2025-11-27
+ | src/main/resources/templates/characters/draco.html
+ | 
+ | ryota-17 | 2025-11-27
+ | ryota-17 | 2025-11-27
+ | src/main/resources/static/css/monster-dex.css
+ | src/main/resources/templates/characters/draco.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/java/com/example/demo/controller/AICoachRestController.java
+ | src/main/java/com/example/demo/repository/TrainingRecordRepository.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | 
+ | mamo-spec | 2025-11-27
+ | src/main/resources/templates/gacha/gacha_animation.html
+ | 
+ | sotsuken | 2025-11-27
+ | src/main/resources/templates/community/index.html
+ | 
+ | sotsuken | 2025-11-27
+ | sotsuken | 2025-11-27
+ | katupan | 2025-11-27
+ | katupan | 2025-11-27
+ | src/main/resources/static/css/base.css
+ | 
+ | katupan | 2025-11-27
+ | src/main/resources/static/css/base.css
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/dto/TrainingLogForm.java
+ | src/main/resources/templates/training/training-session.html
+ | 
+ | sotsuken | 2025-11-27
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/resources/static/css/chat.css
+ | 
+ | sotsuken | 2025-11-27
+ | jackaaaaaaaaaaaaaaa | 2025-11-27
+ | src/main/resources/templates/misc/home.html
+ | 
+ | sotsuken | 2025-11-27
+ | ryota-17 | 2025-11-27
+ | src/main/resources/templates/settings/delete-account.html
+ | 
+ | ryota-17 | 2025-11-27
+ | ryota-17 | 2025-11-27
+ | src/main/java/com/example/demo/controller/SettingController.java
+ | src/main/resources/templates/settings/delete-account.html
+ | src/main/resources/templates/settings/goodbye.html
+ | 
+ | sora0 | 2025-11-26
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/resources/templates/settings/settings.html
+ | src/main/resources/templates/start.html
+ | 
+ | sotsuken | 2025-11-26
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | build.gradle
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/application.properties
+ | 
+ | katupan | 2025-11-26
+ | katupan | 2025-11-26
+ | src/main/resources/static/css/Storage.css
+ | src/main/resources/static/js/CharacterStorage.js
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | sotsuken | 2025-11-26
+ | sotsuken | 2025-11-26
+ | src/main/resources/static/css/base.css
+ | src/main/resources/templates/community/index.html
+ | 
+ | Angel-French | 2025-11-26
+ | src/main/resources/templates/settings/change-password.html
+ | src/main/resources/templates/settings/edit-email.html
+ | src/main/resources/templates/settings/edit-username.html
+ | 
+ | Angel-French | 2025-11-26
+ | Angel-French | 2025-11-26
+ | src/main/resources/templates/misc/ranking.html
+ | src/main/resources/templates/training/nearby_gyms.html
+ | src/main/resources/templates/training/training.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | src/main/resources/static/css/home.css
+ | 
+ | sotsuken | 2025-11-26
+ | src/main/resources/static/css/training-log.css
+ | src/main/resources/templates/log/training-log.html
+ | 
+ | Angel-French | 2025-11-26
+ | Angel-French | 2025-11-26
+ | src/main/resources/templates/community/index.html
+ | src/main/resources/templates/gacha/gacha.html
+ | src/main/resources/templates/log/meal-log-all.html
+ | src/main/resources/templates/log/meal-log-form.html
+ | 
+ | katupan | 2025-11-26
+ | src/main/resources/static/css/Storage.css
+ | src/main/resources/static/img/hi1.png
+ | src/main/resources/static/js/CharacterStorage.js
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | src/main/resources/static/css/home.css
+ | 
+ | Angel-French | 2025-11-26
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | 
+ | Angel-French | 2025-11-26
+ | src/main/resources/templates/training/training-session.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | src/main/java/com/example/demo/controller/CharacterController.java
+ | src/main/resources/templates/characters/Storage.html
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | src/main/resources/templates/misc/home.html
+ | 
+ | katupan | 2025-11-26
+ | frontend/src/Storage.css
+ | src/main/resources/static/css/Storage.css
+ | src/main/resources/static/js/CharacterStorage.js
+ | src/main/resources/templates/characters/Storage.html
+ | 
+ | 溝部翔太 | 2025-11-26
+ | 溝部翔太 | 2025-11-26
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | ryota-17 | 2025-11-26
+ | ryota-17 | 2025-11-26
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | katupan | 2025-11-26
+ | Angel-French | 2025-11-26
+ | Angel-French | 2025-11-26
+ | jackaaaaaaaaaaaaaaa | 2025-11-26
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | Angel-French | 2025-11-26
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | sora0 | 2025-11-25
+ | src/main/resources/static/js/password-check.js
+ | src/main/resources/templates/settings/change-password.html
+ | src/main/resources/templates/settings/edit-email.html
+ | src/main/resources/templates/settings/edit-username.html
+ | 
+ | sora0 | 2025-11-25
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | Angel-French | 2025-11-25
+ | Angel-French | 2025-11-25
+ | src/main/resources/templates/auth/register.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | katupan | 2025-11-25
+ | katupan | 2025-11-25
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | Angel-French | 2025-11-25
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | sotsuken | 2025-11-25
+ | sotsuken | 2025-11-25
+ | src/main/java/com/example/demo/controller/CharacterController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/resources/templates/character.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/training/nearby_gyms.html
+ | 
+ | ryota-17 | 2025-11-25
+ | mamo-spec | 2025-11-25
+ | mamo-spec | 2025-11-25
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/java/com/example/demo/entity/User.java
+ | 
+ | Angel-French | 2025-11-25
+ | sotsuken | 2025-11-25
+ | src/main/resources/templates/misc/home.html
+ | 
+ | sotsuken | 2025-11-25
+ | Angel-French | 2025-11-25
+ | src/main/resources/templates/auth/register.html
+ | 
+ | sotsuken | 2025-11-25
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | sotsuken | 2025-11-25
+ | sotsuken | 2025-11-25
+ | fitworks.db
+ | src/main/resources/static/css/training-log.css
+ | src/main/resources/templates/log/training-log.html
+ | 
+ | sotsuken | 2025-11-25
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | Angel-French | 2025-11-25
+ | src/main/resources/static/css/auth.css
+ | src/main/resources/templates/auth/login.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | frontend/frontend/package-lock.json
+ | frontend/frontend/package.json
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | Angel-French | 2025-11-25
+ | Angel-French | 2025-11-25
+ | fitworks.db
+ | src/main/resources/static/css/auth.css
+ | src/main/resources/static/js/password-check.js
+ | src/main/resources/templates/auth/forgot-password.html
+ | src/main/resources/templates/auth/login.html
+ | src/main/resources/templates/auth/register.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | fitworks.db
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | sotsuken | 2025-11-25
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/service/MissionService.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/templates/misc/daily-mission.html
+ | 
+ | sotsuken | 2025-11-25
+ | mamo-spec | 2025-11-25
+ | mamo-spec | 2025-11-25
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | 溝部翔太 | 2025-11-25
+ | sotsuken | 2025-11-25
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/training/training-map.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | fitworks.db
+ | src/main/resources/templates/gacha/gacha.html
+ | 
+ | Angel-French | 2025-11-25
+ | Angel-French | 2025-11-25
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | sotsuken | 2025-11-25
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | katupan | 2025-11-25
+ | sotsuken | 2025-11-25
+ | sotsuken | 2025-11-25
+ | mamo-spec | 2025-11-25
+ | mamo-spec | 2025-11-25
+ | jackaaaaaaaaaaaaaaa | 2025-11-25
+ | src/main/resources/templates/gacha/customization.html
+ | src/main/resources/templates/log/meal-log-all.html
+ | src/main/resources/templates/log/meal-log-form.html
+ | 
+ | sora0 | 2025-11-23
+ | jackaaaaaaaaaaaaaaa | 2025-11-22
+ | src/main/resources/templates/gacha/customization.html
+ | src/main/resources/templates/log/meal-log-all.html
+ | src/main/resources/templates/log/meal-log-form.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-22
+ | src/main/resources/templates/log/meal-log-all.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-22
+ | src/main/resources/templates/gacha/customization.html
+ | src/main/resources/templates/log/meal-log-form.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-22
+ | src/main/resources/templates/fragments/footer.html
+ | src/main/resources/templates/fragments/header.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-22
+ | src/main/resources/templates/gacha/customization.html
+ | src/main/resources/templates/log/meal-log-form.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-22
+ | src/main/resources/templates/gacha/customization.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-22
+ | src/main/resources/templates/gacha/customization.html
+ | src/main/resources/templates/log/meal-log-form.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-22
+ | src/main/resources/templates/gacha/customization.html
+ | src/main/resources/templates/log/meal-log-form.html
+ | src/main/resources/templates/misc/home.html
+ | 
+ | sora0 | 2025-11-22
+ | sora0 | 2025-11-22
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/SettingController.java
+ | src/main/resources/templates/settings/change-password.html
+ | src/main/resources/templates/settings/edit-username.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-22
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-22
+ | src/main/java/com/example/demo/controller/CustomizationController.java
+ | src/main/java/com/example/demo/controller/MealController.java
+ | src/main/java/com/example/demo/dto/MealLogForm.java
+ | src/main/java/com/example/demo/entity/Item.java
+ | src/main/java/com/example/demo/entity/MealRecord.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/entity/UserItem.java
+ | src/main/java/com/example/demo/repository/ItemRepository.java
+ | src/main/java/com/example/demo/repository/MealRecordRepository.java
+ | src/main/java/com/example/demo/repository/UserItemRepository.java
+ | src/main/java/com/example/demo/service/CustomizationService.java
+ | src/main/java/com/example/demo/service/MealService.java
+ | src/main/resources/templates/gacha/customization.html
+ | src/main/resources/templates/log/meal-log-form.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/java/com/example/demo/controller/CommunityController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/java/com/example/demo/entity/DailyMissionStatus.java
+ | src/main/java/com/example/demo/service/MissionService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/java/com/example/demo/entity/DailyMissionStatus.java
+ | src/main/java/com/example/demo/repository/DailyMissionStatusRepository.java
+ | src/main/java/com/example/demo/service/MissionService.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | 
+ | sora0 | 2025-11-21
+ | fitworks.db
+ | src/main/resources/templates/settings/settings-updated.html
+ | 
+ | 溝部翔太 | 2025-11-21
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-21
+ | mamo-spec | 2025-11-21
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | 
+ | katupan | 2025-11-21
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/training/training-session.html
+ | 
+ | Angel-French | 2025-11-21
+ | Angel-French | 2025-11-21
+ | mamo-spec | 2025-11-21
+ | mamo-spec | 2025-11-21
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | mamo-spec | 2025-11-21
+ | fitworks.db
+ | 
+ | Angel-French | 2025-11-21
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | 
+ | katupan | 2025-11-21
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/training/training-session.html
+ | 
+ | sotsuken | 2025-11-21
+ | fitworks.db
+ | 
+ | 溝部翔太 | 2025-11-21
+ | 溝部翔太 | 2025-11-21
+ | src/main/resources/templates/character-list.html
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/training-session.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | mamo-spec | 2025-11-21
+ | mamo-spec | 2025-11-21
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | katupan | 2025-11-21
+ | fitworks.db
+ | src/main/resources/templates/training/training-session.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | fitworks.db
+ | src/main/resources/templates/character-list.html
+ | src/main/resources/templates/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | fitworks.db
+ | src/main/resources/templates/training-session.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | 
+ | Angel-French | 2025-11-21
+ | fitworks.db
+ | src/main/resources/templates/settings/change-password.html
+ | 
+ | 溝部翔太 | 2025-11-21
+ | 溝部翔太 | 2025-11-21
+ | fitworks.db
+ | 
+ | mamo-spec | 2025-11-21
+ | sotsuken | 2025-11-21
+ | sotsuken | 2025-11-21
+ | katupan | 2025-11-21
+ | katupan | 2025-11-21
+ | Angel-French | 2025-11-21
+ | Angel-French | 2025-11-21
+ | src/main/resources/templates/settings/settings-updated.html
+ | 
+ | YUYA | 2025-11-21
+ | YUYA | 2025-11-21
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/resources/static/css/base.css
+ | src/main/resources/templates/misc/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | fitworks.db
+ | src/main/resources/static/img/applogo.jpg
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | src/main/java/com/example/demo/FitWorksAppApplication.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/training/training-session.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-21
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/dto/MissionStatusDto.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/TrainingRecordRepository.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/java/com/example/demo/controller/RankingController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AICoachController.java
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/resources/templates/ai-coach/ai-coach-chat.html
+ | src/main/resources/templates/auth/forgot-password.html
+ | src/main/resources/templates/auth/login.html
+ | src/main/resources/templates/auth/register.html
+ | src/main/resources/templates/change-password.html
+ | src/main/resources/templates/gacha/gacha.html
+ | src/main/resources/templates/gacha/gacha_animation.html
+ | src/main/resources/templates/gacha/result.html
+ | src/main/resources/templates/log/training-log-all.html
+ | src/main/resources/templates/log/training-log-form-cardio.html
+ | src/main/resources/templates/log/training-log-form-weight.html
+ | src/main/resources/templates/log/training-log.html
+ | src/main/resources/templates/misc/daily-mission.html
+ | src/main/resources/templates/misc/faq.html
+ | src/main/resources/templates/misc/home.html
+ | src/main/resources/templates/misc/ranking.html
+ | src/main/resources/templates/settings/change-password.html
+ | src/main/resources/templates/settings/settings.html
+ | src/main/resources/templates/settings/training-session.html
+ | src/main/resources/templates/training/exercise-list.html
+ | src/main/resources/templates/training/training.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | Miura.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/resources/templates/daily-mission.html
+ | 
+ | sotsuken | 2025-11-20
+ | 溝部翔太 | 2025-11-20
+ | 溝部翔太 | 2025-11-20
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | 溝部翔太 | 2025-11-20
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | 
+ | mamo-spec | 2025-11-20
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/resources/templates/character-list.html
+ | src/main/resources/templates/home.html
+ | 
+ | katupan | 2025-11-20
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/resources/templates/gacha.html
+ | src/main/resources/templates/gacha_animation.html
+ | 
+ | Angel-French | 2025-11-20
+ | Angel-French | 2025-11-20
+ | fitworks.db
+ | 
+ | Angel-French | 2025-11-20
+ | src/main/resources/templates/settings/change-password.html
+ | src/main/resources/templates/settings/edit-email.html
+ | src/main/resources/templates/settings/edit-username.html
+ | 
+ | Angel-French | 2025-11-20
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/SettingController.java
+ | src/main/java/com/example/demo/form/EditEmailForm.java
+ | src/main/java/com/example/demo/form/EditPasswordForm.java
+ | src/main/java/com/example/demo/form/EditUsernameForm.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/resources/templates/settings/change-password.html
+ | src/main/resources/templates/settings/edit-email.html
+ | src/main/resources/templates/settings/edit-username.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/resources/templates/training-log.html
+ | 
+ | sotsuken | 2025-11-20
+ | sotsuken | 2025-11-20
+ | fitworks.db
+ | 
+ | mamo-spec | 2025-11-20
+ | sotsuken | 2025-11-20
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | sotsuken | 2025-11-20
+ | mamo-spec | 2025-11-20
+ | sw225abc-code | 2025-11-20
+ | 溝部翔太 | 2025-11-20
+ | sotsuken | 2025-11-20
+ | mamo-spec | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/GachaController.java
+ | src/main/java/com/example/demo/model/GachaItem.java
+ | src/main/java/com/example/demo/service/GachaService.java
+ | src/main/resources/static/img/gacha_animation.gif
+ | 
+ | 溝部翔太 | 2025-11-20
+ | katupan | 2025-11-20
+ | sotsuken | 2025-11-20
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/repository/TrainingRecordRepository.java
+ | src/main/resources/templates/training-log-all.html
+ | src/main/resources/templates/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/training-session.html
+ | 
+ | 溝部翔太 | 2025-11-20
+ | mamo-spec | 2025-11-20
+ | sotsuken | 2025-11-20
+ | fitworks.db
+ | src/main/resources/templates/daily-mission.html
+ | 
+ | mamo-spec | 2025-11-20
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/exercise-list.html
+ | 
+ | mamo-spec | 2025-11-20
+ | sotsuken | 2025-11-20
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/CommunityController.java
+ | src/main/java/com/example/demo/repository/PostRepository.java
+ | src/main/resources/templates/community/detail.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-20
+ | sw225abc-code | 2025-11-20
+ | sotsuken | 2025-11-20
+ | sotsuken | 2025-11-20
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-20
+ | src/test/daily-mission.html
+ | 
+ | ryota-17 | 2025-11-20
+ | ryota-17 | 2025-11-20
+ | YUYA | 2025-11-20
+ | YUYA | 2025-11-20
+ | fitworks.db
+ | 
+ | katupan | 2025-11-20
+ | 溝部翔太 | 2025-11-20
+ | mamo-spec | 2025-11-20
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | src/main/resources/static/css/base.css
+ | src/main/resources/templates/community/index.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | src/main/java/com/example/demo/controller/CommunityController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-20
+ | src/main/java/com/example/demo/controller/CommunityController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | src/main/java/com/example/demo/controller/RankingController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/ranking.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | src/main/java/com/example/demo/controller/CommunityController.java
+ | src/main/java/com/example/demo/entity/Comment.java
+ | src/main/java/com/example/demo/entity/Post.java
+ | src/main/java/com/example/demo/repository/CommentRepository.java
+ | src/main/java/com/example/demo/repository/PostRepository.java
+ | src/main/resources/templates/community/detail.html
+ | src/main/resources/templates/community/index.html
+ | src/main/resources/templates/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | fitworks.db
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/resources/static/css/home.css
+ | src/main/resources/static/img/hi1.png
+ | src/main/resources/static/img/hi2.png
+ | src/main/resources/static/img/hi3.png
+ | src/main/resources/static/img/hikari1.png
+ | src/main/resources/static/img/hikari2.png
+ | src/main/resources/static/img/hikari3.png
+ | src/main/resources/static/img/kusa1.png
+ | src/main/resources/static/img/kusa2.png
+ | src/main/resources/static/img/kusa3.png
+ | src/main/resources/static/img/mizu1.png
+ | src/main/resources/static/img/mizu2.png
+ | src/main/resources/static/img/mizu3.png
+ | src/main/resources/templates/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | build.gradle
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AICoachRestController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/templates/ai-coach-chat.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | src/main/resources/templates/training-session.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | src/main/resources/static/css/auth.css
+ | src/main/resources/static/css/settings.css
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | src/main/resources/templates/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | src/main/resources/templates/training.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/training.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | fitworks.db
+ | src/main/resources/templates/settings.html
+ | src/main/resources/templates/training.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/exercise-list.html
+ | 
+ | sotsuken | 2025-11-19
+ | jackaaaaaaaaaaaaaaa | 2025-11-19
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/exercise-list.html
+ | src/main/resources/templates/training.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/templates/training.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/training-session.html
+ | src/main/resources/templates/training.html
+ | 
+ | mamo-spec | 2025-11-18
+ | mamo-spec | 2025-11-18
+ | Yuya-Hirano-1125 | 2025-11-18
+ | sotsuken | 2025-11-18
+ | build.gradle
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/dto/TrainingLogForm.java
+ | src/main/java/com/example/demo/entity/TrainingRecord.java
+ | src/main/java/com/example/demo/repository/TrainingRecordRepository.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/application.properties
+ | src/main/resources/static/css/training-log.css
+ | src/main/resources/templates/training-form-cardio.html
+ | src/main/resources/templates/training-form-weight.html
+ | src/main/resources/templates/training-log-form-cardio.html
+ | src/main/resources/templates/training-log-form-weight.html
+ | src/main/resources/templates/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/test/daily-mission.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/templates/daily-mission.html
+ | 
+ | sotsuken | 2025-11-18
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | 
+ | 溝部翔太 | 2025-11-18
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-18
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | .gitignore
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/templates/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/templates/daily-mission.html
+ | src/main/resources/templates/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/templates/daily-mission.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/resources/static/css/daily-mission.css
+ | src/test/daily-mission.html
+ | 
+ | sotsuken | 2025-11-18
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/dto/TrainingLogForm.java
+ | src/main/java/com/example/demo/entity/TrainingRecord.java
+ | src/main/java/com/example/demo/repository/TrainingRecordRepository.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/static/css/training-log.css
+ | src/main/resources/templates/training-log-form-cardio.html
+ | src/main/resources/templates/training-log-form-weight.html
+ | src/main/resources/templates/training-log.html
+ | 
+ | sotsuken | 2025-11-18
+ | mamo-spec | 2025-11-18
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-18
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-18
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-18
+ | fitworks.db
+ | 
+ | mamo-spec | 2025-11-18
+ | mamo-spec | 2025-11-18
+ | fitworks.db
+ | 
+ | 溝部翔太 | 2025-11-18
+ | 溝部翔太 | 2025-11-18
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | src/main/java/com/example/demo/dto/TrainingLogForm.java
+ | src/main/java/com/example/demo/entity/TrainingRecord.java
+ | src/main/java/com/example/demo/repository/TrainingRecordRepository.java
+ | src/main/resources/static/css/daily-mission.css
+ | src/main/resources/static/css/training-log.css
+ | src/main/resources/templates/daily-mission.html
+ | src/main/resources/templates/training-log-form-cardio.html
+ | src/main/resources/templates/training-log-form-weight.html
+ | 
+ | 溝部翔太 | 2025-11-18
+ | build.gradle
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/application.properties
+ | src/main/resources/templates/gacha.html
+ | src/main/resources/templates/training-form-cardio.html
+ | src/main/resources/templates/training-form-weight.html
+ | src/main/resources/templates/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | fitworks.db
+ | 
+ | mamo-spec | 2025-11-18
+ | fitworks.db
+ | 
+ | mamo-spec | 2025-11-18
+ | fitworks.db
+ | 
+ | mamo-spec | 2025-11-18
+ | mamo-spec | 2025-11-18
+ | fitworks.db
+ | 
+ | 溝部翔太 | 2025-11-18
+ | 溝部翔太 | 2025-11-18
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | build.gradle
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/templates/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/resources/templates/training-form-cardio.html
+ | src/main/resources/templates/training-form-weight.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/dto/TrainingLogForm.java
+ | src/main/java/com/example/demo/entity/TrainingRecord.java
+ | src/main/java/com/example/demo/repository/TrainingRecordRepository.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/static/css/training-log.css
+ | src/main/resources/templates/training-log-form-cardio.html
+ | src/main/resources/templates/training-log-form-weight.html
+ | src/main/resources/templates/training-log.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-18
+ | sotsuken | 2025-11-18
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/templates/daily-mission.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/templates/gacha.html
+ | 
+ | katupan | 2025-11-18
+ | sotsuken | 2025-11-18
+ | sotsuken | 2025-11-18
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | fitworks.db
+ | src/main/java/com/example/demo/controller/MissionController.java
+ | 
+ | katupan | 2025-11-18
+ | sotsuken | 2025-11-18
+ | sotsuken | 2025-11-18
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/static/css/daily-mission.css
+ | src/main/resources/templates/daily-mission.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/training.html
+ | 
+ | 三浦亮太 | 2025-11-18
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-18
+ | katupan | 2025-11-18
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-18
+ | そらdesu | 2025-11-18
+ | そらdesu | 2025-11-18
+ | fitworks.db
+ | 
+ | sotsuken | 2025-11-18
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/templates/gacha.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | fitworks.db
+ | src/main/resources/static/css/base.css
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | src/main/resources/static/css/base.css
+ | src/main/resources/static/css/home.css
+ | 
+ | sotsuken | 2025-11-18
+ | fitworks.db
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-18
+ | fitworks.db
+ | src/main/resources/static/css/base.css
+ | src/main/resources/static/css/home.css
+ | src/main/resources/templates/home.html
+ | 
+ | sotsuken | 2025-11-18
+ | jackaaaaaaaaaaaaaaa | 2025-11-17
+ | fitworks.db
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-17
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-17
+ | build.gradle
+ | fitworks.db
+ | src/main/resources/application.properties
+ | 
+ | sotsuken | 2025-11-17
+ | src/main/resources/templates/gacha.html
+ | 
+ | 三浦亮太 | 2025-11-17
+ | katupan | 2025-11-17
+ | katupan | 2025-11-17
+ | jackaaaaaaaaaaaaaaa | 2025-11-17
+ | build.gradle
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-14
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/TrainingController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/templates/gacha.html
+ | src/main/resources/templates/training-form-cardio.html
+ | src/main/resources/templates/training-form-weight.html
+ | src/main/resources/templates/training-log.html
+ | src/main/resources/templates/training-session.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-14
+ | build.gradle
+ | src/main/java/com/example/demo/FitWorksAppApplication.java
+ | src/main/java/com/example/demo/controller/AICoachRestController.java
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/application.properties
+ | src/main/resources/static/css/auth.css
+ | src/main/resources/static/css/base.css
+ | src/main/resources/static/css/chat.css
+ | src/main/resources/static/css/fitworks-dark-theme.css
+ | src/main/resources/static/css/home.css
+ | src/main/resources/static/css/settings.css
+ | src/main/resources/templates/ai-coach-chat.html
+ | src/main/resources/templates/change-password.html
+ | src/main/resources/templates/forgot-password.html
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/login.html
+ | src/main/resources/templates/register.html
+ | src/main/resources/templates/settings.html
+ | src/main/resources/templates/training.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-14
+ | fitworks.db
+ | src/main/java/com/example/demo/FitWorksAppApplication.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/resources/static/css/fitworks-dark-theme.css
+ | src/main/resources/templates/ai-coach-chat.html
+ | src/main/resources/templates/change-password.html
+ | src/main/resources/templates/forgot-password.html
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/login.html
+ | src/main/resources/templates/register.html
+ | src/main/resources/templates/settings.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-14
+ | src/main/java/com/example/demo/controller/AICoachController.java
+ | src/main/java/com/example/demo/controller/AICoachRestController.java
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/ChatController.java
+ | src/main/resources/templates/ai-coach-chat.html
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/login.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-14
+ | src/main/java/com/example/demo/controller/AICoachRestController.java
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/dto/ChatRequest.java
+ | src/main/java/com/example/demo/dto/Message.java
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/login.html
+ | src/main/resources/templates/register.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-14
+ | src/main/java/com/example/demo/controller/AICoachRestController.java
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/dto/ChatRequest.java
+ | src/main/resources/templates/change-password.html
+ | src/main/resources/templates/forgot-password.html
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/login.html
+ | src/main/resources/templates/register.html
+ | src/main/resources/templates/settings.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-14
+ | src/main/java/com/example/demo/FitWorksAppApplication.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-14
+ | fitworks.db
+ | src/main/java/com/example/demo/FitWorksAppApplication.java
+ | 
+ | katupan | 2025-11-14
+ | jackaaaaaaaaaaaaaaa | 2025-11-14
+ | build.gradle
+ | src/main/java/com/example/demo/controller/AICoachController.java
+ | src/main/java/com/example/demo/controller/AICoachRestController.java
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/ChatController.java
+ | src/main/java/com/example/demo/dto/Message.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/resources/application.properties
+ | src/main/resources/templates/ai-coach-chat.html
+ | src/main/resources/templates/change-password.html
+ | src/main/resources/templates/forgot-password.html
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/login.html
+ | src/main/resources/templates/register.html
+ | src/main/resources/templates/settings.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-13
+ | src/main/java/com/example/demo/controller/AICoachController.java
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/settings.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-13
+ | src/main/java/com/example/demo/controller/AICoachController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/application.properties
+ | src/main/resources/templates/ai-coach-chat.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-13
+ | build.gradle
+ | src/main/java/com/example/demo/AppConfig.java
+ | src/main/java/com/example/demo/FitWorksAppApplication.java
+ | src/main/java/com/example/demo/controller/AICoachController.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/application.properties
+ | src/main/resources/templates/ai-coach-chat.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-13
+ | build.gradle
+ | src/main/java/com/example/demo/controller/AICoachController.java
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/service/AICoachService.java
+ | src/main/resources/application.properties
+ | src/main/resources/templates/ai-coach-chat.html
+ | src/main/resources/templates/home.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-13
+ | src/main/resources/templates/forgot-password.html
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/login.html
+ | src/main/resources/templates/register.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-13
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/static/js/453.d7446e4a.chunk.js
+ | src/main/resources/static/js/453.d7446e4a.chunk.js.map
+ | src/main/resources/static/js/main.bd33cc21.js
+ | src/main/resources/static/js/main.bd33cc21.js.LICENSE.txt
+ | src/main/resources/static/js/main.bd33cc21.js.map
+ | src/main/resources/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg
+ | src/main/resources/templates/change-password.html
+ | src/main/resources/templates/forgot-password.html
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/login.html
+ | src/main/resources/templates/register.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-13
+ | fitworks.db
+ | src/main/java/com/example/demo/FitWorksAppApplication.java
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/java/com/example/demo/service/CustomUserDetailsService.java
+ | src/main/java/com/example/demo/service/UserService.java
+ | src/main/resources/static/css/main.f855e6bc.css
+ | src/main/resources/static/css/main.f855e6bc.css.map
+ | src/main/resources/templates/change-password.html
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/login.html
+ | src/main/resources/templates/register.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-13
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-13
+ | fitworks.db
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/resources/application.properties
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/login.html
+ | src/main/resources/templates/register.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-13
+ | fitworks.db
+ | src/main/java/com/example/demo/config/SecurityConfig.java
+ | src/main/java/com/example/demo/controller/AuthController.java
+ | src/main/java/com/example/demo/controller/UserController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | src/main/java/com/example/demo/security/SecurityConfig.java
+ | src/main/java/com/example/demo/service/CustomUserDetailsService.java
+ | src/main/resources/templates/home.html
+ | src/main/resources/templates/login.html
+ | src/main/resources/templates/register.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-13
+ | fitworks.db
+ | src/main/java/com/example/demo/config/SecurityConfig.java
+ | src/main/java/com/example/demo/controller/UserController.java
+ | src/main/java/com/example/demo/entity/User.java
+ | src/main/java/com/example/demo/repository/UserRepository.java
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-12
+ | build.gradle
+ | frontend/.gitignore
+ | frontend/README.md
+ | frontend/frontend/.gitignore
+ | frontend/frontend/README.md
+ | frontend/frontend/package-lock.json
+ | frontend/frontend/package.json
+ | frontend/frontend/public/favicon.ico
+ | frontend/frontend/public/index.html
+ | frontend/frontend/public/logo192.png
+ | frontend/frontend/public/logo512.png
+ | frontend/frontend/public/manifest.json
+ | frontend/frontend/public/robots.txt
+ | frontend/frontend/src/App.css
+ | frontend/frontend/src/App.js
+ | frontend/frontend/src/App.test.js
+ | frontend/frontend/src/index.css
+ | frontend/frontend/src/index.js
+ | frontend/frontend/src/logo.svg
+ | frontend/frontend/src/reportWebVitals.js
+ | frontend/frontend/src/setupTests.js
+ | frontend/package-lock.json
+ | frontend/package.json
+ | frontend/public/favicon.ico
+ | frontend/public/index.html
+ | frontend/public/logo192.png
+ | frontend/public/logo512.png
+ | frontend/public/manifest.json
+ | frontend/public/robots.txt
+ | frontend/src/App.css
+ | frontend/src/App.js
+ | frontend/src/App.test.js
+ | frontend/src/index.css
+ | frontend/src/index.js
+ | frontend/src/logo.svg
+ | frontend/src/reportWebVitals.js
+ | frontend/src/setupTests.js
+ | src/main/resources/static/asset-manifest.json
+ | src/main/resources/static/favicon.ico
+ | src/main/resources/static/index.html
+ | src/main/resources/static/logo192.png
+ | src/main/resources/static/logo512.png
+ | src/main/resources/static/manifest.json
+ | src/main/resources/static/robots.txt
+ | src/main/resources/static/static/css/main.f855e6bc.css
+ | src/main/resources/static/static/css/main.f855e6bc.css.map
+ | src/main/resources/static/static/js/453.d7446e4a.chunk.js
+ | src/main/resources/static/static/js/453.d7446e4a.chunk.js.map
+ | src/main/resources/static/static/js/main.bd33cc21.js
+ | src/main/resources/static/static/js/main.bd33cc21.js.LICENSE.txt
+ | src/main/resources/static/static/js/main.bd33cc21.js.map
+ | src/main/resources/static/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg
+ | 
+ | 三浦亮太 | 2025-11-12
+ | jackaaaaaaaaaaaaaaa | 2025-11-12
+ | build.gradle
+ | 
+ | 三浦亮太 | 2025-11-12
+ | jackaaaaaaaaaaaaaaa | 2025-11-12
+ | tatsukawaNO.1.html
+ | "\343\201\212\343\201\253\343\201\216\343\202\212\343\201\224\343\201\257\343\202\223.html"
+ | 
+ | katupan | 2025-11-12
+ | katupan | 2025-11-12
+ | sotsuken | 2025-11-12
+ | "\343\201\212\343\201\253\343\201\216\343\202\212\343\201\224\343\201\257\343\202\223.html"
+ | 
+ | 三浦亮太 | 2025-11-12
+ | 三浦亮太 | 2025-11-12
+ | katupan | 2025-11-12
+ | 三浦亮太 | 2025-11-12
+ | Miura.html
+ | 
+ | そらdesu | 2025-11-12
+ | jackaaaaaaaaaaaaaaa | 2025-11-12
+ | Goto.html
+ | Miura.html
+ | Mizobe.html
+ | NewFile.html
+ | mamo.html
+ | wasai.html
+ | 
+ | そらdesu | 2025-11-12
+ | そらdesu | 2025-11-12
+ | tatsukawaNO.1.html
+ | 
+ | 溝部翔太 | 2025-11-12
+ | そらdesu | 2025-11-12
+ | katupan | 2025-11-12
+ | 溝部翔太 | 2025-11-12
+ | そらdesu | 2025-11-12
+ | tatsukawaNO.1.html
+ | 
+ | mamo-spec | 2025-11-12
+ | そらdesu | 2025-11-12
+ | tatsukawaNO.1.html
+ | 
+ | sotsuken | 2025-11-12
+ | mamo-spec | 2025-11-12
+ | mamo.html
+ | 
+ | そらdesu | 2025-11-12
+ | sotsuken | 2025-11-12
+ | そらdesu | 2025-11-12
+ | そらdesu | 2025-11-12
+ | tatsukawaNO.1.html
+ | 
+ | 三浦亮太 | 2025-11-12
+ | Miura.html
+ | 
+ | sotsuken | 2025-11-12
+ | Goto.html
+ | 
+ | 溝部翔太 | 2025-11-12
+ | Mizobe.html
+ | 
+ | そらdesu | 2025-11-12
+ | sotsuken | 2025-11-12
+ | wasai.html
+ | 
+ | mamo-spec | 2025-11-12
+ | mamo.html
+ | 
+ | 三浦亮太 | 2025-11-12
+ | Miura.html
+ | 
+ | そらdesu | 2025-11-12
+ | tatsukawaNO.1.html
+ | 
+ | sotsuken | 2025-11-12
+ | NewFile.html
+ | 
+ | katupan | 2025-11-12
+ | NewFile.html
+ | 
+ | sotsuken | 2025-11-12
+ | NewFile.html
+ | 
+ | 溝部翔太 | 2025-11-12
+ | NewFile.html
+ | 
+ | mamo-spec | 2025-11-12
+ | NewFile.html
+ | 
+ | 三浦亮太 | 2025-11-12
+ | NewFile.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-12
+ | NewFile.html
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-12
+ | build.gradle
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-12
+ | build.gradle
+ | fitworks.db
+ | src/main/resources/application.properties
+ | 
+ | jackaaaaaaaaaaaaaaa | 2025-11-11
+ | .gitattributes
+ | .gitignore
+ | build.gradle
+ | gradle/wrapper/gradle-wrapper.jar
+ | gradle/wrapper/gradle-wrapper.properties
+ | gradlew
+ | gradlew.bat
+ | settings.gradle
+ | src/main/java/com/example/demo/FitWorksAppApplication.java
+ | src/main/resources/application.properties
+ | src/test/java/com/example/demo/FitWorksAppApplicationTests.java
