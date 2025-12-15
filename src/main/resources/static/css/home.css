@@ -9,12 +9,18 @@
  
 /* --- TOP BAR ELEMENTS (XP Bar & Daily Mission) --- */ 
  
+/* 追加: ロゴ画像のスタイル調整 */
+.app-logo-display img {
+    display: block;
+    margin: 0 auto 2px auto; 
+}
+
 .xp-daily-header { 
     width: 100%; 
-    /* 隙間を狭くする調整 */
-    margin-bottom: 10px; 
-    padding: 5px 0; 
+    margin-bottom: 2px; 
+    padding: 0; 
     border-bottom: 2px dashed var(--secondary-color); 
+    opacity: 0.6; 
 } 
  
 .xp-bar-container { 
@@ -358,4 +364,9 @@
     font-size: 0.9rem;
     color: #888;
     font-weight: 600;
+}
+
+/* 体重記録ボタン色 */
+.weight-opt {
+    background: linear-gradient(135deg, #009688, #4db6ac);
 }

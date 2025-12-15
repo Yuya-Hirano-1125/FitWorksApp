@@ -19,8 +19,8 @@
 
         .character-wrapper {
             position: relative;
-            width: 440px;
-            height: 440px;
+            width: 400px;
+            height: 400px;
             max-width: 100%;
             margin: 0 auto;
             overflow: visible;
@@ -246,7 +246,7 @@
     </div>
     
     <div class="home-greeting-container">
-       
+        <h1 class="home-app-title">FitWorks</h1>
         <p class="home-greeting-text">
             こんにちは、<span class="home-username" th:text="${username}"></span>さん！
         </p>
@@ -267,6 +267,9 @@
             </a>
             <a th:href="@{/log/meal}" class="record-option-item meal-opt">
                 <i class="fa-solid fa-utensils"></i><br>食事記録
+            </a>
+            <a th:href="@{/training-log/form/body-weight(date=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')})}" class="record-option-item weight-opt">
+                <i class="fa-solid fa-weight-scale"></i><br>体重記録
             </a>
         </div>
     </div>
@@ -290,11 +293,11 @@
 	</a>
 
     <nav id="tutorial-menu-nav" class="bottom-nav">
-        <a id="nav-gacha" th:href="@{/gacha}" class="nav-item"><i class="fa-solid fa-gift"></i><span>ガチャ　</span></a>
+        <a id="nav-gacha" th:href="@{/gacha}" class="nav-item"><i class="fa-solid fa-gift"></i><span>ガチャ</span></a>
         <a id="tutorial-friends-btn" th:href="@{/friends}" class="nav-item"><i class="fa-solid fa-user-group"></i><span>フレンド</span></a>
         <a id="nav-community" th:href="@{/community}" class="nav-item"><i class="fa-solid fa-comments"></i><span>掲示板</span></a>
-        <a id="nav-char" th:href="@{/characters/menu/CharactersMenu}" class="nav-item"><i class="fa-solid fa-user-astronaut"></i><span>キャラ　</span></a>    
-        <a id="tutorial-muscles-btn" th:href="@{/muscles}" class="nav-item"><i class="fa-solid fa-child-reaching"></i><span>筋肉</span></a>
+        <a id="nav-char" th:href="@{/characters/menu/CharactersMenu}" class="nav-item"><i class="fa-solid fa-user-astronaut"></i><span>キャラ</span></a>    
+        <a id="tutorial-muscles-btn" th:href="@{/muscles}" class="nav-item"><i class="fa-solid fa-child-reaching"></i><span>マッスル</span></a>
         <a id="nav-settings" th:href="@{/settings}" class="nav-item"><i class="fa-solid fa-gear"></i><span>設定</span></a>
     </nav>
 </div>
