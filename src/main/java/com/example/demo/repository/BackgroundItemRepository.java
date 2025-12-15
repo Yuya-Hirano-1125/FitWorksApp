@@ -37,5 +37,5 @@ public interface BackgroundItemRepository extends JpaRepository<BackgroundItem, 
      * @return 必要なレベル（userlevel）以下の BackgroundItem エンティティのリスト
      */
     // ⬇️ 修正箇所: 'UserLevel' を 'userlevel' に変更
-    List<BackgroundItem> findByUserlevelLessThanEqual(int currentLevel);
+    List<BackgroundItem> findByUserLevelLessThanEqual(int userLevel);
 }
