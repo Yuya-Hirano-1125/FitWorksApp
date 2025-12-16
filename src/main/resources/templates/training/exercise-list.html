@@ -53,18 +53,27 @@
             background-color: #5a6268;
         }
 
-        /* 検索バー */
+        /* 検索バーエリアの修正 */
         .search-wrapper {
             position: sticky;
             top: 60px; /* ヘッダーの高さに応じて調整 */
             z-index: 90;
             background-color: rgba(240, 242, 245, 0.95);
-            padding: 10px 10px 20px 10px;
+            padding: 10px 0 20px 0; 
             backdrop-filter: blur(5px);
+            margin-bottom: 20px;
         }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            padding: 0 10px;
+            align-items: center;
+        }
+
         .search-box {
-            width: 100%;
-            padding: 15px 20px;
+            flex: 1; 
+            padding: 12px 20px;
             font-size: 16px;
             border: 2px solid #e1e4e8;
             border-radius: 50px;
@@ -76,6 +85,29 @@
         .search-box:focus {
             border-color: #007bff;
             box-shadow: 0 4px 20px rgba(0, 123, 255, 0.15);
+        }
+
+        /* ブックマーク一覧ボタン */
+        .view-bookmarks-btn {
+            background-color: #fff;
+            color: #f39c12; /* 星の色に合わせる */
+            border: 2px solid #f39c12;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .view-bookmarks-btn:hover {
+            background-color: #f39c12;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(243, 156, 18, 0.3);
         }
 
         /* カテゴリセクション */
@@ -317,6 +349,17 @@
             font-size: 1rem;
             white-space: pre-wrap; /* 改行を反映 */
         }
+        
+        /* モバイル対応 */
+        @media (max-width: 600px) {
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .view-bookmarks-btn {
+                justify-content: center;
+            }
+        }
 
     </style>
 </head>
@@ -327,13 +370,19 @@
 <div class="container">
     <div class="page-header">
         <h1 class="page-title"><i class="fa-solid fa-book-open"></i> 全種目図鑑</h1>
-        <a th:href="@{/training}" class="back-btn">
-            <i class="fa-solid fa-arrow-left"></i> 戻る
+        <a th:href="@{/home}" class="back-btn">
+            <i class="fa-solid fa-house"></i> ホーム
         </a>
     </div>
 
     <div class="search-wrapper">
-        <input type="text" id="exerciseSearchInput" class="search-box" placeholder="🔍 種目名、部位、器具で検索..." onkeyup="filterExercises()">
+        <div class="search-container">
+            <input type="text" id="exerciseSearchInput" class="search-box" placeholder="🔍 種目名、部位、器具で検索..." onkeyup="filterExercises()">
+            
+            <a th:href="@{/training/bookmarks}" class="view-bookmarks-btn">
+                <i class="fa-solid fa-star"></i> ブックマーク一覧
+            </a>
+        </div>
     </div>
     
     <div id="noResultsMessage" class="no-results">
