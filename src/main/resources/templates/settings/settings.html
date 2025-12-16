@@ -14,6 +14,25 @@
 	<link rel="stylesheet" th:href="@{/css/base.css}">
     
     <script th:src="@{/js/theme.js}"></script>
+    <style>
+        /* セキュリティセクション用の追加スタイル */
+        .btn-register-bio {
+            padding: 8px 12px;
+            background-color: var(--primary-color, #ffb300);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            text-decoration: none;
+        }
+        .bio-message {
+            font-size: 12px;
+            margin-top: 5px;
+            color: #666;
+            display: block;
+        }
+    </style>
 </head>
 <body class="settings-page">
 <div class="main-container">
@@ -45,6 +64,22 @@
     </div>
 
     <div class="setting-section" style="--section-index: 2;">
+        <div class="section-header" onclick="toggleSection('security-content')">
+            <div><span class="section-icon"><i class="fa-solid fa-fingerprint"></i></span> セキュリティ設定</div>
+            <span class="arrow">▼</span>
+        </div>
+        <div class="section-content" id="security-content">
+            <div class="setting-item" style="flex-direction: column; align-items: flex-start;">
+                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                    <label>生体認証 (Touch ID / Face ID)</label>
+                    <button type="button" id="btn-register-biometric" class="btn-register-bio">デバイスを登録</button>
+                </div>
+                <span id="bio-message" class="bio-message"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="setting-section" style="--section-index: 3;">
         <div class="section-header" onclick="toggleSection('notification-content')">
             <div><span class="section-icon"><i class="fa-solid fa-bell"></i></span> 通知設定</div>
             <span class="arrow">▼</span>
@@ -80,7 +115,7 @@
         </div>
     </div>
 
-    <div class="setting-section" style="--section-index: 3;">
+    <div class="setting-section" style="--section-index: 4;">
         <div class="section-header" onclick="toggleSection('privacy-content')">
             <div><span class="section-icon"><i class="fa-solid fa-shield-halved"></i></span> データとプライバシー</div>
             <span class="arrow">▼</span>
@@ -107,7 +142,7 @@
         </div>
     </div>
 
-    <div class="setting-section" style="--section-index: 4;">
+    <div class="setting-section" style="--section-index: 5;">
         <div class="section-header" onclick="toggleSection('general-content')">
             <div><span class="section-icon"><i class="fa-solid fa-sliders"></i></span> 一般設定</div>
             <span class="arrow">▼</span>
@@ -131,7 +166,7 @@
         </div>
     </div>
 
-    <div class="setting-section" style="--section-index: 5;">
+    <div class="setting-section" style="--section-index: 6;">
         <div class="section-header" onclick="toggleSection('info-content')">
             <div><span class="section-icon"><i class="fa-solid fa-circle-info"></i></span> ヘルプと情報</div>
             <span class="arrow">▼</span>
@@ -200,15 +235,12 @@
         }
     }
 
-    // --- テーマ変更処理 (DB保存 + クライアント反映) ---
+    // --- テーマ変更処理 ---
     function handleThemeChange(themeName) {
-        // 1. 画面上の見た目を即座に変更 (theme.jsの機能を利用)
         localStorage.setItem('fitworks-theme', themeName);
         if (typeof applyTheme === 'function') {
             applyTheme();
         }
-
-        // 2. サーバーに設定を保存
         updateSetting('theme', themeName);
     }
 
@@ -217,7 +249,7 @@
         return confirm("本当にログアウトしますか？");
     }
 
-    // --- アコーディオン（開閉）処理 ---
+    // --- アコーディオン処理 ---
     function toggleSection(contentId) {
         const content = document.getElementById(contentId);
         const sectionHeader = content.previousElementSibling; 
@@ -240,24 +272,111 @@
         }
     }
 
+    // --- ★生体認証登録処理 ---
+    function bufferToBase64url(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function base64urlToBuffer(base64url) {
+        const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes.buffer;
+    }
+
+    document.getElementById('btn-register-biometric').addEventListener('click', async () => {
+        const msgArea = document.getElementById('bio-message');
+        msgArea.textContent = '処理中...';
+        msgArea.style.color = '#666';
+
+        if (!window.PublicKeyCredential) {
+            alert('このデバイスは生体認証に対応していません。');
+            return;
+        }
+
+        try {
+            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+            // 1. オプション取得
+            const optRes = await fetch('/api/webauthn/register/options');
+            if (!optRes.ok) throw new Error('オプション取得失敗');
+            const options = await optRes.json();
+
+            // 2. 認証器作成
+            const credential = await navigator.credentials.create({
+                publicKey: {
+                    rp: { name: "FitWorks" },
+                    user: {
+                        id: base64urlToBuffer(options.user.id),
+                        name: options.user.name,
+                        displayName: options.user.displayName
+                    },
+                    challenge: base64urlToBuffer(options.challenge),
+                    pubKeyCredParams: [
+                        { type: "public-key", alg: -7 }, 
+                        { type: "public-key", alg: -257 }
+                    ],
+                    authenticatorSelection: {
+                        authenticatorAttachment: "platform", 
+                        userVerification: "preferred"
+                    },
+                    timeout: 60000
+                }
+            });
+
+            // 3. 登録リクエスト
+            const regRes = await fetch('/api/webauthn/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({
+                    clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+                    attestationObject: bufferToBase64url(credential.response.attestationObject),
+                    deviceName: "My Device"
+                })
+            });
+
+            if (regRes.ok) {
+                msgArea.textContent = '登録完了！次回からログインで使用できます。';
+                msgArea.style.color = 'green';
+                alert('生体認証を登録しました');
+            } else {
+                const errText = await regRes.text();
+                throw new Error(errText);
+            }
+        } catch (e) {
+            console.error(e);
+            msgArea.textContent = 'エラー: ' + e.message;
+            msgArea.style.color = 'red';
+        }
+    });
+
     // --- 初期化処理 ---
     document.addEventListener('DOMContentLoaded', () => {
-        // DBに保存されているテーマがあればそれを優先、なければLocalStorage、それもなければデフォルト
         const selector = document.getElementById('theme-selector');
         if (selector) {
-            // 現在の選択値を適用（DBの値を反映）
             localStorage.setItem('fitworks-theme', selector.value);
             if (typeof applyTheme === 'function') {
                 applyTheme();
             }
         }
 
-        // アコーディオン初期状態
+        // アコーディオン初期状態 (全て閉じる)
         document.querySelectorAll('.setting-section').forEach(section => {
             const content = section.querySelector('.section-content');
             const arrow = section.querySelector('.arrow');
             
-            // デフォルトで閉じておく
             content.style.maxHeight = '0px';
             content.style.paddingTop = '0px';
             content.style.paddingBottom = '0px';
