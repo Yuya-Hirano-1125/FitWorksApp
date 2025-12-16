@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserItem;
 
+
 @Repository
 public interface UserItemRepository extends JpaRepository<UserItem, Long> {
 
