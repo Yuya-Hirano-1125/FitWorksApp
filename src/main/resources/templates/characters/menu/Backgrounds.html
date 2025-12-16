@@ -85,7 +85,7 @@
     /*<![CDATA[*/
     document.addEventListener('DOMContentLoaded', () => {
         // Thymeleafから現在のユーザーレベルを取得
-        const userLevel = [[${userLevel}]];
+        const userLevel = /*[[${userLevel}]]*/ 1;
         
         if (userLevel === null || userLevel === undefined) {
             console.error('ERROR: userLevel is null or undefined!');
