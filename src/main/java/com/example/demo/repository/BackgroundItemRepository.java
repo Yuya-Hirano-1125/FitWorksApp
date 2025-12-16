@@ -41,7 +41,7 @@ public interface BackgroundItemRepository extends JpaRepository<BackgroundItem, 
     List<BackgroundItem> findByUserLevelLessThanEqual(int userLevel);
     
     /**
-     * 【NEW - 機能4】背景名で検索: 背景名を基に背景アイテムを取得する。
+     * 【機能4】背景名で検索: 背景名を基に背景アイテムを取得する。
      * 
      * @param bgname 背景名
      * @return 該当する BackgroundItem、存在しなければ Optional.empty()
@@ -49,15 +49,7 @@ public interface BackgroundItemRepository extends JpaRepository<BackgroundItem, 
     Optional<BackgroundItem> findByBgname(String bgname);
     
     /**
-     * 【NEW - 機能5】装備中の背景アイテムIDで検索: 特定の装備IDを持つ背景アイテムを取得する。
-     * 
-     * @param equippedBackgroundItemId 装備中の背景アイテムID
-     * @return 該当する BackgroundItem のリスト
-     */
-    List<BackgroundItem> findByEquippedBackgroundItemId(String equippedBackgroundItemId);
-    
-    /**
-     * 【NEW - 機能6】素材の有無で検索: 素材が必要な背景アイテム、または不要な背景アイテムを取得する。
+     * 【機能5】素材の有無で検索: 素材が必要な背景アイテム、または不要な背景アイテムを取得する。
      * 
      * @param hasMaterial true=素材が必要、false=素材不要
      * @return 該当する BackgroundItem のリスト
@@ -65,7 +57,7 @@ public interface BackgroundItemRepository extends JpaRepository<BackgroundItem, 
     List<BackgroundItem> findByHasMaterial(Boolean hasMaterial);
     
     /**
-     * 【NEW - 機能7】複合条件検索: ユーザーレベル以下で、素材が不要な背景アイテムを取得する。
+     * 【機能6】複合条件検索: ユーザーレベル以下で、素材が不要な背景アイテムを取得する。
      * レベルで解放可能な背景アイテムを取得する際に便利です。
      * 
      * @param userLevel ユーザーの現在のレベル
@@ -75,7 +67,7 @@ public interface BackgroundItemRepository extends JpaRepository<BackgroundItem, 
     List<BackgroundItem> findByUserLevelLessThanEqualAndHasMaterial(int userLevel, Boolean hasMaterial);
     
     /**
-     * 【NEW - 機能8】カスタムクエリ: IDのリストで複数の背景アイテムを一括取得する。
+     * 【機能7】カスタムクエリ: IDのリストで複数の背景アイテムを一括取得する。
      * 複数の背景IDを指定して一度に取得したい場合に使用します。
      * 
      * @param ids 背景アイテムのIDリスト
@@ -85,7 +77,7 @@ public interface BackgroundItemRepository extends JpaRepository<BackgroundItem, 
     List<BackgroundItem> findByIdIn(@Param("ids") List<Long> ids);
     
     /**
-     * 【NEW - 機能9】カスタムクエリ: 背景名の部分一致検索(大文字小文字を区別しない)
+     * 【機能8】カスタムクエリ: 背景名の部分一致検索(大文字小文字を区別しない)
      * 
      * @param keyword 検索キーワード
      * @return 背景名にキーワードを含む BackgroundItem のリスト
@@ -94,11 +86,34 @@ public interface BackgroundItemRepository extends JpaRepository<BackgroundItem, 
     List<BackgroundItem> searchByBgnameContaining(@Param("keyword") String keyword);
     
     /**
-     * 【NEW - 機能10】レベル範囲で検索: 特定のレベル範囲内の背景アイテムを取得する。
+     * 【機能9】レベル範囲で検索: 特定のレベル範囲内の背景アイテムを取得する。
      * 
      * @param minLevel 最小レベル
      * @param maxLevel 最大レベル
      * @return レベル範囲内の BackgroundItem のリスト
      */
     List<BackgroundItem> findByUserLevelBetween(int minLevel, int maxLevel);
+    
+    /**
+     * 【機能10】解放レベルが特定レベルと完全一致する背景アイテムを取得。
+     * 特定レベルでちょうど解放される背景を取得する際に使用します。
+     * 
+     * @param userLevel 解放レベル
+     * @return 該当する BackgroundItem のリスト
+     */
+    List<BackgroundItem> findByUserLevel(int userLevel);
+    
+    /**
+     * 【機能11】レベルでソート: すべての背景アイテムをレベル順(昇順)で取得。
+     * 
+     * @return レベル順にソートされた BackgroundItem のリスト
+     */
+    List<BackgroundItem> findAllByOrderByUserLevelAsc();
+    
+    /**
+     * 【機能12】レベルでソート(降順): すべての背景アイテムをレベル順(降順)で取得。
+     * 
+     * @return レベル順(降順)にソートされた BackgroundItem のリスト
+     */
+    List<BackgroundItem> findAllByOrderByUserLevelDesc();
 }
