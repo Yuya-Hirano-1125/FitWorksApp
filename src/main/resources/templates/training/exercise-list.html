@@ -53,13 +53,13 @@
             background-color: #5a6268;
         }
 
-        /* 検索バーエリアの修正 */
+        /* 検索バーエリア */
         .search-wrapper {
             position: sticky;
-            top: 60px; /* ヘッダーの高さに応じて調整 */
+            top: 60px;
             z-index: 90;
             background-color: rgba(240, 242, 245, 0.95);
-            padding: 10px 0 20px 0; 
+            padding: 10px 0 20px 0;
             backdrop-filter: blur(5px);
             margin-bottom: 20px;
         }
@@ -72,7 +72,7 @@
         }
 
         .search-box {
-            flex: 1; 
+            flex: 1;
             padding: 12px 20px;
             font-size: 16px;
             border: 2px solid #e1e4e8;
@@ -90,7 +90,7 @@
         /* ブックマーク一覧ボタン */
         .view-bookmarks-btn {
             background-color: #fff;
-            color: #f39c12; /* 星の色に合わせる */
+            color: #f39c12;
             border: 2px solid #f39c12;
             padding: 12px 20px;
             border-radius: 50px;
@@ -349,8 +349,7 @@
             font-size: 1rem;
             white-space: pre-wrap; /* 改行を反映 */
         }
-        
-        /* モバイル対応 */
+
         @media (max-width: 600px) {
             .search-container {
                 flex-direction: column;
@@ -360,7 +359,6 @@
                 justify-content: center;
             }
         }
-
     </style>
 </head>
 <body>
@@ -405,7 +403,9 @@
                      th:data-name="${exercise.name}"
                      th:data-muscle="${exercise.targetMuscle}"
                      th:data-equip="${exercise.equipment}"
-                     th:data-desc="${exercise.description}"> <div>
+                     th:data-desc="${exercise.description}">
+                    
+                    <div>
                         <div class="card-header">
                             <span class="exercise-name" th:text="${exercise.name}">ベンチプレス</span>
                         </div>
@@ -498,14 +498,19 @@
         const name = cardElement.getAttribute('data-name');
         const muscle = cardElement.getAttribute('data-muscle');
         const equip = cardElement.getAttribute('data-equip');
+        // 解説を取得（もしnullなら空文字にする）
         const desc = cardElement.getAttribute('data-desc');
 
         document.getElementById('modalTitle').textContent = name;
         document.getElementById('modalMuscle').textContent = muscle;
         document.getElementById('modalEquip').textContent = equip;
         
-        // 解説がない場合のフォールバック
-        document.getElementById('modalDesc').textContent = desc ? desc : "詳細な解説はまだ登録されていません。";
+        // 解説がない場合のフォールバックメッセージ
+        if (desc && desc.trim() !== "") {
+            document.getElementById('modalDesc').textContent = desc;
+        } else {
+            document.getElementById('modalDesc').textContent = "詳細な解説はまだ登録されていません。";
+        }
 
         const overlay = document.getElementById('detailModalOverlay');
         overlay.classList.add('active');
@@ -514,18 +519,17 @@
 
     // モーダルを閉じる
     function closeDetailModal(event) {
-        // オーバーレイ自体か閉じるボタンがクリックされた時のみ閉じる
         if (event.target.id === 'detailModalOverlay' || event.target.closest('.modal-close-btn')) {
             const overlay = document.getElementById('detailModalOverlay');
             overlay.classList.remove('active');
-            document.body.style.overflow = ''; // スクロール解除
+            document.body.style.overflow = ''; 
         }
     }
 
     // 検索フィルタリング
     function filterExercises() {
         const input = document.getElementById('exerciseSearchInput');
-        const filter = input.value.toLowerCase().replace(/\s+/g, ''); // スペース除去して小文字化
+        const filter = input.value.toLowerCase().replace(/\s+/g, '');
         const container = document.getElementById('exerciseListContainer');
         const categories = container.getElementsByClassName('category-section');
         let totalVisibleItems = 0;
@@ -540,34 +544,21 @@
                 const name = card.getAttribute('data-name') || "";
                 const muscle = card.getAttribute('data-muscle') || "";
                 const equip = card.getAttribute('data-equip') || "";
-                
-                // 検索対象のテキストを結合
                 const textValue = (name + muscle + equip).toLowerCase().replace(/\s+/g, '');
 
                 if (textValue.includes(filter)) {
-                    card.style.display = ""; // グリッドアイテムとして表示
+                    card.style.display = "";
                     hasVisibleItem = true;
                     totalVisibleItems++;
                 } else {
                     card.style.display = "none";
                 }
             }
-
-            // カテゴリ内のアイテムが全て非表示なら、カテゴリセクションごと隠す
-            if (hasVisibleItem) {
-                category.style.display = "";
-            } else {
-                category.style.display = "none";
-            }
+            category.style.display = hasVisibleItem ? "" : "none";
         }
         
-        // 何も見つからなかった場合のメッセージ表示
         const noResultsMsg = document.getElementById('noResultsMessage');
-        if (totalVisibleItems === 0) {
-            noResultsMsg.style.display = "block";
-        } else {
-            noResultsMsg.style.display = "none";
-        }
+        noResultsMsg.style.display = (totalVisibleItems === 0) ? "block" : "none";
     }
 </script>
 
