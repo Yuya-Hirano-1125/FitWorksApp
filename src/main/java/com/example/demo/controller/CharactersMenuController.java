@@ -34,35 +34,19 @@ public class CharactersMenuController {
         return "characters/menu/CharactersUnlock"; 
     }
 
-    // --- 背景一覧画面へ遷移 ---
+    // 背景一覧画面へ遷移
     @GetMapping("/characters/menu/Backgrounds")
     public String showBackgrounds(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        int userLevel = 1; // デフォルト値
+        int userLevel = 1;
         
-        try {
-            if (userDetails != null) {
-                String username = userDetails.getUsername();
-                System.out.println("=== DEBUG: 認証ユーザー名: " + username + " ===");
-                
-                User currentUser = userService.findByUsername(username);
-                
-                if (currentUser != null) {
-                    userLevel = currentUser.getLevel();
-                    System.out.println("=== DEBUG: 取得したユーザーレベル: " + userLevel + " ===");
-                } else {
-                    System.err.println("=== ERROR: ユーザーが見つかりません: " + username + " ===");
-                }
-            } else {
-                System.err.println("=== ERROR: 認証情報がありません ===");
+        if (userDetails != null) {
+            User currentUser = userService.findByUsername(userDetails.getUsername());
+            if (currentUser != null) {
+                userLevel = currentUser.getLevel();
             }
-        } catch (Exception e) {
-            System.err.println("=== ERROR: ユーザー情報取得エラー: " + e.getMessage() + " ===");
-            e.printStackTrace();
         }
         
         model.addAttribute("userLevel", userLevel);
-        System.out.println("=== DEBUG: Modelに追加した userLevel: " + userLevel + " ===");
-        
         return "characters/menu/Backgrounds"; 
     }
 }
