@@ -1,101 +1,427 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>種目一覧 | FitWorks</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全種目図鑑 | FitWorks</title>
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script th:src="@{/js/theme.js}"></script>
     <style>
+        /* -------------------------------------------------- */
+        /* レイアウト & デザイン */
+        /* -------------------------------------------------- */
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
         .container {
-            max-width: 800px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding-bottom: 80px;
+            padding-bottom: 120px;
         }
-        h2 {
-            margin-top: 30px;
-            color: #444;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-        }
-        .exercise-list {
-            list-style: none;
-            padding: 0;
-        }
-        .exercise-item {
-            background: white;
-            margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
+        /* ヘッダー周り */
+        .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 5px solid #007bff;
-            transition: transform 0.2s;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            padding: 0 15px;
         }
-        .exercise-item:hover {
-            transform: translateX(5px);
+        .page-title {
+            margin: 0;
+            font-size: 1.8rem;
+            color: #2c3e50;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
-        .exercise-info {
-            flex-grow: 1;
+        .back-btn {
+            background-color: #f1f3f5;
+            color: #495057;
+            padding: 10px 18px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .exercise-name {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #333;
-            display: block;
+        .back-btn:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
         }
-        .exercise-details {
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 4px;
-        }
-        .bookmark-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.5em;
-            color: #ccc;
-            transition: color 0.2s;
-            padding: 5px;
-        }
-        .bookmark-btn.active {
-            color: #FFC107; /* Gold */
-        }
-        .bookmark-btn:hover {
-            transform: scale(1.2);
-        }
-        
-        /* 検索バーのスタイル */
-        .search-container {
+
+        /* 検索 & フィルターエリア固定 */
+        .sticky-header-area {
             position: sticky;
-            top: 70px; /* ヘッダーの高さ考慮 */
-            background-color: #f4f7f6; /* 背景色に合わせて調整 */
-            padding: 15px 0;
-            z-index: 99;
+            top: 60px; /* ヘッダーの高さ考慮 */
+            z-index: 90;
+            background-color: rgba(248, 249, 250, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 30px;
         }
+
+        /* 検索バー */
+        .search-container {
+            display: flex;
+            gap: 12px;
+            padding: 0 15px;
+            align-items: center;
+            margin-bottom: 15px;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         .search-box {
-            width: 100%;
-            padding: 15px 20px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            flex: 1;
+            padding: 14px 24px;
+            font-size: 1rem;
+            border: 2px solid transparent;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             outline: none;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background: #fff;
         }
         .search-box:focus {
             border-color: #007bff;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15);
+        }
+
+        /* ブックマーク一覧ボタン */
+        .view-bookmarks-btn {
+            background-color: #fff;
+            color: #f39c12;
+            border: 2px solid #f39c12;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(243, 156, 18, 0.15);
+        }
+        .view-bookmarks-btn:hover {
+            background-color: #f39c12;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(243, 156, 18, 0.3);
+        }
+
+        /* フィルターボタン (横スクロール) */
+        .filter-scroll-wrapper {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 5px 15px 15px 15px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+        .filter-scroll-wrapper::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .filter-btn {
+            background-color: #fff;
+            color: #555;
+            border: 1px solid #e0e0e0;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 8px;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            display: inline-block; /* 確実に並べる */
+        }
+        .filter-btn:last-child {
+            margin-right: 0;
+        }
+        .filter-btn:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+        .filter-btn.active {
+            background-color: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+        }
+        /* 有酸素ボタン特別色 */
+        .filter-btn[data-part="cardio"].active {
+            background-color: #28a745;
+            border-color: #28a745;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        /* カテゴリセクション */
+        .category-section {
+            margin-bottom: 50px;
+            padding: 0 15px;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .category-title {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+        .category-badge {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        /* グリッドレイアウト */
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        /* カードデザイン改善 */
+        .exercise-card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .exercise-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .exercise-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #2c3e50;
+            line-height: 1.4;
+            margin-right: 15px;
         }
         
-        /* 検索結果なしの表示 */
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .tag {
+            font-size: 0.75rem;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            letter-spacing: 0.5px;
+        }
+        .tag-muscle { background-color: #e3f2fd; color: #1565c0; }
+        .tag-equip { background-color: #f3e5f5; color: #6a1b9a; }
+
+        .bookmark-form {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 2;
+        }
+        .bookmark-btn {
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 1.4rem;
+            color: #d1d1d1;
+            transition: all 0.2s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .bookmark-btn.active {
+            color: #ffc107;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+        }
+        .bookmark-btn:hover {
+            transform: scale(1.15);
+        }
+
+        .tap-hint {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #adb5bd;
+            text-align: right;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+        }
+
+        /* 検索結果なし */
         .no-results {
             text-align: center;
-            color: #888;
-            margin-top: 20px;
+            padding: 60px 20px;
+            color: #adb5bd;
+            font-weight: 700;
             display: none;
+        }
+        .no-results i {
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        /* モーダル */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        .detail-modal {
+            background: white;
+            width: 100%;
+            max-width: 550px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-overlay.active .detail-modal {
+            transform: scale(1);
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            padding: 25px 30px;
+            color: white;
+            position: relative;
+        }
+        .modal-title {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 900;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+        }
+        .desc-box {
+            background-color: #f8f9fa;
+            border-left: 6px solid #2c3e50;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .desc-label {
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 0.95rem;
+        }
+        .desc-text {
+            color: #495057;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 600px) {
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .view-bookmarks-btn {
+                justify-content: center;
+            }
+            .filter-btn {
+                padding: 6px 14px;
+                font-size: 0.85rem;
+            }
+            .page-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -104,66 +430,141 @@
 <div th:replace="fragments/header :: header"></div>
 
 <div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-        <h1 style="margin: 0;">全種目図鑑</h1>
-        <a th:href="@{/training}" class="button" style="width: auto; background-color: #6c757d; color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; text-decoration: none;">
-            <i class="fa-solid fa-arrow-left"></i> 戻る
+    <div class="page-header">
+        <h1 class="page-title"><i class="fa-solid fa-book-open"></i> 全種目図鑑</h1>
+        <a th:href="@{/home}" class="back-btn">
+            <i class="fa-solid fa-house"></i> ホーム
         </a>
     </div>
 
-    <div class="search-container">
-        <input type="text" id="exerciseSearchInput" class="search-box" placeholder="🔍 種目名、部位、器具で検索..." onkeyup="filterExercises()">
+    <div class="sticky-header-area">
+        <div class="search-container">
+            <input type="text" id="exerciseSearchInput" class="search-box" placeholder="🔍 種目名、部位、器具で検索..." onkeyup="filterExercises()">
+            
+            <a th:href="@{/training/bookmarks}" class="view-bookmarks-btn">
+                <i class="fa-solid fa-star"></i> ブックマーク
+            </a>
+        </div>
+
+        <div class="filter-scroll-wrapper">
+            <button class="filter-btn active" data-part="all" onclick="filterByPart('all', this)">すべて</button>
+            
+            <button th:each="entry : ${freeWeightExercisesByPart}" 
+                    class="filter-btn" 
+                    th:text="${entry.key}"
+                    th:data-part="${entry.key}"
+                    onclick="filterByPart(this.getAttribute('data-part'), this)">部位名</button>
+            
+            <button class="filter-btn" data-part="cardio" onclick="filterByPart('cardio', this)">有酸素運動</button>
+        </div>
     </div>
     
     <div id="noResultsMessage" class="no-results">
-        <p>一致する種目が見つかりません。</p>
+        <i class="fa-solid fa-circle-exclamation fa-3x"></i><br><br>
+        一致する種目が見つかりません。
     </div>
 
     <div id="exerciseListContainer">
-        <div th:each="entry : ${freeWeightExercisesByPart}" class="category-section">
-            <h2 th:text="${entry.key}" class="category-title" th:data-keywords="${entry.key}">部位名</h2>
-            <ul class="exercise-list">
-                <li th:each="exercise : ${entry.value}" class="exercise-item">
-                    <div class="exercise-info">
-                        <span class="exercise-name" th:text="${exercise.name}">ベンチプレス</span>
-                        <span class="exercise-details">
-                            <i class="fa-solid fa-bullseye"></i> <span th:text="${exercise.targetMuscle}">大胸筋</span> | 
-                            <i class="fa-solid fa-toolbox"></i> <span th:text="${exercise.equipment}">バーベル</span>
-                        </span>
-                    </div>
+        
+        <div th:each="entry : ${freeWeightExercisesByPart}" 
+             class="category-section" 
+             th:data-part="${entry.key}"> 
+             
+            <div class="category-header">
+                <h2 th:text="${entry.key}" class="category-title" th:data-keywords="${entry.key}">部位名</h2>
+                <span class="category-badge" th:text="${#lists.size(entry.value)} + ' 種目'"></span>
+            </div>
+            
+            <div class="exercise-grid">
+                <div th:each="exercise : ${entry.value}" 
+                     class="exercise-card" 
+                     onclick="openDetailModal(this)"
+                     th:data-name="${exercise.name}"
+                     th:data-muscle="${exercise.targetMuscle}"
+                     th:data-equip="${exercise.equipment}"
+                     th:data-desc="${exercise.description}">
                     
-                    <form th:action="@{/training/bookmark/toggle}" method="post" style="display:inline;">
+                    <div>
+                        <div class="card-header">
+                            <span class="exercise-name" th:text="${exercise.name}">ベンチプレス</span>
+                        </div>
+                        
+                        <div class="card-tags">
+                            <span class="tag tag-muscle"><i class="fa-solid fa-bullseye"></i> <span th:text="${exercise.targetMuscle}">大胸筋</span></span>
+                            <span class="tag tag-equip"><i class="fa-solid fa-toolbox"></i> <span th:text="${exercise.equipment}">バーベル</span></span>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/training/bookmark/toggle}" method="post" class="bookmark-form" onclick="event.stopPropagation()">
                         <input type="hidden" name="exerciseName" th:value="${exercise.name}"/>
                         <input type="hidden" name="type" value="WEIGHT"/>
                         <button type="submit" class="bookmark-btn" th:classappend="${#lists.contains(bookmarkedNames, exercise.name)} ? 'active'">
                             <i th:class="${#lists.contains(bookmarkedNames, exercise.name)} ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
                         </button>
                     </form>
-                </li>
-            </ul>
+                    
+                    <div class="tap-hint">詳細 <i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+            </div>
         </div>
 
-        <div class="category-section">
-            <h2 class="category-title" data-keywords="有酸素 カーディオ">有酸素運動</h2>
-            <ul class="exercise-list">
-                <li th:each="exercise : ${cardioExercises}" class="exercise-item">
-                    <div class="exercise-info">
-                        <span class="exercise-name" th:text="${exercise.name}">ランニング</span>
-                        <span class="exercise-details">
-                            <i class="fa-solid fa-heart-pulse"></i> <span th:text="${exercise.targetMuscle}">全身</span> | 
-                            <i class="fa-solid fa-toolbox"></i> <span th:text="${exercise.equipment}">マシン</span>
-                        </span>
-                    </div>
+        <div class="category-section" data-part="cardio">
+            <div class="category-header" style="border-bottom-color: #28a745;">
+                <h2 class="category-title" data-keywords="有酸素 カーディオ" style="color: #28a745;">有酸素運動</h2>
+                <span class="category-badge" style="background-color: #e8f5e9; color: #28a745;" th:text="${#lists.size(cardioExercises)} + ' 種目'"></span>
+            </div>
+            
+            <div class="exercise-grid">
+                <div th:each="exercise : ${cardioExercises}" 
+                     class="exercise-card" 
+                     onclick="openDetailModal(this)"
+                     th:data-name="${exercise.name}"
+                     th:data-muscle="${exercise.targetMuscle}"
+                     th:data-equip="${exercise.equipment}"
+                     th:data-desc="${exercise.description}">
                     
-                    <form th:action="@{/training/bookmark/toggle}" method="post" style="display:inline;">
+                    <div>
+                        <div class="card-header">
+                            <span class="exercise-name" th:text="${exercise.name}">ランニング</span>
+                        </div>
+                        
+                        <div class="card-tags">
+                            <span class="tag tag-muscle" style="color: #28a745; background-color: #e8f5e9;"><i class="fa-solid fa-heart-pulse"></i> <span th:text="${exercise.targetMuscle}">全身</span></span>
+                            <span class="tag tag-equip"><i class="fa-solid fa-toolbox"></i> <span th:text="${exercise.equipment}">マシン</span></span>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/training/bookmark/toggle}" method="post" class="bookmark-form" onclick="event.stopPropagation()">
                         <input type="hidden" name="exerciseName" th:value="${exercise.name}"/>
                         <input type="hidden" name="type" value="CARDIO"/>
                         <button type="submit" class="bookmark-btn" th:classappend="${#lists.contains(bookmarkedNames, exercise.name)} ? 'active'">
                             <i th:class="${#lists.contains(bookmarkedNames, exercise.name)} ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
                         </button>
                     </form>
-                </li>
-            </ul>
+                    
+                    <div class="tap-hint">詳細 <i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="detailModalOverlay" class="modal-overlay" onclick="closeDetailModal(event)">
+    <div class="detail-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">種目名</h3>
+            <button class="modal-close-btn" onclick="closeDetailModal(event)"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-row">
+                <span class="detail-tag tag-muscle"><i class="fa-solid fa-bullseye"></i> <span id="modalMuscle">部位</span></span>
+                <span class="detail-tag tag-equip"><i class="fa-solid fa-toolbox"></i> <span id="modalEquip">器具</span></span>
+            </div>
+            
+            <div class="desc-box">
+                <span class="desc-label"><i class="fa-solid fa-circle-info"></i> 解説・やり方</span>
+                <p class="desc-text" id="modalDesc">ここに解説が入ります。</p>
+            </div>
         </div>
     </div>
 </div>
@@ -171,48 +572,113 @@
 <div th:replace="fragments/footer :: footer"></div>
 
 <script>
+    // 部位フィルタリング機能
+    function filterByPart(part, btnElement) {
+        // 検索ボックスをリセット
+        document.getElementById('exerciseSearchInput').value = '';
+        document.getElementById('noResultsMessage').style.display = 'none';
+
+        // ボタンの見た目を更新
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        if(btnElement) btnElement.classList.add('active');
+
+        // セクションの表示切り替え
+        const sections = document.querySelectorAll('.category-section');
+        sections.forEach(section => {
+            const cards = section.querySelectorAll('.exercise-card');
+            cards.forEach(card => card.style.display = '');
+
+            if (part === 'all') {
+                section.style.display = '';
+            } else {
+                const sectionPart = section.getAttribute('data-part');
+                if (sectionPart === part) {
+                    section.style.display = '';
+                } else {
+                    section.style.display = 'none';
+                }
+            }
+        });
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 検索フィルタリング
     function filterExercises() {
         const input = document.getElementById('exerciseSearchInput');
-        const filter = input.value.toLowerCase().replace(/\s+/g, ''); // スペース除去して小文字化
+        const filter = input.value.toLowerCase().replace(/\s+/g, '');
         const container = document.getElementById('exerciseListContainer');
         const categories = container.getElementsByClassName('category-section');
         let totalVisibleItems = 0;
 
+        // 検索時は全てのセクションを一旦対象にするため、もし絞り込み中なら「すべて」に戻す挙動にするか、
+        // あるいは現在の表示状態を維持するかが選択になりますが、ここでは検索ヒット数を正しく出すために
+        // 非表示セクションは無視する（絞り込み内検索）挙動とします。
+        
         for (let i = 0; i < categories.length; i++) {
             const category = categories[i];
-            const items = category.getElementsByClassName('exercise-item');
+            
+            // 非表示カテゴリはスキップ
+            if (category.style.display === 'none') continue;
+
+            const cards = category.getElementsByClassName('exercise-card');
             let hasVisibleItem = false;
 
-            for (let j = 0; j < items.length; j++) {
-                const item = items[j];
-                const name = item.querySelector('.exercise-name').textContent || "";
-                const details = item.querySelector('.exercise-details').textContent || "";
-                // 検索対象のテキストを結合
-                const textValue = (name + details).toLowerCase().replace(/\s+/g, '');
+            for (let j = 0; j < cards.length; j++) {
+                const card = cards[j];
+                const name = card.getAttribute('data-name') || "";
+                const muscle = card.getAttribute('data-muscle') || "";
+                const equip = card.getAttribute('data-equip') || "";
+                
+                const textValue = (name + muscle + equip).toLowerCase().replace(/\s+/g, '');
 
                 if (textValue.includes(filter)) {
-                    item.style.display = "";
+                    card.style.display = "";
                     hasVisibleItem = true;
                     totalVisibleItems++;
                 } else {
-                    item.style.display = "none";
+                    card.style.display = "none";
                 }
-            }
-
-            // カテゴリ内のアイテムが全て非表示なら、カテゴリタイトルも消す
-            if (hasVisibleItem) {
-                category.style.display = "";
-            } else {
-                category.style.display = "none";
             }
         }
         
-        // 何も見つからなかった場合のメッセージ表示
         const noResultsMsg = document.getElementById('noResultsMessage');
         if (totalVisibleItems === 0) {
             noResultsMsg.style.display = "block";
         } else {
             noResultsMsg.style.display = "none";
+        }
+    }
+
+    // モーダルを開く
+    function openDetailModal(cardElement) {
+        const name = cardElement.getAttribute('data-name');
+        const muscle = cardElement.getAttribute('data-muscle');
+        const equip = cardElement.getAttribute('data-equip');
+        const desc = cardElement.getAttribute('data-desc');
+
+        document.getElementById('modalTitle').textContent = name;
+        document.getElementById('modalMuscle').textContent = muscle;
+        document.getElementById('modalEquip').textContent = equip;
+        
+        if (desc && desc.trim() !== "") {
+            document.getElementById('modalDesc').textContent = desc;
+        } else {
+            document.getElementById('modalDesc').textContent = "詳細な解説はまだ登録されていません。";
+        }
+
+        const overlay = document.getElementById('detailModalOverlay');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // モーダルを閉じる
+    function closeDetailModal(event) {
+        if (event.target.id === 'detailModalOverlay' || event.target.closest('.modal-close-btn')) {
+            const overlay = document.getElementById('detailModalOverlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = ''; 
         }
     }
 </script>

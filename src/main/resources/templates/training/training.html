@@ -116,14 +116,14 @@
 			padding-bottom: 30px;
         }
         
-        /* 部位選択チェックボックス用 */
-        .parts-checkbox-group {
+        /* 部位・器具選択チェックボックス用 */
+        .checkbox-group {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 5px;
         }
-        .parts-checkbox-group label {
+        .checkbox-group label {
             background: #fff;
             border: 1px solid #ddd;
             padding: 8px 12px;
@@ -132,18 +132,25 @@
             font-size: 0.9em;
             transition: all 0.2s;
             user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        .parts-checkbox-group input[type="checkbox"] {
+        .checkbox-group input[type="checkbox"] {
             display: none;
         }
-        .parts-checkbox-group input[type="checkbox"]:checked + span {
-            color: #fff;
-        }
-        .parts-checkbox-group label:has(input:checked) {
+        .checkbox-group label:has(input:checked) {
             background-color: #2196F3;
             color: white;
             border-color: #2196F3;
             box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
+        }
+        
+        /* 器具用カラー */
+        .equip-group label:has(input:checked) {
+            background-color: #009688;
+            border-color: #009688;
+            box-shadow: 0 2px 5px rgba(0, 150, 136, 0.3);
         }
 
         /* 場所・難易度選択用ラジオボタン風スタイル */
@@ -194,13 +201,12 @@
     </div>
 
     <div class="card training-option ai-card">
-        <form th:action="@{/training/start}" method="post">
+        <form th:action="@{/training/start}" method="post" id="aiForm">
             <input type="hidden" name="type" value="ai-suggested"/>
             
             <h2 class="card-title"><i class="fa-solid fa-wand-magic-sparkles"></i> AI時短おまかせメニュー</h2>
             <p class="text-secondary" style="font-size: 0.9em; margin-bottom: 15px;">
-                時間・場所・難易度に合わせてAIが最適なメニューを作成します。<br>
-                <strong>3分からOK！自宅トレも対応！</strong>
+                時間・場所・器具に合わせてAIが最適なメニューを作成します。<br>
             </p>
             
             <div class="form-group">
@@ -212,17 +218,31 @@
             </div>
 
             <div class="form-group">
-                <label style="font-weight:bold;">🏠 場所:</label>
+                <label style="font-weight:bold;">🏠 場所 (プリセット):</label>
                 <div class="radio-group">
-                    <label>
+                    <label onclick="updateEquip('gym')">
                         <input type="radio" name="location" value="gym" checked>
                         <i class="fa-solid fa-building"></i> ジム
                     </label>
-                    <label>
+                    <label onclick="updateEquip('home')">
                         <input type="radio" name="location" value="home">
                         <i class="fa-solid fa-house"></i> 自宅
                     </label>
                 </div>
+            </div>
+            
+            <div class="form-group">
+                <label style="font-weight:bold;">🏋️‍♂️ 利用可能な器具:</label>
+                <div class="checkbox-group equip-group">
+                    <label><input type="checkbox" name="equipment" value="bodyweight" checked><span>自重</span></label>
+                    <label><input type="checkbox" name="equipment" value="dumbbell" checked><span>ダンベル</span></label>
+                    <label><input type="checkbox" name="equipment" value="barbell" checked><span>バーベル</span></label>
+                    <label><input type="checkbox" name="equipment" value="machine" checked><span>マシン</span></label>
+                    <label><input type="checkbox" name="equipment" value="cable" checked><span>ケーブル</span></label>
+                    <label><input type="checkbox" name="equipment" value="smith" checked><span>スミス</span></label>
+                    <label><input type="checkbox" name="equipment" value="pullup_bar" checked><span>懸垂/鉄棒</span></label>
+                </div>
+                <p style="font-size: 0.8em; color: #888; margin-top: 5px;">※チェックした器具を使う種目が選ばれます</p>
             </div>
 
             <div class="form-group">
@@ -245,7 +265,7 @@
 
             <div class="form-group">
                 <label style="font-weight:bold;">💪 鍛えたい部位:</label>
-                <div class="parts-checkbox-group">
+                <div class="checkbox-group">
                     <label><input type="checkbox" name="parts" value="胸" checked><span>胸</span></label>
                     <label><input type="checkbox" name="parts" value="背中"><span>背中</span></label>
                     <label><input type="checkbox" name="parts" value="脚" checked><span>脚</span></label>
@@ -253,7 +273,6 @@
                     <label><input type="checkbox" name="parts" value="腕"><span>腕</span></label>
                     <label><input type="checkbox" name="parts" value="腹筋" checked><span>腹筋</span></label>
                 </div>
-                <p style="font-size: 0.8em; color: #888; margin-top: 5px;">※未選択時はおまかせになります</p>
             </div>
 
             <button type="submit" class="button primary mt-3" style="background: linear-gradient(45deg, #2196F3, #00BCD4); border:none; box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);">
@@ -266,7 +285,6 @@
         <form th:action="@{/training/start}" method="post">
             <input type="hidden" name="type" value="free-weight"/>
             <h2 class="card-title">フリーウェイト</h2>
-            
             <div class="form-group">
                 <label for="musclePart">鍛えたい部位:</label>
                 <select id="musclePart" class="form-control" required>
@@ -274,14 +292,12 @@
                     <option th:each="part : ${freeWeightParts}" th:value="${part}" th:text="${part}"></option>
                 </select>
             </div>
-            
             <div class="form-group">
                 <label for="exerciseName">種目名:</label>
                 <select id="exerciseName" name="exerciseName" class="form-control" required disabled>
                     <option value="">部位を選択してから種目を選んでください</option>
                 </select>
             </div>
-            
             <button type="submit" class="button primary mt-3" id="startFreeWeightSessionButton" disabled><i class="fa-solid fa-dumbbell"></i> セッション開始 </button>
         </form>
     </div>
@@ -290,7 +306,6 @@
         <form th:action="@{/training/start}" method="post">
             <input type="hidden" name="type" value="cardio"/>
             <h2 class="card-title">有酸素運動</h2>
-            
             <div class="form-group">
                 <label for="cardioExerciseName">種目名:</label>
                 <select id="cardioExerciseName" name="exerciseName" class="form-control" required>
@@ -298,11 +313,9 @@
                     <option th:each="exercise : ${cardioExercises}" th:value="${exercise.name}" th:text="${exercise.name}"></option>
                 </select>
             </div>
-            
             <button type="submit" class="button primary mt-3"><i class="fa-solid fa-running"></i> セッション開始 </button>
         </form>
     </div>
-    
 </div>
 
 <div class="container" style="margin-bottom: 30px;">
@@ -315,23 +328,36 @@
     /*<![CDATA[*/
     const freeWeightExercisesByPart = /*[[${freeWeightExercisesByPart}]]*/ {};
     
+    // 場所に応じた器具の自動チェック
+    function updateEquip(location) {
+        const checkboxes = document.querySelectorAll('.equip-group input[type="checkbox"]');
+        if (location === 'gym') {
+            checkboxes.forEach(cb => cb.checked = true);
+        } else if (location === 'home') {
+            checkboxes.forEach(cb => {
+                if (cb.value === 'bodyweight' || cb.value === 'dumbbell') {
+                    cb.checked = true;
+                } else {
+                    cb.checked = false;
+                }
+            });
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const musclePartSelect = document.getElementById('musclePart');
         const exerciseNameSelect = document.getElementById('exerciseName');
         const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
         
         if (musclePartSelect && exerciseNameSelect) {
-            
             musclePartSelect.addEventListener('change', function() {
                 const selectedPart = this.value;
-                
                 exerciseNameSelect.innerHTML = '<option value="">種目を選択してください</option>';
                 exerciseNameSelect.disabled = true;
                 startFreeWeightSessionButton.disabled = true;
 
                 if (selectedPart && freeWeightExercisesByPart[selectedPart]) {
                     const exercises = freeWeightExercisesByPart[selectedPart];
-                    
                     exercises.forEach(exercise => {
                         const option = document.createElement('option');
                         const val = (exercise.name) ? exercise.name : exercise;
@@ -340,8 +366,6 @@
                         exerciseNameSelect.appendChild(option);
                     });
                     exerciseNameSelect.disabled = false;
-                } else {
-                    exerciseNameSelect.innerHTML = '<option value="">部位を選択してから種目を選んでください</option>';
                 }
             });
             

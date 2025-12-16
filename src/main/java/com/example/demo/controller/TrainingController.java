@@ -192,11 +192,11 @@ public class TrainingController {
             @RequestParam(value = "exerciseName", required = false) List<String> exerciseNames, 
             @RequestParam(value = "aiProposal", required = false) String aiProposal,
             @RequestParam(value = "mySetId", required = false) Long mySetId,
-            // 追加パラメータ: 時間、部位、場所、難易度
             @RequestParam(value = "duration", required = false, defaultValue = "15") Integer duration,
             @RequestParam(value = "parts", required = false) List<String> parts,
             @RequestParam(value = "location", required = false, defaultValue = "gym") String location,
             @RequestParam(value = "difficulty", required = false, defaultValue = "intermediate") String difficulty,
+            @RequestParam(value = "equipment", required = false) List<String> equipment, // 器具リスト追加
             Authentication authentication,
             Model model) {
 
@@ -220,8 +220,8 @@ public class TrainingController {
                     model.addAttribute("targetTime", 45);
                     model.addAttribute("restTime", 60);
                 } else {
-                    // ★ 変更: 時間・部位・場所・難易度を渡す
-                    Map<String, Object> aiMenu = trainingLogicService.generateAiSuggestedMenu(duration, parts, location, difficulty);
+                    // 器具リストを渡す
+                    Map<String, Object> aiMenu = trainingLogicService.generateAiSuggestedMenu(duration, parts, location, difficulty, equipment);
                     finalProgramList = (List<String>) aiMenu.get("programList");
                     model.addAttribute("targetTime", aiMenu.get("targetTime"));
                     model.addAttribute("restTime", aiMenu.get("restTime"));
@@ -271,6 +271,7 @@ public class TrainingController {
         return "training/training-session";
     }
 
+    // ... (以下変更なし) ...
     @GetMapping("/training/bookmarks")
     public String showBookmarkList(Authentication authentication, Model model) {
         User currentUser = getCurrentUser(authentication);
