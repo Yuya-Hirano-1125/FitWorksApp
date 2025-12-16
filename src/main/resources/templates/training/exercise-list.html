@@ -10,16 +10,17 @@
     <script th:src="@{/js/theme.js}"></script>
     <style>
         /* -------------------------------------------------- */
-        /* レイアウト & デザイン (Card Grid) */
+        /* レイアウト & デザイン */
         /* -------------------------------------------------- */
         body {
-            background-color: #f0f2f5;
+            background-color: #f8f9fa;
+            color: #333;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding-bottom: 100px;
+            padding-bottom: 120px;
         }
 
         /* ヘッダー周り */
@@ -27,64 +28,74 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            padding: 0 10px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            padding: 0 15px;
         }
         .page-title {
             margin: 0;
             font-size: 1.8rem;
-            color: #333;
+            color: #2c3e50;
             font-weight: 800;
+            letter-spacing: -0.5px;
         }
         .back-btn {
-            background-color: #6c757d;
-            color: white;
-            padding: 8px 16px;
+            background-color: #f1f3f5;
+            color: #495057;
+            padding: 10px 18px;
             border-radius: 50px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             text-decoration: none;
-            transition: background 0.2s;
+            font-weight: 700;
+            transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .back-btn:hover {
-            background-color: #5a6268;
+            background-color: #e9ecef;
+            transform: translateY(-2px);
         }
 
-        /* 検索バーエリア */
-        .search-wrapper {
+        /* 検索 & フィルターエリア固定 */
+        .sticky-header-area {
             position: sticky;
-            top: 60px;
+            top: 60px; /* ヘッダーの高さ考慮 */
             z-index: 90;
-            background-color: rgba(240, 242, 245, 0.95);
-            padding: 10px 0 20px 0;
-            backdrop-filter: blur(5px);
-            margin-bottom: 20px;
+            background-color: rgba(248, 249, 250, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 30px;
         }
 
+        /* 検索バー */
         .search-container {
             display: flex;
-            gap: 10px;
-            padding: 0 10px;
+            gap: 12px;
+            padding: 0 15px;
             align-items: center;
+            margin-bottom: 15px;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .search-box {
             flex: 1;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: 2px solid #e1e4e8;
+            padding: 14px 24px;
+            font-size: 1rem;
+            border: 2px solid transparent;
             border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             outline: none;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             background: #fff;
         }
         .search-box:focus {
             border-color: #007bff;
-            box-shadow: 0 4px 20px rgba(0, 123, 255, 0.15);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15);
         }
 
         /* ブックマーク一覧ボタン */
@@ -94,14 +105,14 @@
             border: 2px solid #f39c12;
             padding: 12px 20px;
             border-radius: 50px;
-            font-weight: bold;
+            font-weight: 800;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 8px;
             white-space: nowrap;
             transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 10px rgba(243, 156, 18, 0.15);
         }
         .view-bookmarks-btn:hover {
             background-color: #f39c12;
@@ -110,144 +121,208 @@
             box-shadow: 0 6px 15px rgba(243, 156, 18, 0.3);
         }
 
+        /* フィルターボタン (横スクロール) */
+        .filter-scroll-wrapper {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 5px 15px 15px 15px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+        .filter-scroll-wrapper::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .filter-btn {
+            background-color: #fff;
+            color: #555;
+            border: 1px solid #e0e0e0;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 8px;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            display: inline-block; /* 確実に並べる */
+        }
+        .filter-btn:last-child {
+            margin-right: 0;
+        }
+        .filter-btn:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+        .filter-btn.active {
+            background-color: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+        }
+        /* 有酸素ボタン特別色 */
+        .filter-btn[data-part="cardio"].active {
+            background-color: #28a745;
+            border-color: #28a745;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
         /* カテゴリセクション */
         .category-section {
-            margin-bottom: 40px;
-            padding: 0 10px;
+            margin-bottom: 50px;
+            padding: 0 15px;
+            animation: fadeIn 0.5s ease;
         }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .category-header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #007bff;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e9ecef;
         }
         .category-title {
             margin: 0;
-            color: #333;
-            font-size: 1.5rem;
+            color: #2c3e50;
+            font-size: 1.6rem;
             font-weight: 800;
         }
         .category-badge {
-            background-color: #007bff;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
         }
 
         /* グリッドレイアウト */
         .exercise-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
         }
 
-        /* カードデザイン */
+        /* カードデザイン改善 */
         .exercise-card {
             background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer;
             position: relative;
-            border: 1px solid #f0f0f0;
+            border: 1px solid rgba(0,0,0,0.02);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             height: 100%;
         }
         .exercise-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border-color: #cce5ff;
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         .exercise-name {
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             font-weight: 800;
             color: #2c3e50;
             line-height: 1.4;
-            margin-right: 10px;
+            margin-right: 15px;
         }
         
         .card-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 12px;
         }
         .tag {
             font-size: 0.75rem;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 5px;
+            letter-spacing: 0.5px;
         }
-        .tag-muscle { background-color: #e3f2fd; color: #1976d2; }
-        .tag-equip { background-color: #f3e5f5; color: #7b1fa2; }
+        .tag-muscle { background-color: #e3f2fd; color: #1565c0; }
+        .tag-equip { background-color: #f3e5f5; color: #6a1b9a; }
 
         .bookmark-form {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 2; /* カードクリックより優先 */
+            top: 20px;
+            right: 20px;
+            z-index: 2;
         }
         .bookmark-btn {
-            background: none;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
             border: none;
             cursor: pointer;
             font-size: 1.4rem;
-            color: #e0e0e0;
-            transition: transform 0.2s, color 0.2s;
-            padding: 5px;
+            color: #d1d1d1;
+            transition: all 0.2s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .bookmark-btn.active {
             color: #ffc107;
-            filter: drop-shadow(0 2px 4px rgba(255, 193, 7, 0.4));
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
         }
         .bookmark-btn:hover {
-            transform: scale(1.2);
+            transform: scale(1.15);
         }
 
-        /* 詳細を見るラベル */
         .tap-hint {
             margin-top: 15px;
-            font-size: 0.8rem;
-            color: #aaa;
+            font-size: 0.85rem;
+            color: #adb5bd;
             text-align: right;
-            font-weight: 600;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
         }
-        .tap-hint i { margin-left: 3px; }
 
         /* 検索結果なし */
         .no-results {
             text-align: center;
-            padding: 40px;
-            color: #888;
-            font-weight: bold;
+            padding: 60px 20px;
+            color: #adb5bd;
+            font-weight: 700;
             display: none;
         }
+        .no-results i {
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
 
-        /* -------------------------------------------------- */
-        /* モーダル (詳細表示) */
-        /* -------------------------------------------------- */
+        /* モーダル */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(5px);
             z-index: 2000;
             display: none;
             justify-content: center;
@@ -260,47 +335,44 @@
             display: flex;
             opacity: 1;
         }
-
         .detail-modal {
             background: white;
             width: 100%;
-            max-width: 500px;
-            border-radius: 20px;
+            max-width: 550px;
+            border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            transform: scale(0.9);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            transform: scale(0.95);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            max-height: 90vh;
+            max-height: 85vh;
             display: flex;
             flex-direction: column;
         }
         .modal-overlay.active .detail-modal {
             transform: scale(1);
         }
-
         .modal-header {
-            background: linear-gradient(135deg, #007bff, #00c6ff);
-            padding: 20px 25px;
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            padding: 25px 30px;
             color: white;
             position: relative;
         }
         .modal-title {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 900;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .modal-close-btn {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 20px;
+            right: 20px;
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            width: 35px;
-            height: 35px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: background 0.2s;
             display: flex;
@@ -308,46 +380,31 @@
             justify-content: center;
         }
         .modal-close-btn:hover {
-            background: rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.3);
         }
-
         .modal-body {
-            padding: 25px;
+            padding: 30px;
             overflow-y: auto;
         }
-        .detail-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .detail-tag {
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
         .desc-box {
             background-color: #f8f9fa;
-            border-left: 5px solid #007bff;
-            padding: 15px;
-            border-radius: 4px;
+            border-left: 6px solid #2c3e50;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
         }
         .desc-label {
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 8px;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 10px;
             display: block;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
         .desc-text {
-            color: #333;
-            line-height: 1.7;
-            font-size: 1rem;
-            white-space: pre-wrap; /* 改行を反映 */
+            color: #495057;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            white-space: pre-wrap;
         }
 
         @media (max-width: 600px) {
@@ -357,6 +414,13 @@
             }
             .view-bookmarks-btn {
                 justify-content: center;
+            }
+            .filter-btn {
+                padding: 6px 14px;
+                font-size: 0.85rem;
+            }
+            .page-title {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -373,24 +437,39 @@
         </a>
     </div>
 
-    <div class="search-wrapper">
+    <div class="sticky-header-area">
         <div class="search-container">
             <input type="text" id="exerciseSearchInput" class="search-box" placeholder="🔍 種目名、部位、器具で検索..." onkeyup="filterExercises()">
             
             <a th:href="@{/training/bookmarks}" class="view-bookmarks-btn">
-                <i class="fa-solid fa-star"></i> ブックマーク一覧
+                <i class="fa-solid fa-star"></i> ブックマーク
             </a>
+        </div>
+
+        <div class="filter-scroll-wrapper">
+            <button class="filter-btn active" data-part="all" onclick="filterByPart('all', this)">すべて</button>
+            
+            <button th:each="entry : ${freeWeightExercisesByPart}" 
+                    class="filter-btn" 
+                    th:text="${entry.key}"
+                    th:data-part="${entry.key}"
+                    onclick="filterByPart(this.getAttribute('data-part'), this)">部位名</button>
+            
+            <button class="filter-btn" data-part="cardio" onclick="filterByPart('cardio', this)">有酸素運動</button>
         </div>
     </div>
     
     <div id="noResultsMessage" class="no-results">
-        <i class="fa-solid fa-circle-exclamation fa-2x" style="margin-bottom: 10px;"></i><br>
+        <i class="fa-solid fa-circle-exclamation fa-3x"></i><br><br>
         一致する種目が見つかりません。
     </div>
 
     <div id="exerciseListContainer">
         
-        <div th:each="entry : ${freeWeightExercisesByPart}" class="category-section">
+        <div th:each="entry : ${freeWeightExercisesByPart}" 
+             class="category-section" 
+             th:data-part="${entry.key}"> 
+             
             <div class="category-header">
                 <h2 th:text="${entry.key}" class="category-title" th:data-keywords="${entry.key}">部位名</h2>
                 <span class="category-badge" th:text="${#lists.size(entry.value)} + ' 種目'"></span>
@@ -424,15 +503,15 @@
                         </button>
                     </form>
                     
-                    <div class="tap-hint">詳細を見る <i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="tap-hint">詳細 <i class="fa-solid fa-chevron-right"></i></div>
                 </div>
             </div>
         </div>
 
-        <div class="category-section">
+        <div class="category-section" data-part="cardio">
             <div class="category-header" style="border-bottom-color: #28a745;">
-                <h2 class="category-title" data-keywords="有酸素 カーディオ">有酸素運動</h2>
-                <span class="category-badge" style="background-color: #28a745;" th:text="${#lists.size(cardioExercises)} + ' 種目'"></span>
+                <h2 class="category-title" data-keywords="有酸素 カーディオ" style="color: #28a745;">有酸素運動</h2>
+                <span class="category-badge" style="background-color: #e8f5e9; color: #28a745;" th:text="${#lists.size(cardioExercises)} + ' 種目'"></span>
             </div>
             
             <div class="exercise-grid">
@@ -463,7 +542,7 @@
                         </button>
                     </form>
                     
-                    <div class="tap-hint">詳細を見る <i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="tap-hint">詳細 <i class="fa-solid fa-chevron-right"></i></div>
                 </div>
             </div>
         </div>
@@ -493,37 +572,36 @@
 <div th:replace="fragments/footer :: footer"></div>
 
 <script>
-    // モーダルを開く
-    function openDetailModal(cardElement) {
-        const name = cardElement.getAttribute('data-name');
-        const muscle = cardElement.getAttribute('data-muscle');
-        const equip = cardElement.getAttribute('data-equip');
-        // 解説を取得（もしnullなら空文字にする）
-        const desc = cardElement.getAttribute('data-desc');
+    // 部位フィルタリング機能
+    function filterByPart(part, btnElement) {
+        // 検索ボックスをリセット
+        document.getElementById('exerciseSearchInput').value = '';
+        document.getElementById('noResultsMessage').style.display = 'none';
 
-        document.getElementById('modalTitle').textContent = name;
-        document.getElementById('modalMuscle').textContent = muscle;
-        document.getElementById('modalEquip').textContent = equip;
+        // ボタンの見た目を更新
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        if(btnElement) btnElement.classList.add('active');
+
+        // セクションの表示切り替え
+        const sections = document.querySelectorAll('.category-section');
+        sections.forEach(section => {
+            const cards = section.querySelectorAll('.exercise-card');
+            cards.forEach(card => card.style.display = '');
+
+            if (part === 'all') {
+                section.style.display = '';
+            } else {
+                const sectionPart = section.getAttribute('data-part');
+                if (sectionPart === part) {
+                    section.style.display = '';
+                } else {
+                    section.style.display = 'none';
+                }
+            }
+        });
         
-        // 解説がない場合のフォールバックメッセージ
-        if (desc && desc.trim() !== "") {
-            document.getElementById('modalDesc').textContent = desc;
-        } else {
-            document.getElementById('modalDesc').textContent = "詳細な解説はまだ登録されていません。";
-        }
-
-        const overlay = document.getElementById('detailModalOverlay');
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden'; // 背景スクロール固定
-    }
-
-    // モーダルを閉じる
-    function closeDetailModal(event) {
-        if (event.target.id === 'detailModalOverlay' || event.target.closest('.modal-close-btn')) {
-            const overlay = document.getElementById('detailModalOverlay');
-            overlay.classList.remove('active');
-            document.body.style.overflow = ''; 
-        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // 検索フィルタリング
@@ -534,8 +612,16 @@
         const categories = container.getElementsByClassName('category-section');
         let totalVisibleItems = 0;
 
+        // 検索時は全てのセクションを一旦対象にするため、もし絞り込み中なら「すべて」に戻す挙動にするか、
+        // あるいは現在の表示状態を維持するかが選択になりますが、ここでは検索ヒット数を正しく出すために
+        // 非表示セクションは無視する（絞り込み内検索）挙動とします。
+        
         for (let i = 0; i < categories.length; i++) {
             const category = categories[i];
+            
+            // 非表示カテゴリはスキップ
+            if (category.style.display === 'none') continue;
+
             const cards = category.getElementsByClassName('exercise-card');
             let hasVisibleItem = false;
 
@@ -544,6 +630,7 @@
                 const name = card.getAttribute('data-name') || "";
                 const muscle = card.getAttribute('data-muscle') || "";
                 const equip = card.getAttribute('data-equip') || "";
+                
                 const textValue = (name + muscle + equip).toLowerCase().replace(/\s+/g, '');
 
                 if (textValue.includes(filter)) {
@@ -554,11 +641,45 @@
                     card.style.display = "none";
                 }
             }
-            category.style.display = hasVisibleItem ? "" : "none";
         }
         
         const noResultsMsg = document.getElementById('noResultsMessage');
-        noResultsMsg.style.display = (totalVisibleItems === 0) ? "block" : "none";
+        if (totalVisibleItems === 0) {
+            noResultsMsg.style.display = "block";
+        } else {
+            noResultsMsg.style.display = "none";
+        }
+    }
+
+    // モーダルを開く
+    function openDetailModal(cardElement) {
+        const name = cardElement.getAttribute('data-name');
+        const muscle = cardElement.getAttribute('data-muscle');
+        const equip = cardElement.getAttribute('data-equip');
+        const desc = cardElement.getAttribute('data-desc');
+
+        document.getElementById('modalTitle').textContent = name;
+        document.getElementById('modalMuscle').textContent = muscle;
+        document.getElementById('modalEquip').textContent = equip;
+        
+        if (desc && desc.trim() !== "") {
+            document.getElementById('modalDesc').textContent = desc;
+        } else {
+            document.getElementById('modalDesc').textContent = "詳細な解説はまだ登録されていません。";
+        }
+
+        const overlay = document.getElementById('detailModalOverlay');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // モーダルを閉じる
+    function closeDetailModal(event) {
+        if (event.target.id === 'detailModalOverlay' || event.target.closest('.modal-close-btn')) {
+            const overlay = document.getElementById('detailModalOverlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = ''; 
+        }
     }
 </script>
 
