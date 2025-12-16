@@ -48,7 +48,7 @@ public class CharacterUnlockController {
         // --- ユーザー情報をDBから取得 ---
         String username = principal.getName();
         int userLevel = userService.getUserLevel(username); // DBからレベル取得
-        int userMaterialCount = userService.getUserMaterialCount(username, materialType); // DBから素材数取得
+        int userMaterialCount = userService.getUserMaterialCount(username, 16L); // DBから素材数取得
 
         // 判定処理
         boolean canUnlock = (userLevel >= chara.getRequiredLevel() && userMaterialCount >= cost);

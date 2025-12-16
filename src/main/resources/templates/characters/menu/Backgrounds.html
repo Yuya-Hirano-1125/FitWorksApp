@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>背景一覧 | FitWorks</title>
@@ -80,13 +82,19 @@
     </div>
 
     <!-- 解放確認ポップアップ -->
-    <div id="unlock-popup" class="popup-hidden fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl p-6 text-center max-w-sm w-full">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">ロック解放</h3>
-            <p id="unlock-message" class="mb-6 text-gray-600 font-medium whitespace-pre-line"></p>
-            <div class="flex gap-4 justify-center">
-                <button id="cancel-unlock" class="flex-1 py-2 bg-gray-200 text-gray-600 rounded-lg font-bold hover:bg-gray-300 transition">キャンセル</button>
-                <button id="confirm-unlock" class="flex-1 py-2 bg-[var(--primary-color)] text-white rounded-lg font-bold shadow-md hover:opacity-90 transition">解放する</button>
+    <div id="unlock-popup" class="popup-hidden unlock-popup-overlay">
+        <div class="unlock-popup-content">
+            <h3 class="unlock-popup-title">
+                ロック解放
+            </h3>
+            <div id="unlock-message" class="unlock-popup-message"></div>
+            <div class="unlock-popup-buttons">
+                <button id="cancel-unlock" class="unlock-btn-cancel">
+                    <i class="fa-solid fa-times"></i> キャンセル
+                </button>
+                <button id="confirm-unlock" class="unlock-btn-confirm">
+                    <i class="fa-solid fa-unlock-keyhole"></i> 解放する
+                </button>
             </div>
         </div>
     </div>
@@ -96,6 +104,10 @@
     <script th:inline="javascript"> 
     /*<![CDATA[*/
     document.addEventListener('DOMContentLoaded', () => {
+
+        // CSRFトークン取得
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
         // Thymeleafから値を取得
         let userLevel = /*[[${userLevel}]]*/ 1;
@@ -305,44 +317,69 @@
         const cancelUnlockBtn = document.getElementById('cancel-unlock');
 
         function openUnlockPopup(bg) {
-            let message = `「${bg.name}」を解放しますか?`;
+            let messageHtml = `<strong>「${bg.name}」</strong>を解放しますか?`;
             
             if (bg.needsMaterial) {
-                message += `\n\n必要素材: ${bg.materialName} × 1`;
-                message += `\n現在の所持数: ${dreamKeyCount}個`;
+                messageHtml += `<br><br>`;
+                messageHtml += `<div style="color: #9333ea; font-weight: bold;">`;
+                messageHtml += `<i class="fa-solid fa-key" style="color: #a855f7;"></i> 必要素材: ${bg.materialName} × 1`;
+                messageHtml += `</div>`;
+                messageHtml += `<div style="color: #059669; font-weight: bold; margin-top: 0.5rem;">`;
+                messageHtml += `<i class="fa-solid fa-box"></i> 現在の所持数: ${dreamKeyCount}個`;
+                messageHtml += `</div>`;
             }
             
-            unlockMessage.textContent = message;
+            unlockMessage.innerHTML = messageHtml;
             unlockPopup.classList.remove('popup-hidden');
             
             const newConfirm = confirmUnlockBtn.cloneNode(true);
             confirmUnlockBtn.parentNode.replaceChild(newConfirm, confirmUnlockBtn);
             
-            newConfirm.addEventListener('click', () => {
+            newConfirm.addEventListener('click', async () => {
                 console.log('解放リクエスト:', bg.name, 'material_id:', bg.materialId);
                 
-                // TODO: サーバーに解放リクエストを送信
-                // fetch('/characters/backgrounds/unlock', {
-                //     method: 'POST',
-                //     headers: { 'Content-Type': 'application/json' },
-                //     body: JSON.stringify({ backgroundId: bg.id, materialId: bg.materialId })
-                // })
-                
-                // 仮の処理: ロック解除
-                bg.locked = false;
-                unlockPopup.classList.add('popup-hidden');
-                
-                // 素材を消費した場合は表示を更新
-                if (bg.needsMaterial) {
-                    dreamKeyCount--;
-                    if (dreamKeyCountElement) {
-                        dreamKeyCountElement.textContent = dreamKeyCount;
+                try {
+                    // サーバーに解放リクエストを送信
+                    const response = await fetch('/characters/backgrounds/unlock', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            [csrfHeader]: csrfToken
+                        },
+                        body: JSON.stringify({ 
+                            backgroundId: bg.id, 
+                            materialId: bg.materialId 
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // 解放成功
+                        bg.locked = false;
+                        unlockPopup.classList.add('popup-hidden');
+                        
+                        // 素材を消費した場合は表示を更新
+                        if (bg.needsMaterial && result.remainingCount !== undefined) {
+                            dreamKeyCount = result.remainingCount;
+                            if (dreamKeyCountElement) {
+                                dreamKeyCountElement.textContent = dreamKeyCount;
+                            }
+                        }
+                        
+                        alert(`「${bg.name}」を解放しました!`);
+                        selectBackground(bg);
+                        renderAll();
+                    } else {
+                        // 解放失敗
+                        alert(result.message || '解放に失敗しました');
+                        unlockPopup.classList.add('popup-hidden');
                     }
-                    alert(`${bg.materialName}を1個消費して「${bg.name}」を解放しました!`);
+                } catch (error) {
+                    console.error('解放エラー:', error);
+                    alert('エラーが発生しました: ' + error.message);
+                    unlockPopup.classList.add('popup-hidden');
                 }
-                
-                selectBackground(bg);
-                renderAll(); 
             });
         }
 

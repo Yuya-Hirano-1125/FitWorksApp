@@ -391,10 +391,9 @@ public class UserService {
                 .map(User::getLevel)
                 .orElse(1); // ユーザーが見つからない場合はLv.1
     }
-    public int getUserMaterialCount(String username, String materialType) {
-        return userItemRepository.findByUser_UsernameAndItem_Type(username, materialType)
-                .map(UserItem::getCount)
-                .orElse(0);
+    public int getUserMaterialCount(String username, Long itemId) {
+        List<UserItem> items = userItemRepository
+            .findAllByUser_UsernameAndItemId(username, itemId);  // ← findAll を付ける！
+        return items.size();
     }
-
 }
