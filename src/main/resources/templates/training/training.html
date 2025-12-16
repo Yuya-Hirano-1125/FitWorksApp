@@ -9,14 +9,10 @@
     
 	<script th:src="@{/js/theme.js}"></script>
     <style>
-        /* ----------------------------------- */
-        /* ★ デザイン強化用カスタムスタイル ★ */
-        /* ----------------------------------- */
         body {
-            background-color: #f8f9fa; /* 背景色を薄いグレーに */
+            background-color: #f8f9fa;
         }
         
-        /* タイトルエリアをFlexbox化してボタンを右寄せにするためのスタイル */
         .page-header-container {
             display: flex;
             justify-content: space-between;
@@ -29,12 +25,11 @@
         .page-title {
             color: #343a40; 
             font-size: 2rem;
-            margin: 0; /* マージンを親コンテナに任せるためリセット */
-            border-bottom: none; /* 親コンテナにボーダーを移動 */
+            margin: 0; 
+            border-bottom: none; 
             padding-bottom: 0;
         }
 
-        /* Home画面風のカードデザインを強化 */
         .card { 
             margin-bottom: 25px; 
             padding: 25px; 
@@ -43,7 +38,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             background-color: #ffffff;
-            /* pointer-events: none; /* デフォルトではクリックイベントを無効にする（フォーム内ボタンで有効化） */
         }
         
         .card:hover {
@@ -55,6 +49,16 @@
             font-size: 1.5rem;
             margin-bottom: 10px;
             color: #007bff; 
+        }
+        
+        /* AIメニュー特別色 */
+        .card.ai-card {
+            background: linear-gradient(to bottom right, #ffffff, #f0f8ff);
+            border: 2px solid #8ec5fc;
+        }
+        .card.ai-card .card-title {
+            color: #2196F3;
+            font-weight: 900;
         }
         
         #free-weight-option {
@@ -108,28 +112,64 @@
             color: #6c757d;
         }
 
-        /* 画面下部の固定ボタン用スタイル */
-        .fixed-footer-button {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 10px 0;
-            background-color: #ffffff; 
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+        .main-content {
+			padding-bottom: 30px;
         }
         
-        .fixed-footer-button .container {
-            max-width: 600px; /* PC/タブレット表示時の幅を制限 (ベースCSSのcontainerに依存) */
-            margin: auto;
-            padding: 0 15px;
+        /* 部位選択チェックボックス用 */
+        .parts-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .parts-checkbox-group label {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .parts-checkbox-group input[type="checkbox"] {
+            display: none;
+        }
+        .parts-checkbox-group input[type="checkbox"]:checked + span {
+            color: #fff;
+        }
+        .parts-checkbox-group label:has(input:checked) {
+            background-color: #2196F3;
+            color: white;
+            border-color: #2196F3;
+            box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
         }
 
-        /* 固定フッター分の余白を確保 */
-        .main-content {
-            /*padding-bottom: 100px; */
-			padding-bottom: 30px;
+        /* 場所・難易度選択用ラジオボタン風スタイル */
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+        .radio-group label {
+            flex: 1;
+            text-align: center;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+        }
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+        .radio-group label:has(input:checked) {
+            background-color: #00BCD4;
+            color: white;
+            border-color: #00BCD4;
+            box-shadow: 0 2px 5px rgba(0, 188, 212, 0.3);
         }
 
     </style>
@@ -153,13 +193,72 @@
         </a>
     </div>
 
-    <div class="card training-option">
+    <div class="card training-option ai-card">
         <form th:action="@{/training/start}" method="post">
             <input type="hidden" name="type" value="ai-suggested"/>
-            <input type="hidden" name="exerciseName" value="AIおすすめプログラム"/>
-            <h2 class="card-title">AIおすすめメニュー</h2>
-            <p class="text-secondary">AIが目標や過去の履歴に基づいた最適なトレーニングプログラムを提案します。</p>
-            <button type="submit" class="button primary mt-3"><i class="fa-solid fa-robot"></i> AIおすすめセッション開始 </button>
+            
+            <h2 class="card-title"><i class="fa-solid fa-wand-magic-sparkles"></i> AI時短おまかせメニュー</h2>
+            <p class="text-secondary" style="font-size: 0.9em; margin-bottom: 15px;">
+                時間・場所・難易度に合わせてAIが最適なメニューを作成します。<br>
+                <strong>3分からOK！自宅トレも対応！</strong>
+            </p>
+            
+            <div class="form-group">
+                <label for="duration" style="font-weight:bold;">⏱️ 時間 (分):</label>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="number" id="duration" name="duration" class="form-control" value="15" min="3" max="180" required style="width: 100px; text-align: center; font-size: 1.2em;">
+                    <span>分くらい</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label style="font-weight:bold;">🏠 場所:</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="location" value="gym" checked>
+                        <i class="fa-solid fa-building"></i> ジム
+                    </label>
+                    <label>
+                        <input type="radio" name="location" value="home">
+                        <i class="fa-solid fa-house"></i> 自宅
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label style="font-weight:bold;">🔥 難易度:</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="difficulty" value="beginner">
+                        🔰 初心者
+                    </label>
+                    <label>
+                        <input type="radio" name="difficulty" value="intermediate" checked>
+                        💪 普通
+                    </label>
+                    <label>
+                        <input type="radio" name="difficulty" value="advanced">
+                        🔥 上級者
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label style="font-weight:bold;">💪 鍛えたい部位:</label>
+                <div class="parts-checkbox-group">
+                    <label><input type="checkbox" name="parts" value="胸" checked><span>胸</span></label>
+                    <label><input type="checkbox" name="parts" value="背中"><span>背中</span></label>
+                    <label><input type="checkbox" name="parts" value="脚" checked><span>脚</span></label>
+                    <label><input type="checkbox" name="parts" value="肩"><span>肩</span></label>
+                    <label><input type="checkbox" name="parts" value="腕"><span>腕</span></label>
+                    <label><input type="checkbox" name="parts" value="腹筋" checked><span>腹筋</span></label>
+                </div>
+                <p style="font-size: 0.8em; color: #888; margin-top: 5px;">※未選択時はおまかせになります</p>
+            </div>
+
+            <button type="submit" class="button primary mt-3" style="background: linear-gradient(45deg, #2196F3, #00BCD4); border:none; box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);">
+                <i class="fa-solid fa-robot"></i> メニューを作成して開始
+            </button>
         </form>
     </div>
 
@@ -186,6 +285,7 @@
             <button type="submit" class="button primary mt-3" id="startFreeWeightSessionButton" disabled><i class="fa-solid fa-dumbbell"></i> セッション開始 </button>
         </form>
     </div>
+    
     <div class="card training-option">
         <form th:action="@{/training/start}" method="post">
             <input type="hidden" name="type" value="cardio"/>
@@ -206,10 +306,10 @@
 </div>
 
 <div class="container" style="margin-bottom: 30px;">
-        <a th:href="@{/home}" class="button secondary">
-            <i class="fa-solid fa-house"></i> ホームに戻る
-        </a>
-    </div>
+    <a th:href="@{/home}" class="button secondary">
+        <i class="fa-solid fa-house"></i> ホームに戻る
+    </a>
+</div>
 
 <script th:inline="javascript">
     /*<![CDATA[*/
@@ -234,7 +334,6 @@
                     
                     exercises.forEach(exercise => {
                         const option = document.createElement('option');
-                        // ★修正箇所: exerciseがオブジェクトの場合は .name を使用、そうでなければそのまま使用
                         const val = (exercise.name) ? exercise.name : exercise;
                         option.value = val;
                         option.textContent = val;

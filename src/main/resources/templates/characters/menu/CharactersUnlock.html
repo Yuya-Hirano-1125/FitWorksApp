@@ -114,9 +114,13 @@
 	    <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
 	    <div class="char-list">
 	        <div th:each="chara : ${fireChars}" class="character-card fire">
-	            <div class="character-img-wrapper">
+	            <!-- 画像枠：未解放なら真っ黒＋錠前 -->
+	            <div class="character-img-wrapper" th:classappend="${chara.name ne 'エンバーハート'} ? 'locked' : ''">
 	                <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+	                <!-- 錠前アイコン（未解放時のみ表示） -->
+	                <i th:if="${chara.name ne 'エンバーハート'}" class="fa-solid fa-lock lock-icon"></i>
 	            </div>
+
 	            <p class="character-name" th:text="${chara.name}">キャラ名</p>
 	            <span class="character-rarity" th:text="${chara.rarity}">★</span>
 	            <div class="requirements">
@@ -127,15 +131,18 @@
 	            <!-- 解放ボタン or 開放済み表示 -->
 	            <div class="unlock-action">
 	                <!-- エンバーハートは最初から解放済み -->
-	                <span th:if="${chara.name == 'エンバーハート'}" class="unlocked-label">
+	                <span th:if="${chara.name eq 'エンバーハート'}" class="unlocked-label">
 	                    ✅ 開放済み
 	                </span>
 
 	                <!-- それ以外は解放ボタン -->
-	                <button th:if="${chara.name != 'エンバーハート'}"
+	                <button th:if="${chara.name ne 'エンバーハート'}"
 	                        type="button"
 	                        class="btn-unlock"
-	                        th:attr="data-id=${chara.id},data-level=${chara.requiredLevel},data-cost=${chara.unlockCost},data-material=${chara.attribute}"
+	                        th:data-id="${chara.id}"
+	                        th:data-level="${chara.requiredLevel}"
+	                        th:data-cost="${chara.unlockCost}"
+	                        th:data-material="${chara.attribute}"
 	                        onclick="openModal(this)">
 	                    <i class="fa-solid fa-lock-open"></i> 解放
 	                </button>
@@ -149,7 +156,6 @@
 	    <div class="modal-content">
 	        <span class="close" onclick="closeModal()">&times;</span>
 	        <h3>解放条件</h3>
-	        <!-- ★ここに条件が表示される -->
 	        <p id="modalText">ここに条件が表示されます</p>
 	        <form id="unlockForm" th:action="@{/characters/unlock}" method="post">
 	            <input type="hidden" name="characterId" id="modalCharacterId">
@@ -162,7 +168,7 @@
 
 	<style>
 	.modal {
-	    display: none; /* 初期は非表示 */
+	    display: none;
 	    position: fixed;
 	    z-index: 1000;
 	    left: 0; top: 0;
@@ -190,6 +196,22 @@
 	    border: none;
 	    border-radius: 4px;
 	}
+
+	/* 未解放キャラを真っ黒にする */
+	.locked .character-img {
+	    filter: brightness(0%);
+	}
+
+	/* 錠前アイコンを中央に重ねる */
+	.lock-icon {
+	    position: absolute;
+	    top: 50%;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+	    font-size: 2rem;
+	    color: #fff;
+	    text-shadow: 0 0 5px rgba(0,0,0,0.7);
+	}
 	</style>
 
 	<script>
@@ -199,7 +221,7 @@
 	    const material = button.getAttribute("data-material");
 	    const id = button.getAttribute("data-id");
 
-	    // ★テキストをセット
+	    // キャラごとの条件文言を組み立て
 	    document.getElementById("modalText").innerText =
 	        `このキャラを解放するには Lv.${level} 以上 と ${material} 素材 ${cost} 個 が必要です。`;
 
@@ -216,7 +238,6 @@
 	    document.getElementById("unlockModal").style.display = "none";
 	}
 	</script>
-
 
     <!-- 水属性 -->
     <div class="pass-section">
