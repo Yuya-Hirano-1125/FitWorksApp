@@ -1,35 +1,37 @@
 package com.example.demo.dto;
 
 public class ExerciseData {
-    private String name;
-    private String difficulty; // "初級", "中級", "上級"
-    private String howTo;
-    private String points;
+    private String name;          // 種目名
+    private String targetMuscle;  // ターゲット部位
+    private String equipment;     // 使用器具
+    private String description;   // 解説・やり方
+    private String difficulty;    // 難易度 (追加)
 
-    public ExerciseData(String name, String difficulty, String howTo, String points) {
+    // コンストラクタ (難易度を追加)
+    public ExerciseData(String name, String targetMuscle, String equipment, String description, String difficulty) {
         this.name = name;
+        this.targetMuscle = targetMuscle;
+        this.equipment = equipment;
+        this.description = description;
         this.difficulty = difficulty;
-        this.howTo = howTo;
-        this.points = points;
     }
+
+    // --- Getter / Setter ---
 
     public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getTargetMuscle() { return targetMuscle; }
+    public void setTargetMuscle(String targetMuscle) { this.targetMuscle = targetMuscle; }
+
+    public String getEquipment() { return equipment; }
+    public void setEquipment(String equipment) { this.equipment = equipment; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
     public String getDifficulty() { return difficulty; }
-    public String getHowTo() { return howTo; }
-    public String getPoints() { return points; }
-
-    // ★重要: HTML側が "description" という名前でデータを求めてくるため、howToを返すメソッドを追加
-    public String getDescription() {
-        return howTo;
-    }
-
-    // ★重要: HTML側が "tips" という名前でデータを求めてくるため、pointsを返すメソッドを追加
-    public String getTips() {
-        return points;
-    }
-
-    // 表示用にフルネームを返す
-    public String getFullName() {
-        return name + " (" + difficulty + ")";
-    }
+    public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
+    
+    public String getFullName() { return name; }
 }

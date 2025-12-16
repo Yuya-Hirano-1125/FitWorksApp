@@ -11,7 +11,7 @@
     
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* --- 既存のスタイル (パスワード表示アイコン等) --- */
+        /* --- 既存のスタイル --- */
         .password-wrapper {
             position: relative !important;
             display: block !important;
@@ -36,9 +36,7 @@
             display: none;
         }
 
-        /* --- ▼▼▼ 今回追加したスタイル (ソーシャルログイン & SMS) ▼▼▼ --- */
-        
-        /* 区切り線 */
+        /* --- 区切り線 --- */
         .separator-container {
             display: flex;
             align-items: center;
@@ -56,7 +54,7 @@
             padding: 0 10px;
         }
 
-        /* ソーシャルログインボタン */
+        /* --- ソーシャル & 生体認証ボタン --- */
         .social-login-group {
             display: flex;
             flex-direction: column;
@@ -77,6 +75,8 @@
             box-sizing: border-box;
             color: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            border: none;
+            cursor: pointer;
         }
         .social-btn:hover {
             opacity: 0.9;
@@ -87,6 +87,7 @@
         }
         .btn-line { background-color: #06C755; }
         .btn-apple { background-color: #000000; }
+        .btn-bio { background-color: #333; margin-top: 10px; }
 
         /* SMS認証セクション */
         .sms-login-section {
@@ -101,23 +102,20 @@
             margin-bottom: 10px;
             display: block;
         }
-        
-        /* SMSフォームのレイアウト */
         .sms-input-group {
             display: flex;
             gap: 8px;
         }
         .sms-input-group input {
             flex-grow: 1;
-            /* auth.cssのスタイルを継承しつつ調整 */
             padding: 12px;
-            border: 1px solid #ddd; /* var(--secondary-color) 近似 */
+            border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 14px;
         }
         .sms-action-btn {
             padding: 0 15px;
-            background-color: var(--primary-color, #ffb300); /* フォールバック色 */
+            background-color: var(--primary-color, #ffb300);
             color: white;
             border: none;
             border-radius: 5px;
@@ -139,8 +137,6 @@
             color: #888;
             margin-top: 5px;
         }
-        
-        /* メッセージ表示エリア */
         .sms-message-area {
             font-size: 13px;
             margin-top: 8px;
@@ -148,8 +144,6 @@
         }
         .msg-info { color: #0056b3; }
         .msg-error { color: #e74c3c; }
-        
-        /* ステップ切り替え用 */
         .hidden { display: none; }
         .link-text {
             color: #666;
@@ -202,7 +196,11 @@
         <span>または</span>
     </div>
 
-    <div class="social-login-group">
+    <button type="button" id="biometric-login-btn" class="social-btn btn-bio">
+        <i class="fa-solid fa-fingerprint"></i> 生体認証でログイン
+    </button>
+
+    <div class="social-login-group" style="margin-top: 10px;">
         <a th:href="@{/oauth2/authorization/line}" class="social-btn btn-line">
             <i class="fa-brands fa-line"></i> LINEでログイン
         </a>
@@ -246,6 +244,26 @@
 <script th:src="@{/js/password.js}"></script>
 
 <script>
+    // --- Base64URL ユーティリティ ---
+    function bufferToBase64url(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function base64urlToBuffer(base64url) {
+        const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return bytes.buffer;
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const csrfToken = document.getElementById('csrf-token-val').value;
         const btnSend = document.getElementById('btn-send-otp');
@@ -255,19 +273,73 @@
         const step1 = document.getElementById('sms-step-1');
         const step2 = document.getElementById('sms-step-2');
         const msgArea = document.getElementById('sms-message');
+        const btnBio = document.getElementById('biometric-login-btn');
 
         function showMessage(msg, isError = false) {
             msgArea.textContent = msg;
             msgArea.className = 'sms-message-area ' + (isError ? 'msg-error' : 'msg-info');
         }
 
-        // 電話番号形式チェック
+        // --- 生体認証ログイン ---
+        if(btnBio) {
+            btnBio.addEventListener('click', async () => {
+                if (!window.PublicKeyCredential) {
+                    alert('このブラウザは生体認証をサポートしていません。');
+                    return;
+                }
+
+                try {
+                    // 1. サーバーからオプション取得
+                    const optRes = await fetch('/api/webauthn/login/options');
+                    const options = await optRes.json();
+                    
+                    const challengeBuffer = base64urlToBuffer(options.challenge);
+                    
+                    // 2. ブラウザ認証器呼び出し
+                    const credential = await navigator.credentials.get({
+                        publicKey: {
+                            challenge: challengeBuffer,
+                            rpId: window.location.hostname,
+                            userVerification: 'preferred',
+                        }
+                    });
+
+                    // 3. サーバーへ検証リクエスト
+                    const authData = {
+                        credentialId: bufferToBase64url(credential.rawId),
+                        clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+                        authenticatorData: bufferToBase64url(credential.response.authenticatorData),
+                        signature: bufferToBase64url(credential.response.signature),
+                        userHandle: credential.response.userHandle ? bufferToBase64url(credential.response.userHandle) : null
+                    };
+
+                    const verifyRes = await fetch('/api/webauthn/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify(authData)
+                    });
+
+                    if (verifyRes.ok) {
+                        window.location.href = '/home';
+                    } else {
+                        const errText = await verifyRes.text();
+                        alert('認証に失敗しました: ' + errText);
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert('エラーが発生しました: ' + e.message);
+                }
+            });
+        }
+
+        // --- SMS認証関連 (既存ロジック) ---
         function isValidPhone(phone) {
-            // 簡易チェック: 数字と+のみで8桁以上
             return /^[+\d]{8,15}$/.test(phone.replace(/\s/g, ''));
         }
 
-        // 送信ボタン
         if(btnSend) {
             btnSend.addEventListener('click', function() {
                 const phone = inputPhone.value.trim();
@@ -275,31 +347,24 @@
                     showMessage("正しい電話番号を入力してください (例: +8190...)", true);
                     return;
                 }
-
                 btnSend.disabled = true;
                 btnSend.textContent = "送信中...";
                 showMessage("");
 
                 fetch('/api/auth/send-otp', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-TOKEN': csrfToken },
                     body: 'phoneNumber=' + encodeURIComponent(phone)
-                })
-                .then(async res => {
+                }).then(async res => {
                     if(res.ok) {
                         step1.classList.add('hidden');
                         step2.classList.remove('hidden');
                         showMessage("認証コードを送信しました。");
                         inputCode.focus();
                     } else {
-                        const txt = await res.text();
-                        throw new Error(txt || "送信エラー");
+                        throw new Error(await res.text() || "送信エラー");
                     }
-                })
-                .catch(err => {
+                }).catch(err => {
                     showMessage("送信失敗: " + err.message, true);
                     btnSend.disabled = false;
                     btnSend.textContent = "送信";
@@ -307,37 +372,28 @@
             });
         }
 
-        // 検証＆ログインボタン
         if(btnVerify) {
             btnVerify.addEventListener('click', function() {
                 const phone = inputPhone.value.trim();
                 const code = inputCode.value.trim();
-                
                 if(code.length < 4) {
                     showMessage("コードを入力してください", true);
                     return;
                 }
-
                 btnVerify.disabled = true;
                 btnVerify.textContent = "確認中...";
 
                 fetch('/api/auth/verify-otp', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-TOKEN': csrfToken },
                     body: 'phoneNumber=' + encodeURIComponent(phone) + '&code=' + encodeURIComponent(code)
-                })
-                .then(async res => {
+                }).then(async res => {
                     if(res.ok) {
                         window.location.href = '/home';
                     } else {
-                        const txt = await res.text();
-                        throw new Error(txt || "認証エラー");
+                        throw new Error(await res.text() || "認証エラー");
                     }
-                })
-                .catch(err => {
+                }).catch(err => {
                     showMessage("ログイン失敗: " + err.message, true);
                     btnVerify.disabled = false;
                     btnVerify.textContent = "ログイン";
@@ -345,7 +401,6 @@
             });
         }
 
-        // リセット機能（グローバルスコープに公開）
         window.resetSmsForm = function() {
             step1.classList.remove('hidden');
             step2.classList.add('hidden');

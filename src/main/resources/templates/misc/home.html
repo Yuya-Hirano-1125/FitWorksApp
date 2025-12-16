@@ -151,7 +151,6 @@
         /* 追加: 挨拶文のスタイル */
         .home-greeting-container {
             text-align: center;
-            /* キャラクターとの被りを防ぐため余白を大きくする */
             margin-top: 60px;
             margin-bottom: 25px;
         }
@@ -246,7 +245,7 @@
     </div>
     
     <div class="home-greeting-container">
-        <h1 class="home-app-title">『FitWorks』へようこそ！</h1>
+        <h1 class="home-app-title">FitWorks</h1>
         <p class="home-greeting-text">
             こんにちは、<span class="home-username" th:text="${username}"></span>さん！
         </p>
@@ -267,6 +266,9 @@
             </a>
             <a th:href="@{/log/meal}" class="record-option-item meal-opt">
                 <i class="fa-solid fa-utensils"></i><br>食事記録
+            </a>
+            <a th:href="@{/training-log/form/body-weight}" class="record-option-item weight-opt">
+                <i class="fa-solid fa-weight-scale"></i><br>体重記録
             </a>
         </div>
     </div>
