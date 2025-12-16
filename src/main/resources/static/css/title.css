@@ -1,3 +1,5 @@
+/* src/main/resources/static/css/title.css */
+
 /* 称号コレクション画面用CSS */
 
 .message {
@@ -15,13 +17,13 @@
     border-radius: 10px;
     text-align: center;
     margin-bottom: 30px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 .current-title-section .label {
     display: block;
     font-size: 0.9rem;
     color: #888;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .title-grid {
@@ -35,21 +37,29 @@
     background: #fff;
     border-radius: 10px;
     padding: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition: transform 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
     border: 1px solid #eee;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.title-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 /* ロック状態のスタイル */
 .title-card.locked {
     background: #f9f9f9;
-    opacity: 0.7;
+    opacity: 0.6;
+    border-style: dashed;
 }
 .title-card.locked .title-name {
-    color: #888;
+    color: #999;
 }
 
 .title-header {
@@ -59,85 +69,183 @@
     margin-bottom: 10px;
 }
 
+/* --- レアリティバッジ (カード内の小さな表示) --- */
 .rarity-badge {
     font-size: 0.7rem;
-    padding: 2px 6px;
+    padding: 2px 8px;
     border-radius: 4px;
-    font-weight: bold;
+    font-weight: 800;
     color: #fff;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
-.rarity-badge.COMMON { background-color: #9e9e9e; }
-.rarity-badge.RARE { background-color: #00bcd4; }
-.rarity-badge.SR { background-color: #9c27b0; }
-.rarity-badge.SSR { background-color: #ff9800; }
-.rarity-badge.UR { background-color: #f44336; box-shadow: 0 0 5px #f44336; }
+.rarity-badge.COMMON { background-color: #a4b0be; }
+.rarity-badge.RARE   { background-color: #2ecc71; }
+.rarity-badge.SR     { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+.rarity-badge.SSR    { background: linear-gradient(135deg, #f1c40f, #e67e22); }
+.rarity-badge.UR     { 
+    background: linear-gradient(45deg, #ff0055, #ff00cc, #5500ff);
+    background-size: 200% 200%;
+    animation: gradient-anim 3s ease infinite;
+}
 
 .status-icon {
     font-size: 0.8rem;
-    color: #4caf50;
+    color: #2ecc71;
+    font-weight: bold;
 }
 
 .title-name {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     margin-bottom: 5px;
     color: #333;
 }
 
-/* 称号バッジ (共通スタイル) */
+/* --- 称号バッジ本体 (現在の称号などで使用) --- */
 .title-badge {
     display: inline-block;
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-weight: bold;
+    padding: 8px 25px;
+    border-radius: 30px;
+    font-weight: 800;
+    font-size: 1.1rem;
     color: #fff;
-    background: #333;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 1;
+    border: 2px solid transparent; /* 枠線用 */
 }
-/* レア度別のバッジ色 */
-.title-badge.COMMON { background: linear-gradient(135deg, #b0bec5, #78909c); }
-.title-badge.RARE { background: linear-gradient(135deg, #4dd0e1, #00acc1); }
-.title-badge.SR { background: linear-gradient(135deg, #ba68c8, #8e24aa); }
-.title-badge.SSR { background: linear-gradient(135deg, #ffb74d, #f57c00); }
-.title-badge.UR { background: linear-gradient(135deg, #ef5350, #c62828); border: 1px solid #ffeb3b; }
+
+/* ▼▼▼ レア度別デザイン設定 ▼▼▼ */
+
+/* COMMON: シンプルなグレー・シルバー */
+.title-badge.COMMON {
+    background: linear-gradient(145deg, #bdc3c7, #95a5a6);
+    border-color: #ecf0f1;
+    color: #fff;
+}
+
+/* RARE: 鮮やかなブルー・グリーン系 */
+.title-badge.RARE {
+    background: linear-gradient(145deg, #00c6ff, #0072ff);
+    border-color: #81d4fa;
+    box-shadow: 0 4px 10px rgba(0, 114, 255, 0.3);
+}
+
+/* SR: 高級感のあるパープル・ゴールド枠 */
+.title-badge.SR {
+    background: linear-gradient(145deg, #8e44ad, #c0392b);
+    border: 2px solid #dcdde1;
+    box-shadow: 0 4px 12px rgba(142, 68, 173, 0.4);
+}
+
+/* SSR: 輝くゴールド + 光沢アニメーション */
+.title-badge.SSR {
+    background: linear-gradient(45deg, #FFD700, #FDB931, #FFD700);
+    color: #783f04; /* 文字色を濃い茶色にして可読性アップ */
+    text-shadow: 0 1px 0px rgba(255,255,255,0.4);
+    border: 2px solid #fff;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+    position: relative;
+    overflow: hidden;
+}
+/* SSRのキラキラエフェクト */
+.title-badge.SSR::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 40%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 60%, rgba(255,255,255,0) 100%);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+/* UR: 虹色グラデーション + 激しい発光 */
+.title-badge.UR {
+    background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+    background-size: 1800% 1800%;
+    color: #fff;
+    border: 2px solid #fff;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.7);
+    animation: rainbow 6s ease infinite;
+}
+
+/* ▲▲▲ デザイン設定ここまで ▲▲▲ */
 
 .title-desc {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #666;
     margin-bottom: 15px;
+    line-height: 1.4;
     flex-grow: 1;
 }
 
 /* ボタン */
 .btn-equip {
     width: 100%;
-    padding: 8px;
+    padding: 10px;
     border: none;
-    border-radius: 5px;
+    border-radius: 25px;
     cursor: pointer;
     background-color: var(--primary-color, #ffb300);
     color: white;
     font-weight: bold;
-    transition: background 0.2s;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 .btn-equip:hover:not(:disabled) {
-    filter: brightness(0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    filter: brightness(1.05);
 }
 .btn-equip.equipped {
-    background-color: #4caf50;
+    background-color: #2ecc71;
+    box-shadow: none;
     cursor: default;
 }
 .btn-equip.locked {
     background-color: #e0e0e0;
-    color: #999;
+    color: #a0a0a0;
+    box-shadow: none;
     cursor: not-allowed;
 }
 .btn-unequip {
-    margin-left: 10px;
-    background: none;
-    border: 1px solid #ccc;
-    padding: 3px 10px;
-    border-radius: 15px;
+    margin-left: 15px;
+    background: #fff;
+    border: 1px solid #ff6b6b;
+    color: #ff6b6b;
+    padding: 5px 15px;
+    border-radius: 20px;
     cursor: pointer;
     font-size: 0.8rem;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+.btn-unequip:hover {
+    background: #ff6b6b;
+    color: #fff;
+}
+
+/* アニメーション定義 */
+@keyframes shine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    20% { transform: translateX(100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
+}
+
+@keyframes rainbow { 
+    0%{background-position:0% 82%}
+    50%{background-position:100% 19%}
+    100%{background-position:0% 82%}
+}
+
+@keyframes gradient-anim {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }

@@ -43,7 +43,7 @@ public class WebAuthnService {
 
     // ※重要: 本番環境では実際のドメインとポートに合わせてください (https必須)
     private static final String RP_ID = "localhost"; 
-    private static final String ORIGIN_URL = "http://localhost:8080";
+    private static final String ORIGIN_URL = "http://localhost:8086";
 
     public Challenge generateChallenge() {
         return new DefaultChallenge();
