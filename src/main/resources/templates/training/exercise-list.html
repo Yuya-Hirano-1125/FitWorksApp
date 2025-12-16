@@ -234,13 +234,15 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 12px;
+            /* 修正: 右側に余白を設けて、絶対配置のブックマークボタンと文字が重ならないようにする */
+            padding-right: 50px; 
         }
         .exercise-name {
             font-size: 1.2rem;
             font-weight: 800;
             color: #2c3e50;
             line-height: 1.4;
-            margin-right: 15px;
+            /* margin-right削除: card-headerのpadding-rightで制御するため */
         }
         
         .card-tags {
@@ -482,11 +484,12 @@
                      th:data-name="${exercise.name}"
                      th:data-muscle="${exercise.targetMuscle}"
                      th:data-equip="${exercise.equipment}"
-                     th:data-desc="${exercise.description}">
+                     th:data-desc="${exercise.description}"
+                     th:data-difficulty="${exercise.difficulty}">
                     
                     <div>
                         <div class="card-header">
-                            <span class="exercise-name" th:text="${exercise.name}">ベンチプレス</span>
+                            <span class="exercise-name" th:text="${exercise.name} + '【' + ${exercise.difficulty} + '】'">ベンチプレス【中級】</span>
                         </div>
                         
                         <div class="card-tags">
@@ -521,11 +524,12 @@
                      th:data-name="${exercise.name}"
                      th:data-muscle="${exercise.targetMuscle}"
                      th:data-equip="${exercise.equipment}"
-                     th:data-desc="${exercise.description}">
+                     th:data-desc="${exercise.description}"
+                     th:data-difficulty="${exercise.difficulty}">
                     
                     <div>
                         <div class="card-header">
-                            <span class="exercise-name" th:text="${exercise.name}">ランニング</span>
+                            <span class="exercise-name" th:text="${exercise.name} + '【' + ${exercise.difficulty} + '】'">ランニング【初級】</span>
                         </div>
                         
                         <div class="card-tags">
@@ -559,6 +563,7 @@
             <div class="detail-row">
                 <span class="detail-tag tag-muscle"><i class="fa-solid fa-bullseye"></i> <span id="modalMuscle">部位</span></span>
                 <span class="detail-tag tag-equip"><i class="fa-solid fa-toolbox"></i> <span id="modalEquip">器具</span></span>
+                <span class="detail-tag tag-equip" style="background-color: #fff3e0; color: #e67e22;"><i class="fa-solid fa-layer-group"></i> <span id="modalDifficulty">難易度</span></span>
             </div>
             
             <div class="desc-box">
@@ -612,10 +617,6 @@
         const categories = container.getElementsByClassName('category-section');
         let totalVisibleItems = 0;
 
-        // 検索時は全てのセクションを一旦対象にするため、もし絞り込み中なら「すべて」に戻す挙動にするか、
-        // あるいは現在の表示状態を維持するかが選択になりますが、ここでは検索ヒット数を正しく出すために
-        // 非表示セクションは無視する（絞り込み内検索）挙動とします。
-        
         for (let i = 0; i < categories.length; i++) {
             const category = categories[i];
             
@@ -657,10 +658,12 @@
         const muscle = cardElement.getAttribute('data-muscle');
         const equip = cardElement.getAttribute('data-equip');
         const desc = cardElement.getAttribute('data-desc');
+        const difficulty = cardElement.getAttribute('data-difficulty');
 
         document.getElementById('modalTitle').textContent = name;
         document.getElementById('modalMuscle').textContent = muscle;
         document.getElementById('modalEquip').textContent = equip;
+        document.getElementById('modalDifficulty').textContent = difficulty || "不明";
         
         if (desc && desc.trim() !== "") {
             document.getElementById('modalDesc').textContent = desc;
