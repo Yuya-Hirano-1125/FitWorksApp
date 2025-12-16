@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.security.Principal;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,7 @@ public class CharacterUnlockController {
     }
 
     /**
-     * キャラクター進化処理
+     * キャラクター解放処理
      */
     @PostMapping("/characters/unlock")
     public String unlockCharacter(@RequestParam Long characterId,
@@ -33,7 +34,6 @@ public class CharacterUnlockController {
                                   RedirectAttributes redirectAttributes,
                                   Principal principal) {
 
-        // DBから対象キャラクターを取得
         Optional<CharacterEntity> optChara = repository.findById(characterId);
         if (optChara.isEmpty()) {
             redirectAttributes.addFlashAttribute("error", "対象キャラクターが存在しません。");
@@ -42,22 +42,88 @@ public class CharacterUnlockController {
 
         CharacterEntity chara = optChara.get();
 
+        // ===== 進化素材 & 進化条件構築 =====
+        switch (chara.getName()) {
+            case "ドラコ":
+                chara.setEvolutionMaterials(Map.ofEntries(
+                    Map.entry("紅玉", 3),
+                    Map.entry("蒼玉", 3),
+                    Map.entry("翠玉", 3),
+                    Map.entry("聖玉", 3),
+                    Map.entry("闇玉", 3)
+                ));
+                chara.setEvolutionConditions(Map.ofEntries(
+                    Map.entry("必要レベル", "10"),
+                    Map.entry("素材ランク", "R素材")
+                ));
+                break;
+
+            case "ドラコス":
+                chara.setEvolutionMaterials(Map.ofEntries(
+                    Map.entry("紅玉", 5),
+                    Map.entry("蒼玉", 5),
+                    Map.entry("翠玉", 5),
+                    Map.entry("聖玉", 5),
+                    Map.entry("闇玉", 5),
+                    Map.entry("赤の聖結晶", 3),
+                    Map.entry("青の聖結晶", 3),
+                    Map.entry("緑の聖結晶", 3),
+                    Map.entry("黄の聖結晶", 3),
+                    Map.entry("闇の聖結晶", 3)
+                ));
+                chara.setEvolutionConditions(Map.ofEntries(
+                    Map.entry("必要レベル", "20"),
+                    Map.entry("素材ランク", "R素材 + SR素材"),
+                    Map.entry("必要キャラ解放", "ドラコ")
+                ));
+                break;
+
+            case "ドラグノイド":
+                chara.setEvolutionMaterials(Map.ofEntries(
+                    Map.entry("紅玉", 7),
+                    Map.entry("蒼玉", 7),
+                    Map.entry("翠玉", 7),
+                    Map.entry("聖玉", 7),
+                    Map.entry("闇玉", 7),
+                    Map.entry("赤の聖結晶", 5),
+                    Map.entry("青の聖結晶", 5),
+                    Map.entry("緑の聖結晶", 5),
+                    Map.entry("黄の聖結晶", 5),
+                    Map.entry("闇の聖結晶", 5),
+                    Map.entry("赫焔鱗", 1)
+                ));
+                chara.setEvolutionConditions(Map.ofEntries(
+                    Map.entry("必要レベル", "30"),
+                    Map.entry("素材ランク", "R素材 + SR素材 + SSR素材"),
+                    Map.entry("属性限定", "火属性のみ"),
+                    Map.entry("必要キャラ解放", "ドラコス")
+                ));
+                break;
+
+            default:
+                chara.setEvolutionMaterials(Map.of()); // エンバーハートなど素材不要
+                chara.setEvolutionConditions(Map.of());
+        }
+
         // ===== デバッグログ =====
         System.out.println("DEBUG: ImagePath=" + chara.getImagePath());
+        System.out.println("DEBUG: EvolutionMaterials=" + chara.getEvolutionMaterials());
+        System.out.println("DEBUG: EvolutionConditions=" + chara.getEvolutionConditions());
 
-        // --- ユーザー情報をDBから取得 ---
+        // --- ユーザー情報を取得 ---
         String username = principal.getName();
-        int userLevel = userService.getUserLevel(username); // DBからレベル取得
-        int userMaterialCount = userService.getUserMaterialCount(username, materialType); // DBから素材数取得
+        int userLevel = userService.getUserLevel(username);
+        int userMaterialCount = userService.getUserMaterialCount(username, materialType);
 
-        // 判定処理
         boolean canUnlock = (userLevel >= chara.getRequiredLevel() && userMaterialCount >= cost);
 
         if (canUnlock) {
-            // TODO: 素材を減算し、キャラを解放済みに更新する処理を追加
+            userService.consumeUserMaterial(username, materialType, cost);
+            userService.unlockCharacterForUser(username, chara.getId());
+
             redirectAttributes.addFlashAttribute(
                 "message",
-                String.format("%s を進化しました！ (必要Lv:%d / 必要素材:%d)",
+                String.format("%s を解放しました！ (必要Lv:%d / 必要素材:%d)",
                         chara.getName(),
                         chara.getRequiredLevel(),
                         cost)
@@ -72,7 +138,6 @@ public class CharacterUnlockController {
             );
         }
 
-        // 一覧画面にリダイレクト
         return "redirect:/characters";
     }
 }

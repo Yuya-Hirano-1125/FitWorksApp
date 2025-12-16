@@ -6,99 +6,116 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/characters/CharactersUnlock.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-	<style>
-	    .attribute-heading { font-size: 1.5rem; margin: 20px 0; }
-	    .fire-color { color: #ff7675; border-bottom: 2px solid #ff7675; }
-	    .water-color { color: #74b9ff; border-bottom: 2px solid #74b9ff; }
-	    .grass-color { color: #55efc4; border-bottom: 2px solid #55efc4; }
-	    .light-color { color: #ffeaa7; border-bottom: 2px solid #ffeaa7; }
-	    .dark-color { color: #a29bfe; border-bottom: 2px solid #a29bfe; }
-	    .secret-color { color: #dfe6e9; border-bottom: 2px solid #dfe6e9; font-style: italic; }
-	    .character-card { display: inline-block; margin: 10px; text-align: center; }
-	    .character-img-wrapper { width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; overflow: hidden; border: 3px solid #ccc; }
-	    .character-img { width: 100%; height: 100%; object-fit: cover; }
-	    .requirements { font-size: 0.9rem; margin-top: 5px; }
+    <style>
+        .attribute-heading { font-size: 1.5rem; margin: 20px 0; }
+        .fire-color { color: #ff7675; border-bottom: 2px solid #ff7675; }
+        .water-color { color: #74b9ff; border-bottom: 2px solid #74b9ff; }
+        .grass-color { color: #55efc4; border-bottom: 2px solid #55efc4; }
+        .light-color { color: #ffeaa7; border-bottom: 2px solid #ffeaa7; }
+        .dark-color { color: #a29bfe; border-bottom: 2px solid #a29bfe; }
+        .secret-color { color: #dfe6e9; border-bottom: 2px solid #dfe6e9; font-style: italic; }
+        .character-card { display: inline-block; margin: 10px; text-align: center; }
+        .character-img-wrapper { width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; overflow: hidden; border: 3px solid #ccc; position: relative; }
+        .character-img { width: 100%; height: 100%; object-fit: cover; }
+        .requirements { font-size: 0.9rem; margin-top: 5px; }
+        .unlocked-label { font-weight: bold; color: #27ae60; }
+        .locked .character-img { filter: brightness(0%); }
+        .lock-icon {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem; color: #fff;
+            text-shadow: 0 0 5px rgba(0,0,0,0.7);
+        }
 
-	    /* ===== モーダル用CSS ===== */
-	    .modal {
-	        display: none; /* 初期は非表示 */
-	        position: fixed;
-	        z-index: 1000;
-	        left: 0; top: 0;
-	        width: 100%; height: 100%;
-	        background-color: rgba(0,0,0,0.5); /* 背景を半透明に */
-	    }
-	    .modal-content {
-	        background: #fff;
-	        margin: 15% auto;
-	        padding: 20px;
-	        border-radius: 8px;
-	        width: 320px;
-	        text-align: center;
-	        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-	        animation: fadeIn 0.3s ease-in-out;
-	    }
-	    .modal-content h3 {
-	        margin-bottom: 10px;
-	        font-size: 1.2rem;
-	        color: #333;
-	    }
-	    .modal-content p {
-	        font-size: 0.95rem;
-	        margin: 10px 0;
-	        color: #444;
-	    }
-	    .close {
-	        float: right;
-	        font-size: 1.5rem;
-	        cursor: pointer;
-	        color: #888;
-	    }
-	    .close:hover {
-	        color: #000;
-	    }
-	    .btn-confirm {
-	        margin-top: 15px;
-	        padding: 8px 16px;
-	        background: #4caf50;
-	        color: #fff;
-	        border: none;
-	        border-radius: 4px;
-	        cursor: pointer;
-	    }
-	    .btn-confirm:hover {
-	        background: #45a049;
-	    }
+        /* ===== モーダル ===== */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.7);
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
 
-	    /* フェードインアニメーション */
-	    @keyframes fadeIn {
-	        from { opacity: 0; transform: scale(0.9); }
-	        to { opacity: 1; transform: scale(1); }
-	    }
-	</style>
+            display: flex;              /* 追加 */
+            justify-content: center;    /* 横中央 */
+            align-items: center;        /* 縦中央 */
+        }
+        .modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
 
+        /* 正方形のポップアップ（常に画面中央固定） */
+        .modal-content {
+            position: relative; /* fixedではなくrelativeに */
+            width: 400px; height: 400px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            animation: fadeIn 0.3s ease-in-out;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .modal-content h4 {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #e74c3c;
+        }
+        .modal-content ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .modal-content li {
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            color: #444;
+        }
+
+        .close {
+            position: absolute; right: 12px; top: 12px;
+            font-size: 1.5rem; cursor: pointer; color: #888;
+            transition: color 0.2s;
+        }
+        .close:hover { color: #000; }
+
+        .btn-confirm {
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: #4caf50; color: #fff;
+            border: none; border-radius: 4px; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-confirm:hover { background: #45a049; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
 </head>
 
 <body>
-	<!-- ヘッダー -->
-	<header>
-	    <h1>キャラクター解放画面</h1>
-	    <div class="status-bar">
-	        <!-- ユーザーレベル表示 -->
-	        <div class="status-item">
-	            <i class="fa-solid fa-crown" style="color:#ffeb3b;"></i>
-	            Lv.<span th:text="${userLevel}">1</span>
-	        </div>
-
-	        <!-- 素材管理ボタン -->
-	        <div class="status-item">
-	            <a th:href="@{/materials}" class="material-link">
-	                <i class="fa-solid fa-gem"></i> 素材管理
-	            </a>
-	        </div>
-	    </div>
-	</header>
-
+    <!-- ヘッダー -->
+    <header>
+        <h1>キャラクター解放画面</h1>
+        <div class="status-bar">
+            <div class="status-item">
+                <i class="fa-solid fa-crown" style="color:#ffeb3b;"></i>
+                Lv.<span th:text="${userLevel}">1</span>
+            </div>
+            <div class="status-item">
+                <a th:href="@{/materials}" class="material-link">
+                    <i class="fa-solid fa-gem"></i> 素材管理
+                </a>
+            </div>
+        </div>
+    </header>
 
     <!-- メッセージ表示 -->
     <div class="message-container" style="max-width: 800px; margin: 10px auto;">
@@ -110,134 +127,144 @@
         </div>
     </div>
 
+	<!-- 炎属性 -->
 	<div class="pass-section">
 	    <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
 	    <div class="char-list">
 	        <div th:each="chara : ${fireChars}" class="character-card fire">
-	            <!-- 画像枠：未解放なら真っ黒＋錠前 -->
 	            <div class="character-img-wrapper" th:classappend="${chara.name ne 'エンバーハート'} ? 'locked' : ''">
-	                <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-	                <!-- 錠前アイコン（未解放時のみ表示） -->
+	                <img class="character-img" th:src="${chara.imagePath}" th:alt="${chara.name}">
 	                <i th:if="${chara.name ne 'エンバーハート'}" class="fa-solid fa-lock lock-icon"></i>
 	            </div>
-
 	            <p class="character-name" th:text="${chara.name}">キャラ名</p>
 	            <span class="character-rarity" th:text="${chara.rarity}">★</span>
 	            <div class="requirements">
 	                <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
 	                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
 	            </div>
-
-	            <!-- 解放ボタン or 開放済み表示 -->
 	            <div class="unlock-action">
-	                <!-- エンバーハートは最初から解放済み -->
-	                <span th:if="${chara.name eq 'エンバーハート'}" class="unlocked-label">
-	                    ✅ 開放済み
-	                </span>
-
-	                <!-- それ以外は解放ボタン -->
-	                <button th:if="${chara.name ne 'エンバーハート'}"
-	                        type="button"
-	                        class="btn-unlock"
-	                        th:data-id="${chara.id}"
-	                        th:data-level="${chara.requiredLevel}"
-	                        th:data-cost="${chara.unlockCost}"
-	                        th:data-material="${chara.attribute}"
-	                        onclick="openModal(this)">
-	                    <i class="fa-solid fa-lock-open"></i> 解放
-	                </button>
+	                <span th:if="${chara.name eq 'エンバーハート'}" class="unlocked-label">✅ 開放済み</span>
+	                <div th:if="${chara.name ne 'エンバーハート'}">
+	                    <button type="button" class="btn-confirm"
+	                            onclick="openModal(
+	                                this.getAttribute('data-name'),
+	                                this.getAttribute('data-materials'),
+	                                this.getAttribute('data-conditions')
+	                            )"
+	                            th:attr="data-name=${chara.name}, 
+	                                     data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, 
+	                                     data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}">
+	                        <i class="fa-solid fa-lock-open"></i> 進化解放条件を見る
+	                    </button>
+	                </div>
 	            </div>
 	        </div>
 	    </div>
 	</div>
 
 	<!-- モーダル -->
-	<div id="unlockModal" class="modal">
+	<div id="globalModal" class="modal">
 	    <div class="modal-content">
 	        <span class="close" onclick="closeModal()">&times;</span>
-	        <h3>解放条件</h3>
-	        <p id="modalText">ここに条件が表示されます</p>
-	        <form id="unlockForm" th:action="@{/characters/unlock}" method="post">
-	            <input type="hidden" name="characterId" id="modalCharacterId">
-	            <input type="hidden" name="cost" id="modalCost">
-	            <input type="hidden" name="materialType" id="modalMaterial">
-	            <button type="submit" class="btn-confirm">解放する</button>
-	        </form>
+	        <h3 id="modalTitle">進化条件</h3>
+	        <div id="modalBody"></div>
 	    </div>
 	</div>
 
 	<style>
+	/* ===== モーダル ===== */
 	.modal {
-	    display: none;
 	    position: fixed;
+	    inset: 0;
+	    background-color: rgba(0,0,0,0.7);
+	    opacity: 0; visibility: hidden; pointer-events: none;
+	    transition: opacity 0.3s ease;
 	    z-index: 1000;
-	    left: 0; top: 0;
-	    width: 100%; height: 100%;
-	    background-color: rgba(0,0,0,0.5);
+
+	    display: flex;              /* 中央寄せ */
+	    justify-content: center;
+	    align-items: center;
 	}
+	.modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
+
 	.modal-content {
+	    position: relative;
+	    width: 400px; height: 400px;
 	    background: #fff;
-	    margin: 15% auto;
-	    padding: 20px;
 	    border-radius: 8px;
-	    width: 300px;
-	    text-align: center;
+	    padding: 20px;
+	    text-align: left;
+	    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+	    animation: fadeIn 0.3s ease-in-out;
+	    overflow-y: auto;
 	}
+
 	.close {
-	    float: right;
-	    font-size: 1.5rem;
-	    cursor: pointer;
+	    position: absolute; right: 12px; top: 12px;
+	    font-size: 1.5rem; cursor: pointer; color: #888;
+	    transition: color 0.2s;
 	}
+	.close:hover { color: #000; }
+
 	.btn-confirm {
 	    margin-top: 15px;
 	    padding: 8px 16px;
-	    background: #4caf50;
-	    color: #fff;
-	    border: none;
-	    border-radius: 4px;
+	    background: #4caf50; color: #fff;
+	    border: none; border-radius: 4px; cursor: pointer;
+	    transition: background 0.2s;
 	}
+	.btn-confirm:hover { background: #45a049; }
 
-	/* 未解放キャラを真っ黒にする */
-	.locked .character-img {
-	    filter: brightness(0%);
-	}
-
-	/* 錠前アイコンを中央に重ねる */
-	.lock-icon {
-	    position: absolute;
-	    top: 50%;
-	    left: 50%;
-	    transform: translate(-50%, -50%);
-	    font-size: 2rem;
-	    color: #fff;
-	    text-shadow: 0 0 5px rgba(0,0,0,0.7);
+	@keyframes fadeIn {
+	    from { opacity: 0; transform: scale(0.95); }
+	    to { opacity: 1; transform: scale(1); }
 	}
 	</style>
 
 	<script>
-	function openModal(button) {
-	    const level = button.getAttribute("data-level");
-	    const cost = button.getAttribute("data-cost");
-	    const material = button.getAttribute("data-material");
-	    const id = button.getAttribute("data-id");
+	function openModal(name, materials, conditions) {
+	  // タイトルにキャラ名を反映
+	  document.getElementById("modalTitle").innerText = name + " の進化条件";
 
-	    // キャラごとの条件文言を組み立て
-	    document.getElementById("modalText").innerText =
-	        `このキャラを解放するには Lv.${level} 以上 と ${material} 素材 ${cost} 個 が必要です。`;
+	  // 本文を組み立て
+	  let bodyHtml = "<h4>進化素材</h4><ul>";
+	  if (materials) {
+	    materials.split(";").forEach(m => {
+	      bodyHtml += "<li>" + m + "</li>";
+	    });
+	  }
+	  bodyHtml += "</ul><h4>進化条件</h4><ul>";
+	  if (conditions) {
+	    conditions.split(";").forEach(c => {
+	      bodyHtml += "<li>" + c + "</li>";
+	    });
+	  }
+	  bodyHtml += "</ul>";
 
-	    // hidden項目に値をセット
-	    document.getElementById("modalCharacterId").value = id;
-	    document.getElementById("modalCost").value = cost;
-	    document.getElementById("modalMaterial").value = material;
+	  // ★ 解放ボタンを追加
+	  bodyHtml += "<div style='text-align:center; margin-top:15px;'>"
+	           + "<button class='btn-confirm' onclick=\"unlockCharacter('" + name + "')\">"
+	           + "<i class='fa-solid fa-unlock'></i> このキャラを解放する"
+	           + "</button></div>";
 
-	    // モーダル表示
-	    document.getElementById("unlockModal").style.display = "block";
+	  // モーダル本文に反映
+	  document.getElementById("modalBody").innerHTML = bodyHtml;
+
+	  // モーダルを表示
+	  document.getElementById("globalModal").classList.add("show");
 	}
 
 	function closeModal() {
-	    document.getElementById("unlockModal").style.display = "none";
+	  document.getElementById("globalModal").classList.remove("show");
+	}
+
+	// ★ 解放処理用の関数（仮）
+	function unlockCharacter(name) {
+	  alert(name + " を解放しました！（ここにサーバー連携処理を追加）");
+	  closeModal();
 	}
 	</script>
+
 
     <!-- 水属性 -->
     <div class="pass-section">

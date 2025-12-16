@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.example.demo.entity.CharacterEntity;
 import com.example.demo.repository.CharacterRepository;
+import com.example.demo.service.CharacterService;
 import com.example.demo.service.UserService;
 
 @Controller
@@ -17,16 +18,23 @@ public class CharacterViewController {
 
     private final CharacterRepository repository;
     private final UserService userService;
+    private final CharacterService characterService; // ✅ 追加
 
-    public CharacterViewController(CharacterRepository repository, UserService userService) {
+    public CharacterViewController(CharacterRepository repository,
+                                   UserService userService,
+                                   CharacterService characterService) {
         this.repository = repository;
         this.userService = userService;
+        this.characterService = characterService; // ✅ 追加
     }
 
     @GetMapping("/characters")
     public String showCharacters(Model model, Principal principal) {
         // 全キャラクター一覧を取得
         List<CharacterEntity> characters = repository.findAll();
+
+        // 進化素材・進化条件をセット
+        characters.forEach(chara -> characterService.applyEvolutionData(chara));
 
         // デバッグ用ログ出力
         System.out.println("=== Character List ===");
@@ -40,7 +48,9 @@ public class CharacterViewController {
                 ", Rarity=" + c.getRarity() +
                 ", RequiredLevel=" + c.getRequiredLevel() +
                 ", UnlockCost=" + c.getUnlockCost() +
-                ", ImagePath=" + c.getImagePath()
+                ", ImagePath=" + c.getImagePath() +
+                ", EvolutionMaterials=" + c.getEvolutionMaterials() +
+                ", EvolutionConditions=" + c.getEvolutionConditions()
             ));
         }
 

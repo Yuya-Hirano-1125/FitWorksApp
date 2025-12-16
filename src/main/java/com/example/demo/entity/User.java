@@ -6,7 +6,9 @@ import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -46,7 +48,7 @@ public class User {
 
     private String providerId;
 
-    private Integer level = 999;
+    private Integer level = 1;
 
     private LocalDate lastMissionCompletionDate;
     private Boolean isRewardClaimedToday = false;
@@ -93,9 +95,15 @@ public class User {
     )
     private Set<User> receivedFriendRequests = new HashSet<>();
 
- // --- チップ機能 ---
+    // --- チップ機能 ---
     @Column(name = "chip")
     private Integer chipCount;
+
+    // --- ★追加: 解放済みキャラクター管理 ---
+    @ElementCollection
+    @CollectionTable(name = "user_unlocked_characters", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "character_id")
+    private Set<Long> unlockedCharacters = new HashSet<>();
 
     public User() {
         if (this.level == null) this.level = 1;
@@ -186,7 +194,7 @@ public class User {
     public void addReceivedFriendRequest(User sender) { this.receivedFriendRequests.add(sender); }
     public void removeReceivedFriendRequest(User sender) { this.receivedFriendRequests.remove(sender); }
 
- // --- XP関連 ---
+    // --- XP関連 ---
     public int calculateRequiredXp() {
         int currentLevel = getLevel();
         return 1000 + (currentLevel - 1) * 200;
@@ -209,7 +217,6 @@ public class User {
         return getXp();
     }
 
-    // ★ここに追加するのが正解
     public void setExperiencePoints(int xp) {
         this.xp = xp;
     }
@@ -219,7 +226,7 @@ public class User {
         return requiredXp == 0 ? 0 : (int) (((double) xp / requiredXp) * 100);
     }
 
- // --- チップ関連 ---
+    // --- チップ関連 ---
     public Integer getChipCount() { 
         return chipCount != null ? chipCount : 0; 
     }
@@ -243,5 +250,25 @@ public class User {
             return true;
         }
         return false;
+    }
+
+    // --- ★解放済みキャラクター管理 ---
+    public void addUnlockedCharacter(Long characterId) {
+        if (unlockedCharacters == null) {
+            unlockedCharacters = new HashSet<>();
+        }
+        unlockedCharacters.add(characterId);
+    }
+
+    public boolean hasUnlockedCharacter(Long characterId) {
+        return unlockedCharacters != null && unlockedCharacters.contains(characterId);
+    }
+
+    public Set<Long> getUnlockedCharacters() {
+        return unlockedCharacters;
+    }
+
+    public void setUnlockedCharacters(Set<Long> unlockedCharacters) {
+        this.unlockedCharacters = unlockedCharacters;
     }
 }
