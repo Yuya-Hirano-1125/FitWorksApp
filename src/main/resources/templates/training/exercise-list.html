@@ -1,102 +1,323 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>種目一覧 | FitWorks</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全種目図鑑 | FitWorks</title>
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script th:src="@{/js/theme.js}"></script>
     <style>
+        /* -------------------------------------------------- */
+        /* レイアウト & デザイン (Card Grid) */
+        /* -------------------------------------------------- */
+        body {
+            background-color: #f0f2f5;
+        }
+
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding-bottom: 80px;
+            padding-bottom: 100px;
         }
-        h2 {
-            margin-top: 30px;
-            color: #444;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-        }
-        .exercise-list {
-            list-style: none;
-            padding: 0;
-        }
-        .exercise-item {
-            background: white;
-            margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
+        /* ヘッダー周り */
+        .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 5px solid #007bff;
-            transition: transform 0.2s;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            padding: 0 10px;
         }
-        .exercise-item:hover {
-            transform: translateX(5px);
-        }
-        .exercise-info {
-            flex-grow: 1;
-        }
-        .exercise-name {
-            font-weight: bold;
-            font-size: 1.1em;
+        .page-title {
+            margin: 0;
+            font-size: 1.8rem;
             color: #333;
-            display: block;
+            font-weight: 800;
         }
-        .exercise-details {
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 4px;
+        .back-btn {
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        .bookmark-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.5em;
-            color: #ccc;
-            transition: color 0.2s;
-            padding: 5px;
+        .back-btn:hover {
+            background-color: #5a6268;
         }
-        .bookmark-btn.active {
-            color: #FFC107; /* Gold */
-        }
-        .bookmark-btn:hover {
-            transform: scale(1.2);
-        }
-        
-        /* 検索バーのスタイル */
-        .search-container {
+
+        /* 検索バー */
+        .search-wrapper {
             position: sticky;
-            top: 70px; /* ヘッダーの高さ考慮 */
-            background-color: #f4f7f6; /* 背景色に合わせて調整 */
-            padding: 15px 0;
-            z-index: 99;
+            top: 60px; /* ヘッダーの高さに応じて調整 */
+            z-index: 90;
+            background-color: rgba(240, 242, 245, 0.95);
+            padding: 10px 10px 20px 10px;
+            backdrop-filter: blur(5px);
         }
         .search-box {
             width: 100%;
             padding: 15px 20px;
             font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 2px solid #e1e4e8;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             outline: none;
             transition: all 0.3s;
+            background: #fff;
         }
         .search-box:focus {
             border-color: #007bff;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 123, 255, 0.15);
+        }
+
+        /* カテゴリセクション */
+        .category-section {
+            margin-bottom: 40px;
+            padding: 0 10px;
+        }
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #007bff;
+        }
+        .category-title {
+            margin: 0;
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        .category-badge {
+            background-color: #007bff;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* グリッドレイアウト */
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* カードデザイン */
+        .exercise-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .exercise-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #cce5ff;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .exercise-name {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #2c3e50;
+            line-height: 1.4;
+            margin-right: 10px;
         }
         
-        /* 検索結果なしの表示 */
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .tag-muscle { background-color: #e3f2fd; color: #1976d2; }
+        .tag-equip { background-color: #f3e5f5; color: #7b1fa2; }
+
+        .bookmark-form {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 2; /* カードクリックより優先 */
+        }
+        .bookmark-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.4rem;
+            color: #e0e0e0;
+            transition: transform 0.2s, color 0.2s;
+            padding: 5px;
+        }
+        .bookmark-btn.active {
+            color: #ffc107;
+            filter: drop-shadow(0 2px 4px rgba(255, 193, 7, 0.4));
+        }
+        .bookmark-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* 詳細を見るラベル */
+        .tap-hint {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #aaa;
+            text-align: right;
+            font-weight: 600;
+        }
+        .tap-hint i { margin-left: 3px; }
+
+        /* 検索結果なし */
         .no-results {
             text-align: center;
+            padding: 40px;
             color: #888;
-            margin-top: 20px;
+            font-weight: bold;
             display: none;
         }
+
+        /* -------------------------------------------------- */
+        /* モーダル (詳細表示) */
+        /* -------------------------------------------------- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .detail-modal {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-overlay.active .detail-modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #007bff, #00c6ff);
+            padding: 20px 25px;
+            color: white;
+            position: relative;
+        }
+        .modal-title {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 900;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-close-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        .modal-body {
+            padding: 25px;
+            overflow-y: auto;
+        }
+        .detail-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .detail-tag {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .desc-box {
+            background-color: #f8f9fa;
+            border-left: 5px solid #007bff;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .desc-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 0.9rem;
+        }
+        .desc-text {
+            color: #333;
+            line-height: 1.7;
+            font-size: 1rem;
+            white-space: pre-wrap; /* 改行を反映 */
+        }
+
     </style>
 </head>
 <body>
@@ -104,66 +325,118 @@
 <div th:replace="fragments/header :: header"></div>
 
 <div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-        <h1 style="margin: 0;">全種目図鑑</h1>
-        <a th:href="@{/training}" class="button" style="width: auto; background-color: #6c757d; color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; text-decoration: none;">
+    <div class="page-header">
+        <h1 class="page-title"><i class="fa-solid fa-book-open"></i> 全種目図鑑</h1>
+        <a th:href="@{/training}" class="back-btn">
             <i class="fa-solid fa-arrow-left"></i> 戻る
         </a>
     </div>
 
-    <div class="search-container">
+    <div class="search-wrapper">
         <input type="text" id="exerciseSearchInput" class="search-box" placeholder="🔍 種目名、部位、器具で検索..." onkeyup="filterExercises()">
     </div>
     
     <div id="noResultsMessage" class="no-results">
-        <p>一致する種目が見つかりません。</p>
+        <i class="fa-solid fa-circle-exclamation fa-2x" style="margin-bottom: 10px;"></i><br>
+        一致する種目が見つかりません。
     </div>
 
     <div id="exerciseListContainer">
+        
         <div th:each="entry : ${freeWeightExercisesByPart}" class="category-section">
-            <h2 th:text="${entry.key}" class="category-title" th:data-keywords="${entry.key}">部位名</h2>
-            <ul class="exercise-list">
-                <li th:each="exercise : ${entry.value}" class="exercise-item">
-                    <div class="exercise-info">
-                        <span class="exercise-name" th:text="${exercise.name}">ベンチプレス</span>
-                        <span class="exercise-details">
-                            <i class="fa-solid fa-bullseye"></i> <span th:text="${exercise.targetMuscle}">大胸筋</span> | 
-                            <i class="fa-solid fa-toolbox"></i> <span th:text="${exercise.equipment}">バーベル</span>
-                        </span>
+            <div class="category-header">
+                <h2 th:text="${entry.key}" class="category-title" th:data-keywords="${entry.key}">部位名</h2>
+                <span class="category-badge" th:text="${#lists.size(entry.value)} + ' 種目'"></span>
+            </div>
+            
+            <div class="exercise-grid">
+                <div th:each="exercise : ${entry.value}" 
+                     class="exercise-card" 
+                     onclick="openDetailModal(this)"
+                     th:data-name="${exercise.name}"
+                     th:data-muscle="${exercise.targetMuscle}"
+                     th:data-equip="${exercise.equipment}"
+                     th:data-desc="${exercise.description}"> <div>
+                        <div class="card-header">
+                            <span class="exercise-name" th:text="${exercise.name}">ベンチプレス</span>
+                        </div>
+                        
+                        <div class="card-tags">
+                            <span class="tag tag-muscle"><i class="fa-solid fa-bullseye"></i> <span th:text="${exercise.targetMuscle}">大胸筋</span></span>
+                            <span class="tag tag-equip"><i class="fa-solid fa-toolbox"></i> <span th:text="${exercise.equipment}">バーベル</span></span>
+                        </div>
                     </div>
-                    
-                    <form th:action="@{/training/bookmark/toggle}" method="post" style="display:inline;">
+
+                    <form th:action="@{/training/bookmark/toggle}" method="post" class="bookmark-form" onclick="event.stopPropagation()">
                         <input type="hidden" name="exerciseName" th:value="${exercise.name}"/>
                         <input type="hidden" name="type" value="WEIGHT"/>
                         <button type="submit" class="bookmark-btn" th:classappend="${#lists.contains(bookmarkedNames, exercise.name)} ? 'active'">
                             <i th:class="${#lists.contains(bookmarkedNames, exercise.name)} ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
                         </button>
                     </form>
-                </li>
-            </ul>
+                    
+                    <div class="tap-hint">詳細を見る <i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+            </div>
         </div>
 
         <div class="category-section">
-            <h2 class="category-title" data-keywords="有酸素 カーディオ">有酸素運動</h2>
-            <ul class="exercise-list">
-                <li th:each="exercise : ${cardioExercises}" class="exercise-item">
-                    <div class="exercise-info">
-                        <span class="exercise-name" th:text="${exercise.name}">ランニング</span>
-                        <span class="exercise-details">
-                            <i class="fa-solid fa-heart-pulse"></i> <span th:text="${exercise.targetMuscle}">全身</span> | 
-                            <i class="fa-solid fa-toolbox"></i> <span th:text="${exercise.equipment}">マシン</span>
-                        </span>
-                    </div>
+            <div class="category-header" style="border-bottom-color: #28a745;">
+                <h2 class="category-title" data-keywords="有酸素 カーディオ">有酸素運動</h2>
+                <span class="category-badge" style="background-color: #28a745;" th:text="${#lists.size(cardioExercises)} + ' 種目'"></span>
+            </div>
+            
+            <div class="exercise-grid">
+                <div th:each="exercise : ${cardioExercises}" 
+                     class="exercise-card" 
+                     onclick="openDetailModal(this)"
+                     th:data-name="${exercise.name}"
+                     th:data-muscle="${exercise.targetMuscle}"
+                     th:data-equip="${exercise.equipment}"
+                     th:data-desc="${exercise.description}">
                     
-                    <form th:action="@{/training/bookmark/toggle}" method="post" style="display:inline;">
+                    <div>
+                        <div class="card-header">
+                            <span class="exercise-name" th:text="${exercise.name}">ランニング</span>
+                        </div>
+                        
+                        <div class="card-tags">
+                            <span class="tag tag-muscle" style="color: #28a745; background-color: #e8f5e9;"><i class="fa-solid fa-heart-pulse"></i> <span th:text="${exercise.targetMuscle}">全身</span></span>
+                            <span class="tag tag-equip"><i class="fa-solid fa-toolbox"></i> <span th:text="${exercise.equipment}">マシン</span></span>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/training/bookmark/toggle}" method="post" class="bookmark-form" onclick="event.stopPropagation()">
                         <input type="hidden" name="exerciseName" th:value="${exercise.name}"/>
                         <input type="hidden" name="type" value="CARDIO"/>
                         <button type="submit" class="bookmark-btn" th:classappend="${#lists.contains(bookmarkedNames, exercise.name)} ? 'active'">
                             <i th:class="${#lists.contains(bookmarkedNames, exercise.name)} ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
                         </button>
                     </form>
-                </li>
-            </ul>
+                    
+                    <div class="tap-hint">詳細を見る <i class="fa-solid fa-chevron-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="detailModalOverlay" class="modal-overlay" onclick="closeDetailModal(event)">
+    <div class="detail-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">種目名</h3>
+            <button class="modal-close-btn" onclick="closeDetailModal(event)"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-row">
+                <span class="detail-tag tag-muscle"><i class="fa-solid fa-bullseye"></i> <span id="modalMuscle">部位</span></span>
+                <span class="detail-tag tag-equip"><i class="fa-solid fa-toolbox"></i> <span id="modalEquip">器具</span></span>
+            </div>
+            
+            <div class="desc-box">
+                <span class="desc-label"><i class="fa-solid fa-circle-info"></i> 解説・やり方</span>
+                <p class="desc-text" id="modalDesc">ここに解説が入ります。</p>
+            </div>
         </div>
     </div>
 </div>
@@ -171,6 +444,36 @@
 <div th:replace="fragments/footer :: footer"></div>
 
 <script>
+    // モーダルを開く
+    function openDetailModal(cardElement) {
+        const name = cardElement.getAttribute('data-name');
+        const muscle = cardElement.getAttribute('data-muscle');
+        const equip = cardElement.getAttribute('data-equip');
+        const desc = cardElement.getAttribute('data-desc');
+
+        document.getElementById('modalTitle').textContent = name;
+        document.getElementById('modalMuscle').textContent = muscle;
+        document.getElementById('modalEquip').textContent = equip;
+        
+        // 解説がない場合のフォールバック
+        document.getElementById('modalDesc').textContent = desc ? desc : "詳細な解説はまだ登録されていません。";
+
+        const overlay = document.getElementById('detailModalOverlay');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; // 背景スクロール固定
+    }
+
+    // モーダルを閉じる
+    function closeDetailModal(event) {
+        // オーバーレイ自体か閉じるボタンがクリックされた時のみ閉じる
+        if (event.target.id === 'detailModalOverlay' || event.target.closest('.modal-close-btn')) {
+            const overlay = document.getElementById('detailModalOverlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = ''; // スクロール解除
+        }
+    }
+
+    // 検索フィルタリング
     function filterExercises() {
         const input = document.getElementById('exerciseSearchInput');
         const filter = input.value.toLowerCase().replace(/\s+/g, ''); // スペース除去して小文字化
@@ -180,26 +483,28 @@
 
         for (let i = 0; i < categories.length; i++) {
             const category = categories[i];
-            const items = category.getElementsByClassName('exercise-item');
+            const cards = category.getElementsByClassName('exercise-card');
             let hasVisibleItem = false;
 
-            for (let j = 0; j < items.length; j++) {
-                const item = items[j];
-                const name = item.querySelector('.exercise-name').textContent || "";
-                const details = item.querySelector('.exercise-details').textContent || "";
+            for (let j = 0; j < cards.length; j++) {
+                const card = cards[j];
+                const name = card.getAttribute('data-name') || "";
+                const muscle = card.getAttribute('data-muscle') || "";
+                const equip = card.getAttribute('data-equip') || "";
+                
                 // 検索対象のテキストを結合
-                const textValue = (name + details).toLowerCase().replace(/\s+/g, '');
+                const textValue = (name + muscle + equip).toLowerCase().replace(/\s+/g, '');
 
                 if (textValue.includes(filter)) {
-                    item.style.display = "";
+                    card.style.display = ""; // グリッドアイテムとして表示
                     hasVisibleItem = true;
                     totalVisibleItems++;
                 } else {
-                    item.style.display = "none";
+                    card.style.display = "none";
                 }
             }
 
-            // カテゴリ内のアイテムが全て非表示なら、カテゴリタイトルも消す
+            // カテゴリ内のアイテムが全て非表示なら、カテゴリセクションごと隠す
             if (hasVisibleItem) {
                 category.style.display = "";
             } else {
