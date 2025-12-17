@@ -8,23 +8,84 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/title.css}">
+    
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        .xp-bar { width: 100%; height: 25px; background: #ddd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
-        .xp-progress { height: 100%; background: linear-gradient(90deg, #4caf50, #81c784); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
+        /* HTML内スタイルは、home.cssでカバーできない動的なものや微調整のみ残します */
         
-        .character-section { position: relative; display: flex; justify-content: center; margin-top: 30px; }
-        .character-display { display: flex; justify-content: center; align-items: flex-end; width: 400px; height: 400px; background-image: url('/img/background/fire-original.png'); background-repeat: no-repeat; background-position: center; background-size: cover; border-radius: 25px; box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3); margin: 0 auto; text-decoration: none; padding-bottom: 10px; box-sizing: border-box; }
+        .xp-bar { width: 100%; height: 25px; background: #e3f2fd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
+        .xp-progress { height: 100%; background: linear-gradient(90deg, #42a5f5, #2196f3); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
+        
+        .character-section { position: relative; display: flex; justify-content: center; margin-top: 0px; }
+        
+        .daily-mission-button { margin-bottom: 5px !important; }
+
+        .character-wrapper {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            max-width: 100%;
+            margin: 0 auto;
+            overflow: visible;
+        }
+
+        .character-display { 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-end; 
+            width: 100%; 
+            height: 100%; 
+            background-image: url('/img/background/fire-original.png'); 
+            background-repeat: no-repeat; 
+            background-position: center; 
+            background-size: cover; 
+            border-radius: 25px; 
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3); 
+            text-decoration: none; 
+            padding-bottom: 10px; 
+            box-sizing: border-box; 
+        }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-50px); } 100% { transform: translateY(0px); } }
         .character-display img { width: auto; height: 85%; max-width: 95%; object-fit: contain; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9)); }
         
-        .action-buttons-row { display: flex; justify-content: center; gap: 20px; margin-top: 15px; margin-bottom: 5px; }
+        .character-side-buttons {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10;
+            top: 40px;
+            right: -125px; 
+        }
 
-        .customize-button { background-color: #ffb300; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: transform 0.1s; display: inline-block; }
-        .customize-button:hover { transform: scale(1.05); }
+        @media (max-width: 650px) {
+            .character-side-buttons {
+                right: 10px;
+                top: 50px; 
+            }
+        }
+
+        .side-action-btn { 
+            color: white; 
+            padding: 10px 0; 
+            border-radius: 15px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 0.85em; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+            transition: transform 0.1s; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 110px; 
+            backdrop-filter: blur(4px);
+        }
+        .side-action-btn:hover { transform: scale(1.05); }
         
-        .title-button { background-color: #9c27b0; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: transform 0.1s; display: inline-block; }
-        .title-button:hover { transform: scale(1.05); }
+        .customize-button { background: linear-gradient(135deg, #ffb300, #ffca28); }
+        .title-button { background: linear-gradient(135deg, #9c27b0, #ba68c8); }
 
         .help-menu-dropdown {
             display: none;
@@ -46,53 +107,59 @@
         .help-menu-item { display: block; padding: 10px; text-decoration: none; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9em; transition: transform 0.2s; border: none; width: 100%; cursor: pointer; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box; }
         .help-menu-item:hover { transform: scale(1.03); }
 
-        .user-title-badge {
-            display: inline-block;
-            position: relative;
-            background: linear-gradient(135deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%);
-            background-size: 200% 200%;
-            color: #fff;
-            font-size: 1.2em; 
-            padding: 8px 25px;
-            border-radius: 50px;
-            font-weight: 900;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            box-shadow: 0 5px 15px rgba(215, 109, 119, 0.5), inset 0 0 10px rgba(255,255,255,0.3);
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            overflow: hidden;
-            animation: gradientMove 5s ease infinite, popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .user-title-badge::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 5s infinite; }
-        .user-title-badge i { margin-right: 8px; color: #ffd700; filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.8)); }
-        @keyframes gradientMove { 0% { background-position: 0% 50% } 50% { background-position: 100% 50% } 100% { background-position: 0% 50% } }
-        @keyframes shine { 0% { left: -100%; } 40% { left: 200%; } 100% { left: 200%; } }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.5); } 100% { opacity: 1; transform: scale(1); } }
-
-        /* Tutorial styles */
-        .tutorial-spotlight { position: absolute; z-index: 9998; border-radius: 8px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; opacity: 0; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6); }
-        .tutorial-spotlight.active { opacity: 1; }
-        .tutorial-rpg-box { position: absolute; z-index: 9999; width: 90%; max-width: 500px; background: rgb(255, 255, 255); border: 2px solid #fff; border-radius: 15px; padding: 15px; display: flex; gap: 15px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: opacity 0.3s, top 0.4s, left 0.4s; transform: translateX(-50%); }
-        .tutorial-rpg-box.active { opacity: 1; visibility: visible; }
-        .rpg-char-area { flex-shrink: 0; width: 80px; height: 80px; background: #fff; border-radius: 50%; overflow: hidden; border: 3px solid #4CAF50; }
-        .rpg-char-area img { width: 100%; height: 100%; object-fit: cover; }
-        .rpg-char-area img.talking { animation: talk-bounce 0.2s infinite alternate; }
-        @keyframes talk-bounce { from { transform: scale(1); } to { transform: scale(1.05); } }
-        .rpg-content { flex-grow: 1; display: flex; flex-direction: column; }
-        .rpg-name-tag { font-size: 0.9em; color: rgb(255, 235, 252); font-weight: bold; margin-bottom: 5px; }
-        .rpg-text-area { font-size: 0.95em; line-height: 1.5; min-height: 3em; }
-        .rpg-controls { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
-        .rpg-btn { background: transparent; border: 1px solid #aaa; color: #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.85em; }
-        .rpg-btn-next { background: #4CAF50; border-color: #4CAF50; color: #fff; font-weight: bold; }
+        /* Tutorial関連のCSSは home.css に移動しました。ここでは競合を避けるため削除しています */
         .tutorial-pointer { position: absolute; z-index: 10000; font-size: 2.5rem; color: #f1c40f; display: none; animation: point-move 1s infinite alternate; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .tutorial-pointer::before { content: '\f0a6'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
         @keyframes point-move { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-        .tutorial-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9990; display: none; }
-        .tutorial-backdrop.active { display: block; }
+        
+        /* 挨拶文のスタイル */
+        .home-greeting-container {
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 25px;
+        }
+        .home-app-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 900;
+            font-size: 2.8rem;
+            font-style: italic;
+            margin: 0;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 2px 4px 10px rgba(0, 198, 251, 0.2);
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+        .home-greeting-text {
+            font-family: 'Noto Sans JP', sans-serif;
+            color: #555;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+        .home-username {
+            color: #0288d1;
+            font-size: 1.2rem;
+            font-weight: 900;
+            margin: 0 2px;
+            text-decoration: underline wavy #4facfe;
+            text-underline-offset: 3px;
+        }
     </style>
 </head>
 <body class="home-page">
+
+<div class="interactive-bg">
+    <div class="mouse-follower-cloud"></div>
+    <div class="bg-cloud cloud-1"></div>
+    <div class="bg-cloud cloud-2"></div>
+    <div class="bg-cloud cloud-3"></div>
+    <div class="bg-cloud cloud-4"></div>
+</div>
 
 <div class="main-container" style="position: relative;"> 
     <button id="help-btn" class="help-label-btn" onclick="toggleHelpMenu()">
@@ -109,7 +176,7 @@
     </div>
 
     <div class="app-logo-display">
-        <img th:src="@{/img/applogo.jpg}" alt="App Logo" />
+        <img th:src="@{/img/applogo-new.png}" alt="App Logo" />
         <div id="tutorial-xp-area">
             <div class="xp-daily-header"></div>
             <div class="xp-bar-container">
@@ -125,31 +192,40 @@
        <i class="fa-solid fa-list-check"></i> デイリーミッション
     </a>
     
-    <div id="tutorial-title-display" style="text-align: center; margin-top: 20px; min-height: 50px;">
-        <span class="user-title-badge" 
-              th:if="${userTitle != null and userTitle != 'なし'}">
-              <i class="fa-solid fa-crown"></i> <span th:text="${userTitle}"></span>
-        </span>
+    <div id="tutorial-title-display" style="text-align: center; margin-top: 5px; min-height: 30px;">
+        <th:block th:if="${userTitle != null and userTitle != 'なし'}">
+            <th:block th:each="enumT : ${T(com.example.demo.entity.AppTitle).values()}" 
+                      th:if="${enumT.displayName == userTitle}">
+                <div class="title-badge" th:classappend="${enumT.rarity}">
+                    <i class="fa-solid fa-crown"></i> <span th:text="${userTitle}"></span>
+                </div>
+            </th:block>
+        </th:block>
     </div>
     
     <div class="character-section">
-        <a id="tutorial-char-display" th:href="@{/character}" class="character-display">
-            <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
-        </a>
-    </div>
-
-    <div class="action-buttons-row">
-        <a id="tutorial-title-btn" th:href="@{/titles}" class="title-button">
-            <i class="fa-solid fa-crown"></i> 称号
-        </a>
-
-        <a id="tutorial-customize-btn" th:href="@{/gacha/customize}" class="customize-button">
-            <i class="fa-solid fa-shirt"></i> 着せ替え
-        </a>
+        <div class="character-wrapper">
+            <a id="tutorial-char-display" th:href="@{/character}" class="character-display">
+                <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
+            </a>
+            
+            <div class="character-side-buttons">
+                <a id="tutorial-title-btn" th:href="@{/titles}" class="side-action-btn title-button">
+                    <i class="fa-solid fa-crown"></i> 称号
+                </a>
+                <a id="tutorial-customize-btn" th:href="@{/gacha/customize}" class="side-action-btn customize-button">
+                    <i class="fa-solid fa-shirt"></i> 着せ替え
+                </a>
+            </div>
+        </div>
     </div>
     
-    <h1>FitWorksへようこそ！</h1>
-    <p class="sub-heading" th:text="'ようこそ、' + ${username} + 'さん！'"></p>
+    <div class="home-greeting-container">
+        <h1 class="home-app-title">FitWorks</h1>
+        <p class="home-greeting-text">
+            こんにちは、<span class="home-username" th:text="${username}"></span>さん！
+        </p>
+    </div>
     
     <a id="tutorial-training-btn" th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
        <i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i> トレーニングを開始 
@@ -166,6 +242,9 @@
             </a>
             <a th:href="@{/log/meal}" class="record-option-item meal-opt">
                 <i class="fa-solid fa-utensils"></i><br>食事記録
+            </a>
+            <a th:href="@{/training-log/form/body-weight}" class="record-option-item weight-opt">
+                <i class="fa-solid fa-weight-scale"></i><br>体重記録
             </a>
         </div>
     </div>
@@ -189,16 +268,11 @@
 	</a>
 
     <nav id="tutorial-menu-nav" class="bottom-nav">
-        <a id="nav-gacha" th:href="@{/gacha}" class="nav-item"><i class="fa-solid fa-gift"></i><span>ガチャ</span></a>
-        
+        <a id="nav-gacha" th:href="@{/gacha}" class="nav-item"><i class="fa-solid fa-gift"></i><span>ガチャ　</span></a>
         <a id="tutorial-friends-btn" th:href="@{/friends}" class="nav-item"><i class="fa-solid fa-user-group"></i><span>フレンド</span></a>
-        
-        <a id="nav-community" th:href="@{/community}" class="nav-item"><i class="fa-solid fa-comments"></i><span>掲示板</span></a>
-        
-        <a id="nav-char" th:href="@{/characters/menu/CharactersMenu}" class="nav-item"><i class="fa-solid fa-user-astronaut"></i><span>キャラ</span></a>    
-        
-        <a id="tutorial-muscles-btn" th:href="@{/muscles}" class="nav-item"><i class="fa-solid fa-child-reaching"></i><span>マッスル</span></a>
-
+        <a id="nav-community" th:href="@{/community}" class="nav-item"><i class="fa-solid fa-comments"></i><span>掲示板　</span></a>
+        <a id="nav-char" th:href="@{/characters/menu/CharactersMenu}" class="nav-item"><i class="fa-solid fa-user-astronaut"></i><span>キャラ　</span></a>    
+        <a id="tutorial-muscles-btn" th:href="@{/muscles}" class="nav-item"><i class="fa-solid fa-child-reaching"></i><span>筋肉　</span></a>
         <a id="nav-settings" th:href="@{/settings}" class="nav-item"><i class="fa-solid fa-gear"></i><span>設定</span></a>
     </nav>
 </div>
@@ -219,6 +293,7 @@
 <div id="tutorial-backdrop" class="tutorial-backdrop"></div>
 
 <script>
+    // ... (既存のJavaScriptロジックに変更はありません) ...
     function toggleRecordMenu() {
         const options = document.getElementById('record-options');
         options.classList.toggle('open');
@@ -238,32 +313,32 @@
     });
 
     const rpgSteps = [
-        { targetId: null, text: "こんにちは！FitWorksへようこそ！\n一緒に最強のトレーナーを目指しましょう！" },
-        { targetId: 'tutorial-xp-area', text: "ここがあなたの「レベル」と「XP」です。\n運動を記録すると経験値が溜まります！" },
-        { targetId: 'tutorial-mission-btn', text: "「デイリーミッション」は毎日更新されます。\n達成して報酬をゲットしましょう。" },
-        { targetId: 'tutorial-title-display', text: "ここには現在装備している「称号」が表示されます。\n強さの証をアピールしましょう！" },
-        { targetId: 'tutorial-char-display', text: "あなたのパートナーです。\nレベルが上がると進化するかも…！？" },
-        { targetId: 'tutorial-title-btn', text: "【新機能】獲得した称号はここで変更できます。\n色々な条件を達成して集めてくださいね。" },
-        { targetId: 'tutorial-customize-btn', text: "ガチャで手に入れたアイテムで\nキャラクターを着せ替えることができます。" },
-        { targetId: 'tutorial-training-btn', text: "基本はここ！「トレーニングを開始」ボタンから\n日々の運動を記録してください。" },
-        { targetId: 'tutorial-record-btn', text: "【新機能】ここから「筋トレ履歴」や「食事記録」\nへ素早くアクセスできます。" },
-        { targetId: 'help-btn', text: "【新機能】「サプリの飲み方」や「チュートリアルの再生」は\nこのヘルプメニューの中にあります。" },
-        { targetId: 'tutorial-care-btn', text: "疲れた時は「AIリフレッシュ」。\nあなたの体調に合わせたケアを提案します。" },
-        { targetId: 'tutorial-friends-btn', text: "「フレンド」機能は下のメニューに移動しました。\n仲間と励まし合ったりランキングで競い合えます。" },
-        { targetId: 'tutorial-muscles-btn', text: "「マッスルパートナー」も下のメニューから！\nあなたの筋肉の成長度合いを可視化できます！" },
-        { targetId: 'tutorial-map-btn', text: "近くのジムや公園を探したいときは\nこのマップ機能を使ってください。" },
-        { targetId: 'tutorial-ai-btn', text: "トレーニングの悩みや相談があれば\nいつでもAIコーチにお任せください！" },
-        { targetId: 'nav-gacha', text: "「ガチャ」では装備アイテムが手に入ります。" },
-        { targetId: 'nav-community', text: "「掲示板」では、他のユーザーと\n情報交換や雑談を楽しめます。" },
-        { targetId: 'nav-char', text: "「キャラ」メニューからは、図鑑を見たり\nパートナーの詳細を確認できます。" },
-        { targetId: 'nav-settings', text: "「設定」ではアカウント情報の変更や\n通知の設定などが可能です。" },
-        { targetId: null, text: "説明は以上です。\nさあ、トレーニングの旅を始めましょう！" }
+        { targetId: null, text: "FitWorksへようこそ！\nこのチュートリアルでは、アプリの全機能をご紹介します！" },
+        { targetId: 'help-btn', text: "まずは画面左上。「ヘルプ」ボタンから、\nこのガイドの再生や、サプリメントの知識を確認できます。" },
+        { targetId: 'tutorial-xp-area', text: "画面上部にはあなたの「レベル」と「XP(経験値)」が表示されます。\nトレーニングを記録してレベルを上げましょう！" },
+        { targetId: 'tutorial-mission-btn', text: "「デイリーミッション」は毎日更新されます。\nクリアして報酬やXPを効率よくゲットしましょう！" },
+        { targetId: 'tutorial-title-display', text: "ここには現在装備している「称号」が輝きます。\nレアな称号を手に入れて、強さをアピールしてください！" },
+        { targetId: 'tutorial-char-display', text: "あなたのパートナーキャラクターです。\nレベルアップと共に進化していく姿を見守りましょう。" },
+        { targetId: 'tutorial-title-btn', text: "「称号」ボタンからコレクション画面へ。\n獲得した称号を付け替えて、個性を出せます。" },
+        { targetId: 'tutorial-customize-btn', text: "「着せ替え」ボタンでは、ガチャで入手したアイテムを\nキャラクターに装備させることができます。" },
+        { targetId: 'tutorial-training-btn', text: "メイン機能はこれ！「トレーニングを開始」ボタン。\nここから日々の運動メニューを作成・記録します。" },
+        { targetId: 'tutorial-record-btn', text: "「記録をつける」メニューを開くと、\n過去の履歴確認や、食事・体重の記録が個別にできます。" },
+        { targetId: 'tutorial-care-btn', text: "疲れた時は「AIリフレッシュ＆ケア」。\n体調に合わせたストレッチや休息法をAIが提案します。" },
+        { targetId: 'tutorial-map-btn', text: "「マップ」機能を使えば、\n近くのジムや公園、トレーニング施設をすぐに探せます。" },
+        { targetId: 'tutorial-ai-btn', text: "トレーニングや食事の悩みは「AIチャット」へ。\n専属のAIコーチが24時間いつでも相談に乗ります！" },
+        { targetId: 'nav-gacha', text: "ここからは下のメニューです。\n「ガチャ」では、着せ替えアイテムなどの報酬が手に入ります。" },
+        { targetId: 'tutorial-friends-btn', text: "「フレンド」機能で仲間とつながりましょう。\nお互いに励まし合ったり、ランキングで競えます。" },
+        { targetId: 'nav-community', text: "「掲示板」はユーザー同士の交流スペース。\n筋トレ情報の交換や、雑談で盛り上がりましょう。" },
+        { targetId: 'nav-char', text: "「キャラ」メニューでは、キャラクター図鑑を見たり、\nパートナーの詳細ステータスを確認できます。" },
+        { targetId: 'tutorial-muscles-btn', text: "「筋肉」タブでは、鍛えた部位が光る「マッスルパートナー」を表示。\n自分の成長箇所が一目でわかります！" },
+        { targetId: 'nav-settings', text: "最後に「設定」。アカウント情報の変更や通知設定、\n生体認証(FaceID/TouchID)の登録もここから行えます。" },
+        { targetId: null, text: "機能説明は以上です。\nさあ、FitWorksで最高のフィットネスライフを始めましょう！" }
     ];
     
     let currentRpgStep = 0;
     let typeWriterInterval;
     let updateLoopId; 
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v15'; 
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v16'; 
 
     document.addEventListener('DOMContentLoaded', function() {
         if (!localStorage.getItem(STORAGE_KEY_RPG)) { setTimeout(() => startRpgTutorial(), 800); }
@@ -308,12 +383,10 @@
     function moveSpotlight(targetId) {
         const spotlight = document.getElementById('tutorial-spotlight');
         const pointer = document.getElementById('tutorial-pointer');
-        
         let targetEl = null;
         if (targetId) {
             targetEl = document.getElementById(targetId);
         }
-
         if (!targetId || !targetEl) {
             pointer.style.display = 'none';
             spotlight.style.width = '0'; spotlight.style.height = '0';
@@ -331,7 +404,6 @@
     function updateSpotlightPosition() {
         const step = rpgSteps[currentRpgStep];
         const msgBox = document.getElementById('tutorial-rpg-box');
-        
         if (!step || !step.targetId) {
              const scrollY = window.pageYOffset; 
              const scrollX = window.pageXOffset;
@@ -339,15 +411,12 @@
              msgBox.style.left = (scrollX + window.innerWidth/2) + 'px';
              return;
         }
-        
         const targetEl = document.getElementById(step.targetId);
         if(!targetEl) return;
-        
         const rect = targetEl.getBoundingClientRect();
         const scrollY = window.pageYOffset; const scrollX = window.pageXOffset;
         const spotlight = document.getElementById('tutorial-spotlight');
         const pointer = document.getElementById('tutorial-pointer');
-        
         spotlight.style.width = (rect.width + 20) + 'px';
         spotlight.style.height = (rect.height + 20) + 'px';
         spotlight.style.top = (rect.top + scrollY - 10) + 'px';
@@ -356,11 +425,9 @@
         pointer.style.left = (rect.left + scrollX + rect.width/2 - 20) + 'px';
         
         let boxTop = rect.top + scrollY - msgBox.offsetHeight - 20;
-        
         if (boxTop < scrollY + 10 || (step.targetId.startsWith('nav-')) || step.targetId.startsWith('tutorial-friends') || step.targetId.startsWith('tutorial-muscles')) {
              boxTop = rect.bottom + scrollY + 30;
         }
-
         msgBox.style.top = boxTop + 'px';
         msgBox.style.left = (rect.left + scrollX + rect.width/2) + 'px';
     }
@@ -378,6 +445,13 @@
         stopUpdateLoop();
         localStorage.setItem(STORAGE_KEY_RPG, 'true');
     }
+
+    document.addEventListener('mousemove', (e) => {
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        document.body.style.setProperty('--mouse-x', x);
+        document.body.style.setProperty('--mouse-y', y);
+    });
 </script>
 </body>
 </html>

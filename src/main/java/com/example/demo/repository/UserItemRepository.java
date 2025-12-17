@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserItem;
 
+
 @Repository
 public interface UserItemRepository extends JpaRepository<UserItem, Long> {
 
@@ -25,6 +26,9 @@ public interface UserItemRepository extends JpaRepository<UserItem, Long> {
     // ユーザー名とアイテムのタイプで所持数を取得（素材管理用）
     Optional<UserItem> findByUser_UsernameAndItem_Type(String username, String type);
 
+    // ★★★ 変更: 複数レコードを返すメソッド（1レコード=1個方式） ★★★
+    List<UserItem> findAllByUser_UsernameAndItemId(String username, Long itemId);
+
     // ----------------------------------------
     // ▼ userId / itemId を指定して検索（より軽量）
     // ----------------------------------------
@@ -35,6 +39,6 @@ public interface UserItemRepository extends JpaRepository<UserItem, Long> {
     // userId と itemId で所持確認
     boolean existsByUserIdAndItemId(Long userId, Long itemId);
 
-    // ユーザーIDとアイテムIDで、具体的な所持データ（個数など）を取得
-    Optional<UserItem> findByUserIdAndItemId(Long userId, Long itemId);
+    // ★★★ 変更: 複数レコードを返す（1レコード=1個方式） ★★★
+    List<UserItem> findAllByUserIdAndItemId(Long userId, Long itemId);
 }

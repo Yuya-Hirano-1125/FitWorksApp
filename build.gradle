@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.5.7'
+    id 'org.springframework.boot' version '3.4.1' // ※3.5.7は存在しないため3.4.1に修正推奨
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -28,11 +28,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
-    // ★追加: ソーシャルログイン用 (OAuth2 Client)
+    // ソーシャルログイン用
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    // ★重要: WebAuthnライブラリを追加 (バージョンを0.28.3に固定)
+    implementation 'com.webauthn4j:webauthn4j-core:0.28.3.RELEASE'
+    implementation 'com.webauthn4j:webauthn4j-spring-security-core:0.11.1.RELEASE'
 
     // JSON
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     // Cache
     implementation 'org.springframework.boot:spring-boot-starter-cache'

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
+	<meta name="_csrf" th:content="${_csrf.token}"/>
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>背景一覧 | FitWorks</title>
@@ -24,12 +26,21 @@
                 背景一覧
             </h1>
             <p class="text-gray-500 mt-2 text-sm font-bold">ホーム画面の背景カスタマイズ</p>
-			<div id="current-level-display" class="mt-4 text-center">
-			    <span class="text-lg font-extrabold text-[var(--primary-color)] bg-yellow-100 px-4 py-1 rounded-full shadow-md">
-			        現在のレベル: <span th:text="${currentLevel}"></span>
-			        </span>
-			</div>
+            
+            <!-- ユーザーレベル表示 -->
+            <div id="current-level-display" class="mt-4 text-center">
+                <span class="text-lg font-extrabold text-[var(--primary-color)] bg-yellow-100 px-4 py-1 rounded-full shadow-md">
+                    Lv.<span id="user-level-value" th:text="${userLevel}">1</span>
+                </span>
             </div>
+            
+            <!-- 夢幻の鍵所持数表示 -->
+            <div id="dream-key-display" class="mt-2 text-center">
+                <span class="text-md font-bold text-purple-600 bg-purple-100 px-4 py-1 rounded-full shadow-md">
+                    <i class="fa-solid fa-key"></i> 夢幻の鍵: <span id="dream-key-count" th:text="${dreamKeyCount}">0</span>個
+                </span>
+            </div>
+        </div>
 
         <div id="content-area"></div>
 
@@ -41,7 +52,9 @@
 
     </div>
 
+    <!-- データソース: 背景アイテムの定義 -->
     <div id="data-source" style="display: none;">
+        <!-- 自然・元素系背景 (レベル解放) -->
         <div class="data-item" data-id="fire" data-category="nature" data-name="炎の世界" data-bg="fire-original" 
              data-img-src="/img/background/fire-original.png" data-locked="false" data-unlock-level="0"></div>
 
@@ -51,30 +64,37 @@
         <div class="data-item" data-id="grass" data-category="nature" data-name="木の世界" data-bg="grass-original" 
              data-img-src="/img/background/grass-original.png" data-locked="true" data-unlock-level="70"></div>
 
-        <div class="data-item" data-id="light" data-category="nature" data-name="光の世界" data-bg="cloud-sky" 
+        <div class="data-item" data-id="light" data-category="nature" data-name="光の世界" data-bg="light-original" 
              data-img-src="/img/background/light-original.png" data-locked="true" data-unlock-level="100"></div>
 
-        <div class="data-item" data-id="dark" data-category="nature" data-name="闇の世界" data-bg="dark-castle" 
+        <div class="data-item" data-id="dark" data-category="nature" data-name="闇の世界" data-bg="dark-original" 
              data-img-src="/img/background/dark-original.png" data-locked="true" data-unlock-level="130"></div>
 
+        <!-- 日常・スペシャル系背景 (素材「夢幻の鍵」で解放) -->
         <div class="data-item" data-id="classroom" data-category="special" data-name="教室" data-bg="classroom" 
-             data-img-src="/img/background/classroom.png" data-locked="true" data-material="true"></div>
+             data-img-src="/img/background/classroom.png" data-locked="true" data-material="true" data-material-name="夢幻の鍵" data-material-id="16"></div>
 
         <div class="data-item" data-id="gaming" data-category="special" data-name="ゲーミングルーム" data-bg="gaming-room" 
-             data-img-src="/img/background/gaming-room.png" data-locked="true" data-material="true"></div>
+             data-img-src="/img/background/gaming-room.png" data-locked="true" data-material="true" data-material-name="夢幻の鍵" data-material-id="16"></div>
              
         <div class="data-item" data-id="server" data-category="special" data-name="サーバールーム" data-bg="server-room" 
-             data-img-src="/img/background/server-room.png" data-locked="true" data-material="true"></div>
+             data-img-src="/img/background/server-room.png" data-locked="true" data-material="true" data-material-name="夢幻の鍵" data-material-id="16"></div>
     </div>
 
-
-    <div id="unlock-popup" class="popup-hidden fixed inset-0 z-[1000] bg-black/60 flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl p-6 text-center max-w-sm w-full">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">ロック解放</h3>
-            <p id="unlock-message" class="mb-6 text-gray-600 font-medium"></p>
-            <div class="flex gap-4 justify-center">
-                <button id="cancel-unlock" class="flex-1 py-2 bg-gray-200 text-gray-600 rounded-lg font-bold">キャンセル</button>
-                <button id="confirm-unlock" class="flex-1 py-2 bg-[var(--primary-color)] text-white rounded-lg font-bold shadow-md">解放する</button>
+    <!-- 解放確認ポップアップ -->
+    <div id="unlock-popup" class="popup-hidden unlock-popup-overlay">
+        <div class="unlock-popup-content">
+            <h3 class="unlock-popup-title">
+                ロック解放
+            </h3>
+            <div id="unlock-message" class="unlock-popup-message"></div>
+            <div class="unlock-popup-buttons">
+                <button id="cancel-unlock" class="unlock-btn-cancel">
+                    <i class="fa-solid fa-times"></i> キャンセル
+                </button>
+                <button id="confirm-unlock" class="unlock-btn-confirm">
+                    <i class="fa-solid fa-unlock-keyhole"></i> 解放する
+                </button>
             </div>
         </div>
     </div>
@@ -82,204 +102,372 @@
     <script src="Backgrounds.js" defer></script>
     
     <script th:inline="javascript"> 
+    /*<![CDATA[*/
     document.addEventListener('DOMContentLoaded', () => {
-        // -----------------------------------------------------
-		// 【元に戻す箇所】
-		const currentLevel = /*[[${currentLevel}]]*/ 12; // またはDBから渡るはずの正しいキー名
-        // -----------------------------------------------------
-		
-        const hasMaterial = true; 
-        const contentArea = document.getElementById('content-area');
-
-        // データ読み込み
-        const dataItems = document.querySelectorAll('#data-source .data-item');
-        const bgList = [];
+        console.log('========== DOMContentLoaded 開始 ==========');
         
-        dataItems.forEach(item => {
-            let isLocked = item.dataset.locked === "true";
-            const unlockLevel = parseInt(item.dataset.unlockLevel || 0);
+        try {
+            // CSRFトークン取得
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+            // Thymeleafから値を取得
+            let userLevel = /*[[${userLevel}]]*/ 1;
+            let dreamKeyCount = /*[[${dreamKeyCount}]]*/ 0;
             
-            // ✅ 修正: ロック判定の際に currentLevel を考慮
-            if (unlockLevel > 0 && unlockLevel <= currentLevel) {
-                 isLocked = false; // 現在のレベルが解放レベル以上ならロック解除
-            } else if (unlockLevel === 0) {
-                 isLocked = false;
+            // ★ 解放済み背景リストを取得
+            let unlockedBackgroundsSet = /*[[${unlockedBackgrounds}]]*/ [];
+            let unlockedBackgrounds = Array.isArray(unlockedBackgroundsSet) 
+                ? unlockedBackgroundsSet 
+                : Array.from(unlockedBackgroundsSet || []);
+            
+            // ★★★ 選択中の背景を取得
+            let selectedBackgroundCode = /*[[${selectedBackground}]]*/ 'fire-original';
+            
+            console.log('========== 背景画面JavaScript初期化 ==========');
+            console.log('ユーザーレベル:', userLevel);
+            console.log('夢幻の鍵所持数:', dreamKeyCount);
+            console.log('解放済み背景リスト:', unlockedBackgrounds);
+            console.log('解放済み背景数:', unlockedBackgrounds.length);
+            console.log('選択中の背景コード:', selectedBackgroundCode);
+            console.log('==========================================');
+            
+            if (userLevel === null || userLevel === undefined) {
+                console.error('ERROR: userLevel is null or undefined!');
+                userLevel = 1;
             }
-            // ---------------------------------------------
             
-            bgList.push({
-                id: item.dataset.id,
-                category: item.dataset.category || 'other',
-                name: item.dataset.name,
-                bgCode: item.dataset.bg,
-                imgSrc: item.dataset.imgSrc,
-                locked: isLocked,
-                unlockLevel: unlockLevel,
-                needsMaterial: item.dataset.material === "true",
-                selected: false
-            });
-        });
-        
-        // 初期選択
-        // ✅ 修正: 初期選択は、ロックされていないアイテムで最初のもの、またはリストの最初のアイテムにするのが自然ですが、
-        // 既存のコード通りにリストの最初のアイテムを選択するロジックを維持します。
-        // すでにロックが解除されているものを選ぶ方が実用的ですが、ここではロジックの変更を最小限にとどめます。
-        const initialSelectIndex = bgList.findIndex(bg => !bg.locked) !== -1 ? bgList.findIndex(bg => !bg.locked) : 0;
-        bgList[initialSelectIndex].selected = true;
+            if (dreamKeyCount === null || dreamKeyCount === undefined) {
+                console.error('ERROR: dreamKeyCount is null or undefined!');
+                dreamKeyCount = 0;
+            }
+            
+            // 表示を更新
+            const userLevelElement = document.getElementById('user-level-value');
+            const dreamKeyCountElement = document.getElementById('dream-key-count');
+            
+            if (userLevelElement) {
+                userLevelElement.textContent = userLevel;
+            }
+            
+            if (dreamKeyCountElement) {
+                dreamKeyCountElement.textContent = dreamKeyCount;
+            }
+            
+            const contentArea = document.getElementById('content-area');
+            if (!contentArea) {
+                console.error('ERROR: content-area が見つかりません!');
+                return;
+            }
 
-
-        const categories = [
-            { id: 'nature', title: '自然・元素', icon: 'fa-leaf' },
-            { id: 'special', title: '日常・スペシャル', icon: 'fa-star' }
-        ];
-
-        function renderAll() {
-            contentArea.innerHTML = ''; 
-
-            categories.forEach(cat => {
-                const items = bgList.filter(item => item.category === cat.id);
-                if (items.length === 0) return;
-
-                const section = document.createElement('div');
-                section.className = 'mb-8';
+            // データ読み込み
+            const dataItems = document.querySelectorAll('#data-source .data-item');
+            console.log('データアイテム数:', dataItems.length);
+            
+            const bgList = [];
+            
+            dataItems.forEach((item, index) => {
+                let isLocked = item.dataset.locked === "true";
+                const unlockLevel = parseInt(item.dataset.unlockLevel || 0);
+                const needsMaterial = item.dataset.material === "true";
+                const materialName = item.dataset.materialName || "";
+                const materialId = parseInt(item.dataset.materialId || 0);
+                const backgroundId = item.dataset.id;
                 
-                section.innerHTML = `
-                    <div class="section-header">
-                        <h2 class="section-title">${cat.title}</h2>
-                    </div>
-                    <div class="card-grid" id="grid-${cat.id}"></div>
-                `;
-                contentArea.appendChild(section);
-                const grid = section.querySelector(`#grid-${cat.id}`);
+                // ★ ロック判定を修正
+                if (needsMaterial) {
+                    // 素材が必要な背景: 解放済みリストに含まれているかチェック
+                    isLocked = !unlockedBackgrounds.includes(backgroundId);
+                    console.log(`背景 ${backgroundId}: 素材解放, ロック状態=${isLocked}`);
+                } else if (unlockLevel > 0) {
+                    // レベル解放: userLevelが解放レベル以上ならロック解除
+                    isLocked = unlockLevel > userLevel;
+                    console.log(`背景 ${backgroundId}: レベル解放(Lv.${unlockLevel}), ロック状態=${isLocked}`);
+                } else {
+                    // unlockLevel === 0 の場合は最初から解放済み
+                    isLocked = false;
+                    console.log(`背景 ${backgroundId}: 初期解放, ロック状態=${isLocked}`);
+                }
+                
+                bgList.push({
+                    id: item.dataset.id,
+                    category: item.dataset.category || 'other',
+                    name: item.dataset.name,
+                    bgCode: item.dataset.bg,
+                    imgSrc: item.dataset.imgSrc,
+                    locked: isLocked,
+                    unlockLevel: unlockLevel,
+                    needsMaterial: needsMaterial,
+                    materialName: materialName,
+                    materialId: materialId,
+                    selected: false
+                });
+            });
+            
+            console.log('bgList作成完了:', bgList.length + '件');
+            
+            // ★★★ 初期選択: 選択中の背景をマーク ★★★
+            const selectedBg = bgList.find(bg => bg.bgCode === selectedBackgroundCode);
+            if (selectedBg && !selectedBg.locked) {
+                selectedBg.selected = true;
+                console.log('選択中の背景を設定:', selectedBg.name, selectedBg.bgCode);
+            } else {
+                // 選択中の背景が見つからない、またはロックされている場合は最初の解放済み背景を選択
+                const initialSelectIndex = bgList.findIndex(bg => !bg.locked);
+                if (initialSelectIndex !== -1) {
+                    bgList[initialSelectIndex].selected = true;
+                    console.log('デフォルト背景を設定:', bgList[initialSelectIndex].name);
+                }
+            }
 
-                items.forEach(bg => {
-                    const card = document.createElement('div');
-                    // ✅ 修正: ロック解除済みで選択可能になった背景にも 'unlocked' クラスを付けるなどで区別できるようにしても良いですが、
-                    // ここでは既存のロジックをベースに、UIの表示内容を変更します。
-                    card.className = `bg-card ${bg.selected ? 'selected' : ''}`;
+            const categories = [
+                { id: 'nature', title: '自然・元素', icon: 'fa-leaf' },
+                { id: 'special', title: '日常・スペシャル', icon: 'fa-star' }
+            ];
+
+            function renderAll() {
+                console.log('renderAll() 開始');
+                contentArea.innerHTML = ''; 
+
+                categories.forEach(cat => {
+                    const items = bgList.filter(item => item.category === cat.id);
+                    console.log(`カテゴリ ${cat.id}: ${items.length}件`);
+                    if (items.length === 0) return;
+
+                    const section = document.createElement('div');
+                    section.className = 'mb-8';
                     
-                    let overlayHtml = '';
-                    let actionHtml = '';
-                    let isUnlockableByMaterial = false; // 素材解放可能か
+                    section.innerHTML = `
+                        <div class="section-header">
+                            <h2 class="section-title">${cat.title}</h2>
+                        </div>
+                        <div class="card-grid" id="grid-${cat.id}"></div>
+                    `;
+                    contentArea.appendChild(section);
+                    const grid = section.querySelector(`#grid-${cat.id}`);
 
-                    if (bg.locked) {
-                        let lockText = '';
+                    items.forEach(bg => {
+                        const card = document.createElement('div');
+                        card.className = `bg-card ${bg.selected ? 'selected' : ''}`;
                         
-                        if (bg.needsMaterial) {
-                            // 素材ロックの場合
-                            if (hasMaterial) {
-                                lockText = "解放可能";
-                                isUnlockableByMaterial = true;
-                            } else {
-                                lockText = "素材不足";
+                        let overlayHtml = '';
+                        let actionHtml = '';
+                        let canUnlock = false;
+
+                        if (bg.locked) {
+                            let lockText = '';
+                            
+                            if (bg.needsMaterial) {
+                                // 素材解放の場合
+                                if (dreamKeyCount > 0) {
+                                    lockText = `<i class="fa-solid fa-key"></i> ${bg.materialName}で解放`;
+                                    canUnlock = true;
+                                } else {
+                                    lockText = `<i class="fa-solid fa-lock"></i> ${bg.materialName}が必要`;
+                                    canUnlock = false;
+                                }
+                            } else if (bg.unlockLevel > 0) {
+                                // レベル解放の場合
+                                if (userLevel >= bg.unlockLevel) {
+                                    lockText = "解放可能";
+                                    canUnlock = true;
+                                } else {
+                                    lockText = `Lv.${bg.unlockLevel}で解放`;
+                                    canUnlock = false;
+                                }
                             }
-                        } else if (bg.unlockLevel > 0) {
-                            // レベルロックの場合
-                            if (currentLevel >= bg.unlockLevel) {
-                                // レベルが足りている場合
-                                lockText = "解放可能";
+
+                            overlayHtml = `
+                                <div class="card-lock-overlay">
+                                    <i class="fa-solid fa-lock text-2xl mb-1"></i>
+                                    <span class="text-xs font-bold tracking-widest">LOCKED</span>
+                                </div>
+                            `;
+                            
+                            if (canUnlock) {
+                                actionHtml = `<button class="status-text text-unlock-ready unlock-trigger bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg font-bold transition shadow-md">
+                                    <i class="fa-solid fa-unlock-keyhole"></i> 解放する
+                                </button>`;
                             } else {
-                                // レベルが足りない場合
-                                lockText = `Lv.${bg.unlockLevel}で解放`;
+                                actionHtml = `<span class="status-text text-locked">${lockText}</span>`;
+                            }
+
+                        } else {
+                            if (bg.selected) {
+                                actionHtml = `<span class="status-text text-selected"><i class="fa-solid fa-check"></i> 適用中</span>`;
+                            } else {
+                                actionHtml = `<button class="status-text text-unlock-ready select-trigger bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition shadow-md">
+                                    <i class="fa-solid fa-hand-pointer"></i> 選択する
+                                </button>`;
                             }
                         }
 
-                        overlayHtml = `
-                            <div class="card-lock-overlay">
-                                <i class="fa-solid fa-lock text-2xl mb-1"></i>
-                                <span class="text-xs font-bold tracking-widest">LOCKED</span>
+                        card.innerHTML = `
+                            <div class="card-image-wrapper">
+                                <img src="${bg.imgSrc}" alt="${bg.name}" class="card-img">
+                                ${overlayHtml}
+                            </div>
+                            <div class="card-body">
+                                <h3 class="card-title">${bg.name}</h3>
+                                ${actionHtml}
                             </div>
                         `;
                         
-                        // ✅ 修正: 解放トリガーの条件を見直し
-                        if (isUnlockableByMaterial || (bg.unlockLevel > 0 && currentLevel >= bg.unlockLevel && !bg.needsMaterial)) {
-                            // レベル条件を満たしているか、素材解放可能 (hasMaterial=true) な場合
-                            actionHtml = `<span class="status-text text-unlock-ready unlock-trigger">解放する</span>`;
-                        } else {
-                            // 解放条件を満たしていない場合
-                            actionHtml = `<span class="status-text text-locked">${lockText}</span>`;
+                        const unlockTrigger = card.querySelector('.unlock-trigger');
+                        if (unlockTrigger) {
+                            unlockTrigger.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                openUnlockPopup(bg);
+                            });
                         }
 
-                    } else {
-                        if (bg.selected) {
-                            actionHtml = `<span class="status-text text-selected"><i class="fa-solid fa-check"></i> 適用中</span>`;
-                        } else {
-                            actionHtml = `<span class="status-text text-unlock-ready select-trigger">選択する</span>`;
+                        const selectTrigger = card.querySelector('.select-trigger');
+                        if (selectTrigger) {
+                            selectTrigger.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                selectBackground(bg);
+                            });
                         }
-                    }
 
-                    card.innerHTML = `
-                        <div class="card-image-wrapper">
-                            <img src="${bg.imgSrc}" alt="${bg.name}" class="card-img">
-                            ${overlayHtml}
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title">${bg.name}</h3>
-                            ${actionHtml}
-                        </div>
-                    `;
-                    
-                    // イベント付与
-                    const unlockTrigger = card.querySelector('.unlock-trigger');
-                    if (unlockTrigger) {
-                        // ロック解除可能な場合（レベル達成または素材あり）のみイベントを付与
-                        unlockTrigger.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            openUnlockPopup(bg);
-                        });
-                    }
-
-                    const selectTrigger = card.querySelector('.select-trigger');
-                    if (selectTrigger) {
-                        selectTrigger.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            selectBackground(bg);
-                        });
-                        // カード全体クリックでも反応させる
-                        card.style.cursor = 'pointer';
-                        card.addEventListener('click', () => selectBackground(bg));
-                    }
-
-                    grid.appendChild(card);
+                        grid.appendChild(card);
+                    });
                 });
-            });
-        }
+                console.log('renderAll() 完了');
+            }
 
-        function selectBackground(bg) {
-            bgList.forEach(b => b.selected = false);
-            bg.selected = true;
-            renderAll();
-        }
+            function selectBackground(bg) {
+                console.log('背景を選択:', bg.name, 'コード:', bg.bgCode);
+                bgList.forEach(b => b.selected = false);
+                bg.selected = true;
+                
+                // サーバーに選択した背景を保存
+                saveSelectedBackground(bg.bgCode);
+                
+                renderAll();
+            }
 
-        const unlockPopup = document.getElementById('unlock-popup');
-        const unlockMessage = document.getElementById('unlock-message');
-        const confirmUnlockBtn = document.getElementById('confirm-unlock');
-        const cancelUnlockBtn = document.getElementById('cancel-unlock');
+            async function saveSelectedBackground(backgroundCode) {
+                try {
+                    const response = await fetch('/characters/backgrounds/select', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            [csrfHeader]: csrfToken
+                        },
+                        body: JSON.stringify({ 
+                            backgroundCode: backgroundCode
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        console.log('背景選択成功:', backgroundCode);
+                        // ★★★ 選択中の背景コードを更新
+                        selectedBackgroundCode = backgroundCode;
+                    } else {
+                        console.error('背景選択失敗:', result.message);
+                        alert('背景の選択に失敗しました: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('背景選択エラー:', error);
+                    alert('エラーが発生しました: ' + error.message);
+                }
+            }
 
-        function openUnlockPopup(bg) {
-            unlockMessage.textContent = `「${bg.name}」を解放しますか？`;
-            unlockPopup.classList.remove('popup-hidden');
-            
-            // 確認ボタンに新たなイベントリスナーを再設定するため、一度クローンして置き換える
-            const newConfirm = confirmUnlockBtn.cloneNode(true);
-            confirmUnlockBtn.parentNode.replaceChild(newConfirm, confirmUnlockBtn);
-            
-            newConfirm.addEventListener('click', () => {
-                // ここで実際にサーバー側などに解放処理をリクエストするロジックが入ります。
-                bg.locked = false;
-                bg.needsMaterial = false; // 素材ロック解除の場合は素材を消費したと見なす
+            const unlockPopup = document.getElementById('unlock-popup');
+            const unlockMessage = document.getElementById('unlock-message');
+            const confirmUnlockBtn = document.getElementById('confirm-unlock');
+            const cancelUnlockBtn = document.getElementById('cancel-unlock');
+
+            function openUnlockPopup(bg) {
+                let messageHtml = `<strong>「${bg.name}」</strong>を解放しますか?`;
+                
+                if (bg.needsMaterial) {
+                    messageHtml += `<br><br>`;
+                    messageHtml += `<div style="color: #9333ea; font-weight: bold;">`;
+                    messageHtml += `<i class="fa-solid fa-key" style="color: #a855f7;"></i> 必要素材: ${bg.materialName} × 1`;
+                    messageHtml += `</div>`;
+                    messageHtml += `<div style="color: #059669; font-weight: bold; margin-top: 0.5rem;">`;
+                    messageHtml += `<i class="fa-solid fa-box"></i> 現在の所持数: ${dreamKeyCount}個`;
+                    messageHtml += `</div>`;
+                }
+                
+                unlockMessage.innerHTML = messageHtml;
+                unlockPopup.classList.remove('popup-hidden');
+                
+                const newConfirm = confirmUnlockBtn.cloneNode(true);
+                confirmUnlockBtn.parentNode.replaceChild(newConfirm, confirmUnlockBtn);
+                
+                newConfirm.addEventListener('click', async () => {
+                    console.log('解放リクエスト:', bg.name, 'material_id:', bg.materialId);
+                    
+                    try {
+                        // サーバーに解放リクエストを送信
+                        const response = await fetch('/characters/backgrounds/unlock', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                [csrfHeader]: csrfToken
+                            },
+                            body: JSON.stringify({ 
+                                backgroundId: bg.id, 
+                                materialId: bg.materialId 
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            // 解放成功
+                            bg.locked = false;
+                            
+                            // ★ 解放済みリストに追加
+                            if (!unlockedBackgrounds.includes(bg.id)) {
+                                unlockedBackgrounds.push(bg.id);
+                            }
+                            
+                            unlockPopup.classList.add('popup-hidden');
+                            
+                            // 素材を消費した場合は表示を更新
+                            if (bg.needsMaterial && result.remainingCount !== undefined) {
+                                dreamKeyCount = result.remainingCount;
+                                if (dreamKeyCountElement) {
+                                    dreamKeyCountElement.textContent = dreamKeyCount;
+                                }
+                            }
+                            
+                            alert(`「${bg.name}」を解放しました!`);
+                            selectBackground(bg);
+                            renderAll();
+                        } else {
+                            // 解放失敗
+                            alert(result.message || '解放に失敗しました');
+                            unlockPopup.classList.add('popup-hidden');
+                        }
+                    } catch (error) {
+                        console.error('解放エラー:', error);
+                        alert('エラーが発生しました: ' + error.message);
+                        unlockPopup.classList.add('popup-hidden');
+                    }
+                });
+            }
+
+            cancelUnlockBtn.addEventListener('click', () => {
                 unlockPopup.classList.add('popup-hidden');
-                selectBackground(bg); // 解放したら選択状態にする
-                renderAll(); 
             });
+
+            console.log('renderAll() を呼び出します');
+            renderAll();
+            console.log('========== DOMContentLoaded 完了 ==========');
+            
+        } catch (error) {
+            console.error('========== JavaScript エラー ==========');
+            console.error(error);
+            console.error('========================================');
         }
-
-        cancelUnlockBtn.addEventListener('click', () => {
-            unlockPopup.classList.add('popup-hidden');
-        });
-
-        renderAll();
     });
+    /*]]>*/
     </script>
 
 </body>

@@ -133,7 +133,6 @@
 
 /* --- MODAL (記録フォーム) --- */
 .modal {
-    /* 既存のスタイル */
     position: fixed;
     z-index: 2000; 
     left: 0;
@@ -144,13 +143,11 @@
     background-color: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(5px);
     
-    /* ★★★ ここからが重要: 完全に無効化する初期設定 ★★★ */
-    display: none; /* 要素を非表示 */
-    opacity: 0;    /* 透明度をゼロに */
-    visibility: hidden; /* 要素を隠す */
-    pointer-events: none; /* クリックイベントを完全に無視 */
+    display: none; 
+    opacity: 0;    
+    visibility: hidden; 
+    pointer-events: none; 
 }
-/* モーダル表示用クラス: これが適用されたら、すべて有効に戻す */
 .modal.is-active {
     display: block;
     opacity: 1;
@@ -245,4 +242,92 @@
     .calendar-day-header {
         font-size: 12px;
     }
+}
+
+/* ========================================================= */
+/* WEIGHT CALENDAR SPECIFIC STYLES */
+/* ========================================================= */
+
+.header-icon-weight {
+    color: #009688;
+}
+
+/* 体重記録済みセルの強調 */
+.calendar-day-cell.weight-logged {
+    background-color: #e0f2f1 !important;
+    border: 2px solid #80cbc4 !important;
+    box-shadow: 0 2px 8px rgba(0, 150, 136, 0.2);
+}
+
+/* カレンダー内の数値表示 */
+.weight-value-display {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.9em;
+    font-weight: 800;
+    color: #00796b;
+    background: rgba(255,255,255,0.6);
+    border-radius: 4px;
+    padding: 2px;
+}
+
+/* モーダル内のカードスタイル微調整 */
+.weight-record-form {
+    width: 100%;
+}
+
+.scale-display-area {
+    background: #263238;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    border: 4px solid #eceff1;
+}
+.scale-label {
+    display: block;
+    color: #78909c;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+.scale-input-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 5px;
+}
+.scale-input {
+    background: transparent;
+    border: none;
+    color: #00e676;
+    font-size: 3.5rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+    text-align: right;
+    width: 180px;
+    outline: none;
+    text-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
+}
+.scale-input::placeholder { color: #37474f; }
+.scale-unit { color: #00e676; font-size: 1.2rem; font-weight: 700; text-shadow: 0 0 10px rgba(0, 230, 118, 0.5); }
+
+.btn-submit-weight {
+    width: 100%;
+    padding: 15px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #009688, #4db6ac);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(0, 150, 136, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-submit-weight:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 150, 136, 0.5);
 }

@@ -128,8 +128,9 @@ public class SecurityConfig {
 
             // 認可設定
             .authorizeHttpRequests(auth -> auth
-                // ★SMS認証APIとOAuth2関連パスを許可
+                // ★SMS認証API、OAuth2、WebAuthn関連パスを許可
                 .requestMatchers("/api/auth/send-otp", "/api/auth/verify-otp").permitAll()
+                .requestMatchers("/api/webauthn/**").permitAll() // WebAuthn用
                 .requestMatchers("/login/**", "/oauth2/**").permitAll()
                 
                 // ★ルートパス("/") を許可リストに追加
@@ -170,7 +171,7 @@ public class SecurityConfig {
             // ログアウト
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
-                .logoutSuccessUrl("/") // ログアウト後もルート(start.html)に戻る
+                .logoutSuccessUrl("/") 
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID", "XSRF-TOKEN")
                 .permitAll()

@@ -287,29 +287,43 @@ h1 {
 /* =========================================
    モーダル（ポップオーバー風）
    ========================================= */
-.modal-overlay {
-    /* 画面全体を覆わず、絶対配置で制御するため初期は非表示 */
-    position: absolute; 
-    z-index: 9999;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    transform: translateY(10px);
-}
+   /* ===== モーダル ===== */
+   .modal {
+       position: fixed;
+       inset: 0;
+       background-color: rgba(0,0,0,0.7);
+       opacity: 0; visibility: hidden; pointer-events: none;
+       transition: opacity 0.3s ease;
+       z-index: 1000;
 
-.modal-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-}
+       display: flex;              /* 追加 */
+       justify-content: center;    /* 横中央 */
+       align-items: center;        /* 縦中央 */
+   }
+   .modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
 
-.modal-content {
-    background: linear-gradient(180deg, #ff9ff3 0%, #f368e0 100%);
-    border: 3px solid #fff; border-radius: 15px;
-    width: 280px; /* カードより少し大きい程度 */
-    padding: 10px;
-    text-align: center;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+   /* 正方形のポップアップ（常に画面中央固定） */
+   .modal-content {
+       position: relative; /* fixedではなくrelativeに */
+       width: 400px; height: 400px;
+       background: #fff;
+       border-radius: 8px;
+       padding: 20px;
+       text-align: left;
+       box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+       animation: fadeIn 0.3s ease-in-out;
+       overflow-y: auto;
+   }
+
+/* 吹き出しの三角（下向き） */
+.modal-content::after {
+    content: '';
+    position: absolute;
+    bottom: -10px; left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #fff;
 }
 
 /* 吹き出しの三角（下向き） */

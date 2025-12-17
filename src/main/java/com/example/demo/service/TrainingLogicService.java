@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,29 +42,15 @@ public class TrainingLogicService {
         return XP_BEGINNER;
     }
     
-    /**
-     * 種目から獲得できるベースXPに基づき、獲得チップ数を計算する。
-     * (このメソッドはTrainingControllerなどから呼び出されます)
-     * * @param exerciseFullName トレーニング種目名 (難易度タグを含む)
-     * @return 獲得チップ数 (int)
-     */
     public int calculateChipReward(String exerciseFullName) {
-        // 最初に種目の難易度に応じたベースXPを取得する
         int baseXp = getExperiencePoints(exerciseFullName);
-
-        // XP値とチップの対応付け
         if (baseXp == XP_ADVANCED) {
-            // 上級 (1000 XP) -> 5 チップ
             return 5;
         } else if (baseXp == XP_INTERMEDIATE) {
-            // 中級 (500 XP) -> 3 チップ
             return 3;
         } else if (baseXp == XP_BEGINNER) {
-            // 初級 (300 XP) -> 1 チップ
             return 1;
         }
-        
-        // それ以外 (0 XPまたはその他の難易度) の場合はチップなし
         return 0;
     }
 
@@ -90,64 +77,168 @@ public class TrainingLogicService {
         return (int) Math.round(totalVolume);
     }
 
-    // AIメニュー生成ロジック
-    public Map<String, Object> generateAiSuggestedMenu() {
+    // 古いメソッド（互換性）
+    public Map<String, Object> generateAiSuggestedMenu(Integer duration, List<String> targetParts, String location, String difficulty) {
+        return generateAiSuggestedMenu(duration, targetParts, location, difficulty, null);
+    }
+
+    // ★ 改修版: 器具フィルター対応
+    public Map<String, Object> generateAiSuggestedMenu(Integer duration, List<String> targetParts, String location, String difficulty, List<String> availableEquipment) {
         Map<String, Object> menu = new LinkedHashMap<>();
         List<String> programList = new ArrayList<>();
         Random random = new Random();
 
-        Map<String, List<ExerciseData>> dataMap = trainingDataService.getFreeWeightExercises();
-        List<String> mainParts = new ArrayList<>(dataMap.keySet()); // 部位リスト
-        String selectedPart = mainParts.get(random.nextInt(mainParts.size()));
-
-        List<ExerciseData> exercises = dataMap.get(selectedPart);
-        if (exercises == null || exercises.isEmpty()) {
-            programList.add("1. スクワット (中級): 3セット x 10回");
-            menu.put("programList", programList);
-            return menu;
+        if (duration == null || duration < 3) duration = 15; 
+        if (location == null) location = "gym";
+        if (difficulty == null) difficulty = "intermediate";
+        
+        // 器具リストがnullの場合は、場所からデフォルト設定
+        if (availableEquipment == null || availableEquipment.isEmpty()) {
+            availableEquipment = new ArrayList<>();
+            if ("home".equals(location)) {
+                availableEquipment.add("bodyweight");
+                availableEquipment.add("dumbbell");
+            } else {
+                // ジムなら全種
+                availableEquipment.add("bodyweight");
+                availableEquipment.add("dumbbell");
+                availableEquipment.add("barbell");
+                availableEquipment.add("machine");
+                availableEquipment.add("cable");
+                availableEquipment.add("smith");
+                availableEquipment.add("pullup_bar");
+            }
         }
 
-        List<ExerciseData> availableExercises = new ArrayList<>(exercises);
+        // 部位リスト
+        List<String> availableParts = new ArrayList<>();
+        Map<String, List<ExerciseData>> allExercises = trainingDataService.getFreeWeightExercises();
+        
+        if (targetParts == null || targetParts.isEmpty()) {
+            availableParts.addAll(allExercises.keySet());
+        } else {
+            availableParts.addAll(targetParts);
+        }
+
+        // 候補種目の選定（器具フィルタリング）
+        List<ExerciseData> candidateExercises = new ArrayList<>();
+        for (String part : availableParts) {
+            List<ExerciseData> exercises = allExercises.get(part);
+            if (exercises != null) {
+                for (ExerciseData ex : exercises) {
+                    if (isPlayable(ex, availableEquipment)) {
+                        candidateExercises.add(ex);
+                    }
+                }
+            }
+        }
+        Collections.shuffle(candidateExercises);
+
+        // 種目数の計算
+        int exerciseTime = 4;
+        int numExercises = Math.max(1, duration / exerciseTime);
+        if (duration < 5) numExercises = 1;
+
+        // 種目リスト作成
         List<ExerciseData> selectedExercises = new ArrayList<>();
-
-        int numExercises = 3 + random.nextInt(2); // 3-4種目
-
-        for (int i = 0; i < numExercises && !availableExercises.isEmpty(); i++) {
-            int index = random.nextInt(availableExercises.size());
-            selectedExercises.add(availableExercises.remove(index));
+        for (int i = 0; i < numExercises && !candidateExercises.isEmpty(); i++) {
+            if (i < candidateExercises.size()) {
+                selectedExercises.add(candidateExercises.get(i));
+            } else {
+                break;
+            }
         }
 
+        // メニュー構成
         for (int i = 0; i < selectedExercises.size(); i++) {
             ExerciseData ex = selectedExercises.get(i);
             String fullName = ex.getFullName();
 
-            int sets = 3 + random.nextInt(2);
-            int reps = 8 + random.nextInt(5);
-            int baseWeight = 30;
-            int difficultyAdjustment = getExperiencePoints(fullName) / 30;
-            int weight = baseWeight + random.nextInt(50) + difficultyAdjustment;
+            int sets = 3;
+            int reps = 10;
+            String weightGuide = "";
 
-            programList.add((i + 1) + ". " + fullName + ": " + sets + "セット x " + reps + "回 (" + weight + "kg)");
+            switch (difficulty) {
+                case "beginner":
+                    sets = 2;
+                    reps = 12 + random.nextInt(4);
+                    weightGuide = fullName.contains("自重") ? "(自重)" : "(軽め)";
+                    break;
+                case "advanced":
+                    sets = 4;
+                    reps = 8 + random.nextInt(3);
+                    weightGuide = fullName.contains("自重") ? "(加重または限界まで)" : "(高重量)";
+                    break;
+                case "intermediate":
+                default:
+                    sets = 3;
+                    reps = 10 + random.nextInt(3);
+                    weightGuide = fullName.contains("自重") ? "(自重)" : "(中重量)";
+                    break;
+            }
+            
+            if (duration < 10) sets = Math.max(1, sets - 1);
+
+            programList.add((i + 1) + ". " + fullName + ": " + sets + "セット x " + reps + "回 " + weightGuide);
         }
 
-        if (random.nextInt(10) < 4) { // 40%で有酸素追加
+        // 有酸素運動の提案
+        boolean addCardio = (duration >= 20 && random.nextBoolean());
+        if (addCardio) {
             List<ExerciseData> cardioList = trainingDataService.getCardioExercises();
-            ExerciseData cardio = cardioList.get(random.nextInt(cardioList.size()));
-            int duration = 15 + random.nextInt(16);
-            programList.add((selectedExercises.size() + 1) + ". " + cardio.getFullName() + ": " + duration + "分");
+            if (!cardioList.isEmpty()) {
+                List<ExerciseData> filteredCardio = new ArrayList<>();
+                for(ExerciseData c : cardioList) {
+                    if(isPlayable(c, availableEquipment)) {
+                        filteredCardio.add(c);
+                    }
+                }
+                
+                if (!filteredCardio.isEmpty()) {
+                    ExerciseData cardio = filteredCardio.get(random.nextInt(filteredCardio.size()));
+                    int cardioTime = Math.min(10, duration / 4);
+                    programList.add("★ 仕上げ: " + cardio.getFullName() + ": " + cardioTime + "分");
+                }
+            }
         }
-
-        int totalTime = 40 + random.nextInt(31);
-        int restTime = 45 + random.nextInt(31);
-
+        
         menu.put("programList", programList);
-        menu.put("targetTime", totalTime);
-        menu.put("restTime", restTime);
+        menu.put("targetTime", duration);
+        menu.put("restTime", (duration < 10) ? 30 : 60);
 
         return menu;
     }
+    
+    // 器具判定ロジック
+    private boolean isPlayable(ExerciseData ex, List<String> availableEquipment) {
+        String name = ex.getName();
+        String equipInfo = ex.getEquipment(); // 例: "ダンベル/バーベル"
+        
+        // 懸垂・ディップスの特別判定
+        if (name.contains("懸垂") || name.contains("チンアップ") || name.contains("ハンギング") || name.contains("ディップス")) {
+            return availableEquipment.contains("pullup_bar");
+        }
+        
+        // 通常のマッチング
+        if (equipInfo == null) return true; // 情報なしならOKとするか、NGとするか。ここではOK
+        
+        // データ側の器具文字列を分割してチェック
+        // "ダンベル/バーベル" -> どちらかがあればOK
+        String[] requiredEquips = equipInfo.split("/");
+        for (String req : requiredEquips) {
+            if (req.contains("自重") && availableEquipment.contains("bodyweight")) return true;
+            if (req.contains("ダンベル") && availableEquipment.contains("dumbbell")) return true;
+            if (req.contains("ケトルベル") && (availableEquipment.contains("dumbbell") || availableEquipment.contains("kettlebell"))) return true; // KBはダンベルで代用可
+            if (req.contains("バーベル") && availableEquipment.contains("barbell")) return true;
+            if (req.contains("マシン") && availableEquipment.contains("machine")) return true;
+            if (req.contains("ケーブル") && availableEquipment.contains("cable")) return true;
+            if (req.contains("スミス") && availableEquipment.contains("smith")) return true;
+            if (req.contains("プレート") && availableEquipment.contains("barbell")) return true; // プレートはバーベルあるならあると仮定
+        }
+        
+        return false;
+    }
 
-    // AI提案テキスト解析
     public List<String> parseAiProposal(String proposalText) {
         List<String> programList = new ArrayList<>();
         if (proposalText == null || proposalText.trim().isEmpty()) {
@@ -174,33 +265,24 @@ public class TrainingLogicService {
         return programList;
     }
 
-    // ★追加: 症状に合わせてケア種目を選択するメソッド
     public String selectCareExercise(String symptom) {
         if (symptom == null) return "深呼吸";
-        
         if (symptom.contains("目") || symptom.contains("眼")) {
             return "ホットアイケア";
         } else if (symptom.contains("肩") || symptom.contains("首")) {
-            return "キャット＆カウ"; // 背骨周りとして推奨
+            return "キャット＆カウ";
         } else if (symptom.contains("腰")) {
             return "フォームローラー(背中)";
         } else if (symptom.contains("足") || symptom.contains("脚")) {
             return "動的ストレッチ(股関節)";
         } else {
-            // デフォルト
             return "ウォーキング"; 
         }
     }
-    // --- チップ付与処理 ---
-    /**
-     * トレーニング終了後に獲得したチップをユーザーに付与してDBに保存する
-     * @param username ユーザー名
-     * @param exerciseFullName 種目名
-     * @return 獲得チップ数
-     */
+
     public int rewardUserWithChips(String username, String exerciseFullName) {
         int chips = calculateChipReward(exerciseFullName);
-        userService.addChips(username, chips); // UserServiceを使って保存
+        userService.addChips(username, chips); 
         return chips;
     }
 }
