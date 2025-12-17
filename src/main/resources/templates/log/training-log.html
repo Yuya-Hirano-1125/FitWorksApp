@@ -8,61 +8,56 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/training-log.css}"> 
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
-        /* 曜日ヘッダーに枠線を追加 */
-        .calendar-day-header {
-            border: 1px solid #ccc;
-            padding: 5px;
-            text-align: center;
-            background-color: #f9f9f9;
-            font-weight: bold;
+        /* 共通背景デザイン */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+
+        .main-container {
+            max-width: 900px; width: 92%; margin: 40px auto; padding: 40px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
         }
 
-        /* 日付セルに枠線を追加 */
-        .calendar-day-cell {
-            border: 1px solid #ccc;
-            min-height: 60px;
-            text-align: center;
-            vertical-align: top;
-            background-color: #fff;
-        }
-
-        /* 日曜は赤 */
-        .calendar-day-header.sun,
-        .calendar-day-cell.sun .day-number {
-            color: #FF3B30;
-        }
-
-        /* 土曜は青 */
-        .calendar-day-header.sat,
-        .calendar-day-cell.sat .day-number {
-            color: #007BFF;
-        }
-
-        /* 平日は白背景＋黒文字 */
-        .calendar-day-header.weekday,
-        .calendar-day-cell.weekday .day-number {
-            background-color: #fff;
-            color: #000;
-        }
-
-        /* 今日のセルを強調 */
-        .calendar-day-cell.today {
-            background-color: #ffeeba;
-            border: 2px solid #ff9800;
-        }
-
-        /* ログ記録済みの印 */
-        .log-indicator {
-            color: gold;
-        }
+        /* カレンダー関連 */
+        .calendar-day-header { border: 1px solid rgba(200,200,200,0.5); padding: 5px; text-align: center; background-color: rgba(255,255,255,0.8); font-weight: bold; }
+        .calendar-day-cell { border: 1px solid rgba(200,200,200,0.5); min-height: 60px; text-align: center; vertical-align: top; background-color: rgba(255,255,255,0.9); transition: background 0.2s; cursor: pointer; }
+        .calendar-day-cell:hover { background-color: #fff; }
+        .calendar-day-header.sun, .calendar-day-cell.sun .day-number { color: #FF3B30; }
+        .calendar-day-header.sat, .calendar-day-cell.sat .day-number { color: #007BFF; }
+        .calendar-day-header.weekday, .calendar-day-cell.weekday .day-number { color: #000; }
+        .calendar-day-cell.today { background-color: #fff8e1; border: 2px solid #ff9800; }
+        .log-indicator { color: gold; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body class="training-log-page">
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+    </div>
+
 <div class="main-container">
     
     <h1 style="margin-bottom: 5px;"><i class="header-icon fa-solid fa-calendar-days"></i>トレーニング記録</h1>
@@ -71,44 +66,21 @@
     <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
     
     <div class="calendar-nav-container">
-        <a th:href="@{/training-log(year=${prevYear}, month=${prevMonth})}" class="nav-arrow">
-            <i class="fa-solid fa-chevron-left"></i>
-        </a>
+        <a th:href="@{/training-log(year=${prevYear}, month=${prevMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></a>
         <h2 class="calendar-title" th:text="${currentYearMonth.year} + '年 ' + ${currentYearMonth.monthValue} + '月'"></h2>
-        <a th:href="@{/training-log(year=${nextYear}, month=${nextMonth})}" class="nav-arrow">
-            <i class="fa-solid fa-chevron-right"></i>
-        </a>
+        <a th:href="@{/training-log(year=${nextYear}, month=${nextMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></a>
     </div>
 
     <div class="calendar-grid">
-        <!-- 曜日ヘッダー（日曜始まり） -->
-        <div class="calendar-day-header"
-             th:each="dayLabel : ${dayLabels}"
-             th:text="${dayLabel}"
-             th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')">
-            曜日
-        </div>
-
-        <!-- 日付セル -->
+        <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')">曜日</div>
         <th:block th:each="date : ${calendarDays}">
-            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''},
-                          dayOfWeek=${date != null ? date.dayOfWeek.name() : ''},
-                          isToday=${date != null and date.isEqual(currentDate)},
-                          isLogged=${date != null and loggedDates.containsKey(date)}"
+            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''}, dayOfWeek=${date != null ? date.dayOfWeek.name() : ''}, isToday=${date != null and date.isEqual(currentDate)}, isLogged=${date != null and loggedDates.containsKey(date)}"
                  class="calendar-day-cell"
-                 th:classappend="${date == null} ? 'empty-day' : (
-                     (${isToday} ? 'today ' : '') +
-                     (${dayOfWeek == 'SATURDAY'} ? 'sat' : 
-                      (${dayOfWeek == 'SUNDAY'} ? 'sun' : 'weekday'))
-                 )"
+                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today ' : '') + (${dayOfWeek == 'SATURDAY'} ? 'sat' : (${dayOfWeek == 'SUNDAY'} ? 'sun' : 'weekday')))"
                  th:attr="data-date=${date != null ? date.toString() : ''}"
                  th:onclick="${date != null} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
-
                 <span class="day-number" th:text="${dateNumber}">1</span>
-                
-                <span th:if="${isLogged}" class="log-indicator">
-                    <i class="fa-solid fa-star"></i>
-                </span>
+                <span th:if="${isLogged}" class="log-indicator"><i class="fa-solid fa-star"></i></span>
             </div>
         </th:block>
     </div>
@@ -118,22 +90,18 @@
             <i class="fa-solid fa-list"></i> 全記録をリストで見る
         </a>
     </div>
-
+    
+    <div style="text-align: center; margin-top:30px;">
+        <a th:href="@{/home}" class="button secondary"><i class="fa-solid fa-house"></i> ホームに戻る</a>
+    </div>
 </div>
-
-
-
 
 <div id="logModal" class="modal">
     <div class="modal-content">
         <span class="close-button" onclick="closeLogModal()">&times;</span>
         <h2 id="modalDateTitle" class="modal-title"></h2>
-        
-        <div id="logViewArea">
-             </div>
-
+        <div id="logViewArea"></div>
         <p class="modal-instruction">新しい記録を追加：</p>
-        
         <div class="form-group">
             <label for="trainingType">記録の種類:</label>
             <select id="trainingType" class="form-control" onchange="loadTrainingForm(this.value, document.getElementById('selectedDateInput').value)">
@@ -142,265 +110,92 @@
                 <option value="BODY_WEIGHT">体重記録</option>
             </select>
         </div>
-        
         <input type="hidden" id="selectedDateInput" name="date" value="">
-        
-        <div id="formContainer">
-            <p>フォームを読み込んでいます...</p>
-        </div>
-
-        <a th:href="@{/training-log/all}" class="button secondary view-all-button">
-            全記録を見る
-        </a>
+        <div id="formContainer"><p>フォームを読み込んでいます...</p></div>
+        <a th:href="@{/training-log/all}" class="button secondary view-all-button">全記録を見る</a>
     </div>
-</div>
-
-<div style="max-width: 450px; margin: 30px auto 70px auto; padding: 0 10px;">
-    <a th:href="@{/home}" class="button secondary">
-        <i class="fa-solid fa-house"></i>
-        <span>ホームに戻る</span>
-    </a>
 </div>
 
 <div th:if="${aiAdvice}" id="aiAdviceModal" class="modal is-active" style="z-index: 2000;">
     <div id="shareTarget" class="modal-content" style="max-width: 400px; text-align: center; background: #fff; border-radius: 15px; padding: 30px; position: relative; overflow: hidden;">
-        
         <span class="close-button no-capture" onclick="document.getElementById('aiAdviceModal').style.display='none'">&times;</span>
-        
-        <div style="margin-bottom: 15px;">
-            <img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4CAF50; padding: 2px;">
-        </div>
-        
+        <div style="margin-bottom: 15px;"><img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4CAF50; padding: 2px;"></div>
         <h3 style="color: #4CAF50; margin-bottom: 15px; font-weight: bold;">Good Job!</h3>
-        
         <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; position: relative;">
             <i class="fa-solid fa-quote-left" style="color: #bcdbf3; font-size: 1.5em; position: absolute; top: 10px; left: 10px;"></i>
-            <p id="aiAdviceText" th:text="${aiAdvice}" style="margin: 0; padding: 5px 10px; color: #333; font-weight: 500; line-height: 1.6;">
-                ここにAIからのアドバイスが表示されます。
-            </p>
+            <p id="aiAdviceText" th:text="${aiAdvice}" style="margin: 0; padding: 5px 10px; color: #333; font-weight: 500; line-height: 1.6;">ここにAIからのアドバイスが表示されます。</p>
         </div>
-
-        <div style="margin-top: 10px; margin-bottom: 10px; font-size: 0.8em; color: #aaa; font-weight: bold;">
-            FitWorks Training Log
-        </div>
-
+        <div style="margin-top: 10px; margin-bottom: 10px; font-size: 0.8em; color: #aaa; font-weight: bold;">FitWorks Training Log</div>
         <div class="sns-buttons-container no-capture">
-            <button onclick="shareScreenImage()" class="btn-sns" style="background: linear-gradient(135deg, #4CAF50, #2E7D32); width: 100%; justify-content: center; font-size: 1em; margin-bottom: 10px; padding: 12px;">
-                <i class="fa-solid fa-share-nodes"></i> 画像としてシェアする
-            </button>
-            
+            <button onclick="shareScreenImage()" class="btn-sns" style="background: linear-gradient(135deg, #4CAF50, #2E7D32); width: 100%; justify-content: center; font-size: 1em; margin-bottom: 10px; padding: 12px;"><i class="fa-solid fa-share-nodes"></i> 画像としてシェアする</button>
             <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="shareToX()" class="btn-sns btn-sns-x" style="font-size: 0.8em; padding: 8px 12px;">
-                    <i class="fa-brands fa-x-twitter"></i> Text
-                </button>
-                <button onclick="shareToLine()" class="btn-sns btn-sns-line" style="font-size: 0.8em; padding: 8px 12px;">
-                    <i class="fa-brands fa-line"></i> Text
-                </button>
-                <button onclick="shareToInstagram()" class="btn-sns btn-sns-insta" style="font-size: 0.8em; padding: 8px 12px;">
-                    <i class="fa-brands fa-instagram"></i> Copy
-                </button>
-                <button onclick="document.getElementById('aiAdviceModal').style.display='none'" class="btn-sns" style="background-color: #777; font-size: 0.8em; padding: 8px 12px;">
-                    閉じる
-                </button>
+                <button onclick="shareToX()" class="btn-sns btn-sns-x" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-x-twitter"></i> Text</button>
+                <button onclick="shareToLine()" class="btn-sns btn-sns-line" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-line"></i> Text</button>
+                <button onclick="shareToInstagram()" class="btn-sns btn-sns-insta" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-instagram"></i> Copy</button>
+                <button onclick="document.getElementById('aiAdviceModal').style.display='none'" class="btn-sns" style="background-color: #777; font-size: 0.8em; padding: 8px 12px;">閉じる</button>
             </div>
         </div>
     </div>
 </div>
 
 <script th:inline="javascript">
-    // トレーニングフォームを非同期で読み込む関数
     function loadTrainingForm(type, date) {
         let url = '';
-        if (type === 'WEIGHT') {
-            url = /*[[@{/training-log/form/weight}]]*/ '/training-log/form/weight';
-        } else if (type === 'CARDIO') {
-            url = /*[[@{/training-log/form/cardio}]]*/ '/training-log/form/cardio';
-        } else if (type === 'BODY_WEIGHT') {
-            url = /*[[@{/training-log/form/body-weight}]]*/ '/training-log/form/body-weight';
-        }
+        if (type === 'WEIGHT') url = /*[[@{/training-log/form/weight}]]*/ '/training-log/form/weight';
+        else if (type === 'CARDIO') url = /*[[@{/training-log/form/cardio}]]*/ '/training-log/form/cardio';
+        else if (type === 'BODY_WEIGHT') url = /*[[@{/training-log/form/body-weight}]]*/ '/training-log/form/body-weight';
         url += '?date=' + date;
-
-        fetch(url)
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('formContainer').innerHTML = html;
-            })
-            .catch(error => {
-                document.getElementById('formContainer').innerHTML = '<p class="error-message">フォームの読み込みに失敗しました。</p>';
-                console.error('Form load error:', error);
-            });
+        fetch(url).then(r => r.text()).then(h => { document.getElementById('formContainer').innerHTML = h; }).catch(e => { console.error(e); });
     }
-
-    // 記録モーダルを開く関数
     function openLogModal(dateString, isLogged) {
         const [year, month, day] = dateString.split('-');
-        const displayDate = `${year}年${month}月${day}日`;
-        
-        // 日付をセット
         document.getElementById('selectedDateInput').value = dateString;
-        document.getElementById('modalDateTitle').innerText = displayDate;
-        
+        document.getElementById('modalDateTitle').innerText = `${year}年${month}月${day}日`;
         const modal = document.getElementById('logModal');
-        const trainingTypeSelect = document.getElementById('trainingType');
-        const formContainer = document.getElementById('formContainer');
-
-        // フォームの状態をリセット
-        trainingTypeSelect.value = 'WEIGHT';
-        formContainer.innerHTML = '<p>フォームを読み込んでいます...</p>';
+        document.getElementById('trainingType').value = 'WEIGHT';
+        document.getElementById('formContainer').innerHTML = '<p>フォームを読み込んでいます...</p>';
         loadTrainingForm('WEIGHT', dateString);
-
-        // 記録済みメッセージの表示切り替え
-        const logViewArea = document.getElementById('logViewArea');
-        if (isLogged) {
-            logViewArea.innerHTML = '<p style="font-weight: 700; color: var(--primary-color); margin-bottom: 10px;">✅ この日は記録済みです。新しい記録を追加するか、全記録を確認してください。</p>';
-        } else {
-            logViewArea.innerHTML = '<p style="color: #999; margin-bottom: 10px;">この日はまだ記録がありません。</p>';
-        }
-
+        const viewArea = document.getElementById('logViewArea');
+        viewArea.innerHTML = isLogged ? '<p style="font-weight: 700; color: var(--primary-color);">✅ この日は記録済みです。</p>' : '<p style="color: #999;">この日はまだ記録がありません。</p>';
         modal.classList.add('is-active');
     }
-
-    // 記録モーダルを閉じる関数
-    function closeLogModal() {
-        const modal = document.getElementById('logModal');
-        modal.classList.remove('is-active');
-        
-        // リセット
-        document.getElementById('formContainer').innerHTML = '<p>フォームを読み込んでいます...</p>';
-        document.getElementById('trainingType').value = 'WEIGHT'; 
+    function closeLogModal() { document.getElementById('logModal').classList.remove('is-active'); }
+    window.onclick = function(e) {
+        const m = document.getElementById('logModal'); const a = document.getElementById('aiAdviceModal');
+        if (m && m.classList.contains('is-active') && e.target === m) closeLogModal();
+        if (a && e.target === a) a.style.display = 'none';
     }
-
-    // モーダル外クリックで閉じる処理
-    window.onclick = function(event) {
-        const modal = document.getElementById('logModal');
-        const adviceModal = document.getElementById('aiAdviceModal');
-        
-        if (modal && modal.classList.contains('is-active') && event.target === modal) {
-            closeLogModal();
-        }
-        // AIアドバイスモーダル用
-        if (adviceModal && event.target === adviceModal) {
-            adviceModal.style.display = 'none';
-        }
-    }
-
-    // ----------------------------------------------------
-    //  画面（画像）シェア機能
-    // ----------------------------------------------------
     async function shareScreenImage() {
-        const target = document.getElementById('shareTarget');
-        const hideElements = target.querySelectorAll('.no-capture');
-        
-        // 1. キャプチャ中はボタンなどを一時的に隠す
-        hideElements.forEach(el => el.style.display = 'none');
-        
-        // ローディング表示
-        const originalBtn = document.querySelector('button[onclick="shareScreenImage()"]');
-        const originalText = originalBtn ? originalBtn.innerHTML : '';
-        if(originalBtn) originalBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 生成中...';
-
+        const t = document.getElementById('shareTarget'); const h = t.querySelectorAll('.no-capture');
+        h.forEach(e => e.style.display = 'none');
         try {
-            // 2. html2canvasで画像を生成
-            // scale: 2 にするときれいな画像になります
-            const canvas = await html2canvas(target, { 
-                scale: 2, 
-                useCORS: true, 
-                backgroundColor: '#ffffff' // 背景色を白で固定
-            });
-
-            // 3. CanvasをBlob形式（画像ファイル）に変換
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], "fitworks_training_log.png", { type: "image/png" });
-                
-                // 4. Web Share API (navigator.share) でシェア
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            files: [file],
-                            title: 'FitWorks Record',
-                            text: getShareText(), // 既存のテキスト取得関数を利用
-                        });
-                    } catch (err) {
-                        console.log('Share canceled or failed', err);
-                    }
-                } else {
-                    // PCなどWeb Share API非対応の場合は画像をダウンロードさせる
-                    const link = document.createElement('a');
-                    link.download = 'fitworks_training_log.png';
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    alert("画像として保存しました。\nSNSアプリから投稿してください。");
-                }
-                
-                // 復帰処理
-                hideElements.forEach(el => el.style.display = '');
-                if(originalBtn) originalBtn.innerHTML = originalText;
-
+            const c = await html2canvas(t, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            c.toBlob(async (b) => {
+                const f = new File([b], "log.png", { type: "image/png" });
+                if (navigator.canShare && navigator.canShare({ files: [f] })) await navigator.share({ files: [f], title: 'FitWorks', text: getShareText() });
+                else { const l = document.createElement('a'); l.download = 'log.png'; l.href = c.toDataURL(); l.click(); alert("画像を保存しました。"); }
+                h.forEach(e => e.style.display = '');
             }, 'image/png');
-
-        } catch (error) {
-            console.error('Capture failed:', error);
-            alert('画像の生成に失敗しました。');
-            hideElements.forEach(el => el.style.display = '');
-            if(originalBtn) originalBtn.innerHTML = originalText;
-        }
+        } catch (e) { console.error(e); h.forEach(e => e.style.display = ''); }
     }
-
-    // ----------------------------------------------------
-    //  SNSシェア機能用スクリプト（テキスト用）
-    // ----------------------------------------------------
-    function getShareText() {
-        const adviceText = document.getElementById('aiAdviceText').innerText;
-        return `【FitWorks】トレーニング完了！🔥\nAIトレーナー「${adviceText}」\n\n#FitWorks #筋トレ #ワークアウト`;
+    function getShareText() { return `【FitWorks】トレーニング完了！🔥\nAIトレーナー「${document.getElementById('aiAdviceText').innerText}」\n#FitWorks`; }
+    function shareToX() { window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}`, '_blank'); }
+    function shareToLine() { window.open(`https://line.me/R/msg/text/?${encodeURIComponent(getShareText())}`, '_blank'); }
+    function shareToInstagram() { navigator.clipboard.writeText(getShareText()).then(() => { alert("コピーしました！Instagramを開きます。"); window.open('https://www.instagram.com/', '_blank'); }); }
+    
+    // 背景アニメーション
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+    class Particle {
+        constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
     }
-
-    function shareToX() {
-        const text = getShareText();
-        const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-        window.open(shareUrl, '_blank');
-    }
-
-    function shareToLine() {
-        const text = getShareText();
-        const shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
-        window.open(shareUrl, '_blank');
-    }
-
-    function shareToInstagram() {
-        const text = getShareText();
-        navigator.clipboard.writeText(text).then(() => {
-            alert("文章をコピーしました！📋\nInstagramを開きます。投稿やストーリーズに貼り付けてください。");
-            window.open('https://www.instagram.com/', '_blank');
-        }).catch(err => {
-            console.error('Copy failed', err);
-            alert("文章のコピーに失敗しました。\n(手動でコピーしてください)");
-            window.open('https://www.instagram.com/', '_blank');
-        });
-    }
-
-    // ----------------------------------------------------
-    //  保存中のローディング表示
-    // ----------------------------------------------------
-    document.addEventListener('submit', function(e) {
-        // イベント発生元が #formContainer 内のフォームかどうかチェック
-        const form = e.target;
-        if (form.closest('#formContainer')) {
-            const btn = form.querySelector('button[type="submit"]');
-            if (btn) {
-                // 二重送信防止 & ローディング表示
-                btn.disabled = true;
-                const originalText = btn.textContent;
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 保存中...';
-                
-                // 万が一のために数秒後に戻す（画面遷移しないバリデーションエラー時などの安全策）
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }, 10000);
-            }
-        }
-    });
+    function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+    animate();
 </script>
-
 </body>
 </html>

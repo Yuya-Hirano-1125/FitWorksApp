@@ -10,163 +10,154 @@
     <link rel="stylesheet" th:href="@{/css/training-log.css}">
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* 体重カレンダー独自の上書き */
+        /* 共通背景デザイン */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+
+        .main-container {
+            max-width: 900px; width: 92%; margin: 40px auto; padding: 40px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
+        }
+
+        /* 体重ログ用スタイル */
         .header-icon-weight { color: #009688; }
-        .calendar-day-cell.weight-logged {
-            background-color: #e0f2f1; /* 薄いティール */
-            border-color: #009688;
-        }
-        .weight-value-display {
-            font-size: 0.85em;
-            color: #00796b;
-            font-weight: 800;
-            display: block;
-            margin-top: 2px;
-        }
+        .calendar-day-cell.weight-logged { background-color: #e0f2f1; border-color: #009688; }
+        .weight-value-display { font-size: 0.85em; color: #00796b; font-weight: 800; display: block; margin-top: 2px; }
+        
+        .calendar-day-header { border: 1px solid rgba(200,200,200,0.5); padding: 5px; text-align: center; background-color: rgba(255,255,255,0.8); font-weight: bold; }
+        .calendar-day-cell { border: 1px solid rgba(200,200,200,0.5); min-height: 60px; text-align: center; vertical-align: top; background-color: rgba(255,255,255,0.9); transition: background 0.2s; cursor: pointer; }
+        .calendar-day-cell:hover { background-color: #fff; }
+        .calendar-day-header.sun, .calendar-day-cell.sun .day-number { color: #FF3B30; }
+        .calendar-day-header.sat, .calendar-day-cell.sat .day-number { color: #007BFF; }
+        .calendar-day-header.weekday, .calendar-day-cell.weekday .day-number { color: #000; }
     </style>
 </head>
 <body class="training-log-page">
-
-<div th:replace="fragments/header :: header"></div>
-
-<div class="main-container">
-    
-    <h1 style="margin-bottom: 5px; text-align: center; color: #444;">
-        <i class="header-icon-weight fa-solid fa-weight-scale"></i> 体重記録
-    </h1>
-    <p class="sub-heading" style="text-align: center;">日々の変化を記録しましょう</p>
-
-    <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
-
-    <div class="calendar-nav-container">
-        <a th:href="@{/training-log/form/body-weight(year=${prevYear}, month=${prevMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></a>
-        <h2 class="calendar-title" th:text="${currentYearMonth.year} + '年 ' + ${currentYearMonth.monthValue} + '月'"></h2>
-        <a th:href="@{/training-log/form/body-weight(year=${nextYear}, month=${nextMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></a>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
     </div>
 
-    <div class="calendar-grid">
-        <div class="calendar-day-header" 
-             th:each="dayLabel : ${dayLabels}" 
-             th:text="${dayLabel}" 
-             th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')">
+    <div class="main-container">
+        <div th:replace="fragments/header :: header"></div>
+
+        <h1 style="margin-bottom: 5px; text-align: center; color: #444;">
+            <i class="header-icon-weight fa-solid fa-weight-scale"></i> 体重記録
+        </h1>
+        <p class="sub-heading" style="text-align: center;">日々の変化を記録しましょう</p>
+
+        <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
+
+        <div class="calendar-nav-container">
+            <a th:href="@{/training-log/form/body-weight(year=${prevYear}, month=${prevMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></a>
+            <h2 class="calendar-title" th:text="${currentYearMonth.year} + '年 ' + ${currentYearMonth.monthValue} + '月'"></h2>
+            <a th:href="@{/training-log/form/body-weight(year=${nextYear}, month=${nextMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+
+        <div class="calendar-grid">
+            <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')"></div>
+            <th:block th:each="date : ${calendarDays}">
+                <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''}, dayOfWeek=${date != null ? date.dayOfWeek.name() : ''}, isToday=${date != null and date.isEqual(currentDate)}, record=${date != null ? weightMap.get(date) : null}"
+                     class="calendar-day-cell"
+                     th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today ' : '') + ((${dayOfWeek == 'SATURDAY'} ? 'sat' : (${dayOfWeek == 'SUNDAY'} ? 'sun' : ''))) + (${record != null} ? ' weight-logged' : ''))"
+                     th:attr="data-date=${date != null ? date.toString() : ''}, data-weight=${record != null ? record.weight : ''}"
+                     onclick="openWeightModal(this)">
+                    <span class="day-number" th:text="${dateNumber}">1</span>
+                    <span th:if="${record != null}" class="weight-value-display"><span th:text="${record.weight}"></span>kg</span>
+                    <span th:if="${record == null and isToday}" class="log-indicator" style="color:#ccc; font-size:0.8em;"><i class="fa-solid fa-plus"></i></span>
+                </div>
+            </th:block>
         </div>
         
-        <th:block th:each="date : ${calendarDays}">
-            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''},
-                          dayOfWeek=${date != null ? date.dayOfWeek.name() : ''},
-                          isToday=${date != null and date.isEqual(currentDate)},
-                          record=${date != null ? weightMap.get(date) : null}"
-                 class="calendar-day-cell"
-                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today' : '') + 
-                                                                    ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + 
-                                                                     ((${dayOfWeek == 'SUNDAY'} ? ' sun' : ''))) +
-                                                                    (${record != null} ? ' weight-logged' : ''))"
-                 th:attr="data-date=${date != null ? date.toString() : ''}, 
-                          data-weight=${record != null ? record.weight : ''}"
-                 onclick="openWeightModal(this)">
-
-                <span class="day-number" th:text="${dateNumber}">1</span>
-                
-                <span th:if="${record != null}" class="weight-value-display">
-                    <span th:text="${record.weight}"></span>kg
-                </span>
-                <span th:if="${record == null and isToday}" class="log-indicator" style="color:#ccc; font-size:0.8em;">
-                    <i class="fa-solid fa-plus"></i>
-                </span>
-            </div>
-        </th:block>
-    </div>
-    
-    <div style="text-align: center; margin-top: 20px;">
-        <a th:href="@{/training-log/all(period='month')}" class="button secondary" style="border-radius: 50px;">
-            <i class="fa-solid fa-chart-line"></i> グラフで推移を確認
-        </a>
-    </div>
-</div>
-
-<div style="max-width: 450px; margin: 30px auto 70px auto; padding: 0 10px;">
-    <a th:href="@{/home}" class="button secondary">
-        <i class="fa-solid fa-house"></i> <span>ホームに戻る</span>
-    </a>
-</div>
-
-<div id="weightModal" class="modal">
-    <div class="modal-content" style="max-width: 400px; padding: 25px;">
-        <span class="close-button" onclick="closeWeightModal()">&times;</span>
+        <div style="text-align: center; margin-top: 20px;">
+            <a th:href="@{/training-log/all(period='month')}" class="button secondary" style="border-radius: 50px;"><i class="fa-solid fa-chart-line"></i> グラフで推移を確認</a>
+        </div>
         
-        <h3 id="modalDateTitle" class="modal-title" style="color: #009688;">2025/12/15</h3>
-        <p class="sub-heading" style="margin-bottom: 20px;">の体重を入力</p>
+        <div style="text-align: center; margin-top: 30px;">
+            <a th:href="@{/home}" class="button secondary"><i class="fa-solid fa-house"></i> ホームに戻る</a>
+        </div>
+    </div>
 
-        <form th:action="@{/training-log/save}" method="post" class="weight-record-form" style="padding: 0;">
-            <input type="hidden" id="recordDateInput" name="recordDate" />
-            <input type="hidden" name="type" value="BODY_WEIGHT" />
-            
-            <div class="scale-display-area" style="margin-bottom: 20px;">
-                <label for="weightInput" class="scale-label">CURRENT WEIGHT</label>
-                <div class="scale-input-wrapper">
-                    <input type="number" id="weightInput" name="weight" class="scale-input" 
-                           step="0.1" min="10" max="300" placeholder="00.0" required 
-                           oninput="this.value = this.value.replace(/[^0-9.]/g, '');"/>
-                    <span class="scale-unit">kg</span>
+    <div id="weightModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; padding: 25px;">
+            <span class="close-button" onclick="closeWeightModal()">&times;</span>
+            <h3 id="modalDateTitle" class="modal-title" style="color: #009688;">2025/12/15</h3>
+            <p class="sub-heading" style="margin-bottom: 20px;">の体重を入力</p>
+            <form th:action="@{/training-log/save}" method="post" class="weight-record-form" style="padding: 0;">
+                <input type="hidden" id="recordDateInput" name="recordDate" />
+                <input type="hidden" name="type" value="BODY_WEIGHT" />
+                <div class="scale-display-area" style="margin-bottom: 20px;">
+                    <label for="weightInput" class="scale-label">CURRENT WEIGHT</label>
+                    <div class="scale-input-wrapper">
+                        <input type="number" id="weightInput" name="weight" class="scale-input" step="0.1" min="10" max="300" placeholder="00.0" required oninput="this.value = this.value.replace(/[^0-9.]/g, '');"/>
+                        <span class="scale-unit">kg</span>
+                    </div>
                 </div>
-            </div>
-            
-            <button type="submit" class="btn-submit-weight">
-                <i class="fa-solid fa-check"></i> 保存する
-            </button>
-        </form>
+                <button type="submit" class="btn-submit-weight"><i class="fa-solid fa-check"></i> 保存する</button>
+            </form>
+        </div>
     </div>
-</div>
 
-<div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/footer :: footer"></div>
 
-<script th:inline="javascript">
-    // モーダル操作
-    function openWeightModal(element) {
-        const dateStr = element.getAttribute('data-date');
-        if (!dateStr) return; // 空白セル対策
-
-        const currentWeight = element.getAttribute('data-weight');
-        
-        document.getElementById('recordDateInput').value = dateStr;
-        document.getElementById('modalDateTitle').innerText = dateStr.replace(/-/g, '/');
-        
-        const weightInput = document.getElementById('weightInput');
-        if (currentWeight) {
-            weightInput.value = currentWeight;
-        } else {
-            weightInput.value = '';
+    <script th:inline="javascript">
+        function openWeightModal(element) {
+            const dateStr = element.getAttribute('data-date');
+            if (!dateStr) return;
+            const currentWeight = element.getAttribute('data-weight');
+            document.getElementById('recordDateInput').value = dateStr;
+            document.getElementById('modalDateTitle').innerText = dateStr.replace(/-/g, '/');
+            const weightInput = document.getElementById('weightInput');
+            weightInput.value = currentWeight ? currentWeight : '';
+            document.getElementById('weightModal').classList.add('is-active');
+            setTimeout(() => weightInput.focus(), 100);
         }
-
-        document.getElementById('weightModal').classList.add('is-active');
-        // 少し遅らせてフォーカス
-        setTimeout(() => weightInput.focus(), 100);
-    }
-
-    function closeWeightModal() {
-        document.getElementById('weightModal').classList.remove('is-active');
-    }
-
-    // 背景クリックで閉じる
-    window.onclick = function(event) {
-        const modal = document.getElementById('weightModal');
-        if (event.target === modal) {
-            closeWeightModal();
+        function closeWeightModal() { document.getElementById('weightModal').classList.remove('is-active'); }
+        window.onclick = function(event) {
+            const modal = document.getElementById('weightModal');
+            if (event.target === modal) closeWeightModal();
         }
-    }
-
-    // 初期ロード時に指定日付があればモーダルを開く
-    document.addEventListener('DOMContentLoaded', function() {
-        const selectedDate = /*[[${selectedDate}]]*/ null;
-        if (selectedDate) {
-            // データ属性を持つセルを探してクリックイベントを発火させる
-            const targetCell = document.querySelector(`.calendar-day-cell[data-date='${selectedDate}']`);
-            if (targetCell) {
-                openWeightModal(targetCell);
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedDate = /*[[${selectedDate}]]*/ null;
+            if (selectedDate) {
+                const targetCell = document.querySelector(`.calendar-day-cell[data-date='${selectedDate}']`);
+                if (targetCell) openWeightModal(targetCell);
             }
-        }
-    });
-</script>
+        });
 
+        // 背景アニメーション
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+        class Particle {
+            constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+        animate();
+    </script>
 </body>
 </html>

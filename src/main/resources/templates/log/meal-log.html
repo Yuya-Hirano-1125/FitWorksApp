@@ -8,98 +8,56 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/training-log.css}"> 
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <script th:src="@{/js/theme.js}"></script>
     <style>
-		.header-icon-meal { color: #4CAF50; }
-		.log-indicator-meal { color: #4CAF50 !important; }
-		.meal-form-container { text-align: left; padding: 0 5px; }
-		.form-row { display: flex; gap: 15px; margin-bottom: 15px; }
-		.form-group { margin-bottom: 15px; }
-		.form-group label { display: block; margin-bottom: 6px; font-weight: 700; color: #555; font-size: 0.9em; }
-		.form-group.half { flex: 1; }
-		.form-control { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1em; background-color: #fff; }
-		.form-control:focus { border-color: #4CAF50; outline: none; }
-		.form-control[readonly] { background-color: #f3f3f3; color: #777; cursor: not-allowed; }
-		.macro-section { background-color: #f9f9f9; border: 1px dashed #ccc; border-radius: 10px; padding: 15px; }
-		.macro-row { display: flex; gap: 10px; justify-content: space-between; }
-		.macro-item { flex: 1; text-align: center; }
-		.macro-item label { font-size: 0.85em; color: #777; margin-bottom: 3px; }
-		.macro-input { text-align: center; font-weight: bold; }
-		.p-input:focus { border-color: #3498db !important; }
-		.f-input:focus { border-color: #e74c3c !important; }
-		.c-input:focus { border-color: #f1c40f !important; }
-		.btn-submit { width: 100%; margin-top: 20px; padding: 12px; font-size: 1.1em; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-		.btn-submit:hover { background-color: #45a049; }
-		.sns-buttons-container { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
-		.btn-sns { color: #fff; padding: 10px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.85em; cursor: pointer; transition: opacity 0.2s, transform 0.1s; display: inline-flex; align-items: center; border: none; }
-		.btn-sns:hover { opacity: 0.9; transform: translateY(-1px); color: white; }
-		.btn-sns i { margin-right: 5px; font-size: 1.1em; }
-		.btn-sns-x { background-color: #000; }
-		.btn-sns-line { background-color: #06C755; }
-		.btn-sns-insta { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        /* 共通背景デザイン */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
 
-		/* --- カレンダー関連のスタイル --- */
+        .main-container {
+            max-width: 900px; width: 92%; margin: 40px auto; padding: 40px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
+        }
 
-		/* 曜日ヘッダーに枠線を追加 */
-		.calendar-day-header {
-		    border: 1px solid #ccc;
-		    padding: 5px;
-		    text-align: center;
-		    background-color: #f9f9f9;
-		    font-weight: bold;
-		}
-
-		/* 日付セルに枠線を追加 */
-		.calendar-day-cell {
-		    border: 1px solid #ccc;
-		    min-height: 60px;
-		    text-align: center;
-		    vertical-align: top;
-		    background-color: #fff;
-		}
-		/* 平日は黒文字 */
-		.calendar-day-header.weekday,
-		.calendar-day-cell.weekday .day-number {
-		    color: #000;   /* 黒文字 */
-		    background-color: #fff; /* 白背景（必要なら） */
-		}
-
-		/* 日曜は赤 */
-		.calendar-day-header.sun,
-		.calendar-day-cell.sun .day-number {
-		    color: #FF3B30;
-		}
-
-		/* 土曜は青 */
-		.calendar-day-header.sat,
-		.calendar-day-cell.sat .day-number {
-		    color: #007BFF;
-		}
-
-		/* 平日は白背景＋黒文字 (カレンダーセルのデフォルトが白のため、ほとんどの要素では不要だが明示的に定義) */
-		.calendar-day-header.weekday,
-		.calendar-day-cell.weekday .day-number {
-		    background-color: #fff;
-		    color: #000;
-		}
-
-		/* 今日のセルを強調 */
-		.calendar-day-cell.today {
-		    background-color: #ffeeba;
-		    border: 2px solid #ff9800;
-		}
-
-		/* ログ記録済みの印 */
-		/* 食事記録用のログインジケーターの色が優先されるため、このコードは食事記録ページでは上書きされますが、トレーニング記録ページでは適用されます。 */
-		.log-indicator {
-		    color: gold;
-		}
+        /* 既存の食事ログ用スタイル */
+        .header-icon-meal { color: #4CAF50; }
+        .log-indicator-meal { color: #4CAF50 !important; }
+        .calendar-day-header { border: 1px solid rgba(200,200,200,0.5); padding: 5px; text-align: center; background-color: rgba(255,255,255,0.8); font-weight: bold; }
+        .calendar-day-cell { border: 1px solid rgba(200,200,200,0.5); min-height: 60px; text-align: center; vertical-align: top; background-color: rgba(255,255,255,0.9); transition: background 0.2s; cursor: pointer; }
+        .calendar-day-cell:hover { background-color: #fff; }
+        .calendar-day-header.sun, .calendar-day-cell.sun .day-number { color: #FF3B30; }
+        .calendar-day-header.sat, .calendar-day-cell.sat .day-number { color: #007BFF; }
+        .calendar-day-header.weekday, .calendar-day-cell.weekday .day-number { color: #000; }
+        .calendar-day-cell.today { background-color: #ffeeba; border: 2px solid #ff9800; }
     </style>
 </head>
 <body class="training-log-page">
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+    </div>
+
 <div class="main-container">
     
     <h1 style="margin-bottom: 5px;">
@@ -117,25 +75,13 @@
     </div>
 
     <div class="calendar-grid">
-		<div class="calendar-day-header" 
-		     th:each="dayLabel : ${dayLabels}" 
-		     th:text="${dayLabel}" 
-		     th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')">
-		    曜日
-		</div>
-        
+        <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')">曜日</div>
         <th:block th:each="date : ${calendarDays}">
-            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''},
-                          dayOfWeek=${date != null ? date.dayOfWeek.name() : ''},
-                          isToday=${date != null and date.isEqual(currentDate)},
-                          isLogged=${date != null and loggedDates.containsKey(date)}"
+            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''}, dayOfWeek=${date != null ? date.dayOfWeek.name() : ''}, isToday=${date != null and date.isEqual(currentDate)}, isLogged=${date != null and loggedDates.containsKey(date)}"
                  class="calendar-day-cell"
-                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today' : '') + 
-                                                                    ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + 
-                                                                     ((${dayOfWeek == 'SUNDAY'} ? ' sun' : ''))))"
+                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today' : '') + ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + ((${dayOfWeek == 'SUNDAY'} ? ' sun' : ''))))"
                  th:attr="data-date=${date != null ? date.toString() : ''}"
                  th:onclick="${date != null} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
-
                 <span class="day-number" th:text="${dateNumber}">1</span>
                 <span th:if="${isLogged}" class="log-indicator log-indicator-meal"><i class="fa-solid fa-utensils"></i></span>
             </div>
@@ -146,7 +92,6 @@
         <a th:href="@{/log/meal/all}" class="button" style="background-color: #555; color: white; width: 100%; display: block; text-align: center; margin-bottom: 10px;">
             <i class="fa-solid fa-list"></i> 全記録をリストで見る
         </a>
-        
         <div style="display: flex; gap: 10px;">
             <form th:action="@{/log/meal/analyze-month}" method="post" onsubmit="showLoading(this)" style="flex: 1;">
                 <input type="hidden" name="year" th:value="${currentYearMonth.year}" />
@@ -155,7 +100,6 @@
                     <i class="fa-solid fa-chart-pie"></i> 月間分析
                 </button>
             </form>
-            
             <form th:action="@{/log/meal/analyze-week}" method="post" onsubmit="showLoading(this)" style="flex: 1;">
                 <button type="submit" class="button" style="background-color: #9b59b6; color: white; width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
                     <i class="fa-solid fa-calendar-week"></i> 今週の分析
@@ -163,311 +107,136 @@
             </form>
         </div>
     </div>
+    
+    <div style="text-align: center; margin-top: 30px;">
+        <a th:href="@{/home}" class="button secondary"><i class="fa-solid fa-house"></i> ホームに戻る</a>
+    </div>
 </div>
 
 <div id="logModal" class="modal" th:classappend="${mealLogForm.date != null} ? 'is-active' : ''">
     <div class="modal-content">
         <span class="close-button" onclick="closeLogModal()">&times;</span>
         <h2 id="modalDateTitle" class="modal-title" th:text="${mealLogForm.date}"></h2>
-        
         <div id="logViewArea"></div>
-
         <div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #4CAF50;">
             <h3 style="font-size: 1rem; margin-top: 0; color: #2e7d32;"><i class="fa-solid fa-camera"></i> 写真から自動入力</h3>
             <form th:action="@{/log/meal/analyze}" method="post" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center;" onsubmit="showLoading(this)">
                 <input type="file" name="mealImage" accept="image/*" class="form-control" style="font-size: 0.9em; padding: 8px;" required>
-                <button type="submit" class="button" style="background-color: #2e7d32; color: white; border: none; font-size: 0.9em; padding: 10px 15px; white-space: nowrap;">
-                    解析
-                </button>
+                <button type="submit" class="button" style="background-color: #2e7d32; color: white; border: none; font-size: 0.9em; padding: 10px 15px; white-space: nowrap;">解析</button>
             </form>
             <p style="font-size: 0.8em; color: #666; margin: 5px 0 0 0;">※写真を選択して「解析」を押すと、内容・カロリー等が自動入力されます</p>
-            <div th:if="${aiComment}" style="margin-top: 10px; font-weight: bold; color: #e65100;">
-                <i class="fa-solid fa-comment-dots"></i> <span th:text="${aiComment}"></span>
-            </div>
+            <div th:if="${aiComment}" style="margin-top: 10px; font-weight: bold; color: #e65100;"><i class="fa-solid fa-comment-dots"></i> <span th:text="${aiComment}"></span></div>
         </div>
-
         <p class="modal-instruction">食事内容を記録：</p>
-        
         <div class="meal-form-container">
             <form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post" onsubmit="showLoading(this)">
-                
-                <div class="form-group">
-                    <label for="dateInput"><i class="fa-regular fa-calendar"></i> 日付</label>
-                    <input type="date" id="dateInput" th:field="*{date}" class="form-control" required>
-                </div>
-
+                <div class="form-group"><label for="dateInput"><i class="fa-regular fa-calendar"></i> 日付</label><input type="date" id="dateInput" th:field="*{date}" class="form-control" required></div>
                 <div class="form-row">
-                    <div class="form-group half">
-                        <label for="time"><i class="fa-regular fa-clock"></i> 時刻</label>
-                        <input type="time" id="time" th:field="*{time}" class="form-control" required>
-                    </div>
-                    <div class="form-group half">
-                        <label for="mealType"><i class="fa-solid fa-utensils"></i> 種類</label>
-                        <select id="mealType" th:field="*{mealType}" class="form-control" required>
-                            <option value="朝食">朝食</option>
-                            <option value="昼食">昼食</option>
-                            <option value="夕食">夕食</option>
-                            <option value="間食">間食</option>
-                        </select>
-                    </div>
+                    <div class="form-group half"><label for="time"><i class="fa-regular fa-clock"></i> 時刻</label><input type="time" id="time" th:field="*{time}" class="form-control" required></div>
+                    <div class="form-group half"><label for="mealType"><i class="fa-solid fa-utensils"></i> 種類</label><select id="mealType" th:field="*{mealType}" class="form-control" required><option value="朝食">朝食</option><option value="昼食">昼食</option><option value="夕食">夕食</option><option value="間食">間食</option></select></div>
                 </div>
-                
                 <div class="form-group">
-                    <label for="content">食事内容</label>
-                    <textarea id="content" th:field="*{content}" class="form-control" rows="2" placeholder="例: ご飯、焼き魚、味噌汁" required></textarea>
-                    
-                    <button type="submit" th:formaction="@{/log/meal/analyze-text}" formnovalidate 
-                            class="button" style="background-color: #3498db; color: white; width: 100%; margin-top: 10px; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                        <i class="fa-solid fa-robot"></i> 内容から栄養計算＆トレーニング提案
-                    </button>
+                    <label for="content">食事内容</label><textarea id="content" th:field="*{content}" class="form-control" rows="2" placeholder="例: ご飯、焼き魚、味噌汁" required></textarea>
+                    <button type="submit" th:formaction="@{/log/meal/analyze-text}" formnovalidate class="button" style="background-color: #3498db; color: white; width: 100%; margin-top: 10px; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-robot"></i> 内容から栄養計算＆トレーニング提案</button>
                 </div>
-
-                <div class="form-group">
-                    <label for="calories">🔥 総カロリー (kcal)</label>
-                    <input type="number" id="calories" th:field="*{calories}" class="form-control" placeholder="0" min="0" max="5000" required>
-                </div>
-
-                <div class="form-group">
-                    <label>PFCバランス (g) <span style="font-size:0.8em; font-weight:normal; color:#888;">※任意</span></label>
+                <div class="form-group"><label for="calories">🔥 総カロリー (kcal)</label><input type="number" id="calories" th:field="*{calories}" class="form-control" placeholder="0" min="0" max="5000" required></div>
+                <div class="form-group"><label>PFCバランス (g) <span style="font-size:0.8em; font-weight:normal; color:#888;">※任意</span></label>
                     <div class="macro-section">
                         <div class="macro-row">
-                            <div class="macro-item">
-                                <label for="protein">P (タンパク質)</label>
-                                <input type="number" id="protein" th:field="*{protein}" class="form-control macro-input p-input" step="0.1" min="0" max="500" placeholder="0.0">
-                            </div>
-                            <div class="macro-item">
-                                <label for="fat">F (脂質)</label>
-                                <input type="number" id="fat" th:field="*{fat}" class="form-control macro-input f-input" step="0.1" min="0" max="500" placeholder="0.0">
-                            </div>
-                            <div class="macro-item">
-                                <label for="carbohydrate">C (炭水化物)</label>
-                                <input type="number" id="carbohydrate" th:field="*{carbohydrate}" class="form-control macro-input c-input" step="0.1" min="0" max="500" placeholder="0.0">
-                            </div>
+                            <div class="macro-item"><label for="protein">P</label><input type="number" id="protein" th:field="*{protein}" class="form-control macro-input p-input" step="0.1" min="0" max="500" placeholder="0.0"></div>
+                            <div class="macro-item"><label for="fat">F</label><input type="number" id="fat" th:field="*{fat}" class="form-control macro-input f-input" step="0.1" min="0" max="500" placeholder="0.0"></div>
+                            <div class="macro-item"><label for="carbohydrate">C</label><input type="number" id="carbohydrate" th:field="*{carbohydrate}" class="form-control macro-input c-input" step="0.1" min="0" max="500" placeholder="0.0"></div>
                         </div>
                     </div>
                 </div>
-
-                <button type="submit" class="btn-submit">
-                    <i class="fa-solid fa-check"></i> 記録を保存
-                </button>
+                <button type="submit" class="btn-submit"><i class="fa-solid fa-check"></i> 記録を保存</button>
             </form>
         </div>
-
         <a th:href="@{/log/meal/all}" class="button secondary view-all-button" style="margin-top: 20px;">全記録を見る</a>
     </div>
 </div>
 
-<div style="max-width: 450px; margin: 30px auto 70px auto; padding: 0 10px;">
-    <a th:href="@{/home}" class="button secondary">
-        <i class="fa-solid fa-house"></i> <span>ホームに戻る</span>
-    </a>
-</div>
-
 <div th:if="${aiAdvice}" id="aiAdviceModal" class="modal is-active" style="z-index: 2000;">
     <div id="shareTarget" class="modal-content" style="max-width: 400px; text-align: center; background: #fff; border-radius: 15px; padding: 30px; position: relative; overflow: hidden;">
-        
         <span class="close-button no-capture" onclick="document.getElementById('aiAdviceModal').style.display='none'">&times;</span>
-        
-        <div style="margin-bottom: 15px;">
-            <img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4CAF50; padding: 2px;">
-        </div>
-        
+        <div style="margin-bottom: 15px;"><img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4CAF50; padding: 2px;"></div>
         <h3 style="color: #4CAF50; margin-bottom: 15px; font-weight: bold;">AI Trainer's Advice!</h3>
-        
         <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; position: relative;">
             <i class="fa-solid fa-quote-left" style="color: #bcdbf3; font-size: 1.5em; position: absolute; top: 10px; left: 10px;"></i>
-            <p id="aiAdviceText" th:text="${aiAdvice}" style="margin: 0; padding: 5px 10px; color: #333; font-weight: 500; line-height: 1.6;">
-                ここにAIからのアドバイスが表示されます。
-            </p>
+            <p id="aiAdviceText" th:text="${aiAdvice}" style="margin: 0; padding: 5px 10px; color: #333; font-weight: 500; line-height: 1.6;">ここにAIからのアドバイスが表示されます。</p>
         </div>
-
-        <div style="margin-top: 10px; margin-bottom: 10px; font-size: 0.8em; color: #aaa; font-weight: bold;">
-            FitWorks Meal Log
-        </div>
-
+        <div style="margin-top: 10px; margin-bottom: 10px; font-size: 0.8em; color: #aaa; font-weight: bold;">FitWorks Meal Log</div>
         <div class="sns-buttons-container no-capture">
-            <button onclick="shareScreenImage()" class="btn-sns" style="background: linear-gradient(135deg, #4CAF50, #2E7D32); width: 100%; justify-content: center; font-size: 1em; margin-bottom: 10px; padding: 12px;">
-                <i class="fa-solid fa-share-nodes"></i> 画像としてシェアする
-            </button>
-            
+            <button onclick="shareScreenImage()" class="btn-sns" style="background: linear-gradient(135deg, #4CAF50, #2E7D32); width: 100%; justify-content: center; font-size: 1em; margin-bottom: 10px; padding: 12px;"><i class="fa-solid fa-share-nodes"></i> 画像としてシェアする</button>
             <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="shareToX()" class="btn-sns btn-sns-x" style="font-size: 0.8em; padding: 8px 12px;">
-                    <i class="fa-brands fa-x-twitter"></i> Text
-                </button>
-                <button onclick="shareToLine()" class="btn-sns btn-sns-line" style="font-size: 0.8em; padding: 8px 12px;">
-                    <i class="fa-brands fa-line"></i> Text
-                </button>
-                <button onclick="shareToInstagram()" class="btn-sns btn-sns-insta" style="font-size: 0.8em; padding: 8px 12px;">
-                    <i class="fa-brands fa-instagram"></i> Copy
-                </button>
-                <button onclick="document.getElementById('aiAdviceModal').style.display='none'" class="btn-sns" style="background-color: #777; font-size: 0.8em; padding: 8px 12px;">
-                    閉じる
-                </button>
+                <button onclick="shareToX()" class="btn-sns btn-sns-x" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-x-twitter"></i> Text</button>
+                <button onclick="shareToLine()" class="btn-sns btn-sns-line" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-line"></i> Text</button>
+                <button onclick="shareToInstagram()" class="btn-sns btn-sns-insta" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-instagram"></i> Copy</button>
+                <button onclick="document.getElementById('aiAdviceModal').style.display='none'" class="btn-sns" style="background-color: #777; font-size: 0.8em; padding: 8px 12px;">閉じる</button>
             </div>
         </div>
     </div>
 </div>
 
-
-
 <script th:inline="javascript">
-    // 記録モーダルを開く関数
     function openLogModal(dateString, isLogged) {
         document.getElementById('dateInput').value = dateString;
         document.getElementById('modalDateTitle').innerText = dateString.replace(/-/g, '/');
-        
         const logViewArea = document.getElementById('logViewArea');
-        if (isLogged) {
-            logViewArea.innerHTML = '<p style="font-weight: 700; color: #4CAF50; margin-bottom: 10px;">✅ この日は記録済みです。</p>';
-        } else {
-            logViewArea.innerHTML = '<p style="color: #999; margin-bottom: 10px;">この日はまだ記録がありません。</p>';
-        }
-
-        // 現在時刻をデフォルトセット
+        logViewArea.innerHTML = isLogged ? '<p style="font-weight: 700; color: #4CAF50; margin-bottom: 10px;">✅ この日は記録済みです。</p>' : '<p style="color: #999; margin-bottom: 10px;">この日はまだ記録がありません。</p>';
         if(!document.getElementById('time').value) {
             const now = new Date();
-            const timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-            document.getElementById('time').value = timeString;
-            
-            // 時間帯で種類を自動選択
-            const hour = now.getHours();
-            const mealTypeSelect = document.getElementById('mealType');
-            if(hour >= 4 && hour < 10) mealTypeSelect.value = "朝食";
-            else if(hour >= 10 && hour < 16) mealTypeSelect.value = "昼食";
-            else if(hour >= 16 || hour < 4) mealTypeSelect.value = "夕食";
+            document.getElementById('time').value = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            const h = now.getHours(); const s = document.getElementById('mealType');
+            if(h>=4 && h<10) s.value="朝食"; else if(h>=10 && h<16) s.value="昼食"; else if(h>=16 || h<4) s.value="夕食";
         }
-
         document.getElementById('logModal').classList.add('is-active');
     }
-
-    function closeLogModal() {
-        document.getElementById('logModal').classList.remove('is-active');
+    function closeLogModal() { document.getElementById('logModal').classList.remove('is-active'); }
+    window.onclick = function(e) {
+        const m = document.getElementById('logModal'); const a = document.getElementById('aiAdviceModal');
+        if (m && m.classList.contains('is-active') && e.target === m) closeLogModal();
+        if (a && e.target === a) a.style.display = 'none';
     }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById('logModal');
-        const adviceModal = document.getElementById('aiAdviceModal');
-        if (modal && modal.classList.contains('is-active') && event.target === modal) {
-            closeLogModal();
-        }
-        if (adviceModal && event.target === adviceModal) {
-            adviceModal.style.display = 'none';
-        }
-    }
-
-    // ▼▼▼ 修正: ローディング表示関数 ▼▼▼
     function showLoading(form) {
         const overlay = document.getElementById('global-loading-overlay');
         const mainText = document.getElementById('loading-main-text');
         const action = form.getAttribute('action');
-        
-        // アクションURLに応じてメッセージを切り替え
-        if (action && (action.includes('analyze') || action.includes('calculate'))) {
-            mainText.innerText = 'AIが分析中です...';
-            // アイコンの色をAIっぽく青系にする
-            overlay.querySelector('.loading-spinner').style.color = '#87ceeb';
-        } else {
-            mainText.innerText = '記録を保存中です...';
-            overlay.querySelector('.loading-spinner').style.color = '#4CAF50';
-        }
-
-        // オーバーレイを表示
+        if (action && (action.includes('analyze') || action.includes('calculate'))) { mainText.innerText = 'AIが分析中です...'; overlay.querySelector('.loading-spinner').style.color = '#87ceeb'; } 
+        else { mainText.innerText = '記録を保存中です...'; overlay.querySelector('.loading-spinner').style.color = '#4CAF50'; }
         overlay.style.display = 'flex';
-
-        // ボタンの二重送信防止（既存の処理）
-        const btn = form.querySelector('button[type="submit"]');
-        if (btn) {
-            btn.disabled = true;
-        }
-        
-        // 万が一レスポンスが帰ってこなかった場合の安全策は
-        // AI処理が長い場合を考慮して今回は入れません
+        const btn = form.querySelector('button[type="submit"]'); if (btn) btn.disabled = true;
     }
-    
-    // ----------------------------------------------------
-    //  画面（画像）シェア機能
-    // ----------------------------------------------------
     async function shareScreenImage() {
-        const target = document.getElementById('shareTarget');
-        const hideElements = target.querySelectorAll('.no-capture');
-        
-        hideElements.forEach(el => el.style.display = 'none');
-        
-        const originalBtn = document.querySelector('button[onclick="shareScreenImage()"]');
-        const originalText = originalBtn ? originalBtn.innerHTML : '';
-        if(originalBtn) originalBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 生成中...';
-
+        const t = document.getElementById('shareTarget'); const h = t.querySelectorAll('.no-capture');
+        h.forEach(e => e.style.display = 'none');
         try {
-            const canvas = await html2canvas(target, { 
-                scale: 2, 
-                useCORS: true, 
-                backgroundColor: '#ffffff'
-            });
-
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], "fitworks_meal_log.png", { type: "image/png" });
-                
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            files: [file],
-                            title: 'FitWorks Record',
-                            text: getShareText(),
-                        });
-                    } catch (err) {
-                        console.log('Share canceled or failed', err);
-                    }
-                } else {
-                    const link = document.createElement('a');
-                    link.download = 'fitworks_meal_log.png';
-                    link.href = canvas.toDataURL();
-                    link.click();
-                    alert("画像として保存しました。\nSNSアプリから投稿してください。");
-                }
-                
-                hideElements.forEach(el => el.style.display = '');
-                if(originalBtn) originalBtn.innerHTML = originalText;
-
+            const c = await html2canvas(t, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            c.toBlob(async (b) => {
+                const f = new File([b], "meal_log.png", { type: "image/png" });
+                if (navigator.canShare && navigator.canShare({ files: [f] })) await navigator.share({ files: [f], title: 'FitWorks', text: getShareText() });
+                else { const l = document.createElement('a'); l.download = 'meal_log.png'; l.href = c.toDataURL(); l.click(); alert("画像を保存しました。"); }
+                h.forEach(e => e.style.display = '');
             }, 'image/png');
-
-        } catch (error) {
-            console.error('Capture failed:', error);
-            alert('画像の生成に失敗しました。');
-            hideElements.forEach(el => el.style.display = '');
-            if(originalBtn) originalBtn.innerHTML = originalText;
-        }
+        } catch (e) { console.error(e); h.forEach(e => e.style.display = ''); }
     }
+    function getShareText() { return `【FitWorks】食事記録完了！🥗\nAIトレーナー「${document.getElementById('aiAdviceText').innerText}」\n#FitWorks`; }
+    function shareToX() { window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}`, '_blank'); }
+    function shareToLine() { window.open(`https://line.me/R/msg/text/?${encodeURIComponent(getShareText())}`, '_blank'); }
+    function shareToInstagram() { navigator.clipboard.writeText(getShareText()).then(() => { alert("コピーしました！Instagramを開きます。"); window.open('https://www.instagram.com/', '_blank'); }); }
 
-    // --- SNSシェア機能（テキスト用） ---
-    function getShareText() {
-        const adviceText = document.getElementById('aiAdviceText').innerText;
-        return `【FitWorks】食事記録完了！🥗\nAIトレーナー「${adviceText}」\n\n#FitWorks #食事管理 #ダイエット`;
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+    class Particle {
+        constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
     }
-
-    function shareToX() {
-        const text = getShareText();
-        const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-        window.open(shareUrl, '_blank');
-    }
-
-    function shareToLine() {
-        const text = getShareText();
-        const shareUrl = `https://line.me/R/msg/text/?${encodeURIComponent(text)}`;
-        window.open(shareUrl, '_blank');
-    }
-
-    function shareToInstagram() {
-        const text = getShareText();
-        navigator.clipboard.writeText(text).then(() => {
-            alert("文章をコピーしました！📋\nInstagramを開きます。投稿やストーリーズに貼り付けてください。");
-            window.open('https://www.instagram.com/', '_blank');
-        }).catch(err => {
-            console.error('Copy failed', err);
-            alert("文章のコピーに失敗しました。\n(手動でコピーしてください)");
-            window.open('https://www.instagram.com/', '_blank');
-        });
-    }
+    function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+    animate();
 </script>
-
 </body>
 </html>

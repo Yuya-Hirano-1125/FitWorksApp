@@ -11,61 +11,125 @@
     <link rel="stylesheet" th:href="@{/css/characters/CharactersMenu.css}">
     
     <script th:src="@{/js/theme.js}"></script>
+    <style>
+        /* 共通背景デザイン */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+
+        .main-container {
+            max-width: 800px; width: 92%; margin: 40px auto; padding: 40px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
+        }
+        
+        /* 既存スタイル調整 */
+        .menu-list { display: flex; flex-direction: column; gap: 15px; }
+        .menu-button { display: flex; align-items: center; background: rgba(255,255,255,0.9); padding: 20px; border-radius: 20px; text-decoration: none; color: #333; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .menu-button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); background: #fff; }
+        .icon-area { font-size: 1.8rem; width: 60px; text-align: center; margin-right: 15px; }
+        .text-area { flex-grow: 1; }
+        .main-text { display: block; font-weight: 800; font-size: 1.1rem; color: #333; }
+        .sub-text { display: block; font-size: 0.85rem; color: #666; margin-top: 3px; }
+        .arrow-icon { color: #ccc; }
+        
+        /* アイコン色 */
+        .style-unlock .icon-area { color: #ff6b6b; }
+        .style-storage .icon-area { color: #4facfe; }
+        .style-material .icon-area { color: #feca57; }
+        .style-backgrounds .icon-area { color: #1dd1a1; }
+    </style>
 </head>
 <body>
-
-<div class="main-container">
-    <div class="header-section">
-        <h1>キャラクターメニュー</h1>
-        <p class="sub-heading">キャラクターの育成・管理を行います</p>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
     </div>
 
-    <div class="menu-list">
-        
-		<a th:href="@{/characters}" class="menu-button style-unlock">
-		    <div class="icon-area"><i class="fa-solid fa-lock-open"></i></div>
-		    <div class="text-area">
-		        <span class="main-text">キャラクター解放</span>
-		        <span class="sub-text">条件を満たして新キャラを解放</span>
-		    </div>
-		    <i class="fa-solid fa-chevron-right arrow-icon"></i>
-		</a>
-
-
-		<a th:href="@{/characters/menu/CharactersStorage}" class="menu-button style-storage">
-		    <div class="icon-area"><i class="fa-solid fa-users"></i></div>
-		    <div class="text-area">
-		        <span class="main-text">キャラクター一覧</span>
-		        <span class="sub-text">所持キャラクターの確認・変更</span>
-		    </div>
-		    <i class="fa-solid fa-chevron-right arrow-icon"></i>
-		</a>
-
-		<a th:href="@{/characters/menu/CharactersEvolutionMaterial}" class="menu-button style-material">
-		    <div class="icon-area"><i class="fa-solid fa-gem"></i></div>
-		    <div class="text-area">
-		        <span class="main-text">素材一覧</span>
-		        <span class="sub-text">ガチャから出る素材を確認</span>
-		    </div>
-		    <i class="fa-solid fa-chevron-right arrow-icon"></i>
-		</a>
-
-		<a th:href="@{/characters/menu/Backgrounds}" class="menu-button style-backgrounds">
-		    <div class="icon-area"><i class="fa-solid fa-image"></i></div>
-		    <div class="text-area">
-		        <span class="main-text">背景一覧</span>
-		        <span class="sub-text">ホーム画面の背景カスタマイズ</span>
-		    </div>
-		    <i class="fa-solid fa-chevron-right arrow-icon"></i>
-		</a>
-
-        <div class="back-btn-container">
-            <a th:href="@{/home}" class="button secondary">
-                <i class="fa-solid fa-house"></i> ホームに戻る
-            </a>
+    <div class="main-container">
+        <div class="header-section">
+            <h1><i class="fa-solid fa-users-gear header-icon"></i> キャラクターメニュー</h1>
+            <p class="sub-heading">キャラクターの育成・管理を行います</p>
         </div>
 
+        <div class="menu-list">
+            
+            <a th:href="@{/characters}" class="menu-button style-unlock">
+                <div class="icon-area"><i class="fa-solid fa-lock-open"></i></div>
+                <div class="text-area">
+                    <span class="main-text">キャラクター解放</span>
+                    <span class="sub-text">条件を満たして新キャラを解放</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow-icon"></i>
+            </a>
+
+            <a th:href="@{/characters/menu/CharactersStorage}" class="menu-button style-storage">
+                <div class="icon-area"><i class="fa-solid fa-users"></i></div>
+                <div class="text-area">
+                    <span class="main-text">キャラクター一覧</span>
+                    <span class="sub-text">所持キャラクターの確認・変更</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow-icon"></i>
+            </a>
+
+            <a th:href="@{/characters/menu/CharactersEvolutionMaterial}" class="menu-button style-material">
+                <div class="icon-area"><i class="fa-solid fa-gem"></i></div>
+                <div class="text-area">
+                    <span class="main-text">素材一覧</span>
+                    <span class="sub-text">ガチャから出る素材を確認</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow-icon"></i>
+            </a>
+
+            <a th:href="@{/characters/menu/Backgrounds}" class="menu-button style-backgrounds">
+                <div class="icon-area"><i class="fa-solid fa-image"></i></div>
+                <div class="text-area">
+                    <span class="main-text">背景一覧</span>
+                    <span class="sub-text">ホーム画面の背景カスタマイズ</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow-icon"></i>
+            </a>
+
+            <div class="back-btn-container" style="text-align:center; margin-top:20px;">
+                <a th:href="@{/home}" class="button secondary">
+                    <i class="fa-solid fa-house"></i> ホームに戻る
+                </a>
+            </div>
+
+        </div>
     </div>
-</div>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+        class Particle {
+            constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+        animate();
+    </script>
 </body>
 </html>
