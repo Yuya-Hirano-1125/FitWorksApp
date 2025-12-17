@@ -13,7 +13,7 @@
     
     <style>
         /* =========================================================
-           🌌 ULTIMATE LOGIN SCREEN STYLE
+           🌌 ULTIMATE LOGIN SCREEN STYLE (WIDE VER.)
            ========================================================= */
         :root {
             --glass-bg: rgba(255, 255, 255, 0.65);
@@ -31,7 +31,9 @@
             font-family: 'Noto Sans JP', sans-serif;
         }
 
-        /* 背景設定 (スタート画面と共通) */
+        /* -----------------------------------------------------------
+           🌌 BACKGROUND: LIQUID AURORA (COMMON)
+           ----------------------------------------------------------- */
         .interactive-bg {
             position: fixed;
             top: 0;
@@ -44,74 +46,163 @@
             animation: auroraFlow 20s ease infinite;
             overflow: hidden;
         }
+
         @keyframes auroraFlow {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
-        /* オーブ */
-        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        /* 光のオーブ */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: floatOrb 30s infinite alternate ease-in-out;
+            z-index: 0;
+        }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
         .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
-        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
 
-        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
 
-        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; box-shadow: 0 0 60px rgba(255,255,255,0.9); }
+        /* Canvas (パーティクル用) */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        /* ☁️ 雲 */
+        .bg-cloud {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.85;
+            z-index: 2;
+            pointer-events: none;
+            box-shadow: 0 0 60px rgba(255,255,255,0.9);
+        }
         .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
         .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
+
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
         @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
 
+        /* マウス追従ライトフレア */
         .mouse-flare {
-            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
             background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
-            transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            mix-blend-mode: screen;
+            z-index: 20;
+            filter: blur(15px);
             transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
         }
 
-        .mega-sparkle { position: fixed; pointer-events: none; z-index: 99999; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); }
+        /* 💥 クリック時のスパークル */
+        .mega-sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 99999;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
 
-        /* コンテナ */
-        .center-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; box-sizing: border-box; }
+        /* -----------------------------------------------------------
+           📦 LOGIN CONTAINER (WIDE)
+           ----------------------------------------------------------- */
+        .center-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
         .main-container {
-            max-width: 450px; width: 100%; text-align: center; padding: 40px 30px;
+            /* 横幅を広げて縦長感を解消 */
+            max-width: 720px;
+            width: 100%;
+            text-align: center;
+            padding: 50px 60px;
+            
+            /* High-End Glassmorphism */
             background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 40px; border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
-            position: relative; z-index: 10;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 
+                0 30px 60px rgba(100, 149, 237, 0.2), 
+                0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            
+            position: relative;
+            z-index: 10;
             animation: containerFloat 6s ease-in-out infinite;
         }
+
         @keyframes containerFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            0%, 100% { transform: translateY(0); box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset; }
+            50% { transform: translateY(-10px); box-shadow: 0 40px 70px rgba(100, 149, 237, 0.15), 0 0 0 2px rgba(255, 255, 255, 0.6) inset; }
         }
 
-        h1 { font-family: 'Poppins', sans-serif; font-size: 2.2rem; font-weight: 800; color: #333; margin-bottom: 5px; letter-spacing: -1px; }
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
         .header-icon { color: #4facfe; margin-right: 10px; }
         .sub-heading { font-size: 0.95rem; color: #666; margin-bottom: 25px; font-weight: 500; }
 
-        /* フォーム要素 */
+        /* フォーム */
         .form-group { text-align: left; margin-bottom: 15px; }
         label { font-weight: 700; color: #555; font-size: 0.9rem; margin-bottom: 5px; display: block; }
         input[type="text"], input[type="password"], input[type="tel"] {
-            width: 100%; padding: 15px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.8);
-            background: rgba(255,255,255,0.6); font-size: 1rem; transition: all 0.3s; box-sizing: border-box;
+            width: 100%; padding: 15px; border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.6);
+            font-size: 1rem; transition: all 0.3s; box-sizing: border-box;
         }
-        input:focus { border-color: #4facfe; background: #fff; outline: none; box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2); }
+        input:focus {
+            border-color: #4facfe; background: #fff; outline: none;
+            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2);
+        }
 
         /* ボタン */
         .button {
             padding: 15px; font-size: 1.1rem; font-weight: 800; border-radius: 30px; width: 100%;
-            display: block; text-align: center; border: none; cursor: pointer; position: relative; overflow: hidden;
-            transition: transform 0.1s;
+            display: block; text-align: center; border: none; cursor: pointer;
+            position: relative; overflow: hidden; transition: transform 0.1s;
         }
-        .button.primary { background: linear-gradient(90deg, #4facfe, #00f2fe); color: white; box-shadow: 0 10px 20px rgba(79, 172, 254, 0.4); }
-        .button.primary:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(79, 172, 254, 0.6); }
+        .button.primary {
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            color: white;
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.4);
+        }
+        .button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(79, 172, 254, 0.6);
+        }
         .button:active { transform: scale(0.95) !important; }
 
         .forgot-password-link { text-align: right; margin-bottom: 20px; }
@@ -121,6 +212,7 @@
         .separator-container::before, .separator-container::after { content: ''; flex: 1; border-bottom: 1px solid rgba(0,0,0,0.1); }
         .separator-container span { padding: 0 10px; }
 
+        .social-login-group { display: flex; gap: 15px; }
         .social-btn {
             display: flex; align-items: center; justify-content: center; width: 100%; padding: 12px;
             border-radius: 15px; font-weight: 700; color: white; margin-bottom: 10px; text-decoration: none;
@@ -129,17 +221,23 @@
         .social-btn:hover { transform: translateY(-2px); opacity: 0.9; }
         .btn-line { background: #06C755; }
         .btn-apple { background: #000; }
-        .btn-bio { background: #333; }
+        .btn-bio { background: #333; margin-bottom: 15px; width: 100%; }
         .social-btn i { margin-right: 8px; font-size: 1.2rem; }
 
-        .sms-login-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.1); }
+        .sms-login-section { margin-top: 25px; padding-top: 25px; border-top: 1px solid rgba(0,0,0,0.1); }
         .sms-input-group { display: flex; gap: 8px; margin-top: 10px; }
-        .sms-action-btn { background: #4facfe; color: white; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .sms-action-btn { background: #4facfe; color: white; border: none; padding: 0 25px; border-radius: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
         
         .register-link { margin-top: 30px; font-size: 0.9rem; color: #666; }
         .register-link a { color: #4facfe; font-weight: 800; text-decoration: none; }
         
         .error-message { color: #ff6b6b; background: rgba(255, 107, 107, 0.1); padding: 10px; border-radius: 10px; margin-bottom: 15px; font-weight: 600; text-align: center; }
+        
+        /* スマホ対応 */
+        @media (max-width: 600px) {
+            .main-container { max-width: 100%; padding: 30px 20px; }
+            .social-login-group { flex-direction: column; gap: 10px; }
+        }
     </style>
 </head>
 <body>
@@ -190,7 +288,7 @@
             <i class="fa-solid fa-fingerprint"></i> 生体認証
         </button>
 
-        <div style="display: flex; gap: 10px;">
+        <div class="social-login-group">
             <a th:href="@{/oauth2/authorization/line}" class="social-btn btn-line button">
                 <i class="fa-brands fa-line"></i> LINE
             </a>
@@ -254,8 +352,8 @@
 
     // --- クリックエフェクト ---
     document.addEventListener('click', function(e) {
-        // ボタンクリック時は派手に、それ以外は控えめに
-        const count = e.target.closest('.button') ? 60 : 12;
+        const isClickable = e.target.closest('.button') || e.target.closest('a') || e.target.closest('input');
+        const count = isClickable ? 60 : 12;
         createExplosion(e.clientX, e.clientY, count);
     });
 
@@ -312,8 +410,101 @@
     }
     animate();
 
-    // SMSなどの既存処理は維持
-    // (省略: SMS認証や生体認証のロジックは前回と同じものが入っている前提)
+    // --- Base64URL Utilities for WebAuthn ---
+    function bufferToBase64url(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+    function base64urlToBuffer(base64url) {
+        const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+        return bytes.buffer;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.getElementById('csrf-token-val').value;
+        const btnSend = document.getElementById('btn-send-otp');
+        const btnVerify = document.getElementById('btn-verify-otp');
+        const inputPhone = document.getElementById('phone-number');
+        const inputCode = document.getElementById('otp-code');
+        const step1 = document.getElementById('sms-step-1');
+        const step2 = document.getElementById('sms-step-2');
+        const msgArea = document.getElementById('sms-message');
+        const btnBio = document.getElementById('biometric-login-btn');
+
+        function showMessage(msg, isError = false) {
+            msgArea.textContent = msg;
+            msgArea.style.color = isError ? '#ff6b6b' : '#4facfe';
+        }
+
+        // WebAuthn
+        if(btnBio) {
+            btnBio.addEventListener('click', async () => {
+                if (!window.PublicKeyCredential) { alert('このブラウザは生体認証をサポートしていません。'); return; }
+                try {
+                    const optRes = await fetch('/api/webauthn/login/options');
+                    const options = await optRes.json();
+                    const challengeBuffer = base64urlToBuffer(options.challenge);
+                    const credential = await navigator.credentials.get({
+                        publicKey: { challenge: challengeBuffer, rpId: window.location.hostname, userVerification: 'preferred' }
+                    });
+                    const authData = {
+                        credentialId: bufferToBase64url(credential.rawId),
+                        clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+                        authenticatorData: bufferToBase64url(credential.response.authenticatorData),
+                        signature: bufferToBase64url(credential.response.signature),
+                        userHandle: credential.response.userHandle ? bufferToBase64url(credential.response.userHandle) : null
+                    };
+                    const verifyRes = await fetch('/api/webauthn/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                        body: JSON.stringify(authData)
+                    });
+                    if (verifyRes.ok) window.location.href = '/home';
+                    else alert('認証失敗: ' + await verifyRes.text());
+                } catch (e) { alert('エラー: ' + e.message); }
+            });
+        }
+
+        // SMS Auth
+        function isValidPhone(phone) { return /^[+\d]{8,15}$/.test(phone.replace(/\s/g, '')); }
+        if(btnSend) {
+            btnSend.addEventListener('click', function() {
+                const phone = inputPhone.value.trim();
+                if(!isValidPhone(phone)) { showMessage("正しい電話番号を入力してください (+81...)", true); return; }
+                btnSend.disabled = true; btnSend.textContent = "送信中..."; showMessage("");
+                fetch('/api/auth/send-otp', {
+                    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-TOKEN': csrfToken },
+                    body: 'phoneNumber=' + encodeURIComponent(phone)
+                }).then(async res => {
+                    if(res.ok) { step1.style.display='none'; step2.style.display='block'; showMessage("認証コードを送信しました。"); inputCode.focus(); }
+                    else throw new Error(await res.text() || "送信エラー");
+                }).catch(err => { showMessage("送信失敗: " + err.message, true); btnSend.disabled = false; btnSend.textContent = "送信"; });
+            });
+        }
+        if(btnVerify) {
+            btnVerify.addEventListener('click', function() {
+                const phone = inputPhone.value.trim(); const code = inputCode.value.trim();
+                if(code.length < 4) { showMessage("コードを入力してください", true); return; }
+                btnVerify.disabled = true; btnVerify.textContent = "確認中...";
+                fetch('/api/auth/verify-otp', {
+                    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRF-TOKEN': csrfToken },
+                    body: 'phoneNumber=' + encodeURIComponent(phone) + '&code=' + encodeURIComponent(code)
+                }).then(async res => {
+                    if(res.ok) window.location.href = '/home';
+                    else throw new Error(await res.text() || "認証エラー");
+                }).catch(err => { showMessage("ログイン失敗: " + err.message, true); btnVerify.disabled = false; btnVerify.textContent = "認証"; });
+            });
+        }
+        window.resetSmsForm = function() {
+            step1.style.display='block'; step2.style.display='none'; inputCode.value = '';
+            btnSend.disabled = false; btnSend.textContent = "送信"; btnVerify.disabled = false; btnVerify.textContent = "認証"; showMessage("");
+        };
+    });
 </script>
 </body>
 </html>
