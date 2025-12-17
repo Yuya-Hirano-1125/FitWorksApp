@@ -422,9 +422,18 @@
                             // 解放成功
                             bg.locked = false;
                             
-                            // ★ 解放済みリストに追加
+                            // ★★★ 解放済みリストに追加 ★★★
                             if (!unlockedBackgrounds.includes(bg.id)) {
                                 unlockedBackgrounds.push(bg.id);
+                                console.log('解放済みリストに追加:', bg.id);
+                                console.log('更新後の解放済みリスト:', unlockedBackgrounds);
+                            }
+                            
+                            // ★★★ bgList内の同じ背景もロック解除 ★★★
+                            const bgInList = bgList.find(b => b.id === bg.id);
+                            if (bgInList) {
+                                bgInList.locked = false;
+                                console.log('bgList内のロック状態を更新:', bgInList.id);
                             }
                             
                             unlockPopup.classList.add('popup-hidden');

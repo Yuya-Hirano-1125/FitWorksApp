@@ -107,7 +107,6 @@ public class CharactersMenuController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // 認証チェック
             if (userDetails == null) {
                 response.put("success", false);
                 response.put("message", "ログインが必要です");
@@ -124,9 +123,7 @@ public class CharactersMenuController {
             System.out.println("ユーザー名: " + username);
             System.out.println("背景ID: " + backgroundId);
             System.out.println("素材ID: " + materialId);
-            System.out.println("==========================================");
 
-            // ユーザー情報取得
             User currentUser = userService.findByUsername(username);
             if (currentUser == null) {
                 response.put("success", false);
@@ -134,8 +131,20 @@ public class CharactersMenuController {
                 return ResponseEntity.status(404).body(response);
             }
 
+            // ★★★ デバッグ: 現在の解放済み背景を表示 ★★★
+            System.out.println("現在の解放済み背景: " + currentUser.getUnlockedBackgrounds());
+            System.out.println("解放済み背景数: " + currentUser.getUnlockedBackgrounds().size());
+            System.out.println("backgroundId '" + backgroundId + "' は解放済み？: " + currentUser.hasUnlockedBackground(backgroundId));
+            
+            // ★★★ 個別にチェック ★★★
+            for (String bg : currentUser.getUnlockedBackgrounds()) {
+                System.out.println("  - 解放済み: '" + bg + "' (equals: " + bg.equals(backgroundId) + ")");
+            }
+            System.out.println("==========================================");
+
             // ★ 既に解放済みかチェック
             if (currentUser.hasUnlockedBackground(backgroundId)) {
+                System.out.println("ERROR: この背景は既に解放されています!");
                 response.put("success", false);
                 response.put("message", "この背景は既に解放されています");
                 return ResponseEntity.ok(response);
@@ -143,6 +152,7 @@ public class CharactersMenuController {
 
             // 所持数チェック
             int dreamKeyCount = userService.getUserMaterialCount(username, DREAM_KEY_ITEM_ID);
+            System.out.println("夢幻の鍵所持数: " + dreamKeyCount);
             
             if (dreamKeyCount <= 0) {
                 response.put("success", false);
@@ -163,17 +173,18 @@ public class CharactersMenuController {
             currentUser.addUnlockedBackground(backgroundId);
             userService.save(currentUser);
 
+            // 保存後の状態を確認
+            User savedUser = userService.findByUsername(username);
+            System.out.println("==========================================");
+            System.out.println("DEBUG: 保存後の確認");
+            System.out.println("==========================================");
+            System.out.println("保存後の解放済み背景: " + savedUser.getUnlockedBackgrounds());
+            System.out.println("解放済み背景数: " + savedUser.getUnlockedBackgrounds().size());
+            System.out.println("==========================================");
+
             // 残りの所持数を取得
             int remainingCount = userService.getUserMaterialCount(username, DREAM_KEY_ITEM_ID);
             
-            System.out.println("==========================================");
-            System.out.println("DEBUG: 解放成功");
-            System.out.println("==========================================");
-            System.out.println("解放した背景ID: " + backgroundId);
-            System.out.println("残りの夢幻の鍵: " + remainingCount);
-            System.out.println("現在の解放済み背景: " + currentUser.getUnlockedBackgrounds());
-            System.out.println("==========================================");
-
             response.put("success", true);
             response.put("message", "背景を解放しました!");
             response.put("remainingCount", remainingCount);
