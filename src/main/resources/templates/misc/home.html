@@ -12,8 +12,10 @@
     
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        .xp-bar { width: 100%; height: 25px; background: #ddd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
-        .xp-progress { height: 100%; background: linear-gradient(90deg, #4caf50, #81c784); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
+        /* HTML内スタイルは、home.cssでカバーできない動的なものや微調整のみ残します */
+        
+        .xp-bar { width: 100%; height: 25px; background: #e3f2fd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
+        .xp-progress { height: 100%; background: linear-gradient(90deg, #42a5f5, #2196f3); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
         
         .character-section { position: relative; display: flex; justify-content: center; margin-top: 0px; }
         
@@ -34,12 +36,12 @@
             align-items: flex-end; 
             width: 100%; 
             height: 100%; 
-            
+            background-image: url('/img/background/fire-original.png'); 
             background-repeat: no-repeat; 
             background-position: center; 
             background-size: cover; 
             border-radius: 25px; 
-            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3); 
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3); 
             text-decoration: none; 
             padding-bottom: 10px; 
             box-sizing: border-box; 
@@ -105,27 +107,11 @@
         .help-menu-item { display: block; padding: 10px; text-decoration: none; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9em; transition: transform 0.2s; border: none; width: 100%; cursor: pointer; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box; }
         .help-menu-item:hover { transform: scale(1.03); }
 
-        /* Tutorial styles */
-        .tutorial-spotlight { position: absolute; z-index: 9998; border-radius: 8px; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; opacity: 0; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6); }
-        .tutorial-spotlight.active { opacity: 1; }
-        .tutorial-rpg-box { position: absolute; z-index: 9999; width: 90%; max-width: 500px; background: rgb(255, 255, 255); border: 2px solid #fff; border-radius: 15px; padding: 15px; display: flex; gap: 15px; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: opacity 0.3s, top 0.4s, left 0.4s; transform: translateX(-50%); }
-        .tutorial-rpg-box.active { opacity: 1; visibility: visible; }
-        .rpg-char-area { flex-shrink: 0; width: 80px; height: 80px; background: #fff; border-radius: 50%; overflow: hidden; border: 3px solid #4CAF50; }
-        .rpg-char-area img { width: 100%; height: 100%; object-fit: cover; }
-        .rpg-char-area img.talking { animation: talk-bounce 0.2s infinite alternate; }
-        @keyframes talk-bounce { from { transform: scale(1); } to { transform: scale(1.05); } }
-        .rpg-content { flex-grow: 1; display: flex; flex-direction: column; }
-        .rpg-name-tag { font-size: 0.9em; color: rgb(255, 235, 252); font-weight: bold; margin-bottom: 5px; }
-        .rpg-text-area { font-size: 0.95em; line-height: 1.5; min-height: 3em; }
-        .rpg-controls { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
-        .rpg-btn { background: transparent; border: 1px solid #aaa; color: #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.85em; }
-        .rpg-btn-next { background: #4CAF50; border-color: #4CAF50; color: #fff; font-weight: bold; }
+        /* Tutorial関連のCSSは home.css に移動しました。ここでは競合を避けるため削除しています */
         .tutorial-pointer { position: absolute; z-index: 10000; font-size: 2.5rem; color: #f1c40f; display: none; animation: point-move 1s infinite alternate; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .tutorial-pointer::before { content: '\f0a6'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
         @keyframes point-move { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-        .tutorial-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9990; display: none; }
-        .tutorial-backdrop.active { display: block; }
-
+        
         /* 挨拶文のスタイル */
         .home-greeting-container {
             text-align: center;
@@ -138,12 +124,12 @@
             font-size: 2.8rem;
             font-style: italic;
             margin: 0;
-            background: linear-gradient(45deg, #ff69b4, #ffb300);
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             color: transparent;
-            text-shadow: 2px 4px 10px rgba(255, 105, 180, 0.2);
+            text-shadow: 2px 4px 10px rgba(0, 198, 251, 0.2);
             letter-spacing: -1px;
             line-height: 1.1;
         }
@@ -156,11 +142,11 @@
             line-height: 1.6;
         }
         .home-username {
-            color: #ff69b4;
+            color: #0288d1;
             font-size: 1.2rem;
             font-weight: 900;
             margin: 0 2px;
-            text-decoration: underline wavy #ffb300;
+            text-decoration: underline wavy #4facfe;
             text-underline-offset: 3px;
         }
     </style>
@@ -169,12 +155,12 @@
 
 <div class="interactive-bg">
     <div class="mouse-follower-cloud"></div>
-    
     <div class="bg-cloud cloud-1"></div>
     <div class="bg-cloud cloud-2"></div>
     <div class="bg-cloud cloud-3"></div>
     <div class="bg-cloud cloud-4"></div>
 </div>
+
 <div class="main-container" style="position: relative;"> 
     <button id="help-btn" class="help-label-btn" onclick="toggleHelpMenu()">
         <span style="font-size: 1.2em;">🔰</span> ヘルプ
@@ -219,10 +205,9 @@
     
     <div class="character-section">
         <div class="character-wrapper">
-			<a id="tutorial-char-display" th:href="@{/character}" class="character-display" 
-			   th:style="'background-image: url(/img/background/' + ${selectedBackground} + '.png);'">
-			    <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
-			</a>
+            <a id="tutorial-char-display" th:href="@{/character}" class="character-display">
+                <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
+            </a>
             
             <div class="character-side-buttons">
                 <a id="tutorial-title-btn" th:href="@{/titles}" class="side-action-btn title-button">
@@ -302,39 +287,13 @@
         <div class="rpg-controls">
             <button class="rpg-btn rpg-btn-skip" onclick="endRpgTutorial()">スキップ</button>
             <button class="rpg-btn rpg-btn-next" id="rpg-next-btn" onclick="nextRpgStep()">次へ</button>
-			<div class="character-section">
-			    <div class="character-wrapper">
-			        <a id="tutorial-char-display" th:href="@{/character}" class="character-display" 
-			           th:style="'background-image: url(' + @{'/img/background/' + ${selectedBackground} + '.png'} + ');'">
-			            <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
-			        </a>
-			        
-			        <div class="character-side-buttons">
-			            <a id="tutorial-title-btn" th:href="@{/titles}" class="side-action-btn title-button">
-			                <i class="fa-solid fa-crown"></i> 称号
-			            </a>
-			            <a id="tutorial-customize-btn" th:href="@{/gacha/customize}" class="side-action-btn customize-button">
-			                <i class="fa-solid fa-shirt"></i> 着せ替え
-			            </a>
-			        </div>
-			    </div>
-			</div>
         </div>
     </div>
 </div>
 <div id="tutorial-backdrop" class="tutorial-backdrop"></div>
 
 <script>
-	
-	/*<![CDATA[*/
-	document.addEventListener('DOMContentLoaded', function() {
-	    const selectedBackground = /*[[${selectedBackground}]]*/ 'fire-original';
-	    console.log('========== ホーム画面背景情報 ==========');
-	    console.log('選択中の背景:', selectedBackground);
-	    console.log('========================================');
-	});
-	/*]]>*/
-	
+    // ... (既存のJavaScriptロジックに変更はありません) ...
     function toggleRecordMenu() {
         const options = document.getElementById('record-options');
         options.classList.toggle('open');
@@ -353,40 +312,33 @@
         }
     });
 
-    // --- チュートリアルシナリオ (全機能網羅・上から順) ---
     const rpgSteps = [
         { targetId: null, text: "FitWorksへようこそ！\nこのチュートリアルでは、アプリの全機能をご紹介します！" },
-        // 上部
         { targetId: 'help-btn', text: "まずは画面左上。「ヘルプ」ボタンから、\nこのガイドの再生や、サプリメントの知識を確認できます。" },
         { targetId: 'tutorial-xp-area', text: "画面上部にはあなたの「レベル」と「XP(経験値)」が表示されます。\nトレーニングを記録してレベルを上げましょう！" },
-        // 中段メイン
         { targetId: 'tutorial-mission-btn', text: "「デイリーミッション」は毎日更新されます。\nクリアして報酬やXPを効率よくゲットしましょう！" },
         { targetId: 'tutorial-title-display', text: "ここには現在装備している「称号」が輝きます。\nレアな称号を手に入れて、強さをアピールしてください！" },
         { targetId: 'tutorial-char-display', text: "あなたのパートナーキャラクターです。\nレベルアップと共に進化していく姿を見守りましょう。" },
-        // キャラ横ボタン
         { targetId: 'tutorial-title-btn', text: "「称号」ボタンからコレクション画面へ。\n獲得した称号を付け替えて、個性を出せます。" },
         { targetId: 'tutorial-customize-btn', text: "「着せ替え」ボタンでは、ガチャで入手したアイテムを\nキャラクターに装備させることができます。" },
-        // アクションボタン群
         { targetId: 'tutorial-training-btn', text: "メイン機能はこれ！「トレーニングを開始」ボタン。\nここから日々の運動メニューを作成・記録します。" },
         { targetId: 'tutorial-record-btn', text: "「記録をつける」メニューを開くと、\n過去の履歴確認や、食事・体重の記録が個別にできます。" },
         { targetId: 'tutorial-care-btn', text: "疲れた時は「AIリフレッシュ＆ケア」。\n体調に合わせたストレッチや休息法をAIが提案します。" },
         { targetId: 'tutorial-map-btn', text: "「マップ」機能を使えば、\n近くのジムや公園、トレーニング施設をすぐに探せます。" },
         { targetId: 'tutorial-ai-btn', text: "トレーニングや食事の悩みは「AIチャット」へ。\n専属のAIコーチが24時間いつでも相談に乗ります！" },
-        // 下部ナビゲーション
         { targetId: 'nav-gacha', text: "ここからは下のメニューです。\n「ガチャ」では、着せ替えアイテムなどの報酬が手に入ります。" },
         { targetId: 'tutorial-friends-btn', text: "「フレンド」機能で仲間とつながりましょう。\nお互いに励まし合ったり、ランキングで競えます。" },
         { targetId: 'nav-community', text: "「掲示板」はユーザー同士の交流スペース。\n筋トレ情報の交換や、雑談で盛り上がりましょう。" },
         { targetId: 'nav-char', text: "「キャラ」メニューでは、キャラクター図鑑を見たり、\nパートナーの詳細ステータスを確認できます。" },
         { targetId: 'tutorial-muscles-btn', text: "「筋肉」タブでは、鍛えた部位が光る「マッスルパートナー」を表示。\n自分の成長箇所が一目でわかります！" },
         { targetId: 'nav-settings', text: "最後に「設定」。アカウント情報の変更や通知設定、\n生体認証(FaceID/TouchID)の登録もここから行えます。" },
-        // 終了
         { targetId: null, text: "機能説明は以上です。\nさあ、FitWorksで最高のフィットネスライフを始めましょう！" }
     ];
     
     let currentRpgStep = 0;
     let typeWriterInterval;
     let updateLoopId; 
-    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v16'; // バージョン更新で再表示
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v16'; 
 
     document.addEventListener('DOMContentLoaded', function() {
         if (!localStorage.getItem(STORAGE_KEY_RPG)) { setTimeout(() => startRpgTutorial(), 800); }
@@ -431,12 +383,10 @@
     function moveSpotlight(targetId) {
         const spotlight = document.getElementById('tutorial-spotlight');
         const pointer = document.getElementById('tutorial-pointer');
-        
         let targetEl = null;
         if (targetId) {
             targetEl = document.getElementById(targetId);
         }
-
         if (!targetId || !targetEl) {
             pointer.style.display = 'none';
             spotlight.style.width = '0'; spotlight.style.height = '0';
@@ -454,7 +404,6 @@
     function updateSpotlightPosition() {
         const step = rpgSteps[currentRpgStep];
         const msgBox = document.getElementById('tutorial-rpg-box');
-        
         if (!step || !step.targetId) {
              const scrollY = window.pageYOffset; 
              const scrollX = window.pageXOffset;
@@ -462,15 +411,12 @@
              msgBox.style.left = (scrollX + window.innerWidth/2) + 'px';
              return;
         }
-        
         const targetEl = document.getElementById(step.targetId);
         if(!targetEl) return;
-        
         const rect = targetEl.getBoundingClientRect();
         const scrollY = window.pageYOffset; const scrollX = window.pageXOffset;
         const spotlight = document.getElementById('tutorial-spotlight');
         const pointer = document.getElementById('tutorial-pointer');
-        
         spotlight.style.width = (rect.width + 20) + 'px';
         spotlight.style.height = (rect.height + 20) + 'px';
         spotlight.style.top = (rect.top + scrollY - 10) + 'px';
@@ -479,12 +425,9 @@
         pointer.style.left = (rect.left + scrollX + rect.width/2 - 20) + 'px';
         
         let boxTop = rect.top + scrollY - msgBox.offsetHeight - 20;
-        
-        // メッセージボックスが画面上部やナビゲーションに被らないように調整
         if (boxTop < scrollY + 10 || (step.targetId.startsWith('nav-')) || step.targetId.startsWith('tutorial-friends') || step.targetId.startsWith('tutorial-muscles')) {
              boxTop = rect.bottom + scrollY + 30;
         }
-
         msgBox.style.top = boxTop + 'px';
         msgBox.style.left = (rect.left + scrollX + rect.width/2) + 'px';
     }
@@ -503,13 +446,9 @@
         localStorage.setItem(STORAGE_KEY_RPG, 'true');
     }
 
-    // --- マウス連動背景アニメーション ---
     document.addEventListener('mousemove', (e) => {
-        // 画面の幅・高さに対するマウス位置の割合（0.0〜1.0）を計算
         const x = e.clientX / window.innerWidth;
         const y = e.clientY / window.innerHeight;
-        
-        // CSS変数に値をセット
         document.body.style.setProperty('--mouse-x', x);
         document.body.style.setProperty('--mouse-y', y);
     });
