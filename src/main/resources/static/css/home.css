@@ -34,7 +34,7 @@
 } 
  
 .xp-bar { 
-    background-color: #ffe8f0; 
+    background-color: #e3f2fd; /* 青テーマ: 薄い青 */
     border-radius: 12px; 
     height: 20px; 
     overflow: hidden; 
@@ -45,7 +45,7 @@
 .xp-progress { 
     height: 100%; 
     width: 65%; /* 暫定値 */ 
-    background: linear-gradient(90deg, #ffc8dd, var(--primary-color), #ff99c8); 
+    background: linear-gradient(90deg, #42a5f5, var(--primary-color), #2196f3); /* 青系グラデーション */
     transition: width 0.6s ease-in-out; 
     display: flex; 
     justify-content: flex-end; 
@@ -101,7 +101,7 @@
     justify-content: center; 
     align-items: center; 
     overflow: hidden; 
-    box-shadow: 0 6px 25px rgba(255, 105, 180, 0.4); 
+    box-shadow: 0 6px 25px rgba(33, 150, 243, 0.4); /* 青い影 */
     animation: softPulse 5s ease-in-out infinite alternate, gentleFloat 6s ease-in-out infinite alternate-reverse; 
     transform-origin: center bottom; 
 } 
@@ -238,7 +238,7 @@
 }
 
 /* ========================================================= */ 
-/* 🌟 RPG TUTORIAL V3 (FINAL: BUTTON BLOCK & DYNAMIC POSITION) 🌟 */ 
+/* 🌟 RPG TUTORIAL V3 🌟 */ 
 /* ========================================================= */ 
 
 .help-label-btn {
@@ -319,7 +319,7 @@
 .meal-opt { background: linear-gradient(135deg, #42a5f5, #4dd0e1); }
 .main-record-btn:active { transform: scale(0.98); }
 
-/* --- New Greeting Styles --- */
+/* --- New Greeting Styles (Blue Theme) --- */
 .home-greeting-container {
     text-align: center;
     margin-top: 60px; /* キャラクターとの被りを防ぐため大きめに確保 */
@@ -332,12 +332,13 @@
     font-size: 2.8rem;
     font-style: italic;
     margin: 0;
-    background: linear-gradient(45deg, #ff69b4, #ffb300);
+    /* 青グラデーションに変更 */
+    background: linear-gradient(45deg, #4facfe, #00f2fe);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     color: transparent;
-    text-shadow: 2px 4px 10px rgba(255, 105, 180, 0.2);
+    text-shadow: 2px 4px 10px rgba(0, 198, 251, 0.2);
     letter-spacing: -1px;
     line-height: 1.1;
 }
@@ -352,11 +353,11 @@
 }
 
 .home-username {
-    color: #ff69b4;
+    color: #0288d1; /* 青に変更 */
     font-size: 1.2rem;
     font-weight: 900;
     margin: 0 2px;
-    text-decoration: underline wavy #ffb300;
+    text-decoration: underline wavy #4facfe;
     text-underline-offset: 3px;
 }
 
@@ -372,59 +373,61 @@
 }
 
 /* ========================================================= */
-/* ☁️ INTERACTIVE 3D FLUFFY CLOUDS (Updated) */
+/* ☁️ INTERACTIVE 3D FLUFFY CLOUDS (BLUE THEME & FIXED) */
 /* ========================================================= */
 
 :root {
     --mouse-x: 0.5;
     --mouse-y: 0.5;
+    /* テーマカラー変数 */
+    --theme-blue-start: #4facfe;
+    --theme-blue-end: #00f2fe;
+    --theme-blue-shadow: rgba(79, 172, 254, 0.4);
 }
 
 body.home-page {
-    background-color: transparent !important; 
+    background-color: transparent !important; /* ベース背景を透過 */
 }
 
+/* 背景を固定してスクロールで見切れないように修正 */
 .interactive-bg {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     z-index: -1;
-    /* 空のグラデーション: 薄い青から白へ */
+    /* 爽やかな青空のグラデーション */
     background: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
     overflow: hidden;
     pointer-events: none;
 }
 
-/* --- 共通の雲スタイル (3D感とフワフワ感) --- */
+/* 共通の雲スタイル (3D感とフワフワ感) */
 .bg-cloud, .mouse-follower-cloud {
     position: absolute;
     background: #fff;
     border-radius: 50%;
-    /* 強いぼかしでフワフワ感を出す */
     filter: blur(20px);
-    /* 複数のシャドウで立体感（内側の影と外側の影） */
     box-shadow: 
-        inset -10px -10px 30px rgba(200, 220, 255, 0.8), /* 陰影 */
-        20px 20px 60px rgba(0, 0, 0, 0.05), /* ドロップシャドウ */
-        0 0 40px rgba(255, 255, 255, 0.9); /* 発光 */
+        inset -10px -10px 30px rgba(200, 220, 255, 0.8),
+        20px 20px 60px rgba(0, 0, 0, 0.05),
+        0 0 40px rgba(255, 255, 255, 0.9);
     opacity: 0.9;
 }
 
-/* ☁️ マウス追従クラウド (カーソルについてくる) */
+/* ☁️ マウス追従クラウド */
 .mouse-follower-cloud {
     width: 200px;
     height: 200px;
     top: 0;
     left: 0;
-    /* マウス位置を中心に配置 */
     transform: translate(calc(var(--mouse-x) * 100vw - 100px), calc(var(--mouse-y) * 100vh - 100px));
-    z-index: 5; /* 背景雲より手前 */
+    z-index: 5;
     opacity: 0.7;
     filter: blur(25px);
-    mix-blend-mode: overlay; /* 背景に馴染ませる */
-    transition: transform 0.1s linear; /* 素早く追従 */
+    mix-blend-mode: overlay;
+    transition: transform 0.1s linear;
 }
 
 /* ☁️ 背景の雲 (パララックス効果) */
@@ -435,7 +438,6 @@ body.home-page {
     height: 400px;
     opacity: 0.8;
     z-index: 1;
-    /* マウスと逆方向にゆっくり動く */
     transform: translate(calc(var(--mouse-x) * -40px), calc(var(--mouse-y) * -40px));
     animation: floatCloud 20s infinite alternate ease-in-out;
 }
@@ -468,7 +470,7 @@ body.home-page {
     width: 500px;
     height: 500px;
     opacity: 0.4;
-    transform: translate(calc(var(--mouse-x) * 30px), calc(var(--mouse-y) * 30px)); /* マウスと同方向に動く */
+    transform: translate(calc(var(--mouse-x) * 30px), calc(var(--mouse-y) * 30px));
 }
 
 @keyframes floatCloud {
@@ -476,13 +478,15 @@ body.home-page {
     100% { transform: translate(30px, -20px) scale(1.05); }
 }
 
-/* メインコンテンツの視認性確保（すりガラス） */
+/* メインコンテンツが見やすくなるよう調整 (すりガラス + 青い枠線) */
 .main-container {
     z-index: 10;
-    background: rgba(255, 255, 255, 0.4); 
-    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.45); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-radius: 20px;
     padding: 20px;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    /* 変更: 枠線を青の半透明に変更 */
+    border: 1px solid rgba(33, 150, 243, 0.4); 
 }
