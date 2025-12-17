@@ -412,9 +412,9 @@ public class TrainingController {
             savedCount = 1;
             earnedXP = 10;
         }
-
+        ExerciseData exerciseData = trainingDataService.getExerciseDataByName(exerciseIdentifier);
         if (savedCount > 0 && exerciseIdentifier != null) {
-            int baseDifficultyXp = trainingLogicService.getExperiencePoints(exerciseIdentifier);
+        	int baseDifficultyXp = trainingLogicService.getExperiencePoints(exerciseData);
             int additionalXp = 0;
             if ("WEIGHT".equals(form.getType())) {
                 additionalXp = trainingLogicService.calculateTotalVolumeXp(form);
@@ -439,7 +439,7 @@ public class TrainingController {
                 }
             }
 
-            int earnedChips = trainingLogicService.calculateChipReward(exerciseIdentifier);
+            int earnedChips = trainingLogicService.calculateChipReward(exerciseData);
             if (earnedChips > 0) {
                 userService.addChips(currentUser.getUsername(), earnedChips);
             }
@@ -497,7 +497,7 @@ public class TrainingController {
                 String targetPart = "その他";
                 int muscleXp = 0;
                 int itemXp = 0;
-
+                ExerciseData exerciseData = trainingDataService.getExerciseDataByName(form.getExerciseName());
                 if ("CARDIO".equals(form.getType())) {
                     if (form.getDurationMinutes() != null && form.getDurationMinutes() > 0) {
                         TrainingRecord record = new TrainingRecord();
@@ -513,7 +513,7 @@ public class TrainingController {
                         if (batchSummary.length() > 0) batchSummary.append(", ");
                         batchSummary.append(form.getExerciseName());
                         
-                        int baseXp = trainingLogicService.getExperiencePoints(form.getExerciseName());
+                        int baseXp = trainingLogicService.getExperiencePoints(exerciseData);
                         itemXp = (baseXp + form.getDurationMinutes());
                         targetPart = "有酸素";
                     }
@@ -539,7 +539,7 @@ public class TrainingController {
                             if (batchSummary.length() > 0) batchSummary.append(", ");
                             batchSummary.append(form.getExerciseName());
 
-                            int baseXp = trainingLogicService.getExperiencePoints(form.getExerciseName());
+                            int baseXp = trainingLogicService.getExperiencePoints(exerciseData);
                             int volXp = trainingLogicService.calculateTotalVolumeXp(form);
                             itemXp = (baseXp + volXp);
                             targetPart = trainingDataService.findPartByExerciseName(form.getExerciseName());

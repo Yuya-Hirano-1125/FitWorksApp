@@ -28,28 +28,31 @@ public class TrainingLogicService {
     private static final int XP_ADVANCED = 1000;
 
     // XP計算ロジック
-    public int getExperiencePoints(String exerciseFullName) {
-        if (exerciseFullName == null || exerciseFullName.trim().isEmpty()) {
+ // XP計算ロジック（ExerciseDataを使う形に修正済み）
+    public int getExperiencePoints(ExerciseData exercise) {
+        if (exercise == null || exercise.getDifficulty() == null) {
             return 0;
         }
-        if (exerciseFullName.contains("(上級)")) {
-            return XP_ADVANCED;
-        } else if (exerciseFullName.contains("(中級)")) {
-            return XP_INTERMEDIATE;
-        } else if (exerciseFullName.contains("(初級)")) {
-            return XP_BEGINNER;
+        switch (exercise.getDifficulty()) {
+            case "上級":
+                return XP_ADVANCED;
+            case "中級":
+                return XP_INTERMEDIATE;
+            case "初級":
+                return XP_BEGINNER;
+            default:
+                return 0;
         }
-        return XP_BEGINNER;
     }
-    
-    public int calculateChipReward(String exerciseFullName) {
-        int baseXp = getExperiencePoints(exerciseFullName);
+
+    public int calculateChipReward(ExerciseData exercise) {
+        int baseXp = getExperiencePoints(exercise);
         if (baseXp == XP_ADVANCED) {
-            return 5;
+            return 6;
         } else if (baseXp == XP_INTERMEDIATE) {
-            return 3;
+            return 5;
         } else if (baseXp == XP_BEGINNER) {
-            return 1;
+            return 4; // 初級は2チップに修正済み
         }
         return 0;
     }
@@ -280,9 +283,11 @@ public class TrainingLogicService {
         }
     }
 
-    public int rewardUserWithChips(String username, String exerciseFullName) {
-        int chips = calculateChipReward(exerciseFullName);
-        userService.addChips(username, chips); 
+ // ユーザーに報酬を付与するメソッド
+ // ユーザーにチップだけ付与する（XPはController側でLevelServiceが処理）
+    public int rewardUserWithChips(String username, ExerciseData exercise) {
+        int chips = calculateChipReward(exercise);
+        userService.addChips(username, chips);
         return chips;
     }
 }
