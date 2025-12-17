@@ -167,6 +167,14 @@
 </head>
 <body class="home-page">
 
+<div class="interactive-bg">
+    <div class="mouse-follower-cloud"></div>
+    
+    <div class="bg-cloud cloud-1"></div>
+    <div class="bg-cloud cloud-2"></div>
+    <div class="bg-cloud cloud-3"></div>
+    <div class="bg-cloud cloud-4"></div>
+</div>
 <div class="main-container" style="position: relative;"> 
     <button id="help-btn" class="help-label-btn" onclick="toggleHelpMenu()">
         <span style="font-size: 1.2em;">🔰</span> ヘルプ
@@ -182,7 +190,7 @@
     </div>
 
     <div class="app-logo-display">
-        <img th:src="@{/img/applogo.jpg}" alt="App Logo" />
+        <img th:src="@{/img/applogo-new.png}" alt="App Logo" />
         <div id="tutorial-xp-area">
             <div class="xp-daily-header"></div>
             <div class="xp-bar-container">
@@ -466,6 +474,17 @@
         stopUpdateLoop();
         localStorage.setItem(STORAGE_KEY_RPG, 'true');
     }
+
+    // --- マウス連動背景アニメーション ---
+    document.addEventListener('mousemove', (e) => {
+        // 画面の幅・高さに対するマウス位置の割合（0.0〜1.0）を計算
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        
+        // CSS変数に値をセット
+        document.body.style.setProperty('--mouse-x', x);
+        document.body.style.setProperty('--mouse-y', y);
+    });
 </script>
 </body>
 </html>

@@ -370,3 +370,119 @@
 .weight-opt {
     background: linear-gradient(135deg, #009688, #4db6ac);
 }
+
+/* ========================================================= */
+/* ☁️ INTERACTIVE 3D FLUFFY CLOUDS (Updated) */
+/* ========================================================= */
+
+:root {
+    --mouse-x: 0.5;
+    --mouse-y: 0.5;
+}
+
+body.home-page {
+    background-color: transparent !important; 
+}
+
+.interactive-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    /* 空のグラデーション: 薄い青から白へ */
+    background: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* --- 共通の雲スタイル (3D感とフワフワ感) --- */
+.bg-cloud, .mouse-follower-cloud {
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+    /* 強いぼかしでフワフワ感を出す */
+    filter: blur(20px);
+    /* 複数のシャドウで立体感（内側の影と外側の影） */
+    box-shadow: 
+        inset -10px -10px 30px rgba(200, 220, 255, 0.8), /* 陰影 */
+        20px 20px 60px rgba(0, 0, 0, 0.05), /* ドロップシャドウ */
+        0 0 40px rgba(255, 255, 255, 0.9); /* 発光 */
+    opacity: 0.9;
+}
+
+/* ☁️ マウス追従クラウド (カーソルについてくる) */
+.mouse-follower-cloud {
+    width: 200px;
+    height: 200px;
+    top: 0;
+    left: 0;
+    /* マウス位置を中心に配置 */
+    transform: translate(calc(var(--mouse-x) * 100vw - 100px), calc(var(--mouse-y) * 100vh - 100px));
+    z-index: 5; /* 背景雲より手前 */
+    opacity: 0.7;
+    filter: blur(25px);
+    mix-blend-mode: overlay; /* 背景に馴染ませる */
+    transition: transform 0.1s linear; /* 素早く追従 */
+}
+
+/* ☁️ 背景の雲 (パララックス効果) */
+.cloud-1 {
+    top: 10%;
+    left: 10%;
+    width: 400px;
+    height: 400px;
+    opacity: 0.8;
+    z-index: 1;
+    /* マウスと逆方向にゆっくり動く */
+    transform: translate(calc(var(--mouse-x) * -40px), calc(var(--mouse-y) * -40px));
+    animation: floatCloud 20s infinite alternate ease-in-out;
+}
+
+.cloud-2 {
+    bottom: 5%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    opacity: 0.6;
+    z-index: 2;
+    transform: translate(calc(var(--mouse-x) * -20px), calc(var(--mouse-y) * -20px));
+    animation: floatCloud 25s infinite alternate-reverse ease-in-out;
+}
+
+.cloud-3 {
+    top: 40%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    opacity: 0.5;
+    z-index: 0;
+    filter: blur(30px);
+    transform: translate(calc(var(--mouse-x) * -60px), calc(var(--mouse-y) * -60px));
+}
+
+.cloud-4 {
+    bottom: 20%;
+    left: -100px;
+    width: 500px;
+    height: 500px;
+    opacity: 0.4;
+    transform: translate(calc(var(--mouse-x) * 30px), calc(var(--mouse-y) * 30px)); /* マウスと同方向に動く */
+}
+
+@keyframes floatCloud {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, -20px) scale(1.05); }
+}
+
+/* メインコンテンツの視認性確保（すりガラス） */
+.main-container {
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.4); 
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
