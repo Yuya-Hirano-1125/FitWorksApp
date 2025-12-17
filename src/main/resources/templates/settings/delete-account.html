@@ -4,64 +4,188 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>アカウント削除 | FitWorks</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/settings.css}">
 	
 	<script th:src="@{/js/theme.js}"></script>
     <style>
+        /* ==========================================================================
+           ✨ BACKGROUND & GLASS DESIGN
+           ========================================================================== */
+        body {
+            margin: 0; padding: 0;
+            background-color: #f0f8ff;
+            min-height: 100vh;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: #333; /* 基本文字色を黒に */
+        }
+
+        /* 背景アニメーション */
+        .interactive-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
+        }
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
+            animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0;
+        }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+        
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+        .mouse-flare {
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px);
+        }
+
+        /* ガラス風メインコンテナ (base.cssの上書き) */
+        .main-container.glass-mode {
+            background: rgba(255, 255, 255, 0.75) !important; /* 少し濃いめにして文字を見やすく */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 50px rgba(100, 149, 237, 0.2) !important;
+            border-radius: 30px;
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 40px;
+        }
+
+        /* ページ固有スタイル */
         .always-open {
             display: block !important;
             max-height: none !important;
             padding: 15px !important;
             border: none !important;
+            background: transparent !important; /* 背景を透明にして親に合わせる */
         }
         .warning-text {
-            color: var(--error-color);
-            font-weight: bold;
+            color: #c0392b; /* 濃い赤 */
+            font-weight: 800;
             margin-bottom: 15px;
-            line-height: 1.6;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.8);
+            margin-bottom: 30px;
+        }
+        
+        /* セクションスタイル調整 */
+        .setting-section {
+            background: rgba(255,255,255,0.6);
+            border-radius: 15px;
+            border: 2px solid #e74c3c; /* 赤枠で警告感を出す */
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.15);
+        }
+        
+        .section-header {
+            color: #c0392b;
+            font-weight: 900;
+            font-size: 1.2rem;
+            border-bottom: 1px solid rgba(231, 76, 60, 0.3);
+            padding: 15px;
         }
     </style>
 </head>
 <body class="settings-page">
-<div class="main-container">
-    <h1><i class="fa-solid fa-user-slash header-icon"></i> アカウント削除</h1>
-    
-    <!-- 注意事項セクション -->
-    <div class="setting-section" style="--section-index: 1;">
-        <div class="section-header">
-            <div><span class="section-icon"><i class="fa-solid fa-triangle-exclamation"></i></span> 注意事項</div>
-        </div>
-        <div class="section-content always-open">
-            <p class="warning-text">⚠ この操作は取り消せません</p>
-            <p class="warning-text">
-                アカウントを削除すると、すべてのデータ（トレーニング履歴、進捗、設定など）が完全に失われます。<br>
-                再度ログインすることはできません。慎重にご確認ください。
-            </p>
-        </div>
+
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div id="mouse-flare" class="mouse-flare"></div>
     </div>
 
-    <!-- ボタンコンテナ -->
-    <div class="button-container" style="margin-top: 40px;">
-        <form th:action="@{/delete-account}" method="post" onsubmit="return confirmDelete()">
-            <button type="submit" class="button primary" 
-                    style="background: var(--error-color); border-color: var(--error-color); box-shadow: 0 8px 25px rgba(255, 74, 74, 0.6);">
-                退会する <i class="fa-solid fa-trash"></i>
-            </button>
-        </form>
+    <div class="main-container glass-mode">
+        <h1><i class="fa-solid fa-user-slash header-icon" style="color: #e74c3c;"></i> アカウント削除</h1>
         
-        <a th:href="@{/settings}" class="button secondary" style="margin-top: 10px;">
-            キャンセルして戻る <i class="fa-solid fa-rotate-left"></i>
-        </a>
-    </div>
-</div>
+        <div class="setting-section" style="--section-index: 1;">
+            <div class="section-header">
+                <div><span class="section-icon"><i class="fa-solid fa-triangle-exclamation"></i></span> 注意事項</div>
+            </div>
+            <div class="section-content always-open">
+                <p class="warning-text" style="font-size: 1.2rem;">⚠ この操作は取り消せません</p>
+                <p class="warning-text">
+                    アカウントを削除すると、すべてのデータ（トレーニング履歴、進捗、設定など）が完全に失われます。<br>
+                    再度ログインすることはできません。<br>慎重にご確認ください。
+                </p>
+            </div>
+        </div>
 
-<script>
-    function confirmDelete() {
-        return confirm("本当にアカウントを削除しますか？\nこの操作は元に戻せません。");
-    }
-</script>
+        <div class="button-container" style="margin-top: 40px;">
+            <form th:action="@{/delete-account}" method="post" onsubmit="return confirmDelete()">
+                <button type="submit" class="button primary" 
+                        style="background: linear-gradient(45deg, #ff416c, #ff4b2b); border: none; box-shadow: 0 8px 20px rgba(255, 65, 108, 0.4); color: white; font-weight: 800;">
+                    退会する <i class="fa-solid fa-trash"></i>
+                </button>
+            </form>
+            
+            <a th:href="@{/settings}" class="button secondary" style="margin-top: 15px; background: white; color: #333; border: 2px solid #ccc; font-weight: bold;">
+                キャンセルして戻る <i class="fa-solid fa-rotate-left"></i>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function confirmDelete() {
+            return confirm("本当にアカウントを削除しますか？\nこの操作は元に戻せません。");
+        }
+
+        // === 背景アニメーションスクリプト ===
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        const flare = document.getElementById('mouse-flare');
+        let particlesArray = [];
+        let width, height;
+
+        function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x; mouse.y = event.y;
+            flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+            particlesArray.push(new Particle(event.clientX, event.clientY));
+        });
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x || Math.random() * width; this.y = y || Math.random() * height;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2;
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+            }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update(); particlesArray[i].draw();
+                if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
 </body>
 </html>
