@@ -14,13 +14,84 @@
     <style>
         /* --- スタート画面専用スタイル（レスポンシブ対応） --- */
 
-        /* 画面全体のコンテナ設定 */
+        :root {
+            --mouse-x: 0.5;
+            --mouse-y: 0.5;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: transparent !important; /* 背景色を透過してinteractive-bgを表示 */
+            min-height: 100vh;
+        }
+
+        /* ☁️ インタラクティブ背景 (ホーム画面と共通) */
+        .interactive-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            /* 空のグラデーション: 薄い青から白へ */
+            background: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .bg-cloud, .mouse-follower-cloud {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            filter: blur(20px);
+            box-shadow: 
+                inset -10px -10px 30px rgba(200, 220, 255, 0.8),
+                20px 20px 60px rgba(0, 0, 0, 0.05),
+                0 0 40px rgba(255, 255, 255, 0.9);
+            opacity: 0.9;
+        }
+
+        .mouse-follower-cloud {
+            width: 200px;
+            height: 200px;
+            top: 0;
+            left: 0;
+            transform: translate(calc(var(--mouse-x) * 100vw - 100px), calc(var(--mouse-y) * 100vh - 100px));
+            z-index: 5;
+            opacity: 0.7;
+            filter: blur(25px);
+            mix-blend-mode: overlay;
+            transition: transform 0.1s linear;
+        }
+
+        .cloud-1 { top: 10%; left: 10%; width: 400px; height: 400px; opacity: 0.8; z-index: 1; transform: translate(calc(var(--mouse-x) * -40px), calc(var(--mouse-y) * -40px)); animation: floatCloud 20s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -10%; width: 600px; height: 600px; opacity: 0.6; z-index: 2; transform: translate(calc(var(--mouse-x) * -20px), calc(var(--mouse-y) * -20px)); animation: floatCloud 25s infinite alternate-reverse ease-in-out; }
+        .cloud-3 { top: 40%; left: 50%; width: 300px; height: 300px; opacity: 0.5; z-index: 0; filter: blur(30px); transform: translate(calc(var(--mouse-x) * -60px), calc(var(--mouse-y) * -60px)); }
+        .cloud-4 { bottom: 20%; left: -100px; width: 500px; height: 500px; opacity: 0.4; transform: translate(calc(var(--mouse-x) * 30px), calc(var(--mouse-y) * 30px)); }
+
+        @keyframes floatCloud {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -20px) scale(1.05); }
+        }
+
+        /* 画面全体のコンテナ設定 (すりガラス効果追加) */
         .main-container {
             max-width: 600px;
             width: 90%;
             margin: 40px auto;
             padding: 40px 30px;
-            text-align: center; /* 全体を中央揃えベースに */
+            text-align: center;
+            
+            /* Glassmorphism */
+            background: rgba(255, 255, 255, 0.4); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            position: relative;
+            z-index: 10;
         }
 
         /* ロゴ周り */
@@ -32,11 +103,12 @@
         .start-logo {
             width: 160px;
             height: 160px;
-            border-radius: 40px; /* 少し丸みを強く */
+            border-radius: 40px; 
             object-fit: contain;
-            background-color: #fff;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* 影を少しリッチに */
+            background-color: rgba(255, 255, 255, 0.9); /* 少し透過 */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             transition: transform 0.3s ease;
+            padding: 10px; /* 余白を追加 */
         }
         
         .start-logo:hover {
@@ -49,34 +121,37 @@
             font-size: 2.6rem;
             font-weight: 800;
             margin-bottom: 10px;
-            color: #333;
+            color: #444; /* コントラスト調整 */
             letter-spacing: 1px;
+            text-shadow: 2px 2px 0px rgba(255,255,255,0.5);
         }
 
         .catch-copy {
             font-size: 1.2rem;
             font-weight: bold;
-            color: rgb(240, 152, 172); /* アプリのテーマカラーに合わせる */
+            color: rgb(240, 152, 172); 
             margin-bottom: 10px;
             display: block;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.8);
         }
 
         .sub-heading {
             font-size: 1.0rem;
             margin-bottom: 30px;
-            color: #666;
+            color: #555;
             line-height: 1.6;
+            font-weight: 600;
         }
 
-        /* アプリ説明カード */
+        /* アプリ説明カード (背景に馴染ませる) */
         .app-description {
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.6); /* 半透明に */
             border-radius: 25px;
             padding: 30px;
             margin: 30px 0;
             text-align: left;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            border: 1px solid rgba(0,0,0,0.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .description-text {
@@ -84,9 +159,10 @@
             color: #555;
             line-height: 1.8;
             margin-bottom: 25px;
+            font-weight: 500;
         }
 
-        /* 特徴リストを2列グリッドにして見やすく */
+        /* 特徴リスト */
         .feature-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -127,7 +203,7 @@
             padding: 18px 25px;
             font-size: 1.1rem;
             font-weight: 700;
-            border-radius: 50px; /* 角丸を強くしてモダンに */
+            border-radius: 50px; 
             width: 100%;
             display: block;
             text-align: center;
@@ -138,7 +214,6 @@
             overflow: hidden;
         }
 
-        /* プライマリーボタン（登録）を目立たせる */
         .button.primary {
             background: linear-gradient(45deg, #ff9966, #ff5e62);
             color: white;
@@ -147,83 +222,57 @@
         }
 
         .button.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 94, 98, 0.5);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 94, 98, 0.5);
         }
         
-        .button.primary i {
-            margin-right: 8px;
-        }
+        .button.primary i { margin-right: 8px; }
 
         .button.secondary {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.8);
             color: #555;
-            border: 2px solid #eee;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
         
         .button.secondary:hover {
             background: #fff;
-            border-color: #ddd;
             color: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
         }
 
-        /* アニメーション用 */
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ------------------------------------------- */
-        /* スマホ向けレスポンシブ設定 (画面幅 480px以下) */
-        /* ------------------------------------------- */
+        /* スマホ向け */
         @media screen and (max-width: 480px) {
-            .main-container {
-                width: 92%;
-                padding: 20px 15px;
-            }
-
-            .start-logo {
-                width: 200px;
-                height: 200px;
-            }
-
-            h1 {
-                font-size: 2.0rem;
-            }
-            
-            .catch-copy {
-                font-size: 1.0rem;
-            }
-
-            .sub-heading {
-                font-size: 0.9rem;
-            }
-
-            .app-description {
-                padding: 20px;
-            }
-            
-            .description-text {
-                font-size: 0.95rem;
-            }
-
-            /* スマホでは1列に戻すか、文字サイズ調整 */
-            .feature-grid {
-                gap: 12px;
-            }
-            
-            .feature-item {
-                font-size: 0.9rem;
-            }
-
-            .button {
-                padding: 15px 20px;
-                font-size: 1rem;
-            }
+            .main-container { width: 92%; padding: 20px 15px; margin-top: 20px; }
+            .start-logo { width: 140px; height: 140px; }
+            h1 { font-size: 2.0rem; }
+            .catch-copy { font-size: 1.0rem; }
+            .sub-heading { font-size: 0.9rem; }
+            .app-description { padding: 20px; }
+            .description-text { font-size: 0.95rem; }
+            .feature-grid { gap: 12px; }
+            .feature-item { font-size: 0.9rem; }
+            .button { padding: 15px 20px; font-size: 1rem; }
         }
     </style>
 </head>
 <body>
+
+<div class="interactive-bg">
+    <div class="mouse-follower-cloud"></div>
+    
+    <div class="bg-cloud cloud-1"></div>
+    <div class="bg-cloud cloud-2"></div>
+    <div class="bg-cloud cloud-3"></div>
+    <div class="bg-cloud cloud-4"></div>
+</div>
+
 <div class="main-container">
     <div class="start-logo-container">
         <img th:src="@{/img/icon.png}" alt="FitWorks Logo" class="start-logo" />
@@ -272,9 +321,23 @@
         </a>
     </div>
     
-    <p style="margin-top: 30px; font-size: 0.8rem; color: #bbb;">
+    <p style="margin-top: 30px; font-size: 0.8rem; color: #888; font-weight: 600;">
         &copy; 2025 FitWorks Project
     </p>
 </div>
+
+<script>
+    // マウス連動背景アニメーション
+    document.addEventListener('mousemove', (e) => {
+        // 画面の幅・高さに対するマウス位置の割合（0.0〜1.0）を計算
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        
+        // CSS変数に値をセット
+        document.body.style.setProperty('--mouse-x', x);
+        document.body.style.setProperty('--mouse-y', y);
+    });
+</script>
+
 </body>
 </html>
