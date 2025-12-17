@@ -420,6 +420,9 @@ public class UserService {
             userRepository.save(user);
         });
     }
+    public int getUserMaterialCount(String username, Long item_id) {
+    	List<UserItem> items = userItemRepository.findAllByUser_UsernameAndItemId(username, item_id);
+        		return items.size(); // 1レコード=1個方式なのでサイズを返す
 
-
+    }
 }
