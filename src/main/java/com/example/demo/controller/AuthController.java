@@ -96,6 +96,14 @@ public class AuthController {
         // ★追加: 称号を表示するためにモデルに格納
         model.addAttribute("userTitle", user.getDisplayTitle());
 
+        
+     // 選択中の背景を取得
+        String selectedBackground = user.getSelectedBackground();
+        if (selectedBackground == null || selectedBackground.isEmpty()) {
+            selectedBackground = "fire-original";
+        }
+        model.addAttribute("selectedBackground", selectedBackground);
+        
         return "misc/home";
     }
 

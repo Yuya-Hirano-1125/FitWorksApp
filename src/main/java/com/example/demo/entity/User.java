@@ -48,14 +48,11 @@ public class User {
 
     private String providerId;
 
-
-    private Integer level ;
-
+    private Integer level;
 
     private LocalDate lastMissionCompletionDate;
     private Boolean isRewardClaimedToday = false;
 
-    // ★追加: 現在装備している称号
     @Enumerated(EnumType.STRING)
     private AppTitle equippedTitle;
 
@@ -67,12 +64,10 @@ public class User {
     @JoinColumn(name = "equipped_costume_item_id")
     private Item equippedCostumeItem;
 
-    // --- 通知設定 ---
     private Boolean notificationTrainingReminder = true;
     private Boolean notificationAiSuggestion = true;
     private Boolean notificationProgressReport = false;
     
-    // 生活リズムに合わせた通知時間 (デフォルトは12:00)
     private LocalTime lifestyleReminderTime = LocalTime.of(12, 0);
 
     private String theme = "default";
@@ -80,7 +75,6 @@ public class User {
     private String resetPasswordToken;
     private LocalDateTime tokenExpiration;
     
-    // --- フレンド機能 ---
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_friends",
@@ -97,15 +91,24 @@ public class User {
     )
     private Set<User> receivedFriendRequests = new HashSet<>();
 
-    // --- チップ機能 ---
     @Column(name = "chip")
     private Integer chipCount;
 
-    // --- ★追加: 解放済みキャラクター管理 ---
+    // 解放済みキャラクター管理
     @ElementCollection
     @CollectionTable(name = "user_unlocked_characters", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "character_id")
     private Set<Long> unlockedCharacters = new HashSet<>();
+
+    // ★★★ 追加: 解放済み背景管理 ★★★
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_unlocked_backgrounds", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "background_id")
+    private Set<String> unlockedBackgrounds = new HashSet<>();
+
+    // ★★★ 追加: 選択中の背景 ★★★
+    @Column(name = "selected_background")
+    private String selectedBackground = "fire-original";
 
     public User() {
         if (this.level == null) this.level = 1;
@@ -237,7 +240,6 @@ public class User {
         this.chipCount = chipCount; 
     }
 
-    // チップを加算
     public void addChips(int chips) {
         if (chips > 0) {
             if (chipCount == null) chipCount = 0;
@@ -245,7 +247,6 @@ public class User {
         }
     }
 
-    // チップを消費
     public boolean useChips(int chips) {
         if (chips > 0 && chipCount != null && chipCount >= chips) {
             chipCount -= chips;
@@ -254,7 +255,7 @@ public class User {
         return false;
     }
 
-    // --- ★解放済みキャラクター管理 ---
+    // --- 解放済みキャラクター管理 ---
     public void addUnlockedCharacter(Long characterId) {
         if (unlockedCharacters == null) {
             unlockedCharacters = new HashSet<>();
@@ -272,5 +273,37 @@ public class User {
 
     public void setUnlockedCharacters(Set<Long> unlockedCharacters) {
         this.unlockedCharacters = unlockedCharacters;
+    }
+
+    // ★★★ 追加: 解放済み背景管理メソッド ★★★
+    public Set<String> getUnlockedBackgrounds() {
+        if (unlockedBackgrounds == null) {
+            unlockedBackgrounds = new HashSet<>();
+        }
+        return unlockedBackgrounds;
+    }
+
+    public void setUnlockedBackgrounds(Set<String> unlockedBackgrounds) {
+        this.unlockedBackgrounds = unlockedBackgrounds;
+    }
+
+    public void addUnlockedBackground(String backgroundId) {
+        if (unlockedBackgrounds == null) {
+            unlockedBackgrounds = new HashSet<>();
+        }
+        unlockedBackgrounds.add(backgroundId);
+    }
+
+    public boolean hasUnlockedBackground(String backgroundId) {
+        return unlockedBackgrounds != null && unlockedBackgrounds.contains(backgroundId);
+    }
+
+    // ★★★ 追加: 選択中の背景管理メソッド ★★★
+    public String getSelectedBackground() {
+        return selectedBackground != null ? selectedBackground : "fire-original";
+    }
+
+    public void setSelectedBackground(String selectedBackground) {
+        this.selectedBackground = selectedBackground;
     }
 }
