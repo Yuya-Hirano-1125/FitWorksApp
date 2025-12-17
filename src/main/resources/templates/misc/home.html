@@ -12,7 +12,7 @@
     
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* HTML内スタイルは、home.cssでカバーできない動的なものや微調整のみ残します */
+        /* HTMLå†…ã‚¹ã‚¿ã‚¤ãƒ«ã¯ã€home.cssã§ã‚«ãƒãƒ¼ã§ããªã„å‹•çš„ãªã‚‚ã®ã‚„å¾®èª¿æ•´ã®ã¿æ®‹ã—ã¾ã™ */
         
         .xp-bar { width: 100%; height: 25px; background: #e3f2fd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
         .xp-progress { height: 100%; background: linear-gradient(90deg, #42a5f5, #2196f3); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
@@ -106,12 +106,12 @@
         .help-menu-item { display: block; padding: 10px; text-decoration: none; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9em; transition: transform 0.2s; border: none; width: 100%; cursor: pointer; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box; }
         .help-menu-item:hover { transform: scale(1.03); }
 
-        /* Tutorial関連のCSSは home.css に移動しました。ここでは競合を避けるため削除しています */
+        /* Tutorialé–¢é€£ã®CSSã¯ home.css ã«ç§»å‹•ã—ã¾ã—ãŸã€‚ã"ã"ã§ã¯ç«¶åˆã‚'é¿ã'ã‚‹ãŸã‚å‰Šé™¤ã—ã¦ã„ã¾ã™ */
         .tutorial-pointer { position: absolute; z-index: 10000; font-size: 2.5rem; color: #f1c40f; display: none; animation: point-move 1s infinite alternate; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .tutorial-pointer::before { content: '\f0a6'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
         @keyframes point-move { from { transform: translateY(0); } to { transform: translateY(-10px); } }
         
-        /* 挨拶文のスタイル */
+        /* æŒ¨æ‹¶æ–‡ã®ã‚¹ã‚¿ã‚¤ãƒ« */
         .home-greeting-container {
             text-align: center;
             margin-top: 60px;
@@ -148,6 +148,287 @@
             text-decoration: underline wavy #4facfe;
             text-underline-offset: 3px;
         }
+
+        /* どうぶつの森風背景解放ポップアップ */
+        .background-unlock-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* どうぶつの森風メインコンテナ */
+        .background-unlock-content {
+            background: linear-gradient(180deg, #fffef7 0%, #faf8f0 100%);
+            border: 6px solid #d4a373;
+            border-radius: 30px;
+            padding: 0;
+            max-width: 520px;
+            width: 90%;
+            box-shadow: 
+                0 0 0 3px #f5e6d3,
+                0 0 0 9px #d4a373,
+                0 15px 35px rgba(0, 0, 0, 0.3);
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes popIn {
+            0% { 
+                transform: scale(0.5) rotate(-5deg); 
+                opacity: 0; 
+            }
+            60% {
+                transform: scale(1.05) rotate(2deg);
+            }
+            100% { 
+                transform: scale(1) rotate(0deg); 
+                opacity: 1; 
+            }
+        }
+
+        /* 葉っぱの装飾 */
+        .leaf-decoration {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.15;
+            pointer-events: none;
+            animation: leafFloat 4s ease-in-out infinite;
+        }
+
+        .leaf-decoration::before {
+            content: '🍃';
+        }
+
+        .leaf-decoration:nth-child(1) { top: 15px; left: 15px; animation-delay: 0s; }
+        .leaf-decoration:nth-child(2) { top: 15px; right: 15px; animation-delay: 1s; }
+        .leaf-decoration:nth-child(3) { bottom: 15px; left: 15px; animation-delay: 2s; }
+        .leaf-decoration:nth-child(4) { bottom: 15px; right: 15px; animation-delay: 3s; }
+
+        @keyframes leafFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        /* ヘッダー部分 */
+        .ff-header {
+            background: linear-gradient(180deg, #9bcc7a 0%, #7db85e 100%);
+            border-bottom: 5px solid #6a9c4f;
+            border-radius: 24px 24px 0 0;
+            padding: 25px 20px;
+            position: relative;
+            box-shadow: 
+                inset 0 2px 0 rgba(255, 255, 255, 0.4),
+                0 3px 0 rgba(106, 156, 79, 0.3);
+        }
+
+        .ff-header::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 2px;
+        }
+
+        /* タイトル */
+        .background-unlock-title {
+            color: #ffffff;
+            font-size: 1.35rem;
+            font-weight: bold;
+            margin: 0;
+            text-align: center;
+            letter-spacing: 0.5px;
+            font-family: Arial, sans-serif;
+            text-shadow: 
+                2px 2px 0 rgba(106, 156, 79, 0.8),
+                -1px -1px 0 rgba(106, 156, 79, 0.3);
+        }
+
+        /* コンテンツ部分 */
+        .ff-content {
+            padding: 30px 25px;
+            position: relative;
+        }
+
+        /* リストコンテナ */
+        .background-unlock-list {
+            background: #ffffff;
+            border: 4px solid #e8d5b7;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 
+                inset 0 2px 0 rgba(0, 0, 0, 0.03),
+                0 3px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* アイテム */
+        .background-unlock-item {
+            background: linear-gradient(135deg, #fff9f0 0%, #fef5e7 100%);
+            border: 3px solid #f4d9a6;
+            border-radius: 15px;
+            color: #5a4a3a;
+            font-size: 1.05rem;
+            font-weight: bold;
+            margin: 12px 0;
+            padding: 14px 18px;
+            position: relative;
+            animation: itemBounce 0.5s ease-out forwards;
+            opacity: 0;
+            box-shadow: 
+                0 4px 0 #e8c78e,
+                0 5px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .background-unlock-item:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 7px 0 #e8c78e,
+                0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes itemBounce {
+            0% { 
+                transform: scale(0.3) translateY(-20px); 
+                opacity: 0; 
+            }
+            50% {
+                transform: scale(1.1) translateY(0);
+                opacity: 1;
+            }
+            100% { 
+                transform: scale(1) translateY(0); 
+                opacity: 1; 
+            }
+        }
+
+        .background-unlock-item:nth-child(1) { animation-delay: 0.1s; }
+        .background-unlock-item:nth-child(2) { animation-delay: 0.2s; }
+        .background-unlock-item:nth-child(3) { animation-delay: 0.3s; }
+        .background-unlock-item:nth-child(4) { animation-delay: 0.4s; }
+
+        .background-unlock-item::before {
+            content: '✿';
+            position: absolute;
+            left: -18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9bcc7a;
+            font-size: 1.3rem;
+            animation: flowerSpin 3s ease-in-out infinite;
+        }
+
+        @keyframes flowerSpin {
+            0%, 100% { transform: translateY(-50%) rotate(0deg); }
+            50% { transform: translateY(-50%) rotate(180deg); }
+        }
+
+        .background-unlock-item i {
+            color: #f4a460;
+            margin-right: 10px;
+            font-size: 1.1rem;
+        }
+
+        .background-unlock-item strong {
+            color: #6a5a4a;
+        }
+
+        /* ボタンコンテナ */
+        .background-unlock-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            padding: 0 25px 30px;
+            position: relative;
+        }
+
+        .background-unlock-buttons button,
+        .background-unlock-buttons a {
+            padding: 14px 26px;
+            border: 4px solid #d4a373;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            transition: all 0.2s ease;
+            font-family: Arial, sans-serif;
+            box-shadow: 
+                0 5px 0 #b8906a,
+                0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .background-unlock-buttons button:active,
+        .background-unlock-buttons a:active {
+            transform: translateY(3px);
+            box-shadow: 
+                0 2px 0 #b8906a,
+                0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .background-unlock-buttons button:hover,
+        .background-unlock-buttons a:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 7px 0 #b8906a,
+                0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 後で確認ボタン */
+        .btn-later {
+            background: linear-gradient(180deg, #f4e4c1 0%, #e8d5b7 100%);
+            color: #6a5a4a;
+            border-color: #d4a373;
+        }
+
+        /* 背景一覧へボタン */
+        .btn-go-backgrounds {
+            background: linear-gradient(180deg, #9bcc7a 0%, #7db85e 100%);
+            color: #ffffff;
+            border-color: #6a9c4f;
+            box-shadow: 
+                0 5px 0 #5a8c3f,
+                0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-go-backgrounds:active {
+            box-shadow: 
+                0 2px 0 #5a8c3f,
+                0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-go-backgrounds:hover {
+            box-shadow: 
+                0 7px 0 #5a8c3f,
+                0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-go-backgrounds i {
+            color: #f4d9a6;
+        }
     </style>
 </head>
 <body class="home-page">
@@ -162,7 +443,7 @@
 
 <div class="main-container" style="position: relative;"> 
     <button id="help-btn" class="help-label-btn" onclick="toggleHelpMenu()">
-        <span style="font-size: 1.2em;">🔰</span> ヘルプ
+        <span style="font-size: 1.2em;">📰</span> ヘルプ
     </button>
     
     <div id="help-menu" class="help-menu-dropdown">
@@ -223,7 +504,7 @@
     <div class="home-greeting-container">
         <h1 class="home-app-title">FitWorks</h1>
         <p class="home-greeting-text">
-            こんにちは、<span class="home-username" th:text="${username}"></span>さん！
+            こんにちは、<span class="home-username" th:text="${username}"></span>さん!
         </p>
     </div>
     
@@ -256,7 +537,7 @@
             color: #555; font-weight: bold; text-decoration: none;
             border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         ">
-            ☕️ AIリフレッシュ＆ケア
+            ☕️ AIリフレッシュ&ケア
         </a>
     </div>
 
@@ -290,20 +571,110 @@
         </div>
     </div>
 </div>
+
+<!-- どうぶつの森風背景解放ポップアップ -->
+<div id="background-unlock-popup" class="background-unlock-overlay" style="display: none;">
+    <div class="background-unlock-content">
+        <!-- 葉っぱの装飾 -->
+        <div class="leaf-decoration"></div>
+        <div class="leaf-decoration"></div>
+        <div class="leaf-decoration"></div>
+        <div class="leaf-decoration"></div>
+
+        <!-- ヘッダー -->
+        <div class="ff-header">
+            <h2 class="background-unlock-title">あたらしい背景が手に入ったよ!</h2>
+        </div>
+
+        <!-- コンテンツ -->
+        <div class="ff-content">
+            <div id="background-unlock-list" class="background-unlock-list">
+                <!-- JavaScriptで動的に挿入 -->
+            </div>
+        </div>
+
+        <!-- ボタン -->
+        <div class="background-unlock-buttons">
+            <button onclick="closeBackgroundUnlockPopup()" class="btn-later">
+                <i class="fa-solid fa-clock"></i>
+                あとで見る
+            </button>
+            <a href="/characters/menu/Backgrounds" class="btn-go-backgrounds">
+                <i class="fa-solid fa-image"></i>
+                背景一覧へ
+            </a>
+        </div>
+    </div>
+</div>
+
 <div id="tutorial-backdrop" class="tutorial-backdrop"></div>
 
-<script>
-    // ... (既存のJavaScriptロジックに変更はありません) ...
+<script th:inline="javascript">
+	/*<![CDATA[*/
+	document.addEventListener('DOMContentLoaded', function() {
+	    // 背景解放データを取得
+	    const backgroundUnlocks = /*[[${backgroundUnlocks}]]*/ null;
+	    
+	    console.log('========== 背景解放チェック ==========');
+	    console.log('backgroundUnlocks:', backgroundUnlocks);
+	    console.log('====================================');
+	    
+	    if (backgroundUnlocks && backgroundUnlocks.hasNewUnlocks) {
+	        const unlockedBackgrounds = backgroundUnlocks.unlockedBackgrounds || [];
+	        
+	        if (unlockedBackgrounds.length > 0) {
+	            // ポップアップを表示
+	            const popup = document.getElementById('background-unlock-popup');
+	            const listContainer = document.getElementById('background-unlock-list');
+	            
+	            // リストをクリア
+	            listContainer.innerHTML = '';
+	            
+	            // 解放された背景を表示
+	            unlockedBackgrounds.forEach(bg => {
+	                const item = document.createElement('div');
+	                item.className = 'background-unlock-item';
+	                item.innerHTML = `
+	                    <i class="fa-solid fa-unlock-keyhole"></i>
+	                    <strong>${bg.name}</strong> (Lv.${bg.requiredLevel}で解放)
+	                `;
+	                listContainer.appendChild(item);
+	            });
+	            
+	            // ポップアップを表示
+	            popup.style.display = 'flex';
+	            
+	            console.log('背景解放ポップアップを表示:', unlockedBackgrounds);
+	        }
+	    }
+	});
+
+	function closeBackgroundUnlockPopup() {
+	    const popup = document.getElementById('background-unlock-popup');
+	    popup.style.display = 'none';
+	}
+
+	// Escapeキーでも閉じられるように
+	document.addEventListener('keydown', (e) => {
+	    if (e.key === 'Escape') {
+	        closeBackgroundUnlockPopup();
+	    }
+	});
+	/*]]>*/
+
+    // 記録メニューのトグル
     function toggleRecordMenu() {
         const options = document.getElementById('record-options');
         options.classList.toggle('open');
     }
 
+    // ヘルプメニューのトグル
     function toggleHelpMenu() {
         const menu = document.getElementById('help-menu');
         menu.classList.toggle('active');
     }
 
+    // ヘルプメニュー外クリックで閉じる
     document.addEventListener('click', function(event) {
         const menu = document.getElementById('help-menu');
         const btn = document.getElementById('help-btn');
@@ -312,27 +683,28 @@
         }
     });
 
+    // RPGチュートリアルのステップ定義
     const rpgSteps = [
-        { targetId: null, text: "FitWorksへようこそ！\nこのチュートリアルでは、アプリの全機能をご紹介します！" },
+        { targetId: null, text: "FitWorksへようこそ!\nこのチュートリアルでは、アプリの全機能をご紹介します!" },
         { targetId: 'help-btn', text: "まずは画面左上。「ヘルプ」ボタンから、\nこのガイドの再生や、サプリメントの知識を確認できます。" },
-        { targetId: 'tutorial-xp-area', text: "画面上部にはあなたの「レベル」と「XP(経験値)」が表示されます。\nトレーニングを記録してレベルを上げましょう！" },
-        { targetId: 'tutorial-mission-btn', text: "「デイリーミッション」は毎日更新されます。\nクリアして報酬やXPを効率よくゲットしましょう！" },
-        { targetId: 'tutorial-title-display', text: "ここには現在装備している「称号」が輝きます。\nレアな称号を手に入れて、強さをアピールしてください！" },
+        { targetId: 'tutorial-xp-area', text: "画面上部にはあなたの「レベル」と「XP(経験値)」が表示されます。\nトレーニングを記録してレベルを上げましょう!" },
+        { targetId: 'tutorial-mission-btn', text: "「デイリーミッション」は毎日更新されます。\nクリアして報酬やXPを効率よくゲットしましょう!" },
+        { targetId: 'tutorial-title-display', text: "ここには現在装備している「称号」が輝きます。\nレアな称号を手に入れて、強さをアピールしてください!" },
         { targetId: 'tutorial-char-display', text: "あなたのパートナーキャラクターです。\nレベルアップと共に進化していく姿を見守りましょう。" },
         { targetId: 'tutorial-title-btn', text: "「称号」ボタンからコレクション画面へ。\n獲得した称号を付け替えて、個性を出せます。" },
         { targetId: 'tutorial-customize-btn', text: "「着せ替え」ボタンでは、ガチャで入手したアイテムを\nキャラクターに装備させることができます。" },
-        { targetId: 'tutorial-training-btn', text: "メイン機能はこれ！「トレーニングを開始」ボタン。\nここから日々の運動メニューを作成・記録します。" },
+        { targetId: 'tutorial-training-btn', text: "メイン機能はこれ!「トレーニングを開始」ボタン。\nここから日々の運動メニューを作成・記録します。" },
         { targetId: 'tutorial-record-btn', text: "「記録をつける」メニューを開くと、\n過去の履歴確認や、食事・体重の記録が個別にできます。" },
-        { targetId: 'tutorial-care-btn', text: "疲れた時は「AIリフレッシュ＆ケア」。\n体調に合わせたストレッチや休息法をAIが提案します。" },
+        { targetId: 'tutorial-care-btn', text: "疲れた時は「AIリフレッシュ&ケア」。\n体調に合わせたストレッチや休息法をAIが提案します。" },
         { targetId: 'tutorial-map-btn', text: "「マップ」機能を使えば、\n近くのジムや公園、トレーニング施設をすぐに探せます。" },
-        { targetId: 'tutorial-ai-btn', text: "トレーニングや食事の悩みは「AIチャット」へ。\n専属のAIコーチが24時間いつでも相談に乗ります！" },
+        { targetId: 'tutorial-ai-btn', text: "トレーニングや食事の悩みは「AIチャット」へ。\n専属のAIコーチが24時間いつでも相談に乗ります!" },
         { targetId: 'nav-gacha', text: "ここからは下のメニューです。\n「ガチャ」では、着せ替えアイテムなどの報酬が手に入ります。" },
         { targetId: 'tutorial-friends-btn', text: "「フレンド」機能で仲間とつながりましょう。\nお互いに励まし合ったり、ランキングで競えます。" },
         { targetId: 'nav-community', text: "「掲示板」はユーザー同士の交流スペース。\n筋トレ情報の交換や、雑談で盛り上がりましょう。" },
         { targetId: 'nav-char', text: "「キャラ」メニューでは、キャラクター図鑑を見たり、\nパートナーの詳細ステータスを確認できます。" },
-        { targetId: 'tutorial-muscles-btn', text: "「筋肉」タブでは、鍛えた部位が光る「マッスルパートナー」を表示。\n自分の成長箇所が一目でわかります！" },
+        { targetId: 'tutorial-muscles-btn', text: "「筋肉」タブでは、鍛えた部位が光る「マッスルパートナー」を表示。\n自分の成長箇所が一目でわかります!" },
         { targetId: 'nav-settings', text: "最後に「設定」。アカウント情報の変更や通知設定、\n生体認証(FaceID/TouchID)の登録もここから行えます。" },
-        { targetId: null, text: "機能説明は以上です。\nさあ、FitWorksで最高のフィットネスライフを始めましょう！" }
+        { targetId: null, text: "機能説明は以上です。\nさあ、FitWorksで最高のフィットネスライフを始めましょう!" }
     ];
     
     let currentRpgStep = 0;
@@ -446,6 +818,7 @@
         localStorage.setItem(STORAGE_KEY_RPG, 'true');
     }
 
+    // マウス追従エフェクト
     document.addEventListener('mousemove', (e) => {
         const x = e.clientX / window.innerWidth;
         const y = e.clientY / window.innerHeight;
