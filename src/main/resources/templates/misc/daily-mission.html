@@ -9,16 +9,76 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/daily-mission.css}">
     <script th:src="@{/js/theme.js}"></script>
+    <style>
+        /* 共通背景デザイン */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        
+        /* 背景アニメーション */
+        .interactive-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
+        }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        /* オーブ & 雲 */
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+
+        /* メインコンテナ（ガラスモーフィズム） */
+        .main-container {
+            max-width: 800px; width: 92%; margin: 40px auto; padding: 40px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
+        }
+        
+        /* 既存のスタイル調整 */
+        .mission-card {
+            background: rgba(255, 255, 255, 0.85); /* 半透明に調整 */
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s;
+        }
+        .mission-card:hover { transform: translateY(-3px); }
+    </style>
 </head>
 <body class="mission-page">
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+    </div>
+
 <div class="main-container">
     
-    <h1 style="margin-bottom: 5px;">
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <h1 style="margin-bottom: 5px; text-align: center;">
         <i class="header-icon fa-solid fa-list-check"></i>今日のミッション
     </h1>
-    <p class="sub-heading">達成して、ご褒美をもらいましょう！毎日午前4時に更新されます。</p>
+    <p class="sub-heading" style="text-align: center; color: #666;">達成して、ご褒美をもらいましょう！毎日午前4時に更新されます。</p>
     
-    <!-- ミッション一覧 -->
     <div class="mission-list">
         <div class="mission-card" th:each="mission : ${missions}">
             <div class="mission-icon">
@@ -42,16 +102,14 @@
                     </span>
                 </div>
             </div>
-            <!-- ✅ 表示切り替え部分 -->
+            
             <form th:action="@{/daily-mission/claim/{id}(id=${mission.id})}" method="post">
-                <!-- 挑戦中ボタン（未達成の間は遷移用ボタンを表示） -->
                 <button th:if="${!mission.completed and mission.missionType == 'TRAINING_LOG'}"
                         type="button" class="button mission-cta-button"
-                        th:onclick="|window.location.href='/daily-mission/running';|">
+                        th:onclick="|window.location.href='/training';|">
                     挑戦中
                 </button>
 
-                <!-- ✅ コミュニティ投稿は /community に変更 -->
                 <button th:if="${!mission.completed and mission.missionType == 'COMMUNITY_POST'}"
                         type="button" class="button mission-cta-button"
                         th:onclick="|window.location.href='/community';|">
@@ -60,30 +118,51 @@
 
                 <button th:if="${!mission.completed and mission.missionType == 'AI_COACH'}"
                         type="button" class="button mission-cta-button"
-                        th:onclick="|window.location.href='/daily-mission/ai-coach';|">
+                        th:onclick="|window.location.href='/ai-coach';|">
                     挑戦中
                 </button>
 
-                <!-- ミッションクリアで報酬受け取りボタン -->
                 <button th:if="${mission.completed and !mission.rewardClaimed}"
-                        type="submit" class="button mission-cta-button">
-                    報酬を受け取る (+<span th:text="${mission.rewardExp}"></span> XP)
+                        type="submit" class="button mission-cta-button" style="background-color: #ff9800; color: white;">
+                    報酬を受け取る
                 </button>
 
-                <!-- 報酬受け取り済み -->
-                <p th:if="${mission.rewardClaimed}">報酬受け取り済み</p>
+                <p th:if="${mission.rewardClaimed}" style="font-size: 0.8rem; color: #888; font-weight: bold;">受け取り済み</p>
             </form>
         </div>
     </div>
     
+    <div style="margin-top: 30px; text-align: center;">
+        <a th:href="@{/home}" class="button secondary">
+            <i class="fa-solid fa-house"></i>
+            <span>ホームに戻る</span>
+        </a>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
 
-<!-- ホームに戻るボタン -->
-<div style="max-width: 450px; margin: 30px auto 70px auto; padding: 0 10px;">
-    <a th:href="@{/home}" class="button secondary">
-        <i class="fa-solid fa-house"></i>
-        <span>ホームに戻る</span>
-    </a>
-</div>
+<script>
+    // 背景アニメーション
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particlesArray = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+    class Particle {
+        constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+    }
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } }
+        requestAnimationFrame(animate);
+    }
+    animate();
+</script>
 </body>
 </html>
