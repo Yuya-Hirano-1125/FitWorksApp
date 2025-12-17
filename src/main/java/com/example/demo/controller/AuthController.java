@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.demo.dto.BackgroundUnlockDto;
 import com.example.demo.entity.AuthProvider;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
@@ -38,10 +39,10 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
-    // --- スタート画面（ルートパス） ---
+    // --- スタート画面(ルートパス) ---
     @GetMapping("/")
     public String index(Authentication authentication) {
-        // 既にログインしているユーザーがアクセスした場合はホームへリダイレクトさせる（任意）
+        // 既にログインしているユーザーがアクセスした場合はホームへリダイレクトさせる(任意)
         if (authentication != null && authentication.isAuthenticated() && 
            !(authentication instanceof AnonymousAuthenticationToken)) {
             return "redirect:/home";
@@ -93,17 +94,28 @@ public class AuthController {
         model.addAttribute("requiredXp", user.calculateRequiredXp());
         model.addAttribute("progressPercent", user.getProgressPercent());
         
-        // ★追加: 称号を表示するためにモデルに格納
+        // ★ 称号を表示するためにモデルに格納
         model.addAttribute("userTitle", user.getDisplayTitle());
-
         
-     // 選択中の背景を取得
+        // ★★★ 選択中の背景を取得
         String selectedBackground = user.getSelectedBackground();
         if (selectedBackground == null || selectedBackground.isEmpty()) {
             selectedBackground = "fire-original";
         }
         model.addAttribute("selectedBackground", selectedBackground);
         
+        // ★★★ 追加: 背景解放チェック
+        BackgroundUnlockDto backgroundUnlocks = userService.checkNewBackgroundUnlocks(user.getUsername());
+        model.addAttribute("backgroundUnlocks", backgroundUnlocks);
+        
+        System.out.println("==========================================");
+        System.out.println("DEBUG: ホーム画面背景情報");
+        System.out.println("==========================================");
+        System.out.println("ユーザー名: " + user.getUsername());
+        System.out.println("選択中の背景: " + selectedBackground);
+        System.out.println("新規解放背景数: " + backgroundUnlocks.getUnlockedBackgrounds().size());
+        System.out.println("==========================================");
+
         return "misc/home";
     }
 

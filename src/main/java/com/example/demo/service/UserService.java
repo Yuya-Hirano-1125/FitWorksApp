@@ -19,13 +19,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.dto.BackgroundUnlockDto;
 import com.example.demo.dto.MissionStatusDto;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserItem;
 import com.example.demo.repository.TrainingRecordRepository;
 import com.example.demo.repository.UserItemRepository; // ★追加
 import com.example.demo.repository.UserRepository;
-
 @Service
 public class UserService {
     
@@ -424,5 +424,57 @@ public class UserService {
     	List<UserItem> items = userItemRepository.findAllByUser_UsernameAndItemId(username, item_id);
         		return items.size(); // 1レコード=1個方式なのでサイズを返す
 
+    }
+    public BackgroundUnlockDto checkNewBackgroundUnlocks(String username) {
+        BackgroundUnlockDto dto = new BackgroundUnlockDto();
+        
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) {
+            return dto;
+        }
+        
+        int currentLevel = user.getLevel();
+        int lastCheckedLevel = user.getLastBackgroundCheckLevel();
+        
+     // 背景解放レベルの定義
+        // ※ Backgrounds.htmlのdata-unlock-levelと一致させること
+        int[][] backgroundLevels = {
+            {40, 0},  // 水の世界: level 40
+            {70, 1},  // 木の世界: level 70
+            {100, 2}, // 光の世界: level 100
+            {130, 3}  // 闇の世界: level 130
+        };
+        
+        String[] backgroundIds = {"water", "grass", "light", "dark"};
+        String[] backgroundNames = {"水の世界", "木の世界", "光の世界", "闇の世界"};
+        
+        // 最後にチェックしたレベルから現在のレベルまでの間に解放された背景を検出
+        for (int i = 0; i < backgroundLevels.length; i++) {
+            int requiredLevel = backgroundLevels[i][0];
+            int index = backgroundLevels[i][1];
+            
+            if (requiredLevel > lastCheckedLevel && requiredLevel <= currentLevel) {
+                // 新しく解放された背景
+                dto.addUnlockedBackground(
+                    backgroundIds[index], 
+                    backgroundNames[index], 
+                    requiredLevel
+                );
+                
+                System.out.println("==========================================");
+                System.out.println("DEBUG: 背景解放検出");
+                System.out.println("==========================================");
+                System.out.println("背景名: " + backgroundNames[index]);
+                System.out.println("必要レベル: " + requiredLevel);
+                System.out.println("現在レベル: " + currentLevel);
+                System.out.println("==========================================");
+            }
+        }
+        
+        // チェック済みレベルを更新
+        user.setLastBackgroundCheckLevel(currentLevel);
+        userRepository.save(user);
+        
+        return dto;
     }
 }

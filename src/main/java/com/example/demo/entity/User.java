@@ -94,21 +94,24 @@ public class User {
     @Column(name = "chip")
     private Integer chipCount;
 
-    // 解放済みキャラクター管理
     @ElementCollection
     @CollectionTable(name = "user_unlocked_characters", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "character_id")
     private Set<Long> unlockedCharacters = new HashSet<>();
 
-    // ★★★ 追加: 解放済み背景管理 ★★★
+    // ★★★ 解放済み背景管理 ★★★
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_unlocked_backgrounds", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "background_id")
     private Set<String> unlockedBackgrounds = new HashSet<>();
 
-    // ★★★ 追加: 選択中の背景 ★★★
+    // ★★★ 選択中の背景 ★★★
     @Column(name = "selected_background")
     private String selectedBackground = "fire-original";
+
+    // ★★★ 背景解放チェック済みレベル ★★★
+    @Column(name = "last_background_check_level")
+    private Integer lastBackgroundCheckLevel = 1;
 
     public User() {
         if (this.level == null) this.level = 1;
@@ -275,7 +278,7 @@ public class User {
         this.unlockedCharacters = unlockedCharacters;
     }
 
-    // ★★★ 追加: 解放済み背景管理メソッド ★★★
+    // ★★★ 解放済み背景管理メソッド ★★★
     public Set<String> getUnlockedBackgrounds() {
         if (unlockedBackgrounds == null) {
             unlockedBackgrounds = new HashSet<>();
@@ -298,12 +301,21 @@ public class User {
         return unlockedBackgrounds != null && unlockedBackgrounds.contains(backgroundId);
     }
 
-    // ★★★ 追加: 選択中の背景管理メソッド ★★★
+    // ★★★ 選択中の背景管理メソッド ★★★
     public String getSelectedBackground() {
         return selectedBackground != null ? selectedBackground : "fire-original";
     }
 
     public void setSelectedBackground(String selectedBackground) {
         this.selectedBackground = selectedBackground;
+    }
+
+    // ★★★ 背景解放チェック済みレベル ★★★
+    public Integer getLastBackgroundCheckLevel() {
+        return lastBackgroundCheckLevel != null ? lastBackgroundCheckLevel : 1;
+    }
+
+    public void setLastBackgroundCheckLevel(Integer lastBackgroundCheckLevel) {
+        this.lastBackgroundCheckLevel = lastBackgroundCheckLevel;
     }
 }
