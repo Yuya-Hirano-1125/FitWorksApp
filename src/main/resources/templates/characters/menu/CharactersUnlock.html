@@ -3,366 +3,416 @@
 <head>
     <meta charset="UTF-8">
     <title>進化の軌跡 - CRYSTAL PATH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/characters/CharactersUnlock.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
     <style>
-        .attribute-heading { font-size: 1.5rem; margin: 20px 0; }
-        .fire-color { color: #ff7675; border-bottom: 2px solid #ff7675; }
-        .water-color { color: #74b9ff; border-bottom: 2px solid #74b9ff; }
-        .grass-color { color: #55efc4; border-bottom: 2px solid #55efc4; }
-        .light-color { color: #ffeaa7; border-bottom: 2px solid #ffeaa7; }
-        .dark-color { color: #a29bfe; border-bottom: 2px solid #a29bfe; }
-        .secret-color { color: #dfe6e9; border-bottom: 2px solid #dfe6e9; font-style: italic; }
-        .character-card { display: inline-block; margin: 10px; text-align: center; }
-        .character-img-wrapper { width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; overflow: hidden; border: 3px solid #ccc; position: relative; }
-        .character-img { width: 100%; height: 100%; object-fit: cover; }
-        .requirements { font-size: 0.9rem; margin-top: 5px; }
-        .unlocked-label { font-weight: bold; color: #27ae60; }
-        .locked .character-img { filter: brightness(0%); }
-        .lock-icon {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2rem; color: #fff;
-            text-shadow: 0 0 5px rgba(0,0,0,0.7);
+        /* ==========================================================================
+           ✨ DESIGN SETTINGS (文字色調整版)
+           ========================================================================== */
+        body {
+            margin: 0; padding: 0;
+            background-color: #f0f8ff;
+            min-height: 100vh;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: #333; /* ★基本文字色を黒(濃いグレー)に設定 */
         }
 
-        /* ===== モーダル ===== */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background-color: rgba(0,0,0,0.7);
-            opacity: 0; visibility: hidden; pointer-events: none;
-            transition: opacity 0.3s ease;
-            z-index: 1000;
+        /* --- 背景アニメーション (変更なし) --- */
+        .interactive-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
+        }
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
+            animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0;
+        }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+        .mouse-flare {
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px);
+        }
 
-            display: flex;              /* 追加 */
-            justify-content: center;    /* 横中央 */
-            align-items: center;        /* 縦中央 */
+        /* --- ガラス風コンテナ --- */
+        .glass-wrapper {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.75); /* 不透明度を少し上げて文字を見やすく */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- テキスト & パーツスタイル --- */
+        
+        /* ヘッダー周り */
+        header h1 {
+            color: #222; /* 黒 */
+            font-weight: 900;
+            text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.8); /* 白縁取りで視認性アップ */
+            margin-bottom: 10px;
+        }
+
+        .status-bar {
+            color: #444; /* ステータス文字も濃く */
+            font-weight: bold;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+        }
+        
+        .material-link {
+            color: #e91e63 !important; /* 素材管理リンク色 */
+            font-weight: bold;
+        }
+
+        /* 属性見出し */
+        .attribute-heading {
+            font-size: 1.5rem; margin: 30px 0 15px; font-weight: 800;
+            text-shadow: 1px 1px 0 #fff; /* 背景に埋もれないように */
+        }
+        .fire-color { color: #d63031; border-bottom: 2px solid #d63031; } /* 少し濃い赤に調整 */
+        .water-color { color: #0984e3; border-bottom: 2px solid #0984e3; } /* 濃い青 */
+        .grass-color { color: #00b894; border-bottom: 2px solid #00b894; } /* 濃い緑 */
+        .light-color { color: #fdcb6e; border-bottom: 2px solid #fdcb6e; text-shadow: 0 1px 1px rgba(0,0,0,0.1); } /* オレンジ寄り */
+        .dark-color { color: #6c5ce7; border-bottom: 2px solid #6c5ce7; }
+        .secret-color { color: #636e72; border-bottom: 2px solid #b2bec3; }
+
+        /* キャラクターカード */
+        .character-card { 
+            display: inline-block; margin: 10px; text-align: center; 
+            background: #ffffff; /* 完全な白背景 */
+            padding: 15px; border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            color: #333; /* カード内文字黒 */
+        }
+        
+        .character-img-wrapper { 
+            width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; 
+            overflow: hidden; border: 3px solid #eee; position: relative; background: #fff; 
+        }
+        .character-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* ★ ここで文字色を黒く指定 */
+        .character-name {
+            font-weight: 800;
+            color: #000; /* 真っ黒 */
+            margin: 8px 0 4px;
+            font-size: 1.1rem;
+        }
+        .character-rarity {
+            font-weight: bold;
+            color: #555; /* 濃いグレー */
+            display: block;
+            margin-bottom: 5px;
+        }
+        .requirements { 
+            font-size: 0.9rem; margin-top: 5px; 
+            font-weight: 700; 
+            color: #333; /* 黒 */
+            background: rgba(0,0,0,0.03); /* 薄い背景で読みやすく */
+            padding: 4px; border-radius: 4px;
+        }
+        
+        .unlocked-label { font-weight: bold; color: #27ae60; }
+        .locked .character-img { filter: brightness(0%); opacity: 0.7; }
+        .lock-icon {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 2rem; color: #fff; text-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
+
+        /* モーダル */
+        .modal {
+            position: fixed; inset: 0; background-color: rgba(0,0,0,0.6);
+            opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease; z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
         }
         .modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
-
-        /* 正方形のポップアップ（常に画面中央固定） */
         .modal-content {
-            position: relative; /* fixedではなくrelativeに */
-            width: 400px; height: 400px;
-            background: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: left;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            animation: fadeIn 0.3s ease-in-out;
-            overflow-y: auto;
+            position: relative; width: 400px; max-height: 80vh; overflow-y: auto;
+            background: #fff; border-radius: 12px; padding: 25px; text-align: left;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+            color: #333; /* モーダル内も黒文字 */
         }
+        .modal-content h3 { color: #000; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
+        .modal-content h4 { color: #d63031; margin: 15px 0 5px; }
+        .modal-content li { color: #444; font-weight: 500; }
 
-        .modal-content h3 {
-            margin-bottom: 10px;
-            font-size: 1.3rem;
-            color: #333;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
+        .close { position: absolute; right: 15px; top: 15px; font-size: 1.8rem; cursor: pointer; color: #888; }
+        .close:hover { color: #333; }
+        
+        .btn-confirm { 
+            margin-top: 15px; padding: 10px 24px; background: linear-gradient(135deg, #4caf50, #2e7d32); 
+            color: #fff; border: none; border-radius: 50px; cursor: pointer; 
+            font-weight: bold; box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3); 
+            transition: transform 0.2s;
         }
-        .modal-content h4 {
-            margin-top: 15px;
-            font-size: 1rem;
-            color: #e74c3c;
+        .btn-confirm:hover { transform: translateY(-2px); }
+        
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        
+        /* 戻るボタン */
+        .btn-back {
+            display: inline-block; padding: 12px 30px; 
+            background: #fff; border: 2px solid #4facfe; color: #4facfe;
+            border-radius: 30px; text-decoration: none; font-weight: 800;
+            transition: all 0.3s;
         }
-        .modal-content ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-        .modal-content li {
-            margin-bottom: 6px;
-            font-size: 0.95rem;
-            color: #444;
-        }
+        .btn-back:hover { background: #4facfe; color: #fff; }
 
-        .close {
-            position: absolute; right: 12px; top: 12px;
-            font-size: 1.5rem; cursor: pointer; color: #888;
-            transition: color 0.2s;
-        }
-        .close:hover { color: #000; }
-
-        .btn-confirm {
-            margin-top: 15px;
-            padding: 8px 16px;
-            background: #4caf50; color: #fff;
-            border: none; border-radius: 4px; cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-confirm:hover { background: #45a049; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
     </style>
 </head>
 
 <body>
-    <!-- ヘッダー -->
-    <header>
-        <h1>キャラクター解放画面</h1>
-        <div class="status-bar">
-            <div class="status-item">
-                <i class="fa-solid fa-crown" style="color:#ffeb3b;"></i>
-                Lv.<span th:text="${userLevel}">1</span>
-            </div>
-            <div class="status-item">
-                <a th:href="@{/materials}" class="material-link">
-                    <i class="fa-solid fa-gem"></i> 素材管理
-                </a>
-            </div>
-        </div>
-    </header>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div id="mouse-flare" class="mouse-flare"></div>
+    </div>
 
-    <!-- メッセージ表示 -->
-    <div class="message-container" style="max-width: 800px; margin: 10px auto;">
-        <div th:if="${message}" class="alert success">
-            <span th:text="${message}"></span>
+    <div class="glass-wrapper">
+        <header style="text-align: center; margin-bottom: 20px;">
+            <h1>キャラクター解放</h1>
+            <div class="status-bar">
+                <div class="status-item" style="display:inline-block; background:rgb(0, 0, 0); padding:5px 15px; border-radius:20px; box-shadow:0 2px 4px rgba(0,0,0,0.1); margin:0 10px;">
+                    <i class="fa-solid fa-crown" style="color:#f1c40f;"></i>
+                    Lv.<span th:text="${userLevel}">1</span>
+                </div>
+                <div class="status-item" style="display:inline-block; background:rgba(255,255,255,0.9); padding:5px 15px; border-radius:20px; box-shadow:0 2px 4px rgba(0,0,0,0.1); margin:0 10px;">
+                    <a th:href="@{/materials}" class="material-link" style="text-decoration:none;">
+                        <i class="fa-solid fa-gem"></i> 素材管理
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="message-container" style="max-width: 800px; margin: 10px auto; text-align:center;">
+            <div th:if="${message}" class="alert success" style="color:#27ae60; background:#e8f8f5; padding:10px; border-radius:8px; font-weight:bold; display:inline-block;">
+                <i class="fa-solid fa-check-circle"></i> <span th:text="${message}"></span>
+            </div>
+            <div th:if="${error}" class="alert error" style="color:#c0392b; background:#fdedec; padding:10px; border-radius:8px; font-weight:bold; display:inline-block;">
+                <i class="fa-solid fa-exclamation-circle"></i> <span th:text="${error}"></span>
+            </div>
         </div>
-        <div th:if="${error}" class="alert error">
-            <span th:text="${error}"></span>
+
+        <div class="pass-section">
+            <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
+            <div class="char-list">
+                <div th:each="chara : ${fireChars}" class="character-card fire">
+                    <div class="character-img-wrapper" th:classappend="${chara.name ne 'エンバーハート'} ? 'locked' : ''">
+                        <img class="character-img" th:src="${chara.imagePath}" th:alt="${chara.name}">
+                        <i th:if="${chara.name ne 'エンバーハート'}" class="fa-solid fa-lock lock-icon"></i>
+                    </div>
+                    <p class="character-name" th:text="${chara.name}">キャラ名</p>
+                    <span class="character-rarity" th:text="${chara.rarity}">★</span>
+                    <div class="requirements">
+                        <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+                        <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                    </div>
+                    <div class="unlock-action" style="margin-top:10px;">
+                        <span th:if="${chara.name eq 'エンバーハート'}" class="unlocked-label">✅ 開放済み</span>
+                        <div th:if="${chara.name ne 'エンバーハート'}">
+                            <button type="button" class="btn-confirm"
+                                    onclick="openModal(
+                                        this.getAttribute('data-name'),
+                                        this.getAttribute('data-materials'),
+                                        this.getAttribute('data-conditions')
+                                    )"
+                                    th:attr="data-name=${chara.name}, 
+                                             data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, 
+                                             data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}">
+                                <i class="fa-solid fa-lock-open"></i> 解放条件
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pass-section">
+            <h2 class="attribute-heading water-color"><i class="fa-solid fa-droplet"></i> 水属性</h2>
+            <div class="char-list">
+                <div th:each="chara : ${waterChars}" class="character-card water">
+                    <div class="character-img-wrapper">
+                        <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                    </div>
+                    <p class="character-name" th:text="${chara.name}">キャラ名</p>
+                    <span class="character-rarity" th:text="${chara.rarity}">★</span>
+                    <div class="requirements">
+                        <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+                        <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pass-section">
+            <h2 class="attribute-heading grass-color"><i class="fa-solid fa-leaf"></i> 草属性</h2>
+            <div class="char-list">
+                <div th:each="chara : ${grassChars}" class="character-card grass">
+                    <div class="character-img-wrapper">
+                        <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                    </div>
+                    <p class="character-name" th:text="${chara.name}">キャラ名</p>
+                    <span class="character-rarity" th:text="${chara.rarity}">★</span>
+                    <div class="requirements">
+                        <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+                        <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pass-section">
+            <h2 class="attribute-heading light-color"><i class="fa-solid fa-sun"></i> 光属性</h2>
+            <div class="char-list">
+                <div th:each="chara : ${lightChars}" class="character-card light">
+                    <div class="character-img-wrapper">
+                        <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                    </div>
+                    <p class="character-name" th:text="${chara.name}">キャラ名</p>
+                    <span class="character-rarity" th:text="${chara.rarity}">★</span>
+                    <div class="requirements">
+                        <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+                        <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pass-section">
+            <h2 class="attribute-heading dark-color"><i class="fa-solid fa-moon"></i> 闇属性</h2>
+            <div class="char-list">
+                <div th:each="chara : ${darkChars}" class="character-card dark">
+                    <div class="character-img-wrapper">
+                        <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                    </div>
+                    <p class="character-name" th:text="${chara.name}">キャラ名</p>
+                    <span class="character-rarity" th:text="${chara.rarity}">★</span>
+                    <div class="requirements">
+                        <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+                        <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pass-section">
+            <h2 class="attribute-heading secret-color">
+                <i class="fa-solid fa-star"></i> シークレット属性
+            </h2>
+            <div class="char-list">
+                <div th:each="chara : ${secretChars}" class="character-card secret">
+                    <div class="character-img-wrapper">
+                        <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                    </div>
+                    <p class="character-name" th:text="${chara.name}">キャラ名</p>
+                    <span class="character-rarity" th:text="${chara.rarity}">★</span>
+                    <div class="requirements">
+                        <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+                        <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-btn-container" style="margin:40px 0 20px; text-align:center;">
+            <a th:href="@{/characters}" class="btn-back">
+                <i class="fa-solid fa-reply"></i> メニューへ戻る
+            </a>
         </div>
     </div>
 
-	<!-- 炎属性 -->
-	<div class="pass-section">
-	    <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
-	    <div class="char-list">
-	        <div th:each="chara : ${fireChars}" class="character-card fire">
-	            <div class="character-img-wrapper" th:classappend="${chara.name ne 'エンバーハート'} ? 'locked' : ''">
-	                <img class="character-img" th:src="${chara.imagePath}" th:alt="${chara.name}">
-	                <i th:if="${chara.name ne 'エンバーハート'}" class="fa-solid fa-lock lock-icon"></i>
-	            </div>
-	            <p class="character-name" th:text="${chara.name}">キャラ名</p>
-	            <span class="character-rarity" th:text="${chara.rarity}">★</span>
-	            <div class="requirements">
-	                <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-	                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-	            </div>
-	            <div class="unlock-action">
-	                <span th:if="${chara.name eq 'エンバーハート'}" class="unlocked-label">✅ 開放済み</span>
-	                <div th:if="${chara.name ne 'エンバーハート'}">
-	                    <button type="button" class="btn-confirm"
-	                            onclick="openModal(
-	                                this.getAttribute('data-name'),
-	                                this.getAttribute('data-materials'),
-	                                this.getAttribute('data-conditions')
-	                            )"
-	                            th:attr="data-name=${chara.name}, 
-	                                     data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, 
-	                                     data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}">
-	                        <i class="fa-solid fa-lock-open"></i> 進化解放条件を見る
-	                    </button>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
-	</div>
-
-	<!-- モーダル -->
-	<div id="globalModal" class="modal">
-	    <div class="modal-content">
-	        <span class="close" onclick="closeModal()">&times;</span>
-	        <h3 id="modalTitle">進化条件</h3>
-	        <div id="modalBody"></div>
-	    </div>
-	</div>
-
-	<style>
-	/* ===== モーダル ===== */
-	.modal {
-	    position: fixed;
-	    inset: 0;
-	    background-color: rgba(0,0,0,0.7);
-	    opacity: 0; visibility: hidden; pointer-events: none;
-	    transition: opacity 0.3s ease;
-	    z-index: 1000;
-
-	    display: flex;              /* 中央寄せ */
-	    justify-content: center;
-	    align-items: center;
-	}
-	.modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
-
-	.modal-content {
-	    position: relative;
-	    width: 400px; height: 400px;
-	    background: #fff;
-	    border-radius: 8px;
-	    padding: 20px;
-	    text-align: left;
-	    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-	    animation: fadeIn 0.3s ease-in-out;
-	    overflow-y: auto;
-	}
-
-	.close {
-	    position: absolute; right: 12px; top: 12px;
-	    font-size: 1.5rem; cursor: pointer; color: #888;
-	    transition: color 0.2s;
-	}
-	.close:hover { color: #000; }
-
-	.btn-confirm {
-	    margin-top: 15px;
-	    padding: 8px 16px;
-	    background: #4caf50; color: #fff;
-	    border: none; border-radius: 4px; cursor: pointer;
-	    transition: background 0.2s;
-	}
-	.btn-confirm:hover { background: #45a049; }
-
-	@keyframes fadeIn {
-	    from { opacity: 0; transform: scale(0.95); }
-	    to { opacity: 1; transform: scale(1); }
-	}
-	</style>
-
-	<script>
-	function openModal(name, materials, conditions) {
-	  // タイトルにキャラ名を反映
-	  document.getElementById("modalTitle").innerText = name + " の進化条件";
-
-	  // 本文を組み立て
-	  let bodyHtml = "<h4>進化素材</h4><ul>";
-	  if (materials) {
-	    materials.split(";").forEach(m => {
-	      bodyHtml += "<li>" + m + "</li>";
-	    });
-	  }
-	  bodyHtml += "</ul><h4>進化条件</h4><ul>";
-	  if (conditions) {
-	    conditions.split(";").forEach(c => {
-	      bodyHtml += "<li>" + c + "</li>";
-	    });
-	  }
-	  bodyHtml += "</ul>";
-
-	  // ★ 解放ボタンを追加
-	  bodyHtml += "<div style='text-align:center; margin-top:15px;'>"
-	           + "<button class='btn-confirm' onclick=\"unlockCharacter('" + name + "')\">"
-	           + "<i class='fa-solid fa-unlock'></i> このキャラを解放する"
-	           + "</button></div>";
-
-	  // モーダル本文に反映
-	  document.getElementById("modalBody").innerHTML = bodyHtml;
-
-	  // モーダルを表示
-	  document.getElementById("globalModal").classList.add("show");
-	}
-
-	function closeModal() {
-	  document.getElementById("globalModal").classList.remove("show");
-	}
-
-	// ★ 解放処理用の関数（仮）
-	function unlockCharacter(name) {
-	  alert(name + " を解放しました！（ここにサーバー連携処理を追加）");
-	  closeModal();
-	}
-	</script>
-
-
-    <!-- 水属性 -->
-    <div class="pass-section">
-        <h2 class="attribute-heading water-color"><i class="fa-solid fa-droplet"></i> 水属性</h2>
-        <div class="char-list">
-            <div th:each="chara : ${waterChars}" class="character-card water">
-                <div class="character-img-wrapper">
-                    <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-                </div>
-                <p class="character-name" th:text="${chara.name}">キャラ名</p>
-                <span class="character-rarity" th:text="${chara.rarity}">★</span>
-                <div class="requirements">
-                    <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-                    <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-                </div>
-            </div>
+    <div id="globalModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">進化条件</h3>
+            <div id="modalBody"></div>
         </div>
     </div>
 
-    <!-- 草属性 -->
-    <div class="pass-section">
-        <h2 class="attribute-heading grass-color"><i class="fa-solid fa-leaf"></i> 草属性</h2>
-        <div class="char-list">
-            <div th:each="chara : ${grassChars}" class="character-card grass">
-                <div class="character-img-wrapper">
-                    <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-                </div>
-                <p class="character-name" th:text="${chara.name}">キャラ名</p>
-                <span class="character-rarity" th:text="${chara.rarity}">★</span>
-                <div class="requirements">
-                    <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-                    <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-                </div>
-            </div>
-        </div>
-    </div>
+    <script>
+    // === 背景アニメーションスクリプト ===
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    const flare = document.getElementById('mouse-flare');
+    let particlesArray = [];
+    let width, height;
 
-    <!-- 光属性 -->
-    <div class="pass-section">
-        <h2 class="attribute-heading light-color"><i class="fa-solid fa-sun"></i> 光属性</h2>
-        <div class="char-list">
-            <div th:each="chara : ${lightChars}" class="character-card light">
-                <div class="character-img-wrapper">
-                    <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-                </div>
-                <p class="character-name" th:text="${chara.name}">キャラ名</p>
-                <span class="character-rarity" th:text="${chara.rarity}">★</span>
-                <div class="requirements">
-                    <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-                    <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-                </div>
-            </div>
-        </div>
-    </div>
+    function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-    <!-- 闇属性 -->
-    <div class="pass-section">
-        <h2 class="attribute-heading dark-color"><i class="fa-solid fa-moon"></i> 闇属性</h2>
-        <div class="char-list">
-            <div th:each="chara : ${darkChars}" class="character-card dark">
-                <div class="character-img-wrapper">
-                    <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-                </div>
-                <p class="character-name" th:text="${chara.name}">キャラ名</p>
-                <span class="character-rarity" th:text="${chara.rarity}">★</span>
-                <div class="requirements">
-                    <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-                    <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-                </div>
-            </div>
-        </div>
-    </div>
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = event.x; mouse.y = event.y;
+        flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+        particlesArray.push(new Particle(event.clientX, event.clientY));
+    });
 
-	<!-- シークレット属性 -->
-	<div class="pass-section">
-	    <h2 class="attribute-heading secret-color">
-	        <i class="fa-solid fa-star"></i> シークレット属性
-	    </h2>
-	    <div class="char-list">
-	        <div th:each="chara : ${secretChars}" class="character-card secret">
-	            <div class="character-img-wrapper">
-	                <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-	            </div>
-	            <p class="character-name" th:text="${chara.name}">キャラ名</p>
-	            <span class="character-rarity" th:text="${chara.rarity}">★</span>
-	            <div class="requirements">
-	                <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-	                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-	            </div>
-	        </div>
-	    </div>
-	</div>
+    class Particle {
+        constructor(x, y) {
+            this.x = x || Math.random() * width; this.y = y || Math.random() * height;
+            this.size = Math.random() * 5 + 2;
+            this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2;
+            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+        }
+        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+    }
 
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update(); particlesArray[i].draw();
+            if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; }
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
 
-	    <!-- 戻るボタン -->
-	    <div class="back-btn-container" style="margin:20px;">
-	        <a th:href="@{/characters}" class="btn-back"><i class="fa-solid fa-reply"></i> 戻る</a>
-	    </div>
-	</body>
-	</html>
+    // === モーダル関連スクリプト (既存) ===
+    function openModal(name, materials, conditions) {
+      document.getElementById("modalTitle").innerText = name + " の進化条件";
+      let bodyHtml = "<h4>進化素材</h4><ul>";
+      if (materials) { materials.split(";").forEach(m => bodyHtml += "<li>" + m + "</li>"); }
+      bodyHtml += "</ul><h4>進化条件</h4><ul>";
+      if (conditions) { conditions.split(";").forEach(c => bodyHtml += "<li>" + c + "</li>"); }
+      bodyHtml += "</ul>";
+      bodyHtml += "<div style='text-align:center; margin-top:20px;'><button class='btn-confirm' onclick=\"unlockCharacter('" + name + "')\"><i class='fa-solid fa-unlock'></i> このキャラを解放する</button></div>";
+      document.getElementById("modalBody").innerHTML = bodyHtml;
+      document.getElementById("globalModal").classList.add("show");
+    }
 
+    function closeModal() { document.getElementById("globalModal").classList.remove("show"); }
+
+    function unlockCharacter(name) {
+      alert(name + " を解放しました！（ここにサーバー連携処理を追加）");
+      closeModal();
+    }
+    
+    // モーダル外クリックで閉じる
+    window.onclick = function(event) {
+        if (event.target == document.getElementById("globalModal")) {
+            closeModal();
+        }
+    }
+    </script>
+</body>
+</html>

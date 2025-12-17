@@ -3,169 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <title>素材一覧 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/characters/CharactersEvolutionMaterial.css}">
     <style>
-        .rarity-row {
-            margin-bottom: 40px;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 20px;
-            text-align: center;
+        /* 背景アニメーション */
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif;}
+        .interactive-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
         }
-        .rarity-row h2 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-        .material-list {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .material-card {
-            width: 160px;
-            text-align: center;
-            border: 2px solid #ccc;       /* デフォルト枠線 */
-            border-radius: 12px;
-            padding: 12px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            position: relative;           /* 疑似要素用に必要 */
-            overflow: hidden;
-        }
-        .material-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+        .mouse-flare { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%); transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px); }
+
+        /* コンテナのガラス風オーバーライド */
+        .main-container.glass-mode {
+            background: rgba(255, 255, 255, 0.65) !important;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 20px 50px rgba(100, 149, 237, 0.2) !important;
+            border-radius: 30px;
+            max-width: 1000px;
+            margin: 40px auto;
         }
 
-        /* レアリティごとの枠色 */
+        /* 既存スタイル */
+        .rarity-row { margin-bottom: 40px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 20px; text-align: center; }
+        .rarity-row h2 { margin-bottom: 15px; color: #333; font-weight:800; }
+        .material-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; }
+        .material-card {
+            width: 160px; text-align: center; border: 2px solid #ccc; border-radius: 12px; padding: 12px;
+            background-color: white; /* カード背景白 */
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
+        }
+        .material-card:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(0,0,0,0.2); }
         .material-card.r { border-color: gray; }
         .material-card.sr { border-color: dodgerblue; }
         .material-card.ssr { border-color: gold; }
-
-        /* URだけ虹色が動き続ける枠（2pxに統一） */
-        .material-card.ur {
-            border: 2px solid transparent;
-        }
+        .material-card.ur { border: 2px solid transparent; }
         .material-card.ur::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 12px;
-            padding: 2px;
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 12px; padding: 2px;
             background: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet);
-            background-size: 400% 400%;
-            animation: rainbowBorder 5s linear infinite;
-            -webkit-mask: 
-                linear-gradient(#fff 0 0) content-box, 
-                linear-gradient(#fff 0 0);
-            -webkit-mask-composite: destination-out;
-            mask-composite: exclude;
+            background-size: 400% 400%; animation: rainbowBorder 5s linear infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out; mask-composite: exclude;
         }
-
-        @keyframes rainbowBorder {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .card-image-container {
-            background-color: white;
-            padding: 8px;
-            border-radius: 8px;
-        }
-        .card-image-container img {
-            max-width: 100px;
-            margin: 0 auto;
-            display: block;
-            background-color: white;
-            border-radius: 4px;
-        }
-        .material-card p {
-            margin: 6px 0;
-            font-weight: bold;
-            color: #333;
-        }
+        @keyframes rainbowBorder { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .card-image-container { background-color: white; padding: 8px; border-radius: 8px; }
+        .card-image-container img { max-width: 100px; margin: 0 auto; display: block; background-color: white; border-radius: 4px; }
+        .material-card p { margin: 6px 0; font-weight: bold; color: #333; }
     </style>
 </head>
 <body>
-<div class="main-container">
-    <div class="header-section" style="text-align:center;">
-        <h1>素材一覧</h1>
-        <p class="sub-heading">ガチャから出る素材を確認できます</p>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div id="mouse-flare" class="mouse-flare"></div>
     </div>
 
-    <!-- R -->
-    <div class="rarity-row" th:if="${itemsR != null and !#lists.isEmpty(itemsR)}">
-        <h2>R</h2>
-        <div class="material-list">
-            <div th:each="item : ${itemsR}" class="material-card r">
-                <div class="card-image-container">
-                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
+    <div class="main-container glass-mode">
+        <div class="header-section" style="text-align:center;">
+            <h1>素材一覧</h1>
+            <p class="sub-heading">ガチャから出る素材を確認できます</p>
+        </div>
+
+        <div class="rarity-row" th:if="${itemsR != null and !#lists.isEmpty(itemsR)}">
+            <h2>R</h2>
+            <div class="material-list">
+                <div th:each="item : ${itemsR}" class="material-card r">
+                    <div class="card-image-container">
+                        <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
+                    </div>
+                    <p th:text="${item.name}"></p>
+                    <p th:text="'所持数: ' + ${item.count}"></p>
                 </div>
-                <p th:text="${item.name}"></p>
-                <p th:text="'所持数: ' + ${item.count}"></p>
             </div>
+        </div>
+
+        <div class="rarity-row" th:if="${itemsSR != null and !#lists.isEmpty(itemsSR)}">
+            <h2>SR</h2>
+            <div class="material-list">
+                <div th:each="item : ${itemsSR}" class="material-card sr">
+                    <div class="card-image-container">
+                        <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
+                    </div>
+                    <p th:text="${item.name}"></p>
+                    <p th:text="'所持数: ' + ${item.count}"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="rarity-row" th:if="${itemsSSR != null and !#lists.isEmpty(itemsSSR)}">
+            <h2>SSR</h2>
+            <div class="material-list">
+                <div th:each="item : ${itemsSSR}" class="material-card ssr">
+                    <div class="card-image-container">
+                        <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
+                    </div>
+                    <p th:text="${item.name}"></p>
+                    <p th:text="'所持数: ' + ${item.count}"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="rarity-row" th:if="${itemsUR != null and !#lists.isEmpty(itemsUR)}">
+            <h2>UR</h2>
+            <div class="material-list">
+                <div th:each="item : ${itemsUR}" class="material-card ur">
+                    <div class="card-image-container">
+                        <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
+                    </div>
+                    <p th:text="${item.name}"></p>
+                    <p th:text="'所持数: ' + ${item.count}"></p>
+                </div>
+            </div>
+        </div>
+
+        <section th:if="${(itemsR == null or #lists.isEmpty(itemsR)) and 
+                         (itemsSR == null or #lists.isEmpty(itemsSR)) and 
+                         (itemsSSR == null or #lists.isEmpty(itemsSSR)) and 
+                         (itemsUR == null or #lists.isEmpty(itemsUR))}" style="text-align:center;">
+            <p>素材がまだ登録されていません。</p>
+        </section>
+
+        <div class="back-btn-container" style="text-align:center; margin-top:20px;">
+            <a th:href="@{/characters/menu/CharactersMenu}" class="button secondary" style="display:inline-block; width:auto; padding:10px 30px;">
+                <i class="fa-solid fa-arrow-left"></i> メニューに戻る
+            </a>
         </div>
     </div>
 
-    <!-- SR -->
-    <div class="rarity-row" th:if="${itemsSR != null and !#lists.isEmpty(itemsSR)}">
-        <h2>SR</h2>
-        <div class="material-list">
-            <div th:each="item : ${itemsSR}" class="material-card sr">
-                <div class="card-image-container">
-                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
-                </div>
-                <p th:text="${item.name}"></p>
-                <p th:text="'所持数: ' + ${item.count}"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- SSR -->
-    <div class="rarity-row" th:if="${itemsSSR != null and !#lists.isEmpty(itemsSSR)}">
-        <h2>SSR</h2>
-        <div class="material-list">
-            <div th:each="item : ${itemsSSR}" class="material-card ssr">
-                <div class="card-image-container">
-                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
-                </div>
-                <p th:text="${item.name}"></p>
-                <p th:text="'所持数: ' + ${item.count}"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- UR -->
-    <div class="rarity-row" th:if="${itemsUR != null and !#lists.isEmpty(itemsUR)}">
-        <h2>UR</h2>
-        <div class="material-list">
-            <div th:each="item : ${itemsUR}" class="material-card ur">
-                <div class="card-image-container">
-                    <img th:src="@{${item.imagePath}}" th:alt="${item.name}">
-                </div>
-                <p th:text="${item.name}"></p>
-                <p th:text="'所持数: ' + ${item.count}"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 全部空の場合 -->
-    <section th:if="${(itemsR == null or #lists.isEmpty(itemsR)) and 
-                     (itemsSR == null or #lists.isEmpty(itemsSR)) and 
-                     (itemsSSR == null or #lists.isEmpty(itemsSSR)) and 
-                     (itemsUR == null or #lists.isEmpty(itemsUR))}" style="text-align:center;">
-        <p>素材がまだ登録されていません。</p>
-    </section>
-
-    <!-- 戻るボタン -->
-    <div class="back-btn-container" style="text-align:center; margin-top:20px;">
-        <a th:href="@{/characters/menu/CharactersMenu}" class="button secondary">
-            <i class="fa-solid fa-arrow-left"></i> メニューに戻る
-        </a>
-    </div>
-</div>
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        const flare = document.getElementById('mouse-flare');
+        let particlesArray = [];
+        let width, height;
+        function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        window.addEventListener('mousemove', (event) => {
+            flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+            particlesArray.push(new Particle(event.clientX, event.clientY));
+        });
+        class Particle {
+            constructor(x, y) {
+                this.x = x || Math.random() * width; this.y = y || Math.random() * height;
+                this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2;
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+            }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update(); particlesArray[i].draw();
+                if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
 </body>
 </html>

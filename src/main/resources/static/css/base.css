@@ -86,7 +86,7 @@ body {
 
 .main-container:hover {
    /* transform: translateY(-100px) scale(0.99); 浮く高さを強調し、少し拡大 */
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), 0 0 20px var(--primary-color), 0 0 0 8px var(--primary-color); /* ホバー時の境界線も強調 */
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2); /* ピンク色の境界線強調を削除 */
 }
 
 h1 {
@@ -250,7 +250,7 @@ h1 {
     }
     .main-container:hover {
         transform: translateY(0px) scale(1.0); /* ホバー時の動きも調整 */
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15), 0 0 15px var(--primary-color);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15); /* ピンク色の光彩を削除 */
     }
     h1 {
         font-size: 36px;
