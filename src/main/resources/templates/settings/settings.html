@@ -5,36 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-    
     <title>設定 | FitWorks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/settings.css}">
-	<link rel="stylesheet" th:href="@{/css/base.css}">
-    
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* セキュリティセクション用の追加スタイル */
-        .btn-register-bio {
-            padding: 8px 12px;
-            background-color: var(--primary-color, #ffb300);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-            text-decoration: none;
+        /* 共通背景デザイン */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        body.settings-page {
+            margin: 0; padding: 0; background-color: #f0f8ff;
+            min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden;
         }
-        .bio-message {
-            font-size: 12px;
-            margin-top: 5px;
-            color: #666;
-            display: block;
+        .interactive-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
         }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+
+        .main-container {
+            max-width: 800px; width: 92%; margin: 40px auto; padding: 40px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
+        }
+
+        /* 既存スタイル調整 */
+        .btn-register-bio { padding: 8px 12px; background-color: var(--primary-color, #ffb300); color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.9em; text-decoration: none; }
+        .bio-message { font-size: 12px; margin-top: 5px; color: #666; display: block; }
+        .setting-section { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px); border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
+        .section-header { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #333; transition: background 0.3s; }
+        .section-header:hover { background: rgba(255,255,255,0.8); }
     </style>
 </head>
 <body class="settings-page">
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+    </div>
+
 <div class="main-container">
     <h1><i class="fa-solid fa-gear header-icon"></i>設定</h1>
     
@@ -205,185 +232,122 @@
 </div>
 
 <script>
-    // --- 設定更新用API呼び出し ---
+    // --- 既存のJSロジック ---
     async function updateSetting(key, value) {
         try {
             const csrfToken = document.querySelector('meta[name="_csrf"]').content;
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
-
-            const payload = {};
-            payload[key] = value;
-
+            const payload = {}; payload[key] = value;
             const response = await fetch('/api/settings/update', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                },
+                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
                 body: JSON.stringify(payload)
             });
-
             const result = await response.json();
-            if (result.success) {
-                console.log(key + ' updated successfully');
-            } else {
-                console.error('Failed to update setting');
-                alert('設定の保存に失敗しました。');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
+            if (result.success) console.log(key + ' updated successfully');
+            else alert('設定の保存に失敗しました。');
+        } catch (error) { console.error('Error:', error); }
     }
-
-    // --- テーマ変更処理 ---
     function handleThemeChange(themeName) {
         localStorage.setItem('fitworks-theme', themeName);
-        if (typeof applyTheme === 'function') {
-            applyTheme();
-        }
+        if (typeof applyTheme === 'function') applyTheme();
         updateSetting('theme', themeName);
     }
-
-    // --- ログアウト確認 ---
-    function confirmLogout() {
-        return confirm("本当にログアウトしますか？");
-    }
-
-    // --- アコーディオン処理 ---
+    function confirmLogout() { return confirm("本当にログアウトしますか？"); }
     function toggleSection(contentId) {
         const content = document.getElementById(contentId);
         const sectionHeader = content.previousElementSibling; 
         const arrow = sectionHeader.querySelector('.arrow');
-        
         if (content.style.maxHeight && content.style.maxHeight !== '0px') {
-            // 閉じる
-            content.style.maxHeight = '0px';
-            content.style.paddingTop = '0px';
-            content.style.paddingBottom = '0px';
-            arrow.innerHTML = '▼';
+            content.style.maxHeight = '0px'; content.style.paddingTop = '0px'; content.style.paddingBottom = '0px'; arrow.innerHTML = '▼';
             setTimeout(() => { content.style.display = 'none'; }, 300); 
         } else {
-            // 開く
-            content.style.display = 'block'; 
-            content.style.maxHeight = content.scrollHeight + 30 + "px"; 
-            content.style.paddingTop = '10px';
-            content.style.paddingBottom = '15px';
-            arrow.innerHTML = '▲';
+            content.style.display = 'block'; content.style.maxHeight = content.scrollHeight + 30 + "px"; content.style.paddingTop = '10px'; content.style.paddingBottom = '15px'; arrow.innerHTML = '▲';
         }
     }
-
-    // --- ★生体認証登録処理 ---
     function bufferToBase64url(buffer) {
         const bytes = new Uint8Array(buffer);
         let binary = '';
-        for (let i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCharCode(bytes[i]);
-        }
+        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
         return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     }
-
     function base64urlToBuffer(base64url) {
         const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
         const binary = atob(base64);
         const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) {
-            bytes[i] = binary.charCodeAt(i);
-        }
+        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
         return bytes.buffer;
     }
-
     document.getElementById('btn-register-biometric').addEventListener('click', async () => {
         const msgArea = document.getElementById('bio-message');
-        msgArea.textContent = '処理中...';
-        msgArea.style.color = '#666';
-
-        if (!window.PublicKeyCredential) {
-            alert('このデバイスは生体認証に対応していません。');
-            return;
-        }
-
+        msgArea.textContent = '処理中...'; msgArea.style.color = '#666';
+        if (!window.PublicKeyCredential) { alert('このデバイスは生体認証に対応していません。'); return; }
         try {
             const csrfToken = document.querySelector('meta[name="_csrf"]').content;
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
-
-            // 1. オプション取得
             const optRes = await fetch('/api/webauthn/register/options');
             if (!optRes.ok) throw new Error('オプション取得失敗');
             const options = await optRes.json();
-
-            // 2. 認証器作成
             const credential = await navigator.credentials.create({
                 publicKey: {
                     rp: { name: "FitWorks" },
-                    user: {
-                        id: base64urlToBuffer(options.user.id),
-                        name: options.user.name,
-                        displayName: options.user.displayName
-                    },
+                    user: { id: base64urlToBuffer(options.user.id), name: options.user.name, displayName: options.user.displayName },
                     challenge: base64urlToBuffer(options.challenge),
-                    pubKeyCredParams: [
-                        { type: "public-key", alg: -7 }, 
-                        { type: "public-key", alg: -257 }
-                    ],
-                    authenticatorSelection: {
-                        authenticatorAttachment: "platform", 
-                        userVerification: "preferred"
-                    },
+                    pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
+                    authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "preferred" },
                     timeout: 60000
                 }
             });
-
-            // 3. 登録リクエスト
             const regRes = await fetch('/api/webauthn/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                },
+                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
                 body: JSON.stringify({
                     clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
                     attestationObject: bufferToBase64url(credential.response.attestationObject),
                     deviceName: "My Device"
                 })
             });
-
-            if (regRes.ok) {
-                msgArea.textContent = '登録完了！次回からログインで使用できます。';
-                msgArea.style.color = 'green';
-                alert('生体認証を登録しました');
-            } else {
-                const errText = await regRes.text();
-                throw new Error(errText);
-            }
-        } catch (e) {
-            console.error(e);
-            msgArea.textContent = 'エラー: ' + e.message;
-            msgArea.style.color = 'red';
-        }
+            if (regRes.ok) { msgArea.textContent = '登録完了！'; msgArea.style.color = 'green'; alert('生体認証を登録しました'); } 
+            else throw new Error(await regRes.text());
+        } catch (e) { console.error(e); msgArea.textContent = 'エラー: ' + e.message; msgArea.style.color = 'red'; }
     });
-
-    // --- 初期化処理 ---
     document.addEventListener('DOMContentLoaded', () => {
         const selector = document.getElementById('theme-selector');
-        if (selector) {
-            localStorage.setItem('fitworks-theme', selector.value);
-            if (typeof applyTheme === 'function') {
-                applyTheme();
-            }
-        }
-
-        // アコーディオン初期状態 (全て閉じる)
+        if (selector) { localStorage.setItem('fitworks-theme', selector.value); if (typeof applyTheme === 'function') applyTheme(); }
         document.querySelectorAll('.setting-section').forEach(section => {
             const content = section.querySelector('.section-content');
             const arrow = section.querySelector('.arrow');
-            
-            content.style.maxHeight = '0px';
-            content.style.paddingTop = '0px';
-            content.style.paddingBottom = '0px';
-            content.style.display = 'none';
+            content.style.maxHeight = '0px'; content.style.paddingTop = '0px'; content.style.paddingBottom = '0px'; content.style.display = 'none';
             if (arrow) arrow.innerHTML = '▼';
         });
     });
+
+    // --- 背景アニメーションJS ---
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particlesArray = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+    class Particle {
+        constructor() {
+            this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2;
+            this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2;
+            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+        }
+        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+    }
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update(); particlesArray[i].draw();
+            if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; }
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
 </script>
 </body>
 </html>

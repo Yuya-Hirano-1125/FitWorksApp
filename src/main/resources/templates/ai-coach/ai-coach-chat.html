@@ -12,162 +12,82 @@
     <link rel="stylesheet" th:href="@{/css/chat.css}"> 
 	<script th:src="@{/js/theme.js}"></script>
 	<style>
-        /* チャット画面特有の簡易スタイル */
+        /* 背景アニメーションスタイル */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+
+        .main-container {
+            max-width: 900px; width: 92%; margin: 20px auto; padding: 30px;
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column;
+            /* チャット画面なので高さを確保 */
+            height: 90vh;
+        }
+
+        /* チャット画面特有の調整 */
         .chat-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #1e1e1e;
+            width: 100%; max-width: 100%;
+            background: rgba(30, 30, 30, 0.85); /* 半透明に */
+            backdrop-filter: blur(10px);
             border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            height: 70vh;
+            display: flex; flex-direction: column;
+            flex-grow: 1; /* 高さいっぱい */
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        .chat-window {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .message {
-            max-width: 80%;
-            padding: 12px 18px;
-            border-radius: 20px;
-            line-height: 1.5;
-            font-size: 0.95rem;
-        }
-        .message.bot {
-            align-self: flex-start;
-            background: #333;
-            color: #ddd;
-            border-bottom-left-radius: 2px;
-            border-top-left-radius: 5px;
-        }
-        .message.user {
-            align-self: flex-end;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            color: white;
-            border-bottom-right-radius: 2px;
-        }
-        .input-area {
-            padding: 15px;
-            background: #252525;
-            display: flex;
-            gap: 10px;
-            border-top: 1px solid #444;
-        }
-        .input-area input {
-            flex-grow: 1;
-            padding: 12px;
-            border-radius: 25px;
-            border: 1px solid #555;
-            background: #333;
-            color: white;
-            outline: none;
-        }
-        .input-area input:focus {
-            border-color: #2575fc;
-        }
-        .input-area button {
-            background: #2575fc;
-            color: white;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .input-area button:hover {
-            transform: scale(1.1);
-        }
-        .suggestions {
-            padding: 10px 15px;
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            background: #252525;
-        }
-        .suggestion-chip {
-            background: #444;
-            color: #ccc;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: 0.2s;
-        }
-        .suggestion-chip:hover {
-            background: #555;
-            color: white;
-        }
-		.chat-row {
-		        display: flex;
-		        align-items: flex-start; /* 上揃え */
-		        gap: 10px;               /* アイコンと吹き出しの間隔 */
-		        margin-bottom: 15px;     /* 次のメッセージとの間隔 */
-		        max-width: 90%;          /* 画面幅いっぱいにはしない */
-		    }
-
-		    /* AI（Bot）の行は左寄せ */
-		    .chat-row.bot {
-		        align-self: flex-start;
-		    }
-
-		    /* ユーザーの行は右寄せ */
-		    .chat-row.user {
-		        align-self: flex-end;
-		        justify-content: flex-end;
-		    }
-
-		    /* キャラクターアイコンのスタイル */
-		    .profile-icon {
-		        width: 45px;             /* アイコンのサイズ */
-		        height: 45px;
-		        border-radius: 50%;      /* 丸くする */
-		        object-fit: cover;       /* 画像の比率を維持 */
-		        flex-shrink: 0;          /* 縮まないように固定 */
-		        box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 影をつけて浮き出させる */
-		    }
-
-		    /* 吹き出しの微調整 */
-		    .message {
-		        position: relative;
-		        margin: 0; /* コンテナで間隔調整するためリセット */
-		    }
-		    
-		    /* トレーニング開始ボタンのスタイル */
-            .start-training-btn {
-                background: linear-gradient(135deg, #007bff, #2575fc);
-                color: white;
-                border: none;
-                padding: 10px 15px;
-                font-size: 0.95rem;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: opacity 0.2s, transform 0.2s;
-                display: block; /* 吹き出し内でブロック要素として表示 */
-                margin-top: 15px; /* メッセージ本文との間隔 */
-                width: fit-content; /* 内容に合わせて幅を調整 */
-                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            }
-            .start-training-btn:hover {
-                opacity: 0.9;
-                transform: translateY(-1px);
-            }
-            .start-training-btn i {
-                margin-right: 5px;
-            }
+        .chat-window { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .message { max-width: 80%; padding: 12px 18px; border-radius: 20px; line-height: 1.5; font-size: 0.95rem; }
+        .message.bot { align-self: flex-start; background: #333; color: #ddd; border-bottom-left-radius: 2px; border-top-left-radius: 5px; }
+        .message.user { align-self: flex-end; background: linear-gradient(135deg, #6a11cb, #2575fc); color: white; border-bottom-right-radius: 2px; }
+        .input-area { padding: 15px; background: rgba(37, 37, 37, 0.9); display: flex; gap: 10px; border-top: 1px solid #444; }
+        .input-area input { flex-grow: 1; padding: 12px; border-radius: 25px; border: 1px solid #555; background: #333; color: white; outline: none; }
+        .input-area input:focus { border-color: #2575fc; }
+        .input-area button { background: #2575fc; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; }
+        .input-area button:hover { transform: scale(1.1); }
+        .suggestions { padding: 10px 15px; display: flex; gap: 10px; overflow-x: auto; background: rgba(37, 37, 37, 0.9); }
+        .suggestion-chip { background: #444; color: #ccc; padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+        .suggestion-chip:hover { background: #555; color: white; }
+		.chat-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; max-width: 90%; }
+		.chat-row.bot { align-self: flex-start; }
+		.chat-row.user { align-self: flex-end; justify-content: flex-end; }
+		.profile-icon { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+		.message { position: relative; margin: 0; }
+        .start-training-btn { background: linear-gradient(135deg, #007bff, #2575fc); color: white; border: none; padding: 10px 15px; font-size: 0.95rem; border-radius: 8px; cursor: pointer; transition: opacity 0.2s, transform 0.2s; display: block; margin-top: 15px; width: fit-content; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .start-training-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .start-training-btn i { margin-right: 5px; }
+        h1 { margin-top: 0; }
     </style>
 </head>
 <body>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+    </div>
+
     <div class="main-container">
-        <h1><i class="fa-solid fa-robot"></i> AIトーク</h1>
-        <p style="text-align: center; color: #aaa; margin-bottom: 20px;">
+        <h1 style="text-align: center;"><i class="fa-solid fa-robot"></i> AIトーク</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">
             あなたのレベルや履歴に合わせて、最適なメニューを提案します！
         </p>
 
@@ -201,180 +121,86 @@
     </div>
 
     <script>
+        // 背景アニメーション
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+        class Particle {
+            constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 既存のチャットJS
         const chatWindow = document.getElementById('chat-window');
         const userInput = document.getElementById('user-input');
-
-        function setInput(text) {
-            userInput.value = text;
-            userInput.focus();
-        }
-
-        // 日本語入力の変換確定(Enter)で送信されないように isComposing をチェック
-        function handleKeyPress(e) {
-            if (e.key === 'Enter' && !e.isComposing) {
-                e.preventDefault(); // フォーム送信などを防ぐ
-                sendMessage();
-            }
-        }
-
-        // AIおすすめトレーニングを開始するためのPOSTリクエストを送信する関数
+        function setInput(text) { userInput.value = text; userInput.focus(); }
+        function handleKeyPress(e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); sendMessage(); } }
         function startSuggestedTraining(menuText) {
-            // CSRFトークンを取得
             const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-            
-            // 動的にフォームを作成
             const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/training/start'; 
-
-            // type=ai-suggested
-            const typeInput = document.createElement('input');
-            typeInput.type = 'hidden';
-            typeInput.name = 'type';
-            typeInput.value = 'ai-suggested';
-            form.appendChild(typeInput);
-
-            // exerciseName
-            const nameInput = document.createElement('input');
-            nameInput.type = 'hidden';
-            nameInput.name = 'exerciseName';
-            nameInput.value = 'AIおすすめプログラム'; 
-            form.appendChild(nameInput);
-            
-            // AIの提案内容から「箇条書き部分」のみを抽出してパラメータとして追加
+            form.method = 'POST'; form.action = '/training/start'; 
+            const typeInput = document.createElement('input'); typeInput.type = 'hidden'; typeInput.name = 'type'; typeInput.value = 'ai-suggested'; form.appendChild(typeInput);
+            const nameInput = document.createElement('input'); nameInput.type = 'hidden'; nameInput.name = 'exerciseName'; nameInput.value = 'AIおすすめプログラム'; form.appendChild(nameInput);
             if (menuText) {
-                // 正規表現: 行頭が「-」「・」「*」または「数字.」で始まる行をマッチさせる
-                // (例: "- ベンチプレス...", "1. スクワット...")
-                // 会話文（「はい、わかりました！」など）を除去してメニューだけにする
                 const matches = menuText.match(/(?:^|\n)\s*[-・*1-9]\.?\s+.+/g);
-                
                 let cleanMenu = menuText;
-                if (matches && matches.length > 0) {
-                    // 抽出した行を結合し、余分な空白を除去
-                    cleanMenu = matches.map(m => m.trim()).join('\n');
-                }
-
-                const menuInput = document.createElement('input');
-                menuInput.type = 'hidden';
-                menuInput.name = 'aiProposal'; // Controller側で受け取る名前
-                menuInput.value = cleanMenu;
-                form.appendChild(menuInput);
+                if (matches && matches.length > 0) cleanMenu = matches.map(m => m.trim()).join('\n');
+                const menuInput = document.createElement('input'); menuInput.type = 'hidden'; menuInput.name = 'aiProposal'; menuInput.value = cleanMenu; form.appendChild(menuInput);
             }
-            
-            // CSRFトークン
-            const csrfInput = document.createElement('input');
-            csrfInput.type = 'hidden';
-            csrfInput.name = '_csrf';
-            csrfInput.value = csrfToken;
-            form.appendChild(csrfInput);
-
-            // フォームを一時的にbodyに追加して送信
-            document.body.appendChild(form);
-            form.submit();
+            const csrfInput = document.createElement('input'); csrfInput.type = 'hidden'; csrfInput.name = '_csrf'; csrfInput.value = csrfToken; form.appendChild(csrfInput);
+            document.body.appendChild(form); form.submit();
         }
-
         async function sendMessage() {
             const message = userInput.value.trim();
             if (!message) return;
-
-            // ユーザーメッセージを表示
             addMessage(message, 'user');
             userInput.value = '';
-
-            // ローディング表示（簡易的）
             const loadingId = addMessage('考え中... <i class="fa-solid fa-spinner fa-spin"></i>', 'bot');
-
             try {
-                // CSRFトークン対策
                 const csrfToken = document.querySelector('meta[name="_csrf"]').content;
                 const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
-
                 const response = await fetch('/api/ai-coach/chat', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        [csrfHeader]: csrfToken 
-                    },
+                    headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
                     body: JSON.stringify({ message: message })
                 });
-
                 const data = await response.json();
-                
-                // ローディングを削除してAIの回答を表示
                 document.getElementById(loadingId).remove();
-                
-                // ★ 修正箇所: 改行コードもエスケープする
-                const rawReplySafe = data.reply
-                    .replace(/\r\n/g, "\\n")
-                    .replace(/\n/g, "\\n")
-                    .replace(/'/g, "\\'")
-                    .replace(/"/g, '&quot;');
-                
-                // 改行コードを<br>に変換して表示用テキストを作成
+                const rawReplySafe = data.reply.replace(/\r\n/g, "\\n").replace(/\n/g, "\\n").replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 let formattedReply = data.reply.replace(/\n/g, '<br>');
-                
-                // メニュー提案が含まれている場合、ボタンを追加
                 const keywords = ["セット", "プログラム", "提案", "回", "メニュー", "種目", "秒", "分"];
                 const isMenuProposal = keywords.some(keyword => data.reply.includes(keyword));
-
                 if (isMenuProposal) {
-                    formattedReply += `
-                        <br><br>
-                        <button class="start-training-btn" onclick="startSuggestedTraining('${rawReplySafe}')">
-                            <i class="fa-solid fa-dumbbell"></i> このメニューでトレーニングを開始
-                        </button>
-                    `;
+                    formattedReply += `<br><br><button class="start-training-btn" onclick="startSuggestedTraining('${rawReplySafe}')"><i class="fa-solid fa-dumbbell"></i> このメニューでトレーニングを開始</button>`;
                 }
-                
                 addMessage(formattedReply, 'bot');
-
             } catch (error) {
                 console.error('Error:', error);
                 document.getElementById(loadingId).remove();
                 addMessage('すみません、エラーが発生しました。もう一度試してください。', 'bot');
             }
         }
-
-		// 既存の addMessage 関数
 		function addMessage(text, sender) {
 		    if (sender === 'bot') {
-		        // --- AIの場合：アイコン付きのレイアウトを作成 ---
-		        
-		        // 1. 行（コンテナ）を作成
-		        const rowDiv = document.createElement('div');
-		        rowDiv.className = 'chat-row bot';
-		        rowDiv.id = 'msg-row-' + Date.now(); // ローディング削除用にID付与
-
-		        // 2. 画像を作成
-		        const img = document.createElement('img');
-		        img.src = '/img/AIcoach.png'; // 画像パス
-		        img.className = 'profile-icon';
-		        img.alt = 'AI';
-
-		        // 3. 吹き出しを作成
-		        const msgDiv = document.createElement('div');
-		        msgDiv.className = 'message bot';
-		        msgDiv.innerHTML = text;
-
-		        // 4. 合体させてチャット画面に追加
-		        rowDiv.appendChild(img);
-		        rowDiv.appendChild(msgDiv);
-		        chatWindow.appendChild(rowDiv);
-
-		        chatWindow.scrollTop = chatWindow.scrollHeight;
-		        return rowDiv.id; // IDを返す（ローディング削除のため）
-
+		        const rowDiv = document.createElement('div'); rowDiv.className = 'chat-row bot'; rowDiv.id = 'msg-row-' + Date.now();
+		        const img = document.createElement('img'); img.src = '/img/AIcoach.png'; img.className = 'profile-icon'; img.alt = 'AI';
+		        const msgDiv = document.createElement('div'); msgDiv.className = 'message bot'; msgDiv.innerHTML = text;
+		        rowDiv.appendChild(img); rowDiv.appendChild(msgDiv); chatWindow.appendChild(rowDiv);
+		        chatWindow.scrollTop = chatWindow.scrollHeight; return rowDiv.id;
 		    } else {
-		        // --- ユーザーの場合：既存のまま（右側の吹き出しのみ） ---
-		        
-		        const msgDiv = document.createElement('div');
-		        msgDiv.className = 'message user';
-		        msgDiv.id = 'msg-' + Date.now();
-		        msgDiv.innerHTML = text;
-		        
-		        chatWindow.appendChild(msgDiv);
-		        chatWindow.scrollTop = chatWindow.scrollHeight;
-		        return msgDiv.id;
+		        const msgDiv = document.createElement('div'); msgDiv.className = 'message user'; msgDiv.id = 'msg-' + Date.now(); msgDiv.innerHTML = text;
+		        chatWindow.appendChild(msgDiv); chatWindow.scrollTop = chatWindow.scrollHeight; return msgDiv.id;
 		    }
 		}
     </script>
