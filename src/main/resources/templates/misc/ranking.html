@@ -12,6 +12,130 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
+        /* ==========================================================================
+           🌌 背景用スタイル (スタート画面から移植)
+           ========================================================================== */
+        
+        /* 全体の設定 */
+        body {
+            background-color: #f0f8ff;
+            min-height: 100vh;
+            /* ランキング画面用に高さを確保 */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* 上寄せにする（リストが長くなるため） */
+            padding-top: 40px;
+            padding-bottom: 40px;
+        }
+
+        /* 背景エリア */
+        .interactive-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%;
+            animation: auroraFlow 20s ease infinite;
+            overflow: hidden;
+        }
+
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* オーブ */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: floatOrb 30s infinite alternate ease-in-out;
+            z-index: 0;
+        }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        /* Canvas */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        /* ☁️ 雲 */
+        .bg-cloud {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.85;
+            z-index: 2;
+            pointer-events: none;
+            box-shadow: 0 0 60px rgba(255,255,255,0.9);
+        }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
+
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        /* マウス追従ライトフレア */
+        .mouse-flare {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            mix-blend-mode: screen;
+            z-index: 20;
+            filter: blur(15px);
+            transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
+
+        /* ==========================================================================
+           🏆 ランキング画面用コンテナ & スタイル調整
+           ========================================================================== */
+        
+        .main-container {
+            max-width: 800px; /* ランキング用に少し幅広に */
+            width: 95%;
+            text-align: center;
+            padding: 40px 30px;
+            
+            /* スタート画面と同じガラス風スタイル */
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 
+                0 30px 60px rgba(100, 149, 237, 0.2), 
+                0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            
+            position: relative;
+            z-index: 10;
+            /* コンテナの浮遊アニメーションはリストが長いと酔う可能性があるので控えめに、または削除 */
+        }
+
         .ranking-list { 
             list-style: none; 
             padding: 0; 
@@ -22,7 +146,8 @@
         .ranking-item {
             display: flex; 
             align-items: center; 
-            background: var(--ai-bubble); 
+            /* 背景を少し透過させてなじませる */
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 20px; 
             padding: 15px 20px; 
             margin-bottom: 15px;
@@ -30,11 +155,12 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         .ranking-item:hover { 
             transform: translateX(5px) scale(1.01); 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
             background: #ffffff;
             border-color: var(--secondary-color);
         }
@@ -55,11 +181,12 @@
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
         }
 
+        /* バッジの色味調整 */
         .rank-1 { 
             background: linear-gradient(135deg, #ffd700, #fff0a0); 
             color: #b8860b; 
             border: 2px solid #fff;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
         }
         .rank-2 { 
             background: linear-gradient(135deg, #c0c0c0, #e0e0e0); 
@@ -73,12 +200,12 @@
         }
 
         .ranking-item.top-rank { 
-            background: #fff;
+            background: rgba(255, 255, 255, 0.9);
             border: 2px solid var(--secondary-color);
         }
         .ranking-item:has(.rank-1) {
             border-color: var(--primary-color);
-            background: #fff0f5; 
+            background: rgba(255, 240, 245, 0.9); 
         }
 
         .user-info { 
@@ -88,7 +215,7 @@
         .user-name { 
             font-weight: 800; 
             font-size: 1.1rem; 
-            color: var(--dark-text); 
+            color: #333; /* 文字色を少し濃く */
             margin-bottom: 4px;
         }
         .user-stats { 
@@ -100,7 +227,7 @@
         }
 
         .stat-tag { 
-            background: var(--ai-accent-color); 
+            background: #4facfe; /* スタート画面のテーマカラーに合わせる */
             color: white; 
             padding: 3px 10px; 
             border-radius: 12px; 
@@ -109,43 +236,64 @@
         }
         .xp-text {
             font-weight: 600;
-            color: var(--primary-color);
+            color: #4facfe;
         }
         
         .page-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px;
         }
+        
+        .header-icon { color: #4facfe; margin-right: 8px; }
+
         .view-selector {
             padding: 8px 12px;
-            border-radius: 10px;
-            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            border: 2px solid #4facfe;
             background: #fff;
             font-weight: bold;
-            color: var(--dark-text);
+            color: #333;
             cursor: pointer;
+            outline: none;
+            transition: 0.3s;
+        }
+        .view-selector:hover {
+            background: #4facfe;
+            color: #fff;
         }
     </style>
 </head>
 <body>
 
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div id="mouse-flare" class="mouse-flare"></div>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+        <div class="bg-cloud cloud-3"></div>
+    </div>
+
     <div class="main-container">
         
-        <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="page-header">
             <div class="ranking-header" style="margin:0;">
-                <h1 style="font-size: 1.5rem;">
+                <h1 style="font-size: 1.8rem; margin:0; text-align:left;">
                     <i class="fa-solid fa-trophy header-icon"></i>ランキング
                 </h1>
             </div>
             
-            <select class="view-selector" onchange="location.href=this.value" 
-                    style="padding: 8px; border-radius: 10px; border: 2px solid #3498db;">
+            <select class="view-selector" onchange="location.href=this.value">
                 <option value="/friends">フレンド管理</option>
                 <option value="/ranking" selected>フレンドランキング</option>
             </select>
         </div>
 
-        <p class="sub-heading" style="margin-bottom: 20px;">フレンドと競い合おう！</p>
+        <p class="sub-heading" style="margin-bottom: 30px; color:#555; font-weight:700;">
+            フレンドと競い合って、高みを目指そう！
+        </p>
 
         <ul class="ranking-list">
             <li th:each="user, stat : ${rankingList}" 
@@ -168,7 +316,7 @@
             </li>
             
             <li th:if="${#lists.isEmpty(rankingList)}" style="text-align: center; color: #666; padding: 20px;">
-                まだフレンドがいません。フレンド管理画面から追加しましょう！
+                まだフレンドがいません。<br>フレンド管理画面から追加しましょう！
             </li>
         </ul>
 
@@ -179,6 +327,85 @@
         </div>
 
     </div>
+
+    <script>
+        // === 🌟 CANVAS PARTICLE SYSTEM ===
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        const flare = document.getElementById('mouse-flare');
+        
+        let particlesArray = [];
+        let width, height;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x;
+            mouse.y = event.y;
+            if(flare) {
+                flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+            }
+            for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
+        });
+
+        class Particle {
+            constructor() {
+                this.x = mouse.x;
+                this.y = mouse.y;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 4 - 2;
+                this.speedY = Math.random() * 4 - 2;
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'white';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                if (particlesArray[i].size <= 0.3) {
+                    particlesArray.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        
+        // 背景の雲のパララックス効果
+        const cloud1 = document.querySelector('.cloud-1');
+        const cloud2 = document.querySelector('.cloud-2');
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth - e.pageX) / 60;
+            const y = (window.innerHeight - e.pageY) / 60;
+            if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
+            if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
+        });
+
+        animate();
+    </script>
 
 </body>
 </html>
