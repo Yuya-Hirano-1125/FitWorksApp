@@ -34,4 +34,9 @@ public class ExerciseData {
     public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
     
     public String getFullName() { return name; }
+
+    // ★ 追加: TrainingLogicService 側で使えるようにする
+    public String getLevel() { 
+        return difficulty; 
+    }
 }
