@@ -4,23 +4,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>全種目図鑑 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* -------------------------------------------------- */
-        /* レイアウト & デザイン */
-        /* -------------------------------------------------- */
+        /* ==========================================================================
+           🌌 背景用スタイル (スタート画面から移植)
+           ========================================================================== */
+        
         body {
-            background-color: #f8f9fa;
+            /* ベースカラー */
+            background-color: #f0f8ff;
             color: #333;
+            font-family: 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
 
+        /* 背景エリア */
+        .interactive-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%;
+            animation: auroraFlow 20s ease infinite;
+            overflow: hidden;
+        }
+
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* オーブ */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: floatOrb 30s infinite alternate ease-in-out;
+            z-index: 0;
+        }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        /* Canvas */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        /* ☁️ 雲 */
+        .bg-cloud {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.85;
+            z-index: 2;
+            pointer-events: none;
+            box-shadow: 0 0 60px rgba(255,255,255,0.9);
+        }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
+
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        /* マウス追従ライトフレア */
+        .mouse-flare {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            mix-blend-mode: screen;
+            z-index: 20;
+            filter: blur(15px);
+            transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
+
+        /* -------------------------------------------------- */
+        /* コンテナ & ガラスモーフィズム */
+        /* -------------------------------------------------- */
         .container {
             max-width: 1100px;
-            margin: 0 auto;
+            margin: 40px auto;
+            padding: 30px;
             padding-bottom: 120px;
+            
+            /* ガラス風スタイル */
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 
+                0 30px 60px rgba(100, 149, 237, 0.2), 
+                0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            
+            position: relative;
+            z-index: 10;
         }
 
         /* ヘッダー周り */
@@ -28,9 +135,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 25px;
             margin-bottom: 15px;
-            padding: 0 15px;
+            padding: 0 10px;
         }
         .page-title {
             margin: 0;
@@ -38,9 +144,10 @@
             color: #2c3e50;
             font-weight: 800;
             letter-spacing: -0.5px;
+            text-shadow: 0 2px 4px rgba(255,255,255,0.5);
         }
         .back-btn {
-            background-color: #f1f3f5;
+            background-color: rgba(255, 255, 255, 0.8);
             color: #495057;
             padding: 10px 18px;
             border-radius: 50px;
@@ -51,23 +158,29 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
         .back-btn:hover {
-            background-color: #e9ecef;
+            background-color: #fff;
             transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
         }
 
         /* 検索 & フィルターエリア固定 */
         .sticky-header-area {
             position: sticky;
-            top: 60px; /* ヘッダーの高さ考慮 */
+            top: 60px; 
             z-index: 90;
-            background-color: rgba(248, 249, 250, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            /* ガラス風に変更 */
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 15px 0;
             margin-bottom: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
 
         /* 検索バー */
@@ -88,14 +201,15 @@
             font-size: 1rem;
             border: 2px solid transparent;
             border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
             outline: none;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            background: #fff;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.9);
         }
         .search-box:focus {
-            border-color: #007bff;
-            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15);
+            border-color: #4facfe;
+            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2);
+            background: #fff;
         }
 
         /* ブックマーク一覧ボタン */
@@ -121,39 +235,35 @@
             box-shadow: 0 6px 15px rgba(243, 156, 18, 0.3);
         }
 
-        /* フィルターボタン (横スクロール) */
+        /* フィルターボタン */
         .filter-scroll-wrapper {
             overflow-x: auto;
             white-space: nowrap;
-            padding: 5px 15px 15px 15px;
+            padding: 5px 15px 5px 15px;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
-        .filter-scroll-wrapper::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
-        }
+        .filter-scroll-wrapper::-webkit-scrollbar { display: none; }
 
         .filter-btn {
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.8);
             color: #555;
-            border: 1px solid #e0e0e0;
+            border: 1px solid rgba(0,0,0,0.1);
             padding: 8px 18px;
             border-radius: 50px;
             font-size: 0.9rem;
             font-weight: 700;
             cursor: pointer;
             margin-right: 8px;
-            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-            display: inline-block; /* 確実に並べる */
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: inline-block;
         }
-        .filter-btn:last-child {
-            margin-right: 0;
-        }
+        .filter-btn:last-child { margin-right: 0; }
         .filter-btn:hover {
-            background-color: #f8f9fa;
+            background-color: #fff;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .filter-btn.active {
             background-color: #2c3e50;
@@ -161,7 +271,6 @@
             border-color: #2c3e50;
             box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
         }
-        /* 有酸素ボタン特別色 */
         .filter-btn[data-part="cardio"].active {
             background-color: #28a745;
             border-color: #28a745;
@@ -171,7 +280,7 @@
         /* カテゴリセクション */
         .category-section {
             margin-bottom: 50px;
-            padding: 0 15px;
+            padding: 0 5px;
             animation: fadeIn 0.5s ease;
         }
         @keyframes fadeIn {
@@ -185,7 +294,7 @@
             gap: 12px;
             margin-bottom: 20px;
             padding-bottom: 12px;
-            border-bottom: 2px solid #e9ecef;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
         }
         .category-title {
             margin: 0;
@@ -194,12 +303,13 @@
             font-weight: 800;
         }
         .category-badge {
-            background-color: #e9ecef;
+            background-color: rgba(255,255,255,0.6);
             color: #495057;
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 700;
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
         /* グリッドレイアウト */
@@ -211,14 +321,15 @@
 
         /* カードデザイン改善 */
         .exercise-card {
-            background: white;
+            /* 少し透過させて背景をなじませる */
+            background: rgba(255, 255, 255, 0.85);
             border-radius: 20px;
             padding: 24px;
             box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer;
             position: relative;
-            border: 1px solid rgba(0,0,0,0.02);
+            border: 1px solid rgba(255,255,255,0.5);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -227,6 +338,8 @@
         .exercise-card:hover {
             transform: translateY(-8px) scale(1.02);
             box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
+            background: #fff;
+            border-color: #4facfe;
         }
 
         .card-header {
@@ -234,7 +347,6 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 12px;
-            /* 修正: 右側に余白を設けて、絶対配置のブックマークボタンと文字が重ならないようにする */
             padding-right: 50px; 
         }
         .exercise-name {
@@ -242,7 +354,6 @@
             font-weight: 800;
             color: #2c3e50;
             line-height: 1.4;
-            /* margin-right削除: card-headerのpadding-rightで制御するため */
         }
         
         .card-tags {
@@ -271,27 +382,28 @@
             z-index: 2;
         }
         .bookmark-btn {
-            background: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.5);
             border-radius: 50%;
-            border: none;
+            border: 1px solid rgba(0,0,0,0.05);
             cursor: pointer;
             font-size: 1.4rem;
-            color: #d1d1d1;
+            color: #ccc;
             transition: all 0.2s;
             width: 40px;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .bookmark-btn.active {
             color: #ffc107;
             background: #fff;
             box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+            border-color: #ffc107;
         }
         .bookmark-btn:hover {
             transform: scale(1.15);
+            background: #fff;
         }
 
         .tap-hint {
@@ -310,12 +422,14 @@
         .no-results {
             text-align: center;
             padding: 60px 20px;
-            color: #adb5bd;
+            color: #666;
             font-weight: 700;
             display: none;
+            background: rgba(255,255,255,0.5);
+            border-radius: 20px;
         }
         .no-results i {
-            color: #dee2e6;
+            color: #ccc;
             margin-bottom: 15px;
         }
 
@@ -323,8 +437,9 @@
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 2000;
             display: none;
             justify-content: center;
@@ -338,23 +453,24 @@
             opacity: 1;
         }
         .detail-modal {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             width: 100%;
             max-width: 550px;
-            border-radius: 24px;
+            border-radius: 30px;
             overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3);
             transform: scale(0.95);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             max-height: 85vh;
             display: flex;
             flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.8);
         }
         .modal-overlay.active .detail-modal {
             transform: scale(1);
         }
         .modal-header {
-            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
             padding: 25px 30px;
             color: white;
             position: relative;
@@ -363,6 +479,7 @@
             margin: 0;
             font-size: 1.6rem;
             font-weight: 900;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .modal-close-btn {
             position: absolute;
@@ -382,15 +499,15 @@
             justify-content: center;
         }
         .modal-close-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.4);
         }
         .modal-body {
             padding: 30px;
             overflow-y: auto;
         }
         .desc-box {
-            background-color: #f8f9fa;
-            border-left: 6px solid #2c3e50;
+            background-color: #f0f8ff;
+            border-left: 6px solid #4facfe;
             padding: 20px;
             border-radius: 8px;
             margin-top: 20px;
@@ -410,6 +527,7 @@
         }
 
         @media (max-width: 600px) {
+            .container { margin: 20px 10px; padding: 20px; border-radius: 30px;}
             .search-container {
                 flex-direction: column;
                 align-items: stretch;
@@ -428,6 +546,17 @@
     </style>
 </head>
 <body>
+
+<div class="interactive-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div id="mouse-flare" class="mouse-flare"></div>
+    <div class="bg-cloud cloud-1"></div>
+    <div class="bg-cloud cloud-2"></div>
+    <div class="bg-cloud cloud-3"></div>
+</div>
 
 <div th:replace="fragments/header :: header"></div>
 
@@ -514,7 +643,7 @@
         <div class="category-section" data-part="cardio">
             <div class="category-header" style="border-bottom-color: #28a745;">
                 <h2 class="category-title" data-keywords="有酸素 カーディオ" style="color: #28a745;">有酸素運動</h2>
-                <span class="category-badge" style="background-color: #e8f5e9; color: #28a745;" th:text="${#lists.size(cardioExercises)} + ' 種目'"></span>
+                <span class="category-badge" style="background-color: rgba(40, 167, 69, 0.1); color: #28a745;" th:text="${#lists.size(cardioExercises)} + ' 種目'"></span>
             </div>
             
             <div class="exercise-grid">
@@ -577,18 +706,92 @@
 <div th:replace="fragments/footer :: footer"></div>
 
 <script>
-    // 部位フィルタリング機能
+    // === 🌟 CANVAS PARTICLE SYSTEM ===
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    const flare = document.getElementById('mouse-flare');
+    
+    let particlesArray = [];
+    let width, height;
+
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = event.x;
+        mouse.y = event.y;
+        if(flare) flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+        for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
+    });
+
+    class Particle {
+        constructor() {
+            this.x = mouse.x;
+            this.y = mouse.y;
+            this.size = Math.random() * 5 + 2;
+            this.speedX = Math.random() * 4 - 2;
+            this.speedY = Math.random() * 4 - 2;
+            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.size > 0.2) this.size -= 0.1;
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'white';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw();
+            if (particlesArray[i].size <= 0.3) {
+                particlesArray.splice(i, 1);
+                i--;
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+    
+    // 背景の雲のパララックス効果
+    const cloud1 = document.querySelector('.cloud-1');
+    const cloud2 = document.querySelector('.cloud-2');
+    document.addEventListener('mousemove', (e) => {
+        const x = (window.innerWidth - e.pageX) / 60;
+        const y = (window.innerHeight - e.pageY) / 60;
+        if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
+        if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
+    });
+
+    animate();
+</script>
+
+<script>
+    // 既存のJSロジック (部位フィルタリングなど)
     function filterByPart(part, btnElement) {
-        // 検索ボックスをリセット
         document.getElementById('exerciseSearchInput').value = '';
         document.getElementById('noResultsMessage').style.display = 'none';
 
-        // ボタンの見た目を更新
         const buttons = document.querySelectorAll('.filter-btn');
         buttons.forEach(btn => btn.classList.remove('active'));
         if(btnElement) btnElement.classList.add('active');
 
-        // セクションの表示切り替え
         const sections = document.querySelectorAll('.category-section');
         sections.forEach(section => {
             const cards = section.querySelectorAll('.exercise-card');
@@ -609,7 +812,6 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 検索フィルタリング
     function filterExercises() {
         const input = document.getElementById('exerciseSearchInput');
         const filter = input.value.toLowerCase().replace(/\s+/g, '');
@@ -619,24 +821,18 @@
 
         for (let i = 0; i < categories.length; i++) {
             const category = categories[i];
-            
-            // 非表示カテゴリはスキップ
             if (category.style.display === 'none') continue;
 
             const cards = category.getElementsByClassName('exercise-card');
-            let hasVisibleItem = false;
-
             for (let j = 0; j < cards.length; j++) {
                 const card = cards[j];
                 const name = card.getAttribute('data-name') || "";
                 const muscle = card.getAttribute('data-muscle') || "";
                 const equip = card.getAttribute('data-equip') || "";
-                
                 const textValue = (name + muscle + equip).toLowerCase().replace(/\s+/g, '');
 
                 if (textValue.includes(filter)) {
                     card.style.display = "";
-                    hasVisibleItem = true;
                     totalVisibleItems++;
                 } else {
                     card.style.display = "none";
@@ -652,7 +848,6 @@
         }
     }
 
-    // モーダルを開く
     function openDetailModal(cardElement) {
         const name = cardElement.getAttribute('data-name');
         const muscle = cardElement.getAttribute('data-muscle');
@@ -676,7 +871,6 @@
         document.body.style.overflow = 'hidden';
     }
 
-    // モーダルを閉じる
     function closeDetailModal(event) {
         if (event.target.id === 'detailModalOverlay' || event.target.closest('.modal-close-btn')) {
             const overlay = document.getElementById('detailModalOverlay');
