@@ -4,10 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>フレンド管理 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script th:src="@{/js/theme.js}"></script>
     <style>
+        /* ==========================================================================
+           移植された背景デザイン & スタイル
+           ========================================================================== */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --primary-color: #4facfe;
+            --accent-color: #00f2fe;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            min-height: 100vh;
+            font-family: 'Noto Sans JP', sans-serif;
+            overflow-x: hidden; /* 横スクロール防止 */
+        }
+
+        /* 背景アニメーション */
+        .interactive-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%;
+            animation: auroraFlow 20s ease infinite;
+            overflow: hidden;
+        }
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* オーブ */
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
+            animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0;
+        }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        /* Canvas & パーティクル */
+        #bg-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none; mix-blend-mode: screen;
+        }
+        .bg-cloud {
+            position: absolute; background: #fff; border-radius: 50%;
+            filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none;
+            box-shadow: 0 0 60px rgba(255,255,255,0.9);
+        }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        .mouse-flare {
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen;
+            z-index: 20; filter: blur(15px); transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
+
+        /* メインコンテナ（ガラスモーフィズム適用） */
+        .main-container {
+            max-width: 800px; /* 少し広めに調整 */
+            width: 92%;
+            margin: 40px auto;
+            padding: 40px;
+            
+            background: rgba(255, 255, 255, 0.65); /* 透明度調整 */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 
+                0 30px 60px rgba(100, 149, 237, 0.2), 
+                0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 既存のスタイル */
         .page-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px;
@@ -27,24 +121,37 @@
         }
         .nav-btn {
             flex: 1; padding: 10px; text-align: center;
-            background: #eee; border-radius: 10px;
+            background: rgba(255,255,255,0.5); /* 半透明に */
+            border-radius: 10px;
             text-decoration: none; color: #666; font-weight: bold;
             border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.8);
         }
         .nav-btn.active {
             background: #fff; border-color: var(--primary-color); color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.2);
         }
 
         .user-list { list-style: none; padding: 0; }
         .user-card {
             display: flex; align-items: center; justify-content: space-between;
-            background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.85); /* カードも少し透過 */
+            border-radius: 15px; padding: 15px; margin-bottom: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            border: 1px solid rgba(255,255,255,0.8);
+            transition: transform 0.2s;
         }
+        .user-card:hover { transform: translateY(-2px); }
         .user-info { display: flex; align-items: center; gap: 10px; }
         .user-avatar { 
-            width: 40px; height: 40px; background: #ddd; border-radius: 50%; 
+            width: 40px; height: 40px; background: linear-gradient(135deg, #e0c3fc, #8ec5fc); 
+            color: #fff;
+            border-radius: 50%; 
             display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
         }
         
         .search-box {
@@ -52,10 +159,24 @@
         }
         .search-input {
             flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #ccc;
+            background: rgba(255,255,255,0.9);
         }
+        
+        h1, h3 { color: #333; }
     </style>
 </head>
 <body>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div id="mouse-flare" class="mouse-flare"></div>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+        <div class="bg-cloud cloud-3"></div>
+    </div>
+
     <div class="main-container">
         
         <div class="page-header">
@@ -74,25 +195,25 @@
                th:classappend="${currentSection == 'search'} ? 'active' : ''">検索</a>
         </div>
 
-        <div th:if="${successMessage}" style="color: green; margin-bottom: 10px;" th:text="${successMessage}"></div>
-        <div th:if="${errorMessage}" style="color: red; margin-bottom: 10px;" th:text="${errorMessage}"></div>
+        <div th:if="${successMessage}" style="color: green; margin-bottom: 10px; font-weight:bold; background: rgba(255,255,255,0.8); padding:5px; border-radius:5px;" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" style="color: red; margin-bottom: 10px; font-weight:bold; background: rgba(255,255,255,0.8); padding:5px; border-radius:5px;" th:text="${errorMessage}"></div>
 
         <div th:if="${currentSection == 'list'}">
             
             <div th:if="${!#lists.isEmpty(requests)}" style="margin-bottom: 30px;">
                 <h3 style="color: #e67e22;"><i class="fa-solid fa-envelope"></i> 承認待ち</h3>
                 <ul class="user-list">
-                    <li th:each="req : ${requests}" class="user-card" style="border: 1px solid #e67e22;">
+                    <li th:each="req : ${requests}" class="user-card" style="border: 2px solid #e67e22;">
                         <div class="user-info">
                             <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
                             <span th:text="${req.username}" style="font-weight: bold;">User</span>
                         </div>
                         <div style="display: flex; gap: 5px;">
                             <form th:action="@{/friends/approve/{id}(id=${req.id})}" method="post">
-                                <button class="button primary" style="padding: 5px 10px; font-size: 0.8rem;">承認</button>
+                                <button class="button primary" style="padding: 5px 15px; font-size: 0.8rem; border-radius: 20px;">承認</button>
                             </form>
                             <form th:action="@{/friends/reject/{id}(id=${req.id})}" method="post">
-                                <button class="button secondary" style="padding: 5px 10px; font-size: 0.8rem;">拒否</button>
+                                <button class="button secondary" style="padding: 5px 15px; font-size: 0.8rem; border-radius: 20px;">拒否</button>
                             </form>
                         </div>
                     </li>
@@ -109,9 +230,9 @@
                             <div style="font-size: 0.8rem; color: #666;" th:text="'Lv.' + ${friend.level}">Lv.10</div>
                         </div>
                     </div>
-                    <span style="color: var(--primary-color); font-size: 0.8rem;">フレンド</span>
+                    <span style="color: var(--primary-color); font-size: 0.8rem; font-weight:bold;">フレンド</span>
                 </li>
-                <li th:if="${#lists.isEmpty(friends)}" style="text-align: center; color: #888;">
+                <li th:if="${#lists.isEmpty(friends)}" style="text-align: center; color: #666; padding: 20px;">
                     まだフレンドがいません。「検索」から探してみよう！
                 </li>
             </ul>
@@ -120,7 +241,7 @@
         <div th:if="${currentSection == 'search'}">
             <form th:action="@{/friends/search}" method="get" class="search-box">
                 <input type="text" name="keyword" class="search-input" placeholder="ユーザー名で検索..." th:value="${keyword}">
-                <button type="submit" class="button primary"><i class="fa-solid fa-search"></i></button>
+                <button type="submit" class="button primary" style="width: auto; border-radius: 10px; padding: 0 20px;"><i class="fa-solid fa-search"></i></button>
             </form>
 
             <ul class="user-list">
@@ -131,20 +252,95 @@
                     </div>
                     
                     <form th:action="@{/friends/request/{id}(id=${user.id})}" method="post">
-                        <button class="button secondary" style="padding: 5px 15px; font-size: 0.9rem;">申請</button>
+                        <button class="button secondary" style="padding: 5px 15px; font-size: 0.9rem; border-radius: 20px;">申請</button>
                     </form>
                 </li>
-                <li th:if="${searchResults != null && #lists.isEmpty(searchResults)}" style="text-align: center; color: #888;">
+                <li th:if="${searchResults != null && #lists.isEmpty(searchResults)}" style="text-align: center; color: #666; padding: 20px;">
                     ユーザーが見つかりませんでした。
                 </li>
             </ul>
         </div>
 
-        <div class="button-container">
+        <div class="button-container" style="margin-top: 30px;">
             <a th:href="@{/home}" class="button secondary">
                 <i class="fa-solid fa-house"></i> ホームに戻る
             </a>
         </div>
     </div>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        const flare = document.getElementById('mouse-flare');
+        
+        let particlesArray = [];
+        let width, height;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x;
+            mouse.y = event.y;
+            flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+            for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
+        });
+
+        // 背景の雲のパララックス効果
+        const cloud1 = document.querySelector('.cloud-1');
+        const cloud2 = document.querySelector('.cloud-2');
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth - e.pageX) / 60;
+            const y = (window.innerHeight - e.pageY) / 60;
+            if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
+            if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = mouse.x;
+                this.y = mouse.y;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 4 - 2;
+                this.speedY = Math.random() * 4 - 2;
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'white';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                if (particlesArray[i].size <= 0.3) {
+                    particlesArray.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
 </body>
 </html>

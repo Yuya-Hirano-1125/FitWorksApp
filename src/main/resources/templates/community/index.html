@@ -11,39 +11,173 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
-        /* CSS省略... 既存のデザインを維持 */
-        .new-post-area { background: var(--ai-bubble); padding: 25px; border-radius: 20px; margin-bottom: 40px; border: 2px dashed var(--secondary-color); text-align: left; }
-        .new-post-area h3 { margin-top: 0; color: var(--primary-color); font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        .custom-input, .custom-textarea { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 15px; border: 2px solid #fff; background: #fff; font-family: inherit; resize: none; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: all 0.3s ease; box-sizing: border-box; }
+        /* ==========================================================================
+           移植された背景デザイン & スタイル
+           ========================================================================== */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --primary-color: #4facfe;
+            --accent-color: #00f2fe;
+            --ai-bubble: rgba(255, 255, 255, 0.85); /* 既存変数上書き */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            min-height: 100vh;
+            font-family: 'Noto Sans JP', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* 背景アニメーション */
+        .interactive-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%;
+            animation: auroraFlow 20s ease infinite;
+            overflow: hidden;
+        }
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* オーブ */
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
+            animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0;
+        }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        /* Canvas & パーティクル */
+        #bg-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none; mix-blend-mode: screen;
+        }
+        .bg-cloud {
+            position: absolute; background: #fff; border-radius: 50%;
+            filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none;
+            box-shadow: 0 0 60px rgba(255,255,255,0.9);
+        }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        .mouse-flare {
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen;
+            z-index: 20; filter: blur(15px); transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
+
+        /* メインコンテナ（ガラスモーフィズム適用） */
+        .main-container {
+            max-width: 900px; /* コミュニティ用に少し広く */
+            width: 92%;
+            margin: 40px auto;
+            padding: 40px;
+            
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 
+                0 30px 60px rgba(100, 149, 237, 0.2), 
+                0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 既存スタイルの調整 */
+        .new-post-area { 
+            background: rgba(255, 255, 255, 0.7); /* 透過調整 */
+            padding: 25px; border-radius: 20px; margin-bottom: 40px; 
+            border: 2px dashed #a18cd1; 
+            text-align: left; 
+        }
+        .new-post-area h3 { margin-top: 0; color: #555; font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        
+        .custom-input, .custom-textarea { 
+            width: 100%; padding: 15px; margin-bottom: 15px; 
+            border-radius: 15px; border: 2px solid rgba(255,255,255,0.8); 
+            background: rgba(255,255,255,0.9); 
+            font-family: inherit; resize: none; overflow: hidden; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03); 
+            transition: all 0.3s ease; box-sizing: border-box; 
+        }
         .custom-input:focus, .custom-textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.1); }
+        
         .post-list { display: flex; flex-direction: column; gap: 20px; margin-bottom: 40px; }
-        .post-card { background: #fff; border-radius: 20px; padding: 20px 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 2px solid var(--light-bg); text-align: left; position: relative; transition: border-color 0.3s; overflow: hidden; }
-        .post-card:hover { border-color: var(--secondary-color); }
-        .post-title a { font-size: 1.25rem; font-weight: 800; color: var(--dark-text); text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.2s; word-break: break-word; overflow-wrap: break-word; }
+        .post-card { 
+            background: rgba(255, 255, 255, 0.85); /* カードも少し透過 */
+            border-radius: 20px; padding: 20px 25px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            border: 2px solid transparent; 
+            text-align: left; position: relative; 
+            transition: all 0.3s; overflow: hidden; 
+        }
+        .post-card:hover { transform: translateY(-2px); border-color: var(--accent-color); }
+        
+        .post-title a { font-size: 1.25rem; font-weight: 800; color: #333; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.2s; word-break: break-word; overflow-wrap: break-word; }
         .post-title a:hover { color: var(--primary-color); }
         .post-title i { color: var(--primary-color); font-size: 0.9rem; flex-shrink: 0; }
-        .post-meta { font-size: 0.85rem; color: #888; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
+        .post-meta { font-size: 0.85rem; color: #666; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 8px; }
         .post-excerpt { font-size: 0.95rem; color: #555; line-height: 1.6; margin-bottom: 15px; word-break: break-word; overflow-wrap: break-word; }
-        .btn-comment { display: inline-block; background: var(--ai-accent-color); color: white; padding: 8px 20px; border-radius: 25px; font-size: 0.9rem; font-weight: 700; text-decoration: none; transition: all 0.3s cubic-bezier(.25,.8,.25,1); box-shadow: 0 4px 10px rgba(135, 206, 235, 0.4); border: 2px solid transparent; }
-        .btn-comment:hover { background: var(--primary-color); transform: translateY(-3px); box-shadow: 0 6px 15px rgba(255, 105, 180, 0.4); }
+        
+        .btn-comment { 
+            display: inline-block; 
+            background: linear-gradient(135deg, #4facfe, #00f2fe); 
+            color: white; padding: 8px 20px; border-radius: 25px; 
+            font-size: 0.9rem; font-weight: 700; text-decoration: none; 
+            transition: all 0.3s cubic-bezier(.25,.8,.25,1); 
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.3); border: none; 
+        }
+        .btn-comment:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(79, 172, 254, 0.5); }
         .btn-comment i { margin-right: 5px; }
 
-        /* いいねボタンのデザイン */
+        /* いいねボタン */
         .like-form { display: inline-block; }
         .btn-like {
             background: none; border: none; cursor: pointer;
-            font-size: 1.1rem; color: #ccc; /* デフォルトはグレー */
+            font-size: 1.1rem; color: #ccc; 
             transition: all 0.3s; padding: 2px 5px;
         }
         .btn-like:hover { transform: scale(1.2); }
-        
-        /* ★重要: いいね済み(.liked)のときは赤ピンクにする */
         .btn-like.liked { color: #ff4757; } 
-        
         .like-count { font-size: 0.9rem; margin-left: 2px; color: #666; font-weight: bold; }
+        
+        h1 { color: #333; }
+        .sub-heading { color: #666; margin-top: -10px; margin-bottom: 30px; font-weight: 600;}
     </style>
 </head>
 <body>
+
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div id="mouse-flare" class="mouse-flare"></div>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+        <div class="bg-cloud cloud-3"></div>
+    </div>
 
     <div class="main-container">
         
@@ -111,6 +245,81 @@
     </div>
     
     <script>
+        // === 🌟 CANVAS PARTICLE SYSTEM ===
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        const flare = document.getElementById('mouse-flare');
+        
+        let particlesArray = [];
+        let width, height;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x;
+            mouse.y = event.y;
+            flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+            for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
+        });
+
+        // 背景の雲のパララックス効果
+        const cloud1 = document.querySelector('.cloud-1');
+        const cloud2 = document.querySelector('.cloud-2');
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth - e.pageX) / 60;
+            const y = (window.innerHeight - e.pageY) / 60;
+            if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
+            if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = mouse.x;
+                this.y = mouse.y;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 4 - 2;
+                this.speedY = Math.random() * 4 - 2;
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'white';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                if (particlesArray[i].size <= 0.3) {
+                    particlesArray.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 既存のTextarea自動拡張
         document.addEventListener('DOMContentLoaded', function() {
             const textarea = document.getElementById('auto-expand-textarea');
             if (!textarea) return;
