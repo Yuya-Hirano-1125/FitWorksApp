@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ようこそ | FitWorks</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/auth.css}">
@@ -12,25 +12,29 @@
 	<script th:src="@{/js/theme.js}"></script>
     
     <style>
-        /* --- スタート画面専用スタイル（アメイジング・ブルーテーマ） --- */
+        /* ==========================================================================
+           ✨ FITWORKS START SCREEN - LIGHT & SOLID
+           ========================================================================== */
 
         :root {
-            --mouse-x: 0.5;
-            --mouse-y: 0.5;
-            --theme-blue-start: #4facfe;
-            --theme-blue-end: #00f2fe;
-            --theme-blue-shadow: rgba(79, 172, 254, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --primary-color: #4facfe;
+            --accent-color: #00f2fe;
         }
 
         body {
             margin: 0;
             padding: 0;
-            background-color: transparent !important;
+            background-color: #f0f8ff;
             min-height: 100vh;
-            overflow-x: hidden; /* 横スクロール防止 */
+            overflow-x: hidden;
+            font-family: 'Noto Sans JP', sans-serif;
         }
 
-        /* 🌌 インタラクティブ背景 (劇的進化版) */
+        /* -----------------------------------------------------------
+           🌌 BACKGROUND: LIQUID AURORA
+           ----------------------------------------------------------- */
         .interactive-bg {
             position: fixed;
             top: 0;
@@ -38,244 +42,425 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            /* 夜明けのような深みのあるグラデーション */
-            background: linear-gradient(to top, #a1c4fd 0%, #c2e9fb 100%);
+            /* 4色のリッチなグラデーション */
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%;
+            animation: auroraFlow 20s ease infinite;
             overflow: hidden;
-            pointer-events: none;
         }
 
-        /* --- 新追加: 回転する光の筋 (Sun Rays) --- */
-        .bg-sun-rays {
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 背景に浮かぶ巨大な光のオーブ */
+        .orb {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 200vmax; /* 画面いっぱいに広げる */
-            height: 200vmax;
-            /* 光の筋のパターンを作成 */
-            background: conic-gradient(
-                from 0deg,
-                rgba(255, 255, 255, 0.4) 0deg,
-                transparent 20deg,
-                rgba(255, 255, 255, 0.4) 40deg,
-                transparent 60deg,
-                rgba(255, 255, 255, 0.4) 80deg,
-                transparent 100deg,
-                rgba(255, 255, 255, 0.4) 120deg,
-                transparent 140deg,
-                rgba(255, 255, 255, 0.4) 160deg,
-                transparent 180deg,
-                rgba(255, 255, 255, 0.4) 200deg,
-                transparent 220deg,
-                rgba(255, 255, 255, 0.4) 240deg,
-                transparent 260deg,
-                rgba(255, 255, 255, 0.4) 280deg,
-                transparent 300deg,
-                rgba(255, 255, 255, 0.4) 320deg,
-                transparent 340deg,
-                rgba(255, 255, 255, 0.4) 360deg
-            );
-            /* 中心をずらして配置 */
-            transform: translate(-50%, -50%);
-            z-index: 0; /* 雲より後ろ */
-            mix-blend-mode: overlay; /* 背景に馴染ませる */
-            filter: blur(80px); /* 強くぼかして柔らかな光に */
-            opacity: 0.6;
-            animation: rotateRays 60s linear infinite;
-        }
-
-        @keyframes rotateRays {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        /* --- 新追加: 舞い上がる光の粒子 (Particles) --- */
-        .bg-particle {
-            position: absolute;
-            bottom: -10%;
-            background: radial-gradient(circle, #fff, transparent 60%);
             border-radius: 50%;
+            filter: blur(80px);
             opacity: 0.6;
-            z-index: 2;
-            filter: blur(3px);
-            animation: floatUp linear infinite;
+            animation: floatOrb 30s infinite alternate ease-in-out;
+            z-index: 0;
         }
-        .p1 { left: 10%; width: 20px; height: 20px; animation-duration: 15s; animation-delay: 0s; }
-        .p2 { left: 30%; width: 30px; height: 30px; animation-duration: 20s; animation-delay: 2s; }
-        .p3 { left: 50%; width: 15px; height: 15px; animation-duration: 18s; animation-delay: 5s; }
-        .p4 { left: 70%; width: 25px; height: 25px; animation-duration: 22s; animation-delay: 1s; }
-        .p5 { left: 90%; width: 18px; height: 18px; animation-duration: 16s; animation-delay: 3s; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
 
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(0.8); opacity: 0; }
-            20% { opacity: 0.7; }
-            80% { opacity: 0.5; }
-            100% { transform: translateY(-120vh) scale(1.2); opacity: 0; }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
         }
 
+        /* Canvas (光のパーティクル用) */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* グラデーションの上 */
+            pointer-events: none;
+            mix-blend-mode: screen; /* 光を強調 */
+        }
 
-        /* --- 既存の雲 (微調整) --- */
-        .bg-cloud, .mouse-follower-cloud {
+        /* ☁️ 雲 */
+        .bg-cloud {
             position: absolute;
             background: #fff;
             border-radius: 50%;
-            filter: blur(25px); /* ぼかしを強化 */
-            box-shadow: 
-                inset -10px -10px 40px rgba(200, 235, 255, 0.9), /* 影を青っぽく強く */
-                30px 30px 70px rgba(0, 0, 0, 0.05),
-                0 0 50px rgba(255, 255, 255, 1.0); /* 発光を強く */
-            opacity: 0.95;
+            filter: blur(40px);
+            opacity: 0.85;
+            z-index: 2; /* Canvasの上 */
+            pointer-events: none;
+            box-shadow: 0 0 60px rgba(255,255,255,0.9);
         }
-
-        /* 強化されたマウス追従ライト */
-        .mouse-follower-cloud {
-            width: 250px; /* 大きく */
-            height: 250px;
-            top: 0; left: 0;
-            transform: translate(calc(var(--mouse-x) * 100vw - 125px), calc(var(--mouse-y) * 100vh - 125px));
-            z-index: 6;
-            opacity: 0.8;
-            filter: blur(35px);
-            mix-blend-mode: plus-lighter; /* より強く発光させる */
-            transition: transform 0.08s linear; /* 少しクイックに */
-            /* レンズフレアっぽい色味を追加 */
-            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 50%, transparent 80%);
-        }
-
-        /* 雲の配置とアニメーション */
-        .cloud-1 { top: 5%; left: 5%; width: 450px; height: 450px; opacity: 0.85; z-index: 3; transform: translate(calc(var(--mouse-x) * -40px), calc(var(--mouse-y) * -40px)); animation: floatCloud 25s infinite alternate ease-in-out; }
-        .cloud-2 { bottom: -5%; right: -15%; width: 700px; height: 700px; opacity: 0.7; z-index: 4; transform: translate(calc(var(--mouse-x) * -25px), calc(var(--mouse-y) * -25px)); animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
-        .cloud-3 { top: 35%; left: 60%; width: 350px; height: 350px; opacity: 0.5; z-index: 1; filter: blur(40px); transform: translate(calc(var(--mouse-x) * -70px), calc(var(--mouse-y) * -70px)); }
-        .cloud-4 { bottom: 15%; left: -150px; width: 600px; height: 600px; opacity: 0.4; z-index: 2; transform: translate(calc(var(--mouse-x) * 35px), calc(var(--mouse-y) * 35px)); }
+        
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
 
         @keyframes floatCloud {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            100% { transform: translate(40px, -30px) scale(1.08) rotate(3deg); }
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, -20px); }
+        }
+        @keyframes breatheCloud {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); }
         }
 
+        /* 変更点: マウス追従ライトフレア (より強く「光」らしく) */
+        .mouse-flare {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            /* 中心が強く光る白、外側へ向けて青白く消える */
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            mix-blend-mode: screen; /* 重ね合わせモードをスクリーンに */
+            z-index: 20; /* 手前に表示 */
+            filter: blur(15px); /* 光の滲み */
+            transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
 
-        /* --- メインコンテナ (変更なし) --- */
+        /* -----------------------------------------------------------
+           📦 CENTER CONTAINER
+           ----------------------------------------------------------- */
+        .center-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
         .main-container {
             max-width: 600px;
-            width: 90%;
-            margin: 40px auto;
-            padding: 40px 30px;
+            width: 100%;
             text-align: center;
-            background: rgba(255, 255, 255, 0.45); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 30px;
-            border: 1px solid rgba(33, 150, 243, 0.4);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            padding: 50px 40px;
+            
+            /* Glassmorphism */
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 
+                0 30px 60px rgba(100, 149, 237, 0.2), 
+                0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            
             position: relative;
             z-index: 10;
+            animation: containerFloat 6s ease-in-out infinite;
         }
 
-        /* ...(以下、ロゴ、テキスト、ボタンなどのスタイルは前回と同じため省略せず記述)... */
-        .start-logo-container { margin-bottom: 25px; animation: fadeInDown 1s ease-out; }
-        .start-logo { width: 160px; height: 160px; border-radius: 40px; object-fit: contain; background-color: rgba(255, 255, 255, 0.9); box-shadow: 0 10px 25px rgba(0,0,0,0.1); transition: transform 0.3s ease; padding: 10px; }
-        .start-logo:hover { transform: scale(1.05) rotate(-3deg); }
-        h1 { font-family: 'Poppins', sans-serif; font-size: 2.6rem; font-weight: 800; margin-bottom: 10px; color: #444; letter-spacing: 1px; text-shadow: 2px 2px 0px rgba(255,255,255,0.5); }
-        .catch-copy { font-size: 1.2rem; font-weight: bold; color: #0288d1; margin-bottom: 10px; display: block; text-shadow: 1px 1px 0 rgba(255,255,255,0.8); }
-        .sub-heading { font-size: 1.0rem; margin-bottom: 30px; color: #555; line-height: 1.6; font-weight: 600; }
-        .app-description { background-color: rgba(255, 255, 255, 0.65); border-radius: 25px; padding: 30px; margin: 30px 0; text-align: left; box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid rgba(255, 255, 255, 0.6); }
-        .description-text { font-size: 1.05rem; color: #555; line-height: 1.8; margin-bottom: 25px; font-weight: 500; }
-        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .feature-item { display: flex; align-items: center; font-size: 0.95rem; font-weight: bold; color: #444; }
-        .feature-item i { color: #fff; background: linear-gradient(135deg, var(--theme-blue-start), var(--theme-blue-end)); width: 32px; height: 32px; line-height: 32px; text-align: center; border-radius: 50%; margin-right: 10px; font-size: 0.9rem; flex-shrink: 0; box-shadow: 0 3px 8px var(--theme-blue-shadow); }
-        .auth-buttons { display: flex; flex-direction: column; gap: 15px; margin-top: 40px; }
-        .button { padding: 18px 25px; font-size: 1.1rem; font-weight: 700; border-radius: 50px; width: 100%; display: block; text-align: center; box-sizing: border-box; text-decoration: none; transition: all 0.3s ease; position: relative; overflow: hidden; }
-        .button.primary { background: linear-gradient(45deg, var(--theme-blue-start), var(--theme-blue-end)); color: white; border: none; box-shadow: 0 5px 15px var(--theme-blue-shadow); }
-        .button.primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 25px rgba(0, 198, 251, 0.5); }
-        .button.primary i { margin-right: 8px; }
-        .button.secondary { background: rgba(255, 255, 255, 0.8); color: #555; border: 2px solid rgba(255, 255, 255, 0.9); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .button.secondary:hover { background: #fff; color: #0288d1; border-color: #0288d1; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @media screen and (max-width: 480px) { .main-container { width: 92%; padding: 20px 15px; margin-top: 20px; } .start-logo { width: 140px; height: 140px; } h1 { font-size: 2.0rem; } .catch-copy { font-size: 1.0rem; } .sub-heading { font-size: 0.9rem; } .app-description { padding: 20px; } .description-text { font-size: 0.95rem; } .feature-grid { gap: 12px; } .feature-item { font-size: 0.9rem; } .button { padding: 15px 20px; font-size: 1rem; } }
+        @keyframes containerFloat {
+            0%, 100% { transform: translateY(0); box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset; }
+            50% { transform: translateY(-15px); box-shadow: 0 50px 80px rgba(100, 149, 237, 0.15), 0 0 0 2px rgba(255, 255, 255, 0.6) inset; }
+        }
+
+        /* ロゴ */
+        .start-logo-container { margin-bottom: 25px; }
+        .start-logo {
+            width: 160px;
+            height: 160px;
+            border-radius: 45px;
+            background: rgba(255,255,255,0.95);
+            padding: 15px;
+            box-shadow: 0 15px 35px rgba(79, 172, 254, 0.3);
+            object-fit: contain;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .start-logo:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* 変更点: タイトル・テキスト (黒色単色) */
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 900;
+            margin: 5px 0;
+            /* 黒色単色 */
+            color: #000000;
+            background: none;
+            -webkit-text-fill-color: initial;
+            letter-spacing: -1px;
+            /* 影もなしでソリッドに */
+            text-shadow: none;
+        }
+
+        .catch-copy {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #555;
+            margin-bottom: 12px;
+            display: block;
+            letter-spacing: 0.05em;
+        }
+
+        .sub-heading {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 35px;
+            font-weight: 500;
+            line-height: 1.8;
+        }
+
+        /* 説明カード */
+        .app-description {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 25px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+            transition: transform 0.3s;
+        }
+        .app-description:hover { transform: translateY(-3px); }
+        
+        .description-text { font-size: 1rem; color: #555; font-weight: 600; line-height: 1.8; }
+
+        /* アイコングリッド */
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 20px; }
+        .feature-item { display: flex; align-items: center; font-size: 0.95rem; font-weight: 700; color: #555; }
+        .feature-item i {
+            width: 38px; height: 38px; line-height: 38px; text-align: center;
+            border-radius: 50%; margin-right: 12px; font-size: 1rem; flex-shrink: 0;
+            color: #fff;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+            transition: transform 0.3s;
+        }
+        .feature-item:hover i { transform: scale(1.15); }
+
+        /* ボタン */
+        .auth-buttons { display: flex; flex-direction: column; gap: 18px; margin-top: 40px; }
+        
+        .button {
+            padding: 20px 30px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            border-radius: 50px;
+            width: 100%;
+            display: block;
+            text-align: center;
+            box-sizing: border-box;
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* プライマリーボタン (流れる光沢) */
+        .button.primary {
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            color: white;
+            border: none;
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+        }
+        .button.primary::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: 0.5s;
+        }
+        .button.primary:hover::after { left: 100%; }
+        .button.primary:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 15px 35px rgba(79, 172, 254, 0.6);
+        }
+
+        /* セカンダリーボタン */
+        .button.secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #4facfe;
+            border: 2px solid #4facfe;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .button.secondary:hover {
+            background: #4facfe;
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .main-container { padding: 40px 25px; width: 92%; }
+            h1 { font-size: 2.5rem; }
+            .start-logo { width: 130px; height: 130px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="interactive-bg">
-    <div class="bg-sun-rays"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 
-    <div class="bg-particle p1"></div>
-    <div class="bg-particle p2"></div>
-    <div class="bg-particle p3"></div>
-    <div class="bg-particle p4"></div>
-    <div class="bg-particle p5"></div>
-
-    <div class="mouse-follower-cloud"></div>
+    <canvas id="bg-canvas"></canvas>
     
+    <div id="mouse-flare" class="mouse-flare"></div>
+
     <div class="bg-cloud cloud-1"></div>
     <div class="bg-cloud cloud-2"></div>
     <div class="bg-cloud cloud-3"></div>
-    <div class="bg-cloud cloud-4"></div>
 </div>
 
-<div class="main-container">
-    <div class="start-logo-container">
-        <img th:src="@{/img/icon.png}" alt="FitWorks Logo" class="start-logo" />
-    </div>
+<div class="center-wrapper">
+    <div class="main-container">
+        <div class="start-logo-container">
+            <img th:src="@{/img/icon.png}" alt="FitWorks Logo" class="start-logo" />
+        </div>
 
-    <h1>FitWorks</h1>
-    <span class="catch-copy">毎日の運動が、冒険に変わる。</span>
-    <p class="sub-heading">
-        続かないトレーニングはもう終わり。<br>
-        ゲーム感覚で、理想の自分へレベルアップ。
-    </p>
-    
-    <div class="app-description">
-        <p class="description-text">
-            FitWorksは、あなたの努力を「XP（経験値）」に変えるフィットネスRPGアプリです。汗をかいた分だけ、あなたもパートナーも強くなれる！
+        <h1>FitWorks</h1>
+        <span class="catch-copy">空を飛ぶように、軽やかに。</span>
+        <p class="sub-heading">
+            日々のトレーニングが、あなたとパートナーを<br>
+            新しい景色へと連れて行きます。
         </p>
-        <div class="feature-grid">
-            <div class="feature-item">
-                <i class="fa-solid fa-dumbbell"></i> 運動でXP獲得
-            </div>
-            <div class="feature-item">
-                <i class="fa-solid fa-user-astronaut"></i> キャラ育成
-            </div>
-            <div class="feature-item">
-                <i class="fa-solid fa-gift"></i> ご褒美ガチャ
-            </div>
-            <div class="feature-item">
-                <i class="fa-solid fa-robot"></i> AIコーチ機能
-            </div>
-            <div class="feature-item">
-                <i class="fa-solid fa-trophy"></i> ランキング
-            </div>
-            <div class="feature-item">
-                <i class="fa-solid fa-comments"></i> 掲示板で交流
+        
+        <div class="app-description">
+            <p class="description-text">
+                FitWorksは、運動を「冒険」に変えるフィットネスアプリ。
+                あなたの頑張りが経験値になり、キャラクターが成長します。
+            </p>
+            <div class="feature-grid">
+                <div class="feature-item"><i class="fa-solid fa-dumbbell"></i> 楽しく運動</div>
+                <div class="feature-item"><i class="fa-solid fa-user-astronaut"></i> キャラ育成</div>
+                <div class="feature-item"><i class="fa-solid fa-gift"></i> ご褒美ガチャ</div>
+                <div class="feature-item"><i class="fa-solid fa-chart-line"></i> 成長記録</div>
             </div>
         </div>
-    </div>
-    
-    <div class="auth-buttons">
-        <a th:href="@{/register}" class="button primary">
-            <i class="fa-solid fa-rocket"></i> 今すぐ冒険を始める(新規登録)
-        </a>
+        
+        <div class="auth-buttons">
+            <a th:href="@{/register}" class="button primary">
+                <i class="fa-solid fa-rocket"></i> 今すぐ始める (無料)
+            </a>
 
-        <a th:href="@{/login}" class="button secondary">
-            <i class="fa-solid fa-right-to-bracket"></i> ログイン
-        </a>
+            <a th:href="@{/login}" class="button secondary">
+                <i class="fa-solid fa-right-to-bracket"></i> ログイン
+            </a>
+        </div>
+        
+        <p style="margin-top: 35px; font-size: 0.8rem; color: #888; font-weight: 600;">
+            &copy; 2025 FitWorks Project
+        </p>
     </div>
-    
-    <p style="margin-top: 30px; font-size: 0.8rem; color: #888; font-weight: 600;">
-        &copy; 2025 FitWorks Project
-    </p>
 </div>
 
 <script>
-    // マウス連動背景アニメーション
-    document.addEventListener('mousemove', (e) => {
-        // 画面の幅・高さに対するマウス位置の割合（0.0〜1.0）を計算
-        const x = e.clientX / window.innerWidth;
-        const y = e.clientY / window.innerHeight;
+    // === 🌟 LIGHT TRAIL & FLARE SYSTEM ===
+    
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    const flare = document.getElementById('mouse-flare');
+    
+    let particlesArray = [];
+    let width, height;
+
+    // キャンバスリサイズ
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // マウス座標
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = event.x;
+        mouse.y = event.y;
         
-        // CSS変数に値をセット
-        document.body.style.setProperty('--mouse-x', x);
-        document.body.style.setProperty('--mouse-y', y);
+        // フレア（光の玉）を移動
+        flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+
+        // マウスが動いた時に「光の粒子」を生成
+        for(let i = 0; i < 2; i++) {
+            particlesArray.push(new Particle());
+        }
     });
+
+    // 光のパーティクルクラス
+    class Particle {
+        constructor() {
+            this.x = mouse.x;
+            this.y = mouse.y;
+            // 飛び散るサイズ
+            this.size = Math.random() * 5 + 2;
+            // 飛び散る速度
+            this.speedX = Math.random() * 4 - 2;
+            this.speedY = Math.random() * 4 - 2;
+            // 色: 白～淡い青の光
+            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+        }
+        
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            // 徐々に小さくする
+            if (this.size > 0.2) this.size -= 0.1;
+        }
+        
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            // 発光表現
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'white';
+            ctx.fill();
+            // 影をリセット
+            ctx.shadowBlur = 0;
+        }
+    }
+
+    // アニメーションループ
+    function handleParticles() {
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw();
+            
+            // 小さくなったら配列から削除
+            if (particlesArray[i].size <= 0.3) {
+                particlesArray.splice(i, 1);
+                i--;
+            }
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        handleParticles();
+        requestAnimationFrame(animate);
+    }
+    
+    // 背景の雲のパララックス効果（控えめに）
+    const cloud1 = document.querySelector('.cloud-1');
+    const cloud2 = document.querySelector('.cloud-2');
+    
+    document.addEventListener('mousemove', (e) => {
+        const x = (window.innerWidth - e.pageX) / 60;
+        const y = (window.innerHeight - e.pageY) / 60;
+        
+        if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
+        if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
+    });
+
+    animate();
 </script>
 
 </body>
