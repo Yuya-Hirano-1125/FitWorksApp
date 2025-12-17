@@ -4,73 +4,279 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ブックマーク済みトレーニング | FitWorks</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <script th:src="@{/js/theme.js}"></script>
+    
     <style>
-        .bookmark-container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        /* ==========================================================================
+           🌌 背景用スタイル (共通)
+           ========================================================================== */
+        body {
+            background-color: #f0f8ff;
+            color: #333;
+            font-family: 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .interactive-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%;
+            animation: auroraFlow 20s ease infinite;
+            overflow: hidden;
+        }
+
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: floatOrb 30s infinite alternate ease-in-out;
+            z-index: 0;
+        }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        .bg-cloud {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.85;
+            z-index: 2;
+            pointer-events: none;
+            box-shadow: 0 0 60px rgba(255,255,255,0.9);
+        }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
+
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        .mouse-flare {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            mix-blend-mode: screen;
+            z-index: 20;
+            filter: blur(15px);
+            transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
+
+        /* ==========================================================================
+           📑 ブックマーク一覧スタイル (ガラスモーフィズム)
+           ========================================================================== */
+        .bookmark-container { 
+            max-width: 800px; 
+            margin: 40px auto; 
+            padding: 40px 30px;
+            
+            /* ガラス風コンテナ */
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            font-weight: 800;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(255,255,255,0.5);
+        }
+
         .bookmark-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.85); /* 少し透過 */
+            border-radius: 20px;
+            padding: 20px 25px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 5px solid var(--primary-color);
+            border-left: 6px solid var(--primary-color);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.6);
         }
-        .bookmark-info h3 { margin: 0 0 5px 0; color: var(--dark-text); }
-        .bookmark-type { font-size: 0.85em; color: #666; background: #f0f0f0; padding: 2px 8px; border-radius: 4px; }
+        
+        .bookmark-card:hover {
+            transform: translateY(-3px);
+            background: #fff;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .bookmark-info h3 { 
+            margin: 0 0 8px 0; 
+            color: #2c3e50; 
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .bookmark-type { 
+            font-size: 0.8em; 
+            color: #555; 
+            background: rgba(0,0,0,0.05); 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-weight: 600;
+        }
+
         .action-buttons { display: flex; gap: 10px; }
+        
         .btn-start {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 700;
             border: none;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.3);
+            transition: transform 0.2s;
         }
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 172, 254, 0.4);
+        }
+
         .btn-remove {
-            background-color: transparent;
+            background-color: white;
             color: #999;
-            border: 1px solid #ddd;
-            padding: 8px 12px;
-            border-radius: 20px;
+            border: 2px solid #eee;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
-        .btn-remove:hover { background-color: #ffebee; color: #ff4444; border-color: #ff4444; }
-        .empty-state { text-align: center; padding: 40px; color: #777; }
+        .btn-remove:hover { 
+            background-color: #ffebee; 
+            color: #ff4444; 
+            border-color: #ffcdd2; 
+            transform: scale(1.1);
+        }
+        
+        .empty-state { 
+            text-align: center; 
+            padding: 60px 20px; 
+            color: #666;
+            background: rgba(255,255,255,0.6);
+            border-radius: 20px;
+        }
+        
+        /* アラートメッセージ */
+        .alert {
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .alert-success { background: rgba(212, 237, 218, 0.9); color: #155724; border: 1px solid #c3e6cb; }
+        .alert-info { background: rgba(209, 236, 241, 0.9); color: #0c5460; border: 1px solid #bee5eb; }
+
+        /* スマホ対応 */
+        @media (max-width: 600px) {
+            .bookmark-container { margin: 20px 10px; padding: 30px 20px; border-radius: 30px;}
+            .bookmark-card { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .action-buttons { width: 100%; justify-content: flex-end; }
+            .btn-start { flex-grow: 1; justify-content: center; }
+        }
     </style>
 </head>
 <body>
+
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div id="mouse-flare" class="mouse-flare"></div>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+        <div class="bg-cloud cloud-3"></div>
+    </div>
+
     <div th:replace="~{fragments/header :: header}"></div>
 
     <div class="main-container bookmark-container">
-        <h1><i class="fa-solid fa-bookmark" style="color: gold;"></i> ブックマーク一覧</h1>
+        <h1><i class="fa-solid fa-bookmark" style="color: gold; text-shadow: 0 2px 5px rgba(0,0,0,0.2);"></i> ブックマーク一覧</h1>
         
         <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
         <div th:if="${message}" class="alert alert-info" th:text="${message}"></div>
 
         <div th:if="${bookmarks.isEmpty()}" class="empty-state">
-            <i class="fa-regular fa-bookmark fa-3x" style="margin-bottom: 15px;"></i>
-            <p>ブックマークされたトレーニングはありません。<br>種目一覧からお気に入りのトレーニングを追加しましょう！</p>
-            <a th:href="@{/training/exercises}" class="button">種目一覧へ</a>
+            <i class="fa-regular fa-bookmark fa-3x" style="margin-bottom: 15px; color: #ccc;"></i>
+            <p style="margin-bottom: 25px;">ブックマークされたトレーニングはありません。<br>種目一覧からお気に入りのトレーニングを追加しましょう！</p>
+            <a th:href="@{/training/exercises}" class="button primary">
+                <i class="fa-solid fa-magnifying-glass"></i> 種目一覧へ
+            </a>
         </div>
 
         <div th:each="bookmark : ${bookmarks}" class="bookmark-card">
             <div class="bookmark-info">
                 <h3 th:text="${bookmark.exerciseName}">ベンチプレス (中級)</h3>
-                <span class="bookmark-type" th:text="${bookmark.type == 'free-weight' ? 'フリーウェイト' : '有酸素運動'}">TYPE</span>
+                <span class="bookmark-type">
+                    <i th:class="${bookmark.type == 'free-weight' ? 'fa-solid fa-dumbbell' : 'fa-solid fa-person-running'}" style="margin-right:4px;"></i>
+                    <span th:text="${bookmark.type == 'free-weight' ? 'フリーウェイト' : '有酸素運動'}">TYPE</span>
+                </span>
             </div>
             
             <div class="action-buttons">
-                <form th:action="@{/training/start}" method="post">
+                <form th:action="@{/training/start}" method="post" style="display:inline;">
                     <input type="hidden" name="type" th:value="${bookmark.type}">
                     <input type="hidden" name="exerciseName" th:value="${bookmark.exerciseName}">
                     <button type="submit" class="btn-start">
@@ -78,7 +284,7 @@
                     </button>
                 </form>
 
-                <form th:action="@{/training/bookmark/toggle}" method="post">
+                <form th:action="@{/training/bookmark/toggle}" method="post" style="display:inline;">
                     <input type="hidden" name="exerciseName" th:value="${bookmark.exerciseName}">
                     <input type="hidden" name="type" th:value="${bookmark.type}">
                     <input type="hidden" name="redirectUrl" value="/training/bookmarks">
@@ -89,11 +295,91 @@
             </div>
         </div>
         
-        <div style="margin-top: 30px; text-align: center;">
-            <a th:href="@{/training/exercises}" class="button secondary">種目一覧へ戻る</a>
+        <div style="margin-top: 40px; text-align: center;">
+            <a th:href="@{/training/exercises}" class="button secondary">
+                <i class="fa-solid fa-arrow-left"></i> 種目一覧へ戻る
+            </a>
         </div>
     </div>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+        // === 🌟 CANVAS PARTICLE SYSTEM ===
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        const flare = document.getElementById('mouse-flare');
+        
+        let particlesArray = [];
+        let width, height;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x;
+            mouse.y = event.y;
+            if(flare) flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+            for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
+        });
+
+        class Particle {
+            constructor() {
+                this.x = mouse.x;
+                this.y = mouse.y;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 4 - 2;
+                this.speedY = Math.random() * 4 - 2;
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = 'white';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                if (particlesArray[i].size <= 0.3) {
+                    particlesArray.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        
+        // 背景の雲のパララックス効果
+        const cloud1 = document.querySelector('.cloud-1');
+        const cloud2 = document.querySelector('.cloud-2');
+        document.addEventListener('mousemove', (e) => {
+            const x = (window.innerWidth - e.pageX) / 60;
+            const y = (window.innerHeight - e.pageY) / 60;
+            if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
+            if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
+        });
+
+        animate();
+    </script>
+
 </body>
 </html>
