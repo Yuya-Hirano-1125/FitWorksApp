@@ -7,57 +7,52 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-    
     <style>
-        /* 利用規約専用スタイル */
-        .terms-container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            margin-top: 20px;
-            text-align: left;
+        /* 共通背景デザイン */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+
+        .main-container {
+            max-width: 800px; width: 92%; margin: 40px auto; padding: 40px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
         }
 
-        .terms-content h2 {
-            font-size: 1.1rem;
-            color: var(--primary-color, #ff69b4); /* アプリのテーマカラー */
-            border-bottom: 2px dashed #eee;
-            padding-bottom: 5px;
-            margin-top: 25px;
-            margin-bottom: 10px;
-        }
-
-        .terms-content h2:first-child {
-            margin-top: 0;
-        }
-
-        .terms-content p {
-            font-size: 0.95rem;
-            line-height: 1.8;
-            color: #555;
-            margin-bottom: 10px;
-        }
-
-        .terms-content ul {
-            padding-left: 20px;
-            margin-bottom: 15px;
-            color: #555;
-        }
-
-        .terms-content li {
-            margin-bottom: 5px;
-            font-size: 0.95rem;
-        }
-
-        /* 戻るボタンエリア */
-        .action-area {
-            margin-top: 30px;
-            text-align: center;
-        }
+        /* 規約・ポリシー専用スタイル */
+        .terms-container { background-color: rgba(255,255,255,0.9); padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; text-align: left; }
+        .terms-content h2 { font-size: 1.1rem; color: var(--primary-color, #ff69b4); border-bottom: 2px dashed #eee; padding-bottom: 5px; margin-top: 25px; margin-bottom: 10px; }
+        .terms-content h2:first-child { margin-top: 0; }
+        .terms-content p { font-size: 0.95rem; line-height: 1.8; color: #555; margin-bottom: 10px; }
+        .terms-content ul { padding-left: 20px; margin-bottom: 15px; color: #555; }
+        .terms-content li { margin-bottom: 5px; font-size: 0.95rem; }
+        .action-area { margin-top: 30px; text-align: center; }
     </style>
 </head>
 <body>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+    </div>
+
 <div class="main-container">
     <h1><i class="fa-solid fa-file-contract header-icon"></i> 利用規約</h1>
     
@@ -89,9 +84,7 @@
             <h2>第5条（免責事項）</h2>
             <p>当チームは，本サービスに関して，ユーザーと他のユーザーまたは第三者との間において生じた取引，連絡または紛争等について一切責任を負いません。</p>
             
-            <p style="text-align: right; margin-top: 30px; font-size: 0.8rem; color: #999;">
-                2025年制定
-            </p>
+            <p style="text-align: right; margin-top: 30px; font-size: 0.8rem; color: #999;">2025年制定</p>
         </div>
     </div>
 
@@ -101,9 +94,22 @@
         </a>
     </div>
 
-    <p style="margin-top: 30px; font-size: 0.85rem; color: #aaa; text-align: center;">
-        &copy; 2025 FitWorks Project
-    </p>
+    <p style="margin-top: 30px; font-size: 0.85rem; color: #aaa; text-align: center;">&copy; 2025 FitWorks Project</p>
 </div>
+
+<script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+    class Particle {
+        constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+    }
+    function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+    animate();
+</script>
 </body>
 </html>
