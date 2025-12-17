@@ -177,7 +177,9 @@
                     <label for="cardioExerciseName">種目名:</label>
                     <select id="cardioExerciseName" name="exerciseName" class="form-control" required>
                         <option value="">種目を選択してください</option>
-                        <option th:each="exercise : ${cardioExercises}" th:value="${exercise.name}" th:text="${exercise.name}"></option>
+						<option th:each="exercise : ${cardioExercises}" 
+						            th:value="${exercise.name}" 
+						            th:text="${exercise.displayName}"></option>
                     </select>
                 </div>
                 <button type="submit" class="button primary mt-3"><i class="fa-solid fa-running"></i> セッション開始 </button>
