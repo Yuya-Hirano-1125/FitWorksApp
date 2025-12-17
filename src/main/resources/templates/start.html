@@ -13,7 +13,7 @@
     
     <style>
         /* ==========================================================================
-           ✨ FITWORKS START SCREEN - MEGA SPARKLE EDITION
+           ✨ FITWORKS START SCREEN - ULTIMATE SPARKLE
            ========================================================================== */
 
         :root {
@@ -33,7 +33,7 @@
         }
 
         /* -----------------------------------------------------------
-           🌌 BACKGROUND: LIQUID AURORA
+           🌌 BACKGROUND
            ----------------------------------------------------------- */
         .interactive-bg {
             position: fixed;
@@ -42,7 +42,6 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            /* 4色のリッチなグラデーション */
             background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
             background-size: 400% 400%;
             animation: auroraFlow 20s ease infinite;
@@ -55,7 +54,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* 背景に浮かぶ巨大な光のオーブ */
+        /* オーブ */
         .orb {
             position: absolute;
             border-radius: 50%;
@@ -73,7 +72,7 @@
             100% { transform: translate(50px, 30px) scale(1.1); }
         }
 
-        /* Canvas (光のパーティクル用) */
+        /* Canvas */
         #bg-canvas {
             position: absolute;
             top: 0;
@@ -96,19 +95,12 @@
             pointer-events: none;
             box-shadow: 0 0 60px rgba(255,255,255,0.9);
         }
-        
         .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
         .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
 
-        @keyframes floatCloud {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(40px, -20px); }
-        }
-        @keyframes breatheCloud {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.15); }
-        }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
 
         /* マウス追従ライトフレア */
         .mouse-flare {
@@ -125,16 +117,12 @@
             transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
         }
 
-        /* -----------------------------------------------------------
-           💥 MEGA SPARKLE ANIMATION (CSSで補助)
-           ----------------------------------------------------------- */
+        /* 💥 クリック時のスパークル (スタイル定義) */
         .mega-sparkle {
             position: fixed;
-            border-radius: 50%;
             pointer-events: none;
-            z-index: 9999;
-            /* JSで動的に制御するため、基本スタイルのみ定義 */
-            will-change: transform, opacity;
+            z-index: 99999;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); /* 発光 */
         }
 
         /* -----------------------------------------------------------
@@ -186,10 +174,9 @@
             object-fit: contain;
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .start-logo:hover {
-            transform: scale(1.1) rotate(5deg);
-        }
+        .start-logo:hover { transform: scale(1.1) rotate(5deg); }
 
+        /* タイトル (黒色単色) */
         h1 {
             font-family: 'Poppins', sans-serif;
             font-size: 3.2rem;
@@ -230,7 +217,6 @@
             transition: transform 0.3s;
         }
         .app-description:hover { transform: translateY(-3px); }
-        
         .description-text { font-size: 1rem; color: #555; font-weight: 600; line-height: 1.8; }
 
         .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 20px; }
@@ -257,7 +243,7 @@
             text-align: center;
             box-sizing: border-box;
             text-decoration: none;
-            transition: all 0.2s; /* クリック反応を早く */
+            transition: all 0.1s; /* 反応速度重視 */
             position: relative;
             overflow: hidden;
             cursor: pointer;
@@ -269,13 +255,12 @@
             border: none;
             box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
         }
-        /* 光沢エフェクト */
         .button.primary::after {
             content: "";
             position: absolute;
             top: 0; left: -100%;
             width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); /* 明るく */
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
             transition: 0.4s;
         }
         .button.primary:hover::after { left: 100%; }
@@ -283,7 +268,7 @@
             transform: translateY(-4px) scale(1.03);
             box-shadow: 0 15px 35px rgba(79, 172, 254, 0.6);
         }
-        .button:active { transform: scale(0.92) !important; }
+        .button:active { transform: scale(0.95); }
 
         .button.secondary {
             background: rgba(255, 255, 255, 0.9);
@@ -311,11 +296,8 @@
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
-
     <canvas id="bg-canvas"></canvas>
-    
     <div id="mouse-flare" class="mouse-flare"></div>
-
     <div class="bg-cloud cloud-1"></div>
     <div class="bg-cloud cloud-2"></div>
     <div class="bg-cloud cloud-3"></div>
@@ -364,8 +346,7 @@
 </div>
 
 <script>
-    // === 🌟 MEGA SPARKLE & LIGHT TRAIL SYSTEM ===
-    
+    // === 🌟 CANVAS PARTICLE SYSTEM ===
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     const flare = document.getElementById('mouse-flare');
@@ -386,70 +367,71 @@
     window.addEventListener('mousemove', (event) => {
         mouse.x = event.x;
         mouse.y = event.y;
-        
         flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
-
-        // マウス移動時の粒子生成
-        for(let i = 0; i < 2; i++) {
-            particlesArray.push(new Particle());
-        }
+        for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
     });
 
-    // --- 派手なクリックエフェクト (Mega Sparkle) ---
+    // --- 🚀 クリック時の爆発エフェクト & 遅延遷移 ---
     document.querySelectorAll('.button').forEach(btn => {
         btn.addEventListener('click', function(e) {
-            // e.clientX / e.clientY が取れない場合（キーボード操作など）の対策
+            e.preventDefault(); // 即時遷移を止める
+            
             const rect = btn.getBoundingClientRect();
+            // クリック位置が取れなければボタンの中心で
             const x = e.clientX || (rect.left + rect.width / 2);
             const y = e.clientY || (rect.top + rect.height / 2);
             
-            createMegaSparkles(x, y);
+            // 爆発！
+            createExplosion(x, y);
+            
+            // 少し待ってから移動
+            const href = this.getAttribute('href');
+            setTimeout(() => {
+                window.location.href = href;
+            }, 600); // 0.6秒後に遷移
         });
     });
 
-    // 画面クリックでも少し出る
+    // 画面のどこかをクリックしても少し出る
     document.addEventListener('mousedown', function(e) {
-        // ボタン以外をクリックした時のみ
-        if (!e.target.closest('.button')) {
-            createMegaSparkles(e.clientX, e.clientY, 8); // 控えめに
+        if(!e.target.closest('.button')) {
+            createExplosion(e.clientX, e.clientY, 10);
         }
     });
 
-    function createMegaSparkles(x, y, count = 30) {
-        const colors = ['#4facfe', '#00f2fe', '#fff', '#ffd700', '#fbc2eb', '#ff9a9e'];
+    function createExplosion(x, y, count = 60) {
+        const colors = ['#4facfe', '#00f2fe', '#fff', '#ffd700', '#ff0080', '#7fff00'];
         
-        for(let i=0; i < count; i++) {
+        for (let i = 0; i < count; i++) {
             const spark = document.createElement('div');
             spark.classList.add('mega-sparkle');
             
-            // ランダムな色とサイズ
-            const size = Math.random() * 12 + 4; // 4px ~ 16px
+            // ランダムな方向と速度
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 250 + 50; // 飛び散る距離
+            const size = Math.random() * 12 + 4;
+            
             spark.style.width = `${size}px`;
             spark.style.height = `${size}px`;
             spark.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
             spark.style.left = x + 'px';
             spark.style.top = y + 'px';
-            
-            // 放射状に広がるアニメーションをWeb Animations APIで直接制御
-            const angle = Math.random() * Math.PI * 2;
-            const velocity = Math.random() * 150 + 50; // 50px ~ 200px 飛ぶ
-            const tx = Math.cos(angle) * velocity;
-            const ty = Math.sin(angle) * velocity;
+            spark.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px'; // 丸と四角を混ぜる
             
             document.body.appendChild(spark);
             
+            // Web Animations APIでアニメーション
             spark.animate([
-                { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
-                { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1)`, opacity: 1, offset: 0.6 },
-                { transform: `translate(calc(-50% + ${tx * 1.2}px), calc(-50% + ${ty * 1.2}px)) scale(0)`, opacity: 0 }
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                { transform: `translate(calc(-50% + ${Math.cos(angle) * velocity}px), calc(-50% + ${Math.sin(angle) * velocity}px)) scale(0)`, opacity: 0 }
             ], {
-                duration: 600 + Math.random() * 400, // 0.6 ~ 1.0秒
-                easing: 'cubic-bezier(0, .9, .57, 1)',
+                duration: 500 + Math.random() * 400,
+                easing: 'cubic-bezier(0.22, 1, 0.36, 1)', // 気持ちいいイージング
+                fill: 'forwards'
             }).onfinish = () => spark.remove();
         }
     }
 
-    // 光のパーティクルクラス
     class Particle {
         constructor() {
             this.x = mouse.x;
@@ -459,25 +441,24 @@
             this.speedY = Math.random() * 4 - 2;
             this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
         }
-        
         update() {
             this.x += this.speedX;
             this.y += this.speedY;
             if (this.size > 0.2) this.size -= 0.1;
         }
-        
         draw() {
             ctx.fillStyle = this.color;
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.shadowBlur = 15;
+            ctx.shadowBlur = 10;
             ctx.shadowColor = 'white';
             ctx.fill();
             ctx.shadowBlur = 0;
         }
     }
 
-    function handleParticles() {
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (let i = 0; i < particlesArray.length; i++) {
             particlesArray[i].update();
             particlesArray[i].draw();
@@ -486,22 +467,15 @@
                 i--;
             }
         }
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        handleParticles();
         requestAnimationFrame(animate);
     }
     
-    // パララックス
+    // 背景の雲のパララックス効果
     const cloud1 = document.querySelector('.cloud-1');
     const cloud2 = document.querySelector('.cloud-2');
-    
     document.addEventListener('mousemove', (e) => {
         const x = (window.innerWidth - e.pageX) / 60;
         const y = (window.innerHeight - e.pageY) / 60;
-        
         if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
         if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
     });
