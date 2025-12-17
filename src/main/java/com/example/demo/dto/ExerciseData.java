@@ -33,10 +33,18 @@ public class ExerciseData {
     public String getDifficulty() { return difficulty; }
     public void setDifficulty(String difficulty) { this.difficulty = difficulty; }
     
-    public String getFullName() { return name; }
+    // 元の名前だけ返す
+    public String getFullName() { 
+        return name; 
+    }
 
     // ★ 追加: TrainingLogicService 側で使えるようにする
     public String getLevel() { 
         return difficulty; 
+    }
+
+    // ★ 追加: 表示用に「名前＋難易度」を返す
+    public String getDisplayName() {
+        return name + "　　" + difficulty;
     }
 }
