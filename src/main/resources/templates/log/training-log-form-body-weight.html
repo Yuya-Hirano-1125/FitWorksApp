@@ -36,6 +36,17 @@
             position: relative; z-index: 10;
         }
 
+        /* ヘッダー修正 */
+        .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
+        .page-title { color: #444; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+
         /* 体重ログ用スタイル */
         .header-icon-weight { color: #009688; }
         .calendar-day-cell.weight-logged { background-color: #e0f2f1; border-color: #009688; }
@@ -61,9 +72,15 @@
     <div class="main-container">
         <div th:replace="fragments/header :: header"></div>
 
-        <h1 style="margin-bottom: 5px; text-align: center; color: #444;">
-            <i class="header-icon-weight fa-solid fa-weight-scale"></i> 体重記録
-        </h1>
+        <div class="page-header-container">
+            <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <h1 class="page-title">
+                <i class="header-icon-weight fa-solid fa-weight-scale"></i> 体重記録
+            </h1>
+        </div>
+
         <p class="sub-heading" style="text-align: center;">日々の変化を記録しましょう</p>
 
         <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
@@ -93,10 +110,7 @@
             <a th:href="@{/training-log/all(period='month')}" class="button secondary" style="border-radius: 50px;"><i class="fa-solid fa-chart-line"></i> グラフで推移を確認</a>
         </div>
         
-        <div style="text-align: center; margin-top: 30px;">
-            <a th:href="@{/home}" class="button secondary"><i class="fa-solid fa-house"></i> ホームに戻る</a>
         </div>
-    </div>
 
     <div id="weightModal" class="modal">
         <div class="modal-content" style="max-width: 400px; padding: 25px;">
@@ -121,6 +135,7 @@
     <div th:replace="fragments/footer :: footer"></div>
 
     <script th:inline="javascript">
+        // ... (script content unchanged) ...
         function openWeightModal(element) {
             const dateStr = element.getAttribute('data-date');
             if (!dateStr) return;

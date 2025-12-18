@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIクリニック | FitWorks</title>
-    
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
-    
     <style>
         /* 共通背景デザイン */
         :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; --bg-color: #f0f4f8; --text-main: #2d3748; --text-sub: #718096; --card-bg: #ffffff; --accent-primary: #4fd1c5; }
@@ -36,6 +34,16 @@
             position: relative; z-index: 10;
         }
 
+        /* ヘッダー修正 */
+        .page-header-container { display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 10px; gap: 15px; }
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+
         /* デザイン調整 */
         .care-container { max-width: 100%; margin: 0 auto; padding: 0; }
         .care-header { text-align: center; margin-bottom: 40px; padding: 40px 20px; background: rgba(255,255,255,0.7); border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.8); }
@@ -47,62 +55,21 @@
         .divider::before, .divider::after { content: ''; flex: 1; height: 2px; background: #e2e8f0; border-radius: 2px; }
         .divider::before { margin-right: 20px; } .divider::after { margin-left: 20px; }
         
-        /* --- 修正箇所: Gridレイアウトを見切れにくい形に変更 --- */
-        .symptom-grid { 
-            display: flex; 
-            flex-wrap: wrap; /* 折り返しを有効化 */
-            justify-content: center; 
-            gap: 20px; 
-            padding-bottom: 10px; 
-        }
-        
-        .symptom-card { 
-            flex: 1 1 250px; /* 幅に柔軟性を持たせる (最小250px) */
-            max-width: 300px; /* 最大幅 */
-            background: rgba(255,255,255,0.9); 
-            border: none; 
-            border-radius: 20px; 
-            padding: 30px 20px; 
-            cursor: pointer; 
-            transition: all 0.3s; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            text-align: center; 
-            border: 2px solid transparent; 
-        }
-        
+        .symptom-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding-bottom: 10px; }
+        .symptom-card { flex: 1 1 250px; max-width: 300px; background: rgba(255,255,255,0.9); border: none; border-radius: 20px; padding: 30px 20px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; text-align: center; border: 2px solid transparent; }
         .symptom-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); border-color: rgba(79, 209, 197, 0.3); }
         .icon-wrapper { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 20px; transition: transform 0.4s ease; box-shadow: inset 0 2px 6px rgba(0,0,0,0.05); }
         .symptom-card:hover .icon-wrapper { transform: scale(1.1) rotate(5deg); }
-        
         .type-eye .icon-wrapper { background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: #0284c7; }
         .type-shoulder .icon-wrapper { background: linear-gradient(135deg, #ffe4e6, #fecdd3); color: #e11d48; }
         .type-waist .icon-wrapper { background: linear-gradient(135deg, #ffedd5, #fed7aa); color: #ea580c; }
         .type-tired .icon-wrapper { background: linear-gradient(135deg, #f3e8ff, #d8b4fe); color: #9333ea; }
         .type-sleep .icon-wrapper { background: linear-gradient(135deg, #e2e8f0, #cbd5e1); color: #475569; }
         .type-stress .icon-wrapper { background: linear-gradient(135deg, #ccfbf1, #99f6e4); color: #0d9488; }
-        
         .card-title { font-size: 1.2rem; font-weight: 900; color: var(--text-main); }
         .card-desc { font-size: 0.9rem; font-weight: 500; color: var(--text-sub); line-height: 1.6; }
-        
-        .footer-nav { text-align: center; margin: 60px 0 10px; }
-        .btn-back { display: inline-flex; align-items: center; padding: 14px 35px; color: var(--text-sub); background: #fff; border-radius: 50px; text-decoration: none; font-size: 1rem; font-weight: 700; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: all 0.2s; gap: 10px; }
-        .btn-back:hover { transform: translateY(-2px); color: var(--text-main); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-
-        /* スマホ向けレスポンシブ調整 */
-        @media (max-width: 600px) {
-            .symptom-card { 
-                max-width: 100%; /* 幅いっぱいに広げる */
-                flex-basis: 100%;
-            }
-            .main-container {
-                padding: 20px; /* パディングを少し減らす */
-            }
-        }
+        @media (max-width: 600px) { .symptom-card { max-width: 100%; flex-basis: 100%; } .main-container { padding: 20px; } }
     </style>
-    
     <script>
         function selectSymptom(value) {
             document.getElementById('symptomInput').value = value;
@@ -121,6 +88,12 @@
 
     <div class="main-container">
         <div th:replace="~{fragments/header :: header}"></div>
+
+        <div class="page-header-container">
+            <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+                <i class="fa-solid fa-house"></i>
+            </a>
+        </div>
 
         <div class="care-container">
             <div class="care-header">
@@ -191,21 +164,13 @@
                 </div>
             </form>
 
-            <div class="footer-nav">
-                <a th:href="@{/home}" class="btn-back">
-                    <i class="fa-solid fa-arrow-left"></i> ホームに戻る
-                </a>
             </div>
-        </div>
 
         <div th:replace="~{fragments/footer :: footer}"></div>
     </div>
 
     <script>
-        // 背景アニメーション
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let particlesArray = [];
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas); resizeCanvas();
         const mouse = { x: undefined, y: undefined };
@@ -215,11 +180,7 @@
             update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
             draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
         }
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } }
-            requestAnimationFrame(animate);
-        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
         animate();
     </script>
 </body>

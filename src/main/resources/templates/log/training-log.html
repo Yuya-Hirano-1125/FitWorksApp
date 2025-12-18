@@ -38,6 +38,17 @@
             position: relative; z-index: 10;
         }
 
+        /* ヘッダー修正 */
+        .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
+        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+
         /* カレンダー関連 */
         .calendar-day-header { border: 1px solid rgba(200,200,200,0.5); padding: 5px; text-align: center; background-color: rgba(255,255,255,0.8); font-weight: bold; }
         .calendar-day-cell { border: 1px solid rgba(200,200,200,0.5); min-height: 60px; text-align: center; vertical-align: top; background-color: rgba(255,255,255,0.9); transition: background 0.2s; cursor: pointer; }
@@ -60,7 +71,13 @@
 
 <div class="main-container">
     
-    <h1 style="margin-bottom: 5px;"><i class="header-icon fa-solid fa-calendar-days"></i>トレーニング記録</h1>
+    <div class="page-header-container">
+        <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <h1 class="page-title"><i class="header-icon fa-solid fa-calendar-days"></i>トレーニング記録</h1>
+    </div>
+
     <p class="sub-heading" th:text="${username} + 'さんの頑張りをチェックしましょう。'">トレーニング記録カレンダー</p>
 
     <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
@@ -91,10 +108,7 @@
         </a>
     </div>
     
-    <div style="text-align: center; margin-top:30px;">
-        <a th:href="@{/home}" class="button secondary"><i class="fa-solid fa-house"></i> ホームに戻る</a>
     </div>
-</div>
 
 <div id="logModal" class="modal">
     <div class="modal-content">
@@ -139,6 +153,7 @@
 </div>
 
 <script th:inline="javascript">
+    // ...existing script content...
     function loadTrainingForm(type, date) {
         let url = '';
         if (type === 'WEIGHT') url = /*[[@{/training-log/form/weight}]]*/ '/training-log/form/weight';
