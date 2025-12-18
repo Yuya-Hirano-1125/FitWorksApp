@@ -53,7 +53,53 @@
         #free-weight-option { background-color: rgba(230,240,255,0.8); border-color: #007bff; }
 
         .form-group { margin-bottom: 20px; }
+        
+        /* 既存の .form-control スタイルを維持しつつ上書き */
         .form-control { width: 100%; padding: 10px 15px; border: 1px solid #ccc; border-radius: 6px; background-color: rgba(255,255,255,0.9); font-size: 1rem; }
+        
+        /* ▼ プルダウンメニュー（セレクトボックス）の改良スタイル ▼ */
+        select.form-control {
+            font-size: 1.3rem;         /* 文字サイズを大きく */
+            padding: 15px 20px;        /* 余白を広げてタップしやすく */
+            height: auto;              /* 高さ自動調整 */
+            border: 2px solid #8ec5fc; /* 枠線を少し太く */
+            border-radius: 12px;       /* 角丸を強調 */
+            background-color: #ffffff;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #333;
+            
+            /* ブラウザ標準の矢印を消してカスタム矢印にする（見やすくするため） */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007bff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
+        }
+
+        select.form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        select.form-control:disabled {
+            background-color: #f5f5f5;
+            border-color: #ddd;
+            color: #aaa;
+            cursor: not-allowed;
+            background-image: none; /* 無効時は矢印なし */
+        }
+
+        select.form-control option {
+            font-size: 1.1rem;
+            padding: 10px;
+        }
+        /* ▲ 改良ここまで ▲ */
         
         .button { width: 100%; padding: 12px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; transition: background-color 0.2s; text-align: center; display: block; text-decoration: none; box-sizing: border-box; cursor: pointer; }
         .button.primary { background-color: #007bff; color: white; border: none; }
@@ -167,20 +213,19 @@
             <form th:action="@{/training/start}" method="post">
                 <input type="hidden" name="type" value="free-weight"/>
                 <h2 class="card-title">フリーウェイト</h2>
-				<div class="form-group">
-				    <label for="musclePart">鍛えたい部位:</label>
-				    <select id="musclePart" name="musclePart" class="form-control" required>
-				        <option value="">部位を選択してください</option>
-				        <option th:each="part : ${freeWeightParts}" th:value="${part}" th:text="${part}"></option>
-				    </select>
-				</div>
-
-				<div class="form-group">
-				    <label for="exerciseName">種目名:</label>
-				    <select id="exerciseName" name="exerciseName" class="form-control" required disabled>
-				        <option value="">部位を選択してから種目を選んでください</option>
-				    </select>
-				</div>
+                <div class="form-group">
+                    <label for="musclePart">鍛えたい部位:</label>
+                    <select id="musclePart" class="form-control" required>
+                        <option value="">部位を選択してください</option>
+                        <option th:each="part : ${freeWeightParts}" th:value="${part}" th:text="${part}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exerciseName">種目名:</label>
+                    <select id="exerciseName" name="exerciseName" class="form-control" required disabled>
+                        <option value="">部位を選択してから種目を選んでください</option>
+                    </select>
+                </div>
                 <button type="submit" class="button primary mt-3" id="startFreeWeightSessionButton" disabled><i class="fa-solid fa-dumbbell"></i> セッション開始 </button>
             </form>
         </div>
@@ -204,41 +249,52 @@
         
         </div>
 
-		<script th:inline="javascript">
-		    /*<![CDATA[*/
-		    const freeWeightExercisesByPart = /*[[${freeWeightExercisesByPart}]]*/ {};
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // 背景アニメーション
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+        class Particle {
+            constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+        animate();
 
-			document.addEventListener('DOMContentLoaded', function() {
-			    const musclePartSelect = document.getElementById('musclePart');
-			    const exerciseNameSelect = document.getElementById('exerciseName');
-			    const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
-
-			    if (musclePartSelect && exerciseNameSelect) {
-			        musclePartSelect.addEventListener('change', function() {
-			            const selectedPart = this.value;
-			            exerciseNameSelect.innerHTML = '<option value="">種目を選択してください</option>';
-			            exerciseNameSelect.disabled = true;
-			            startFreeWeightSessionButton.disabled = true;
-
-			            if (selectedPart && freeWeightExercisesByPart[selectedPart]) {
-			                const exercises = freeWeightExercisesByPart[selectedPart];
-			                exercises.forEach(exercise => {
-			                    const option = document.createElement('option');
-			                    option.value = exercise.name || exercise; // サーバーに送る値は純粋な種目名
-			                    option.textContent = exercise.fullName2 || exercise.name || exercise; // 表示は「ベンチプレス　【中級】」
-			                    exerciseNameSelect.appendChild(option);
-			                });
-			                exerciseNameSelect.disabled = false; // 部位を選んだら有効化
-			            }
-			        });
-
-			        exerciseNameSelect.addEventListener('change', function() {
-			            startFreeWeightSessionButton.disabled = !this.value;
-			        });
-			    }
-			});
-		    /*]]>*/
-		</script>
-
+        const freeWeightExercisesByPart = /*[[${freeWeightExercisesByPart}]]*/ {};
+        function updateEquip(location) {
+            const checkboxes = document.querySelectorAll('.equip-group input[type="checkbox"]');
+            if (location === 'gym') { checkboxes.forEach(cb => cb.checked = true); } 
+            else if (location === 'home') { checkboxes.forEach(cb => { if (cb.value === 'bodyweight' || cb.value === 'dumbbell') { cb.checked = true; } else { cb.checked = false; } }); }
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const musclePartSelect = document.getElementById('musclePart');
+            const exerciseNameSelect = document.getElementById('exerciseName');
+            const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
+            if (musclePartSelect && exerciseNameSelect) {
+                musclePartSelect.addEventListener('change', function() {
+                    const selectedPart = this.value;
+                    exerciseNameSelect.innerHTML = '<option value="">種目を選択してください</option>';
+                    exerciseNameSelect.disabled = true; startFreeWeightSessionButton.disabled = true;
+                    if (selectedPart && freeWeightExercisesByPart[selectedPart]) {
+                        const exercises = freeWeightExercisesByPart[selectedPart];
+                        exercises.forEach(exercise => {
+                            const option = document.createElement('option');
+                            const val = (exercise.name) ? exercise.name : exercise;
+                            option.value = val; option.textContent = val;
+                            exerciseNameSelect.appendChild(option);
+                        });
+                        exerciseNameSelect.disabled = false;
+                    }
+                });
+                exerciseNameSelect.addEventListener('change', function() { startFreeWeightSessionButton.disabled = !this.value; });
+            }
+        });
+        /*]]>*/
+    </script>
 </body>
 </html>
