@@ -231,29 +231,13 @@ public class MealController {
         List<LocalDate> calendarDays = new ArrayList<>();
         LocalDate firstOfMonth = targetYearMonth.atDay(1);
         
-        // --- 修正箇所 1: 日曜日始まりの埋め草計算 ---
-        // JavaのDayOfWeekは月曜が1、日曜が7。
-        // 日曜始まりのカレンダーの場合、欲しいパディング数は以下の通り:
-        // 日曜(7) -> 0, 月曜(1) -> 1, ..., 土曜(6) -> 6
-        int dayValue = firstOfMonth.getDayOfWeek().getValue();
-        int paddingDays = dayValue % 7;
-        if (paddingDays != 0) { // 日曜日(7)なら0、そうでなければそのままの値
-            paddingDays = dayValue;
-        }
-        
-        // 以下のシンプルで汎用的なロジックに置き換えます
-        // DayOfWeek.getValue()で取得した値(1-7)から、週の最初の曜日(SUNDAY=7)の値を引いて、7で割った余りを取る
-        // (1 + 7 - 7) % 7 = 1 % 7 = 1 （月曜始まりのインデックス） -> これはダメ
-        // (7 - 7) % 7 = 0 (日曜始まりのインデックス)
-        int dayOfWeekValue = firstOfMonth.getDayOfWeek().getValue(); // 月=1, ..., 日=7
-        int paddingDaysSundayStart = dayOfWeekValue % 7; // 日=0, 月=1, ..., 土=6
+        int dayOfWeekValue = firstOfMonth.getDayOfWeek().getValue(); 
+        int paddingDaysSundayStart = dayOfWeekValue % 7; 
         
         for (int i = 0; i < paddingDaysSundayStart; i++) calendarDays.add(null);
-        // ------------------------------------------------
 
         for (int i = 1; i <= targetYearMonth.lengthOfMonth(); i++) calendarDays.add(targetYearMonth.atDay(i));
         
-        // --- 修正箇所 2: 曜日のラベル順序の変更 (日曜日始まり) ---
         List<String> dayLabels = new ArrayList<>();
         DayOfWeek[] days = {
             DayOfWeek.SUNDAY, 
@@ -267,7 +251,6 @@ public class MealController {
         for (DayOfWeek day : days) {
             dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE));
         }
-        // --------------------------------------------------------
 
         model.addAttribute("username", user.getUsername());
         model.addAttribute("currentDate", today);
@@ -279,12 +262,8 @@ public class MealController {
         model.addAttribute("prevMonth", targetYearMonth.minusMonths(1).getMonthValue());
         model.addAttribute("nextYear", targetYearMonth.plusMonths(1).getYear());
         model.addAttribute("nextMonth", targetYearMonth.plusMonths(1).getMonthValue());
-
-        // ... (省略: AI解析データのフォーム反映ロジック) ...
         
-        // MealLogFormのインスタンス化とAIデータ反映ロジックは省略しません
         MealLogForm form = new MealLogForm();
-        // AI解析データがある場合、フォームに反映
         if (model.containsAttribute("analyzedData")) {
             Map<String, Object> data = (Map<String, Object>) model.asMap().get("analyzedData");
             if (data != null && !data.containsKey("error")) {
@@ -327,7 +306,6 @@ public class MealController {
             User user = userService.findByUsername(userDetails.getUsername());
             MealRecord savedRecord = mealService.saveMealRecord(form, user);
             
-            // AIアドバイス生成
             try {
                 String advice = aiCoachService.generateDietBasedTrainingAdvice(user, form);
                 redirectAttributes.addFlashAttribute("aiAdvice", advice); 
@@ -345,9 +323,23 @@ public class MealController {
     }
     
     @GetMapping("/all")
-    public String showAllMealLogs(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+    public String showAllMealLogs(@AuthenticationPrincipal UserDetails userDetails, 
+                                  @RequestParam(value = "mealType", required = false) String mealType,
+                                  Model model) {
         User user = userService.findByUsername(userDetails.getUsername());
-        model.addAttribute("mealRecords", mealService.getMealRecordsByUser(user));
+        
+        List<MealRecord> allRecords = mealService.getMealRecordsByUser(user);
+        
+        // フィルタリング処理
+        if (mealType != null && !mealType.isEmpty()) {
+            allRecords = allRecords.stream()
+                    .filter(r -> mealType.equals(r.getMealType()))
+                    .collect(Collectors.toList());
+        }
+        
+        model.addAttribute("mealRecords", allRecords);
+        model.addAttribute("selectedMealType", mealType);
+        
         return "log/meal-log-all"; 
     }
 

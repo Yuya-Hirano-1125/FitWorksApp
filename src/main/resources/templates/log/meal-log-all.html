@@ -51,6 +51,8 @@
             max-width: 800px;
             margin: 40px auto;
             padding: 20px;
+            /* パディングで重なり防止 */
+            padding-top: 110px;
             position: relative;
             z-index: 10;
         }
@@ -85,7 +87,7 @@
 
         @media (max-width: 600px) {
             .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
-            .log-form-container { padding-top: 80px !important; }
+            .log-form-container { padding-top: 100px !important; }
         }
         
         .empty-message {
@@ -144,6 +146,33 @@
         .carb-value { color: #f1c40f; }
         
         h1 { text-shadow: 0 2px 4px rgba(255,255,255,0.5); }
+
+        /* フィルターフォーム */
+        .filter-form {
+            background: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .filter-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-select:focus { border-color: #4CAF50; }
+        
+        @media (max-width: 600px) {
+            .filter-form { flex-direction: column; align-items: stretch; }
+        }
     </style>
 </head>
 <body>
@@ -161,7 +190,7 @@
     </div>
 
     <main class="log-form-container">
-        <a th:href="@{/home}" class="back-arrow-button" title="一つ戻る">
+        <a th:href="@{/log/meal}" class="back-arrow-button" title="食事記録に戻る">
             <i class="fa-solid fa-arrow-left"></i>
         </a>
 
@@ -169,8 +198,20 @@
 
         <a th:href="@{/log/meal}" class="button primary">新しい食事を記録する</a>
 		
+        <div class="filter-form">
+            <form th:action="@{/log/meal/all}" method="get" style="width: 100%; display: flex; gap: 10px; justify-content: center;">
+                <select name="mealType" class="filter-select" onchange="this.form.submit()" style="flex: 1; max-width: 300px;">
+                    <option value="">🕒 時系列 (すべて表示)</option>
+                    <option value="朝食" th:selected="${selectedMealType == '朝食'}">🍳 朝食</option>
+                    <option value="昼食" th:selected="${selectedMealType == '昼食'}">🍱 昼食</option>
+                    <option value="夕食" th:selected="${selectedMealType == '夕食'}">🍲 夕食</option>
+                    <option value="間食" th:selected="${selectedMealType == '間食'}">🍪 間食</option>
+                </select>
+            </form>
+        </div>
+
         <div th:if="${#lists.isEmpty(mealRecords)}" class="empty-message">
-            <p>まだ食事の記録がありません。記録を開始して健康管理を始めましょう！</p>
+            <p>条件に一致する記録がありません。<br>記録を開始して健康管理を始めましょう！</p>
         </div>
         
         <ul th:unless="${#lists.isEmpty(mealRecords)}" class="meal-record-list">

@@ -161,8 +161,8 @@ public class TrainingController {
     public String showTrainingOptions(Authentication authentication, Model model) {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
         model.addAttribute("freeWeightParts", trainingDataService.getMuscleParts());
-        model.addAttribute("cardioExercises", trainingDataService.getCardioExercises());
         model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercisesByPart());
+        model.addAttribute("cardioExercises", trainingDataService.getCardioExercises());
         return "training/training";
     }
 
@@ -271,7 +271,6 @@ public class TrainingController {
         return "training/training-session";
     }
 
-    // ... (以下変更なし) ...
     @GetMapping("/training/bookmarks")
     public String showBookmarkList(Authentication authentication, Model model) {
         User currentUser = getCurrentUser(authentication);
@@ -643,17 +642,41 @@ public class TrainingController {
     }
 
     @GetMapping("/training-log/all")
-    public String showAllTrainingLog(Authentication authentication, @RequestParam(value = "period", defaultValue = "day") String period, Model model) {
+    public String showAllTrainingLog(Authentication authentication, 
+                                     @RequestParam(value = "period", defaultValue = "day") String period, 
+                                     @RequestParam(value = "part", required = false) String part,
+                                     Model model) {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
+        
         model.addAttribute("period", period);
+        model.addAttribute("allParts", trainingDataService.getMuscleParts());
+        model.addAttribute("selectedPart", part);
+
         List<TrainingRecord> allRecords = trainingRecordRepository.findByUser_IdOrderByRecordDateDesc(currentUser.getId());
+        
+        // 部位フィルターが指定されている場合のフィルタリング
+        if (part != null && !part.isEmpty()) {
+            allRecords = allRecords.stream().filter(record -> {
+                if ("CARDIO".equalsIgnoreCase(record.getType())) {
+                    return "有酸素".equals(part);
+                } else if ("WEIGHT".equalsIgnoreCase(record.getType()) || "CARE".equalsIgnoreCase(record.getType())) {
+                    String recordPart = trainingDataService.findPartByExerciseName(record.getExerciseName());
+                    return part.equals(recordPart);
+                }
+                return false;
+            }).collect(Collectors.toList());
+        }
+
         List<TrainingRecord> recordsForChart = new ArrayList<>(allRecords);
         recordsForChart.sort((r1, r2) -> r1.getRecordDate().compareTo(r2.getRecordDate()));
+        
         List<BodyWeightRecord> weightRecords = new ArrayList<>();
         if (bodyWeightRecordRepository != null) { weightRecords = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser); }
+        
         Map<String, int[]> durationMap = new TreeMap<>();
         Map<String, List<Double>> weightMap = new TreeMap<>();
+        
         for (TrainingRecord record : recordsForChart) {
             if (record.getRecordDate() == null) continue;
             String key = getKey(record.getRecordDate(), period);
@@ -663,15 +686,18 @@ public class TrainingController {
             if (record.getDurationMinutes() != null) { duration = record.getDurationMinutes(); } else { int sets = record.getSets() != null ? record.getSets() : 1; duration = sets * 3; }
             if ("CARDIO".equalsIgnoreCase(record.getType())) { durations[0] += duration; } else { durations[1] += duration; }
         }
+        
         for (BodyWeightRecord wr : weightRecords) {
             if (wr.getDate() == null) continue;
             String key = getKey(wr.getDate(), period);
             weightMap.computeIfAbsent(key, k -> new ArrayList<>()).add(wr.getWeight());
         }
+        
         List<String> allKeys = new ArrayList<>();
         allKeys.addAll(durationMap.keySet());
         allKeys.addAll(weightMap.keySet());
         allKeys = allKeys.stream().distinct().sorted().collect(Collectors.toList());
+        
         List<DailyChartData> chartDataList = new ArrayList<>();
         for (String key : allKeys) {
             int[] durations = durationMap.getOrDefault(key, new int[]{0, 0});
@@ -681,7 +707,9 @@ public class TrainingController {
             String displayDate = getLabel(key, period);
             chartDataList.add(new DailyChartData(displayDate, durations[0], durations[1], avgWeight));
         }
+        
         try { ObjectMapper mapper = new ObjectMapper(); String jsonChartData = mapper.writeValueAsString(chartDataList); model.addAttribute("chartDataJson", jsonChartData); } catch (Exception e) { e.printStackTrace(); model.addAttribute("chartDataJson", "[]"); }
+        
         model.addAttribute("records", allRecords);
         return "log/training-log-all";
     }

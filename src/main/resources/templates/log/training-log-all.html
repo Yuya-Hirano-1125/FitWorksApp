@@ -56,6 +56,8 @@
             padding: 20px;
             position: relative;
             z-index: 10;
+            /* 修正: 上部パディングを追加 */
+            padding-top: 110px;
         }
         
         /* 🔙 戻るボタン */
@@ -88,7 +90,7 @@
 
         @media (max-width: 600px) {
             .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
-            .log-list-container { padding-top: 80px !important; }
+            .log-list-container { padding-top: 100px !important; }
         }
 
         /* 少し背景が透けるように調整 */
@@ -147,9 +149,33 @@
         
         h1 { text-shadow: 0 2px 4px rgba(255,255,255,0.5); }
         
+        /* フィルターフォーム */
+        .filter-form {
+            background: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .filter-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-select:focus { border-color: #4facfe; }
+
         @media (max-width: 600px) {
             .record-card { flex-direction: column; align-items: flex-start; }
             .record-right { margin-top: 10px; width: 100%; text-align: right; font-size: 0.8rem; color: #aaa; }
+            .filter-form { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
@@ -173,15 +199,29 @@
 
     <h1><i class="fa-solid fa-list-ul header-icon"></i>全トレーニング記録</h1>
     
+    <div class="filter-form">
+        <form th:action="@{/training-log/all}" method="get" style="width: 100%; display: flex; gap: 10px; justify-content: center;">
+            <input type="hidden" name="period" th:value="${period}">
+            <select name="part" class="filter-select" onchange="this.form.submit()" style="flex: 1; max-width: 300px;">
+                <option value="">🕒 時系列 (すべて表示)</option>
+                <option th:each="p : ${allParts}" 
+                        th:value="${p}" 
+                        th:text="${p}" 
+                        th:selected="${selectedPart == p}">部位名</option>
+                <option value="有酸素" th:selected="${selectedPart == '有酸素'}">🏃 有酸素運動</option>
+            </select>
+        </form>
+    </div>
+
     <div class="chart-container">
         <div class="chart-options">
-            <a th:href="@{/training-log/all(period='day')}" 
+            <a th:href="@{/training-log/all(period='day', part=${selectedPart})}" 
                class="button" 
                th:classappend="${period == 'day' or period == null} ? 'primary' : 'secondary'">日次</a>
-            <a th:href="@{/training-log/all(period='week')}" 
+            <a th:href="@{/training-log/all(period='week', part=${selectedPart})}" 
                class="button" 
                th:classappend="${period == 'week'} ? 'primary' : 'secondary'">週次</a>
-            <a th:href="@{/training-log/all(period='month')}" 
+            <a th:href="@{/training-log/all(period='month', part=${selectedPart})}" 
                class="button" 
                th:classappend="${period == 'month'} ? 'primary' : 'secondary'">月次</a>
         </div>
@@ -190,7 +230,7 @@
     </div>
 
     <div th:if="${records.empty}" class="no-records">
-        <p>まだ記録がありません。<br>トレーニングを行って記録してみましょう！</p>
+        <p>条件に一致する記録がありません。<br>トレーニングを行って記録してみましょう！</p>
         <a th:href="@{/training}" class="button primary" style="margin-top:15px;">トレーニングを始める</a>
     </div>
 
