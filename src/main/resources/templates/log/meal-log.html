@@ -1,257 +1,294 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>食事記録 | FitWorks</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <title>食事記録一覧 | FitWorks</title>
     <link rel="stylesheet" th:href="@{/css/base.css}">
-    <link rel="stylesheet" th:href="@{/css/training-log.css}"> 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/training-log.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+	
+	<script th:src="@{/js/theme.js}"></script>
     <style>
-        /* 共通背景デザイン */
-        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
-        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
-        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
-        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        /* ==========================================================================
+           🌌 BACKGROUND STYLES
+           ========================================================================== */
+        body {
+            margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; overflow-x: hidden; font-family: 'Noto Sans JP', sans-serif;
+        }
+        .interactive-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%; animation: auroraFlow 20s ease infinite; overflow: hidden;
+        }
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+        }
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0;
+        }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
-        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+        .bg-cloud {
+            position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; box-shadow: 0 0 60px rgba(255,255,255,0.9);
+        }
         .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
-        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
-        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+        .mouse-flare {
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px);
+        }
+        .mega-sparkle { position: fixed; pointer-events: none; z-index: 99999; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); }
 
-        .main-container {
-            max-width: 900px; width: 92%; margin: 40px auto; padding: 40px;
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 45px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
-            position: relative; z-index: 10;
+        /* Existing Styles with transparency tweaks */
+        .log-form-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            background-color: rgba(232, 245, 233, 0.9); /* 少し透過 */
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            color: #4CAF50;
+            font-size: 1.1em;
+            margin-bottom: 20px;
         }
 
-        /* ヘッダー修正 */
-        .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
-        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
-        .home-link-icon {
-            display: flex; align-items: center; justify-content: center;
-            width: 50px; height: 50px; background-color: white; color: #007bff;
-            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
-            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+        .back-to-form {
+            display: block;
+            text-align: center;
+            margin: 20px auto 30px auto;
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s;
         }
-        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+        .back-to-form:hover { background-color: #45a049; }
 
-        /* 既存の食事ログ用スタイル */
-        .header-icon-meal { color: #4CAF50; }
-        .log-indicator-meal { color: #4CAF50 !important; }
-        .calendar-day-header { border: 1px solid rgba(200,200,200,0.5); padding: 5px; text-align: center; background-color: rgba(255,255,255,0.8); font-weight: bold; }
-        .calendar-day-cell { border: 1px solid rgba(200,200,200,0.5); min-height: 60px; text-align: center; vertical-align: top; background-color: rgba(255,255,255,0.9); transition: background 0.2s; cursor: pointer; }
-        .calendar-day-cell:hover { background-color: #fff; }
-        .calendar-day-header.sun, .calendar-day-cell.sun .day-number { color: #FF3B30; }
-        .calendar-day-header.sat, .calendar-day-cell.sat .day-number { color: #007BFF; }
-        .calendar-day-header.weekday, .calendar-day-cell.weekday .day-number { color: #000; }
-        .calendar-day-cell.today { background-color: #ffeeba; border: 2px solid #ff9800; }
+        .meal-record-list { list-style: none; padding: 0; margin-top: 0; }
+        .meal-card {
+            background-color: rgba(255, 255, 255, 0.9); /* 少し透過 */
+            backdrop-filter: blur(10px);
+            border: 1px solid #ddd;
+            border-left: 5px solid #4CAF50;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.2s;
+        }
+        .meal-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+        .meal-card h3 {
+            margin-top: 0; padding-bottom: 5px; color: #4CAF50; font-size: 1.2em; display: flex; justify-content: space-between; align-items: center;
+        }
+        .meal-card .meal-time { font-size: 0.9em; color: #777; }
+
+        .macro-data { display: flex; justify-content: space-around; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; }
+        .macro-item { text-align: center; flex: 1; padding: 0 5px; font-size: 0.9em; }
+        .macro-item span { color: #777; }
+        .macro-item strong { display: block; font-size: 1.3em; margin-top: 2px; }
+        .total-calories {
+            font-size: 1.2em; font-weight: bold; margin: 10px 0; padding: 5px 0; color: #E67E22; text-align: center; background-color: rgba(255, 243, 224, 0.8); border-radius: 4px;
+        }
+        .protein-value { color: #3498db; }
+        .fat-value { color: #e74c3c; }
+        .carb-value { color: #f1c40f; }
+        
+        h1 { text-shadow: 0 2px 4px rgba(255,255,255,0.5); }
     </style>
 </head>
-<body class="training-log-page">
+<body>
+    <div th:insert="~{fragments/header :: header}"></div>
+
     <div class="interactive-bg">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
         <canvas id="bg-canvas"></canvas>
+        <div id="mouse-flare" class="mouse-flare"></div>
         <div class="bg-cloud cloud-1"></div>
         <div class="bg-cloud cloud-2"></div>
+        <div class="bg-cloud cloud-3"></div>
     </div>
 
-<div class="main-container">
-    
-    <div class="page-header-container">
-        <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
-            <i class="fa-solid fa-house"></i>
-        </a>
-        <h1 class="page-title">
-            <i class="header-icon header-icon-meal fa-solid fa-utensils"></i> 食事記録
-        </h1>
-    </div>
+    <main class="log-form-container">
+        <h1>🍽️ 食事記録一覧</h1>
 
-    <p class="sub-heading" th:text="${username} + 'さんの食事を管理しましょう。'">食事記録カレンダー</p>
-
-    <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
-    <div th:if="${error}" class="error-message" style="color:red; text-align:center; margin-bottom:10px;" th:text="${error}"></div>
-    
-    <div class="calendar-nav-container">
-        <a th:href="@{/log/meal(year=${prevYear}, month=${prevMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></a>
-        <h2 class="calendar-title" th:text="${currentYearMonth.year} + '年 ' + ${currentYearMonth.monthValue} + '月'"></h2>
-        <a th:href="@{/log/meal(year=${nextYear}, month=${nextMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></a>
-    </div>
-
-    <div class="calendar-grid">
-        <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')">曜日</div>
-        <th:block th:each="date : ${calendarDays}">
-            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''}, dayOfWeek=${date != null ? date.dayOfWeek.name() : ''}, isToday=${date != null and date.isEqual(currentDate)}, isLogged=${date != null and loggedDates.containsKey(date)}"
-                 class="calendar-day-cell"
-                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today' : '') + ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + ((${dayOfWeek == 'SUNDAY'} ? ' sun' : ''))))"
-                 th:attr="data-date=${date != null ? date.toString() : ''}"
-                 th:onclick="${date != null} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
-                <span class="day-number" th:text="${dateNumber}">1</span>
-                <span th:if="${isLogged}" class="log-indicator log-indicator-meal"><i class="fa-solid fa-utensils"></i></span>
-            </div>
-        </th:block>
-    </div>
-
-    <div style="text-align: center; margin: 20px 0;">
-        <a th:href="@{/log/meal/all}" class="button" style="background-color: #555; color: white; width: 100%; display: block; text-align: center; margin-bottom: 10px;">
-            <i class="fa-solid fa-list"></i> 全記録をリストで見る
-        </a>
-        <div style="display: flex; gap: 10px;">
-            <form th:action="@{/log/meal/analyze-month}" method="post" onsubmit="showLoading(this)" style="flex: 1;">
-                <input type="hidden" name="year" th:value="${currentYearMonth.year}" />
-                <input type="hidden" name="month" th:value="${currentYearMonth.monthValue}" />
-                <button type="submit" class="button" style="background-color: #e67e22; color: white; width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
-                    <i class="fa-solid fa-chart-pie"></i> 月間分析
-                </button>
-            </form>
-            <form th:action="@{/log/meal/analyze-week}" method="post" onsubmit="showLoading(this)" style="flex: 1;">
-                <button type="submit" class="button" style="background-color: #9b59b6; color: white; width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
-                    <i class="fa-solid fa-calendar-week"></i> 今週の分析
-                </button>
-            </form>
+        <a th:href="@{/log/meal}" class="button primary">新しい食事を記録する</a>
+		<div style="text-align: center; margin-top: 30px;">
+			<a th:href="@{/home}" class="button secondary">
+						<i class="fa-solid fa-house"></i> ホームに戻る
+				</a>
+		</div>
+        <div th:if="${#lists.isEmpty(mealRecords)}" class="empty-message">
+            <p>まだ食事の記録がありません。記録を開始して健康管理を始めましょう！</p>
         </div>
-    </div>
-    
-    </div>
+        
+        <ul th:unless="${#lists.isEmpty(mealRecords)}" class="meal-record-list">
+            <li th:each="record : ${mealRecords}" class="meal-card">
+                
+                <h3>
+                    <span th:text="${record.mealType}">朝食</span>
+                    <span class="meal-time" th:text="${#temporals.format(record.mealDateTime, 'yyyy年MM月dd日 HH:mm')}"></span>
+                </h3>
+                
+                <div class="total-calories">
+                    総カロリー: <span th:text="${record.calories ?: 0}">0</span> kcal
+                </div>
 
-<div id="logModal" class="modal" th:classappend="${mealLogForm.date != null} ? 'is-active' : ''">
-    <div class="modal-content">
-        <span class="close-button" onclick="closeLogModal()">&times;</span>
-        <h2 id="modalDateTitle" class="modal-title" th:text="${mealLogForm.date}"></h2>
-        <div id="logViewArea"></div>
-        <div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #4CAF50;">
-            <h3 style="font-size: 1rem; margin-top: 0; color: #2e7d32;"><i class="fa-solid fa-camera"></i> 写真から自動入力</h3>
-            <form th:action="@{/log/meal/analyze}" method="post" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center;" onsubmit="showLoading(this)">
-                <input type="file" name="mealImage" accept="image/*" class="form-control" style="font-size: 0.9em; padding: 8px;" required>
-                <button type="submit" class="button" style="background-color: #2e7d32; color: white; border: none; font-size: 0.9em; padding: 10px 15px; white-space: nowrap;">解析</button>
-            </form>
-            <p style="font-size: 0.8em; color: #666; margin: 5px 0 0 0;">※写真を選択して「解析」を押すと、内容・カロリー等が自動入力されます</p>
-            <div th:if="${aiComment}" style="margin-top: 10px; font-weight: bold; color: #e65100;"><i class="fa-solid fa-comment-dots"></i> <span th:text="${aiComment}"></span></div>
-        </div>
-        <p class="modal-instruction">食事内容を記録：</p>
-        <div class="meal-form-container">
-            <form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post" onsubmit="showLoading(this)">
-                <div class="form-group"><label for="dateInput"><i class="fa-regular fa-calendar"></i> 日付</label><input type="date" id="dateInput" th:field="*{date}" class="form-control" required></div>
-                <div class="form-row">
-                    <div class="form-group half"><label for="time"><i class="fa-regular fa-clock"></i> 時刻</label><input type="time" id="time" th:field="*{time}" class="form-control" required></div>
-                    <div class="form-group half"><label for="mealType"><i class="fa-solid fa-utensils"></i> 種類</label><select id="mealType" th:field="*{mealType}" class="form-control" required><option value="朝食">朝食</option><option value="昼食">昼食</option><option value="夕食">夕食</option><option value="間食">間食</option></select></div>
-                </div>
-                <div class="form-group">
-                    <label for="content">食事内容</label><textarea id="content" th:field="*{content}" class="form-control" rows="2" placeholder="例: ご飯、焼き魚、味噌汁" required></textarea>
-                    <button type="submit" th:formaction="@{/log/meal/analyze-text}" formnovalidate class="button" style="background-color: #3498db; color: white; width: 100%; margin-top: 10px; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-robot"></i> 内容から栄養計算＆トレーニング提案</button>
-                </div>
-                <div class="form-group"><label for="calories">🔥 総カロリー (kcal)</label><input type="number" id="calories" th:field="*{calories}" class="form-control" placeholder="0" min="0" max="5000" required></div>
-                <div class="form-group"><label>PFCバランス (g) <span style="font-size:0.8em; font-weight:normal; color:#888;">※任意</span></label>
-                    <div class="macro-section">
-                        <div class="macro-row">
-                            <div class="macro-item"><label for="protein">P</label><input type="number" id="protein" th:field="*{protein}" class="form-control macro-input p-input" step="0.1" min="0" max="500" placeholder="0.0"></div>
-                            <div class="macro-item"><label for="fat">F</label><input type="number" id="fat" th:field="*{fat}" class="form-control macro-input f-input" step="0.1" min="0" max="500" placeholder="0.0"></div>
-                            <div class="macro-item"><label for="carbohydrate">C</label><input type="number" id="carbohydrate" th:field="*{carbohydrate}" class="form-control macro-input c-input" step="0.1" min="0" max="500" placeholder="0.0"></div>
-                        </div>
+                <p style="margin-top: 15px;">内容: <span th:text="${record.content}"></span></p>
+
+                <div class="macro-data">
+                    <div class="macro-item">
+                        <span>タンパク質 (P)</span>
+                        <strong class="protein-value" th:text="${#numbers.formatDecimal(record.protein ?: 0, 1, 1)} + 'g'">0.0g</strong>
+                    </div>
+                    <div class="macro-item">
+                        <span>脂質 (F)</span>
+                        <strong class="fat-value" th:text="${#numbers.formatDecimal(record.fat ?: 0, 1, 1)} + 'g'">0.0g</strong>
+                    </div>
+                    <div class="macro-item">
+                        <span>炭水化物 (C)</span>
+                        <strong class="carb-value" th:text="${#numbers.formatDecimal(record.carbohydrate ?: 0, 1, 1)} + 'g'">0.0g</strong>
                     </div>
                 </div>
-                <button type="submit" class="btn-submit"><i class="fa-solid fa-check"></i> 記録を保存</button>
-            </form>
-        </div>
-        <a th:href="@{/log/meal/all}" class="button secondary view-all-button" style="margin-top: 20px;">全記録を見る</a>
-    </div>
-</div>
+            </li>
+        </ul>
 
-<div th:if="${aiAdvice}" id="aiAdviceModal" class="modal is-active" style="z-index: 2000;">
-    <div id="shareTarget" class="modal-content" style="max-width: 400px; text-align: center; background: #fff; border-radius: 15px; padding: 30px; position: relative; overflow: hidden;">
-        <span class="close-button no-capture" onclick="document.getElementById('aiAdviceModal').style.display='none'">&times;</span>
-        <div style="margin-bottom: 15px;"><img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4CAF50; padding: 2px;"></div>
-        <h3 style="color: #4CAF50; margin-bottom: 15px; font-weight: bold;">AI Trainer's Advice!</h3>
-        <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; position: relative;">
-            <i class="fa-solid fa-quote-left" style="color: #bcdbf3; font-size: 1.5em; position: absolute; top: 10px; left: 10px;"></i>
-            <p id="aiAdviceText" th:text="${aiAdvice}" style="margin: 0; padding: 5px 10px; color: #333; font-weight: 500; line-height: 1.6;">ここにAIからのアドバイスが表示されます。</p>
-        </div>
-        <div style="margin-top: 10px; margin-bottom: 10px; font-size: 0.8em; color: #aaa; font-weight: bold;">FitWorks Meal Log</div>
-        <div class="sns-buttons-container no-capture">
-            <button onclick="shareScreenImage()" class="btn-sns" style="background: linear-gradient(135deg, #4CAF50, #2E7D32); width: 100%; justify-content: center; font-size: 1em; margin-bottom: 10px; padding: 12px;"><i class="fa-solid fa-share-nodes"></i> 画像としてシェアする</button>
-            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="shareToX()" class="btn-sns btn-sns-x" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-x-twitter"></i> Text</button>
-                <button onclick="shareToLine()" class="btn-sns btn-sns-line" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-line"></i> Text</button>
-                <button onclick="shareToInstagram()" class="btn-sns btn-sns-insta" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-instagram"></i> Copy</button>
-                <button onclick="document.getElementById('aiAdviceModal').style.display='none'" class="btn-sns" style="background-color: #777; font-size: 0.8em; padding: 8px 12px;">閉じる</button>
-            </div>
-        </div>
-    </div>
-</div>
+    </main>
 
-<script th:inline="javascript">
-    // ... (script content omitted for brevity, same as before) ...
-    function openLogModal(dateString, isLogged) {
-        document.getElementById('dateInput').value = dateString;
-        document.getElementById('modalDateTitle').innerText = dateString.replace(/-/g, '/');
-        const logViewArea = document.getElementById('logViewArea');
-        logViewArea.innerHTML = isLogged ? '<p style="font-weight: 700; color: #4CAF50; margin-bottom: 10px;">✅ この日は記録済みです。</p>' : '<p style="color: #999; margin-bottom: 10px;">この日はまだ記録がありません。</p>';
-        if(!document.getElementById('time').value) {
-            const now = new Date();
-            document.getElementById('time').value = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-            const h = now.getHours(); const s = document.getElementById('mealType');
-            if(h>=4 && h<10) s.value="朝食"; else if(h>=10 && h<16) s.value="昼食"; else if(h>=16 || h<4) s.value="夕食";
-        }
-        document.getElementById('logModal').classList.add('is-active');
-    }
-    function closeLogModal() { document.getElementById('logModal').classList.remove('is-active'); }
-    window.onclick = function(e) {
-        const m = document.getElementById('logModal'); const a = document.getElementById('aiAdviceModal');
-        if (m && m.classList.contains('is-active') && e.target === m) closeLogModal();
-        if (a && e.target === a) a.style.display = 'none';
-    }
-    function showLoading(form) {
-        const overlay = document.getElementById('global-loading-overlay');
-        const mainText = document.getElementById('loading-main-text');
-        const action = form.getAttribute('action');
-        if (action && (action.includes('analyze') || action.includes('calculate'))) { mainText.innerText = 'AIが分析中です...'; overlay.querySelector('.loading-spinner').style.color = '#87ceeb'; } 
-        else { mainText.innerText = '記録を保存中です...'; overlay.querySelector('.loading-spinner').style.color = '#4CAF50'; }
-        overlay.style.display = 'flex';
-        const btn = form.querySelector('button[type="submit"]'); if (btn) btn.disabled = true;
-    }
-    async function shareScreenImage() {
-        const t = document.getElementById('shareTarget'); const h = t.querySelectorAll('.no-capture');
-        h.forEach(e => e.style.display = 'none');
-        try {
-            const c = await html2canvas(t, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-            c.toBlob(async (b) => {
-                const f = new File([b], "meal_log.png", { type: "image/png" });
-                if (navigator.canShare && navigator.canShare({ files: [f] })) await navigator.share({ files: [f], title: 'FitWorks', text: getShareText() });
-                else { const l = document.createElement('a'); l.download = 'meal_log.png'; l.href = c.toDataURL(); l.click(); alert("画像を保存しました。"); }
-                h.forEach(e => e.style.display = '');
-            }, 'image/png');
-        } catch (e) { console.error(e); h.forEach(e => e.style.display = ''); }
-    }
-    function getShareText() { return `【FitWorks】食事記録完了！🥗\nAIトレーナー「${document.getElementById('aiAdviceText').innerText}」\n#FitWorks`; }
-    function shareToX() { window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}`, '_blank'); }
-    function shareToLine() { window.open(`https://line.me/R/msg/text/?${encodeURIComponent(getShareText())}`, '_blank'); }
-    function shareToInstagram() { navigator.clipboard.writeText(getShareText()).then(() => { alert("コピーしました！Instagramを開きます。"); window.open('https://www.instagram.com/', '_blank'); }); }
+    <div th:insert="~{fragments/footer :: footer}"></div>
+    
+    <script>
+    // === 🌟 CANVAS PARTICLE SYSTEM ===
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    const flare = document.getElementById('mouse-flare');
+    
+    let particlesArray = [];
+    let width, height;
 
-    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
     const mouse = { x: undefined, y: undefined };
-    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
-    class Particle {
-        constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
-        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
-        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = event.x;
+        mouse.y = event.y;
+        if(flare) flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+        for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
+    });
+
+    document.querySelectorAll('.button').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX || (rect.left + rect.width / 2);
+            const y = e.clientY || (rect.top + rect.height / 2);
+            createExplosion(x, y);
+        });
+    });
+
+    document.addEventListener('mousedown', function(e) {
+        if(!e.target.closest('.button')) {
+            createExplosion(e.clientX, e.clientY, 10);
+        }
+    });
+
+    function createExplosion(x, y, count = 60) {
+        const colors = ['#4facfe', '#00f2fe', '#fff', '#ffd700', '#ff0080', '#7fff00'];
+        for (let i = 0; i < count; i++) {
+            const spark = document.createElement('div');
+            spark.classList.add('mega-sparkle');
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 250 + 50;
+            const size = Math.random() * 12 + 4;
+            spark.style.width = `${size}px`;
+            spark.style.height = `${size}px`;
+            spark.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            spark.style.left = x + 'px';
+            spark.style.top = y + 'px';
+            spark.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            document.body.appendChild(spark);
+            spark.animate([
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                { transform: `translate(calc(-50% + ${Math.cos(angle) * velocity}px), calc(-50% + ${Math.sin(angle) * velocity}px)) scale(0)`, opacity: 0 }
+            ], {
+                duration: 500 + Math.random() * 400,
+                easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+                fill: 'forwards'
+            }).onfinish = () => spark.remove();
+        }
     }
-    function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+
+    class Particle {
+        constructor() {
+            this.x = mouse.x;
+            this.y = mouse.y;
+            this.size = Math.random() * 5 + 2;
+            this.speedX = Math.random() * 4 - 2;
+            this.speedY = Math.random() * 4 - 2;
+            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.size > 0.2) this.size -= 0.1;
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'white';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw();
+            if (particlesArray[i].size <= 0.3) {
+                particlesArray.splice(i, 1);
+                i--;
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+    
+    const cloud1 = document.querySelector('.cloud-1');
+    const cloud2 = document.querySelector('.cloud-2');
+    document.addEventListener('mousemove', (e) => {
+        const x = (window.innerWidth - e.pageX) / 60;
+        const y = (window.innerHeight - e.pageY) / 60;
+        if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
+        if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
+    });
     animate();
-</script>
+    </script>
 </body>
 </html>

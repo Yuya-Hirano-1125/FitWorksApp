@@ -12,17 +12,62 @@
     <script th:src="@{/js/theme.js}"></script>
     
     <style>
+        /* ==========================================================================
+           🌌 BACKGROUND STYLES
+           ========================================================================== */
+        body {
+            margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; overflow-x: hidden; font-family: 'Noto Sans JP', sans-serif;
+        }
+        .interactive-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%; animation: auroraFlow 20s ease infinite; overflow: hidden;
+        }
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+        }
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0;
+        }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+        .bg-cloud {
+            position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; box-shadow: 0 0 60px rgba(255,255,255,0.9);
+        }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+        .mouse-flare {
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px);
+        }
+        .mega-sparkle { position: fixed; pointer-events: none; z-index: 99999; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); }
+
+        /* Existing Styles */
         .log-list-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
+            z-index: 10; /* 背景より手前に */
         }
+        /* 少し背景が透けるように調整しても良いですが、元の白背景を生かします */
+        .chart-container, .record-card {
+            background: rgba(255, 255, 255, 0.9); /* 少し透過 */
+            backdrop-filter: blur(10px);
+        }
+
         .chart-container {
-            background: white;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
         .chart-options {
             display: flex;
@@ -36,7 +81,6 @@
             min-width: 80px;
         }
         .record-card {
-            background: white;
             border-radius: 10px;
             padding: 15px 20px;
             margin-bottom: 15px;
@@ -47,62 +91,47 @@
             align-items: center;
             flex-wrap: wrap;
         }
-        /* 種類ごとの色分け */
-        .record-card.type-weight { border-left-color: var(--primary-color); }
-        .record-card.type-cardio { border-left-color: var(--secondary-color); }
+        .record-card.type-weight { border-left-color: var(--primary-color, #4facfe); }
+        .record-card.type-cardio { border-left-color: var(--secondary-color, #ff9966); }
         
-        .record-date {
-            font-family: 'Poppins', sans-serif;
-            font-weight: bold;
-            color: #555;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-        .record-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #333;
-        }
-        .record-details {
-            color: #666;
-            font-size: 0.95rem;
-            margin-top: 3px;
-        }
+        .record-date { font-family: 'Poppins', sans-serif; font-weight: bold; color: #555; font-size: 0.9rem; margin-bottom: 5px; }
+        .record-title { font-size: 1.1rem; font-weight: bold; color: #333; }
+        .record-details { color: #666; font-size: 0.95rem; margin-top: 3px; }
+        
         .no-records {
             text-align: center;
             padding: 40px;
-            color: #888;
+            color: #555;
+            background: rgba(255,255,255,0.6);
+            border-radius: 10px;
+            font-weight: bold;
         }
-        .back-btn-container {
-            margin-bottom: 20px;
-        }
-        .badge {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            color: white;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-        .badge-weight { background-color: var(--primary-color); color: #000;}
-        .badge-cardio { background-color: var(--secondary-color); }
+        .back-btn-container { margin-bottom: 20px; }
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; color: white; margin-left: 8px; vertical-align: middle; }
+        .badge-weight { background-color: var(--primary-color, #4facfe); color: #fff;}
+        .badge-cardio { background-color: var(--secondary-color, #ff9966); }
+        
+        h1 { text-shadow: 0 2px 4px rgba(255,255,255,0.5); }
         
         @media (max-width: 600px) {
-            .record-card {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .record-right {
-                margin-top: 10px;
-                width: 100%;
-                text-align: right;
-                font-size: 0.8rem;
-                color: #aaa;
-            }
+            .record-card { flex-direction: column; align-items: flex-start; }
+            .record-right { margin-top: 10px; width: 100%; text-align: right; font-size: 0.8rem; color: #aaa; }
         }
     </style>
 </head>
 <body>
+
+<div class="interactive-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div id="mouse-flare" class="mouse-flare"></div>
+    <div class="bg-cloud cloud-1"></div>
+    <div class="bg-cloud cloud-2"></div>
+    <div class="bg-cloud cloud-3"></div>
+</div>
+
 <div class="log-list-container">
     <div class="back-btn-container">
         <a th:href="@{/training-log}" class="button secondary" style="padding: 8px 15px; font-size: 0.9rem;">
@@ -201,7 +230,7 @@
                         yAxisID: 'y1',
                         tension: 0.1,
                         order: 0,
-                        spanGaps: true // データが抜けていても線をつなぐ
+                        spanGaps: true
                     },
                     {
                         label: '有酸素 (分)',
@@ -228,38 +257,137 @@
                     intersect: false,
                 },
                 scales: {
-                    x: {
-                        stacked: true,
-                    },
+                    x: { stacked: true },
                     y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        stacked: true,
-                        title: {
-                            display: true,
-                            text: 'トレーニング時間 (分)'
-                        },
-                        ticks: {
-                            stepSize: 5
-                        }
+                        type: 'linear', display: true, position: 'left', stacked: true,
+                        title: { display: true, text: 'トレーニング時間 (分)' },
+                        ticks: { stepSize: 5 }
                     },
                     y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        grid: {
-                            drawOnChartArea: false,
-                        },
-                        title: {
-                            display: true,
-                            text: '体重 (kg)'
-                        }
+                        type: 'linear', display: true, position: 'right',
+                        grid: { drawOnChartArea: false },
+                        title: { display: true, text: '体重 (kg)' }
                     }
                 }
             }
         });
     }
+
+    // === 🌟 CANVAS PARTICLE SYSTEM ===
+    const canvas = document.getElementById('bg-canvas');
+    const ctxCanvas = canvas.getContext('2d'); // 変数名変更して衝突回避
+    const flare = document.getElementById('mouse-flare');
+    
+    let particlesArray = [];
+    let width, height;
+
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = event.x;
+        mouse.y = event.y;
+        if(flare) flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+        for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
+    });
+
+    // Button click effect
+    document.querySelectorAll('.button').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            // 普通のリンク遷移を阻害しない程度に
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX || (rect.left + rect.width / 2);
+            const y = e.clientY || (rect.top + rect.height / 2);
+            createExplosion(x, y);
+        });
+    });
+
+    document.addEventListener('mousedown', function(e) {
+        if(!e.target.closest('.button')) {
+            createExplosion(e.clientX, e.clientY, 10);
+        }
+    });
+
+    function createExplosion(x, y, count = 60) {
+        const colors = ['#4facfe', '#00f2fe', '#fff', '#ffd700', '#ff0080', '#7fff00'];
+        for (let i = 0; i < count; i++) {
+            const spark = document.createElement('div');
+            spark.classList.add('mega-sparkle');
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 250 + 50;
+            const size = Math.random() * 12 + 4;
+            spark.style.width = `${size}px`;
+            spark.style.height = `${size}px`;
+            spark.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            spark.style.left = x + 'px';
+            spark.style.top = y + 'px';
+            spark.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            document.body.appendChild(spark);
+            spark.animate([
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                { transform: `translate(calc(-50% + ${Math.cos(angle) * velocity}px), calc(-50% + ${Math.sin(angle) * velocity}px)) scale(0)`, opacity: 0 }
+            ], {
+                duration: 500 + Math.random() * 400,
+                easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+                fill: 'forwards'
+            }).onfinish = () => spark.remove();
+        }
+    }
+
+    class Particle {
+        constructor() {
+            this.x = mouse.x;
+            this.y = mouse.y;
+            this.size = Math.random() * 5 + 2;
+            this.speedX = Math.random() * 4 - 2;
+            this.speedY = Math.random() * 4 - 2;
+            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.size > 0.2) this.size -= 0.1;
+        }
+        draw() {
+            ctxCanvas.fillStyle = this.color;
+            ctxCanvas.beginPath();
+            ctxCanvas.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctxCanvas.shadowBlur = 10;
+            ctxCanvas.shadowColor = 'white';
+            ctxCanvas.fill();
+            ctxCanvas.shadowBlur = 0;
+        }
+    }
+
+    function animate() {
+        ctxCanvas.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw();
+            if (particlesArray[i].size <= 0.3) {
+                particlesArray.splice(i, 1);
+                i--;
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+    
+    const cloud1 = document.querySelector('.cloud-1');
+    const cloud2 = document.querySelector('.cloud-2');
+    document.addEventListener('mousemove', (e) => {
+        const x = (window.innerWidth - e.pageX) / 60;
+        const y = (window.innerHeight - e.pageY) / 60;
+        if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
+        if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
+    });
+    animate();
 </script>
 </body>
 </html>
