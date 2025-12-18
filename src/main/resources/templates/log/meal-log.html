@@ -47,6 +47,18 @@
         .calendar-day-header.sat, .calendar-day-cell.sat .day-number { color: #007BFF; }
         .calendar-day-header.weekday, .calendar-day-cell.weekday .day-number { color: #000; }
         .calendar-day-cell.today { background-color: #ffeeba; border: 2px solid #ff9800; }
+
+        /* ヘッダー修正 */
+        .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #4CAF50; padding-bottom: 15px; gap: 15px; }
+        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
+        /* ホームボタンはトレーニング記録(青)と統一 */
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
     </style>
 </head>
 <body class="training-log-page">
@@ -60,9 +72,15 @@
 
 <div class="main-container">
     
-    <h1 style="margin-bottom: 5px;">
-        <i class="header-icon header-icon-meal fa-solid fa-utensils"></i> 食事記録
-    </h1>
+    <div class="page-header-container">
+        <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <h1 class="page-title">
+            <i class="header-icon header-icon-meal fa-solid fa-utensils"></i> 食事記録
+        </h1>
+    </div>
+
     <p class="sub-heading" th:text="${username} + 'さんの食事を管理しましょう。'">食事記録カレンダー</p>
 
     <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
@@ -107,10 +125,7 @@
             </form>
         </div>
     </div>
-    
-    <div style="text-align: center; margin-top: 30px;">
-        <a th:href="@{/home}" class="button secondary"><i class="fa-solid fa-house"></i> ホームに戻る</a>
-    </div>
+
 </div>
 
 <div id="logModal" class="modal" th:classappend="${mealLogForm.date != null} ? 'is-active' : ''">
