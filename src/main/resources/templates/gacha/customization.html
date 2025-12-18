@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +9,6 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* 共通背景デザイン */
         :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
         body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
         .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
@@ -17,38 +16,29 @@
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
-        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
-        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
-        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
-        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
-        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
 
         .main-container {
             max-width: 700px; width: 92%; margin: 40px auto; padding: 40px;
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 45px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px; border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
         }
-
-        /* カスタマイズ画面用スタイル */
+        .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
+        .page-title { color: #333; font-size: 1.8rem; margin: 0; flex-grow: 1; text-align: left; }
+        
+        /* 修正：ボタンサイズ変更 */
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
         .character-view-container { display: flex; justify-content: center; margin-bottom: 20px; }
-        .character-view { width: 300px; height: 300px; border: 4px solid var(--primary-color); background-color: #ffffff; border-radius: 15px; position: relative; background-size: cover; background-position: center; overflow: hidden; box-shadow: 0 0 20px rgba(255, 105, 180, 0.3); transition: transform 0.3s ease; }
-        .character-view:hover { transform: scale(1.02); }
+        .character-view { width: 300px; height: 300px; border: 4px solid var(--primary-color); background-color: #ffffff; border-radius: 15px; position: relative; background-size: cover; background-position: center; overflow: hidden; box-shadow: 0 0 20px rgba(255, 105, 180, 0.3); }
         .character-costume { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 2; }
-        .current-bg-label { position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.9); color: #333; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 5; }
-        
-        .control-section { margin-bottom: 30px; padding: 15px; border: 1px solid rgba(255,255,255,0.8); border-radius: 15px; background: rgba(255,255,255,0.7); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .control-section h3 { font-size: 1.1rem; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; color: #333; }
-        .control-panel { display: flex; justify-content: center; gap: 10px; }
-        .control-panel a.button { flex-grow: 1; max-width: 300px; font-size: 0.9rem; padding: 12px; margin: 0; text-align: center; text-decoration: none; border-radius:10px; }
-        
-        h1 { color: #333; text-align: center; }
-        .sub-heading { text-align: center; color: #666; margin-bottom: 20px; }
     </style>
 </head>
 <body class="customize-page">
@@ -56,14 +46,15 @@
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
         <canvas id="bg-canvas"></canvas>
-        <div class="bg-cloud cloud-1"></div>
-        <div class="bg-cloud cloud-2"></div>
     </div>
-
     <div class="main-container">
-        <h1><i class="fa-solid fa-shirt header-icon"></i>着せ替え</h1>
-        <p class="sub-heading">自分だけのキャラクターを作ろう！</p>
-
+        <div class="page-header-container">
+            <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <h1 class="page-title"><i class="fa-solid fa-shirt"></i>着せ替え</h1>
+        </div>
+        <p class="sub-heading" style="text-align:center; color:#666; margin-bottom:25px;">自分だけのキャラクターを作ろう！</p>
         <div class="message-area" style="margin-bottom:20px;">
             <div th:if="${message}" style="color:green; text-align:center; font-weight:bold;">
                 <i class="fa-solid fa-check-circle"></i> <span th:text="${message}"></span>
@@ -72,63 +63,28 @@
                 <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span>
             </div>
         </div>
-
         <div class="character-view-container">
-            <div class="character-view" 
-                 th:style="${equippedBackground != null} ? 'background-image: url(' + ${equippedBackground.item.imagePath} + ');' : 'background-color: #fff0f5;'">
-                
-                <p class="current-bg-label">
-                    <i class="fa-solid fa-image"></i>
-                    <span th:text="${equippedBackground} != null ? ${equippedBackground.item.name} : '背景なし'"></span>
-                </p>
-
-                <img th:src="@{/img/mizu1.png}" alt="ベースキャラクター" 
-                     style="width: 100%; height: auto; position: absolute; bottom: 0; z-index: 1;">
-                
-                <div class="character-costume" th:if="${equippedCostume != null}" 
-                     th:style="'background-image: url(' + ${equippedCostume.item.imagePath} + ');'">
-                </div>
+            <div class="character-view" th:style="${equippedBackground != null} ? 'background-image: url(' + ${equippedBackground.item.imagePath} + ');' : 'background-color: #fff0f5;'">
+                <p class="current-bg-label" style="position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.9); color: #333; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; z-index: 5;"><i class="fa-solid fa-image"></i> <span th:text="${equippedBackground} != null ? ${equippedBackground.item.name} : '背景なし'"></span></p>
+                <img th:src="@{/img/mizu1.png}" alt="ベースキャラクター" style="width: 100%; height: auto; position: absolute; bottom: 0; z-index: 1;">
+                <div class="character-costume" th:if="${equippedCostume != null}" th:style="'background-image: url(' + ${equippedCostume.item.imagePath} + ');'"></div>
             </div>
         </div>
-
-        <div class="control-section">
-            <h3><i class="fa-solid fa-user"></i> キャラクター選択</h3>
-            <div class="control-panel">
-                <a th:href="@{/characters/menu/CharactersStorage}" class="button primary">
-                    <i class="fa-solid fa-user-check"></i> キャラクター一覧へ
-                </a>
+        <div class="control-section" style="margin-bottom: 30px; padding: 15px; border: 1px solid rgba(255,255,255,0.8); border-radius: 15px; background: rgba(255,255,255,0.7);">
+            <h3 style="font-size: 1.1rem; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; color: #333;"><i class="fa-solid fa-user"></i> キャラクター選択</h3>
+            <div class="control-panel" style="display: flex; justify-content: center; gap: 10px;">
+                <a th:href="@{/characters/menu/CharactersStorage}" class="button primary" style="flex-grow: 1; max-width: 300px; font-size: 0.9rem; padding: 12px; text-align: center; text-decoration: none; border-radius:10px;"><i class="fa-solid fa-user-check"></i> キャラクター一覧へ</a>
             </div>
         </div>
-        
-        <div class="control-section">
-            <h3><i class="fa-solid fa-image"></i> 背景選択</h3>
-            <div class="control-panel">
-                <a th:href="@{/characters/menu/Backgrounds}" class="button primary">
-                    <i class="fa-solid fa-panorama"></i> 背景一覧へ
-                </a>
+        <div class="control-section" style="padding: 15px; border: 1px solid rgba(255,255,255,0.8); border-radius: 15px; background: rgba(255,255,255,0.7);">
+            <h3 style="font-size: 1.1rem; margin-top: 0; margin-bottom: 15px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; color: #333;"><i class="fa-solid fa-image"></i> 背景選択</h3>
+            <div class="control-panel" style="display: flex; justify-content: center; gap: 10px;">
+                <a th:href="@{/characters/menu/Backgrounds}" class="button primary" style="flex-grow: 1; max-width: 300px; font-size: 0.9rem; padding: 12px; text-align: center; text-decoration: none; border-radius:10px;"><i class="fa-solid fa-panorama"></i> 背景一覧へ</a>
             </div>
-        </div>
-
-        <div class="button-container" style="margin-top: 40px; text-align: center;">
-            <a th:href="@{/home}" class="button secondary">
-                <i class="fa-solid fa-house"></i> ホームに戻る
-            </a>
         </div>
     </div>
-
     <script>
-        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeCanvas); resizeCanvas();
-        const mouse = { x: undefined, y: undefined };
-        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
-        class Particle {
-            constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
-            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
-            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
-        }
-        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
-        animate();
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); requestAnimationFrame(animate); } animate();
     </script>
 </body>
 </html>

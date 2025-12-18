@@ -32,13 +32,16 @@
         }
         .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
         .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
+        
+        /* 修正：ボタンサイズ変更 */
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
-            width: 42px; height: 42px; background-color: white; color: #007bff;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
             border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
-            transition: all 0.3s ease; font-size: 1.2rem; flex-shrink: 0;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+        
         .title-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: flex-start; padding-top: 60px; z-index: 10000; animation: fadeIn 0.4s; }
         .title-popup-content { background: linear-gradient(135deg, #fff, #f0f8ff); padding: 40px 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 4px solid #ffd700; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
