@@ -8,23 +8,10 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* ==========================================================================
-           共通背景デザイン & ガラスモーフィズム
-           ========================================================================== */
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.8);
-            --primary-color: #4facfe;
-        }
-        body {
-            margin: 0; padding: 0; background-color: #f0f8ff;
-            min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden;
-        }
-        .interactive-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
-        }
+        /* 共通背景デザイン省略 */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(255, 255, 255, 0.8); --primary-color: #4facfe; }
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
@@ -38,47 +25,35 @@
 
         .main-container {
             max-width: 800px; width: 92%; margin: 40px auto; padding: 40px;
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(20px) saturate(180%);
+            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 45px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 45px; border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
         }
 
-        /* --- 筋肉アバターのスタイル --- */
-        .avatar-section {
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 15px; padding: 20px; margin-bottom: 30px;
-            text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden;
+        /* ヘッダー修正 */
+        .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
+        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
         }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+
+        /* 既存スタイル */
+        .avatar-section { background-color: rgba(255, 255, 255, 0.8); border-radius: 15px; padding: 20px; margin-bottom: 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; }
         .avatar-container { position: relative; width: 100%; max-width: 360px; height: 520px; margin: 0 auto; perspective: 1000px; }
         .body-shape { width: 100%; height: 100%; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15)); animation: bodyFloat 6s ease-in-out infinite alternate; }
         @keyframes bodyFloat { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
-        
-        /* 筋肉パーツの基本スタイル */
-        .muscle-part { 
-            fill: #ecf0f1; /* デフォルト色（薄いグレー） */
-            stroke: #fff; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; 
-            transition: fill 1s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
-            transform-box: fill-box; transform-origin: center; cursor: pointer; 
-        }
+        .muscle-part { fill: #ecf0f1; stroke: #fff; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; transition: fill 1s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); transform-box: fill-box; transform-origin: center; cursor: pointer; }
         .muscle-base { fill: #ccc; stroke: #fff; stroke-width: 2; }
-        
         .muscle-group:hover .muscle-part { filter: brightness(1.2); transform: scale(1.05); z-index: 10; }
-        
-        /* 光るエフェクト（高レベル用） */
-        .glowing .muscle-part { 
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
-            animation: musclePulse 2s infinite alternate; 
-        }
-        @keyframes musclePulse { 
-            0% { transform: scale(var(--current-scale, 1.05)); } 
-            100% { transform: scale(calc(var(--current-scale, 1.05) * 1.05)); filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); } 
-        }
-        
-        .muscle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding-bottom: 80px; }
+        .glowing .muscle-part { filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)); animation: musclePulse 2s infinite alternate; }
+        @keyframes musclePulse { 0% { transform: scale(var(--current-scale, 1.05)); } 100% { transform: scale(calc(var(--current-scale, 1.05) * 1.05)); filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); } }
+        .muscle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding-bottom: 20px; }
         .muscle-card { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; position: relative; border: 2px solid transparent; transition: transform 0.2s; }
         .muscle-card:hover { transform: translateY(-3px); border-color: var(--primary-color); }
         .muscle-icon { font-size: 3rem; margin-bottom: 10px; color: var(--primary-color); background: rgba(255,255,255,0.8); width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
@@ -103,60 +78,30 @@
     </div>
 
     <div class="main-container">
-        <div th:replace="~{fragments/header :: header}"></div>
-
-        <h1><i class="fa-solid fa-dumbbell"></i> マッスルパートナー</h1>
+        
+        <div class="page-header-container">
+            <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <h1 class="page-title"><i class="fa-solid fa-dumbbell"></i> マッスルパートナー</h1>
+        </div>
         
         <div class="avatar-section">
             <h3>現在の筋肉ステータス</h3>
             <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">
                 レベルに応じて色が変化します！<br>
-                <span style="color:#4facfe; font-weight:bold;">青(初期)</span> → 
-                <span style="color:#00c853; font-weight:bold;">緑</span> → 
-                <span style="color:#ffb300; font-weight:bold;">黄</span> → 
-                <span style="color:#ff4444; font-weight:bold;">赤(Lv30〜)</span>
+                <span style="color:#4facfe; font-weight:bold;">青(初期)</span> → <span style="color:#00c853; font-weight:bold;">緑</span> → <span style="color:#ffb300; font-weight:bold;">黄</span> → <span style="color:#ff4444; font-weight:bold;">赤(Lv30〜)</span>
             </p>
-            
             <div class="avatar-container">
                 <svg class="body-shape" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="muscleShine" x1="0%" y1="0%" x2="100%" y2="50%">
-                            <stop offset="0%" style="stop-color:rgba(255,255,255,0.3);stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:rgba(255,255,255,0);stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-
-                    <circle class="muscle-base" cx="200" cy="50" r="30" />
-                    <rect class="muscle-base" x="185" y="78" width="30" height="15" />
-
-                    <g id="part-shoulders" class="muscle-group" data-part-name="肩">
-                        <path class="muscle-part" d="M185,93 L130,95 Q115,100 115,125 L135,130 L185,110 Z" />
-                        <path class="muscle-part" d="M215,93 L270,95 Q285,100 285,125 L265,130 L215,110 Z" />
-                    </g>
-
-                    <g id="part-back" class="muscle-group" data-part-name="背中">
-                        <path class="muscle-part" d="M185,110 L145,135 L155,190 L185,200 Z" />
-                        <path class="muscle-part" d="M215,110 L255,135 L245,190 L215,200 Z" />
-                    </g>
-
-                    <g id="part-arms" class="muscle-group" data-part-name="腕">
-                        <path class="muscle-part" d="M115,125 L105,200 L95,280 L125,280 L135,200 L140,135 Z" />
-                        <path class="muscle-part" d="M285,125 L295,200 L305,280 L275,280 L265,200 L260,135 Z" />
-                    </g>
-
-                    <g id="part-chest" class="muscle-group" data-part-name="胸">
-                        <path class="muscle-part" d="M185,93 L215,93 L240,115 L230,165 L200,170 L170,165 L160,115 Z" />
-                    </g>
-
-                    <g id="part-abs" class="muscle-group" data-part-name="腹筋">
-                        <path class="muscle-part" d="M170,165 L230,165 L225,250 L200,260 L175,250 Z" />
-                    </g>
-
-                    <g id="part-legs" class="muscle-group" data-part-name="脚">
-                        <path class="muscle-part" d="M175,250 L200,260 L195,320 L185,450 L160,550 L130,550 L140,400 L135,300 L155,200 Z" />
-                        <path class="muscle-part" d="M225,250 L200,260 L205,320 L215,450 L240,550 L270,550 L260,400 L265,300 L245,200 Z" />
-                    </g>
-                    
+                    <defs><linearGradient id="muscleShine" x1="0%" y1="0%" x2="100%" y2="50%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.3);stop-opacity:1" /><stop offset="100%" style="stop-color:rgba(255,255,255,0);stop-opacity:1" /></linearGradient></defs>
+                    <circle class="muscle-base" cx="200" cy="50" r="30" /> <rect class="muscle-base" x="185" y="78" width="30" height="15" />
+                    <g id="part-shoulders" class="muscle-group" data-part-name="肩"><path class="muscle-part" d="M185,93 L130,95 Q115,100 115,125 L135,130 L185,110 Z" /><path class="muscle-part" d="M215,93 L270,95 Q285,100 285,125 L265,130 L215,110 Z" /></g>
+                    <g id="part-back" class="muscle-group" data-part-name="背中"><path class="muscle-part" d="M185,110 L145,135 L155,190 L185,200 Z" /><path class="muscle-part" d="M215,110 L255,135 L245,190 L215,200 Z" /></g>
+                    <g id="part-arms" class="muscle-group" data-part-name="腕"><path class="muscle-part" d="M115,125 L105,200 L95,280 L125,280 L135,200 L140,135 Z" /><path class="muscle-part" d="M285,125 L295,200 L305,280 L275,280 L265,200 L260,135 Z" /></g>
+                    <g id="part-chest" class="muscle-group" data-part-name="胸"><path class="muscle-part" d="M185,93 L215,93 L240,115 L230,165 L200,170 L170,165 L160,115 Z" /></g>
+                    <g id="part-abs" class="muscle-group" data-part-name="腹筋"><path class="muscle-part" d="M170,165 L230,165 L225,250 L200,260 L175,250 Z" /></g>
+                    <g id="part-legs" class="muscle-group" data-part-name="脚"><path class="muscle-part" d="M175,250 L200,260 L195,320 L185,450 L160,550 L130,550 L140,400 L135,300 L155,200 Z" /><path class="muscle-part" d="M225,250 L200,260 L205,320 L215,450 L240,550 L270,550 L260,400 L265,300 L245,200 Z" /></g>
                     <rect x="0" y="0" width="400" height="600" fill="url(#muscleShine)" style="pointer-events: none; mix-blend-mode: soft-light;" />
                 </svg>
                 <div id="tooltip"></div>
@@ -167,26 +112,13 @@
         <div class="muscle-grid">
             <div th:each="muscle : ${muscles}" class="muscle-card">
                 <div class="muscle-part-badge" th:text="${muscle.targetPart}">胸</div>
-                
                 <div class="muscle-icon">
-                    <i class="fa-solid" 
-                       th:classappend="${#strings.contains(muscle.targetPart, '胸') ? 'fa-shield-heart' : 
-                                       (#strings.contains(muscle.targetPart, '脚') ? 'fa-person-running' : 
-                                       (#strings.contains(muscle.targetPart, '腕') ? 'fa-hand-fist' : 
-                                       (#strings.contains(muscle.targetPart, '背') ? 'fa-child' : 
-                                       (#strings.contains(muscle.targetPart, '肩') ? 'fa-user-plus' : 
-                                       (#strings.contains(muscle.targetPart, '腹') ? 'fa-table-cells' : 'fa-child-reaching')))))}"></i>
+                    <i class="fa-solid" th:classappend="${#strings.contains(muscle.targetPart, '胸') ? 'fa-shield-heart' : (#strings.contains(muscle.targetPart, '脚') ? 'fa-person-running' : (#strings.contains(muscle.targetPart, '腕') ? 'fa-hand-fist' : (#strings.contains(muscle.targetPart, '背') ? 'fa-child' : (#strings.contains(muscle.targetPart, '肩') ? 'fa-user-plus' : (#strings.contains(muscle.targetPart, '腹') ? 'fa-table-cells' : 'fa-child-reaching')))))}"></i>
                 </div>
-
                 <div class="muscle-name" th:text="${muscle.customName}">胸筋太郎</div>
                 <div class="level-info" th:text="'Lv.' + ${muscle.level}">Lv.1</div>
-
-                <div class="xp-bar-bg">
-                    <div class="xp-bar-fill" th:style="'width:' + ${muscle.progressPercent} + '%;'"></div>
-                </div>
-                <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;" 
-                     th:text="'Next Lv: ' + ${muscle.xp} + ' / ' + ${muscle.requiredXp} + ' XP'"></div>
-
+                <div class="xp-bar-bg"><div class="xp-bar-fill" th:style="'width:' + ${muscle.progressPercent} + '%;'"></div></div>
+                <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;" th:text="'Next Lv: ' + ${muscle.xp} + ' / ' + ${muscle.requiredXp} + ' XP'"></div>
                 <form th:action="@{/muscles/rename}" method="post" class="rename-form">
                     <input type="hidden" name="id" th:value="${muscle.id}">
                     <input type="text" name="newName" class="rename-input" placeholder="名前を変更" required>
@@ -195,128 +127,43 @@
             </div>
         </div>
 
-        <div class="button-container">
-            <a th:href="@{/home}" class="button secondary"><i class="fa-solid fa-house"></i> ホームに戻る</a>
-        </div>
-        
         <div th:replace="~{fragments/footer :: footer}"></div>
     </div>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // サーバーから渡された筋肉データを取得
         const muscleData = /*[[${muscles}]]*/ [];
-        console.log("Loaded Muscle Data:", muscleData); // デバッグ用
-
         document.addEventListener('DOMContentLoaded', () => {
             const tooltip = document.getElementById('tooltip');
-
-            // 1. 各部位の色を計算して適用
             muscleData.forEach(muscle => {
-                const level = parseInt(muscle.level, 10) || 1;
-                const partName = muscle.targetPart; 
-                let svgId = null;
-
-                // 部位名のマッピング (「大胸筋」や「胸部」など表記揺れに対応)
-                if (partName.includes('胸')) svgId = 'part-chest';
-                else if (partName.includes('背')) svgId = 'part-back';
-                else if (partName.includes('脚') || partName.includes('足')) svgId = 'part-legs';
-                else if (partName.includes('腕')) svgId = 'part-arms';
-                else if (partName.includes('腹')) svgId = 'part-abs';
-                else if (partName.includes('肩')) svgId = 'part-shoulders';
-
-                console.log(`Part: ${partName} -> ID: ${svgId}, Level: ${level}`); // デバッグ用
-
+                const level = parseInt(muscle.level, 10) || 1; const partName = muscle.targetPart; let svgId = null;
+                if (partName.includes('胸')) svgId = 'part-chest'; else if (partName.includes('背')) svgId = 'part-back'; else if (partName.includes('脚') || partName.includes('足')) svgId = 'part-legs'; else if (partName.includes('腕')) svgId = 'part-arms'; else if (partName.includes('腹')) svgId = 'part-abs'; else if (partName.includes('肩')) svgId = 'part-shoulders';
                 if(svgId) {
                     const el = document.getElementById(svgId);
-                    if(el) {
-                        applyMuscleStyle(el, level);
-                        el.addEventListener('mousemove', (e) => {
-                            showTooltip(e, `${muscle.targetPart}: Lv.${level} (${muscle.customName})`);
-                        });
-                        el.addEventListener('mouseleave', hideTooltip);
-                    } else {
-                        console.warn(`SVG Element not found for ID: ${svgId}`);
-                    }
+                    if(el) { applyMuscleStyle(el, level); el.addEventListener('mousemove', (e) => { showTooltip(e, `${muscle.targetPart}: Lv.${level} (${muscle.customName})`); }); el.addEventListener('mouseleave', hideTooltip); }
                 }
             });
-
-            // 2. 虹色変化のロジック (青->緑->黄->赤)
             function applyMuscleStyle(element, level) {
                 const targets = (element.tagName.toLowerCase() === 'g') ? element.querySelectorAll('path') : [element];
-                
-                // レベル30で最大色（赤）になるように設定
-                const maxLevel = 30; 
-                let ratio = level / maxLevel;
-                if (ratio > 1) ratio = 1; // 100%を超えないように
-
-                // HSL色空間で色相を回転させる
-                // 240(青) -> 120(緑) -> 60(黄) -> 0(赤)
-                const startHue = 240; 
-                const endHue = 0;
-                // ratioが増えるほどHueを減らす
-                const hue = startHue - (startHue * ratio);
-                
-                // 鮮やかな色にする (彩度100%, 輝度50%)
-                const color = `hsl(${hue}, 100%, 50%)`;
-                
-                // レベルに応じてサイズも少し大きくする
-                const scale = 1 + (ratio * 0.15); 
-
-                targets.forEach(target => {
-                    target.style.fill = color;
-                    target.style.transform = `scale(${scale})`;
-                    
-                    if(level >= 10) {
-                        target.style.setProperty('--current-scale', scale);
-                    }
-                });
-
-                // レベル10以上で発光エフェクト付与
-                if (level >= 10) {
-                    element.classList.add('glowing');
-                }
+                const maxLevel = 30; let ratio = level / maxLevel; if (ratio > 1) ratio = 1;
+                const startHue = 240; const endHue = 0; const hue = startHue - (startHue * ratio); const color = `hsl(${hue}, 100%, 50%)`; const scale = 1 + (ratio * 0.15); 
+                targets.forEach(target => { target.style.fill = color; target.style.transform = `scale(${scale})`; if(level >= 10) { target.style.setProperty('--current-scale', scale); } });
+                if (level >= 10) { element.classList.add('glowing'); }
             }
-
-            function showTooltip(e, text) {
-                tooltip.textContent = text;
-                tooltip.style.opacity = '1';
-                const containerRect = document.querySelector('.avatar-container').getBoundingClientRect();
-                let x = e.clientX - containerRect.left + 15;
-                let y = e.clientY - containerRect.top - 10;
-                if (x > containerRect.width - 100) x -= 120;
-                tooltip.style.left = x + 'px';
-                tooltip.style.top = y + 'px';
-            }
+            function showTooltip(e, text) { tooltip.textContent = text; tooltip.style.opacity = '1'; const containerRect = document.querySelector('.avatar-container').getBoundingClientRect(); let x = e.clientX - containerRect.left + 15; let y = e.clientY - containerRect.top - 10; if (x > containerRect.width - 100) x -= 120; tooltip.style.left = x + 'px'; tooltip.style.top = y + 'px'; }
             function hideTooltip() { tooltip.style.opacity = '0'; }
         });
-
-        // --- Particle Animation ---
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let particlesArray = [];
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
         const mouse = { x: undefined, y: undefined };
         window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
         class Particle {
-            constructor() {
-                this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2;
-                this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2;
-                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
-            }
+            constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
             update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
             draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
         }
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update(); particlesArray[i].draw();
-                if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; }
-            }
-            requestAnimationFrame(animate);
-        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
         animate();
         /*]]>*/
     </script>
