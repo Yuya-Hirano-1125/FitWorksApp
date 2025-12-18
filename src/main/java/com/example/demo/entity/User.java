@@ -94,7 +94,7 @@ public class User {
     @Column(name = "chip")
     private Integer chipCount;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER) // EAGER を明示的に指定
     @CollectionTable(name = "user_unlocked_characters", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "character_id")
     private Set<Long> unlockedCharacters = new HashSet<>();

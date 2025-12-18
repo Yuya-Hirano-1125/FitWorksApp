@@ -28,7 +28,6 @@
         .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
         .page-title { color: #333; font-size: 1.8rem; margin: 0; flex-grow: 1; text-align: left; }
         
-        /* 修正：ボタンサイズ変更 */
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -37,7 +36,15 @@
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
         .character-view-container { display: flex; justify-content: center; margin-bottom: 20px; }
-        .character-view { width: 300px; height: 300px; border: 4px solid var(--primary-color); background-color: #ffffff; border-radius: 15px; position: relative; background-size: cover; background-position: center; overflow: hidden; box-shadow: 0 0 20px rgba(255, 105, 180, 0.3); }
+        .character-view { 
+            width: 300px; height: 300px; 
+            background-color: transparent; 
+            border-radius: 15px; 
+            position: relative; 
+            background-size: cover; 
+            background-position: center; 
+            overflow: hidden; 
+        }
         .character-costume { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 2; }
     </style>
 </head>
@@ -54,20 +61,12 @@
             </a>
             <h1 class="page-title"><i class="fa-solid fa-shirt"></i>着せ替え</h1>
         </div>
-        <p class="sub-heading" style="text-align:center; color:#666; margin-bottom:25px;">自分だけのキャラクターを作ろう！</p>
         <div class="message-area" style="margin-bottom:20px;">
             <div th:if="${message}" style="color:green; text-align:center; font-weight:bold;">
                 <i class="fa-solid fa-check-circle"></i> <span th:text="${message}"></span>
             </div>
             <div th:if="${errorMessage}" style="color:red; text-align:center; font-weight:bold;">
                 <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${errorMessage}"></span>
-            </div>
-        </div>
-        <div class="character-view-container">
-            <div class="character-view" th:style="${equippedBackground != null} ? 'background-image: url(' + ${equippedBackground.item.imagePath} + ');' : 'background-color: #fff0f5;'">
-                <p class="current-bg-label" style="position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.9); color: #333; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; z-index: 5;"><i class="fa-solid fa-image"></i> <span th:text="${equippedBackground} != null ? ${equippedBackground.item.name} : '背景なし'"></span></p>
-                <img th:src="@{/img/mizu1.png}" alt="ベースキャラクター" style="width: 100%; height: auto; position: absolute; bottom: 0; z-index: 1;">
-                <div class="character-costume" th:if="${equippedCostume != null}" th:style="'background-image: url(' + ${equippedCostume.item.imagePath} + ');'"></div>
             </div>
         </div>
         <div class="control-section" style="margin-bottom: 30px; padding: 15px; border: 1px solid rgba(255,255,255,0.8); border-radius: 15px; background: rgba(255,255,255,0.7);">

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <meta charset="UTF-8">
     <title>進化の軌跡 - CRYSTAL PATH</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
@@ -34,24 +36,29 @@
 	    .character-rarity { font-weight: bold; color: #555; display: block; margin-bottom: 5px; }
 	    .requirements { font-size: 0.9rem; margin-top: 5px; font-weight: 700; color: #333; background: rgba(0,0,0,0.03); padding: 4px; border-radius: 4px; }
 	    .unlocked-label { font-weight: bold; color: #27ae60; }
-	    .locked .character-img { filter: brightness(0%); opacity: 0.7; }
+	    
+	    /* ★★★ 修正: locked クラスがある場合のみ暗くする ★★★ */
+	    .character-img-wrapper.locked .character-img { 
+	        filter: brightness(0%); 
+	        opacity: 0.7; 
+	    }
 	    .lock-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; color: #fff; text-shadow: 0 0 5px rgba(0,0,0,0.8); }
 
-	    /* ===== モーダル ===== */
+	    /* モーダル */
 	    .modal {
-	      position: absolute; /* スクロールに追従 */
-	      top: 0; left: 0; right: 0; bottom: 0;
+	      position: fixed;
+	      top: 0; 
+	      left: 0; 
+	      right: 0; 
+	      bottom: 0;
 	      background-color: rgba(0,0,0,0.6);
 	      opacity: 0;
 	      visibility: hidden;
 	      pointer-events: none;
 	      transition: opacity 0.3s ease;
 	      z-index: 1000;
-
-	      display: flex;
-	      justify-content: center;
-	      align-items: flex-start; /* 上から配置してスクロールに追従 */
-	      padding-top: 50px; /* 少し余白を入れて中央寄せ感 */
+	      overflow-y: auto;
+	      padding: 20px;
 	    }
 
 	    .modal.show {
@@ -61,7 +68,7 @@
 	    }
 
 	    .modal-content {
-	      position: relative;
+	      position: absolute; /* ★ relative → absolute に変更 */
 	      width: 90%;
 	      max-width: 500px;
 	      background: #fff;
@@ -69,8 +76,10 @@
 	      padding: 25px;
 	      text-align: left;
 	      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-	      max-height: 80vh; /* 高さ制限してスクロール可能に */
+	      max-height: 80vh;
 	      overflow-y: auto;
+	      /* ★ 動的に位置を設定するため、top/left はJSで制御 */
+	      transform: translateX(-50%); /* ★ 横方向の中央揃え用 */
 	    }
 
 	    .close {
@@ -87,6 +96,31 @@
 	        transition: background 0.2s;
 	    }
 	    .btn-confirm:hover { background: #45a049; }
+	    
+	    .evolution-table {
+	      width: 100%;
+	      border-collapse: collapse;
+	      margin: 10px 0;
+	    }
+	    .evolution-table th {
+	      text-align: left;
+	      background: #f8f9fa;
+	      padding: 6px 10px;
+	      border: 1px solid #ddd;
+	      font-weight: bold;
+	      width: 50%;
+	    }
+	    .evolution-table td {
+	      padding: 6px 10px;
+	      border: 1px solid #ddd;
+	      text-align: center;
+	      width: 50%;
+	    }
+	    .modal-section h4 {
+	      margin-top: 15px;
+	      font-size: 1rem;
+	      color: #e74c3c;
+	    }
 	</style>
 
 </head>
@@ -113,9 +147,12 @@
 		    <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
 		    <div class="char-list">
 		        <div th:each="chara : ${fireChars}" class="character-card fire">
-		            <div class="character-img-wrapper" th:classappend="${chara.name ne 'エンバーハート'} ? 'locked' : ''">
+		            <!-- ★★★ 修正: unlockedIds に含まれていない場合のみ locked クラスを付与 ★★★ -->
+		            <div class="character-img-wrapper" 
+		                 th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
 		                <img class="character-img" th:src="${chara.imagePath}" th:alt="${chara.name}">
-		                <i th:if="${chara.name ne 'エンバーハート'}" class="fa-solid fa-lock lock-icon"></i>
+		                <!-- ★★★ 修正: 未解放の場合のみロックアイコン表示 ★★★ -->
+		                <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
 		            </div>
 		            <p class="character-name" th:text="${chara.name}">キャラ名</p>
 		            <span class="character-rarity" th:text="${chara.rarity}">★</span>
@@ -124,8 +161,9 @@
 		                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
 		            </div>
 		            <div class="unlock-action" style="margin-top:10px;">
-		                <span th:if="${chara.name eq 'エンバーハート'}" class="unlocked-label">✅ 開放済み</span>
-		                <div th:if="${chara.name ne 'エンバーハート'}">
+		                <!-- ★★★ 修正: 解放済みかどうかで表示切り替え ★★★ -->
+		                <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
+		                <div th:if="${!unlockedIds.contains(chara.id)}">
 		                    <button type="button" class="btn-confirm"
 		                            onclick="openModal(
 		                                this.getAttribute('data-id'),
@@ -133,7 +171,8 @@
 		                                this.getAttribute('data-materials'),
 		                                this.getAttribute('data-conditions'),
 		                                this.getAttribute('data-cost'),
-		                                this.getAttribute('data-materialType')
+		                                this.getAttribute('data-materialType'),
+		                                event
 		                            )"
 		                            th:attr="data-id=${chara.id},
 		                                     data-name=${chara.name}, 
@@ -148,141 +187,30 @@
 		        </div>
 		    </div>
 		</div>
-
-		<!-- モーダル -->
-		<div id="globalModal" class="modal">
-		    <div class="modal-content">
-		        <span class="close" onclick="closeModal()">&times;</span>
-		        <h3 id="modalTitle">進化条件</h3>
-		        <div id="modalBody"></div>
-		    </div>
-		</div>
-
-		<style>
-		.evolution-table {
-		  width: 100%;
-		  border-collapse: collapse;
-		  margin: 10px 0;
-		}
-		.evolution-table th {
-		  text-align: left;
-		  background: #f8f9fa;
-		  padding: 6px 10px;
-		  border: 1px solid #ddd;
-		  font-weight: bold;
-		  width: 50%;
-		}
-		.evolution-table td {
-		  padding: 6px 10px;
-		  border: 1px solid #ddd;
-		  text-align: center;
-		  width: 50%;
-		}
-		.modal-section h4 {
-		  margin-top: 15px;
-		  font-size: 1rem;
-		  color: #e74c3c;
-		}
-		</style>
-
-		<!-- ✅ スクリプトは body の最後に置く -->
-		<script>
-		document.addEventListener("DOMContentLoaded", function() {
-
-		  window.openModal = function(id, name, materials, conditions, cost, materialType) {
-		    if (materials) materials = materials.replace(/[{}]/g, "");
-		    if (conditions) conditions = conditions.replace(/[{}]/g, "");
-
-		    document.getElementById("modalTitle").innerText = name + " の進化条件";
-
-		    // 進化素材テーブル
-		    let bodyHtml = "<div class='modal-section'><h4>進化素材</h4><table class='evolution-table'>";
-		    if (materials && materials.trim()) {
-		      let matArray = materials.split(",");
-		      matArray.forEach(m => {
-		        let parts = m.trim().split("=");
-		        if (parts.length === 2) {
-		          bodyHtml += "<tr><th>" + parts[0].trim() + "</th><td>" + parts[1].trim() + "</td></tr>";
-		        }
-		      });
-		    } else {
-		      bodyHtml += "<tr><td colspan='2'>素材情報なし</td></tr>";
-		    }
-		    bodyHtml += "</table></div>";
-
-		    // 進化条件テーブル
-		    bodyHtml += "<div class='modal-section'><h4>進化条件</h4><table class='evolution-table'>";
-		    if (conditions && conditions.trim()) {
-		      let condArray = conditions.split(",");
-		      condArray.forEach(c => {
-		        let parts = c.trim().split("=");
-		        if (parts.length === 2) {
-		          bodyHtml += "<tr><th>" + parts[0].trim() + "</th><td>" + parts[1].trim() + "</td></tr>";
-		        }
-		      });
-		    } else {
-		      bodyHtml += "<tr><td colspan='2'>条件情報なし</td></tr>";
-		    }
-		    bodyHtml += "</table></div>";
-
-		    // 解放ボタン
-		    bodyHtml += "<div style='text-align:center; margin-top:20px;'>"
-		             + "<button class='btn-confirm' onclick=\"unlockCharacter('" + id + "','" + name + "','" + cost + "','" + materialType + "')\">"
-		             + "<i class='fa-solid fa-unlock'></i> このキャラを解放する"
-		             + "</button></div>";
-
-		    document.getElementById("modalBody").innerHTML = bodyHtml;
-		    document.getElementById("globalModal").classList.add("show");
-		  };
-
-		  window.closeModal = function() {
-		    document.getElementById("globalModal").classList.remove("show");
-		  };
-
-		  // ✅ サーバー連携版の解放処理
-		  window.unlockCharacter = function(id, name, cost, materialType) {
-		    fetch("/unlock", {
-		      method: "POST",
-		      headers: { "Content-Type": "application/json" },
-		      body: JSON.stringify({
-		        characterId: id,
-		        characterName: name,
-		        cost: cost,
-		        materialType: materialType
-		      })
-		    })
-		    .then(response => response.json())
-		    .then(data => {
-		      if (data.success) {
-		        alert(name + " を解放しました！");
-		        closeModal();
-		        location.reload(); // 画面更新で解放済み表示に切り替え
-		      } else {
-		        alert("解放失敗: " + (data.message || "不明なエラー"));
-		      }
-		    })
-		    .catch(error => {
-		      console.error("解放エラー:", error);
-		      alert("通信エラーが発生しました");
-		    });
-		  };
-		});
-		</script>
-
-
 	
         <div class="pass-section">
             <h2 class="attribute-heading water-color"><i class="fa-solid fa-droplet"></i> 水属性</h2>
             <div class="char-list">
                 <div th:each="chara : ${waterChars}" class="character-card water">
-                    <div class="character-img-wrapper">
+                    <div class="character-img-wrapper"
+                         th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
                         <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                        <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
                     </div>
                     <p class="character-name" th:text="${chara.name}">キャラ名</p>
                     <span class="character-rarity" th:text="${chara.rarity}">★</span>
                     <div class="requirements">
                         <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
                         <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                    </div>
+                    <div class="unlock-action" style="margin-top:10px;">
+                        <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
+                        <div th:if="${!unlockedIds.contains(chara.id)}">
+                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), event)"
+                                    th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='蒼玉'">
+                                <i class="fa-solid fa-lock-open"></i> 解放条件
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -292,14 +220,25 @@
             <h2 class="attribute-heading grass-color"><i class="fa-solid fa-leaf"></i> 草属性</h2>
             <div class="char-list">
                 <div th:each="chara : ${grassChars}" class="character-card grass">
-                    <div class="character-img-wrapper">
+                    <div class="character-img-wrapper"
+                         th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
                         <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                        <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
                     </div>
                     <p class="character-name" th:text="${chara.name}">キャラ名</p>
                     <span class="character-rarity" th:text="${chara.rarity}">★</span>
                     <div class="requirements">
                         <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
                         <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                    </div>
+                    <div class="unlock-action" style="margin-top:10px;">
+                        <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
+                        <div th:if="${!unlockedIds.contains(chara.id)}">
+                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), event)"
+                                    th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='翠玉'">
+                                <i class="fa-solid fa-lock-open"></i> 解放条件
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -309,14 +248,25 @@
             <h2 class="attribute-heading light-color"><i class="fa-solid fa-sun"></i> 光属性</h2>
             <div class="char-list">
                 <div th:each="chara : ${lightChars}" class="character-card light">
-                    <div class="character-img-wrapper">
+                    <div class="character-img-wrapper"
+                         th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
                         <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                        <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
                     </div>
                     <p class="character-name" th:text="${chara.name}">キャラ名</p>
                     <span class="character-rarity" th:text="${chara.rarity}">★</span>
                     <div class="requirements">
                         <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
                         <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                    </div>
+                    <div class="unlock-action" style="margin-top:10px;">
+                        <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
+                        <div th:if="${!unlockedIds.contains(chara.id)}">
+                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), event)"
+                                    th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='聖玉'">
+                                <i class="fa-solid fa-lock-open"></i> 解放条件
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -326,14 +276,25 @@
             <h2 class="attribute-heading dark-color"><i class="fa-solid fa-moon"></i> 闇属性</h2>
             <div class="char-list">
                 <div th:each="chara : ${darkChars}" class="character-card dark">
-                    <div class="character-img-wrapper">
+                    <div class="character-img-wrapper"
+                         th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
                         <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                        <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
                     </div>
                     <p class="character-name" th:text="${chara.name}">キャラ名</p>
                     <span class="character-rarity" th:text="${chara.rarity}">★</span>
                     <div class="requirements">
                         <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
                         <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                    </div>
+                    <div class="unlock-action" style="margin-top:10px;">
+                        <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
+                        <div th:if="${!unlockedIds.contains(chara.id)}">
+                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), event)"
+                                    th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='闇玉'">
+                                <i class="fa-solid fa-lock-open"></i> 解放条件
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -345,14 +306,25 @@
             </h2>
             <div class="char-list">
                 <div th:each="chara : ${secretChars}" class="character-card secret">
-                    <div class="character-img-wrapper">
+                    <div class="character-img-wrapper"
+                         th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
                         <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+                        <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
                     </div>
                     <p class="character-name" th:text="${chara.name}">キャラ名</p>
                     <span class="character-rarity" th:text="${chara.rarity}">★</span>
                     <div class="requirements">
                         <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
                         <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+                    </div>
+                    <div class="unlock-action" style="margin-top:10px;">
+                        <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
+                        <div th:if="${!unlockedIds.contains(chara.id)}">
+                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), event)"
+                                    th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='虹玉'">
+                                <i class="fa-solid fa-lock-open"></i> 解放条件
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -374,70 +346,140 @@
     </div>
 
     <script>
-    // === 背景アニメーションスクリプト ===
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    const flare = document.getElementById('mouse-flare');
-    let particlesArray = [];
-    let width, height;
+    document.addEventListener("DOMContentLoaded", function() {
+      // CSRFトークンを取得
+      const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+      const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-    function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
-    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+      window.openModal = function(id, name, materials, conditions, cost, materialType, event) {
+        if (materials) materials = materials.replace(/[{}]/g, "");
+        if (conditions) conditions = conditions.replace(/[{}]/g, "");
 
-    const mouse = { x: undefined, y: undefined };
-    window.addEventListener('mousemove', (event) => {
-        mouse.x = event.x; mouse.y = event.y;
-        flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
-        particlesArray.push(new Particle(event.clientX, event.clientY));
-    });
+        document.getElementById("modalTitle").innerText = name + " の進化条件";
 
-    class Particle {
-        constructor(x, y) {
-            this.x = x || Math.random() * width; this.y = y || Math.random() * height;
-            this.size = Math.random() * 5 + 2;
-            this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2;
-            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+        // 進化素材テーブル
+        let bodyHtml = "<div class='modal-section'><h4>進化素材</h4><table class='evolution-table'>";
+        if (materials && materials.trim()) {
+          let matArray = materials.split(",");
+          matArray.forEach(m => {
+            let parts = m.trim().split("=");
+            if (parts.length === 2) {
+              bodyHtml += "<tr><th>" + parts[0].trim() + "</th><td>" + parts[1].trim() + "</td></tr>";
+            }
+          });
+        } else {
+          bodyHtml += "<tr><td colspan='2'>素材情報なし</td></tr>";
         }
-        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
-        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
-    }
+        bodyHtml += "</table></div>";
 
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < particlesArray.length; i++) {
-            particlesArray[i].update(); particlesArray[i].draw();
-            if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; }
+        // 進化条件テーブル
+        bodyHtml += "<div class='modal-section'><h4>進化条件</h4><table class='evolution-table'>";
+        if (conditions && conditions.trim()) {
+          let condArray = conditions.split(",");
+          condArray.forEach(c => {
+            let parts = c.trim().split("=");
+            if (parts.length === 2) {
+              bodyHtml += "<tr><th>" + parts[0].trim() + "</th><td>" + parts[1].trim() + "</td></tr>";
+            }
+          });
+        } else {
+          bodyHtml += "<tr><td colspan='2'>条件情報なし</td></tr>";
         }
-        requestAnimationFrame(animate);
-    }
-    animate();
+        bodyHtml += "</table></div>";
 
-    // === モーダル関連スクリプト (既存) ===
-    function openModal(name, materials, conditions) {
-      document.getElementById("modalTitle").innerText = name + " の進化条件";
-      let bodyHtml = "<h4>進化素材</h4><ul>";
-      if (materials) { materials.split(";").forEach(m => bodyHtml += "<li>" + m + "</li>"); }
-      bodyHtml += "</ul><h4>進化条件</h4><ul>";
-      if (conditions) { conditions.split(";").forEach(c => bodyHtml += "<li>" + c + "</li>"); }
-      bodyHtml += "</ul>";
-      bodyHtml += "<div style='text-align:center; margin-top:20px;'><button class='btn-confirm' onclick=\"unlockCharacter('" + name + "')\"><i class='fa-solid fa-unlock'></i> このキャラを解放する</button></div>";
-      document.getElementById("modalBody").innerHTML = bodyHtml;
-      document.getElementById("globalModal").classList.add("show");
-    }
+        // 解放ボタン
+        bodyHtml += "<div style='text-align:center; margin-top:20px;'>"
+                 + "<button class='btn-confirm' onclick=\"unlockCharacter('" + id + "','" + name + "','" + cost + "','" + materialType + "')\">"
+                 + "<i class='fa-solid fa-unlock'></i> このキャラを解放する"
+                 + "</button></div>";
 
-    function closeModal() { document.getElementById("globalModal").classList.remove("show"); }
+        document.getElementById("modalBody").innerHTML = bodyHtml;
+        
+        // ★★★ クリックされた要素の位置を取得してモーダルを配置 ★★★
+        if (event) {
+          const button = event.target.closest('.btn-confirm');
+          const card = button.closest('.character-card');
+          const cardRect = card.getBoundingClientRect();
+          const modalContent = document.querySelector('.modal-content');
+          
+          // カードの位置を基準にモーダルを配置
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+          const modalTop = cardRect.top + scrollTop - 20; // カードの少し上に表示
+          const modalLeft = 50; // 画面中央（%で指定）
+          
+          modalContent.style.top = modalTop + 'px';
+          modalContent.style.left = modalLeft + '%';
+          
+          console.log('Modal position:', {cardTop: cardRect.top, scrollTop, modalTop});
+        }
+        
+        document.getElementById("globalModal").classList.add("show");
+        // ★★★ 削除: bodyのスクロールを無効化しない ★★★
+      };
 
-    function unlockCharacter(name) {
-      alert(name + " を解放しました！（ここにサーバー連携処理を追加）");
-      closeModal();
-    }
-    
-    // モーダル外クリックで閉じる
-    window.onclick = function(event) {
-        if (event.target == document.getElementById("globalModal")) {
+      window.closeModal = function() {
+        document.getElementById("globalModal").classList.remove("show");
+        // ★★★ 削除: bodyのスクロールを再有効化（最初から無効化していないため不要） ★★★
+      };
+
+      // ✅ サーバー連携版の解放処理(CSRF対応)
+      window.unlockCharacter = function(id, name, cost, materialType) {
+        console.log("DEBUG: unlockCharacter called", {id, name, cost, materialType});
+        
+        fetch("/unlock", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken // CSRFトークンを追加
+          },
+          body: JSON.stringify({
+            characterId: id,
+            characterName: name,
+            cost: cost,
+            materialType: materialType
+          })
+        })
+        .then(response => {
+          console.log("DEBUG: Response status:", response.status);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log("DEBUG: Response data:", data);
+          if (data.success) {
+            alert(name + " を解放しました!");
             closeModal();
+            location.reload(); // 画面更新で解放済み表示に切り替え
+          } else {
+            alert("解放失敗: " + (data.message || "不明なエラー"));
+          }
+        })
+        .catch(error => {
+          console.error("解放エラー:", error);
+          alert("通信エラーが発生しました: " + error.message);
+        });
+      };
+      
+      // モーダル外クリックで閉じる
+      window.onclick = function(event) {
+        const modal = document.getElementById("globalModal");
+        if (event.target == modal) {
+          closeModal();
         }
-    }
+      }
+      
+      // ★★★ 追加: ESCキーでモーダルを閉じる ★★★
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          const modal = document.getElementById("globalModal");
+          if (modal.classList.contains('show')) {
+            closeModal();
+          }
+        }
+      });
+    });
     </script>
 </body>
 </html>

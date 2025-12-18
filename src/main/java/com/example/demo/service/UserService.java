@@ -501,5 +501,46 @@ public class UserService {
             userRepository.save(user);
         });
     }
+    @Transactional
+    public boolean consumeUserMaterialByItemId(String username, Long itemId, int cost) {
+        // ユーザーが持っている該当アイテムのレコードを全て取得
+        List<UserItem> items = userItemRepository.findAllByUser_UsernameAndItemId(username, itemId);
+        
+        int totalCount = items.size(); // 1レコード=1個なのでサイズが所持数
+        
+        System.out.println("DEBUG: consumeUserMaterialByItemId - username=" + username + ", itemId=" + itemId + ", totalCount=" + totalCount + ", cost=" + cost);
+        
+        if (totalCount < cost) {
+            System.out.println("DEBUG: 素材不足 - 必要: " + cost + ", 所持: " + totalCount);
+            return false; // 足りない
+        }
+        
+        // 必要数だけレコードを削除
+        for (int i = 0; i < cost && i < items.size(); i++) {
+            userItemRepository.delete(items.get(i));
+            System.out.println("DEBUG: 素材削除 - id=" + items.get(i).getId());
+        }
+        
+        System.out.println("DEBUG: 素材消費成功 - " + cost + "個削除しました");
+        return true;
+    }
+    @Transactional(readOnly = true)
+    public List<Long> getUnlockedCharacterIds(String username) {
+        return userRepository.findByUsername(username)
+            .map(user -> {
+                // EAGERフェッチなので即座に取得可能
+                // または、トランザクション内でLazyロードも可能
+                if (user.getUnlockedCharacters() == null) {
+                    System.out.println("DEBUG: unlockedCharacters is null for user: " + username);
+                    return new ArrayList<Long>();
+                }
+                System.out.println("DEBUG: getUnlockedCharacterIds - user: " + username + ", count: " + user.getUnlockedCharacters().size());
+                return new ArrayList<>(user.getUnlockedCharacters());
+            })
+            .orElseGet(() -> {
+                System.out.println("DEBUG: User not found: " + username);
+                return new ArrayList<>();
+            });
+    }
 
 }

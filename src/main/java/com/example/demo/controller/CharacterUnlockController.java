@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.CharacterEntity;
+import com.example.demo.entity.User;
 import com.example.demo.repository.CharacterRepository;
 import com.example.demo.service.UserService;
 
@@ -32,7 +35,6 @@ public class CharacterUnlockController {
     public ResponseEntity<Map<String, Object>> unlockCharacter(@RequestBody Map<String, Object> request,
                                                                Principal principal) {
 
-        // --- リクエスト受信ログ ---
         System.out.println("DEBUG: /unlock called with request=" + request);
 
         Long characterId = Long.valueOf(request.get("characterId").toString());
@@ -52,100 +54,420 @@ public class CharacterUnlockController {
         CharacterEntity chara = optChara.get();
         System.out.println("DEBUG: 対象キャラ=" + chara.getName());
 
-        // ===== 進化素材 & 進化条件構築 =====
-        switch (chara.getName()) {
-            case "ドラコ":
-                chara.setEvolutionMaterials(Map.ofEntries(
-                    Map.entry("紅玉", 3),
-                    Map.entry("蒼玉", 3),
-                    Map.entry("翠玉", 3),
-                    Map.entry("聖玉", 3),
-                    Map.entry("闇玉", 3)
-                ));
-                chara.setEvolutionConditions(Map.ofEntries(
-                    Map.entry("必要レベル", "10"),
-                    Map.entry("素材ランク", "R素材")
-                ));
-                break;
-
-            case "ドラコス":
-                chara.setEvolutionMaterials(Map.ofEntries(
-                    Map.entry("紅玉", 5),
-                    Map.entry("蒼玉", 5),
-                    Map.entry("翠玉", 5),
-                    Map.entry("聖玉", 5),
-                    Map.entry("闇玉", 5),
-                    Map.entry("赤の聖結晶", 3),
-                    Map.entry("青の聖結晶", 3),
-                    Map.entry("緑の聖結晶", 3),
-                    Map.entry("黄の聖結晶", 3),
-                    Map.entry("闇の聖結晶", 3)
-                ));
-                chara.setEvolutionConditions(Map.ofEntries(
-                    Map.entry("必要レベル", "20"),
-                    Map.entry("素材ランク", "R素材 + SR素材"),
-                    Map.entry("必要キャラ解放", "ドラコ")
-                ));
-                break;
-
-            case "ドラグノイド":
-                chara.setEvolutionMaterials(Map.ofEntries(
-                    Map.entry("紅玉", 7),
-                    Map.entry("蒼玉", 7),
-                    Map.entry("翠玉", 7),
-                    Map.entry("聖玉", 7),
-                    Map.entry("闇玉", 7),
-                    Map.entry("赤の聖結晶", 5),
-                    Map.entry("青の聖結晶", 5),
-                    Map.entry("緑の聖結晶", 5),
-                    Map.entry("黄の聖結晶", 5),
-                    Map.entry("闇の聖結晶", 5),
-                    Map.entry("赫焔鱗", 1)
-                ));
-                chara.setEvolutionConditions(Map.ofEntries(
-                    Map.entry("必要レベル", "30"),
-                    Map.entry("素材ランク", "R素材 + SR素材 + SSR素材"),
-                    Map.entry("属性限定", "火属性のみ"),
-                    Map.entry("必要キャラ解放", "ドラコス")
-                ));
-                break;
-
-            default:
-                chara.setEvolutionMaterials(Map.of());
-                chara.setEvolutionConditions(Map.of());
-        }
-
         // --- ユーザー情報を取得 ---
         String username = principal.getName();
-        int userLevel = userService.getUserLevel(username);
-        int userMaterialCount = userService.getUserMaterialCount(username, materialType);
-
-        System.out.println("DEBUG: user=" + username + ", level=" + userLevel + ", materialCount=" + userMaterialCount);
-
-        boolean canUnlock = (userLevel >= chara.getRequiredLevel() && userMaterialCount >= cost);
-
-        Map<String, Object> response = new HashMap<>();
-        if (canUnlock) {
-            userService.consumeUserMaterial(username, materialType, cost);
-            userService.unlockCharacterForUser(username, chara.getId());
-
-            System.out.println("DEBUG: 解放成功! user=" + username + ", charaId=" + chara.getId());
-
-            response.put("success", true);
-            response.put("message", String.format("%s を解放しました！", chara.getName()));
-        } else {
-            System.out.println("DEBUG: 解放失敗 条件不足 user=" + username + ", charaId=" + chara.getId());
-
-            response.put("success", false);
-            response.put("message", String.format(
-                "条件不足です！ %s の解放には Lv.%d 以上と素材 %d 個が必要です。",
-                chara.getName(),
-                chara.getRequiredLevel(),
-                cost
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "ユーザー情報が取得できませんでした。"
             ));
         }
 
-        return ResponseEntity.ok(response);
+        int userLevel = user.getLevel();
         
+        // ===== 進化素材 & 進化条件構築 =====
+        Map<String, Integer> evolutionMaterials = new HashMap<>();
+        Map<String, String> evolutionConditions = new HashMap<>();
+        List<String> prerequisiteCharacters = new ArrayList<>();
+        
+        // ★★★ 修正: 実際のDB登録キャラクター名に合わせる ★★★
+        switch (chara.getName()) {
+            // ===== 炎属性 =====
+            case "エンバーハート":
+                // 初期キャラは素材不要
+                evolutionConditions.put("必要レベル", "1");
+                break;
+
+            case "ドラコ":
+                evolutionMaterials.put("紅玉", 3);
+                evolutionMaterials.put("蒼玉", 3);
+                evolutionMaterials.put("翠玉", 3);
+                evolutionMaterials.put("聖玉", 3);
+                evolutionMaterials.put("闇玉", 3);
+                evolutionConditions.put("必要レベル", "10");
+                break;
+
+            case "ドラコス":
+                evolutionMaterials.put("紅玉", 5);
+                evolutionMaterials.put("蒼玉", 5);
+                evolutionMaterials.put("翠玉", 5);
+                evolutionMaterials.put("聖玉", 5);
+                evolutionMaterials.put("闇玉", 5);
+                evolutionMaterials.put("赤の聖結晶", 3);
+                evolutionMaterials.put("青の聖結晶", 3);
+                evolutionMaterials.put("緑の聖結晶", 3);
+                evolutionMaterials.put("黄の聖結晶", 3);
+                evolutionMaterials.put("紫の聖結晶", 3);
+                evolutionConditions.put("必要レベル", "20");
+                prerequisiteCharacters.add("ドラコ");
+                break;
+
+            case "ドラグノイド":
+                evolutionMaterials.put("紅玉", 7);
+                evolutionMaterials.put("蒼玉", 7);
+                evolutionMaterials.put("翠玉", 7);
+                evolutionMaterials.put("聖玉", 7);
+                evolutionMaterials.put("闇玉", 7);
+                evolutionMaterials.put("赤の聖結晶", 5);
+                evolutionMaterials.put("青の聖結晶", 5);
+                evolutionMaterials.put("緑の聖結晶", 5);
+                evolutionMaterials.put("黄の聖結晶", 5);
+                evolutionMaterials.put("紫の聖結晶", 5);
+                evolutionMaterials.put("赫焔鱗", 1);
+                evolutionConditions.put("必要レベル", "30");
+                prerequisiteCharacters.add("ドラコス");
+                break;
+
+            // ===== 水属性 =====
+            case "ルーナドロップ":
+                evolutionMaterials.put("紅玉", 3);
+                evolutionMaterials.put("蒼玉", 3);
+                evolutionMaterials.put("翠玉", 3);
+                evolutionMaterials.put("聖玉", 3);
+                evolutionMaterials.put("闇玉", 3);
+                evolutionConditions.put("必要レベル", "40");
+                prerequisiteCharacters.add("ドラグノイド");
+                break;
+
+            case "ドリー":
+                evolutionMaterials.put("紅玉", 5);
+                evolutionMaterials.put("蒼玉", 5);
+                evolutionMaterials.put("翠玉", 5);
+                evolutionMaterials.put("聖玉", 5);
+                evolutionMaterials.put("闇玉", 5);
+                evolutionMaterials.put("赤の聖結晶", 3);
+                evolutionMaterials.put("青の聖結晶", 3);
+                evolutionMaterials.put("緑の聖結晶", 3);
+                evolutionMaterials.put("黄の聖結晶", 3);
+                evolutionMaterials.put("紫の聖結晶", 3);
+                evolutionConditions.put("必要レベル", "50");
+                prerequisiteCharacters.add("ルーナドロップ");
+                break;
+
+            case "ドルフィ":
+                evolutionMaterials.put("紅玉", 7);
+                evolutionMaterials.put("蒼玉", 7);
+                evolutionMaterials.put("翠玉", 7);
+                evolutionMaterials.put("聖玉", 7);
+                evolutionMaterials.put("闇玉", 7);
+                evolutionMaterials.put("赤の聖結晶", 5);
+                evolutionMaterials.put("青の聖結晶", 5);
+                evolutionMaterials.put("緑の聖結晶", 5);
+                evolutionMaterials.put("黄の聖結晶", 5);
+                evolutionMaterials.put("紫の聖結晶", 5);
+                evolutionMaterials.put("氷華の杖", 1);
+                evolutionConditions.put("必要レベル", "60");
+                prerequisiteCharacters.add("ドリー");
+                break;
+
+            case "ドルフィナス":
+                evolutionMaterials.put("紅玉", 7);
+                evolutionMaterials.put("蒼玉", 7);
+                evolutionMaterials.put("翠玉", 7);
+                evolutionMaterials.put("聖玉", 7);
+                evolutionMaterials.put("闇玉", 7);
+                evolutionMaterials.put("赤の聖結晶", 5);
+                evolutionMaterials.put("青の聖結晶", 5);
+                evolutionMaterials.put("緑の聖結晶", 5);
+                evolutionMaterials.put("黄の聖結晶", 5);
+                evolutionMaterials.put("紫の聖結晶", 5);
+                evolutionMaterials.put("氷華の杖", 2);
+                evolutionConditions.put("必要レベル", "70");
+                prerequisiteCharacters.add("ドルフィ");
+                break;
+
+            // ===== 草属性 =====
+            case "フォリアン":
+                evolutionMaterials.put("紅玉", 3);
+                evolutionMaterials.put("蒼玉", 3);
+                evolutionMaterials.put("翠玉", 3);
+                evolutionMaterials.put("聖玉", 3);
+                evolutionMaterials.put("闇玉", 3);
+                evolutionConditions.put("必要レベル", "80");
+                prerequisiteCharacters.add("ドルフィナス");
+                break;
+
+            case "シル":
+                evolutionMaterials.put("紅玉", 5);
+                evolutionMaterials.put("蒼玉", 5);
+                evolutionMaterials.put("翠玉", 5);
+                evolutionMaterials.put("聖玉", 5);
+                evolutionMaterials.put("闇玉", 5);
+                evolutionMaterials.put("赤の聖結晶", 3);
+                evolutionMaterials.put("青の聖結晶", 3);
+                evolutionMaterials.put("緑の聖結晶", 3);
+                evolutionMaterials.put("黄の聖結晶", 3);
+                evolutionMaterials.put("紫の聖結晶", 3);
+                evolutionConditions.put("必要レベル", "90");
+                prerequisiteCharacters.add("フォリアン");
+                break;
+
+            case "シルファ":
+                evolutionMaterials.put("紅玉", 7);
+                evolutionMaterials.put("蒼玉", 7);
+                evolutionMaterials.put("翠玉", 7);
+                evolutionMaterials.put("聖玉", 7);
+                evolutionMaterials.put("闇玉", 7);
+                evolutionMaterials.put("赤の聖結晶", 5);
+                evolutionMaterials.put("青の聖結晶", 5);
+                evolutionMaterials.put("緑の聖結晶", 5);
+                evolutionMaterials.put("黄の聖結晶", 5);
+                evolutionMaterials.put("紫の聖結晶", 5);
+                evolutionMaterials.put("緑晶灯", 1);
+                evolutionConditions.put("必要レベル", "100");
+                prerequisiteCharacters.add("シル");
+                break;
+
+            case "シルフィナ":
+                evolutionMaterials.put("紅玉", 7);
+                evolutionMaterials.put("蒼玉", 7);
+                evolutionMaterials.put("翠玉", 7);
+                evolutionMaterials.put("聖玉", 7);
+                evolutionMaterials.put("闇玉", 7);
+                evolutionMaterials.put("赤の聖結晶", 5);
+                evolutionMaterials.put("青の聖結晶", 5);
+                evolutionMaterials.put("緑の聖結晶", 5);
+                evolutionMaterials.put("黄の聖結晶", 5);
+                evolutionMaterials.put("紫の聖結晶", 5);
+                evolutionMaterials.put("緑晶灯", 2);
+                evolutionConditions.put("必要レベル", "110");
+                prerequisiteCharacters.add("シルファ");
+                break;
+
+            // ===== 光属性 =====
+            case "ハローネスト":
+                evolutionMaterials.put("紅玉", 3);
+                evolutionMaterials.put("蒼玉", 3);
+                evolutionMaterials.put("翠玉", 3);
+                evolutionMaterials.put("聖玉", 3);
+                evolutionMaterials.put("闇玉", 3);
+                evolutionConditions.put("必要レベル", "120");
+                prerequisiteCharacters.add("シルフィナ");
+                break;
+
+            case "メリー":
+                evolutionMaterials.put("紅玉", 5);
+                evolutionMaterials.put("蒼玉", 5);
+                evolutionMaterials.put("翠玉", 5);
+                evolutionMaterials.put("聖玉", 5);
+                evolutionMaterials.put("闇玉", 5);
+                evolutionMaterials.put("赤の聖結晶", 3);
+                evolutionMaterials.put("青の聖結晶", 3);
+                evolutionMaterials.put("緑の聖結晶", 3);
+                evolutionMaterials.put("黄の聖結晶", 3);
+                evolutionMaterials.put("紫の聖結晶", 3);
+                evolutionConditions.put("必要レベル", "130");
+                prerequisiteCharacters.add("ハローネスト");
+                break;
+
+            case "メリル":
+                evolutionMaterials.put("紅玉", 7);
+                evolutionMaterials.put("蒼玉", 7);
+                evolutionMaterials.put("翠玉", 7);
+                evolutionMaterials.put("聖玉", 7);
+                evolutionMaterials.put("闇玉", 7);
+                evolutionMaterials.put("赤の聖結晶", 5);
+                evolutionMaterials.put("青の聖結晶", 5);
+                evolutionMaterials.put("緑の聖結晶", 5);
+                evolutionMaterials.put("黄の聖結晶", 5);
+                evolutionMaterials.put("紫の聖結晶", 5);
+                evolutionMaterials.put("夢紡ぎの枕", 1);
+                evolutionConditions.put("必要レベル", "140");
+                prerequisiteCharacters.add("メリー");
+                break;
+
+            case "メリノア":
+                evolutionMaterials.put("紅玉", 7);
+                evolutionMaterials.put("蒼玉", 7);
+                evolutionMaterials.put("翠玉", 7);
+                evolutionMaterials.put("聖玉", 7);
+                evolutionMaterials.put("闇玉", 7);
+                evolutionMaterials.put("赤の聖結晶", 5);
+                evolutionMaterials.put("青の聖結晶", 5);
+                evolutionMaterials.put("緑の聖結晶", 5);
+                evolutionMaterials.put("黄の聖結晶", 5);
+                evolutionMaterials.put("紫の聖結晶", 5);
+                evolutionMaterials.put("夢紡ぎの枕", 2);
+                evolutionConditions.put("必要レベル", "150");
+                prerequisiteCharacters.add("メリル");
+                break;
+
+            // ===== 闇属性 =====
+            case "ネビュリス":
+                evolutionMaterials.put("紅玉", 3);
+                evolutionMaterials.put("蒼玉", 3);
+                evolutionMaterials.put("翠玉", 3);
+                evolutionMaterials.put("聖玉", 3);
+                evolutionMaterials.put("闇玉", 3);
+                evolutionConditions.put("必要レベル", "160");
+                prerequisiteCharacters.add("メリノア");
+                break;
+
+            case "ロービ":
+                evolutionMaterials.put("紅玉", 5);
+                evolutionMaterials.put("蒼玉", 5);
+                evolutionMaterials.put("翠玉", 5);
+                evolutionMaterials.put("聖玉", 5);
+                evolutionMaterials.put("闇玉", 5);
+                evolutionMaterials.put("赤の聖結晶", 3);
+                evolutionMaterials.put("青の聖結晶", 3);
+                evolutionMaterials.put("緑の聖結晶", 3);
+                evolutionMaterials.put("黄の聖結晶", 3);
+                evolutionMaterials.put("紫の聖結晶", 3);
+                evolutionConditions.put("必要レベル", "170");
+                prerequisiteCharacters.add("ネビュリス");
+                break;
+
+            case "ローバス":
+                evolutionMaterials.put("紅玉", 7);
+                evolutionMaterials.put("蒼玉", 7);
+                evolutionMaterials.put("翠玉", 7);
+                evolutionMaterials.put("聖玉", 7);
+                evolutionMaterials.put("闇玉", 7);
+                evolutionMaterials.put("赤の聖結晶", 5);
+                evolutionMaterials.put("青の聖結晶", 5);
+                evolutionMaterials.put("緑の聖結晶", 5);
+                evolutionMaterials.put("黄の聖結晶", 5);
+                evolutionMaterials.put("紫の聖結晶", 5);
+                evolutionMaterials.put("月詠みの杖", 1);
+                evolutionConditions.put("必要レベル", "180");
+                prerequisiteCharacters.add("ロービ");
+                break;
+
+            case "ロービアス":
+                evolutionMaterials.put("紅玉", 7);
+                evolutionMaterials.put("蒼玉", 7);
+                evolutionMaterials.put("翠玉", 7);
+                evolutionMaterials.put("聖玉", 7);
+                evolutionMaterials.put("闇玉", 7);
+                evolutionMaterials.put("赤の聖結晶", 5);
+                evolutionMaterials.put("青の聖結晶", 5);
+                evolutionMaterials.put("緑の聖結晶", 5);
+                evolutionMaterials.put("黄の聖結晶", 5);
+                evolutionMaterials.put("紫の聖結晶", 5);
+                evolutionMaterials.put("月詠みの杖", 2);
+                evolutionConditions.put("必要レベル", "190");
+                prerequisiteCharacters.add("ローバス");
+                break;
+
+            // ===== シークレット属性 =====
+            case "シークレット":
+                evolutionMaterials.put("虹玉", 15);
+                evolutionMaterials.put("紅玉", 10);
+                evolutionMaterials.put("蒼玉", 10);
+                evolutionMaterials.put("翠玉", 10);
+                evolutionMaterials.put("聖玉", 10);
+                evolutionMaterials.put("闇玉", 10);
+                evolutionMaterials.put("赤の聖結晶", 5);
+                evolutionMaterials.put("青の聖結晶", 5);
+                evolutionMaterials.put("緑の聖結晶", 5);
+                evolutionMaterials.put("黄の聖結晶", 5);
+                evolutionMaterials.put("闇の聖結晶", 5);
+                evolutionConditions.put("必要レベル", "250");
+                break;
+
+            default:
+                break;
+        }
+        
+        chara.setEvolutionMaterials(evolutionMaterials);
+        chara.setEvolutionConditions(evolutionConditions);
+
+        // ===== 解放条件チェック =====
+        List<String> failureReasons = new ArrayList<>();
+        
+        // 1. レベルチェック
+        if (userLevel < chara.getRequiredLevel()) {
+            failureReasons.add(String.format("レベル不足 (必要: Lv.%d, 現在: Lv.%d)", 
+                chara.getRequiredLevel(), userLevel));
+        }
+        
+        // 2. 素材チェック（全ての必要素材を確認）
+        for (Map.Entry<String, Integer> entry : evolutionMaterials.entrySet()) {
+            String matName = entry.getKey();
+            int required = entry.getValue();
+            Long matItemId = getMaterialItemId(matName);
+            int userCount = userService.getUserMaterialCount(username, matItemId);
+            
+            System.out.println("DEBUG: 素材チェック - " + matName + " 必要:" + required + " 所持:" + userCount);
+            
+            if (userCount < required) {
+                failureReasons.add(String.format("%s が不足 (必要: %d個, 所持: %d個)", 
+                    matName, required, userCount));
+            }
+        }
+        
+        // 3. 前提キャラクター解放チェック
+        for (String prereqName : prerequisiteCharacters) {
+            Long prereqId = getCharacterIdByName(prereqName);
+            if (prereqId == null || !user.hasUnlockedCharacter(prereqId)) {
+                failureReasons.add(String.format("前提キャラ「%s」が未解放", prereqName));
+            }
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        
+        if (failureReasons.isEmpty()) {
+            // ===== 解放成功 =====
+            // 全ての素材を消費
+            for (Map.Entry<String, Integer> entry : evolutionMaterials.entrySet()) {
+                String matName = entry.getKey();
+                int required = entry.getValue();
+                Long matItemId = getMaterialItemId(matName);
+                userService.consumeUserMaterialByItemId(username, matItemId, required);
+                System.out.println("DEBUG: 素材消費 - " + matName + " x" + required);
+            }
+            
+            // キャラクター解放
+            userService.unlockCharacterForUser(username, chara.getId());
+            System.out.println("DEBUG: 解放成功! user=" + username + ", charaId=" + chara.getId());
+
+            response.put("success", true);
+            response.put("message", String.format("%s を解放しました!", chara.getName()));
+        } else {
+            // ===== 解放失敗 =====
+            System.out.println("DEBUG: 解放失敗 条件不足 user=" + username + ", charaId=" + chara.getId());
+            
+            String errorMessage = "解放失敗: " + chara.getName() + " の解放には以下が必要です。\n";
+            for (String reason : failureReasons) {
+                errorMessage += "• " + reason + "\n";
+            }
+            
+            response.put("success", false);
+            response.put("message", errorMessage.trim());
+        }
+
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * 素材タイプ名からitem_idを取得するヘルパーメソッド
+     */
+    private Long getMaterialItemId(String materialType) {
+        switch (materialType) {
+            case "紅玉": return 1L;
+            case "蒼玉": return 2L;
+            case "翠玉": return 3L;
+            case "聖玉": return 4L;
+            case "闇玉": return 5L;
+            case "赤の聖結晶": return 6L;
+            case "青の聖結晶": return 7L;
+            case "緑の聖結晶": return 8L;
+            case "黄の聖結晶": return 9L;
+            case "闇の聖結晶": return 10L;
+            case "赫焔鱗": return 11L;
+            default: return 1L;
+        }
+    }
+    
+    /**
+     * キャラクター名からIDを取得するヘルパーメソッド
+     */
+    private Long getCharacterIdByName(String name) {
+        Optional<CharacterEntity> chara = repository.findAll().stream()
+            .filter(c -> c.getName().equals(name))
+            .findFirst();
+        return chara.map(CharacterEntity::getId).orElse(null);
     }
 }

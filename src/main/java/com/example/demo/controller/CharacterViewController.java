@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,14 +19,14 @@ public class CharacterViewController {
 
     private final CharacterRepository repository;
     private final UserService userService;
-    private final CharacterService characterService; // ✅ 追加
+    private final CharacterService characterService;
 
     public CharacterViewController(CharacterRepository repository,
                                    UserService userService,
                                    CharacterService characterService) {
         this.repository = repository;
         this.userService = userService;
-        this.characterService = characterService; // ✅ 追加
+        this.characterService = characterService;
     }
 
     @GetMapping("/characters")
@@ -71,10 +72,10 @@ public class CharacterViewController {
                 .filter(c -> "light".equals(c.getAttribute()))
                 .toList());
 
-        // 闇属性は4体まで表示（シークレット除外）
+        // 闇属性は4体まで表示(シークレット除外)
         model.addAttribute("darkChars", characters.stream()
                 .filter(c -> "dark".equals(c.getAttribute()))
-                .filter(c -> !"シークレット".equals(c.getName())) // 名前がシークレットなら除外
+                .filter(c -> !"シークレット".equals(c.getName()))
                 .limit(4)
                 .toList());
 
@@ -83,15 +84,23 @@ public class CharacterViewController {
                 .filter(c -> "secret".equals(c.getAttribute()) || "シークレット".equals(c.getName()))
                 .toList());
 
-        // --- ユーザーデータをDBから取得 ---
+        // --- ★★★ 修正: UserServiceの専用メソッドで安全に取得 ★★★ ---
         int userLevel = 1;
+        List<Long> unlockedIds = new ArrayList<>();
+        
         if (principal != null) {
             String username = principal.getName();
-            userLevel = userService.getUserLevel(username); // DBからレベル取得
+            userLevel = userService.getUserLevel(username);
+            
+            // ★★★ @Transactional付きメソッドで安全に取得 ★★★
+            unlockedIds = userService.getUnlockedCharacterIds(username);
+            System.out.println("DEBUG: User=" + username + ", Level=" + userLevel + ", UnlockedCharacters=" + unlockedIds);
         }
+        
         model.addAttribute("userLevel", userLevel);
+        model.addAttribute("unlockedIds", unlockedIds);
 
-        // 素材や解放済みキャラは仮のまま（後でDB連動に変更可能）
+        // 素材は仮のまま(後でDB連動に変更可能)
         model.addAttribute("userMaterials", Map.of(
                 "fire", 20,
                 "water", 15,
@@ -100,7 +109,6 @@ public class CharacterViewController {
                 "dark", 8,
                 "secret", 1
         ));
-        model.addAttribute("unlockedIds", List.of(0L, 10L, 40L));
 
         // CharactersUnlock.html を返す
         return "characters/menu/CharactersUnlock";
