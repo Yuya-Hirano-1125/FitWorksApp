@@ -10,19 +10,10 @@
     <link rel="stylesheet" th:href="@{/css/daily-mission.css}">
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* 共通背景デザイン */
         :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
         body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
-        
-        /* 背景アニメーション */
-        .interactive-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
-        }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        
-        /* オーブ & 雲 */
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
@@ -31,33 +22,25 @@
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
         @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
-        
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
 
-        /* メインコンテナ（ガラスモーフィズム） */
         .main-container {
             max-width: 800px; width: 92%; margin: 40px auto; padding: 40px;
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 45px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px; border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
         }
-        
-        /* 既存のスタイル調整 */
-        .mission-card {
-            background: rgba(255, 255, 255, 0.85); /* 半透明に調整 */
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: transform 0.2s;
+        .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
+        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 42px; height: 42px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.2rem; flex-shrink: 0;
         }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+        .mission-card { background: rgba(255, 255, 255, 0.85); border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; padding: 20px; display: flex; align-items: center; gap: 15px; transition: transform 0.2s; }
         .mission-card:hover { transform: translateY(-3px); }
     </style>
 </head>
@@ -69,100 +52,56 @@
         <div class="bg-cloud cloud-1"></div>
         <div class="bg-cloud cloud-2"></div>
     </div>
-
-<div class="main-container">
-    
-    <div th:replace="~{fragments/header :: header}"></div>
-
-    <h1 style="margin-bottom: 5px; text-align: center;">
-        <i class="header-icon fa-solid fa-list-check"></i>今日のミッション
-    </h1>
-    <p class="sub-heading" style="text-align: center; color: #666;">達成して、ご褒美をもらいましょう！毎日午前4時に更新されます。</p>
-    
-    <div class="mission-list">
-        <div class="mission-card" th:each="mission : ${missions}">
-            <div class="mission-icon">
-                <i class="fa-solid fa-running" th:if="${mission.missionType == 'TRAINING_LOG'}"></i>
-                <i class="fa-solid fa-dumbbell" th:if="${mission.missionType == 'COMMUNITY_POST'}"></i>
-                <i class="fa-solid fa-robot" th:if="${mission.missionType == 'AI_COACH'}"></i>
-            </div>
-            <div class="mission-details">
-                <div class="mission-header">
-                    <span class="mission-title" th:text="${mission.description}"></span>
-                    <span class="mission-reward">🎁 <span th:text="${mission.rewardExp}"></span> XP</span>
+    <div class="main-container">
+        <div class="page-header-container">
+            <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <h1 class="page-title"><i class="header-icon fa-solid fa-list-check"></i>今日のミッション</h1>
+        </div>
+        <p class="sub-heading" style="text-align: center; color: #666;">達成して、ご褒美をもらいましょう！毎日午前4時に更新されます。</p>
+        <div class="mission-list">
+            <div class="mission-card" th:each="mission : ${missions}">
+                <div class="mission-icon">
+                    <i class="fa-solid fa-running" th:if="${mission.missionType == 'TRAINING_LOG'}"></i>
+                    <i class="fa-solid fa-dumbbell" th:if="${mission.missionType == 'COMMUNITY_POST'}"></i>
+                    <i class="fa-solid fa-robot" th:if="${mission.missionType == 'AI_COACH'}"></i>
                 </div>
-                <div class="mission-progress-container">
-                    <div class="progress-bar-wrap">
-                        <div class="progress-bar"
-                             th:style="|width:${(mission.currentCount * 100) / mission.requiredCount}%|">
-                        </div>
+                <div class="mission-details">
+                    <div class="mission-header">
+                        <span class="mission-title" th:text="${mission.description}"></span>
+                        <span class="mission-reward">🎁 <span th:text="${mission.rewardExp}"></span> XP</span>
                     </div>
-                    <span class="progress-text"
-                          th:text="|${(mission.currentCount * 100) / mission.requiredCount}% (${mission.currentCount}/${mission.requiredCount})|">
-                    </span>
+                    <div class="mission-progress-container">
+                        <div class="progress-bar-wrap">
+                            <div class="progress-bar" th:style="|width:${(mission.currentCount * 100) / mission.requiredCount}%|"></div>
+                        </div>
+                        <span class="progress-text" th:text="|${(mission.currentCount * 100) / mission.requiredCount}% (${mission.currentCount}/${mission.requiredCount})|"></span>
+                    </div>
                 </div>
+                <form th:action="@{/daily-mission/claim/{id}(id=${mission.id})}" method="post">
+                    <button th:if="${!mission.completed and mission.missionType == 'TRAINING_LOG'}" type="button" class="button mission-cta-button" onclick="window.location.href='/training';">挑戦中</button>
+                    <button th:if="${!mission.completed and mission.missionType == 'COMMUNITY_POST'}" type="button" class="button mission-cta-button" onclick="window.location.href='/community';">挑戦中</button>
+                    <button th:if="${!mission.completed and mission.missionType == 'AI_COACH'}" type="button" class="button mission-cta-button" onclick="window.location.href='/ai-coach';">挑戦中</button>
+                    <button th:if="${mission.completed and !mission.rewardClaimed}" type="submit" class="button mission-cta-button" style="background-color: #ff9800; color: white;">報酬を受け取る</button>
+                    <p th:if="${mission.rewardClaimed}" style="font-size: 0.8rem; color: #888; font-weight: bold;">受け取り済み</p>
+                </form>
             </div>
-            
-            <form th:action="@{/daily-mission/claim/{id}(id=${mission.id})}" method="post">
-                <button th:if="${!mission.completed and mission.missionType == 'TRAINING_LOG'}"
-                        type="button" class="button mission-cta-button"
-                        th:onclick="|window.location.href='/training';|">
-                    挑戦中
-                </button>
-
-                <button th:if="${!mission.completed and mission.missionType == 'COMMUNITY_POST'}"
-                        type="button" class="button mission-cta-button"
-                        th:onclick="|window.location.href='/community';|">
-                    挑戦中
-                </button>
-
-                <button th:if="${!mission.completed and mission.missionType == 'AI_COACH'}"
-                        type="button" class="button mission-cta-button"
-                        th:onclick="|window.location.href='/ai-coach';|">
-                    挑戦中
-                </button>
-
-                <button th:if="${mission.completed and !mission.rewardClaimed}"
-                        type="submit" class="button mission-cta-button" style="background-color: #ff9800; color: white;">
-                    報酬を受け取る
-                </button>
-
-                <p th:if="${mission.rewardClaimed}" style="font-size: 0.8rem; color: #888; font-weight: bold;">受け取り済み</p>
-            </form>
         </div>
     </div>
-    
-    <div style="margin-top: 30px; text-align: center;">
-        <a th:href="@{/home}" class="button secondary">
-            <i class="fa-solid fa-house"></i>
-            <span>ホームに戻る</span>
-        </a>
-    </div>
-
-    <div th:replace="~{fragments/footer :: footer}"></div>
-</div>
-
-<script>
-    // 背景アニメーション
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let particlesArray = [];
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    const mouse = { x: undefined, y: undefined };
-    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
-    class Particle {
-        constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
-        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
-        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
-    }
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } }
-        requestAnimationFrame(animate);
-    }
-    animate();
-</script>
+    <script>
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+        class Particle {
+            constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+        animate();
+    </script>
 </body>
 </html>
