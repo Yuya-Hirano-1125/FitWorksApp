@@ -77,6 +77,17 @@
         
         .back-nav { display: inline-flex; align-items: center; color: #666; text-decoration: none; font-weight: 700; transition: color 0.2s; }
         .back-nav:hover { color: var(--primary-color); }
+
+        /* ホームボタンのスタイル（追加） */
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+            position: absolute; left: 0; top: 0;
+            z-index: 20;
+        }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
     </style>
 </head>
 <body>
@@ -91,8 +102,13 @@
     <div class="main-container">
         <div th:replace="~{fragments/header :: header}"></div>
 
-        <h1 class="page-title"><i class="fa-solid fa-prescription-bottle-medical"></i> サプリメントガイド</h1>
-        <p class="page-subtitle">効果を最大化する飲み方＆タイミング</p>
+        <div style="position: relative;">
+            <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <h1 class="page-title"><i class="fa-solid fa-prescription-bottle-medical"></i> サプリメントガイド</h1>
+            <p class="page-subtitle">効果を最大化する飲み方＆タイミング</p>
+        </div>
         
         <div class="search-container">
             <input type="text" id="suppleSearch" class="search-box" placeholder="サプリメントを検索 (例: プロテイン, BCAA)..." onkeyup="filterSupplements()">
@@ -211,9 +227,6 @@
             該当するサプリメントが見つかりませんでした。
         </div>
 
-        <div style="margin-top: 40px; text-align: center;">
-            <a th:href="@{/home}" class="button secondary"><i class="fa-solid fa-house"></i> ホームに戻る</a>
-        </div>
         
         <div th:replace="~{fragments/footer :: footer}"></div>
     </div>
