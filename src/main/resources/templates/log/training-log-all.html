@@ -17,6 +17,7 @@
            ========================================================================== */
         body {
             margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; overflow-x: hidden; font-family: 'Noto Sans JP', sans-serif;
+            color: #333; /* 全体の文字色を濃く */
         }
         .interactive-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
@@ -49,14 +50,13 @@
         }
         .mega-sparkle { position: fixed; pointer-events: none; z-index: 99999; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); }
 
-        /* Existing Styles */
+        /* Container & Layout */
         .log-list-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             position: relative;
             z-index: 10;
-            /* 修正: 上部パディングを追加 */
             padding-top: 110px;
         }
         
@@ -75,7 +75,7 @@
             justify-content: center;
             align-items: center;
             text-decoration: none;
-            color: #555;
+            color: #007bff; /* 青色統一 */
             font-size: 2.2rem;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             z-index: 1000;
@@ -83,8 +83,8 @@
         }
         .back-arrow-button:hover {
             transform: scale(1.1);
-            background: #fff;
-            color: #4facfe;
+            background: #007bff;
+            color: #fff;
             box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
         }
 
@@ -93,9 +93,9 @@
             .log-list-container { padding-top: 100px !important; }
         }
 
-        /* 少し背景が透けるように調整 */
+        /* チャート・カード共通 */
         .chart-container, .record-card {
-            background: rgba(255, 255, 255, 0.9); 
+            background: rgba(255, 255, 255, 0.95); 
             backdrop-filter: blur(10px);
         }
 
@@ -116,23 +116,44 @@
             font-size: 0.9rem;
             min-width: 80px;
         }
+        
+        /* レコードカードのスタイル修正 */
         .record-card {
             border-radius: 10px;
             padding: 15px 20px;
             margin-bottom: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-left: 5px solid #ccc;
+            border-left: 6px solid #ccc;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
         }
-        .record-card.type-weight { border-left-color: var(--primary-color, #4facfe); }
-        .record-card.type-cardio { border-left-color: var(--secondary-color, #ff9966); }
+        /* 青色統一 */
+        .record-card.type-weight { border-left-color: #007bff; }
+        .record-card.type-cardio { border-left-color: #17a2b8; }
         
-        .record-date { font-family: 'Poppins', sans-serif; font-weight: bold; color: #555; font-size: 0.9rem; margin-bottom: 5px; }
-        .record-title { font-size: 1.1rem; font-weight: bold; color: #333; }
-        .record-details { color: #666; font-size: 0.95rem; margin-top: 3px; }
+        .record-date { 
+            font-family: 'Poppins', sans-serif; 
+            font-weight: bold; 
+            color: #333; /* 黒く */
+            font-size: 0.95rem; 
+            margin-bottom: 5px; 
+        }
+        
+        .record-title { 
+            font-size: 1.2rem; 
+            font-weight: 800; 
+            color: #007bff; /* タイトルは青 */
+            margin-bottom: 5px;
+        }
+        
+        .record-details { 
+            color: #333; /* 詳細も黒く */
+            font-size: 1.05rem; 
+            font-weight: 500;
+            margin-top: 3px; 
+        }
         
         .no-records {
             text-align: center;
@@ -144,38 +165,71 @@
         }
         .back-btn-container { margin-bottom: 20px; }
         .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; color: white; margin-left: 8px; vertical-align: middle; }
-        .badge-weight { background-color: var(--primary-color, #4facfe); color: #fff;}
-        .badge-cardio { background-color: var(--secondary-color, #ff9966); }
+        .badge-weight { background-color: #007bff; color: #fff;}
+        .badge-cardio { background-color: #17a2b8; }
         
-        h1 { text-shadow: 0 2px 4px rgba(255,255,255,0.5); }
+        h1 { 
+            text-shadow: 0 2px 4px rgba(255,255,255,0.5); 
+            color: #333; /* タイトル黒 */
+        }
+        .header-icon { color: #007bff; margin-right: 10px; }
         
-        /* フィルターフォーム */
+        /* ▼ フィルターフォーム（改良版） ▼ */
         .filter-form {
-            background: rgba(255,255,255,0.8);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        
+        .filter-select {
+            width: 100%;
+            max-width: 400px;
+            font-size: 1.3rem; /* 文字を大きく */
+            font-weight: 600;
+            color: #333;
+            padding: 14px 40px 14px 20px; /* 余白をたっぷりと */
+            border-radius: 50px; /* 丸く */
+            border: 2px solid #b3d7ff; /* 淡い青枠 */
+            background-color: #fff;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* カスタム矢印 (青) */
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007bff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+            background-size: 1.2em;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .filter-select {
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 2px solid #ddd;
-            font-size: 1rem;
-            outline: none;
-            cursor: pointer;
-            transition: all 0.3s;
+        
+        .filter-select:hover {
+            border-color: #4facfe;
+            box-shadow: 0 6px 12px rgba(79, 172, 254, 0.2);
+            transform: translateY(-2px);
         }
-        .filter-select:focus { border-color: #4facfe; }
+        
+        .filter-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
+        }
+        /* ▲ フィルターフォーム改良ここまで ▲ */
 
         @media (max-width: 600px) {
             .record-card { flex-direction: column; align-items: flex-start; }
             .record-right { margin-top: 10px; width: 100%; text-align: right; font-size: 0.8rem; color: #aaa; }
-            .filter-form { flex-direction: column; align-items: stretch; }
+            .filter-form { flex-direction: column; align-items: stretch; padding: 15px; }
+            .filter-select { font-size: 1.1rem; padding: 12px 35px 12px 15px; }
         }
     </style>
 </head>
@@ -200,9 +254,9 @@
     <h1><i class="fa-solid fa-list-ul header-icon"></i>全トレーニング記録</h1>
     
     <div class="filter-form">
-        <form th:action="@{/training-log/all}" method="get" style="width: 100%; display: flex; gap: 10px; justify-content: center;">
+        <form th:action="@{/training-log/all}" method="get" style="width: 100%; display: flex; justify-content: center;">
             <input type="hidden" name="period" th:value="${period}">
-            <select name="part" class="filter-select" onchange="this.form.submit()" style="flex: 1; max-width: 300px;">
+            <select name="part" class="filter-select" onchange="this.form.submit()">
                 <option value="">🕒 時系列 (すべて表示)</option>
                 <option th:each="p : ${allParts}" 
                         th:value="${p}" 

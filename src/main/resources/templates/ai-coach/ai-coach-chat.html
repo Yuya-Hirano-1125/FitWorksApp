@@ -37,53 +37,176 @@
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
             display: flex; flex-direction: column;
-            /* チャット画面なので高さを確保 */
             height: 90vh;
         }
 
-        /* ヘッダー修正 */
+        /* ヘッダー */
         .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 2px solid rgba(255, 255, 255, 0.3); padding-bottom: 15px; gap: 15px; }
-        .page-title { color: #333; font-size: 2rem; margin: 0; flex-grow: 1; text-align: center; }
+        .page-title { color: #333; font-size: 2.5rem; margin: 0; flex-grow: 1; text-align: center; }
+        
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
-            width: 50px; height: 50px; background-color: white; color: #007bff;
+            width: 75px; height: 75px; 
+            background-color: white; color: #007bff;
             border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
-            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+            transition: all 0.3s ease; 
+            font-size: 2.4rem; 
+            flex-shrink: 0;
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
-        /* チャット画面特有の調整 */
+        /* 説明文 */
+        .intro-text {
+            text-align: center; color: #444; margin-bottom: 25px;
+            font-size: 1.3rem; 
+            font-weight: 600; 
+            line-height: 1.5;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+        }
+
+        /* チャット画面コンテナ - 白背景 + 青い枠線 */
         .chat-container {
             width: 100%; max-width: 100%;
-            background: rgba(30, 30, 30, 0.85); /* 半透明に */
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
             border-radius: 15px;
             display: flex; flex-direction: column;
-            flex-grow: 1; /* 高さいっぱい */
+            flex-grow: 1; 
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            border: 3px solid #2575fc; 
         }
-        .chat-window { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        .message { max-width: 80%; padding: 12px 18px; border-radius: 20px; line-height: 1.5; font-size: 0.95rem; }
-        .message.bot { align-self: flex-start; background: #333; color: #ddd; border-bottom-left-radius: 2px; border-top-left-radius: 5px; }
-        .message.user { align-self: flex-end; background: linear-gradient(135deg, #6a11cb, #2575fc); color: white; border-bottom-right-radius: 2px; }
-        .input-area { padding: 15px; background: rgba(37, 37, 37, 0.9); display: flex; gap: 10px; border-top: 1px solid #444; }
-        .input-area input { flex-grow: 1; padding: 12px; border-radius: 25px; border: 1px solid #555; background: #333; color: white; outline: none; }
-        .input-area input:focus { border-color: #2575fc; }
-        .input-area button { background: #2575fc; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; }
+        .chat-window { flex-grow: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* ========================================
+           吹き出し (Speech Bubble) - コミック風スタイル
+           ========================================
+        */
+        .message { 
+            position: relative;
+            max-width: 80%; 
+            padding: 18px 25px; 
+            border-radius: 25px; /* 少し丸みを抑えて吹き出し感 */
+            line-height: 1.6; 
+            font-size: 1.35rem; 
+            font-weight: 600; /* 文字くっきり */
+            /* ★ 黒い縁取り ★ */
+            border: 3px solid #000; 
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.1); /* 立体感を出す影 */
+        }
+
+        /* --- Botの吹き出し（薄い水色） --- */
+        .message.bot { 
+            align-self: flex-start; 
+            background: #e1f5fe; 
+            color: #333; 
+            margin-left: 25px; /* しっぽのスペース確保 */
+        }
+        
+        /* Botのしっぽ：黒い枠部分 */
+        .message.bot::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: -23px; /* 枠線の太さ(3px) + サイズ分調整 */
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 20px solid #000; /* 黒い三角形 */
+        }
+        /* Botのしっぽ：中身の色部分 */
+        .message.bot::after {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: -17px; /* 黒枠より少し右にずらす */
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 20px solid #e1f5fe; /* 背景色と同じ三角形 */
+        }
+
+        /* --- Userの吹き出し（水色） --- */
+        .message.user { 
+            align-self: flex-end; 
+            background: #4fc3f7; 
+            color: #000;
+            margin-right: 25px; /* しっぽのスペース確保 */
+        }
+        
+        /* Userのしっぽ：黒い枠部分 */
+        .message.user::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            right: -23px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 20px solid #000; /* 黒い三角形 */
+        }
+        /* Userのしっぽ：中身の色部分 */
+        .message.user::after {
+            content: "";
+            position: absolute;
+            top: 20px;
+            right: -17px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 20px solid #4fc3f7; /* 背景色と同じ三角形 */
+        }
+
+        /* 入力エリア */
+        .input-area { padding: 15px; background: rgba(255, 255, 255, 0.95); display: flex; gap: 12px; border-top: 1px solid #eee; align-items: center; }
+        .input-area input { 
+            flex-grow: 1; padding: 18px; border-radius: 35px; border: 2px solid #ccc; background: #fff; color: #333; outline: none; font-size: 1.3rem; 
+        }
+        .input-area input:focus { border-color: #2575fc; box-shadow: 0 0 5px rgba(37, 117, 252, 0.2); }
+        .input-area button { 
+            background: #2575fc; color: white; border: none; width: 70px; height: 70px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
         .input-area button:hover { transform: scale(1.1); }
-        .suggestions { padding: 10px 15px; display: flex; gap: 10px; overflow-x: auto; background: rgba(37, 37, 37, 0.9); }
-        .suggestion-chip { background: #444; color: #ccc; padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: 0.2s; }
-        .suggestion-chip:hover { background: #555; color: white; }
-		.chat-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; max-width: 90%; }
+        
+        /* 提案エリア */
+        .suggestions { padding: 12px 15px; display: flex; gap: 12px; overflow-x: auto; background: rgba(255, 255, 255, 0.95); border-top: 1px solid #f0f0f0; }
+        .suggestion-chip { background: #e9ecef; color: #495057; padding: 10px 18px; border-radius: 20px; font-size: 1.1rem; cursor: pointer; white-space: nowrap; transition: 0.2s; border: 1px solid #dee2e6; }
+        .suggestion-chip:hover { background: #dee2e6; color: #212529; }
+        
+        /* チャット行のレイアウト */
+		.chat-row { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 25px; max-width: 95%; }
 		.chat-row.bot { align-self: flex-start; }
 		.chat-row.user { align-self: flex-end; justify-content: flex-end; }
-		.profile-icon { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-		.message { position: relative; margin: 0; }
-        .start-training-btn { background: linear-gradient(135deg, #007bff, #2575fc); color: white; border: none; padding: 10px 15px; font-size: 0.95rem; border-radius: 8px; cursor: pointer; transition: opacity 0.2s, transform 0.2s; display: block; margin-top: 15px; width: fit-content; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        
+        /* コーチアイコン (80px) */
+		.profile-icon { 
+            width: 80px; height: 80px; 
+            border-radius: 50%; object-fit: cover; flex-shrink: 0; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
+            border: 2px solid white;
+        }
+        
+        /* 提案ボタン */
+        .start-training-btn { 
+            background: linear-gradient(135deg, #007bff, #2575fc); 
+            color: white; 
+            border: none; 
+            padding: 15px 25px; 
+            font-size: 1.25rem; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: opacity 0.2s, transform 0.2s; 
+            display: block; 
+            margin-top: 15px; 
+            width: fit-content; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+        }
         .start-training-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .start-training-btn i { margin-right: 5px; }
+        .start-training-btn i { margin-right: 8px; }
         h1 { margin-top: 0; }
     </style>
 </head>
@@ -105,7 +228,7 @@
             <h1 class="page-title"><i class="fa-solid fa-robot"></i> AIトーク</h1>
         </div>
 
-        <p style="text-align: center; color: #666; margin-bottom: 20px;">
+        <p class="intro-text">
             あなたのレベルや履歴に合わせて、最適なメニューを提案します！
         </p>
 
