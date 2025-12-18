@@ -32,9 +32,20 @@
             position: relative; z-index: 10;
         }
 
+        /* ヘッダーレイアウトの修正 */
         .page-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
         .page-title { color: #343a40; font-size: 2rem; margin: 0; }
         
+        /* 左上配置用のホームボタンデザイン */
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.2rem;
+        }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+
         .card { margin-bottom: 25px; padding: 25px; border: 1px solid rgba(255,255,255,0.8); border-radius: 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease; background-color: rgba(255,255,255,0.85); }
         .card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
         .card-title { font-size: 1.5rem; margin-bottom: 10px; color: #007bff; }
@@ -72,7 +83,12 @@
     <div class="main-container">
         
         <div class="page-header-container">
-            <h1 class="page-title"><i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i> トレーニング選択</h1>
+            <div class="header-left">
+                <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+                    <i class="fa-solid fa-house"></i>
+                </a>
+                <h1 class="page-title"><i class="fa-solid fa-dumbbell"></i> トレーニング選択</h1>
+            </div>
             <a th:href="@{/training/exercises}" class="button" style="background-color: #28a745; color: white; width: auto; margin: 0; padding: 8px 16px; font-size: 1rem;">
                 <i class="fa-solid fa-list"></i> 種目一覧
             </a>
@@ -186,10 +202,7 @@
             </form>
         </div>
 
-        <div style="margin-top: 30px; text-align: center;">
-            <a th:href="@{/home}" class="button secondary"><i class="fa-solid fa-house"></i> ホームに戻る</a>
         </div>
-    </div>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
