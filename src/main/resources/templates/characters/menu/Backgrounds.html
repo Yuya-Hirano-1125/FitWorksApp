@@ -54,17 +54,10 @@
                 <i class="fa-solid fa-image text-blue-500"></i>
                 背景一覧
             </h1>
-            <p class="text-gray-500 mt-2 text-sm font-bold">ホーム画面の背景カスタマイズ</p>
             
             <div id="current-level-display" class="mt-4 text-center">
                 <span class="text-lg font-extrabold text-[var(--primary-color)] bg-yellow-100 px-4 py-1 rounded-full shadow-md">
                     Lv.<span id="user-level-value" th:text="${userLevel}">1</span>
-                </span>
-            </div>
-            
-            <div id="dream-key-display" class="mt-2 text-center">
-                <span class="text-md font-bold text-purple-600 bg-purple-100 px-4 py-1 rounded-full shadow-md">
-                    <i class="fa-solid fa-key"></i> 夢幻の鍵: <span id="dream-key-count" th:text="${dreamKeyCount}">0</span>個
                 </span>
             </div>
         </div>
@@ -205,8 +198,8 @@
             }
 
             const categories = [
-                { id: 'nature', title: '自然・元素', icon: 'fa-leaf' },
-                { id: 'special', title: '日常・スペシャル', icon: 'fa-star' }
+                { id: 'nature', title: "デフォルト背景"},
+                { id: 'special', title: 'スペシャル背景'}
             ];
 
             function renderAll() {
@@ -217,11 +210,29 @@
 
                     const section = document.createElement('div');
                     section.className = 'mb-8';
+                    
+                    // スペシャル背景の場合は夢幻の鍵表示を追加
+                    let dreamKeyHtml = '';
+                    if (cat.id === 'special') {
+                        dreamKeyHtml = `
+                            <div id="dream-key-display" style="display: inline-block; margin-left: 20px; vertical-align: middle;">
+                                <div style="background: linear-gradient(135deg, #fae8ff 0%, #f3e8ff 100%); border: 3px solid #9333ea; border-radius: 16px; padding: 10px 14px; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3); display: inline-flex; align-items: center; gap: 10px;">
+                                    <img src="/img/item/UR-niji-touka.png" alt="夢幻の鍵" style="width: 32px !important; height: 32px !important; display: inline-block !important; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));" onerror="this.style.display='none'">
+                                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                        <span style="font-size: 10px; color: #7e22ce; font-weight: 600; line-height: 1;">夢幻の鍵</span>
+                                        <span id="dream-key-count" style="font-size: 18px; color: #9333ea; font-weight: 800; line-height: 1.2;">${dreamKeyCount}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
                     section.innerHTML = `
                         <div class="section-header border-b border-gray-200 pb-2 mb-4">
                             <h2 class="section-title text-xl font-bold text-gray-700">
                                 <i class="fa-solid ${cat.icon} mr-2"></i>${cat.title}
                             </h2>
+                            ${dreamKeyHtml}
                         </div>
                         <div class="card-grid" id="grid-${cat.id}"></div>
                     `;
@@ -260,7 +271,7 @@
                             if (bg.selected) {
                                 actionHtml = `<span class="status-text text-selected"><i class="fa-solid fa-check"></i> 適用中</span>`;
                             } else {
-                                actionHtml = `<button class="status-text text-unlock-ready select-trigger bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition shadow-md"><i class="fa-solid fa-hand-pointer"></i> 選択する</button>`;
+                                actionHtml = `<button class="status-text text-unlock-ready select-trigger bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition shadow-md"><i class="fa-solid fa-check-circle"></i> 適用する</button>`;
                             }
                         }
 

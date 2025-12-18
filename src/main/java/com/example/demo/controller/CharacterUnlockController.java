@@ -32,9 +32,14 @@ public class CharacterUnlockController {
     public ResponseEntity<Map<String, Object>> unlockCharacter(@RequestBody Map<String, Object> request,
                                                                Principal principal) {
 
+        // --- リクエスト受信ログ ---
+        System.out.println("DEBUG: /unlock called with request=" + request);
+
         Long characterId = Long.valueOf(request.get("characterId").toString());
         int cost = Integer.parseInt(request.get("cost").toString());
         String materialType = request.get("materialType").toString();
+
+        System.out.println("DEBUG: characterId=" + characterId + ", cost=" + cost + ", materialType=" + materialType);
 
         Optional<CharacterEntity> optChara = repository.findById(characterId);
         if (optChara.isEmpty()) {
@@ -45,6 +50,7 @@ public class CharacterUnlockController {
         }
 
         CharacterEntity chara = optChara.get();
+        System.out.println("DEBUG: 対象キャラ=" + chara.getName());
 
         // ===== 進化素材 & 進化条件構築 =====
         switch (chara.getName()) {
@@ -114,6 +120,8 @@ public class CharacterUnlockController {
         int userLevel = userService.getUserLevel(username);
         int userMaterialCount = userService.getUserMaterialCount(username, materialType);
 
+        System.out.println("DEBUG: user=" + username + ", level=" + userLevel + ", materialCount=" + userMaterialCount);
+
         boolean canUnlock = (userLevel >= chara.getRequiredLevel() && userMaterialCount >= cost);
 
         Map<String, Object> response = new HashMap<>();
@@ -121,9 +129,13 @@ public class CharacterUnlockController {
             userService.consumeUserMaterial(username, materialType, cost);
             userService.unlockCharacterForUser(username, chara.getId());
 
+            System.out.println("DEBUG: 解放成功! user=" + username + ", charaId=" + chara.getId());
+
             response.put("success", true);
             response.put("message", String.format("%s を解放しました！", chara.getName()));
         } else {
+            System.out.println("DEBUG: 解放失敗 条件不足 user=" + username + ", charaId=" + chara.getId());
+
             response.put("success", false);
             response.put("message", String.format(
                 "条件不足です！ %s の解放には Lv.%d 以上と素材 %d 個が必要です。",
@@ -134,5 +146,6 @@ public class CharacterUnlockController {
         }
 
         return ResponseEntity.ok(response);
+        
     }
 }
