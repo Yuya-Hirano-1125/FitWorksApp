@@ -167,19 +167,20 @@
             <form th:action="@{/training/start}" method="post">
                 <input type="hidden" name="type" value="free-weight"/>
                 <h2 class="card-title">フリーウェイト</h2>
-                <div class="form-group">
-                    <label for="musclePart">鍛えたい部位:</label>
-                    <select id="musclePart" class="form-control" required>
-                        <option value="">部位を選択してください</option>
-                        <option th:each="part : ${freeWeightParts}" th:value="${part}" th:text="${part}"></option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="exerciseName">種目名:</label>
-                    <select id="exerciseName" name="exerciseName" class="form-control" required disabled>
-                        <option value="">部位を選択してから種目を選んでください</option>
-                    </select>
-                </div>
+				<div class="form-group">
+				    <label for="musclePart">鍛えたい部位:</label>
+				    <select id="musclePart" name="musclePart" class="form-control" required>
+				        <option value="">部位を選択してください</option>
+				        <option th:each="part : ${freeWeightParts}" th:value="${part}" th:text="${part}"></option>
+				    </select>
+				</div>
+
+				<div class="form-group">
+				    <label for="exerciseName">種目名:</label>
+				    <select id="exerciseName" name="exerciseName" class="form-control" required disabled>
+				        <option value="">部位を選択してから種目を選んでください</option>
+				    </select>
+				</div>
                 <button type="submit" class="button primary mt-3" id="startFreeWeightSessionButton" disabled><i class="fa-solid fa-dumbbell"></i> セッション開始 </button>
             </form>
         </div>
@@ -203,52 +204,41 @@
         
         </div>
 
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        // 背景アニメーション
-        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeCanvas); resizeCanvas();
-        const mouse = { x: undefined, y: undefined };
-        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
-        class Particle {
-            constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
-            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
-            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
-        }
-        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
-        animate();
+		<script th:inline="javascript">
+		    /*<![CDATA[*/
+		    const freeWeightExercisesByPart = /*[[${freeWeightExercisesByPart}]]*/ {};
 
-        const freeWeightExercisesByPart = /*[[${freeWeightExercisesByPart}]]*/ {};
-        function updateEquip(location) {
-            const checkboxes = document.querySelectorAll('.equip-group input[type="checkbox"]');
-            if (location === 'gym') { checkboxes.forEach(cb => cb.checked = true); } 
-            else if (location === 'home') { checkboxes.forEach(cb => { if (cb.value === 'bodyweight' || cb.value === 'dumbbell') { cb.checked = true; } else { cb.checked = false; } }); }
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            const musclePartSelect = document.getElementById('musclePart');
-            const exerciseNameSelect = document.getElementById('exerciseName');
-            const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
-            if (musclePartSelect && exerciseNameSelect) {
-                musclePartSelect.addEventListener('change', function() {
-                    const selectedPart = this.value;
-                    exerciseNameSelect.innerHTML = '<option value="">種目を選択してください</option>';
-                    exerciseNameSelect.disabled = true; startFreeWeightSessionButton.disabled = true;
-                    if (selectedPart && freeWeightExercisesByPart[selectedPart]) {
-                        const exercises = freeWeightExercisesByPart[selectedPart];
-                        exercises.forEach(exercise => {
-                            const option = document.createElement('option');
-                            const val = (exercise.name) ? exercise.name : exercise;
-                            option.value = val; option.textContent = val;
-                            exerciseNameSelect.appendChild(option);
-                        });
-                        exerciseNameSelect.disabled = false;
-                    }
-                });
-                exerciseNameSelect.addEventListener('change', function() { startFreeWeightSessionButton.disabled = !this.value; });
-            }
-        });
-        /*]]>*/
-    </script>
+			document.addEventListener('DOMContentLoaded', function() {
+			    const musclePartSelect = document.getElementById('musclePart');
+			    const exerciseNameSelect = document.getElementById('exerciseName');
+			    const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
+
+			    if (musclePartSelect && exerciseNameSelect) {
+			        musclePartSelect.addEventListener('change', function() {
+			            const selectedPart = this.value;
+			            exerciseNameSelect.innerHTML = '<option value="">種目を選択してください</option>';
+			            exerciseNameSelect.disabled = true;
+			            startFreeWeightSessionButton.disabled = true;
+
+			            if (selectedPart && freeWeightExercisesByPart[selectedPart]) {
+			                const exercises = freeWeightExercisesByPart[selectedPart];
+			                exercises.forEach(exercise => {
+			                    const option = document.createElement('option');
+			                    option.value = exercise.name || exercise; // サーバーに送る値は純粋な種目名
+			                    option.textContent = exercise.fullName2 || exercise.name || exercise; // 表示は「ベンチプレス　【中級】」
+			                    exerciseNameSelect.appendChild(option);
+			                });
+			                exerciseNameSelect.disabled = false; // 部位を選んだら有効化
+			            }
+			        });
+
+			        exerciseNameSelect.addEventListener('change', function() {
+			            startFreeWeightSessionButton.disabled = !this.value;
+			        });
+			    }
+			});
+		    /*]]>*/
+		</script>
+
 </body>
 </html>

@@ -267,8 +267,13 @@ public class TrainingDataService {
         return exerciseMap;
     }
 
-    // ドロップダウン表示用 (StringのMap)
-    public Map<String, List<String>> getFreeWeightExercisesByPart() {
+ // ドロップダウン表示用 (ExerciseDataのMap)
+    public Map<String, List<ExerciseData>> getFreeWeightExercisesByPart() {
+        return exerciseMap;  // 変換せずそのまま返す
+    }
+    
+ // MySet作成フォームなどで使用する簡易Map (名前だけ)
+    public Map<String, List<String>> getSimpleFreeWeightExercisesMap() {
         return exerciseMap.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
@@ -278,11 +283,6 @@ public class TrainingDataService {
                         (e1, e2) -> e1,
                         LinkedHashMap::new
                 ));
-    }
-    
-    // MySet作成フォームなどで使用する簡易Map
-    public Map<String, List<String>> getSimpleFreeWeightExercisesMap() {
-        return getFreeWeightExercisesByPart();
     }
 
     // 部位のリストを取得
