@@ -4,12 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>マイセット一覧 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <script th:src="@{/js/theme.js}"></script>
     <style>
+        /* ==========================================================================
+           🌌 背景用スタイル (start.htmlより移植)
+           ========================================================================== */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --primary-color: #4facfe;
+            --accent-color: #00f2fe;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            min-height: 100vh;
+            font-family: 'Noto Sans JP', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .interactive-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%;
+            animation: auroraFlow 20s ease infinite;
+            overflow: hidden;
+        }
+
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: floatOrb 30s infinite alternate ease-in-out;
+            z-index: 0;
+        }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        .bg-cloud {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.85;
+            z-index: 2;
+            pointer-events: none;
+            box-shadow: 0 0 60px rgba(255,255,255,0.9);
+        }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
+
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        .mouse-flare {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            mix-blend-mode: screen;
+            z-index: 20;
+            filter: blur(15px);
+            transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
+
+        /* -----------------------------------------------------------
+           📦 MAIN CONTAINER
+           ----------------------------------------------------------- */
         .main-container {
             max-width: 800px;
+            width: 92%;
             margin: 40px auto;
             padding: 40px;
             background: rgba(255, 255, 255, 0.65);
@@ -17,7 +119,7 @@
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 45px;
             border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative;
             z-index: 10;
         }
@@ -52,40 +154,62 @@
 
         @media (max-width: 600px) {
             .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
-            .main-container { padding-top: 80px !important; }
+            .main-container { padding: 30px 20px; padding-top: 80px !important; }
         }
 
         .myset-card {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
             border-left: 6px solid #6f42c1;
+            transition: transform 0.3s;
+        }
+        .myset-card:hover {
+            transform: translateY(-3px);
+            background: #fff;
         }
         .myset-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
             padding-bottom: 10px;
         }
-        .myset-title { font-size: 1.2rem; font-weight: bold; color: var(--dark-text); }
+        .myset-title { font-size: 1.2rem; font-weight: bold; color: #333; }
         .myset-exercises { margin: 10px 0; padding-left: 20px; color: #555; }
         .myset-actions { display: flex; gap: 10px; justify-content: flex-end; }
         .btn-start {
-            background-color: var(--primary-color); color: white; border: none;
-            padding: 8px 16px; border-radius: 20px; cursor: pointer; text-decoration: none;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white; border: none;
+            padding: 10px 20px; border-radius: 30px; cursor: pointer; text-decoration: none;
             display: inline-flex; align-items: center; gap: 5px; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.3);
+            transition: all 0.3s;
         }
+        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(79, 172, 254, 0.5); }
+        
         .btn-delete {
-            background-color: #ffebee; color: #ff4444; border: 1px solid #ff4444;
-            padding: 8px 12px; border-radius: 20px; cursor: pointer;
+            background-color: #fff0f0; color: #ff4444; border: 1px solid #ff4444;
+            padding: 8px 12px; border-radius: 20px; cursor: pointer; transition: all 0.3s;
         }
+        .btn-delete:hover { background-color: #ff4444; color: white; }
     </style>
 </head>
-<body style="background-color: #f0f8ff;">
+<body>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div id="mouse-flare" class="mouse-flare"></div>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+        <div class="bg-cloud cloud-3"></div>
+    </div>
+
     <div th:replace="~{fragments/header :: header}"></div>
 
     <div class="main-container">
@@ -99,29 +223,29 @@
         <div th:if="${message}" class="alert alert-info" th:text="${message}"></div>
 
         <div style="text-align: right; margin-bottom: 20px;">
-            <a th:href="@{/training/mysets/new}" class="button primary">
+            <a th:href="@{/training/mysets/new}" class="button primary" style="background: linear-gradient(135deg, #a18cd1, #fbc2eb); border: none; padding: 12px 25px; border-radius: 30px; color: white; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 5px 15px rgba(161, 140, 209, 0.4);">
                 <i class="fa-solid fa-plus"></i> 新規作成
             </a>
         </div>
 
-        <div th:if="${mySets.isEmpty()}" style="text-align: center; color: #777; padding: 40px;">
-            <p>まだマイセットがありません。<br>お気に入りの種目を組み合わせてセットを作りましょう！</p>
+        <div th:if="${mySets.isEmpty()}" style="text-align: center; color: #777; padding: 40px; background: rgba(255,255,255,0.6); border-radius: 20px;">
+            <p style="font-weight: 700;">まだマイセットがありません。<br>お気に入りの種目を組み合わせてセットを作りましょう！</p>
         </div>
 
         <div th:each="set : ${mySets}" class="myset-card">
             <div class="myset-header">
                 <span class="myset-title" th:text="${set.name}">セット名</span>
-                <span style="font-size: 0.9em; color: #888;" th:text="${set.exerciseNames.size()} + ' 種目'">3 種目</span>
+                <span style="font-size: 0.9em; color: #888; font-weight: 600;" th:text="${set.exerciseNames.size()} + ' 種目'">3 種目</span>
             </div>
             
             <ul class="myset-exercises">
                 <li th:each="ex, stat : ${set.exerciseNames}" th:if="${stat.index < 3}" th:text="${ex}">種目名</li>
-                <li th:if="${set.exerciseNames.size() > 3}" style="list-style: none; color: #888;">...他</li>
+                <li th:if="${set.exerciseNames.size() > 3}" style="list-style: none; color: #888; font-size: 0.9em;">...他 <span th:text="${set.exerciseNames.size() - 3}"></span> 種目</li>
             </ul>
 
             <div class="myset-actions">
                 <form th:action="@{/training/mysets/delete/{id}(id=${set.id})}" method="post" onsubmit="return confirm('本当に削除しますか？');">
-                    <button type="submit" class="btn-delete"><i class="fa-solid fa-trash"></i></button>
+                    <button type="submit" class="btn-delete" title="削除"><i class="fa-solid fa-trash"></i></button>
                 </form>
 
                 <form th:action="@{/training/start}" method="post">
@@ -136,5 +260,82 @@
     </div>
     
     <div th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+    // === 🌟 CANVAS PARTICLE SYSTEM (start.htmlより移植) ===
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    const flare = document.getElementById('mouse-flare');
+    
+    let particlesArray = [];
+    let width, height;
+
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = event.x;
+        mouse.y = event.y;
+        if(flare) flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+        for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
+    });
+
+    class Particle {
+        constructor() {
+            this.x = mouse.x;
+            this.y = mouse.y;
+            this.size = Math.random() * 5 + 2;
+            this.speedX = Math.random() * 4 - 2;
+            this.speedY = Math.random() * 4 - 2;
+            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.size > 0.2) this.size -= 0.1;
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'white';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw();
+            if (particlesArray[i].size <= 0.3) {
+                particlesArray.splice(i, 1);
+                i--;
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+    
+    // 背景の雲のパララックス効果
+    const cloud1 = document.querySelector('.cloud-1');
+    const cloud2 = document.querySelector('.cloud-2');
+    document.addEventListener('mousemove', (e) => {
+        const x = (window.innerWidth - e.pageX) / 60;
+        const y = (window.innerHeight - e.pageY) / 60;
+        if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
+        if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
+    });
+
+    animate();
+</script>
 </body>
 </html>
