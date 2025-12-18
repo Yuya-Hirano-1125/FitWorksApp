@@ -283,7 +283,7 @@ public class User {
     }
 
 
-    // ★★★ 解放済み背景管理メソッド ★★★
+ // ★★★ 解放済み背景管理メソッド ★★★
     public Set<String> getUnlockedBackgrounds() {
         if (unlockedBackgrounds == null) {
             unlockedBackgrounds = new HashSet<>();
@@ -292,27 +292,31 @@ public class User {
     }
 
     public void setUnlockedBackgrounds(Set<String> unlockedBackgrounds) {
-        this.unlockedBackgrounds = unlockedBackgrounds;
+        this.unlockedBackgrounds = (unlockedBackgrounds != null) ? unlockedBackgrounds : new HashSet<>();
     }
 
     public void addUnlockedBackground(String backgroundId) {
         if (unlockedBackgrounds == null) {
             unlockedBackgrounds = new HashSet<>();
         }
-        unlockedBackgrounds.add(backgroundId);
+        if (backgroundId != null && !backgroundId.isBlank()) {
+            unlockedBackgrounds.add(backgroundId);
+        }
     }
 
     public boolean hasUnlockedBackground(String backgroundId) {
-        return unlockedBackgrounds != null && unlockedBackgrounds.contains(backgroundId);
+        return backgroundId != null && unlockedBackgrounds != null && unlockedBackgrounds.contains(backgroundId);
     }
 
     // ★★★ 選択中の背景管理メソッド ★★★
     public String getSelectedBackground() {
-        return selectedBackground != null ? selectedBackground : "fire-original";
+        return (selectedBackground != null && !selectedBackground.isBlank()) ? selectedBackground : "fire-original";
     }
 
     public void setSelectedBackground(String selectedBackground) {
-        this.selectedBackground = selectedBackground;
+        this.selectedBackground = (selectedBackground != null && !selectedBackground.isBlank())
+                ? selectedBackground
+                : "fire-original";
     }
 
     // ★★★ 背景解放チェック済みレベル ★★★
@@ -321,6 +325,6 @@ public class User {
     }
 
     public void setLastBackgroundCheckLevel(Integer lastBackgroundCheckLevel) {
-        this.lastBackgroundCheckLevel = lastBackgroundCheckLevel;
+        this.lastBackgroundCheckLevel = (lastBackgroundCheckLevel != null) ? lastBackgroundCheckLevel : 1;
     }
 }
