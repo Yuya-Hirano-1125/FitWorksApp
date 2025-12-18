@@ -35,6 +35,39 @@
             position: relative; z-index: 10;
         }
 
+        /* 🔙 戻るボタン */
+        .back-arrow-button {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #555;
+            font-size: 2.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .back-arrow-button:hover {
+            transform: scale(1.1);
+            background: #fff;
+            color: #4facfe;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
+            .main-container { padding-top: 80px !important; }
+        }
+
         /* FAQ専用スタイル */
         .faq-container { background-color: rgba(255,255,255,0.9); padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; text-align: left; }
         .faq-item { margin-bottom: 25px; border-bottom: 1px solid #f0f0f0; padding-bottom: 20px; }
@@ -43,7 +76,6 @@
         .q-mark { color: var(--primary-color, #ff69b4); font-weight: 800; margin-right: 10px; font-family: 'Poppins', sans-serif; font-size: 1.2rem; line-height: 1.2; }
         .answer { background-color: rgba(249,249,249,0.8); padding: 15px; border-radius: 10px; font-size: 0.95rem; color: #555; line-height: 1.6; display: flex; align-items: flex-start; }
         .a-mark { color: #888; font-weight: 800; margin-right: 10px; font-family: 'Poppins', sans-serif; margin-top: 2px; }
-        .action-area { margin-top: 30px; text-align: center; }
     </style>
 </head>
 <body>
@@ -56,6 +88,10 @@
     </div>
 
 <div class="main-container">
+    <a th:href="@{/settings}" class="back-arrow-button" title="設定に戻る">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+
     <h1><i class="fa-solid fa-circle-question header-icon"></i> FAQ</h1>
     <p class="sub-heading">よくあるご質問をまとめました</p>
     
@@ -76,12 +112,6 @@
             <div class="question"><span class="q-mark">Q.</span> パスワードを忘れました。</div>
             <div class="answer"><span class="a-mark">A.</span><div>ログイン画面の「パスワードを忘れた方」リンクから、パスワードのリセット手続きを行ってください。</div></div>
         </div>
-    </div>
-
-    <div class="action-area">
-        <a th:href="@{/settings}" class="button secondary" style="background: #fff; color: #555; border: 1px solid #ddd; display:inline-block; width: auto; padding: 10px 30px;">
-            <i class="fa-solid fa-arrow-left"></i> 設定に戻る
-        </a>
     </div>
 
     <p style="margin-top: 30px; font-size: 0.85rem; color: #aaa; text-align: center;">&copy; 2025 FitWorks Project</p>

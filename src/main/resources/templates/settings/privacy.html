@@ -34,6 +34,39 @@
             position: relative; z-index: 10;
         }
 
+        /* 🔙 戻るボタン */
+        .back-arrow-button {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #555;
+            font-size: 2.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .back-arrow-button:hover {
+            transform: scale(1.1);
+            background: #fff;
+            color: #4facfe;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
+            .main-container { padding-top: 80px !important; }
+        }
+
         /* 規約・ポリシー専用スタイル */
         .policy-container { background-color: rgba(255,255,255,0.9); padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; text-align: left; }
         .policy-content h2 { font-size: 1.1rem; color: var(--primary-color, #ff69b4); border-bottom: 2px dashed #eee; padding-bottom: 5px; margin-top: 25px; margin-bottom: 10px; }
@@ -41,7 +74,6 @@
         .policy-content p { font-size: 0.95rem; line-height: 1.8; color: #555; margin-bottom: 10px; }
         .policy-content ul { padding-left: 20px; margin-bottom: 15px; color: #555; }
         .policy-content li { margin-bottom: 5px; font-size: 0.95rem; }
-        .action-area { margin-top: 30px; text-align: center; }
     </style>
 </head>
 <body>
@@ -54,6 +86,10 @@
     </div>
 
 <div class="main-container">
+    <a th:href="@{/settings}" class="back-arrow-button" title="設定に戻る">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+
     <h1><i class="fa-solid fa-user-shield header-icon"></i> プライバシーポリシー</h1>
     
     <div class="policy-container">
@@ -87,12 +123,6 @@
             
             <p style="text-align: right; margin-top: 30px; font-size: 0.8rem; color: #999;">2025年制定</p>
         </div>
-    </div>
-
-    <div class="action-area">
-        <a th:href="@{/settings}" class="button secondary" style="background: #fff; color: #555; border: 1px solid #ddd; display:inline-block; width: auto; padding: 10px 30px;">
-            <i class="fa-solid fa-arrow-left"></i> 設定に戻る
-        </a>
     </div>
 
     <p style="margin-top: 30px; font-size: 0.85rem; color: #aaa; text-align: center;">&copy; 2025 FitWorks Project</p>
