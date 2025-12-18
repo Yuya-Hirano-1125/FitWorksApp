@@ -79,7 +79,7 @@ public class GachaController {
         Long userId = user.getId();
 
         // ★チップ消費ロジック
-        int cost = (count == 1) ? 1 : 5; // 1回なら1枚、6連なら5枚
+        int cost = (count == 1) ? 1 : 10; // 1回なら1枚、11連なら10枚
         boolean success = user.useChips(cost);
 
         if (!success) {
