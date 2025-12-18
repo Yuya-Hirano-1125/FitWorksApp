@@ -58,7 +58,7 @@ body {
 .bg-card {
     background: #4b5563; /* スクショのような濃いグレー */
     color: white;
-    border-radius: 0.75rem;
+    border-radius: 1.5rem; /* より丸く */
     overflow: hidden;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s;
@@ -125,8 +125,15 @@ body {
 .status-text {
     font-size: 0.9rem;
     font-weight: bold;
-    text-decoration: underline;
+    padding: 0.5rem 1.5rem;
+    border-radius: 2rem; /* ボタンを丸く */
     cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.status-text.unlock-trigger,
+.status-text.select-trigger {
+    border-radius: 2rem; /* ボタンを丸く */
 }
 
 .text-unlock-ready { color: #f472b6; } /* 解放可能:ピンク */
@@ -267,7 +274,7 @@ body {
     color: #374151;
     font-weight: 700;
     font-size: 1rem;
-    border-radius: 0.75rem;
+    border-radius: 1.5rem; /* より丸く */
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -295,7 +302,7 @@ body {
     color: white;
     font-weight: 700;
     font-size: 1rem;
-    border-radius: 0.75rem;
+    border-radius: 1.5rem; /* より丸く */
     cursor: pointer;
     position: relative;
     overflow: hidden;
