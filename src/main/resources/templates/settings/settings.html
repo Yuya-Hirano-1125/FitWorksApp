@@ -12,17 +12,10 @@
     <link rel="stylesheet" th:href="@{/css/settings.css}">
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* 共通背景デザイン */
+        /* 共通背景デザイン省略 */
         :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
-        body.settings-page {
-            margin: 0; padding: 0; background-color: #f0f8ff;
-            min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden;
-        }
-        .interactive-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
-        }
+        body.settings-page { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
@@ -36,21 +29,31 @@
 
         .main-container {
             max-width: 800px; width: 92%; margin: 40px auto; padding: 40px;
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(20px) saturate(180%);
+            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 45px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 45px; border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
         }
 
-        /* 既存スタイル調整 */
+        /* ヘッダー修正 */
+        .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
+        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+
         .btn-register-bio { padding: 8px 12px; background-color: var(--primary-color, #ffb300); color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 0.9em; text-decoration: none; }
         .bio-message { font-size: 12px; margin-top: 5px; color: #666; display: block; }
         .setting-section { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px); border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
         .section-header { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: bold; color: #333; transition: background 0.3s; }
         .section-header:hover { background: rgba(255,255,255,0.8); }
+        .button { padding: 12px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; transition: background-color 0.2s; text-align: center; display: block; text-decoration: none; box-sizing: border-box; cursor: pointer; }
+        .button.primary { background-color: #007bff; color: white; border: none; }
     </style>
 </head>
 <body class="settings-page">
@@ -63,7 +66,13 @@
     </div>
 
 <div class="main-container">
-    <h1><i class="fa-solid fa-gear header-icon"></i>設定</h1>
+    
+    <div class="page-header-container">
+        <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <h1 class="page-title"><i class="fa-solid fa-gear header-icon"></i> 設定</h1>
+    </div>
     
     <div class="setting-section" style="--section-index: 1;">
         <div class="section-header" onclick="toggleSection('account-content')">
@@ -115,27 +124,21 @@
             <div class="setting-item">
                 <label for="trainingReminder">トレーニングリマインダー</label>
                 <label class="switch">
-                    <input type="checkbox" id="trainingReminder" 
-                           th:checked="${user.notificationTrainingReminder}"
-                           onchange="updateSetting('notificationTrainingReminder', this.checked)">
+                    <input type="checkbox" id="trainingReminder" th:checked="${user.notificationTrainingReminder}" onchange="updateSetting('notificationTrainingReminder', this.checked)">
                     <span class="slider"></span>
                 </label>
             </div>
             <div class="setting-item">
                 <label for="aiSuggestion">AIコーチの提案通知</label>
                 <label class="switch">
-                    <input type="checkbox" id="aiSuggestion"
-                           th:checked="${user.notificationAiSuggestion}"
-                           onchange="updateSetting('notificationAiSuggestion', this.checked)">
+                    <input type="checkbox" id="aiSuggestion" th:checked="${user.notificationAiSuggestion}" onchange="updateSetting('notificationAiSuggestion', this.checked)">
                     <span class="slider"></span>
                 </label>
             </div>
             <div class="setting-item">
                 <label for="progressReport">進捗レポートメール</label>
                 <label class="switch">
-                    <input type="checkbox" id="progressReport"
-                           th:checked="${user.notificationProgressReport}"
-                           onchange="updateSetting('notificationProgressReport', this.checked)">
+                    <input type="checkbox" id="progressReport" th:checked="${user.notificationProgressReport}" onchange="updateSetting('notificationProgressReport', this.checked)">
                     <span class="slider"></span>
                 </label>
             </div>
@@ -150,17 +153,11 @@
         <div class="section-content" id="privacy-content">
             <div class="setting-item">
                 <label>データ利用の同意</label>
-                <label class="switch">
-                    <input type="checkbox" checked>
-                    <span class="slider"></span>
-                </label>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
             </div>
             <div class="setting-item">
                 <label>広告のパーソナライズ</label>
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
+                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
             </div>
             <div class="setting-item">
                 <label>データのダウンロード</label>
@@ -185,10 +182,7 @@
             </div>
             <div class="setting-item">
                 <label>測定単位</label>
-                <select>
-                    <option>メートル法 (kg/cm)</option>
-                    <option>ヤード・ポンド法 (lb/in)</option>
-                </select>
+                <select><option>メートル法 (kg/cm)</option><option>ヤード・ポンド法 (lb/in)</option></select>
             </div>
         </div>
     </div>
@@ -199,155 +193,32 @@
             <span class="arrow">▼</span>
         </div>
         <div class="section-content" id="info-content">
-            <div class="setting-item">
-                <label>よくある質問 (FAQ)</label>
-                <a th:href="@{/faq}">表示</a>
-            </div>
-            <div class="setting-item">
-                <label>利用規約</label>
-                <a th:href="@{/terms}">表示</a>
-            </div>
-            <div class="setting-item">
-                <label>プライバシーポリシー</label>
-                <a th:href="@{/privacy}">表示</a>
-            </div>
-            <div class="setting-item">
-                <label>バージョン</label>
-                <span>1.0.0 (FitBot-v3)</span>
-            </div>
+            <div class="setting-item"><label>よくある質問 (FAQ)</label><a th:href="@{/faq}">表示</a></div>
+            <div class="setting-item"><label>利用規約</label><a th:href="@{/terms}">表示</a></div>
+            <div class="setting-item"><label>プライバシーポリシー</label><a th:href="@{/privacy}">表示</a></div>
+            <div class="setting-item"><label>バージョン</label><span>1.0.0 (FitBot-v3)</span></div>
         </div>
     </div>
     
-    <div class="button-container" style="margin-top: 40px;">
+    <div class="button-container" style="margin-top: 40px; text-align: center;">
         <form th:action="@{/logout}" method="post" style="display:inline;">
-            <button type="submit" onclick="return confirmLogout()" class="button primary" style="background: var(--error-color); border-color: var(--error-color); box-shadow: 0 8px 25px rgba(255, 74, 74, 0.6);">
+            <button type="submit" onclick="return confirmLogout()" class="button primary" style="background: var(--error-color); border-color: var(--error-color); box-shadow: 0 8px 25px rgba(255, 74, 74, 0.6); width: auto; padding: 12px 30px;">
                 ログアウト <i class="fa-solid fa-right-from-bracket"></i>
             </button>
         </form>
-        
-        <a th:href="@{/home}" class="button secondary" style="margin-top: 10px;">
-            <i class="fa-solid fa-house"></i> ホームに戻る
-        </a>
     </div>
 </div>
 
 <script>
-    // --- 既存のJSロジック ---
-    async function updateSetting(key, value) {
-        try {
-            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
-            const payload = {}; payload[key] = value;
-            const response = await fetch('/api/settings/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
-                body: JSON.stringify(payload)
-            });
-            const result = await response.json();
-            if (result.success) console.log(key + ' updated successfully');
-            else alert('設定の保存に失敗しました。');
-        } catch (error) { console.error('Error:', error); }
-    }
-    function handleThemeChange(themeName) {
-        localStorage.setItem('fitworks-theme', themeName);
-        if (typeof applyTheme === 'function') applyTheme();
-        updateSetting('theme', themeName);
-    }
+    async function updateSetting(key, value) { try { const csrfToken = document.querySelector('meta[name="_csrf"]').content; const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content; const payload = {}; payload[key] = value; const response = await fetch('/api/settings/update', { method: 'POST', headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken }, body: JSON.stringify(payload) }); const result = await response.json(); if (result.success) console.log(key + ' updated successfully'); else alert('設定の保存に失敗しました。'); } catch (error) { console.error('Error:', error); } }
+    function handleThemeChange(themeName) { localStorage.setItem('fitworks-theme', themeName); if (typeof applyTheme === 'function') applyTheme(); updateSetting('theme', themeName); }
     function confirmLogout() { return confirm("本当にログアウトしますか？"); }
-    function toggleSection(contentId) {
-        const content = document.getElementById(contentId);
-        const sectionHeader = content.previousElementSibling; 
-        const arrow = sectionHeader.querySelector('.arrow');
-        if (content.style.maxHeight && content.style.maxHeight !== '0px') {
-            content.style.maxHeight = '0px'; content.style.paddingTop = '0px'; content.style.paddingBottom = '0px'; arrow.innerHTML = '▼';
-            setTimeout(() => { content.style.display = 'none'; }, 300); 
-        } else {
-            content.style.display = 'block'; content.style.maxHeight = content.scrollHeight + 30 + "px"; content.style.paddingTop = '10px'; content.style.paddingBottom = '15px'; arrow.innerHTML = '▲';
-        }
-    }
-    function bufferToBase64url(buffer) {
-        const bytes = new Uint8Array(buffer);
-        let binary = '';
-        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    }
-    function base64urlToBuffer(base64url) {
-        const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
-        const binary = atob(base64);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-        return bytes.buffer;
-    }
-    document.getElementById('btn-register-biometric').addEventListener('click', async () => {
-        const msgArea = document.getElementById('bio-message');
-        msgArea.textContent = '処理中...'; msgArea.style.color = '#666';
-        if (!window.PublicKeyCredential) { alert('このデバイスは生体認証に対応していません。'); return; }
-        try {
-            const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
-            const optRes = await fetch('/api/webauthn/register/options');
-            if (!optRes.ok) throw new Error('オプション取得失敗');
-            const options = await optRes.json();
-            const credential = await navigator.credentials.create({
-                publicKey: {
-                    rp: { name: "FitWorks" },
-                    user: { id: base64urlToBuffer(options.user.id), name: options.user.name, displayName: options.user.displayName },
-                    challenge: base64urlToBuffer(options.challenge),
-                    pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
-                    authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "preferred" },
-                    timeout: 60000
-                }
-            });
-            const regRes = await fetch('/api/webauthn/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
-                body: JSON.stringify({
-                    clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
-                    attestationObject: bufferToBase64url(credential.response.attestationObject),
-                    deviceName: "My Device"
-                })
-            });
-            if (regRes.ok) { msgArea.textContent = '登録完了！'; msgArea.style.color = 'green'; alert('生体認証を登録しました'); } 
-            else throw new Error(await regRes.text());
-        } catch (e) { console.error(e); msgArea.textContent = 'エラー: ' + e.message; msgArea.style.color = 'red'; }
-    });
-    document.addEventListener('DOMContentLoaded', () => {
-        const selector = document.getElementById('theme-selector');
-        if (selector) { localStorage.setItem('fitworks-theme', selector.value); if (typeof applyTheme === 'function') applyTheme(); }
-        document.querySelectorAll('.setting-section').forEach(section => {
-            const content = section.querySelector('.section-content');
-            const arrow = section.querySelector('.arrow');
-            content.style.maxHeight = '0px'; content.style.paddingTop = '0px'; content.style.paddingBottom = '0px'; content.style.display = 'none';
-            if (arrow) arrow.innerHTML = '▼';
-        });
-    });
-
-    // --- 背景アニメーションJS ---
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    let particlesArray = [];
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resizeCanvas); resizeCanvas();
-    const mouse = { x: undefined, y: undefined };
-    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
-    class Particle {
-        constructor() {
-            this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2;
-            this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2;
-            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
-        }
-        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
-        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
-    }
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < particlesArray.length; i++) {
-            particlesArray[i].update(); particlesArray[i].draw();
-            if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; }
-        }
-        requestAnimationFrame(animate);
-    }
-    animate();
+    function toggleSection(contentId) { const content = document.getElementById(contentId); const sectionHeader = content.previousElementSibling; const arrow = sectionHeader.querySelector('.arrow'); if (content.style.maxHeight && content.style.maxHeight !== '0px') { content.style.maxHeight = '0px'; content.style.paddingTop = '0px'; content.style.paddingBottom = '0px'; arrow.innerHTML = '▼'; setTimeout(() => { content.style.display = 'none'; }, 300); } else { content.style.display = 'block'; content.style.maxHeight = content.scrollHeight + 30 + "px"; content.style.paddingTop = '10px'; content.style.paddingBottom = '15px'; arrow.innerHTML = '▲'; } }
+    function bufferToBase64url(buffer) { const bytes = new Uint8Array(buffer); let binary = ''; for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]); return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+    function base64urlToBuffer(base64url) { const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/'); const binary = atob(base64); const bytes = new Uint8Array(binary.length); for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i); return bytes.buffer; }
+    document.getElementById('btn-register-biometric').addEventListener('click', async () => { const msgArea = document.getElementById('bio-message'); msgArea.textContent = '処理中...'; msgArea.style.color = '#666'; if (!window.PublicKeyCredential) { alert('このデバイスは生体認証に対応していません。'); return; } try { const csrfToken = document.querySelector('meta[name="_csrf"]').content; const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content; const optRes = await fetch('/api/webauthn/register/options'); if (!optRes.ok) throw new Error('オプション取得失敗'); const options = await optRes.json(); const credential = await navigator.credentials.create({ publicKey: { rp: { name: "FitWorks" }, user: { id: base64urlToBuffer(options.user.id), name: options.user.name, displayName: options.user.displayName }, challenge: base64urlToBuffer(options.challenge), pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }], authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "preferred" }, timeout: 60000 } }); const regRes = await fetch('/api/webauthn/register', { method: 'POST', headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken }, body: JSON.stringify({ clientDataJSON: bufferToBase64url(credential.response.clientDataJSON), attestationObject: bufferToBase64url(credential.response.attestationObject), deviceName: "My Device" }) }); if (regRes.ok) { msgArea.textContent = '登録完了！'; msgArea.style.color = 'green'; alert('生体認証を登録しました'); } else throw new Error(await regRes.text()); } catch (e) { console.error(e); msgArea.textContent = 'エラー: ' + e.message; msgArea.style.color = 'red'; } });
+    document.addEventListener('DOMContentLoaded', () => { const selector = document.getElementById('theme-selector'); if (selector) { localStorage.setItem('fitworks-theme', selector.value); if (typeof applyTheme === 'function') applyTheme(); } document.querySelectorAll('.setting-section').forEach(section => { const content = section.querySelector('.section-content'); const arrow = section.querySelector('.arrow'); content.style.maxHeight = '0px'; content.style.paddingTop = '0px'; content.style.paddingBottom = '0px'; content.style.display = 'none'; if (arrow) arrow.innerHTML = '▼'; }); });
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = []; function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; } window.addEventListener('resize', resizeCanvas); resizeCanvas(); const mouse = { x: undefined, y: undefined }; window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); }); class Particle { constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; } update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; } draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); } } function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); } animate();
 </script>
 </body>
 </html>
