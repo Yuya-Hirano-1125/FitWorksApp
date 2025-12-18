@@ -11,11 +11,10 @@
     <script th:src="@{/js/theme.js}"></script>
     <style>
         /* ==========================================================================
-           🌌 背景用スタイル (スタート画面から移植)
+           🌌 背景用スタイル
            ========================================================================== */
         
         body {
-            /* ベースカラー */
             background-color: #f0f8ff;
             color: #333;
             font-family: 'Noto Sans JP', sans-serif;
@@ -24,7 +23,6 @@
             min-height: 100vh;
         }
 
-        /* 背景エリア */
         .interactive-bg {
             position: fixed;
             top: 0;
@@ -44,7 +42,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* オーブ */
         .orb {
             position: absolute;
             border-radius: 50%;
@@ -62,7 +59,6 @@
             100% { transform: translate(50px, 30px) scale(1.1); }
         }
 
-        /* Canvas */
         #bg-canvas {
             position: absolute;
             top: 0;
@@ -74,7 +70,6 @@
             mix-blend-mode: screen;
         }
 
-        /* ☁️ 雲 */
         .bg-cloud {
             position: absolute;
             background: #fff;
@@ -92,7 +87,6 @@
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
         @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
 
-        /* マウス追従ライトフレア */
         .mouse-flare {
             position: absolute;
             width: 300px;
@@ -108,71 +102,71 @@
         }
 
         /* -------------------------------------------------- */
-        /* コンテナ & ガラスモーフィズム */
+        /* コンテナ & デザイン調整 */
         /* -------------------------------------------------- */
         .container {
             max-width: 1100px;
             margin: 40px auto;
             padding: 30px;
             padding-bottom: 120px;
-            
-            /* ガラス風スタイル */
             background: rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 40px;
             border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 
-                0 30px 60px rgba(100, 149, 237, 0.2), 
-                0 0 0 2px rgba(255, 255, 255, 0.6) inset;
-            
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative;
             z-index: 10;
         }
 
-        /* ヘッダー周り */
+        /* 🔙 戻るボタン */
+        .back-arrow-button {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #555;
+            font-size: 2.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .back-arrow-button:hover {
+            transform: scale(1.1);
+            background: #fff;
+            color: #4facfe;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
         .page-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
             padding: 0 10px;
         }
         .page-title {
             margin: 0;
-            font-size: 1.8rem;
+            font-size: 2rem;
             color: #2c3e50;
             font-weight: 800;
             letter-spacing: -0.5px;
             text-shadow: 0 2px 4px rgba(255,255,255,0.5);
         }
-        .back-btn {
-            background-color: rgba(255, 255, 255, 0.8);
-            color: #495057;
-            padding: 10px 18px;
-            border-radius: 50px;
-            font-size: 0.95rem;
-            text-decoration: none;
-            font-weight: 700;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid rgba(255,255,255,0.5);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-        .back-btn:hover {
-            background-color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-        }
 
-        /* 検索 & フィルターエリア固定 */
         .sticky-header-area {
             position: sticky;
             top: 60px; 
             z-index: 90;
-            /* ガラス風に変更 */
             background-color: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
@@ -183,7 +177,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
 
-        /* 検索バー */
         .search-container {
             display: flex;
             gap: 12px;
@@ -212,7 +205,6 @@
             background: #fff;
         }
 
-        /* ブックマーク一覧ボタン */
         .view-bookmarks-btn {
             background-color: #fff;
             color: #f39c12;
@@ -235,7 +227,6 @@
             box-shadow: 0 6px 15px rgba(243, 156, 18, 0.3);
         }
 
-        /* フィルターボタン */
         .filter-scroll-wrapper {
             overflow-x: auto;
             white-space: nowrap;
@@ -277,7 +268,6 @@
             box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
         }
 
-        /* カテゴリセクション */
         .category-section {
             margin-bottom: 50px;
             padding: 0 5px;
@@ -312,16 +302,13 @@
             border: 1px solid rgba(0,0,0,0.05);
         }
 
-        /* グリッドレイアウト */
         .exercise-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 24px;
         }
 
-        /* カードデザイン改善 */
         .exercise-card {
-            /* 少し透過させて背景をなじませる */
             background: rgba(255, 255, 255, 0.85);
             border-radius: 20px;
             padding: 24px;
@@ -418,7 +405,6 @@
             gap: 4px;
         }
 
-        /* 検索結果なし */
         .no-results {
             text-align: center;
             padding: 60px 20px;
@@ -433,7 +419,6 @@
             margin-bottom: 15px;
         }
 
-        /* モーダル */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -527,7 +512,8 @@
         }
 
         @media (max-width: 600px) {
-            .container { margin: 20px 10px; padding: 20px; border-radius: 30px;}
+            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
+            .container { margin: 20px 10px; padding: 20px; border-radius: 30px; padding-top: 80px !important; }
             .search-container {
                 flex-direction: column;
                 align-items: stretch;
@@ -561,11 +547,12 @@
 <div th:replace="fragments/header :: header"></div>
 
 <div class="container">
+    <a th:href="@{/home}" class="back-arrow-button" title="一つ戻る">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+
     <div class="page-header">
         <h1 class="page-title"><i class="fa-solid fa-book-open"></i> 全種目図鑑</h1>
-        <a th:href="@{/home}" class="back-btn">
-            <i class="fa-solid fa-house"></i> ホーム
-        </a>
     </div>
 
     <div class="sticky-header-area">
@@ -783,7 +770,6 @@
 </script>
 
 <script>
-    // 既存のJSロジック (部位フィルタリングなど)
     function filterByPart(part, btnElement) {
         document.getElementById('exerciseSearchInput').value = '';
         document.getElementById('noResultsMessage').style.display = 'none';

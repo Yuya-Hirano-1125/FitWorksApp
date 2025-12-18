@@ -13,22 +13,19 @@
 
     <style>
         /* ==========================================================================
-           🌌 背景用スタイル (スタート画面から移植)
+           🌌 背景用スタイル
            ========================================================================== */
         
-        /* 全体の設定 */
         body {
             background-color: #f0f8ff;
             min-height: 100vh;
-            /* ランキング画面用に高さを確保 */
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* 上寄せにする（リストが長くなるため） */
+            align-items: flex-start;
             padding-top: 40px;
             padding-bottom: 40px;
         }
 
-        /* 背景エリア */
         .interactive-bg {
             position: fixed;
             top: 0;
@@ -48,7 +45,6 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* オーブ */
         .orb {
             position: absolute;
             border-radius: 50%;
@@ -66,7 +62,6 @@
             100% { transform: translate(50px, 30px) scale(1.1); }
         }
 
-        /* Canvas */
         #bg-canvas {
             position: absolute;
             top: 0;
@@ -78,7 +73,6 @@
             mix-blend-mode: screen;
         }
 
-        /* ☁️ 雲 */
         .bg-cloud {
             position: absolute;
             background: #fff;
@@ -96,7 +90,6 @@
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
         @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
 
-        /* マウス追従ライトフレア */
         .mouse-flare {
             position: absolute;
             width: 300px;
@@ -116,24 +109,51 @@
            ========================================================================== */
         
         .main-container {
-            max-width: 800px; /* ランキング用に少し幅広に */
+            max-width: 800px;
             width: 95%;
             text-align: center;
             padding: 40px 30px;
-            
-            /* スタート画面と同じガラス風スタイル */
             background: rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 45px;
             border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 
-                0 30px 60px rgba(100, 149, 237, 0.2), 
-                0 0 0 2px rgba(255, 255, 255, 0.6) inset;
-            
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative;
             z-index: 10;
-            /* コンテナの浮遊アニメーションはリストが長いと酔う可能性があるので控えめに、または削除 */
+        }
+
+        /* 🔙 戻るボタン */
+        .back-arrow-button {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #555;
+            font-size: 2.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .back-arrow-button:hover {
+            transform: scale(1.1);
+            background: #fff;
+            color: #4facfe;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
+            .main-container { padding-top: 80px !important; }
         }
 
         .ranking-list { 
@@ -146,7 +166,6 @@
         .ranking-item {
             display: flex; 
             align-items: center; 
-            /* 背景を少し透過させてなじませる */
             background: rgba(255, 255, 255, 0.8);
             border-radius: 20px; 
             padding: 15px 20px; 
@@ -181,67 +200,25 @@
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
         }
 
-        /* バッジの色味調整 */
-        .rank-1 { 
-            background: linear-gradient(135deg, #ffd700, #fff0a0); 
-            color: #b8860b; 
-            border: 2px solid #fff;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
-        }
-        .rank-2 { 
-            background: linear-gradient(135deg, #c0c0c0, #e0e0e0); 
-            color: #707070; 
-            border: 2px solid #fff;
-        }
-        .rank-3 { 
-            background: linear-gradient(135deg, #cd7f32, #eab676); 
-            color: #8b4513; 
-            border: 2px solid #fff;
-        }
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #fff0a0); color: #b8860b; border: 2px solid #fff; box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #e0e0e0); color: #707070; border: 2px solid #fff; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #eab676); color: #8b4513; border: 2px solid #fff; }
 
-        .ranking-item.top-rank { 
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid var(--secondary-color);
-        }
-        .ranking-item:has(.rank-1) {
-            border-color: var(--primary-color);
-            background: rgba(255, 240, 245, 0.9); 
-        }
+        .ranking-item.top-rank { background: rgba(255, 255, 255, 0.9); border: 2px solid var(--secondary-color); }
+        .ranking-item:has(.rank-1) { border-color: var(--primary-color); background: rgba(255, 240, 245, 0.9); }
 
-        .user-info { 
-            flex-grow: 1; 
-            text-align: left;
-        }
-        .user-name { 
-            font-weight: 800; 
-            font-size: 1.1rem; 
-            color: #333; /* 文字色を少し濃く */
-            margin-bottom: 4px;
-        }
-        .user-stats { 
-            font-size: 0.9rem; 
-            color: #666; 
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .user-info { flex-grow: 1; text-align: left; }
+        .user-name { font-weight: 800; font-size: 1.1rem; color: #333; margin-bottom: 4px; }
+        .user-stats { font-size: 0.9rem; color: #666; display: flex; align-items: center; gap: 8px; }
 
-        .stat-tag { 
-            background: #4facfe; /* スタート画面のテーマカラーに合わせる */
-            color: white; 
-            padding: 3px 10px; 
-            border-radius: 12px; 
-            font-size: 0.75rem; 
-            font-weight: 700;
-        }
-        .xp-text {
-            font-weight: 600;
-            color: #4facfe;
-        }
+        .stat-tag { background: #4facfe; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; }
+        .xp-text { font-weight: 600; color: #4facfe; }
         
         .page-header {
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; justify-content: center; align-items: center;
             margin-bottom: 20px;
+            flex-direction: column;
+            gap: 15px;
         }
         
         .header-icon { color: #4facfe; margin-right: 8px; }
@@ -278,9 +255,13 @@
 
     <div class="main-container">
         
+        <a th:href="@{/friends}" class="back-arrow-button" title="一つ戻る">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        
         <div class="page-header">
             <div class="ranking-header" style="margin:0;">
-                <h1 style="font-size: 1.8rem; margin:0; text-align:left;">
+                <h1 style="font-size: 1.8rem; margin:0; text-align:center;">
                     <i class="fa-solid fa-trophy header-icon"></i>ランキング
                 </h1>
             </div>
@@ -319,12 +300,6 @@
                 まだフレンドがいません。<br>フレンド管理画面から追加しましょう！
             </li>
         </ul>
-
-        <div class="button-container">
-            <a th:href="@{/friends}" class="button secondary">
-                <i class="fa-solid fa-arrow-left"></i> フレンド画面へ
-            </a>
-        </div>
 
     </div>
 

@@ -55,11 +55,45 @@
             margin: 0 auto;
             padding: 20px;
             position: relative;
-            z-index: 10; /* 背景より手前に */
+            z-index: 10;
         }
-        /* 少し背景が透けるように調整しても良いですが、元の白背景を生かします */
+        
+        /* 🔙 戻るボタン */
+        .back-arrow-button {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #555;
+            font-size: 2.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .back-arrow-button:hover {
+            transform: scale(1.1);
+            background: #fff;
+            color: #4facfe;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
+            .log-list-container { padding-top: 80px !important; }
+        }
+
+        /* 少し背景が透けるように調整 */
         .chart-container, .record-card {
-            background: rgba(255, 255, 255, 0.9); /* 少し透過 */
+            background: rgba(255, 255, 255, 0.9); 
             backdrop-filter: blur(10px);
         }
 
@@ -133,11 +167,9 @@
 </div>
 
 <div class="log-list-container">
-    <div class="back-btn-container">
-        <a th:href="@{/training-log}" class="button secondary" style="padding: 8px 15px; font-size: 0.9rem;">
-            <i class="fa-solid fa-calendar-days"></i> カレンダーに戻る
-        </a>
-    </div>
+    <a th:href="@{/training-log}" class="back-arrow-button" title="一つ戻る">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
 
     <h1><i class="fa-solid fa-list-ul header-icon"></i>全トレーニング記録</h1>
     
@@ -275,7 +307,7 @@
 
     // === 🌟 CANVAS PARTICLE SYSTEM ===
     const canvas = document.getElementById('bg-canvas');
-    const ctxCanvas = canvas.getContext('2d'); // 変数名変更して衝突回避
+    const ctxCanvas = canvas.getContext('2d'); 
     const flare = document.getElementById('mouse-flare');
     
     let particlesArray = [];
@@ -301,7 +333,6 @@
     // Button click effect
     document.querySelectorAll('.button').forEach(btn => {
         btn.addEventListener('click', function(e) {
-            // 普通のリンク遷移を阻害しない程度に
             const rect = btn.getBoundingClientRect();
             const x = e.clientX || (rect.left + rect.width / 2);
             const y = e.clientY || (rect.top + rect.height / 2);
