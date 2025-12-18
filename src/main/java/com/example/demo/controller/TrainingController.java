@@ -161,8 +161,8 @@ public class TrainingController {
     public String showTrainingOptions(Authentication authentication, Model model) {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
         model.addAttribute("freeWeightParts", trainingDataService.getMuscleParts());
-        model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercisesByPart());
         model.addAttribute("cardioExercises", trainingDataService.getCardioExercises());
+        model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercisesByPart());
         return "training/training";
     }
 

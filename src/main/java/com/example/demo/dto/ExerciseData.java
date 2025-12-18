@@ -45,6 +45,11 @@ public class ExerciseData {
 
     // ★ 追加: 表示用に「名前＋難易度」を返す
     public String getDisplayName() {
-        return name + "　　" + difficulty;
+        return "【"+ difficulty+ "】" + name + "　";
     }
+    
+    public String getFullName2() {
+        return "【" + difficulty + "】" + "　" + name ;
+    }
+    
 }
