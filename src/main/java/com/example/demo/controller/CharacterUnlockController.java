@@ -129,7 +129,7 @@ public class CharacterUnlockController {
             userService.consumeUserMaterial(username, materialType, cost);
             userService.unlockCharacterForUser(username, chara.getId());
 
-            System.out.println("DEBUG: 解放成功 user=" + username + ", charaId=" + chara.getId());
+            System.out.println("DEBUG: 解放成功! user=" + username + ", charaId=" + chara.getId());
 
             response.put("success", true);
             response.put("message", String.format("%s を解放しました！", chara.getName()));
@@ -146,5 +146,6 @@ public class CharacterUnlockController {
         }
 
         return ResponseEntity.ok(response);
+        
     }
 }
