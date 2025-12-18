@@ -477,4 +477,29 @@ public class UserService {
         
         return dto;
     }
+ // ===== 新規追加: 素材を消費する処理 =====
+    @Transactional
+    public boolean consumeUserMaterial1(String username, String materialType, int cost) {
+        Optional<UserItem> optItem = userItemRepository.findByUser_UsernameAndItem_Type(username, materialType);
+        if (optItem.isEmpty()) {
+            return false; // 素材が存在しない
+        }
+        UserItem item = optItem.get();
+        if (item.getCount() < cost) {
+            return false; // 足りない
+        }
+        item.setCount(item.getCount() - cost); // 減算
+        userItemRepository.save(item);
+        return true;
+    }
+
+    // ===== 新規追加: キャラを解放済みにする処理 =====
+    @Transactional
+    public void unlockCharacterForUser1(String username, Long characterId) {
+        userRepository.findByUsername(username).ifPresent(user -> {
+            user.addUnlockedCharacter(characterId); // ★Userエンティティにこのメソッドを用意
+            userRepository.save(user);
+        });
+    }
+
 }

@@ -257,8 +257,9 @@ public class User {
         }
         return false;
     }
+    
 
-    // --- 解放済みキャラクター管理 ---
+ // --- 解放済みキャラクター管理 ---
     public void addUnlockedCharacter(Long characterId) {
         if (unlockedCharacters == null) {
             unlockedCharacters = new HashSet<>();
@@ -271,12 +272,16 @@ public class User {
     }
 
     public Set<Long> getUnlockedCharacters() {
+        if (unlockedCharacters == null) {
+            unlockedCharacters = new HashSet<>();
+        }
         return unlockedCharacters;
     }
 
     public void setUnlockedCharacters(Set<Long> unlockedCharacters) {
-        this.unlockedCharacters = unlockedCharacters;
+        this.unlockedCharacters = unlockedCharacters != null ? unlockedCharacters : new HashSet<>();
     }
+
 
     // ★★★ 解放済み背景管理メソッド ★★★
     public Set<String> getUnlockedBackgrounds() {

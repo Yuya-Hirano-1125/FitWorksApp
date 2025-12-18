@@ -1,19 +1,20 @@
 package com.example.demo.controller;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.CharacterEntity;
 import com.example.demo.repository.CharacterRepository;
 import com.example.demo.service.UserService;
 
-@Controller
+@RestController
 public class CharacterUnlockController {
 
     private final CharacterRepository repository;
@@ -25,19 +26,22 @@ public class CharacterUnlockController {
     }
 
     /**
-     * キャラクター解放処理
+     * キャラクター解放処理 (JSONレスポンス)
      */
-    @PostMapping("/characters/unlock")
-    public String unlockCharacter(@RequestParam Long characterId,
-                                  @RequestParam int cost,
-                                  @RequestParam String materialType,
-                                  RedirectAttributes redirectAttributes,
-                                  Principal principal) {
+    @PostMapping("/unlock")
+    public ResponseEntity<Map<String, Object>> unlockCharacter(@RequestBody Map<String, Object> request,
+                                                               Principal principal) {
+
+        Long characterId = Long.valueOf(request.get("characterId").toString());
+        int cost = Integer.parseInt(request.get("cost").toString());
+        String materialType = request.get("materialType").toString();
 
         Optional<CharacterEntity> optChara = repository.findById(characterId);
         if (optChara.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "対象キャラクターが存在しません。");
-            return "redirect:/characters";
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "対象キャラクターが存在しません。"
+            ));
         }
 
         CharacterEntity chara = optChara.get();
@@ -101,14 +105,9 @@ public class CharacterUnlockController {
                 break;
 
             default:
-                chara.setEvolutionMaterials(Map.of()); // エンバーハートなど素材不要
+                chara.setEvolutionMaterials(Map.of());
                 chara.setEvolutionConditions(Map.of());
         }
-
-        // ===== デバッグログ =====
-        System.out.println("DEBUG: ImagePath=" + chara.getImagePath());
-        System.out.println("DEBUG: EvolutionMaterials=" + chara.getEvolutionMaterials());
-        System.out.println("DEBUG: EvolutionConditions=" + chara.getEvolutionConditions());
 
         // --- ユーザー情報を取得 ---
         String username = principal.getName();
@@ -117,27 +116,23 @@ public class CharacterUnlockController {
 
         boolean canUnlock = (userLevel >= chara.getRequiredLevel() && userMaterialCount >= cost);
 
+        Map<String, Object> response = new HashMap<>();
         if (canUnlock) {
             userService.consumeUserMaterial(username, materialType, cost);
             userService.unlockCharacterForUser(username, chara.getId());
 
-            redirectAttributes.addFlashAttribute(
-                "message",
-                String.format("%s を解放しました！ (必要Lv:%d / 必要素材:%d)",
-                        chara.getName(),
-                        chara.getRequiredLevel(),
-                        cost)
-            );
+            response.put("success", true);
+            response.put("message", String.format("%s を解放しました！", chara.getName()));
         } else {
-            redirectAttributes.addFlashAttribute(
-                "error",
-                String.format("条件不足です！ %s の解放には Lv.%d 以上と素材 %d 個が必要です。",
-                        chara.getName(),
-                        chara.getRequiredLevel(),
-                        cost)
-            );
+            response.put("success", false);
+            response.put("message", String.format(
+                "条件不足です！ %s の解放には Lv.%d 以上と素材 %d 個が必要です。",
+                chara.getName(),
+                chara.getRequiredLevel(),
+                cost
+            ));
         }
 
-        return "redirect:/characters";
+        return ResponseEntity.ok(response);
     }
 }

@@ -287,35 +287,42 @@ h1 {
 /* =========================================
    モーダル（ポップオーバー風）
    ========================================= */
-   /* ===== モーダル ===== */
-   .modal {
-       position: fixed;
-       inset: 0;
-       background-color: rgba(0,0,0,0.7);
-       opacity: 0; visibility: hidden; pointer-events: none;
-       transition: opacity 0.3s ease;
-       z-index: 1000;
 
-       display: flex;              /* 追加 */
-       justify-content: center;    /* 横中央 */
-       align-items: center;        /* 縦中央 */
-   }
-   .modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
+/* ===== モーダル ===== */
+.modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.7);
+    opacity: 0; 
+    visibility: hidden; 
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+}
+.modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
 
-   /* 正方形のポップアップ（常に画面中央固定） */
-   .modal-content {
-       position: relative; /* fixedではなくrelativeに */
-       width: 400px; height: 400px;
-       background: #fff;
-       border-radius: 8px;
-       padding: 20px;
-       text-align: left;
-       box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-       animation: fadeIn 0.3s ease-in-out;
-       overflow-y: auto;
-   }
+/* ポップアップ本体 */
+.modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    height: auto;
+    max-height: 90vh;
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: left;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    animation: fadeIn 0.3s ease-in-out;
+    overflow-y: auto;
+    margin: auto;
+}
 
-/* 吹き出しの三角（下向き） */
+/* 吹き出しの三角 */
 .modal-content::after {
     content: '';
     position: absolute;
@@ -326,22 +333,21 @@ h1 {
     border-top: 10px solid #fff;
 }
 
-/* 吹き出しの三角（下向き） */
-.modal-content::after {
-    content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid #fff;
-}
-
+/* ヘッダー */
 .modal-header {
-    margin: 0; padding: 5px; border-bottom: 2px dashed rgba(255,255,255,0.5);
-    font-family: var(--font-title); font-size: 16px; color: #fff; text-shadow: 1px 1px 0 #ff6b81;
+    margin: 0; padding: 5px;
+    border-bottom: 2px dashed rgba(0,0,0,0.1);
+    font-family: var(--font-title);
+    font-size: 16px;
+    color: #333;
+    font-weight: bold;
 }
 
+/* 本文内の画像やメッセージ */
 .modal-body-img img { max-width: 80px; max-height: 80px; object-fit: contain; }
-.modal-message { color: #fff; font-size: 12px; margin: 5px 0; }
+.modal-message { color: #333; font-size: 13px; margin: 5px 0; }
 
+/* 素材リスト（アイコン表示用） */
 .ff-mat-list {
     display: flex; justify-content: center; gap: 5px; margin: 10px 0;
 }
@@ -354,7 +360,35 @@ h1 {
 .ff-mat-count.ok { color: #2ed573; }
 .ff-mat-count.ng { color: #ff4757; }
 
+/* アクションボタン */
 .modal-actions { display: flex; justify-content: center; gap: 10px; }
+
+/* ✅ 進化素材・条件を表形式で見やすく */
+.evolution-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 0.95rem;
+}
+.evolution-table th {
+    text-align: left;
+    background: #f8f9fa;
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    font-weight: bold;
+    width: 50%;
+}
+.evolution-table td {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+    width: 50%;
+}
+.modal-section h4 {
+    margin-top: 15px;
+    font-size: 1rem;
+    color: #e74c3c;
+}
 
 /* =========================================
    戻るボタン
