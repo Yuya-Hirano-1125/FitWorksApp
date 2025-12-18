@@ -67,6 +67,21 @@
         /* --- ヘッダーエリア --- */
         .gacha-header { text-align: center; margin-bottom: 35px; position: relative; }
 
+        /* --- ホームボタンのスタイル (Daily Missionより移植) --- */
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+            
+            /* ガチャ画面用に位置調整: ヘッダー左上に絶対配置 */
+            position: absolute;
+            left: 0;
+            top: 10px; /* タイトルとのバランスを見て調整 */
+            z-index: 20;
+        }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+
         .gacha-title {
             font-family: 'M PLUS Rounded 1c', sans-serif;
             font-size: 5rem; font-weight: 900; line-height: 1.1; margin: 0; letter-spacing: 3px;
@@ -210,7 +225,10 @@
 
 <div class="main-container">
 
-    <div class="gacha-header">
+    <div class="gacha-header" style="position: relative;">
+        <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+            <i class="fa-solid fa-house"></i>
+        </a>
         <h1 class="gacha-title">GACHA</h1>
         <p class="sub-heading">進化素材をあつめよう！</p>
     </div>
@@ -261,11 +279,6 @@
         </a>
     </div>
 
-    <div class="footer-nav">
-        <a th:href="@{/home}" class="home-btn">
-            <i class="fa-solid fa-house-chimney"></i> ホームにもどる
-        </a>
-    </div>
 
 </div>
 
