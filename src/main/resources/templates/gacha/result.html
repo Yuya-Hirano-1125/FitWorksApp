@@ -10,99 +10,353 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
+        /* ==========================================================================
+           🌌 BACKGROUND STYLES (start.htmlと同様)
+           ========================================================================== */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --primary-color: #4facfe; 
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+
+        .interactive-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%;
+            animation: auroraFlow 20s ease infinite;
+            overflow: hidden;
+        }
+
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: floatOrb 30s infinite alternate ease-in-out;
+            z-index: 0;
+        }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            mix-blend-mode: screen;
+        }
+
+        .bg-cloud {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.85;
+            z-index: 2;
+            pointer-events: none;
+            box-shadow: 0 0 60px rgba(255,255,255,0.9);
+        }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
+
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        .mouse-flare {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            mix-blend-mode: screen;
+            z-index: 20;
+            filter: blur(15px);
+            transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
+
+        /* ==========================================================================
+           🎁 GACHA RESULT SPECIFIC STYLES
+           ========================================================================== */
+        
+        /* メインコンテナをすりガラス風にする */
         .gacha-page .main-container {
-            max-width: 600px;
+            max-width: 800px;
+            width: 90%;
+            margin: 40px auto;
+            padding: 40px;
+            
+            background: rgba(255, 255, 255, 0.65); /* 半透明 */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 10px;
         }
 
         .result-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
         }
 
         .result-card {
-            background: rgb(255, 255, 255);
-            padding: 15px;
-            border: 2px solid var(--primary-color);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.85); /* カードも少し透過 */
+            padding: 20px;
+            border: 2px solid transparent;
+            border-radius: 20px;
             text-align: center;
             animation: fadeIn 0.8s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
         }
 
         .result-card img {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             object-fit: contain;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+        }
+        
+        .result-name {
+            font-weight: 700;
+            color: #444;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
         }
 
-        /* ★★★★★ 文字色をレアリティごとに変更する CSS ★★★★★ */
+        /* レアリティごとのスタイル */
         .rarity-UR {
             font-weight: 900;
             background: linear-gradient(45deg, #ff00cc, #3333ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            font-size: 1.2rem;
         }
 
         .rarity-SSR {
-            color: #FFD700; /* 金色 */
-            font-weight: 700;
+            color: #FFD700;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .rarity-SR {
-            color: #C0C0C0; /* シルバー */
+            color: #a0a0a0;
             font-weight: 700;
         }
 
         .rarity-R {
-            color: #CD7F32; /* ブロンズ */
+            color: #cd7f32;
             font-weight: 700;
         }
 
-        .result-rarity {
-            font-size: 14px;
-            margin-top: 5px;
+        /* ボタンデザインの統一 */
+        .button {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            display: inline-block;
+            text-decoration: none;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
         }
+        
+        .button.primary {
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            color: white;
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+            border: none;
+        }
+        .button.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(79, 172, 254, 0.5);
+        }
+
+        .button.secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: #555;
+            border: 2px solid #ddd;
+        }
+        .button.secondary:hover {
+            background: #fff;
+            border-color: #aaa;
+            transform: translateY(-3px);
+        }
+
     </style>
 </head>
 
 <body class="gacha-page">
+
+<div class="interactive-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div id="mouse-flare" class="mouse-flare"></div>
+    <div class="bg-cloud cloud-1"></div>
+    <div class="bg-cloud cloud-2"></div>
+    <div class="bg-cloud cloud-3"></div>
+</div>
+
 <div class="main-container">
 
-    <h1><i class="fa-solid fa-gift"></i> ガチャ結果</h1>
-    <p class="sub-heading">おめでとう！以下のアイテムを獲得しました！</p>
+    <h1><i class="fa-solid fa-gift" style="color: #ff6b6b;"></i> ガチャ結果</h1>
+    <p class="sub-heading" style="color:#666;">おめでとう！以下のアイテムを獲得しました！</p>
 
-    <!-- ▼ ガチャ結果一覧 -->
     <div class="result-list">
-
-        <!-- ★ rarity に応じて class を動的に追加 -->
         <div class="result-card" th:each="item : ${results}">
             <img th:src="@{${item.imagePath}}" alt="result">
 
             <div class="result-name" th:text="${item.name}"></div>
 
-            <!-- ★ class に rarity-SSR / rarity-SR などが付く -->
             <div class="result-rarity"
                  th:text="${item.rarity}"
                  th:classappend="' rarity-' + ${item.rarity}">
             </div>
         </div>
-
     </div>
 
-    <!-- ▼ ボタン：userId を引き継ぐ -->
-    <div class="button-container" style="margin-top: 40px;">
+    <div class="button-container" style="margin-top: 50px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
 
         <a th:href="@{/gacha(userId=${userId})}" class="button primary">
             <i class="fa-solid fa-rotate-right"></i> もう一度引く
         </a>
 
-        <a th:href="@{/home}" class="button secondary" style="margin-top: 20px;">
+        <a th:href="@{/home}" class="button secondary">
             <i class="fa-solid fa-house"></i> ホームに戻る
         </a>
 
     </div>
 </div>
+
+<script>
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    const flare = document.getElementById('mouse-flare');
+    
+    let particlesArray = [];
+    let width, height;
+
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = event.x;
+        mouse.y = event.y;
+        if(flare) {
+            flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+        }
+        for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
+    });
+
+    // 雲のパララックス
+    const cloud1 = document.querySelector('.cloud-1');
+    const cloud2 = document.querySelector('.cloud-2');
+    document.addEventListener('mousemove', (e) => {
+        const x = (window.innerWidth - e.pageX) / 60;
+        const y = (window.innerHeight - e.pageY) / 60;
+        if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
+        if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
+    });
+
+    class Particle {
+        constructor() {
+            this.x = mouse.x;
+            this.y = mouse.y;
+            this.size = Math.random() * 5 + 2;
+            this.speedX = Math.random() * 4 - 2;
+            this.speedY = Math.random() * 4 - 2;
+            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.size > 0.2) this.size -= 0.1;
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'white';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw();
+            if (particlesArray[i].size <= 0.3) {
+                particlesArray.splice(i, 1);
+                i--;
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
+</script>
+
 </body>
 </html>
