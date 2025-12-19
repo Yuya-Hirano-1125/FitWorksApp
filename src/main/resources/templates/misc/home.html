@@ -414,6 +414,35 @@
         .btn-go-backgrounds i {
             color: #f4d9a6;
         }
+		
+		/* --- ボタンが押せなくなる問題を解決する追加設定 --- */
+
+		/* 1. チュートリアル関連は、動いていない時はクリックを「透過」させる */
+		.tutorial-backdrop, 
+		.tutorial-spotlight, 
+		.tutorial-pointer,
+		.tutorial-rpg-box {
+		    pointer-events: none; /* 透明な壁にならないようにする設定 */
+		}
+
+		/* 2. 'active' クラスがついている時（チュートリアル中）だけ操作を有効にする */
+		.tutorial-backdrop.active,
+		.tutorial-rpg-box.active {
+		    pointer-events: auto;
+		}
+
+		/* 3. 背景の雲やエフェクトは、絶対にボタンの邪魔をしないようにする */
+		.interactive-bg,
+		.mouse-follower-cloud,
+		.bg-cloud {
+		    pointer-events: none !important;
+		    z-index: -1; 
+		}
+
+		/* 4. メッセージボックスがボタンを覆い隠さないように調整 */
+		#tutorial-rpg-box {
+		    z-index: 10001;
+		}
     </style>
 </head>
 <body class="home-page">
