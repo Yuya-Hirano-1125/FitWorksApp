@@ -4,11 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+//★追加: AuthenticationPrincipal を解決するためのインポート
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +26,7 @@ import com.example.demo.form.EditEmailForm;
 import com.example.demo.form.EditPasswordForm;
 import com.example.demo.form.EditUsernameForm;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.CustomUserDetailsService;
 import com.example.demo.service.UserService;
 
 @Controller
@@ -28,6 +34,16 @@ public class SettingController {
 
     @Autowired
     private UserService userService;
+    
+ // ★追加: userDetailsService フィールドを追加
+    private final CustomUserDetailsService userDetailsService;
+    
+ // ★修正: 引数に CustomUserDetailsService を追加して保存する
+    public SettingController(UserService userService, CustomUserDetailsService userDetailsService) {
+        this.userService = userService;
+        this.userDetailsService = userDetailsService; // ★追加
+    }
+    
     
     @Autowired
     private UserRepository userRepository;
@@ -93,35 +109,65 @@ public class SettingController {
         
         return response;
     }
-
-    // -------------------------
-    // ユーザー名編集
-    // -------------------------
+ // 1. ユーザー名変更画面の表示
     @GetMapping("/edit-username")
     public String editUsername(Model model) {
-        if (!model.containsAttribute("form")) {
-             model.addAttribute("form", new EditUsernameForm());
-        }
+        model.addAttribute("editUsernameForm", new EditUsernameForm());
         return "settings/edit-username";
     }
 
+    // 2. ユーザー名変更の処理実行
+ // 引数に RedirectAttributes を追加
     @PostMapping("/edit-username")
-    public String updateUsername(@ModelAttribute("form") EditUsernameForm form, 
-                                 BindingResult bindingResult, 
-                                 RedirectAttributes redirectAttributes,
+    public String updateUsername(@Validated @ModelAttribute EditUsernameForm form,
+                                 BindingResult result,
+                                 @AuthenticationPrincipal UserDetails currentUser,
+                                 RedirectAttributes redirectAttributes, // ★追加: これでメッセージを持ち運べます
                                  Model model) {
         
-        if ("admin".equalsIgnoreCase(form.getUsername())) {
-            bindingResult.rejectValue("username", "error.username", "そのユーザー名は既に使用されています。");
-            model.addAttribute("errorMessage", "ユーザー名の更新に失敗しました。入力内容を確認してください。");
-            return "settings/edit-username"; 
+        // バリデーションエラー時は元の画面に戻す
+        if (result.hasErrors()) {
+            return "settings/edit-username";
         }
 
-        // TODO: DB の更新処理
-        System.out.println("新しいユーザー名：" + form.getUsername());
+        try {
+            // DB更新
+            userService.updateUsername(currentUser.getUsername(), form.getNewUsername());
+
+            // セキュリティコンテキスト（ログイン情報）の更新
+            updateSecurityContext(form.getNewUsername());
+
+            // ★追加: 完了メッセージをセット（リダイレクト先に一度だけ表示される）
+            redirectAttributes.addFlashAttribute("successMessage", "ユーザー名が正常に変更されました！✨");
+
+            // ★変更: 設定一覧画面へリダイレクト
+            return "redirect:/settings"; 
+
+        } catch (IllegalArgumentException e) {
+            // 重複エラーなどは元の画面で表示
+            model.addAttribute("errorMessage", e.getMessage());
+            return "settings/edit-username";
+        }
+    }
+
+    /**
+     * Spring Securityのコンテキスト内のユーザー情報を更新するヘルパーメソッド
+     */
+    private void updateSecurityContext(String newUsername) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         
-        redirectAttributes.addFlashAttribute("successMessage", "ユーザー名が正常に更新されました！🎉");
-        return "redirect:/settings?updated=username";
+        // 現在のPrincipalから新しいUserDetailsを作成（または既存のものをラップしなおす）
+        // ここでは簡易的に、現在のAuthenticationを維持しつつPrincipalの名前が変わった前提で再設定します
+        // ※ 本格的には UserDetailsService からロードし直すのが最も安全です
+        
+        User newUser = new User(); // ここはEntityのUserではなくUserDetailsの実装に合わせて調整
+        // CustomUserDetailsを使用している場合は、以下のように再ロードが推奨されます:
+        UserDetails newUserDetails = userDetailsService.loadUserByUsername(newUsername);
+
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                newUserDetails, auth.getCredentials(), auth.getAuthorities());
+        
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
 
     // -------------------------

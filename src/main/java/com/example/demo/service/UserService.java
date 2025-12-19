@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -546,6 +547,26 @@ public class UserService {
                 System.out.println("DEBUG: User not found: " + username);
                 return new ArrayList<>();
             });
+    }
+    /**
+     * ユーザー名を更新する
+     * @param currentUsername 現在のログインユーザー名
+     * @param newUsername 新しいユーザー名
+     * @throws IllegalArgumentException ユーザー名が既に存在する場合
+     */
+    @Transactional
+    public void updateUsername(String currentUsername, String newUsername) {
+        // 1. 重複チェック
+        if (userRepository.findByUsername(newUsername).isPresent()) {
+            throw new IllegalArgumentException("そのユーザー名は既に使用されています。");
+        }
+
+        // 2. ユーザー取得と更新
+        User user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        
+        user.setUsername(newUsername);
+        userRepository.save(user);
     }
 
 }

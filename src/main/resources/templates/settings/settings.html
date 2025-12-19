@@ -66,6 +66,11 @@
     </div>
 
 <div class="main-container">
+	<div th:if="${successMessage}" class="alert alert-success" role="alert" 
+			     style="color: #155724; background-color: #d4edda; border-color: #c3e6cb; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+			    <i class="fa-solid fa-check-circle"></i>
+			    <span th:text="${successMessage}">変更完了メッセージ</span>
+			</div>
     
     <div class="page-header-container">
         <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
