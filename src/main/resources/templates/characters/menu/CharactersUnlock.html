@@ -11,327 +11,53 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
 	<style>
-	    body {
-	        margin: 0; padding: 0;
-	        background-color: #f0f8ff;
-	        min-height: 100vh;
-	        font-family: 'Noto Sans JP', sans-serif;
-	        color: #333;
-	    }
-
-	    /* キャラクターカード */
-	    .character-card { 
-	        display: inline-block; margin: 10px; text-align: center; 
-	        background: #ffffff;
-	        padding: 15px; border-radius: 12px;
-	        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-	        color: #333;
-	    }
-	    .character-img-wrapper { 
-	        width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; 
-	        overflow: hidden; border: 3px solid #eee; position: relative; background: #fff; 
-	    }
+	    body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; color: #333; }
+	    .character-card { display: inline-block; margin: 10px; text-align: center; background: #ffffff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); color: #333; }
+	    .character-img-wrapper { width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; overflow: hidden; border: 3px solid #eee; position: relative; background: #fff; }
 	    .character-img { width: 100%; height: 100%; object-fit: cover; }
 	    .character-name { font-weight: 800; color: #000; margin: 8px 0 4px; font-size: 1.1rem; }
 	    .character-rarity { font-weight: bold; color: #555; display: block; margin-bottom: 5px; }
 	    .requirements { font-size: 0.9rem; margin-top: 5px; font-weight: 700; color: #333; background: rgba(0,0,0,0.03); padding: 4px; border-radius: 4px; }
 	    .unlocked-label { font-weight: bold; color: #27ae60; }
-	    
-	    .character-img-wrapper.locked .character-img { 
-	        filter: brightness(0%); 
-	        opacity: 0.7; 
-	    }
+	    .character-img-wrapper.locked .character-img { filter: brightness(0%); opacity: 0.7; }
 	    .lock-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2rem; color: #fff; text-shadow: 0 0 5px rgba(0,0,0,0.8); }
-
+	    
 	    /* モーダル */
-	    .modal {
-	      position: fixed;
-	      top: 0; 
-	      left: 0; 
-	      right: 0; 
-	      bottom: 0;
-	      background-color: rgba(0,0,0,0.6);
-	      opacity: 0;
-	      visibility: hidden;
-	      pointer-events: none;
-	      transition: opacity 0.3s ease;
-	      z-index: 1000;
-	      overflow-y: auto;
-	      padding: 20px;
-	    }
-
-	    .modal.show {
-	      opacity: 1;
-	      visibility: visible;
-	      pointer-events: auto;
-	    }
-
-	    .modal-content {
-	      position: absolute;
-	      width: 95%;
-	      max-width: 500px;
-	      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-	      border-radius: 20px;
-	      padding: 0;
-	      text-align: center;
-	      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-	      overflow: visible;
-	      transform: translateX(-50%);
-	      border: 3px solid #f39c12;
-	    }
-
-	    .modal-header {
-	      background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-	      padding: 10px 20px;
-	      border-radius: 17px 17px 0 0;
-	      position: relative;
-	    }
-
-	    .modal-header h3 {
-	      margin: 0;
-	      color: #fff;
-	      font-size: 1rem;
-	      font-weight: 900;
-	      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-	      letter-spacing: 1px;
-	    }
-
-	    .modal-body-wrapper {
-	      padding: 12px 15px;
-	      overflow: visible;
-	      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-	    }
-
-	    .close {
-	        position: absolute; 
-	        right: 12px; 
-	        top: 50%;
-	        transform: translateY(-50%);
-	        font-size: 1.4rem; 
-	        cursor: pointer; 
-	        color: #fff;
-	        width: 24px;
-	        height: 24px;
-	        display: flex;
-	        align-items: center;
-	        justify-content: center;
-	        border-radius: 50%;
-	        background: rgba(255,255,255,0.2);
-	        transition: all 0.3s;
-	        font-weight: bold;
-	    }
-	    .close:hover { 
-	      background: rgba(255,255,255,0.3);
-	      transform: translateY(-50%) rotate(90deg);
-	    }
-
-	    .modal-footer {
-	      padding: 12px 15px;
-	      background: #1a252f;
-	      border-radius: 0 0 17px 17px;
-	      text-align: center;
-	      border-top: 2px solid #f39c12;
-	    }
-
-	    .btn-confirm {
-	        padding: 10px 28px;
-	        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-	        color: #fff;
-	        border: none; 
-	        border-radius: 20px; 
-	        cursor: pointer;
-	        transition: all 0.3s;
-	        font-weight: 900;
-	        font-size: 0.9rem;
-	        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.5);
-	        letter-spacing: 0.5px;
-	    }
-	    .btn-confirm:hover { 
-	      transform: translateY(-2px);
-	      box-shadow: 0 6px 20px rgba(231, 76, 60, 0.7);
-	    }
+	    .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.6); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease; z-index: 1000; overflow-y: auto; padding: 20px; }
+	    .modal.show { opacity: 1; visibility: visible; pointer-events: auto; }
+	    .modal-content { position: absolute; width: 95%; max-width: 500px; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); border-radius: 20px; padding: 0; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.5); overflow: visible; transform: translateX(-50%); border: 3px solid #f39c12; }
+	    .modal-header { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); padding: 10px 20px; border-radius: 17px 17px 0 0; position: relative; }
+	    .modal-header h3 { margin: 0; color: #fff; font-size: 1rem; font-weight: 900; text-shadow: 0 2px 4px rgba(0,0,0,0.3); letter-spacing: 1px; }
+	    .modal-body-wrapper { padding: 12px 15px; overflow: visible; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); }
+	    .close { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 1.4rem; cursor: pointer; color: #fff; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all 0.3s; font-weight: bold; }
+	    .close:hover { background: rgba(255,255,255,0.3); transform: translateY(-50%) rotate(90deg); }
+	    .modal-footer { padding: 12px 15px; background: #1a252f; border-radius: 0 0 17px 17px; text-align: center; border-top: 2px solid #f39c12; }
+	    .btn-confirm { padding: 10px 28px; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: #fff; border: none; border-radius: 20px; cursor: pointer; transition: all 0.3s; font-weight: 900; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.5); letter-spacing: 0.5px; }
+	    .btn-confirm:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(231, 76, 60, 0.7); }
 	    
 	    /* 現在のキャラクター表示 */
-	    .current-character {
-	      background: rgba(255,255,255,0.05);
-	      border-radius: 10px;
-	      padding: 8px;
-	      margin-bottom: 10px;
-	      border: 2px solid rgba(255,255,255,0.1);
-	    }
-	    
-	    .char-card {
-	      display: inline-block;
-	      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-	      border-radius: 10px;
-	      padding: 8px 12px;
-	      border: 2px solid #f39c12;
-	      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-	      min-width: 80px;
-	    }
-	    
-	    .char-card img {
-	      width: 55px;
-	      height: 55px;
-	      border-radius: 50%;
-	      border: 2px solid #fff;
-	      margin-bottom: 6px;
-	      background: #fff;
-	      object-fit: cover;
-	      object-position: center 20%;
-	      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-	    }
-	    
-	    .char-card-info {
-	      display: flex;
-	      flex-direction: column;
-	      gap: 2px;
-	    }
-	    
-	    .char-card-name {
-	      color: #fff;
-	      font-weight: 900;
-	      font-size: 0.75rem;
-	      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-	    }
-	    
-	    .char-card-rarity {
-	      color: #ffd700;
-	      font-weight: 900;
-	      font-size: 0.7rem;
-	      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-	    }
-	    
-	    .char-card-level {
-	      display: none;
-	    }
+	    .current-character { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 8px; margin-bottom: 10px; border: 2px solid rgba(255,255,255,0.1); }
+	    .char-card { display: inline-block; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); border-radius: 10px; padding: 8px 12px; border: 2px solid #f39c12; box-shadow: 0 2px 8px rgba(0,0,0,0.4); min-width: 80px; }
+	    .char-card img { width: 55px; height: 55px; border-radius: 50%; border: 2px solid #fff; margin-bottom: 6px; background: #fff; object-fit: cover; object-position: center 20%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+	    .char-card-info { display: flex; flex-direction: column; gap: 2px; }
+	    .char-card-name { color: #fff; font-weight: 900; font-size: 0.75rem; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+	    .char-card-rarity { color: #ffd700; font-weight: 900; font-size: 0.7rem; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+	    .char-card-level { display: none; }
 	    
 	    /* 必要素材エリア */
-	    .required-materials {
-	      background: rgba(0,0,0,0.2);
-	      border-radius: 8px;
-	      padding: 8px;
-	      margin-bottom: 10px;
-	      border: 2px solid #f39c12;
-	    }
+	    .required-materials { background: rgba(0,0,0,0.2); border-radius: 8px; padding: 8px; margin-bottom: 10px; border: 2px solid #f39c12; }
+	    .material-grid { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+	    .mat-item { display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.08); border-radius: 6px; padding: 5px; min-width: 50px; border: 1px solid rgba(255,255,255,0.15); }
+	    .mat-item img { width: 32px; height: 32px; object-fit: contain; background: white; border-radius: 5px; padding: 3px; margin-bottom: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+	    .mat-item-name { color: #fff; font-size: 0.6rem; font-weight: 700; text-align: center; margin-bottom: 2px; line-height: 1.1; }
+	    .mat-item-count { color: #f39c12; font-size: 0.75rem; font-weight: 900; }
 	    
-	    .material-grid {
-	      display: flex;
-	      justify-content: center;
-	      gap: 6px;
-	      flex-wrap: wrap;
-	    }
-	    
-	    .mat-item {
-	      display: flex;
-	      flex-direction: column;
-	      align-items: center;
-	      background: rgba(255,255,255,0.08);
-	      border-radius: 6px;
-	      padding: 5px;
-	      min-width: 50px;
-	      border: 1px solid rgba(255,255,255,0.15);
-	    }
-	    
-	    .mat-item img {
-	      width: 32px;
-	      height: 32px;
-	      object-fit: contain;
-	      background: white;
-	      border-radius: 5px;
-	      padding: 3px;
-	      margin-bottom: 3px;
-	      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-	    }
-	    
-	    .mat-item-name {
-	      color: #fff;
-	      font-size: 0.6rem;
-	      font-weight: 700;
-	      text-align: center;
-	      margin-bottom: 2px;
-	      line-height: 1.1;
-	    }
-	    
-	    .mat-item-count {
-	      color: #f39c12;
-	      font-size: 0.75rem;
-	      font-weight: 900;
-	    }
-	    
-	    /* 進化矢印 */
-	    .evo-arrow {
-	      font-size: 1.1rem;
-	      color: #f39c12;
-	      margin: 5px 0;
-	      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-	    }
-	    
-	    /* 進化後キャラクター */
-	    .evolved-character {
-	      background: rgba(231, 76, 60, 0.15);
-	      border-radius: 10px;
-	      padding: 8px;
-	      margin-bottom: 0;
-	      border: 2px solid #e74c3c;
-	    }
-	    
-	    .evolved-character .char-card {
-	      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-	    }
-	    
-	    /* その他条件 */
-	    .other-conditions {
-	      background: rgba(52, 152, 219, 0.15);
-	      border-radius: 10px;
-	      padding: 10px;
-	      margin-bottom: 0;
-	      border: 2px solid #3498db;
-	    }
-	    
-	    .cond-item {
-	      display: flex;
-	      justify-content: space-between;
-	      padding: 6px 10px;
-	      background: rgba(255,255,255,0.05);
-	      margin-bottom: 5px;
-	      border-radius: 6px;
-	      border-left: 3px solid #3498db;
-	      font-size: 0.8rem;
-	    }
-	    
-	    .cond-item:last-child {
-	      margin-bottom: 0;
-	    }
-	    
-	    .cond-label {
-	      color: #ecf0f1;
-	      font-weight: 700;
-	    }
-	    
-	    .cond-value {
-	      color: #f39c12;
-	      font-weight: 900;
-	    }
-	    
-	    .evolution-table {
-	      display: none;
-	    }
-	    .modal-section {
-	      display: none;
-	    }
-		/* 素材所持数の色分け */
-		.mat-item-count.sufficient {
-		  color: #2ecc71;  /* 緑色 - 足りている */
-		  font-weight: 900;
-		}
-
-		.mat-item-count.insufficient {
-		  color: #e74c3c;  /* 赤色 - 足りていない */
-		  font-weight: 900;
-		}
+	    .evo-arrow { font-size: 1.1rem; color: #f39c12; margin: 5px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+	    .evolved-character { background: rgba(231, 76, 60, 0.15); border-radius: 10px; padding: 8px; margin-bottom: 0; border: 2px solid #e74c3c; }
+	    .evolved-character .char-card { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+		.mat-item-count.sufficient { color: #2ecc71; font-weight: 900; }
+		.mat-item-count.insufficient { color: #e74c3c; font-weight: 900; }
 	</style>
-
 </head>
 
 <body>
@@ -351,13 +77,11 @@
             </div>
         </header>
 
-		<!-- 炎属性 -->
 		<div class="pass-section">
 		    <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
 		    <div class="char-list">
 		        <div th:each="chara : ${fireChars}" class="character-card fire">
-		            <div class="character-img-wrapper" 
-		                 th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
+		            <div class="character-img-wrapper" th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
 		                <img class="character-img" th:src="${chara.imagePath}" th:alt="${chara.name}">
 		                <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
 		            </div>
@@ -371,22 +95,8 @@
 		                <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
 		                <div th:if="${!unlockedIds.contains(chara.id)}">
 		                    <button type="button" class="btn-confirm"
-		                            onclick="openModal(
-		                                this.getAttribute('data-id'),
-		                                this.getAttribute('data-name'),
-		                                this.getAttribute('data-materials'),
-		                                this.getAttribute('data-conditions'),
-		                                this.getAttribute('data-cost'),
-		                                this.getAttribute('data-materialType'),
-		                                this,
-		                                event
-		                            )"
-		                            th:attr="data-id=${chara.id},
-		                                     data-name=${chara.name}, 
-		                                     data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, 
-		                                     data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')},
-		                                     data-cost=${chara.unlockCost},
-		                                     data-materialType='紅玉'">
+		                            onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
+		                            th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${chara.evolutionMaterials}, data-conditions=${chara.evolutionConditions}, data-cost=${chara.unlockCost}, data-materialType='紅玉'">
 		                        <i class="fa-solid fa-lock-open"></i> 解放条件
 		                    </button>
 		                </div>
@@ -394,153 +104,144 @@
 		        </div>
 		    </div>
 		</div>
-	
-        <div class="pass-section">
-            <h2 class="attribute-heading water-color"><i class="fa-solid fa-droplet"></i> 水属性</h2>
-            <div class="char-list">
-                <div th:each="chara : ${waterChars}" class="character-card water">
-                    <div class="character-img-wrapper"
-                         th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
-                        <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-                        <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
-                    </div>
-                    <p class="character-name" th:text="${chara.name}">キャラ名</p>
-                    <span class="character-rarity" th:text="${chara.rarity}">★</span>
-                    <div class="requirements">
-                        <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-                        <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-                    </div>
-                    <div class="unlock-action" style="margin-top:10px;">
-                        <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
-                        <div th:if="${!unlockedIds.contains(chara.id)}">
-                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
-                                    th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='蒼玉'">
-                                <i class="fa-solid fa-lock-open"></i> 解放条件
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+		<div class="pass-section">
+		    <h2 class="attribute-heading water-color"><i class="fa-solid fa-droplet"></i> 水属性</h2>
+		    <div class="char-list">
+		        <div th:each="chara : ${waterChars}" class="character-card water">
+		            <div class="character-img-wrapper" th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
+		                <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+		                <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
+		            </div>
+		            <p class="character-name" th:text="${chara.name}">キャラ名</p>
+		            <span class="character-rarity" th:text="${chara.rarity}">★</span>
+		            <div class="requirements">
+		                <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+		                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+		            </div>
+		            <div class="unlock-action" style="margin-top:10px;">
+		                <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
+		                <div th:if="${!unlockedIds.contains(chara.id)}">
+		                    <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
+		                            th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${chara.evolutionMaterials}, data-conditions=${chara.evolutionConditions}, data-cost=${chara.unlockCost}, data-materialType='蒼玉'">
+		                        <i class="fa-solid fa-lock-open"></i> 解放条件
+		                    </button>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
 
         <div class="pass-section">
-            <h2 class="attribute-heading grass-color"><i class="fa-solid fa-leaf"></i> 草属性</h2>
-            <div class="char-list">
-                <div th:each="chara : ${grassChars}" class="character-card grass">
-                    <div class="character-img-wrapper"
-                         th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
-                        <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-                        <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
-                    </div>
-                    <p class="character-name" th:text="${chara.name}">キャラ名</p>
-                    <span class="character-rarity" th:text="${chara.rarity}">★</span>
-                    <div class="requirements">
-                        <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-                        <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-                    </div>
-                    <div class="unlock-action" style="margin-top:10px;">
-                        <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
-                        <div th:if="${!unlockedIds.contains(chara.id)}">
-                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
-                                    th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='翠玉'">
-                                <i class="fa-solid fa-lock-open"></i> 解放条件
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+		    <h2 class="attribute-heading grass-color"><i class="fa-solid fa-leaf"></i> 草属性</h2>
+		    <div class="char-list">
+		        <div th:each="chara : ${grassChars}" class="character-card grass">
+		            <div class="character-img-wrapper" th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
+		                <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+		                <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
+		            </div>
+		            <p class="character-name" th:text="${chara.name}">キャラ名</p>
+		            <span class="character-rarity" th:text="${chara.rarity}">★</span>
+		            <div class="requirements">
+		                <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+		                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+		            </div>
+		            <div class="unlock-action" style="margin-top:10px;">
+		                <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
+		                <div th:if="${!unlockedIds.contains(chara.id)}">
+		                    <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
+		                            th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${chara.evolutionMaterials}, data-conditions=${chara.evolutionConditions}, data-cost=${chara.unlockCost}, data-materialType='翠玉'">
+		                        <i class="fa-solid fa-lock-open"></i> 解放条件
+		                    </button>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
 
-        <div class="pass-section">
-            <h2 class="attribute-heading light-color"><i class="fa-solid fa-sun"></i> 光属性</h2>
-            <div class="char-list">
-                <div th:each="chara : ${lightChars}" class="character-card light">
-                    <div class="character-img-wrapper"
-                         th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
-                        <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-                        <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
-                    </div>
-                    <p class="character-name" th:text="${chara.name}">キャラ名</p>
-                    <span class="character-rarity" th:text="${chara.rarity}">★</span>
-                    <div class="requirements">
-                        <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-                        <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-                    </div>
-                    <div class="unlock-action" style="margin-top:10px;">
-                        <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
-                        <div th:if="${!unlockedIds.contains(chara.id)}">
-                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
-                                    th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='聖玉'">
-                                <i class="fa-solid fa-lock-open"></i> 解放条件
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+		<div class="pass-section">
+		    <h2 class="attribute-heading light-color"><i class="fa-solid fa-sun"></i> 光属性</h2>
+		    <div class="char-list">
+		        <div th:each="chara : ${lightChars}" class="character-card light">
+		            <div class="character-img-wrapper" th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
+		                <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+		                <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
+		            </div>
+		            <p class="character-name" th:text="${chara.name}">キャラ名</p>
+		            <span class="character-rarity" th:text="${chara.rarity}">★</span>
+		            <div class="requirements">
+		                <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+		                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+		            </div>
+		            <div class="unlock-action" style="margin-top:10px;">
+		                <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
+		                <div th:if="${!unlockedIds.contains(chara.id)}">
+		                    <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
+		                            th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${chara.evolutionMaterials}, data-conditions=${chara.evolutionConditions}, data-cost=${chara.unlockCost}, data-materialType='聖玉'">
+		                        <i class="fa-solid fa-lock-open"></i> 解放条件
+		                    </button>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
 
-        <div class="pass-section">
-            <h2 class="attribute-heading dark-color"><i class="fa-solid fa-moon"></i> 闇属性</h2>
-            <div class="char-list">
-                <div th:each="chara : ${darkChars}" class="character-card dark">
-                    <div class="character-img-wrapper"
-                         th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
-                        <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-                        <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
-                    </div>
-                    <p class="character-name" th:text="${chara.name}">キャラ名</p>
-                    <span class="character-rarity" th:text="${chara.rarity}">★</span>
-                    <div class="requirements">
-                        <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-                        <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-                    </div>
-                    <div class="unlock-action" style="margin-top:10px;">
-                        <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
-                        <div th:if="${!unlockedIds.contains(chara.id)}">
-                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
-                                    th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='闇玉'">
-                                <i class="fa-solid fa-lock-open"></i> 解放条件
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="pass-section">
-            <h2 class="attribute-heading secret-color">
-                <i class="fa-solid fa-star"></i> シークレット属性
-            </h2>
-            <div class="char-list">
-                <div th:each="chara : ${secretChars}" class="character-card secret">
-                    <div class="character-img-wrapper"
-                         th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
-                        <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
-                        <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
-                    </div>
-                    <p class="character-name" th:text="${chara.name}">キャラ名</p>
-                    <span class="character-rarity" th:text="${chara.rarity}">★</span>
-                    <div class="requirements">
-                        <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
-                        <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
-                    </div>
-                    <div class="unlock-action" style="margin-top:10px;">
-                        <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
-                        <div th:if="${!unlockedIds.contains(chara.id)}">
-                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
-                                    th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='虹玉'">
-                                <i class="fa-solid fa-lock-open"></i> 解放条件
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+		<div class="pass-section">
+		    <h2 class="attribute-heading dark-color"><i class="fa-solid fa-moon"></i> 闇属性</h2>
+		    <div class="char-list">
+		        <div th:each="chara : ${darkChars}" class="character-card dark">
+		            <div class="character-img-wrapper" th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
+		                <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+		                <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
+		            </div>
+		            <p class="character-name" th:text="${chara.name}">キャラ名</p>
+		            <span class="character-rarity" th:text="${chara.rarity}">★</span>
+		            <div class="requirements">
+		                <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+		                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+		            </div>
+		            <div class="unlock-action" style="margin-top:10px;">
+		                <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
+		                <div th:if="${!unlockedIds.contains(chara.id)}">
+		                    <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
+		                            th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${chara.evolutionMaterials}, data-conditions=${chara.evolutionConditions}, data-cost=${chara.unlockCost}, data-materialType='闇玉'">
+		                        <i class="fa-solid fa-lock-open"></i> 解放条件
+		                    </button>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+		
+		<div class="pass-section">
+		    <h2 class="attribute-heading secret-color"><i class="fa-solid fa-star"></i> シークレット属性</h2>
+		    <div class="char-list">
+		        <div th:each="chara : ${secretChars}" class="character-card secret">
+		            <div class="character-img-wrapper" th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
+		                <img class="character-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
+		                <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
+		            </div>
+		            <p class="character-name" th:text="${chara.name}">キャラ名</p>
+		            <span class="character-rarity" th:text="${chara.rarity}">★</span>
+		            <div class="requirements">
+		                <span>必要Lv: <span th:text="${chara.requiredLevel}">1</span></span>
+		                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
+		            </div>
+		            <div class="unlock-action" style="margin-top:10px;">
+		                <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
+		                <div th:if="${!unlockedIds.contains(chara.id)}">
+		                    <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
+		                            th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${chara.evolutionMaterials}, data-conditions=${chara.evolutionConditions}, data-cost=${chara.unlockCost}, data-materialType='虹玉'">
+		                        <i class="fa-solid fa-lock-open"></i> 解放条件
+		                    </button>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
 
         <div class="back-btn-container" style="margin:40px 0 20px; text-align:center;">
-            <a th:href="@{/characters}" class="btn-back">
-                <i class="fa-solid fa-reply"></i> メニューへ戻る
-            </a>
+            <a th:href="@{/characters}" class="btn-back"><i class="fa-solid fa-reply"></i> メニューへ戻る</a>
         </div>
     </div>
 
@@ -564,84 +265,45 @@
 	  const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
 	  const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-	  // Thymeleafからmaterialcountsを取得
+	  // Thymeleafから取得したMap。キーはID文字列 "1", "2" ...
 	  const materialCounts = /*[[${materialCounts}]]*/ {};
-	  
-	  console.log("DEBUG: DBから取得した素材所持数:", materialCounts);
+	  console.log("DEBUG: DBから取得した素材所持数(IDベース):", materialCounts);
 
-	  const materialImages = {
-	    "紅玉": "/img/item/R-red.png",
-	    "蒼玉": "/img/item/R-blue.png",
-	    "翠玉": "/img/item/R-green.png",
-	    "聖玉": "/img/item/R-yellow.png",
-	    "闇玉": "/img/item/R-purple.png",
-	    "赤の聖結晶": "/img/item/SR-red.png",
-	    "青の聖結晶": "/img/item/SR-blue.png",
-	    "緑の聖結晶": "/img/item/SR-green.png",
-	    "黄の聖結晶": "/img/item/SR-yellow.png",
-	    "紫の聖結晶": "/img/item/SR-purple.png",
-	    "赫焔鱗": "/img/item/SSR-red.png",
-	    "氷蒼の矛": "/img/item/SSR-blue.png",
-	    "緑晶燈": "/img/item/SSR-green.png",
-	    "夢紡ぎの枕": "/img/item/SSR-yellow.png",
-	    "月詠みの斧": "/img/item/SSR-purple.png"
+      // ★ IDと画像・名前のマッピング定義 (data.sqlの順番)
+	  const itemMap = {
+	    "1": { name: "紅玉", img: "/img/item/R-red.png" },
+	    "2": { name: "蒼玉", img: "/img/item/R-blue.png" },
+	    "3": { name: "翠玉", img: "/img/item/R-green.png" },
+	    "4": { name: "聖玉", img: "/img/item/R-yellow.png" },
+	    "5": { name: "闇玉", img: "/img/item/R-purple.png" },
+	    "6": { name: "赤の聖結晶", img: "/img/item/SR-red.png" },
+	    "7": { name: "青の聖結晶", img: "/img/item/SR-blue.png" },
+	    "8": { name: "緑の聖結晶", img: "/img/item/SR-green.png" },
+	    "9": { name: "黄の聖結晶", img: "/img/item/SR-yellow.png" },
+	    "10": { name: "紫の聖結晶", img: "/img/item/SR-purple.png" },
+	    "11": { name: "赫焔鱗", img: "/img/item/SSR-red.png" },
+	    "12": { name: "氷華の杖", img: "/img/item/SSR-blue.png" },
+	    "13": { name: "緑晶灯", img: "/img/item/SSR-green.png" },
+	    "14": { name: "夢紡ぎの枕", img: "/img/item/SSR-yellow.png" },
+	    "15": { name: "月詠みの杖", img: "/img/item/SSR-purple.png" },
+	    "16": { name: "夢幻の鍵", img: "/img/item/UR-niji.png" }
 	  };
 
-	  // ★★★ openModal関数 - 1つだけ定義 ★★★
 	  window.openModal = function(id, name, materials, conditions, cost, materialType, buttonElement, event) {
+        // materials文字列は "1=3, 2=3" のような形式になっている
 	    if (materials) materials = materials.replace(/[{}]/g, "");
 	    if (conditions) conditions = conditions.replace(/[{}]/g, "");
 	    
-	    console.log("=== openModal called ===");
-	    console.log("DEBUG: materials:", materials);
-	    console.log("DEBUG: materialCounts:", materialCounts);
-
-	    // キャラクターIDから画像パスを生成
 	    const currentCharId = Math.floor(id / 10) * 10 - 10;
 	    const currentCharImgPath = currentCharId >= 0 ? '/img/character/' + currentCharId + '.png' : '/img/character/0.png';
 	    const nextCharImgPath = '/img/character/' + id + '.png';
-	    
-	    // キャラクター名のマッピング
-	    const charNames = {
-	      0: 'エンバーハート', 10: 'ドラコ', 20: 'ドラコス', 30: 'ドラグノイド',
-	      40: 'ルーナドロップ', 50: 'ドリー', 60: 'ドルフィ', 70: 'ドルフィナス',
-	      80: 'フォリアン', 90: 'シル', 100: 'シルファ', 110: 'シルフィナ',
-	      120: 'ハローバスト', 130: 'メリー', 140: 'メリル', 150: 'メリノア',
-	      160: 'ノビュリス', 170: 'ローピ', 180: 'ローバス', 190: 'ローピアス',
-	      250: 'シークレット'
-	    };
-	    const currentCharName = charNames[currentCharId] || '';
-	    
-	    // レアリティ表示用
-	    const rarityMap = {
-	      0: '★1', 10: '★2', 20: '★3', 30: '★4', 
-	      40: '★1', 50: '★2', 60: '★3', 70: '★4', 
-	      80: '★1', 90: '★2', 100: '★3', 110: '★4', 
-	      120: '★1', 130: '★2', 140: '★3', 150: '★4',
-	      160: '★1', 170: '★2', 180: '★3', 190: '★4', 
-	      250: '???'
-	    };
-	    const currentRarity = rarityMap[currentCharId] || '★1';
-	    const nextRarity = rarityMap[id] || '★2';
 
 	    document.getElementById("modalTitle").innerText = "進化合成";
-
 	    let bodyHtml = "";
 
-	    // 現在のキャラクター
-	    bodyHtml += "<div class='current-character'>";
-	    bodyHtml += "<div class='char-card'>";
-	    bodyHtml += "<img src='" + currentCharImgPath + "' alt='現在のキャラ'>";
-	    bodyHtml += "<div class='char-card-info'>";
-	    bodyHtml += "<div class='char-card-name'>" + currentCharName + "</div>";
-	    bodyHtml += "<div class='char-card-rarity'>" + currentRarity + "</div>";
-	    bodyHtml += "</div>";
-	    bodyHtml += "</div>";
-	    bodyHtml += "</div>";
+	    bodyHtml += "<div class='current-character'><div class='char-card'><img src='" + currentCharImgPath + "'><div class='char-card-info'><div class='char-card-name'>Current</div></div></div></div>";
 
-	    // 必要素材
-	    bodyHtml += "<div class='required-materials'>";
-	    bodyHtml += "<div class='material-grid'>";
+	    bodyHtml += "<div class='required-materials'><div class='material-grid'>";
 	    
 	    if (materials && materials.trim()) {
 	      let matArray = materials.split(",");
@@ -649,64 +311,35 @@
 	        let m = matArray[i];
 	        let parts = m.trim().split("=");
 	        if (parts.length === 2) {
-	          let matName = parts[0].trim();
+	          let matId = parts[0].trim(); // ここがID ("1", "2"...)
 	          let matRequired = parseInt(parts[1].trim());
-	          let matOwned = materialCounts[matName] || 0;
-	          let imgPath = materialImages[matName];
+	          
+              // IDを使って所持数と情報を取得
+	          let matOwned = materialCounts[matId] || 0;
+              let itemInfo = itemMap[matId];
 	          
 	          let countClass = matOwned >= matRequired ? 'sufficient' : 'insufficient';
 	          
-	          console.log("素材: " + matName + ", 必要: " + matRequired + ", 所持: " + matOwned);
-	          
-	          if (imgPath) {
+	          if (itemInfo) {
 	            bodyHtml += "<div class='mat-item'>";
-	            bodyHtml += "<img src='" + imgPath + "' alt='" + matName + "'>";
-	            bodyHtml += "<div class='mat-item-name'>" + matName + "</div>";
+	            bodyHtml += "<img src='" + itemInfo.img + "' alt='" + itemInfo.name + "'>";
+	            bodyHtml += "<div class='mat-item-name'>" + itemInfo.name + "</div>";
 	            bodyHtml += "<div class='mat-item-count " + countClass + "'>" + matOwned + "/" + matRequired + "</div>";
 	            bodyHtml += "</div>";
-	          }
+	          } else {
+                console.warn("未知のアイテムID: " + matId);
+              }
 	        }
 	      }
 	    }
-	    
 	    bodyHtml += "</div></div>";
-
-	    // 進化矢印
-	    bodyHtml += "<div class='evo-arrow'>⬇</div>";
-
-	    // 進化後のキャラクター
-	    bodyHtml += "<div class='evolved-character'>";
-	    bodyHtml += "<div class='char-card'>";
-	    bodyHtml += "<img src='" + nextCharImgPath + "' alt='" + name + "'>";
-	    bodyHtml += "<div class='char-card-info'>";
-	    bodyHtml += "<div class='char-card-name'>" + name + "</div>";
-	    bodyHtml += "<div class='char-card-level'>Lv.1</div>";
-	    bodyHtml += "<div class='char-card-rarity'>" + nextRarity + "</div>";
-	    bodyHtml += "</div>";
-	    bodyHtml += "</div>";
-	    bodyHtml += "</div>";
+        
+	    bodyHtml += "<div class='evo-arrow'>⬇</div><div class='evolved-character'><div class='char-card'><img src='" + nextCharImgPath + "'><div class='char-card-info'><div class='char-card-name'>" + name + "</div></div></div></div>";
 
 	    document.getElementById("modalBody").innerHTML = bodyHtml;
 	    
-	    let footerHtml = "<button class='btn-confirm' onclick=\"unlockCharacter('" + id + "','" + name + "','" + cost + "','" + materialType + "')\">"
-	                  + "進化させる"
-	                  + "</button>";
+	    let footerHtml = "<button class='btn-confirm' onclick=\"unlockCharacter('" + id + "','" + name + "','" + cost + "','" + materialType + "')\">進化させる</button>";
 	    document.getElementById("modalFooter").innerHTML = footerHtml;
-	    
-	    if (event && buttonElement) {
-	      const card = buttonElement.closest('.character-card');
-	      if (card) {
-	        const cardRect = card.getBoundingClientRect();
-	        const modalContent = document.querySelector('.modal-content');
-	        
-	        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-	        const modalTop = cardRect.top + scrollTop - 20;
-	        const modalLeft = 50;
-	        
-	        modalContent.style.top = modalTop + 'px';
-	        modalContent.style.left = modalLeft + '%';
-	      }
-	    }
 	    
 	    document.getElementById("globalModal").classList.add("show");
 	  };
@@ -716,59 +349,23 @@
 	  };
 
 	  window.unlockCharacter = function(id, name, cost, materialType) {
-	    console.log("DEBUG: unlockCharacter called", {id, name, cost, materialType});
-	    
 	    fetch("/unlock", {
 	      method: "POST",
-	      headers: { 
-	        "Content-Type": "application/json",
-	        [csrfHeader]: csrfToken
-	      },
-	      body: JSON.stringify({
-	        characterId: id,
-	        characterName: name,
-	        cost: cost,
-	        materialType: materialType
-	      })
+	      headers: { "Content-Type": "application/json", [csrfHeader]: csrfToken },
+	      body: JSON.stringify({ characterId: id, characterName: name, cost: cost, materialType: materialType })
 	    })
-	    .then(response => {
-	      console.log("DEBUG: Response status:", response.status);
-	      if (!response.ok) {
-	        throw new Error(`HTTP error! status: ${response.status}`);
-	      }
-	      return response.json();
-	    })
+	    .then(r => r.json())
 	    .then(data => {
-	      console.log("DEBUG: Response data:", data);
-	      if (data.success) {
-	        alert(name + " を解放しました!");
-	        closeModal();
-	        location.reload();
-	      } else {
-	        alert("解放失敗: " + (data.message || "不明なエラー"));
-	      }
+	      if (data.success) { alert("解放しました!"); location.reload(); }
+	      else { alert("失敗: " + data.message); }
 	    })
-	    .catch(error => {
-	      console.error("解放エラー:", error);
-	      alert("通信エラーが発生しました: " + error.message);
-	    });
+        .catch(e => alert("通信エラー"));
 	  };
-	  
-	  window.onclick = function(event) {
-	    const modal = document.getElementById("globalModal");
-	    if (event.target == modal) {
-	      closeModal();
-	    }
-	  };
-	  
-	  document.addEventListener('keydown', function(event) {
-	    if (event.key === 'Escape') {
-	      const modal = document.getElementById("globalModal");
-	      if (modal.classList.contains('show')) {
-	        closeModal();
-	      }
-	    }
-	  });
+      
+      // モーダル外クリックで閉じる
+      window.onclick = function(event) {
+        if (event.target == document.getElementById("globalModal")) closeModal();
+      }
 	});
 	</script>
 </body>

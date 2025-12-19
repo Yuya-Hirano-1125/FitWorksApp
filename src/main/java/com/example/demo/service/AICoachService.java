@@ -56,6 +56,7 @@ public class AICoachService {
     /**
      * ★追加: ホーム画面用の一言アドバイス生成
      * 時間帯や状況に合わせて、柔軟なアドバイス（40文字以内）を生成します。
+     * エラー発生時は、AIエラーを表示せず、デフォルトの挨拶を返します。
      */
     public String generateHomeAdvice(User user) {
         LocalTime now = LocalTime.now();
@@ -84,8 +85,13 @@ public class AICoachService {
         sb.append("- 挨拶は短く、すぐにアドバイスに入る。\n");
 
         try {
-            return callGeminiApi(sb.toString());
+            // エラーハンドリングのため、共通メソッドを使わず直接呼び出し
+            if (this.client == null) throw new IllegalStateException("API Key未設定");
+            GenerateContentResponse response = client.models.generateContent(MODEL_ID, sb.toString(), null);
+            return response.text();
         } catch (Exception e) {
+            // ログには出すが、画面には挨拶だけを返す
+            System.err.println("Home Advice Error: " + e.getMessage());
             return user.getUsername() + "さん、今日も良い筋肉ライフをムキ！";
         }
     }
@@ -399,7 +405,8 @@ public class AICoachService {
             return response.text();
         } catch (Exception e) {
             e.printStackTrace();
-            return "エラーが発生しましたムキ！(" + e.getMessage() + ")";
+            // エラー内容はログに出すが、画面には短いメッセージだけを返す
+            return "アクセスが集中しているムキ！少し時間を置いて試してほしいムキ！";
         }
     }
 }
