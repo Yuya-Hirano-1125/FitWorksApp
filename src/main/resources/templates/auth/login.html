@@ -15,204 +15,55 @@
         /* =========================================================
            🌌 SPLIT LAYOUT LOGIN SCREEN (横長ワイド版)
            ========================================================= */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f0f8ff;
-            min-height: 100vh;
-            overflow-x: hidden;
-            font-family: 'Noto Sans JP', sans-serif;
-        }
-
-        /* -----------------------------------------------------------
-           🌌 BACKGROUND: AURORA
-           ----------------------------------------------------------- */
-        .interactive-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%;
-            animation: auroraFlow 20s ease infinite;
-        }
-
-        @keyframes auroraFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* オーブ & パーティクル関連は共通 */
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; overflow-x: hidden; font-family: 'Noto Sans JP', sans-serif; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; animation: floatOrb 30s infinite alternate; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation: floatOrb 30s infinite alternate-reverse; }
-        
         @keyframes floatOrb { to { transform: translate(50px, 30px); } }
-
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
         .mouse-flare { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%); transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px); }
         .mega-sparkle { position: fixed; pointer-events: none; z-index: 99999; box-shadow: 0 0 8px rgba(255, 255, 255, 0.8); }
-
-        /* -----------------------------------------------------------
-           📦 MAIN CONTAINER (SPLIT LAYOUT)
-           ----------------------------------------------------------- */
-        .center-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 40px;
-            box-sizing: border-box;
-        }
-
-        .main-container {
-            /* 左右分割用にFlexboxを使用 */
-            display: flex;
-            flex-direction: row;
-            
-            /* 横幅をガツンと広げる */
-            width: 100%;
-            max-width: 1100px; 
-            min-height: 600px; /* ある程度の高さを確保 */
-
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2);
-            
-            overflow: hidden; /* 角丸からはみ出さないように */
-            position: relative;
-            z-index: 10;
-        }
-
-        /* --- 左側：ウェルカムエリア --- */
-        .login-left {
-            flex: 1; /* 1:1の比率、または width: 45% 等 */
-            width: 45%;
-            background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.1));
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            border-right: 1px solid rgba(255, 255, 255, 0.5);
-            color: #333;
-            text-align: center;
-        }
-
-        .login-left h1 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 2.8rem;
-            font-weight: 900;
-            margin: 0 0 10px 0;
-            color: #333;
-        }
-        .login-left .welcome-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: rgb(0, 0, 0);
-            margin-bottom: 30px;
-        }
-        .login-logo {
-            width: 200px;
-            height: 200px;
-            object-fit: contain;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));
-            margin-bottom: 20px;
-            animation: floatLogo 6s ease-in-out infinite;
-        }
-        @keyframes floatLogo {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        /* --- 右側：フォームエリア --- */
-        .login-right {
-            flex: 1.3; /* 入力エリアを少し広く */
-            width: 55%;
-            padding: 50px 60px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.4);
-        }
-
+        .center-wrapper { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 40px; box-sizing: border-box; }
+        .main-container { display: flex; flex-direction: row; width: 100%; max-width: 1100px; min-height: 600px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-radius: 40px; border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2); overflow: hidden; position: relative; z-index: 10; }
+        .login-left { flex: 1; width: 45%; background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.1)); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; border-right: 1px solid rgba(255, 255, 255, 0.5); color: #333; text-align: center; }
+        .login-left h1 { font-family: 'Poppins', sans-serif; font-size: 2.8rem; font-weight: 900; margin: 0 0 10px 0; color: #333; }
+        .login-left .welcome-text { font-size: 1.1rem; font-weight: 600; color: rgb(0, 0, 0); margin-bottom: 30px; }
+        .login-logo { width: 200px; height: 200px; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1)); margin-bottom: 20px; animation: floatLogo 6s ease-in-out infinite; }
+        @keyframes floatLogo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .login-right { flex: 1.3; width: 55%; padding: 50px 60px; display: flex; flex-direction: column; justify-content: center; background: rgba(255, 255, 255, 0.4); }
         .login-header { text-align: left; margin-bottom: 25px; }
         .login-header h2 { font-size: 1.8rem; margin: 0; color: #333; font-weight: 800; }
         .login-header p { margin: 5px 0 0; color: #666; font-size: 0.95rem; }
-
-        /* フォーム要素 */
         .form-group { margin-bottom: 20px; }
         label { font-weight: 700; color: #555; font-size: 0.9rem; margin-bottom: 6px; display: block; }
-        input[type="text"], input[type="password"], input[type="tel"] {
-            width: 100%; padding: 15px 18px; border-radius: 15px;
-            border: 2px solid rgba(255,255,255,0.8);
-            background: rgba(255,255,255,0.7);
-            font-size: 1rem; transition: all 0.3s; box-sizing: border-box;
-        }
-        input:focus {
-            border-color: #4facfe; background: #fff; outline: none;
-            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2);
-        }
-
-        /* Remember Me & Forgot Password */
-        .form-footer {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 25px; font-size: 0.9rem;
-        }
-        .remember-me {
-            display: flex; align-items: center; gap: 8px; cursor: pointer; color: #555; font-weight: 600; margin: 0;
-        }
+        input[type="text"], input[type="password"], input[type="tel"] { width: 100%; padding: 15px 18px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.7); font-size: 1rem; transition: all 0.3s; box-sizing: border-box; }
+        input:focus { border-color: #4facfe; background: #fff; outline: none; box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2); }
+        .form-footer { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; font-size: 0.9rem; }
+        .remember-me { display: flex; align-items: center; gap: 8px; cursor: pointer; color: #555; font-weight: 600; margin: 0; }
         .remember-me input { width: 18px; height: 18px; accent-color: #4facfe; cursor: pointer; }
         .forgot-link { color: #4facfe; font-weight: 700; text-decoration: none; }
         .forgot-link:hover { text-decoration: underline; }
-
-        /* ボタン */
-        .button {
-            padding: 16px; font-size: 1.1rem; font-weight: 800; border-radius: 30px; width: 100%;
-            display: block; text-align: center; border: none; cursor: pointer;
-            position: relative; overflow: hidden; transition: transform 0.1s;
-        }
-        .button.primary {
-            background: linear-gradient(90deg, #4facfe, #00f2fe);
-            color: white;
-            box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
-        }
+        .button { padding: 16px; font-size: 1.1rem; font-weight: 800; border-radius: 30px; width: 100%; display: block; text-align: center; border: none; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.1s; }
+        .button.primary { background: linear-gradient(90deg, #4facfe, #00f2fe); color: white; box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4); }
         .button.primary:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(79, 172, 254, 0.6); }
-
         .separator-container { display: flex; align-items: center; margin: 25px 0; color: #888; font-size: 0.9rem; }
         .separator-container::before, .separator-container::after { content: ''; flex: 1; border-bottom: 1px solid rgba(0,0,0,0.1); }
         .separator-container span { padding: 0 15px; }
-
-        /* ソーシャルボタン (コンパクトに横並び) */
         .social-login-group { display: flex; gap: 15px; }
-        .social-btn {
-            flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px;
-            border-radius: 15px; font-weight: 700; color: white; text-decoration: none;
-            transition: transform 0.2s; border: none; cursor: pointer; font-size: 0.95rem;
-        }
+        .social-btn { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; border-radius: 15px; font-weight: 700; color: white; text-decoration: none; transition: transform 0.2s; border: none; cursor: pointer; font-size: 0.95rem; }
         .social-btn:hover { transform: translateY(-2px); opacity: 0.9; }
         .btn-line { background: #06C755; }
         .btn-apple { background: #000; }
         .btn-bio { background: #333; width: 100%; margin-bottom: 15px; }
         .social-btn i { margin-right: 8px; font-size: 1.1rem; }
-
-        /* SMSエリア */
         .sms-login-section { margin-top: 20px; padding-top: 20px; border-top: 1px dashed rgba(0,0,0,0.1); }
         .sms-input-group { display: flex; gap: 10px; margin-top: 10px; }
         .sms-action-btn { background: #4facfe; color: white; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-
         .register-link { text-align: center; margin-top: 30px; font-size: 0.9rem; color: #666; }
         .register-link a { color: #4facfe; font-weight: 800; text-decoration: none; }
-        
         .error-message { color: #ff6b6b; background: rgba(255, 107, 107, 0.1); padding: 12px; border-radius: 10px; margin-bottom: 20px; font-weight: 600; text-align: center; font-size: 0.9rem; }
-
-        /* 📱 スマホ対応: 縦並びに戻す */
         @media (max-width: 900px) {
             .main-container { flex-direction: column; max-width: 500px; height: auto; }
             .login-left { width: 100%; padding: 30px 20px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.5); }
@@ -349,8 +200,17 @@
     });
 
     // SMS & WebAuthn Logic
-    function bufferToBase64url(b){ const s = String.fromCharCode(...new Uint8Array(b)); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
-    function base64urlToBuffer(s){ return Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), c => c.charCodeAt(0)).buffer; }
+    function bufferToBase64url(b){ 
+        const s = String.fromCharCode(...new Uint8Array(b)); 
+        return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); 
+    }
+    
+    // パディング補完ロジック
+    function base64urlToBuffer(s){ 
+        const b64 = s.replace(/-/g, '+').replace(/_/g, '/');
+        const padding = b64.length % 4 === 0 ? '' : '='.repeat(4 - (b64.length % 4));
+        return Uint8Array.from(atob(b64 + padding), c => c.charCodeAt(0)).buffer; 
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
         const csrfToken = document.getElementById('csrf-token-val').value;
@@ -362,15 +222,48 @@
         const step2 = document.getElementById('sms-step-2');
         const msgArea = document.getElementById('sms-message');
         const btnBio = document.getElementById('biometric-login-btn');
+        const usernameInput = document.getElementById('username'); // ユーザー名入力欄取得
 
         function showMessage(msg, isError=false){ msgArea.textContent = msg; msgArea.style.color = isError?'#ff6b6b':'#4facfe'; }
 
         if(btnBio) {
             btnBio.addEventListener('click', async () => {
                 if(!window.PublicKeyCredential){ alert('生体認証未対応'); return; }
+
+                // ★ユーザー名入力を必須にする
+                const username = usernameInput.value.trim();
+                if (!username) {
+                    alert('生体認証を行う前に、ユーザー名を入力してください');
+                    usernameInput.focus();
+                    return;
+                }
+
                 try {
-                    const opt = await (await fetch('/api/webauthn/login/options')).json();
-                    const cred = await navigator.credentials.get({ publicKey: { challenge: base64urlToBuffer(opt.challenge), rpId: window.location.hostname, userVerification: 'preferred' } });
+                    // ★ユーザー名をパラメータとして送信
+                    const opt = await (await fetch('/api/webauthn/login/options?username=' + encodeURIComponent(username))).json();
+
+                    // publicKeyオプション作成
+                    const publicKey = {
+                        challenge: base64urlToBuffer(opt.challenge),
+                        userVerification: 'preferred'
+                        // rpId は自動判定に任せる
+                    };
+
+                    // ★サーバーから allowCredentials が返ってきたら設定する
+                    if (opt.allowCredentials && opt.allowCredentials.length > 0) {
+                        publicKey.allowCredentials = opt.allowCredentials.map(c => ({
+                            type: c.type,
+                            id: base64urlToBuffer(c.id),
+                            transports: c.transports
+                        }));
+                    } else {
+                        // ユーザーが見つからない、またはキーが登録されていない場合
+                        alert('このユーザー名で登録された生体認証キーが見つかりません。');
+                        return;
+                    }
+
+                    const cred = await navigator.credentials.get({ publicKey });
+                    
                     const res = await fetch('/api/webauthn/login', { method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrfToken}, body: JSON.stringify({
                         credentialId: bufferToBase64url(cred.rawId),
                         clientDataJSON: bufferToBase64url(cred.response.clientDataJSON),
@@ -378,7 +271,13 @@
                         signature: bufferToBase64url(cred.response.signature),
                         userHandle: cred.response.userHandle ? bufferToBase64url(cred.response.userHandle) : null
                     })});
-                    if(res.ok) window.location.href='/home'; else alert('認証失敗');
+                    
+                    if(res.ok) window.location.href='/home'; 
+                    else {
+                        const err = await res.text();
+                        console.error("Auth failed:", err);
+                        alert('認証失敗: ' + err);
+                    }
                 } catch(e){ console.error(e); alert('エラー発生'); }
             });
         }

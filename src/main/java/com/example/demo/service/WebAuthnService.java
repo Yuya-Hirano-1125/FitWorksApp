@@ -1,9 +1,12 @@
 package com.example.demo.service;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,28 +44,47 @@ public class WebAuthnService {
     private final WebAuthnManager webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager();
     private final ObjectConverter objectConverter = new ObjectConverter();
 
-    // ※重要: 本番環境では実際のドメインとポートに合わせてください (https必須)
-    private static final String RP_ID = "localhost"; 
-    private static final String ORIGIN_URL = "http://localhost:8086";
+    @Value("${webauthn.rp.id:localhost}")
+    private String rpId;
+
+    // 一般的なデフォルトポート 8080 に変更
+    @Value("${webauthn.origin.url:http://localhost:8080}")
+    private String originUrl;
 
     public Challenge generateChallenge() {
         return new DefaultChallenge();
     }
 
     /**
-     * Base64URLデコード（パディング不足を補完してデコード）
+     * ユーザーに紐づくCredential IDのリストを取得する
+     */
+    @Transactional(readOnly = true)
+    public List<String> getCredentialIds(User user) {
+        List<Authenticator> authenticators = authenticatorRepository.findByUser(user);
+        return authenticators.stream()
+                .map(Authenticator::getCredentialId)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Base64URLデコード (Java標準ライブラリ使用・パディング補完付き)
      */
     private byte[] decodeBase64Url(String source) {
-        if (source == null) {
+        if (source == null || source.isEmpty()) {
             return new byte[0];
         }
-        // パディング(=)が不足している場合に補完する
-        String base64 = source.replace("-", "+").replace("_", "/");
-        int padding = 4 - (base64.length() % 4);
+        String base64Url = source;
+        int padding = 4 - (base64Url.length() % 4);
         if (padding < 4) {
-            base64 += "=".repeat(padding);
+            base64Url += "=".repeat(padding);
         }
-        return Base64.getDecoder().decode(base64);
+        try {
+            return Base64.getUrlDecoder().decode(base64Url);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Base64 Decode Error: " + e.getMessage());
+            System.err.println("Input String: " + source);
+            throw e;
+        }
     }
 
     /**
@@ -70,16 +92,20 @@ public class WebAuthnService {
      */
     @Transactional
     public void register(String clientDataJSONStr, String attestationObjectStr, Challenge challenge, User user, String deviceName) {
+        System.out.println("Registering: clientDataJSON length=" + (clientDataJSONStr != null ? clientDataJSONStr.length() : "null"));
+        System.out.println("Registering: attestationObject length=" + (attestationObjectStr != null ? attestationObjectStr.length() : "null"));
+
         byte[] clientDataJSON = decodeBase64Url(clientDataJSONStr);
         byte[] attestationObject = decodeBase64Url(attestationObjectStr);
 
+        // 引数順序修正済み: (attestationObject, clientDataJSON)
         RegistrationRequest registrationRequest = new RegistrationRequest(
-            clientDataJSON,
-            attestationObject
+            attestationObject,
+            clientDataJSON
         );
 
         RegistrationParameters registrationParameters = new RegistrationParameters(
-            new ServerProperty(new Origin(ORIGIN_URL), RP_ID, challenge, null),
+            new ServerProperty(new Origin(originUrl), rpId, challenge, null),
             null, 
             false, 
             false  
@@ -88,7 +114,6 @@ public class WebAuthnService {
         RegistrationData registrationData = webAuthnManager.parse(registrationRequest);
         webAuthnManager.validate(registrationData, registrationParameters);
 
-        // DBに保存
         Authenticator auth = new Authenticator();
         auth.setUser(user);
         
@@ -123,11 +148,12 @@ public class WebAuthnService {
         byte[] userHandleBytes = userHandle != null ? decodeBase64Url(userHandle) : null;
         byte[] credentialIdBytes = decodeBase64Url(credentialId);
 
+        // 引数順序修正済み: (..., authenticatorData, clientDataJSON, ...)
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
             credentialIdBytes,
             userHandleBytes,
-            clientDataJSON,
-            authenticatorData,
+            authenticatorData, // binary
+            clientDataJSON,    // JSON
             signature
         );
 
@@ -145,87 +171,46 @@ public class WebAuthnService {
             coseKey
         );
 
-        // コンストラクタエラーを回避するため、インターフェースを直接実装して CredentialRecord を作成
         CredentialRecord credentialRecord = new CredentialRecord() {
             @Override
-            public AttestedCredentialData getAttestedCredentialData() {
-                return attestedCredentialData;
-            }
-
+            public AttestedCredentialData getAttestedCredentialData() { return attestedCredentialData; }
             @Override
-            public AttestationStatement getAttestationStatement() {
-                return null;
-            }
-
+            public AttestationStatement getAttestationStatement() { return null; }
             @Override
-            public long getCounter() {
-                return auth.getCount();
-            }
-
+            public long getCounter() { return auth.getCount(); }
             @Override
-            public Set<AuthenticatorTransport> getTransports() {
-                return null;
-            }
-
+            public Set<AuthenticatorTransport> getTransports() { return null; }
             @Override
-            public AuthenticationExtensionsAuthenticatorOutputs<RegistrationExtensionAuthenticatorOutput> getAuthenticatorExtensions() {
-                return null;
-            }
-
+            public AuthenticationExtensionsAuthenticatorOutputs<RegistrationExtensionAuthenticatorOutput> getAuthenticatorExtensions() { return null; }
             @Override
-            public Boolean isUvInitialized() {
-                return null;
-            }
-
+            public Boolean isUvInitialized() { return null; }
             @Override
-            public Boolean isBackupEligible() {
-                return null;
-            }
-
+            public Boolean isBackupEligible() { return null; }
             @Override
-            public Boolean isBackedUp() {
-                return null;
-            }
-
-            // --- 追加実装（エラー解消のために必須）---
+            public Boolean isBackedUp() { return null; }
             @Override
-            public CollectedClientData getClientData() {
-                return null;
-            }
-
+            public CollectedClientData getClientData() { return null; }
             @Override
-            public void setCounter(long value) {
-                // 検証用一時オブジェクトのため実装不要
-            }
-
+            public void setCounter(long value) {}
             @Override
-            public void setUvInitialized(boolean value) {
-                // 検証用一時オブジェクトのため実装不要
-            }
-
+            public void setUvInitialized(boolean value) {}
             @Override
-            public void setBackupEligible(boolean value) {
-                // 検証用一時オブジェクトのため実装不要
-            }
-
+            public void setBackupEligible(boolean value) {}
             @Override
-            public void setBackedUp(boolean value) {
-                // 検証用一時オブジェクトのため実装不要
-            }
+            public void setBackedUp(boolean value) {}
         };
 
         AuthenticationParameters authenticationParameters = new AuthenticationParameters(
-            new ServerProperty(new Origin(ORIGIN_URL), RP_ID, challenge, null),
+            new ServerProperty(new Origin(originUrl), rpId, challenge, null),
             credentialRecord,
-            null, // allowCredentials
-            false, // userVerificationRequired
-            true   // userPresenceRequired
+            null, 
+            false, 
+            true
         );
 
         AuthenticationData authenticationData = webAuthnManager.parse(authenticationRequest);
         webAuthnManager.validate(authenticationData, authenticationParameters);
 
-        // カウンター更新
         auth.setCount(authenticationData.getAuthenticatorData().getSignCount());
         authenticatorRepository.save(auth);
 

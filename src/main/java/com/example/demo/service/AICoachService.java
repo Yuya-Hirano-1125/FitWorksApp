@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,10 +33,10 @@ public class AICoachService {
 
     private Client client;
 
-    // ★修正: gemini-2.5-flash (または preview/exp が必要ならそちら)
+    // gemini-2.5-flash
     private static final String MODEL_ID = "gemini-2.5-flash"; 
     
-    // ★修正: 待機時間をさらに余裕を持たせる (429対策)
+    // 待機時間をさらに余裕を持たせる (429対策)
     private static final int MAX_RETRIES = 5;
     private static final long MIN_WAIT_MS = 20000; // 最低20秒待機
 
@@ -48,6 +50,43 @@ public class AICoachService {
             } catch (Exception e) {
                 System.err.println("Gemini Client Init Error: " + e.getMessage());
             }
+        }
+    }
+
+    /**
+     * ★追加: ホーム画面用の一言アドバイス生成
+     * 時間帯や状況に合わせて、柔軟なアドバイス（40文字以内）を生成します。
+     */
+    public String generateHomeAdvice(User user) {
+        LocalTime now = LocalTime.now();
+        String timeStr = now.format(DateTimeFormatter.ofPattern("HH:mm"));
+        String situation;
+        
+        // 時間帯による状況設定
+        if (now.isBefore(LocalTime.of(10, 0))) {
+            situation = "朝です。寝起きで体が硬いかもしれません。活動スイッチを入れる提案を。";
+        } else if (now.isAfter(LocalTime.of(18, 0))) {
+            situation = "夜です。今日一日の仕事や勉強の疲れが溜まっています。リラックスや軽いストレッチを。";
+        } else {
+            situation = "日中です。活動の合間です。隙間時間の運動や気分転換を。";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("あなたは親しみやすい専属AIトレーナーです。\n");
+        sb.append("ユーザー【").append(user.getUsername()).append("】さんがアプリのホーム画面を開きました。\n");
+        sb.append("現在時刻は").append(timeStr).append("、状況は「").append(situation).append("」です。\n");
+        sb.append("ユーザーの疲労度や生活リズムを気遣い、この瞬間に最適な「一言アドバイス」をください。\n\n");
+        
+        sb.append("【回答ルール】\n");
+        sb.append("- 40文字以内で簡潔に。\n");
+        sb.append("- 「今日は軽めに」「ガッツリ行こう」「まずは深呼吸」など、柔軟に提案する。\n");
+        sb.append("- 語尾に「ムキ」をつける。\n");
+        sb.append("- 挨拶は短く、すぐにアドバイスに入る。\n");
+
+        try {
+            return callGeminiApi(sb.toString());
+        } catch (Exception e) {
+            return user.getUsername() + "さん、今日も良い筋肉ライフをムキ！";
         }
     }
 
@@ -267,7 +306,6 @@ public class AICoachService {
         while (attempt < MAX_RETRIES) {
             try {
                 GenerateContentResponse response;
-                // ★修正: gemini-2.5-flash を使用
                 if (content != null) {
                     response = client.models.generateContent(MODEL_ID, content, null);
                 } else {
@@ -276,32 +314,22 @@ public class AICoachService {
                 return cleanJsonResult(response.text());
 
             } catch (ClientException e) {
-                // 429: Rate Limit, 503: Service Unavailable, 404: Not Found
                 if (e.getMessage().contains("429") || e.getMessage().contains("Quota exceeded") || 
                     e.getMessage().contains("503") || e.getMessage().contains("404")) {
                     
                     lastException = e;
                     attempt++;
-                    
-                    long waitTime = MIN_WAIT_MS; // デフォルト待機 (20秒)
-
-                    // エラーメッセージから待機時間を解析 ("retry in 45.4s")
+                    long waitTime = MIN_WAIT_MS; 
                     Matcher matcher = Pattern.compile("retry in ([0-9\\.]+)s").matcher(e.getMessage());
                     if (matcher.find()) {
                         try {
                             double seconds = Double.parseDouble(matcher.group(1));
-                            // 指定時間 + 3秒のマージン
                             waitTime = (long) (seconds * 1000) + 3000; 
-                        } catch (NumberFormatException nfe) {
-                            // 無視
-                        }
+                        } catch (NumberFormatException nfe) {}
                     } else {
-                         // 解析不能なら、回数に応じて待機時間を増やす (20s, 40s, 60s...)
                          waitTime = MIN_WAIT_MS * attempt;
                     }
-
                     System.out.println("Gemini API Error (" + e.getMessage() + "). Retrying in " + waitTime + "ms... (" + attempt + "/" + MAX_RETRIES + ")");
-                    
                     if (attempt < MAX_RETRIES) {
                         try {
                             Thread.sleep(waitTime);
@@ -311,11 +339,10 @@ public class AICoachService {
                         }
                     }
                 } else {
-                    throw e; // その他のエラーは即スロー
+                    throw e; 
                 }
             }
         }
-        
         System.err.println("Gemini API Retry Failed: " + lastException.getMessage());
         return "{\"error\": \"現在アクセスが集中しており解析できません。1分ほど待ってから再試行してください。\"}";
     }
@@ -368,7 +395,6 @@ public class AICoachService {
     private String callGeminiApi(String prompt) {
         try {
             if (this.client == null) return "API Key未設定ムキ！";
-            // ★修正: MODEL_ID定数を使用
             GenerateContentResponse response = client.models.generateContent(MODEL_ID, prompt, null);
             return response.text();
         } catch (Exception e) {

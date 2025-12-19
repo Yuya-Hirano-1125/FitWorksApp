@@ -267,12 +267,12 @@ public class TrainingDataService {
         return exerciseMap;
     }
 
- // ドロップダウン表示用 (ExerciseDataのMap)
+ // ドロップダウン表示用 (ExerciseDataのMapを返すように修正)
     public Map<String, List<ExerciseData>> getFreeWeightExercisesByPart() {
-        return exerciseMap;  // 変換せずそのまま返す
+        return exerciseMap;  // 文字列に変換せず、そのまま返す
     }
-    
- // MySet作成フォームなどで使用する簡易Map (名前だけ)
+
+    // MySet作成フォームなどで使用する簡易Map (名前だけ欲しい場合はこちらを利用)
     public Map<String, List<String>> getSimpleFreeWeightExercisesMap() {
         return exerciseMap.entrySet().stream()
                 .collect(Collectors.toMap(

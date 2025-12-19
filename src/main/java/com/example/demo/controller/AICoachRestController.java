@@ -6,6 +6,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,11 +33,22 @@ public class AICoachRestController {
     @Autowired
     private TrainingRecordRepository trainingRecordRepository;
 
+    // ★追加: ホーム画面用のアドバイスを取得するAPI
+    @GetMapping("/home-advice")
+    public String getHomeAdvice(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return "ログインしてトレーニングを始めるムキ！";
+        }
+        
+        // ユーザー情報を取得してAIサービスへ
+        User user = userService.findByUsername(userDetails.getUsername());
+        return aiCoachService.generateHomeAdvice(user);
+    }
+
     @PostMapping("/chat")
     public Map<String, String> chat(@RequestBody Map<String, String> payload, Authentication authentication) {
         Map<String, String> response = new HashMap<>();
         
-        // 1. ログインユーザー情報の取得
         User user = null;
         if (authentication != null) {
             user = userService.findByUsername(authentication.getName());
@@ -45,23 +59,12 @@ public class AICoachRestController {
             return response;
         }
 
-        // 2. ユーザーメッセージの取得
         String userMessage = payload.get("message");
-
-        // 3. トレーニング履歴の取得 (最新10件)
         List<TrainingRecord> history = trainingRecordRepository.findTop10ByUser_IdOrderByRecordDateDesc(user.getId());
 
-        // 4. AIサービスへコンテキスト付きで依頼
-        // (Serviceメソッドを先ほど修正したものに変更);
         String aiReply = aiCoachService.generateCoachingAdvice(user, history, userMessage);
         
         response.put("reply", aiReply);
         return response;
     }
 }
-
-
-
-
-
-
