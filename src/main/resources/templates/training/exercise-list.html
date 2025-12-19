@@ -22,6 +22,33 @@
             padding: 0;
             min-height: 100vh;
         }
+		#scrollTopBtn {
+		    position: absolute; /* ★ fixed → absolute */
+		    right: 25px;
+		    top: 600px;          /* 初期位置（JSで上書き） */
+		    width: 60px;
+		    height: 60px;
+		    border-radius: 50%;
+		    border: none;
+		    cursor: pointer;
+
+		    background: rgba(255, 255, 255, 0.85);
+		    backdrop-filter: blur(8px);
+		    -webkit-backdrop-filter: blur(8px);
+
+		    color: #4facfe;
+		    font-size: 1.6rem;
+
+		    box-shadow:
+		        0 10px 25px rgba(79, 172, 254, 0.35),
+		        inset 0 0 0 2px rgba(255,255,255,0.8);
+
+		    opacity: 0;
+		    pointer-events: none;
+		    transition: opacity 0.3s ease, transform 0.3s ease;
+		    z-index: 1500;
+		}
+
 
         .interactive-bg {
             position: fixed;
@@ -545,7 +572,9 @@
 </div>
 
 <div th:replace="fragments/header :: header"></div>
-
+<button id="scrollTopBtn" title="一番上に戻る">
+    <i class="fa-solid fa-arrow-up"></i>
+</button>
 <div class="container">
     <a th:href="@{/training}" class="back-arrow-button" title="一つ戻る">
         <i class="fa-solid fa-arrow-left"></i>
@@ -768,6 +797,32 @@
 
     animate();
 </script>
+
+<script>
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+
+        // 表示制御
+        if (scrollY > 300) {
+            scrollTopBtn.classList.add('show');
+        } else {
+            scrollTopBtn.classList.remove('show');
+        }
+
+        // ★ スクロール追従（ここが追加ポイント）
+        scrollTopBtn.style.top = (scrollY + window.innerHeight - 120) + 'px';
+    });
+
+    scrollTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+</script>
+
 
 <script>
     function filterByPart(part, btnElement) {
