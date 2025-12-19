@@ -456,6 +456,8 @@
 </div>
 
 <div class="main-container" style="position: relative;"> 
+    <div id="real-time-clock" class="real-time-clock">00:00:00</div>
+
     <button id="help-btn" class="help-label-btn" onclick="toggleHelpMenu()">
         <span style="font-size: 1.2em;">📰</span>ヘルプ
     </button>
@@ -513,7 +515,9 @@
     </div>
     
     <div class="home-greeting-container">
-<h1>     </h1>
+        <p class="home-greeting-text">
+            こんにちは、<span class="home-username" th:text="${username}"></span>さん!
+        </p>
     </div>
     
     <div class="ai-home-advice-container">
@@ -659,7 +663,7 @@
 	        }
 	    }
 	    
-	    // ★ここを追加: AIアドバイス取得
+	    // AIアドバイス取得
 	    const aiMessageEl = document.getElementById('ai-home-message');
 	    if (aiMessageEl) {
 	        fetch('/api/ai-coach/home-advice')
@@ -683,6 +687,19 @@
 	                aiMessageEl.textContent = "今日も一緒に頑張るムキ！";
 	            });
 	    }
+
+        // ★時計更新処理: 秒数を追加
+        function updateRealTimeClock() {
+            const now = new Date();
+            // second: '2-digit' を追加して秒まで表示
+            const timeString = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const clockEl = document.getElementById('real-time-clock');
+            if (clockEl) {
+                clockEl.textContent = timeString;
+            }
+        }
+        setInterval(updateRealTimeClock, 1000);
+        updateRealTimeClock(); // 初回実行
 	});
 
 	function closeBackgroundUnlockPopup() {

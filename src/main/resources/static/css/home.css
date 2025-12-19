@@ -491,7 +491,7 @@ body.home-page {
     border: 1px solid rgba(33, 150, 243, 0.4); 
 }
 
-/* --- ★ここを追加: AIホームアドバイス吹き出しスタイル --- */
+/* --- ★AIホームアドバイス吹き出しスタイル --- */
 .ai-home-advice-container {
     display: flex;
     align-items: center;
@@ -541,4 +541,30 @@ body.home-page {
 @keyframes blink {
     0%, 100% { opacity: 0.2; }
     50% { opacity: 1; }
+}
+
+/* ★リアルタイム時計のスタイル */
+.real-time-clock {
+    position: absolute;
+    top: 20px; /* ヘルプボタンと同じ高さに */
+    left: 20px; /* 左端から20px */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #0288d1; /* テーマカラーの青 */
+    background: rgba(255, 255, 255, 0.9); /* 少し透けた白背景 */
+    padding: 6px 14px;
+    border-radius: 25px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    letter-spacing: 1px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(4px);
+    transition: transform 0.2s ease;
+    /* ★追加: 等幅数字にして秒が変わっても幅がブレないようにする */
+    font-variant-numeric: tabular-nums;
+}
+
+.real-time-clock:hover {
+    transform: scale(1.05);
 }
