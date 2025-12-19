@@ -26,13 +26,26 @@
             height: auto;
         }
 
-        /* ▼ スキップボタン用（修正） */
-        .skip-button {
+        /* ▼ ガチャ結果テキスト（修正） */
+        p {
             /* ★変更ここから */
             position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
+            /* ★変更ここまで */
+
+            margin: 0;
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        /* ▼ スキップボタン（修正） */
+        .skip-button {
+            /* ★変更ここから */
+            position: fixed;
+            top: 20px;
+            right: 20px;
             /* ★変更ここまで */
 
             padding: 10px 28px;
@@ -49,7 +62,7 @@
 
         .skip-button:hover {
             opacity: 0.8;
-            transform: translateX(-50%) translateY(-2px);
+            transform: translateY(-2px);
         }
     </style>
 </head>
