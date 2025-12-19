@@ -87,7 +87,7 @@ public class WebAuthnService {
 
         System.out.println("Decoded bytes: clientDataJSON=" + clientDataJSON.length + ", attestationObject=" + attestationObject.length);
 
-        // 修正: (attestationObject, clientDataJSON) の順序に
+        // 修正: 順序 (attestationObject, clientDataJSON)
         RegistrationRequest registrationRequest = new RegistrationRequest(
             attestationObject,
             clientDataJSON
@@ -137,7 +137,7 @@ public class WebAuthnService {
         byte[] userHandleBytes = userHandle != null ? decodeBase64Url(userHandle) : null;
         byte[] credentialIdBytes = decodeBase64Url(credentialId);
 
-        // 修正: 引数順序を (..., authenticatorData, clientDataJSON, ...) に変更
+        // 修正: 順序 (authenticatorData, clientDataJSON)
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
             credentialIdBytes,
             userHandleBytes,

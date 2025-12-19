@@ -354,7 +354,7 @@
         return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); 
     }
     
-    // 修正: パディング補完ロジックを追加
+    // パディング補完付きデコード
     function base64urlToBuffer(s){ 
         const b64 = s.replace(/-/g, '+').replace(/_/g, '/');
         const padding = b64.length % 4 === 0 ? '' : '='.repeat(4 - (b64.length % 4));
@@ -379,7 +379,14 @@
                 if(!window.PublicKeyCredential){ alert('生体認証未対応'); return; }
                 try {
                     const opt = await (await fetch('/api/webauthn/login/options')).json();
-                    const cred = await navigator.credentials.get({ publicKey: { challenge: base64urlToBuffer(opt.challenge), rpId: window.location.hostname, userVerification: 'preferred' } });
+                    // 修正: rpId を削除してブラウザの自動判定に任せる
+                    const cred = await navigator.credentials.get({ 
+                        publicKey: { 
+                            challenge: base64urlToBuffer(opt.challenge), 
+                            userVerification: 'preferred' 
+                        } 
+                    });
+                    
                     const res = await fetch('/api/webauthn/login', { method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrfToken}, body: JSON.stringify({
                         credentialId: bufferToBase64url(cred.rawId),
                         clientDataJSON: bufferToBase64url(cred.response.clientDataJSON),
