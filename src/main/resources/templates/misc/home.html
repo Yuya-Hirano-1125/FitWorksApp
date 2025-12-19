@@ -513,9 +513,16 @@
     </div>
     
     <div class="home-greeting-container">
-        <p class="home-greeting-text">
-            こんにちは、<span class="home-username" th:text="${username}"></span>さん!
-        </p>
+<h1>     </h1>
+    </div>
+    
+    <div class="ai-home-advice-container">
+        <div class="ai-avatar-small">
+            <img th:src="@{/img/AIcoach.png}" alt="AI">
+        </div>
+        <div class="ai-bubble-content">
+             <p id="ai-home-message">コンディション診断中<span class="loading-dots">...</span></p>
+        </div>
     </div>
     
     <a id="tutorial-training-btn" th:href="@{/training}" class="daily-mission-button" style="background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 6px 20px rgba(255, 94, 98, 0.4); margin-top: 20px;">
@@ -650,6 +657,31 @@
 	            
 	            console.log('背景解放ポップアップを表示:', unlockedBackgrounds);
 	        }
+	    }
+	    
+	    // ★ここを追加: AIアドバイス取得
+	    const aiMessageEl = document.getElementById('ai-home-message');
+	    if (aiMessageEl) {
+	        fetch('/api/ai-coach/home-advice')
+	            .then(res => res.text())
+	            .then(text => {
+	                // タイピングアニメーション風に表示
+	                aiMessageEl.innerHTML = '';
+	                let i = 0;
+	                const speed = 40; 
+	                function typeWriter() {
+	                    if (i < text.length) {
+	                        aiMessageEl.textContent += text.charAt(i);
+	                        i++;
+	                        setTimeout(typeWriter, speed);
+	                    }
+	                }
+	                typeWriter();
+	            })
+	            .catch(err => {
+	                console.error("AI Advice Error:", err);
+	                aiMessageEl.textContent = "今日も一緒に頑張るムキ！";
+	            });
 	    }
 	});
 

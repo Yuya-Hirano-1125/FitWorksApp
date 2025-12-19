@@ -490,3 +490,55 @@ body.home-page {
     /* 変更: 枠線を青の半透明に変更 */
     border: 1px solid rgba(33, 150, 243, 0.4); 
 }
+
+/* --- ★ここを追加: AIホームアドバイス吹き出しスタイル --- */
+.ai-home-advice-container {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #54a0ff; /* AIっぽい青色 */
+    border-radius: 20px;
+    padding: 10px 15px;
+    margin: 10px auto;
+    width: 95%;
+    max-width: 95%;
+    box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(84, 160, 255, 0.2);
+    animation: fadeIn 0.8s ease-out;
+}
+
+.ai-avatar-small {
+    flex-shrink: 0;
+    width: 45px;
+    height: 45px;
+    margin-right: 12px;
+}
+
+.ai-avatar-small img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #54a0ff;
+    object-fit: cover;
+}
+
+.ai-bubble-content {
+    flex-grow: 1;
+}
+
+.ai-bubble-content p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #333;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.loading-dots {
+    animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+}
