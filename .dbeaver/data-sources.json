@@ -26,6 +26,19 @@
 				"type": "dev",
 				"closeIdleConnection": true
 			}
+		},
+		"sqlite_jdbc-19b343beddc-5426871704ec3c58": {
+			"provider": "sqlite",
+			"driver": "sqlite_jdbc",
+			"name": "fitworks.db 3",
+			"save-password": true,
+			"configuration": {
+				"database": "C:\\Users\\sotsuken\\git\\FitWorksApp\\fitworks.db",
+				"url": "jdbc:sqlite:C:\\Users\\sotsuken\\git\\FitWorksApp\\fitworks.db",
+				"configurationType": "MANUAL",
+				"type": "dev",
+				"closeIdleConnection": true
+			}
 		}
 	},
 	"connection-types": {
