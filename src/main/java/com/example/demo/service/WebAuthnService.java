@@ -4,6 +4,7 @@ import java.util.Base64;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value; // 追加
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,9 +42,12 @@ public class WebAuthnService {
     private final WebAuthnManager webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager();
     private final ObjectConverter objectConverter = new ObjectConverter();
 
-    // ※重要: 本番環境では実際のドメインとポートに合わせてください (https必須)
-    private static final String RP_ID = "localhost"; 
-    private static final String ORIGIN_URL = "http://localhost:8086";
+    // ★修正: 設定ファイルから読み込むように変更（デフォルト値はローカル用）
+    @Value("${webauthn.rp.id:localhost}")
+    private String rpId;
+
+    @Value("${webauthn.origin.url:http://localhost:8086}")
+    private String originUrl;
 
     public Challenge generateChallenge() {
         return new DefaultChallenge();
@@ -78,8 +82,9 @@ public class WebAuthnService {
             attestationObject
         );
 
+        // ★修正: 定数ではなくフィールド変数を参照
         RegistrationParameters registrationParameters = new RegistrationParameters(
-            new ServerProperty(new Origin(ORIGIN_URL), RP_ID, challenge, null),
+            new ServerProperty(new Origin(originUrl), rpId, challenge, null),
             null, 
             false, 
             false  
@@ -214,8 +219,9 @@ public class WebAuthnService {
             }
         };
 
+        // ★修正: 定数ではなくフィールド変数を参照
         AuthenticationParameters authenticationParameters = new AuthenticationParameters(
-            new ServerProperty(new Origin(ORIGIN_URL), RP_ID, challenge, null),
+            new ServerProperty(new Origin(originUrl), rpId, challenge, null),
             credentialRecord,
             null, // allowCredentials
             false, // userVerificationRequired
