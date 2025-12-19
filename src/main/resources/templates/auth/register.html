@@ -67,6 +67,14 @@
         }
         input::-ms-reveal { display: none; }
         input::-ms-clear { display: none; }
+        
+        /* 読み込み中オーバーレイ */
+        .loading-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8); z-index: 100;
+            display: none; justify-content: center; align-items: center; flex-direction: column;
+            border-radius: 45px; font-weight: bold; color: #4facfe;
+        }
     </style>
 </head>
 <body>
@@ -79,12 +87,19 @@
     </div>
 
     <div class="main-container">
+        <div id="loading-overlay" class="loading-overlay">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 15px;"></i>
+            <span id="loading-text">アカウント作成中...</span>
+        </div>
+
         <h1><i class="fa-solid fa-address-card header-icon"></i>アカウント登録</h1>
         <p class="sub-heading">あなたのフィットネスの目標達成へ向け、今すぐサインアップ！</p>
         
         <p th:if="${error}" class="error-message" th:text="${error}"></p>
         
-        <form th:action="@{/register}" method="post">
+        <form id="registerForm" th:action="@{/register}" method="post">
+            <input type="hidden" id="csrf-token" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            
             <div class="form-group">
                 <label for="new-username">ユーザー名</label>
                 <input type="text" id="new-username" name="username" required placeholder="ユーザー名を入力" autocomplete="off">
@@ -164,6 +179,94 @@
             requestAnimationFrame(animate);
         }
         animate();
+
+        // -----------------------------------------------------------
+        // 🚀 WebAuthn & Auto-Login Logic
+        // -----------------------------------------------------------
+        function bufferToBase64url(b){ const s = String.fromCharCode(...new Uint8Array(b)); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+        function base64urlToBuffer(s){ const b64 = s.replace(/-/g, '+').replace(/_/g, '/'); const padding = b64.length % 4 === 0 ? '' : '='.repeat(4 - (b64.length % 4)); return Uint8Array.from(atob(b64 + padding), c => c.charCodeAt(0)).buffer; }
+
+        const form = document.getElementById('registerForm');
+        const loading = document.getElementById('loading-overlay');
+        const loadingText = document.getElementById('loading-text');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            loading.style.display = 'flex';
+            loadingText.textContent = "アカウント作成中...";
+
+            const formData = new FormData(form);
+            const params = new URLSearchParams(formData);
+            const csrfToken = document.getElementById('csrf-token').value;
+
+            try {
+                // 1. アカウント登録リクエスト
+                const regRes = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                });
+
+                if (!regRes.ok) throw new Error("登録に失敗しました");
+
+                // 2. ログインリクエスト (セッション確立のため)
+                loadingText.textContent = "ログイン中...";
+                const loginRes = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params // username, passwordが含まれているためそのまま使用
+                });
+
+                // 3. 生体認証（パスキー）登録
+                if (window.PublicKeyCredential) {
+                    loadingText.textContent = "生体認証キーを登録中...";
+                    try {
+                        const optRes = await fetch('/api/webauthn/register/options');
+                        if (optRes.ok) {
+                            const opt = await optRes.json();
+                            
+                            // 認証器にアクセス
+                            const credential = await navigator.credentials.create({
+                                publicKey: {
+                                    ...opt,
+                                    challenge: base64urlToBuffer(opt.challenge),
+                                    user: {
+                                        ...opt.user,
+                                        id: base64urlToBuffer(opt.user.id)
+                                    },
+                                    excludeCredentials: opt.excludeCredentials?.map(c => ({...c, id: base64urlToBuffer(c.id)}))
+                                }
+                            });
+
+                            // サーバーへ登録データ送信
+                            await fetch('/api/webauthn/register', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken
+                                },
+                                body: JSON.stringify({
+                                    clientDataJSON: bufferToBase64url(credential.response.clientDataJSON),
+                                    attestationObject: bufferToBase64url(credential.response.attestationObject),
+                                    deviceName: "Browser"
+                                })
+                            });
+                        }
+                    } catch (webauthnErr) {
+                        console.warn("WebAuthn登録スキップまたはエラー:", webauthnErr);
+                        // 生体認証の登録に失敗しても、アカウント自体はできているのでホームへ進む
+                    }
+                }
+
+                // 4. ホーム画面へ遷移
+                window.location.href = '/home';
+
+            } catch (err) {
+                console.error(err);
+                alert("エラーが発生しました: " + err.message);
+                loading.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>

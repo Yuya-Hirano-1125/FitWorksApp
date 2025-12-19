@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.User;
@@ -44,7 +48,7 @@ public class WebAuthnController {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
         
         Challenge challenge = webAuthnService.generateChallenge();
-        // チャレンジをセッションに保存（Base64URLエンコードして保存）
+        // チャレンジをセッションに保存
         session.setAttribute("WEBAUTHN_CHALLENGE", Base64.getUrlEncoder().withoutPadding().encodeToString(challenge.getValue()));
 
         return ResponseEntity.ok(Map.of(
@@ -82,15 +86,33 @@ public class WebAuthnController {
         }
     }
 
-    // --- ログインフロー: オプション取得 ---
+    // --- ログインフロー: オプション取得 (ユーザー名を受け取るように変更) ---
     @GetMapping("/login/options")
-    public ResponseEntity<?> getLoginOptions(HttpSession session) {
+    public ResponseEntity<?> getLoginOptions(@RequestParam(required = false) String username, HttpSession session) {
         Challenge challenge = webAuthnService.generateChallenge();
         session.setAttribute("WEBAUTHN_CHALLENGE", Base64.getUrlEncoder().withoutPadding().encodeToString(challenge.getValue()));
         
-        return ResponseEntity.ok(Map.of(
-            "challenge", Base64.getUrlEncoder().withoutPadding().encodeToString(challenge.getValue())
-        ));
+        Map<String, Object> response = new HashMap<>();
+        response.put("challenge", Base64.getUrlEncoder().withoutPadding().encodeToString(challenge.getValue()));
+
+        // ユーザー名が指定されている場合、そのユーザーの認証器リストを allowCredentials として返す
+        if (username != null && !username.isEmpty()) {
+            userRepository.findByUsername(username).ifPresent(user -> {
+                List<String> credentialIds = webAuthnService.getCredentialIds(user);
+                
+                List<Map<String, Object>> allowCredentials = new ArrayList<>();
+                for (String credId : credentialIds) {
+                    allowCredentials.add(Map.of(
+                        "type", "public-key",
+                        "id", credId, // Base64URL文字列
+                        "transports", List.of("internal", "hybrid") 
+                    ));
+                }
+                response.put("allowCredentials", allowCredentials);
+            });
+        }
+        
+        return ResponseEntity.ok(response);
     }
     
     // --- ログインフロー: 完了 ---
