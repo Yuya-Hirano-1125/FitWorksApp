@@ -349,8 +349,17 @@
     });
 
     // SMS & WebAuthn Logic
-    function bufferToBase64url(b){ const s = String.fromCharCode(...new Uint8Array(b)); return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
-    function base64urlToBuffer(s){ return Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), c => c.charCodeAt(0)).buffer; }
+    function bufferToBase64url(b){ 
+        const s = String.fromCharCode(...new Uint8Array(b)); 
+        return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); 
+    }
+    
+    // 修正: パディング補完ロジックを追加
+    function base64urlToBuffer(s){ 
+        const b64 = s.replace(/-/g, '+').replace(/_/g, '/');
+        const padding = b64.length % 4 === 0 ? '' : '='.repeat(4 - (b64.length % 4));
+        return Uint8Array.from(atob(b64 + padding), c => c.charCodeAt(0)).buffer; 
+    }
 
     document.addEventListener('DOMContentLoaded', function() {
         const csrfToken = document.getElementById('csrf-token-val').value;
