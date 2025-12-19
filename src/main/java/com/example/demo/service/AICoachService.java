@@ -84,8 +84,12 @@ public class AICoachService {
         sb.append("- 挨拶は短く、すぐにアドバイスに入る。\n");
 
         try {
-            return callGeminiApi(sb.toString());
+            // ★修正: エラー時にcatchブロックへ確実に移行させるため、callGeminiApiを使わず直接呼び出します
+            if (this.client == null) throw new IllegalStateException("API Key未設定");
+            GenerateContentResponse response = client.models.generateContent(MODEL_ID, sb.toString(), null);
+            return response.text();
         } catch (Exception e) {
+            // エラー時はこの短い挨拶が返されます
             return user.getUsername() + "さん、今日も良い筋肉ライフをムキ！";
         }
     }
@@ -399,7 +403,8 @@ public class AICoachService {
             return response.text();
         } catch (Exception e) {
             e.printStackTrace();
-            return "エラーが発生しましたムキ！(" + e.getMessage() + ")";
+            // ★修正: 長文のエラーを表示せず、短く終わらせる
+            return "エラーが発生したムキ…時間を置いて試してほしいムキ！";
         }
     }
 }
