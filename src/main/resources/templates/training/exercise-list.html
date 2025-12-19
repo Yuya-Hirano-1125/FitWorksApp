@@ -48,6 +48,13 @@
 		    transition: opacity 0.3s ease, transform 0.3s ease;
 		    z-index: 1500;
 		}
+		/* ▼ 表示状態（これが無いと一生出ない） */
+		#scrollTopBtn.show {
+		    opacity: 1;
+		    pointer-events: auto;
+		    transform: translateY(0);
+		}
+
 
 
         .interactive-bg {
@@ -801,27 +808,41 @@
 <script>
     const scrollTopBtn = document.getElementById('scrollTopBtn');
 
-    window.addEventListener('scroll', () => {
-        const scrollY = window.scrollY;
+    // ボタンが存在しない場合は何もしない（安全対策）
+    if (scrollTopBtn) {
 
-        // 表示制御
-        if (scrollY > 300) {
-            scrollTopBtn.classList.add('show');
-        } else {
-            scrollTopBtn.classList.remove('show');
-        }
+        // ▼ 位置更新関数（共通化）
+        const updateButtonPosition = () => {
+            const scrollY = window.scrollY;
 
-        // ★ スクロール追従（ここが追加ポイント）
-        scrollTopBtn.style.top = (scrollY + window.innerHeight - 120) + 'px';
-    });
+            // 表示制御
+            if (scrollY > 300) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
 
-    scrollTopBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+            // ★ スクロール追従
+            scrollTopBtn.style.top =
+                (scrollY + window.innerHeight - 120) + 'px';
+        };
+
+        // スクロール時
+        window.addEventListener('scroll', updateButtonPosition);
+
+        // ページ読み込み直後にも実行（★重要）
+        window.addEventListener('load', updateButtonPosition);
+
+        // クリック時
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         });
-    });
+    }
 </script>
+
 
 
 <script>
