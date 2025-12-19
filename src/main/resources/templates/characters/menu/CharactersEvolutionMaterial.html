@@ -6,6 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/characters/CharactersEvolutionMaterial.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* 背景アニメーション */
         body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif;}
@@ -32,6 +33,7 @@
             border-radius: 30px;
             max-width: 1000px;
             margin: 40px auto;
+            position: relative; /* 戻るボタン配置用に追加 */
         }
 
         /* 既存スタイル */
@@ -59,6 +61,37 @@
         .card-image-container { background-color: white; padding: 8px; border-radius: 8px; }
         .card-image-container img { max-width: 100px; margin: 0 auto; display: block; background-color: white; border-radius: 4px; }
         .material-card p { margin: 6px 0; font-weight: bold; color: #333; }
+
+        /* 🔙 戻るボタン */
+        .back-arrow-button {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #555;
+            font-size: 2.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .back-arrow-button:hover {
+            transform: scale(1.1);
+            background: #fff;
+            color: #4facfe;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+        @media (max-width: 600px) {
+            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -70,6 +103,10 @@
     </div>
 
     <div class="main-container glass-mode">
+        <a th:href="@{/characters/menu/CharactersMenu}" class="back-arrow-button" title="メニューに戻る">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+
         <div class="header-section" style="text-align:center;">
             <h1>素材一覧</h1>
             <p class="sub-heading">ガチャから出る素材を確認できます</p>
@@ -135,9 +172,7 @@
         </section>
 
         <div class="back-btn-container" style="text-align:center; margin-top:20px;">
-            <a th:href="@{/characters/menu/CharactersMenu}" class="button secondary" style="display:inline-block; width:auto; padding:10px 30px;">
-                <i class="fa-solid fa-arrow-left"></i> メニューに戻る
-            </a>
+            
         </div>
     </div>
 

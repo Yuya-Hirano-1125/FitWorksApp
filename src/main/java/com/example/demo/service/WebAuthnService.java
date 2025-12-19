@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,11 +47,23 @@ public class WebAuthnService {
     @Value("${webauthn.rp.id:localhost}")
     private String rpId;
 
-    @Value("${webauthn.origin.url:http://localhost:8086}")
+    // 一般的なデフォルトポート 8080 に変更
+    @Value("${webauthn.origin.url:http://localhost:8080}")
     private String originUrl;
 
     public Challenge generateChallenge() {
         return new DefaultChallenge();
+    }
+
+    /**
+     * ユーザーに紐づくCredential IDのリストを取得する
+     */
+    @Transactional(readOnly = true)
+    public List<String> getCredentialIds(User user) {
+        List<Authenticator> authenticators = authenticatorRepository.findByUser(user);
+        return authenticators.stream()
+                .map(Authenticator::getCredentialId)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -59,7 +73,6 @@ public class WebAuthnService {
         if (source == null || source.isEmpty()) {
             return new byte[0];
         }
-        // Base64URLのパディング(=)が不足している場合に補完する
         String base64Url = source;
         int padding = 4 - (base64Url.length() % 4);
         if (padding < 4) {
@@ -85,9 +98,7 @@ public class WebAuthnService {
         byte[] clientDataJSON = decodeBase64Url(clientDataJSONStr);
         byte[] attestationObject = decodeBase64Url(attestationObjectStr);
 
-        System.out.println("Decoded bytes: clientDataJSON=" + clientDataJSON.length + ", attestationObject=" + attestationObject.length);
-
-        // 修正: (attestationObject, clientDataJSON) の順序に
+        // 引数順序修正済み: (attestationObject, clientDataJSON)
         RegistrationRequest registrationRequest = new RegistrationRequest(
             attestationObject,
             clientDataJSON
@@ -137,11 +148,11 @@ public class WebAuthnService {
         byte[] userHandleBytes = userHandle != null ? decodeBase64Url(userHandle) : null;
         byte[] credentialIdBytes = decodeBase64Url(credentialId);
 
-        // 修正: 引数順序を (..., authenticatorData, clientDataJSON, ...) に変更
+        // 引数順序修正済み: (..., authenticatorData, clientDataJSON, ...)
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
             credentialIdBytes,
             userHandleBytes,
-            authenticatorData, // バイナリ
+            authenticatorData, // binary
             clientDataJSON,    // JSON
             signature
         );

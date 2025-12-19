@@ -67,6 +67,22 @@
         }
         input::-ms-reveal { display: none; }
         input::-ms-clear { display: none; }
+
+        /* ▼▼▼ 追加: ソーシャルボタン用のスタイル ▼▼▼ */
+        .separator-container { display: flex; align-items: center; margin: 25px 0; color: #888; font-size: 0.9rem; }
+        .separator-container::before, .separator-container::after { content: ''; flex: 1; border-bottom: 1px solid rgba(0,0,0,0.1); }
+        .separator-container span { padding: 0 15px; }
+
+        .social-login-group { display: flex; gap: 15px; margin-bottom: 20px; }
+        .social-btn {
+            flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px;
+            border-radius: 15px; font-weight: 700; color: white; text-decoration: none;
+            transition: transform 0.2s; border: none; cursor: pointer; font-size: 0.95rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .social-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-line { background: #06C755; }
+        /* ▲▲▲ 追加ここまで ▲▲▲ */
     </style>
 </head>
 <body>
@@ -128,6 +144,14 @@
                 <button type="submit" class="button primary">アカウントを作成</button>
             </div>
         </form>
+
+        <div class="separator-container"><span>または</span></div>
+
+        <div class="social-login-group">
+            <a th:href="@{/oauth2/authorization/line}" class="social-btn btn-line">
+                <i class="fa-brands fa-line"></i> LINEで登録
+            </a>
+        </div>
         <p class="login-link">
             アカウントをお持ちですか？
             <a th:href="@{/login}">ログインはこちら</a>
