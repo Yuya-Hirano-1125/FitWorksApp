@@ -37,7 +37,6 @@
 	    .requirements { font-size: 0.9rem; margin-top: 5px; font-weight: 700; color: #333; background: rgba(0,0,0,0.03); padding: 4px; border-radius: 4px; }
 	    .unlocked-label { font-weight: bold; color: #27ae60; }
 	    
-	    /* ★★★ 修正: locked クラスがある場合のみ暗くする ★★★ */
 	    .character-img-wrapper.locked .character-img { 
 	        filter: brightness(0%); 
 	        opacity: 0.7; 
@@ -68,59 +67,269 @@
 	    }
 
 	    .modal-content {
-	      position: absolute; /* ★ relative → absolute に変更 */
-	      width: 90%;
+	      position: absolute;
+	      width: 95%;
 	      max-width: 500px;
-	      background: #fff;
-	      border-radius: 12px;
-	      padding: 25px;
-	      text-align: left;
-	      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-	      max-height: 80vh;
-	      overflow-y: auto;
-	      /* ★ 動的に位置を設定するため、top/left はJSで制御 */
-	      transform: translateX(-50%); /* ★ 横方向の中央揃え用 */
+	      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+	      border-radius: 20px;
+	      padding: 0;
+	      text-align: center;
+	      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+	      overflow: visible;
+	      transform: translateX(-50%);
+	      border: 3px solid #f39c12;
+	    }
+
+	    .modal-header {
+	      background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+	      padding: 10px 20px;
+	      border-radius: 17px 17px 0 0;
+	      position: relative;
+	    }
+
+	    .modal-header h3 {
+	      margin: 0;
+	      color: #fff;
+	      font-size: 1rem;
+	      font-weight: 900;
+	      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+	      letter-spacing: 1px;
+	    }
+
+	    .modal-body-wrapper {
+	      padding: 12px 15px;
+	      overflow: visible;
+	      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
 	    }
 
 	    .close {
-	        position: absolute; right: 12px; top: 12px;
-	        font-size: 1.5rem; cursor: pointer; color: #888;
+	        position: absolute; 
+	        right: 12px; 
+	        top: 50%;
+	        transform: translateY(-50%);
+	        font-size: 1.4rem; 
+	        cursor: pointer; 
+	        color: #fff;
+	        width: 24px;
+	        height: 24px;
+	        display: flex;
+	        align-items: center;
+	        justify-content: center;
+	        border-radius: 50%;
+	        background: rgba(255,255,255,0.2);
+	        transition: all 0.3s;
+	        font-weight: bold;
 	    }
-	    .close:hover { color: #000; }
+	    .close:hover { 
+	      background: rgba(255,255,255,0.3);
+	      transform: translateY(-50%) rotate(90deg);
+	    }
+
+	    .modal-footer {
+	      padding: 12px 15px;
+	      background: #1a252f;
+	      border-radius: 0 0 17px 17px;
+	      text-align: center;
+	      border-top: 2px solid #f39c12;
+	    }
 
 	    .btn-confirm {
-	        margin-top: 15px;
-	        padding: 8px 16px;
-	        background: #4caf50; color: #fff;
-	        border: none; border-radius: 4px; cursor: pointer;
-	        transition: background 0.2s;
+	        padding: 10px 28px;
+	        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+	        color: #fff;
+	        border: none; 
+	        border-radius: 20px; 
+	        cursor: pointer;
+	        transition: all 0.3s;
+	        font-weight: 900;
+	        font-size: 0.9rem;
+	        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.5);
+	        letter-spacing: 0.5px;
 	    }
-	    .btn-confirm:hover { background: #45a049; }
+	    .btn-confirm:hover { 
+	      transform: translateY(-2px);
+	      box-shadow: 0 6px 20px rgba(231, 76, 60, 0.7);
+	    }
+	    
+	    /* 現在のキャラクター表示 */
+	    .current-character {
+	      background: rgba(255,255,255,0.05);
+	      border-radius: 10px;
+	      padding: 8px;
+	      margin-bottom: 10px;
+	      border: 2px solid rgba(255,255,255,0.1);
+	    }
+	    
+	    .char-card {
+	      display: inline-block;
+	      background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+	      border-radius: 10px;
+	      padding: 8px 12px;
+	      border: 2px solid #f39c12;
+	      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+	      min-width: 80px;
+	    }
+	    
+	    .char-card img {
+	      width: 55px;
+	      height: 55px;
+	      border-radius: 50%;
+	      border: 2px solid #fff;
+	      margin-bottom: 6px;
+	      background: #fff;
+	      object-fit: cover;
+	      object-position: center 20%;
+	      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+	    }
+	    
+	    .char-card-info {
+	      display: flex;
+	      flex-direction: column;
+	      gap: 2px;
+	    }
+	    
+	    .char-card-name {
+	      color: #fff;
+	      font-weight: 900;
+	      font-size: 0.75rem;
+	      text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	    }
+	    
+	    .char-card-rarity {
+	      color: #ffd700;
+	      font-weight: 900;
+	      font-size: 0.7rem;
+	      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+	    }
+	    
+	    .char-card-level {
+	      display: none;
+	    }
+	    
+	    /* 必要素材エリア */
+	    .required-materials {
+	      background: rgba(0,0,0,0.2);
+	      border-radius: 8px;
+	      padding: 8px;
+	      margin-bottom: 10px;
+	      border: 2px solid #f39c12;
+	    }
+	    
+	    .material-grid {
+	      display: flex;
+	      justify-content: center;
+	      gap: 6px;
+	      flex-wrap: wrap;
+	    }
+	    
+	    .mat-item {
+	      display: flex;
+	      flex-direction: column;
+	      align-items: center;
+	      background: rgba(255,255,255,0.08);
+	      border-radius: 6px;
+	      padding: 5px;
+	      min-width: 50px;
+	      border: 1px solid rgba(255,255,255,0.15);
+	    }
+	    
+	    .mat-item img {
+	      width: 32px;
+	      height: 32px;
+	      object-fit: contain;
+	      background: white;
+	      border-radius: 5px;
+	      padding: 3px;
+	      margin-bottom: 3px;
+	      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+	    }
+	    
+	    .mat-item-name {
+	      color: #fff;
+	      font-size: 0.6rem;
+	      font-weight: 700;
+	      text-align: center;
+	      margin-bottom: 2px;
+	      line-height: 1.1;
+	    }
+	    
+	    .mat-item-count {
+	      color: #f39c12;
+	      font-size: 0.75rem;
+	      font-weight: 900;
+	    }
+	    
+	    /* 進化矢印 */
+	    .evo-arrow {
+	      font-size: 1.1rem;
+	      color: #f39c12;
+	      margin: 5px 0;
+	      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+	    }
+	    
+	    /* 進化後キャラクター */
+	    .evolved-character {
+	      background: rgba(231, 76, 60, 0.15);
+	      border-radius: 10px;
+	      padding: 8px;
+	      margin-bottom: 0;
+	      border: 2px solid #e74c3c;
+	    }
+	    
+	    .evolved-character .char-card {
+	      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+	    }
+	    
+	    /* その他条件 */
+	    .other-conditions {
+	      background: rgba(52, 152, 219, 0.15);
+	      border-radius: 10px;
+	      padding: 10px;
+	      margin-bottom: 0;
+	      border: 2px solid #3498db;
+	    }
+	    
+	    .cond-item {
+	      display: flex;
+	      justify-content: space-between;
+	      padding: 6px 10px;
+	      background: rgba(255,255,255,0.05);
+	      margin-bottom: 5px;
+	      border-radius: 6px;
+	      border-left: 3px solid #3498db;
+	      font-size: 0.8rem;
+	    }
+	    
+	    .cond-item:last-child {
+	      margin-bottom: 0;
+	    }
+	    
+	    .cond-label {
+	      color: #ecf0f1;
+	      font-weight: 700;
+	    }
+	    
+	    .cond-value {
+	      color: #f39c12;
+	      font-weight: 900;
+	    }
 	    
 	    .evolution-table {
-	      width: 100%;
-	      border-collapse: collapse;
-	      margin: 10px 0;
+	      display: none;
 	    }
-	    .evolution-table th {
-	      text-align: left;
-	      background: #f8f9fa;
-	      padding: 6px 10px;
-	      border: 1px solid #ddd;
-	      font-weight: bold;
-	      width: 50%;
+	    .modal-section {
+	      display: none;
 	    }
-	    .evolution-table td {
-	      padding: 6px 10px;
-	      border: 1px solid #ddd;
-	      text-align: center;
-	      width: 50%;
-	    }
-	    .modal-section h4 {
-	      margin-top: 15px;
-	      font-size: 1rem;
-	      color: #e74c3c;
-	    }
+		/* 素材所持数の色分け */
+		.mat-item-count.sufficient {
+		  color: #2ecc71;  /* 緑色 - 足りている */
+		  font-weight: 900;
+		}
+
+		.mat-item-count.insufficient {
+		  color: #e74c3c;  /* 赤色 - 足りていない */
+		  font-weight: 900;
+		}
 	</style>
 
 </head>
@@ -147,11 +356,9 @@
 		    <h2 class="attribute-heading fire-color"><i class="fa-solid fa-fire"></i> 炎属性</h2>
 		    <div class="char-list">
 		        <div th:each="chara : ${fireChars}" class="character-card fire">
-		            <!-- ★★★ 修正: unlockedIds に含まれていない場合のみ locked クラスを付与 ★★★ -->
 		            <div class="character-img-wrapper" 
 		                 th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
 		                <img class="character-img" th:src="${chara.imagePath}" th:alt="${chara.name}">
-		                <!-- ★★★ 修正: 未解放の場合のみロックアイコン表示 ★★★ -->
 		                <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
 		            </div>
 		            <p class="character-name" th:text="${chara.name}">キャラ名</p>
@@ -161,7 +368,6 @@
 		                <span>素材: <span th:text="${chara.unlockCost}">0</span></span>
 		            </div>
 		            <div class="unlock-action" style="margin-top:10px;">
-		                <!-- ★★★ 修正: 解放済みかどうかで表示切り替え ★★★ -->
 		                <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
 		                <div th:if="${!unlockedIds.contains(chara.id)}">
 		                    <button type="button" class="btn-confirm"
@@ -172,6 +378,7 @@
 		                                this.getAttribute('data-conditions'),
 		                                this.getAttribute('data-cost'),
 		                                this.getAttribute('data-materialType'),
+		                                this,
 		                                event
 		                            )"
 		                            th:attr="data-id=${chara.id},
@@ -206,7 +413,7 @@
                     <div class="unlock-action" style="margin-top:10px;">
                         <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
                         <div th:if="${!unlockedIds.contains(chara.id)}">
-                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), event)"
+                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
                                     th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='蒼玉'">
                                 <i class="fa-solid fa-lock-open"></i> 解放条件
                             </button>
@@ -234,7 +441,7 @@
                     <div class="unlock-action" style="margin-top:10px;">
                         <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
                         <div th:if="${!unlockedIds.contains(chara.id)}">
-                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), event)"
+                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
                                     th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='翠玉'">
                                 <i class="fa-solid fa-lock-open"></i> 解放条件
                             </button>
@@ -262,7 +469,7 @@
                     <div class="unlock-action" style="margin-top:10px;">
                         <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
                         <div th:if="${!unlockedIds.contains(chara.id)}">
-                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), event)"
+                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
                                     th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='聖玉'">
                                 <i class="fa-solid fa-lock-open"></i> 解放条件
                             </button>
@@ -290,7 +497,7 @@
                     <div class="unlock-action" style="margin-top:10px;">
                         <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
                         <div th:if="${!unlockedIds.contains(chara.id)}">
-                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), event)"
+                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
                                     th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='闇玉'">
                                 <i class="fa-solid fa-lock-open"></i> 解放条件
                             </button>
@@ -320,7 +527,7 @@
                     <div class="unlock-action" style="margin-top:10px;">
                         <span th:if="${unlockedIds.contains(chara.id)}" class="unlocked-label">✅ 開放済み</span>
                         <div th:if="${!unlockedIds.contains(chara.id)}">
-                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), event)"
+                            <button type="button" class="btn-confirm" onclick="openModal(this.getAttribute('data-id'), this.getAttribute('data-name'), this.getAttribute('data-materials'), this.getAttribute('data-conditions'), this.getAttribute('data-cost'), this.getAttribute('data-materialType'), this, event)"
                                     th:attr="data-id=${chara.id}, data-name=${chara.name}, data-materials=${#strings.arrayJoin(chara.evolutionMaterials,';')}, data-conditions=${#strings.arrayJoin(chara.evolutionConditions,';')}, data-cost=${chara.unlockCost}, data-materialType='虹玉'">
                                 <i class="fa-solid fa-lock-open"></i> 解放条件
                             </button>
@@ -339,147 +546,230 @@
 
     <div id="globalModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h3 id="modalTitle">進化条件</h3>
-            <div id="modalBody"></div>
+            <div class="modal-header">
+                <h3 id="modalTitle">進化条件</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body-wrapper">
+                <div id="modalBody"></div>
+            </div>
+            <div class="modal-footer">
+                <div id="modalFooter"></div>
+            </div>
         </div>
     </div>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      // CSRFトークンを取得
-      const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-      const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+	<script th:inline="javascript">
+	document.addEventListener("DOMContentLoaded", function() {
+	  const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+	  const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 
-      window.openModal = function(id, name, materials, conditions, cost, materialType, event) {
-        if (materials) materials = materials.replace(/[{}]/g, "");
-        if (conditions) conditions = conditions.replace(/[{}]/g, "");
+	  // Thymeleafからmaterialcountsを取得
+	  const materialCounts = /*[[${materialCounts}]]*/ {};
+	  
+	  console.log("DEBUG: DBから取得した素材所持数:", materialCounts);
 
-        document.getElementById("modalTitle").innerText = name + " の進化条件";
+	  const materialImages = {
+	    "紅玉": "/img/item/R-red.png",
+	    "蒼玉": "/img/item/R-blue.png",
+	    "翠玉": "/img/item/R-green.png",
+	    "聖玉": "/img/item/R-yellow.png",
+	    "闇玉": "/img/item/R-purple.png",
+	    "赤の聖結晶": "/img/item/SR-red.png",
+	    "青の聖結晶": "/img/item/SR-blue.png",
+	    "緑の聖結晶": "/img/item/SR-green.png",
+	    "黄の聖結晶": "/img/item/SR-yellow.png",
+	    "紫の聖結晶": "/img/item/SR-purple.png",
+	    "赫焔鱗": "/img/item/SSR-red.png",
+	    "氷蒼の矛": "/img/item/SSR-blue.png",
+	    "緑晶燈": "/img/item/SSR-green.png",
+	    "夢紡ぎの枕": "/img/item/SSR-yellow.png",
+	    "月詠みの斧": "/img/item/SSR-purple.png"
+	  };
 
-        // 進化素材テーブル
-        let bodyHtml = "<div class='modal-section'><h4>進化素材</h4><table class='evolution-table'>";
-        if (materials && materials.trim()) {
-          let matArray = materials.split(",");
-          matArray.forEach(m => {
-            let parts = m.trim().split("=");
-            if (parts.length === 2) {
-              bodyHtml += "<tr><th>" + parts[0].trim() + "</th><td>" + parts[1].trim() + "</td></tr>";
-            }
-          });
-        } else {
-          bodyHtml += "<tr><td colspan='2'>素材情報なし</td></tr>";
-        }
-        bodyHtml += "</table></div>";
+	  // ★★★ openModal関数 - 1つだけ定義 ★★★
+	  window.openModal = function(id, name, materials, conditions, cost, materialType, buttonElement, event) {
+	    if (materials) materials = materials.replace(/[{}]/g, "");
+	    if (conditions) conditions = conditions.replace(/[{}]/g, "");
+	    
+	    console.log("=== openModal called ===");
+	    console.log("DEBUG: materials:", materials);
+	    console.log("DEBUG: materialCounts:", materialCounts);
 
-        // 進化条件テーブル
-        bodyHtml += "<div class='modal-section'><h4>進化条件</h4><table class='evolution-table'>";
-        if (conditions && conditions.trim()) {
-          let condArray = conditions.split(",");
-          condArray.forEach(c => {
-            let parts = c.trim().split("=");
-            if (parts.length === 2) {
-              bodyHtml += "<tr><th>" + parts[0].trim() + "</th><td>" + parts[1].trim() + "</td></tr>";
-            }
-          });
-        } else {
-          bodyHtml += "<tr><td colspan='2'>条件情報なし</td></tr>";
-        }
-        bodyHtml += "</table></div>";
+	    // キャラクターIDから画像パスを生成
+	    const currentCharId = Math.floor(id / 10) * 10 - 10;
+	    const currentCharImgPath = currentCharId >= 0 ? '/img/character/' + currentCharId + '.png' : '/img/character/0.png';
+	    const nextCharImgPath = '/img/character/' + id + '.png';
+	    
+	    // キャラクター名のマッピング
+	    const charNames = {
+	      0: 'エンバーハート', 10: 'ドラコ', 20: 'ドラコス', 30: 'ドラグノイド',
+	      40: 'ルーナドロップ', 50: 'ドリー', 60: 'ドルフィ', 70: 'ドルフィナス',
+	      80: 'フォリアン', 90: 'シル', 100: 'シルファ', 110: 'シルフィナ',
+	      120: 'ハローバスト', 130: 'メリー', 140: 'メリル', 150: 'メリノア',
+	      160: 'ノビュリス', 170: 'ローピ', 180: 'ローバス', 190: 'ローピアス',
+	      250: 'シークレット'
+	    };
+	    const currentCharName = charNames[currentCharId] || '';
+	    
+	    // レアリティ表示用
+	    const rarityMap = {
+	      0: '★1', 10: '★2', 20: '★3', 30: '★4', 
+	      40: '★1', 50: '★2', 60: '★3', 70: '★4', 
+	      80: '★1', 90: '★2', 100: '★3', 110: '★4', 
+	      120: '★1', 130: '★2', 140: '★3', 150: '★4',
+	      160: '★1', 170: '★2', 180: '★3', 190: '★4', 
+	      250: '???'
+	    };
+	    const currentRarity = rarityMap[currentCharId] || '★1';
+	    const nextRarity = rarityMap[id] || '★2';
 
-        // 解放ボタン
-        bodyHtml += "<div style='text-align:center; margin-top:20px;'>"
-                 + "<button class='btn-confirm' onclick=\"unlockCharacter('" + id + "','" + name + "','" + cost + "','" + materialType + "')\">"
-                 + "<i class='fa-solid fa-unlock'></i> このキャラを解放する"
-                 + "</button></div>";
+	    document.getElementById("modalTitle").innerText = "進化合成";
 
-        document.getElementById("modalBody").innerHTML = bodyHtml;
-        
-        // ★★★ クリックされた要素の位置を取得してモーダルを配置 ★★★
-        if (event) {
-          const button = event.target.closest('.btn-confirm');
-          const card = button.closest('.character-card');
-          const cardRect = card.getBoundingClientRect();
-          const modalContent = document.querySelector('.modal-content');
-          
-          // カードの位置を基準にモーダルを配置
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          const modalTop = cardRect.top + scrollTop - 20; // カードの少し上に表示
-          const modalLeft = 50; // 画面中央（%で指定）
-          
-          modalContent.style.top = modalTop + 'px';
-          modalContent.style.left = modalLeft + '%';
-          
-          console.log('Modal position:', {cardTop: cardRect.top, scrollTop, modalTop});
-        }
-        
-        document.getElementById("globalModal").classList.add("show");
-        // ★★★ 削除: bodyのスクロールを無効化しない ★★★
-      };
+	    let bodyHtml = "";
 
-      window.closeModal = function() {
-        document.getElementById("globalModal").classList.remove("show");
-        // ★★★ 削除: bodyのスクロールを再有効化（最初から無効化していないため不要） ★★★
-      };
+	    // 現在のキャラクター
+	    bodyHtml += "<div class='current-character'>";
+	    bodyHtml += "<div class='char-card'>";
+	    bodyHtml += "<img src='" + currentCharImgPath + "' alt='現在のキャラ'>";
+	    bodyHtml += "<div class='char-card-info'>";
+	    bodyHtml += "<div class='char-card-name'>" + currentCharName + "</div>";
+	    bodyHtml += "<div class='char-card-rarity'>" + currentRarity + "</div>";
+	    bodyHtml += "</div>";
+	    bodyHtml += "</div>";
+	    bodyHtml += "</div>";
 
-      // ✅ サーバー連携版の解放処理(CSRF対応)
-      window.unlockCharacter = function(id, name, cost, materialType) {
-        console.log("DEBUG: unlockCharacter called", {id, name, cost, materialType});
-        
-        fetch("/unlock", {
-          method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            [csrfHeader]: csrfToken // CSRFトークンを追加
-          },
-          body: JSON.stringify({
-            characterId: id,
-            characterName: name,
-            cost: cost,
-            materialType: materialType
-          })
-        })
-        .then(response => {
-          console.log("DEBUG: Response status:", response.status);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log("DEBUG: Response data:", data);
-          if (data.success) {
-            alert(name + " を解放しました!");
-            closeModal();
-            location.reload(); // 画面更新で解放済み表示に切り替え
-          } else {
-            alert("解放失敗: " + (data.message || "不明なエラー"));
-          }
-        })
-        .catch(error => {
-          console.error("解放エラー:", error);
-          alert("通信エラーが発生しました: " + error.message);
-        });
-      };
-      
-      // モーダル外クリックで閉じる
-      window.onclick = function(event) {
-        const modal = document.getElementById("globalModal");
-        if (event.target == modal) {
-          closeModal();
-        }
-      }
-      
-      // ★★★ 追加: ESCキーでモーダルを閉じる ★★★
-      document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-          const modal = document.getElementById("globalModal");
-          if (modal.classList.contains('show')) {
-            closeModal();
-          }
-        }
-      });
-    });
-    </script>
+	    // 必要素材
+	    bodyHtml += "<div class='required-materials'>";
+	    bodyHtml += "<div class='material-grid'>";
+	    
+	    if (materials && materials.trim()) {
+	      let matArray = materials.split(",");
+	      for (let i = 0; i < matArray.length; i++) {
+	        let m = matArray[i];
+	        let parts = m.trim().split("=");
+	        if (parts.length === 2) {
+	          let matName = parts[0].trim();
+	          let matRequired = parseInt(parts[1].trim());
+	          let matOwned = materialCounts[matName] || 0;
+	          let imgPath = materialImages[matName];
+	          
+	          let countClass = matOwned >= matRequired ? 'sufficient' : 'insufficient';
+	          
+	          console.log("素材: " + matName + ", 必要: " + matRequired + ", 所持: " + matOwned);
+	          
+	          if (imgPath) {
+	            bodyHtml += "<div class='mat-item'>";
+	            bodyHtml += "<img src='" + imgPath + "' alt='" + matName + "'>";
+	            bodyHtml += "<div class='mat-item-name'>" + matName + "</div>";
+	            bodyHtml += "<div class='mat-item-count " + countClass + "'>" + matOwned + "/" + matRequired + "</div>";
+	            bodyHtml += "</div>";
+	          }
+	        }
+	      }
+	    }
+	    
+	    bodyHtml += "</div></div>";
+
+	    // 進化矢印
+	    bodyHtml += "<div class='evo-arrow'>⬇</div>";
+
+	    // 進化後のキャラクター
+	    bodyHtml += "<div class='evolved-character'>";
+	    bodyHtml += "<div class='char-card'>";
+	    bodyHtml += "<img src='" + nextCharImgPath + "' alt='" + name + "'>";
+	    bodyHtml += "<div class='char-card-info'>";
+	    bodyHtml += "<div class='char-card-name'>" + name + "</div>";
+	    bodyHtml += "<div class='char-card-level'>Lv.1</div>";
+	    bodyHtml += "<div class='char-card-rarity'>" + nextRarity + "</div>";
+	    bodyHtml += "</div>";
+	    bodyHtml += "</div>";
+	    bodyHtml += "</div>";
+
+	    document.getElementById("modalBody").innerHTML = bodyHtml;
+	    
+	    let footerHtml = "<button class='btn-confirm' onclick=\"unlockCharacter('" + id + "','" + name + "','" + cost + "','" + materialType + "')\">"
+	                  + "進化させる"
+	                  + "</button>";
+	    document.getElementById("modalFooter").innerHTML = footerHtml;
+	    
+	    if (event && buttonElement) {
+	      const card = buttonElement.closest('.character-card');
+	      if (card) {
+	        const cardRect = card.getBoundingClientRect();
+	        const modalContent = document.querySelector('.modal-content');
+	        
+	        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+	        const modalTop = cardRect.top + scrollTop - 20;
+	        const modalLeft = 50;
+	        
+	        modalContent.style.top = modalTop + 'px';
+	        modalContent.style.left = modalLeft + '%';
+	      }
+	    }
+	    
+	    document.getElementById("globalModal").classList.add("show");
+	  };
+
+	  window.closeModal = function() {
+	    document.getElementById("globalModal").classList.remove("show");
+	  };
+
+	  window.unlockCharacter = function(id, name, cost, materialType) {
+	    console.log("DEBUG: unlockCharacter called", {id, name, cost, materialType});
+	    
+	    fetch("/unlock", {
+	      method: "POST",
+	      headers: { 
+	        "Content-Type": "application/json",
+	        [csrfHeader]: csrfToken
+	      },
+	      body: JSON.stringify({
+	        characterId: id,
+	        characterName: name,
+	        cost: cost,
+	        materialType: materialType
+	      })
+	    })
+	    .then(response => {
+	      console.log("DEBUG: Response status:", response.status);
+	      if (!response.ok) {
+	        throw new Error(`HTTP error! status: ${response.status}`);
+	      }
+	      return response.json();
+	    })
+	    .then(data => {
+	      console.log("DEBUG: Response data:", data);
+	      if (data.success) {
+	        alert(name + " を解放しました!");
+	        closeModal();
+	        location.reload();
+	      } else {
+	        alert("解放失敗: " + (data.message || "不明なエラー"));
+	      }
+	    })
+	    .catch(error => {
+	      console.error("解放エラー:", error);
+	      alert("通信エラーが発生しました: " + error.message);
+	    });
+	  };
+	  
+	  window.onclick = function(event) {
+	    const modal = document.getElementById("globalModal");
+	    if (event.target == modal) {
+	      closeModal();
+	    }
+	  };
+	  
+	  document.addEventListener('keydown', function(event) {
+	    if (event.key === 'Escape') {
+	      const modal = document.getElementById("globalModal");
+	      if (modal.classList.contains('show')) {
+	        closeModal();
+	      }
+	    }
+	  });
+	});
+	</script>
 </body>
 </html>

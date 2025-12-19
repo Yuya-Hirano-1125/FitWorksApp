@@ -455,9 +455,15 @@ public class CharacterUnlockController {
             case "青の聖結晶": return 7L;
             case "緑の聖結晶": return 8L;
             case "黄の聖結晶": return 9L;
-            case "闇の聖結晶": return 10L;
+            case "紫の聖結晶": return 10L;
             case "赫焔鱗": return 11L;
-            default: return 1L;
+            case "氷華の杖": return 12L;     // ★修正
+            case "緑晶燈": return 13L;
+            case "夢紡ぎの枕": return 14L;
+            case "月詠みの杖": return 15L;   // ★修正
+            default: 
+                System.err.println("WARNING: Unknown material type: " + materialType);
+                return 1L;
         }
     }
     

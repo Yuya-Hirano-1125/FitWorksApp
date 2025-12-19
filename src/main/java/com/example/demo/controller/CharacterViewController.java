@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -109,6 +110,24 @@ public class CharacterViewController {
                 "dark", 8,
                 "secret", 1
         ));
+        Map<String, Integer> materialCounts = new HashMap<>();
+        materialCounts.put("紅玉", 0);
+        materialCounts.put("蒼玉", 0);
+        materialCounts.put("翠玉", 0);
+        materialCounts.put("聖玉", 0);
+        materialCounts.put("闇玉", 0);
+        materialCounts.put("赤の聖結晶", 0);
+        materialCounts.put("青の聖結晶", 0);
+        materialCounts.put("緑の聖結晶", 0);
+        materialCounts.put("黄の聖結晶", 0);
+        materialCounts.put("紫の聖結晶", 0);
+        materialCounts.put("赫焔鱗", 0);
+        materialCounts.put("氷華の杖", 0);
+        materialCounts.put("緑晶燈", 0);
+        materialCounts.put("夢紡ぎの枕", 0);
+        materialCounts.put("月詠みの杖", 0);
+        
+        model.addAttribute("materialCounts", materialCounts);
 
         // CharactersUnlock.html を返す
         return "characters/menu/CharactersUnlock";

@@ -61,6 +61,7 @@ public class UserService {
     }
     
     
+    
 
     // --- ユーザー登録処理 (既存) ---
     @Transactional
@@ -421,9 +422,13 @@ public class UserService {
         });
     }
     public int getUserMaterialCount(String username, Long item_id) {
-    	List<UserItem> items = userItemRepository.findAllByUser_UsernameAndItemId(username, item_id);
-        		return items.size(); // 1レコード=1個方式なのでサイズを返す
-
+        System.out.println("DEBUG: getUserMaterialCount called - username=" + username + ", item_id=" + item_id);
+        
+        List<UserItem> items = userItemRepository.findAllByUser_UsernameAndItemId(username, item_id);
+        
+        System.out.println("DEBUG: Found " + items.size() + " items for username=" + username + ", item_id=" + item_id);
+        
+        return items.size();
     }
     public BackgroundUnlockDto checkNewBackgroundUnlocks(String username) {
         BackgroundUnlockDto dto = new BackgroundUnlockDto();
