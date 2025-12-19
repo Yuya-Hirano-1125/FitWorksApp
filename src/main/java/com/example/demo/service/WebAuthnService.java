@@ -87,9 +87,10 @@ public class WebAuthnService {
 
         System.out.println("Decoded bytes: clientDataJSON=" + clientDataJSON.length + ", attestationObject=" + attestationObject.length);
 
+        // 修正済み: (attestationObject, clientDataJSON) の順序
         RegistrationRequest registrationRequest = new RegistrationRequest(
-            clientDataJSON,
-            attestationObject
+            attestationObject,
+            clientDataJSON
         );
 
         RegistrationParameters registrationParameters = new RegistrationParameters(
@@ -99,7 +100,6 @@ public class WebAuthnService {
             false  
         );
 
-        // ここでエラーが出る場合、データの中身（JSON/CBOR）が不正
         RegistrationData registrationData = webAuthnManager.parse(registrationRequest);
         webAuthnManager.validate(registrationData, registrationParameters);
 
@@ -137,11 +137,12 @@ public class WebAuthnService {
         byte[] userHandleBytes = userHandle != null ? decodeBase64Url(userHandle) : null;
         byte[] credentialIdBytes = decodeBase64Url(credentialId);
 
+        // ★修正箇所: 引数の順序を変更しました (authenticatorData, clientDataJSON)
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(
             credentialIdBytes,
             userHandleBytes,
-            clientDataJSON,
-            authenticatorData,
+            authenticatorData, // 3番目: authenticatorData (バイナリ)
+            clientDataJSON,    // 4番目: clientDataJSON (JSON)
             signature
         );
 
