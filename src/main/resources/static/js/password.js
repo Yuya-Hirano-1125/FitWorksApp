@@ -1,16 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // =========================================
-    // 1. パスワード欄のコピペ・切り取り禁止 (新規追加)
+    // 1. パスワード欄のコピペ・切り取り禁止
     // =========================================
-    // すべてのパスワード入力欄（と、それに関連する入力欄）を取得
     const passwordInputs = document.querySelectorAll('.password-wrapper input');
 
     passwordInputs.forEach(input => {
         // 貼り付け (Paste) 禁止
         input.addEventListener('paste', function(e) {
             e.preventDefault();
-            // alert('貼り付けはできません'); // 必要であればコメントアウトを外して警告を表示
         });
 
         // コピー (Copy) 禁止
@@ -24,9 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-
     // =========================================
-    // 2. 目のアイコンの機能 (前回までの内容)
+    // 2. 目のアイコンの表示/非表示切り替え機能
     // =========================================
     const icons = document.querySelectorAll('.toggle-password-icon');
 
@@ -37,36 +34,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const input = wrapper.querySelector('input');
         if (!input) return;
 
-        // --- アイコンの出現制御 (文字がある時だけ表示) ---
-        const updateIconVisibility = () => {
-            if (input.value.length > 0) {
-                icon.style.display = 'block';
-            } else {
-                icon.style.display = 'none';
-                // 空になったら隠す状態に戻す
-                if (input.type === 'text') {
-                    input.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
-                }
-            }
-        };
-
-        updateIconVisibility();
-        input.addEventListener('input', updateIconVisibility);
-
-        // --- クリックでの表示切り替え (トグル動作) ---
+        // クリックでの表示切り替え (トグル動作)
         icon.addEventListener('click', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // フォーム送信などを防ぐ
 
             if (input.type === 'password') {
+                // パスワードを表示
                 input.type = 'text';
                 icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
+                icon.classList.add('fa-eye-slash'); // 斜線付きの目に変更
             } else {
+                // パスワードを非表示
                 input.type = 'password';
                 icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+                icon.classList.add('fa-eye'); // 普通の目に変更
             }
         });
     });

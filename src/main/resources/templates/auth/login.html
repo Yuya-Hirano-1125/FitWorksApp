@@ -71,6 +71,23 @@
             .login-logo { width: 80px; height: 80px; }
             .login-left h1 { font-size: 2rem; }
         }
+		
+		/* ▼▼▼ register.html から移植したパスワード欄のスタイル ▼▼▼ */
+		.password-wrapper {
+		    position: relative !important; display: block !important; width: 100% !important;
+		}
+		.password-wrapper input {
+		    display: block !important; width: 100% !important;
+		    padding-right: 40px !important; box-sizing: border-box !important;
+		}
+		.password-wrapper .toggle-password-icon {
+		    position: absolute !important; top: 50% !important; right: 10px !important;
+		    transform: translateY(-50%) !important; z-index: 10 !important;
+		    cursor: pointer; color: #888;
+		}
+		/* ブラウザ標準のパスワード表示ボタンを消す */
+		input::-ms-reveal { display: none; }
+		input::-ms-clear { display: none; }
     </style>
 </head>
 <body>
@@ -96,6 +113,11 @@
                 <h2>ログイン</h2>
                 <p>アカウント情報を入力してください。</p>
             </div>
+			<div th:if="${param.passwordChanged}" class="alert alert-success" role="alert"
+			         style="color: #155724; background-color: #d4edda; border-color: #c3e6cb; padding: 15px; margin-bottom: 20px; border-radius: 5px; text-align: center;">
+			        <i class="fa-solid fa-check-circle"></i>
+			        パスワードを変更しました。<br>新しいパスワードでログインしてください。
+			    </div>
 
             <p th:if="${param.error}" class="error-message">
                 <i class="fa-solid fa-circle-exclamation"></i> ユーザー名またはパスワードが違います
@@ -107,15 +129,13 @@
                     <input type="text" id="username" name="username" required placeholder="example@fitworks.com" autocomplete="off">
                 </div>
                 
-                <div class="form-group">
-                    <label for="password">パスワード</label>
-                    <div style="position: relative;">
-                        <input type="password" id="password" name="password" required placeholder="パスワードを入力" autocomplete="off">
-                        <i class="fa-solid fa-eye toggle-password-icon" onclick="togglePasswordVisibility('password', this)" 
-                           style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #aaa; cursor: pointer;"></i>
-                    </div>
-                </div>
-
+				<div class="form-group">
+				    <label for="password">パスワード</label>
+				    <div class="password-wrapper">
+				        <input type="password" id="password" name="password" required placeholder="パスワードを入力" autocomplete="off">
+				        <i class="fa-solid fa-eye toggle-password-icon"></i>
+				    </div>
+				</div>
                 <div class="form-footer">
                     <label class="remember-me">
                         <input type="checkbox" name="remember-me"> 
@@ -304,5 +324,6 @@
         window.resetSmsForm = () => { step1.style.display='block'; step2.style.display='none'; btnSend.disabled=false; btnSend.textContent="送信"; btnVerify.disabled=false; btnVerify.textContent="認証"; showMessage(""); };
     });
 </script>
+<script th:src="@{/js/password.js}"></script>
 </body>
 </html>

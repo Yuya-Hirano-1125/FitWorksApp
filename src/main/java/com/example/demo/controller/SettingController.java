@@ -3,6 +3,9 @@ package com.example.demo.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -188,7 +191,7 @@ public class SettingController {
         return "redirect:/settings?updated=email";
     }
 
-    // -------------------------
+ // -------------------------
     // パスワード変更
     // -------------------------
     @GetMapping("/change-password")
@@ -202,20 +205,42 @@ public class SettingController {
     @PostMapping("/change-password")
     public String updatePassword(@ModelAttribute("form") EditPasswordForm form, 
                                  BindingResult bindingResult, 
+                                 @AuthenticationPrincipal UserDetails currentUser, 
                                  RedirectAttributes redirectAttributes, 
+                                 HttpServletRequest request, // ★追加: セッション操作のため
                                  Model model) {
         
-        if (!"correct_password".equals(form.getCurrentPassword())) { // 実際はDBと照合する
+        // 1. 新しいパスワードと確認用パスワードの一致チェック
+        if (!form.getNewPassword().equals(form.getConfirmPassword())) {
+            model.addAttribute("errorMessage", "新しいパスワードと確認用パスワードが一致しません。");
+            return "settings/change-password";
+        }
+
+        // 2. パスワード変更処理
+        boolean isChanged = userService.changePassword(
+                currentUser.getUsername(), 
+                form.getCurrentPassword(), 
+                form.getNewPassword()
+        );
+
+        if (!isChanged) {
             model.addAttribute("errorMessage", "現在のパスワードが間違っています。もう一度お試しください。");
             return "settings/change-password";
         }
         
-        // TODO: パスワード更新処理
-        System.out.println("現在:" + form.getCurrentPassword());
-        System.out.println("新しい:" + form.getNewPassword());
+        // 3. ★修正: ログアウト処理を行ってログイン画面へ
         
-        redirectAttributes.addFlashAttribute("successMessage", "パスワードが正常に変更されました！🔑");
-        return "redirect:/settings?updated=password";
+        // セキュリティコンテキストをクリア
+        SecurityContextHolder.clearContext();
+        
+        // セッションを無効化 (これで完全にログアウト状態になります)
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        // ログイン画面へリダイレクト（パラメータを付けてメッセージを表示させる）
+        return "redirect:/login?passwordChanged=true";
     }
 
     // -------------------------
