@@ -109,7 +109,7 @@
 	        <input type="text" id="newUsername" th:field="*{newUsername}" class="form-control" />
 	    </div>
 		<div class="button-container">
-	    <button type="submit" class="btn btn-primary">変更する</button>
+	    <button type="submit" id="submitButton" class="button primary" disabled>変更する</button>
 		</div>
 	</form>
 </div>
@@ -127,6 +127,31 @@
     }
     function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
     animate();
+	
+	document.addEventListener('DOMContentLoaded', function() {
+	        const usernameInput = document.getElementById('newUsername');
+	        const submitButton = document.getElementById('submitButton');
+
+	        // 入力欄の監視関数
+	        function toggleButtonState() {
+	            // 空文字または空白のみの場合はボタンを無効化
+	            if (usernameInput.value.trim() === '') {
+	                submitButton.disabled = true;
+	                submitButton.style.opacity = "0.6"; // 見た目も薄くする
+	                submitButton.style.cursor = "not-allowed";
+	            } else {
+	                submitButton.disabled = false;
+	                submitButton.style.opacity = "1.0"; // 元に戻す
+	                submitButton.style.cursor = "pointer";
+	            }
+	        }
+
+	        // 入力するたびにチェックを実行
+	        usernameInput.addEventListener('input', toggleButtonState);
+
+	        // ページ読み込み時にも一度チェック（ブラウザのオートフィル対策）
+	        toggleButtonState();
+			});
 </script>
 </body>
 </html>

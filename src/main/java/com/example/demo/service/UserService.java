@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +43,9 @@ public class UserService {
 
     @Autowired
     private SmsService smsService;
+    
+ // ★設定: 変更禁止期間（日数）
+    private static final int USERNAME_CHANGE_COOLDOWN_DAYS = 7;
 
     @Value("${app.base-url}")
     private String baseUrl;
@@ -549,23 +552,34 @@ public class UserService {
             });
     }
     /**
-     * ユーザー名を更新する
-     * @param currentUsername 現在のログインユーザー名
-     * @param newUsername 新しいユーザー名
-     * @throws IllegalArgumentException ユーザー名が既に存在する場合
+     * ユーザー名を更新する（クールダウン期間チェック付き）
      */
     @Transactional
     public void updateUsername(String currentUsername, String newUsername) {
-        // 1. 重複チェック
+        // 1. 新しい名前が既に使われていないかチェック
         if (userRepository.findByUsername(newUsername).isPresent()) {
             throw new IllegalArgumentException("そのユーザー名は既に使用されています。");
         }
 
-        // 2. ユーザー取得と更新
         User user = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 2. ★クールダウン期間のチェック
+        if (user.getLastUsernameChangeDate() != null) {
+            long daysSinceLastChange = ChronoUnit.DAYS.between(user.getLastUsernameChangeDate(), LocalDateTime.now());
+            
+            if (daysSinceLastChange < USERNAME_CHANGE_COOLDOWN_DAYS) {
+                long daysRemaining = USERNAME_CHANGE_COOLDOWN_DAYS - daysSinceLastChange;
+                throw new IllegalArgumentException(
+                    "ユーザー名は一度変更すると " + USERNAME_CHANGE_COOLDOWN_DAYS + " 日間変更できません。" +
+                    "あと " + daysRemaining + " 日お待ちください。"
+                );
+            }
+        }
+
+        // 3. 更新処理
         user.setUsername(newUsername);
+        user.setLastUsernameChangeDate(LocalDateTime.now()); // ★現在時刻を記録
         userRepository.save(user);
     }
 

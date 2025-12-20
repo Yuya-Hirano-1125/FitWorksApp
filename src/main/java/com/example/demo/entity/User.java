@@ -31,6 +31,8 @@ public class User {
     private Long id;
 
     private int xp = 0;
+ // ★追加: 最後にユーザー名を変更した日時
+    private LocalDateTime lastUsernameChangeDate;
 
     @Column(unique = true)
     private String username;
@@ -326,5 +328,13 @@ public class User {
 
     public void setLastBackgroundCheckLevel(Integer lastBackgroundCheckLevel) {
         this.lastBackgroundCheckLevel = (lastBackgroundCheckLevel != null) ? lastBackgroundCheckLevel : 1;
+    }
+ // ★追加: Getter / Setter
+    public LocalDateTime getLastUsernameChangeDate() {
+        return lastUsernameChangeDate;
+    }
+
+    public void setLastUsernameChangeDate(LocalDateTime lastUsernameChangeDate) {
+        this.lastUsernameChangeDate = lastUsernameChangeDate;
     }
 }
