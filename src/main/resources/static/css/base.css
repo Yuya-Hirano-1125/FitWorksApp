@@ -47,11 +47,12 @@
 }
 
 /* --- CORE STRUCTURE --- */
+/* --- CORE STRUCTURE --- */
 body {
-    /* よりドリーミーな背景グラデーションとアニメーション */
-    background: linear-gradient(135deg, #fce4ec, #f8bbd0, #e1bee7, #c5eff7); 
-    background-size: 400% 400%;
-    animation: dreamyBackground 30s ease infinite alternate; /* アニメーションをより長く、ドリーミーに */
+    /* グラデーションの設定 (前回修正済み) */
+    background: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
+    background-attachment: fixed;
+
     font-family: 'Poppins', 'Noto Sans JP', sans-serif;
     display: flex;
     flex-direction: column;
@@ -59,15 +60,16 @@ body {
     justify-content: center;
     min-height: 100vh;
     margin: 0;
-    padding: 20px;
+    
+    /* ★修正: 下のパディングを0にして、スクロールをコンテンツの端で止める */
+    padding: 20px 20px 0 20px; /* 上 右 下 左 */
+    
     box-sizing: border-box;
     perspective: 1000px;
     color: var(--dark-text);
-    /* 背景グリッドを削除 */
-    background-image: none;
-    overflow-x: hidden; /* 横スクロールバーを防ぐ */
+    
+    overflow-x: hidden;
 }
-
 .main-container {
     background: var(--container-bg);
     padding: 45px 55px;
