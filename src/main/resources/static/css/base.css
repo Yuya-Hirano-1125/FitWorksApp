@@ -47,7 +47,6 @@
 }
 
 /* --- CORE STRUCTURE --- */
-/* --- CORE STRUCTURE --- */
 body {
     /* グラデーションの設定 (前回修正済み) */
     background: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
@@ -61,8 +60,8 @@ body {
     min-height: 100vh;
     margin: 0;
     
-    /* ★修正: 下のパディングを0にして、スクロールをコンテンツの端で止める */
-    padding: 20px 20px 0 20px; /* 上 右 下 左 */
+    /* ★修正: 下のパディングを追加して背景が常に表示されるようにする */
+    padding: 20px 20px 40px 20px; /* 上 右 下 左 */
     
     box-sizing: border-box;
     perspective: 1000px;
