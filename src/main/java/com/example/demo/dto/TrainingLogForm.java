@@ -15,6 +15,9 @@ public class TrainingLogForm {
     private LocalDate recordDate;
     private String type; // "WEIGHT" or "CARDIO"
 
+    // ★追加: メモ欄
+    private String memo;
+
     // フリーウェイト用
     private String exerciseName;
 

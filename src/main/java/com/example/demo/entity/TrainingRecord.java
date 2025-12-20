@@ -49,6 +49,10 @@ public class TrainingRecord {
     private Integer durationMinutes; // 分
     private Double distanceKm; // km
 
+    // ★追加: メモ欄
+    @Column(length = 500)
+    private String memo;
+
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 }

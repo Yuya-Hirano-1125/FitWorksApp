@@ -372,6 +372,9 @@ public class TrainingController {
                         record.setSets(1);
                         record.setWeight(detail.getWeight());
                         record.setReps(detail.getReps());
+                        // ★メモ保存
+                        record.setMemo(form.getMemo());
+                        
                         trainingRecordRepository.save(record);
                         savedCount++;
                     }
@@ -385,6 +388,9 @@ public class TrainingController {
                 record.setSets(form.getSets());
                 record.setReps(form.getReps());
                 record.setWeight(form.getWeight());
+                // ★メモ保存
+                record.setMemo(form.getMemo());
+                
                 trainingRecordRepository.save(record);
                 savedCount = 1;
             }
@@ -396,6 +402,9 @@ public class TrainingController {
             record.setCardioType(form.getCardioType());
             record.setDurationMinutes(form.getDurationMinutes());
             record.setDistanceKm(form.getDistanceKm());
+            // ★メモ保存
+            record.setMemo(form.getMemo());
+            
             exerciseIdentifier = form.getCardioType();
             trainingSummary = form.getCardioType() + " (有酸素運動)";
             trainingRecordRepository.save(record);
@@ -506,6 +515,9 @@ public class TrainingController {
                         record.setCardioType(form.getExerciseName()); 
                         record.setDurationMinutes(form.getDurationMinutes());
                         record.setDistanceKm(form.getDistanceKm());
+                        // ★メモ保存
+                        record.setMemo(form.getMemo());
+                        
                         trainingRecordRepository.save(record);
                         totalSaved++;
                         
@@ -529,6 +541,9 @@ public class TrainingController {
                                 record.setSets(1);
                                 record.setWeight(detail.getWeight());
                                 record.setReps(detail.getReps());
+                                // ★メモ保存
+                                record.setMemo(form.getMemo());
+                                
                                 trainingRecordRepository.save(record);
                                 savedCount++;
                                 totalSaved++;

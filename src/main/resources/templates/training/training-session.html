@@ -217,6 +217,26 @@
             box-shadow: 0 0 10px rgba(79, 172, 254, 0.3);
             outline: none;
         }
+        
+        /* ★追加: メモ入力欄用スタイル */
+        .memo-area {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            margin-top: 5px;
+        }
+        .memo-area:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.3);
+            outline: none;
+        }
 
         table th { color: #aaa; font-weight: 600; padding-bottom: 10px; }
         table td { padding: 5px 0; }
@@ -394,6 +414,11 @@
             <button type="button" id="add-set-btn" class="button secondary" style="width: 100%; margin-top: 10px; padding: 10px; font-size: 0.9em; background:rgba(255,255,255,0.1); color:white; border:1px dashed #666;">
                 <i class="fa-solid fa-plus"></i> セットを追加
             </button>
+
+            <div style="margin-top: 20px;">
+                <label class="form-label"><i class="fa-regular fa-comment-dots"></i> メモ・感想</label>
+                <textarea name="memo" class="memo-area" placeholder="重量の感覚や、調子などを記録..."></textarea>
+            </div>
             
             <button type="submit" class="btn-finish">
                 記録して終了 <i class="fa-solid fa-check"></i>
@@ -429,6 +454,11 @@
                     <input type="number" name="distanceKm" id="cardio-distance" class="form-input" step="0.1" placeholder="0.0">
                     <span class="unit">km</span>
                 </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label class="form-label"><i class="fa-regular fa-comment-dots"></i> メモ・感想</label>
+                <textarea name="memo" class="memo-area" placeholder="コースの状況や感想を記録..."></textarea>
             </div>
             
             <button type="submit" class="btn-finish">
@@ -466,6 +496,9 @@
                             <input type="number" th:name="|logs[${stat.index}].distanceKm|" class="form-input" step="0.1" placeholder="0.0">
                         </div>
                     </div>
+                    <div style="margin-top: 10px;">
+                        <textarea th:name="|logs[${stat.index}].memo|" class="memo-area" style="min-height:50px; font-size:0.9rem;" placeholder="メモ..."></textarea>
+                    </div>
                 </div>
 
                 <div th:unless="${#lists.contains(cardioList, exName)}">
@@ -493,6 +526,10 @@
                             th:onclick="|addBatchSetRow(${stat.index})|">
                         <i class="fa-solid fa-plus"></i>
                     </button>
+
+                    <div style="margin-top: 10px;">
+                        <textarea th:name="|logs[${stat.index}].memo|" class="memo-area" style="min-height:50px; font-size:0.9rem;" placeholder="メモ..."></textarea>
+                    </div>
                 </div>
 
             </div>
