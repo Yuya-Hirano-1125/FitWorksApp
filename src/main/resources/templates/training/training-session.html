@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${trainingTitle}"></title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700;900&family=M+PLUS+Rounded+1c:wght@500;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
 
@@ -13,959 +13,573 @@
     
     <style>
         /* ==========================================================================
-           🌌 背景用スタイル
+           🌌 BACKGROUND & THEME
            ========================================================================== */
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.8);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-color: #00f2fe;
+            --text-color: #333;
+            --card-bg: rgba(255, 255, 255, 0.95);
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #f0f8ff; 
+            margin: 0; padding: 0;
+            background-color: #f0f8ff;
             min-height: 100vh;
+            font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
+            color: var(--text-color);
             overflow-x: hidden;
-            font-family: 'Noto Sans JP', sans-serif;
-            color: #333;
         }
 
-        /* 背景エリア */
+        /* 背景アニメーション */
         .interactive-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%;
-            animation: auroraFlow 20s ease infinite;
-            overflow: hidden;
+            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
         }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        @keyframes auroraFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* オーブ */
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            animation: floatOrb 30s infinite alternate ease-in-out;
-            z-index: 0;
-        }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
-        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
-
-        @keyframes floatOrb {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 30px) scale(1.1); }
-        }
-
-        /* Canvas */
-        #bg-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            mix-blend-mode: screen;
-        }
-
-        /* ☁️ 雲 */
-        .bg-cloud {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            filter: blur(40px);
-            opacity: 0.85;
-            z-index: 2;
-            pointer-events: none;
-            box-shadow: 0 0 60px rgba(255,255,255,0.9);
-        }
-        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
-        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
-        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
-
-        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
-        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
-
-        /* マウス追従ライトフレア */
-        .mouse-flare {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            mix-blend-mode: screen;
-            z-index: 20;
-            filter: blur(15px);
-            transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
-        }
+        
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(30px); opacity: 0.8; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 300px; height: 300px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 10%; right: -5%; width: 400px; height: 400px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, -20px); } }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
 
         /* ==========================================================================
-           🏗 メインレイアウト (ガラスモーフィズム)
+           🏗 LAYOUT
            ========================================================================== */
-        
         .main-container {
-            max-width: 800px;
-            width: 95%;
-            margin: 40px auto;
-            padding: 40px 30px;
-            
-            background: rgba(255, 255, 255, 0.55);
+            max-width: 800px; width: 92%; margin: 40px auto 100px; padding: 30px 25px;
+            background: var(--glass-bg);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 45px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 
-                0 30px 60px rgba(100, 149, 237, 0.2), 
-                0 0 0 2px rgba(255, 255, 255, 0.6) inset;
-            
-            /* 相対配置にして内部のabsolute要素の基準にする */
-            position: relative;
-            z-index: 10;
-            text-align: center;
+            border-radius: 40px;
+            border: 2px solid #fff;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(255,255,255,0.5);
+            position: relative; z-index: 10;
         }
 
-        h1 {
-            color: #333;
-            font-size: 2rem;
-            margin-bottom: 20px;
-            font-weight: 800;
-            text-shadow: 0 2px 10px rgba(255,255,255,0.5);
+        /* ヘッダー */
+        .session-header { text-align: center; margin-bottom: 30px; position: relative; }
+        .session-title {
+            font-size: 1.8rem; font-weight: 900; margin: 0;
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(100, 181, 246, 0.3);
+            letter-spacing: 1px; line-height: 1.2;
         }
+        .session-subtitle { font-size: 0.9rem; color: #666; font-weight: 700; margin-top: 5px; }
+
+        /* 戻るボタン */
+        .back-arrow-button {
+            position: absolute; top: 20px; left: 20px;
+            width: 50px; height: 50px;
+            background: #fff; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            text-decoration: none; color: #666; font-size: 1.4rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s; z-index: 100;
+            border: 2px solid #eee;
+        }
+        .back-arrow-button:hover { transform: scale(1.1); color: #4facfe; border-color: #4facfe; }
 
         /* ==========================================================================
-           ⏱ トレーニング用ウィジェット
+           ⏱ WIDGETS & FORMS
            ========================================================================== */
         
-        .interval-container, .record-form-container, .myset-exercise-block, .log-placeholder {
-            background: rgba(30, 30, 30, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            padding: 25px;
-            margin-top: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            backdrop-filter: blur(5px);
-            text-align: left;
-            color: #eee;
+        /* タイマーウィジェット */
+        .timer-widget {
+            background: #2d3436; color: #fff;
+            border-radius: 25px; padding: 25px;
+            margin-bottom: 30px; text-align: center;
+            box-shadow: 0 10px 30px rgba(45, 52, 54, 0.3);
+            border: 3px solid #636e72;
+            position: relative; overflow: hidden;
         }
-
+        .timer-widget::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: linear-gradient(90deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1);
+        }
         .timer-display {
-            font-size: 3.5rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: #fff;
-            margin: 10px 0 20px;
-            font-family: 'Poppins', monospace;
-            text-shadow: 0 0 20px rgba(79, 172, 254, 0.6);
+            font-family: 'Poppins', monospace; font-size: 3.5rem; font-weight: 700;
+            letter-spacing: 3px; color: #81ecec; margin: 10px 0;
+            text-shadow: 0 0 20px rgba(129, 236, 236, 0.4);
         }
+        
+        .timer-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+        .btn-timer {
+            padding: 10px 20px; border-radius: 20px; border: none; font-weight: 700; cursor: pointer;
+            transition: 0.2s; font-size: 0.9rem; display: flex; align-items: center; gap: 5px;
+        }
+        .btn-start { background: #00b894; color: white; flex: 2; justify-content: center; box-shadow: 0 4px 0 #00896f; }
+        .btn-start:active { transform: translateY(4px); box-shadow: none; }
+        .btn-reset { background: #636e72; color: white; flex: 1; justify-content: center; box-shadow: 0 4px 0 #2d3436; }
+        .btn-reset:active { transform: translateY(4px); box-shadow: none; }
+        
+        .timer-input-group { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 10px; color: #b2bec3; font-size: 0.9rem; }
+        .timer-input { background: #636e72; border: 1px solid #b2bec3; color: white; width: 50px; text-align: center; border-radius: 8px; padding: 5px; font-weight: bold; }
 
-        .button {
-            padding: 15px 25px;
-            border-radius: 30px;
-            font-weight: 700;
-            cursor: pointer;
-            border: none;
+        /* 入力フォームエリア */
+        .form-section {
+            background: #fff; border-radius: 25px; padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            margin-bottom: 30px; border: 1px solid #eee;
+        }
+        .section-heading {
+            font-size: 1.2rem; font-weight: 800; color: #333; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;
+        }
+        .section-heading i { color: #a18cd1; }
+
+        /* セット入力行（カードスタイル） */
+        .set-row-card {
+            display: flex; align-items: center; gap: 10px;
+            background: #f8f9fa; border: 2px solid #eee;
+            padding: 12px; border-radius: 15px; margin-bottom: 12px;
             transition: all 0.2s;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
+        }
+        .set-row-card:focus-within { border-color: #a18cd1; background: #fff; box-shadow: 0 5px 15px rgba(161, 140, 209, 0.2); }
+        
+        .set-num {
+            background: #333; color: #fff; width: 28px; height: 28px;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
+        }
+        .input-group { flex: 1; position: relative; }
+        .input-group input {
+            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd;
+            font-size: 1.1rem; font-weight: bold; text-align: center; color: #333;
+            background: #fff; box-sizing: border-box;
+        }
+        .input-group input:focus { outline: none; border-color: #a18cd1; }
+        .unit-label {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            color: #999; font-size: 0.8rem; font-weight: 700; pointer-events: none;
         }
         
-        .timer-button-primary {
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-            color: #fff;
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
-        }
-        .timer-button-secondary {
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        .timer-button-tertiary {
-            background: rgba(255,255,255,0.1);
-            color: #ccc;
-            font-size: 0.9rem;
-            padding: 8px 15px;
-        }
+        .btn-remove { color: #ff7675; cursor: pointer; padding: 5px; transition: 0.2s; font-size: 1.1rem; }
+        .btn-remove:hover { color: #d63031; transform: scale(1.2); }
 
-        .form-label { color: #ccc; margin-bottom: 8px; font-weight: 600; }
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            color: white;
-            font-size: 1.1rem;
-            text-align: center;
+        /* 追加ボタン */
+        .btn-add-set {
+            width: 100%; padding: 12px; border: 2px dashed #b2bec3;
+            background: #f0f0f0; color: #636e72; border-radius: 15px;
+            font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px;
         }
-        .form-input:focus {
-            border-color: #4facfe;
-            box-shadow: 0 0 10px rgba(79, 172, 254, 0.3);
-            outline: none;
-        }
-        
-        /* ★追加: メモ入力欄用スタイル */
+        .btn-add-set:hover { background: #dfe6e9; border-color: #636e72; color: #333; }
+
+        /* メモ欄 */
         .memo-area {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            resize: vertical;
-            min-height: 80px;
-            font-family: inherit;
-            margin-top: 5px;
+            width: 100%; padding: 15px; border-radius: 15px; border: 2px solid #eee;
+            background: #fdfdfd; font-family: inherit; font-size: 1rem; color: #333;
+            resize: vertical; min-height: 80px; box-sizing: border-box; margin-top: 10px;
         }
-        .memo-area:focus {
-            border-color: #4facfe;
-            box-shadow: 0 0 10px rgba(79, 172, 254, 0.3);
-            outline: none;
-        }
+        .memo-area:focus { outline: none; border-color: #a18cd1; background: #fff; }
 
-        table th { color: #aaa; font-weight: 600; padding-bottom: 10px; }
-        table td { padding: 5px 0; }
-
+        /* 完了ボタン */
         .btn-finish {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(45deg, #00c853, #69f0ae);
-            color: #003300;
-            font-weight: 800;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0, 200, 83, 0.3);
-            transition: transform 0.2s;
-            margin-top: 25px;
+            width: 100%; padding: 18px; margin-top: 25px;
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+            color: #fff; border: none; border-radius: 30px;
+            font-size: 1.2rem; font-weight: 900; letter-spacing: 1px;
+            cursor: pointer; box-shadow: 0 10px 20px rgba(0, 176, 155, 0.3);
+            transition: all 0.3s; position: relative; overflow: hidden;
         }
-        .btn-finish:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 200, 83, 0.4); }
+        .btn-finish:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 176, 155, 0.4); }
+        .btn-finish:active { transform: scale(0.98); }
 
+        /* AI関連 */
+        .ai-camera-section { margin-bottom: 25px; text-align: center; }
+        .btn-ai-camera {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; padding: 12px 25px; border-radius: 25px;
+            font-weight: 800; cursor: pointer; box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+            display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;
+        }
+        .btn-ai-camera:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(118, 75, 162, 0.5); }
+        
         #ai-verification-container {
-            margin-top: 20px;
-            background: #000;
-            border: 3px solid #00f2fe;
-            border-radius: 15px;
-            overflow: hidden;
-            display: none;
-            position: relative;
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+            margin-top: 15px; border-radius: 15px; overflow: hidden;
+            border: 3px solid #764ba2; background: #000; position: relative; display: none;
+        }
+        #ai-status-overlay {
+            position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7);
+            color: #fff; padding: 5px 10px; border-radius: 5px; font-weight: bold;
+        }
+        #ai-rep-counter-overlay {
+            position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7);
+            color: #00e676; padding: 5px 15px; border-radius: 5px; font-size: 1.5rem; font-weight: 900;
         }
 
-        .control-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        .control-buttons a { flex: 1; }
-        .button.secondary {
-            background: rgba(255,255,255,0.8);
-            color: #555;
-            border: 1px solid #ccc;
-        }
-        
-        .timer-settings input {
-            background: rgba(0,0,0,0.3);
-            color: #fff;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            padding: 8px;
-            text-align: center;
-            font-size: 1.1rem;
-            width: 60px !important;
-        }
-        
-        /* 🔙 戻るボタン（メインコンテナ内左上） */
-        .back-arrow-button {
-            position: absolute; /* コンテナに対して絶対配置 */
-            top: 25px;
-            left: 25px;
-            width: 80px;  /* 変更: 50px -> 80px */
-            height: 80px; /* 変更: 50px -> 80px */
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            color: #555;
-            font-size: 2.2rem; /* 変更: ボタン拡大に合わせてアイコンも大きく */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .back-arrow-button:hover {
-            transform: scale(1.1);
-            background: #fff;
-            color: #4facfe;
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
-        }
-        
-        /* スマホ用調整 */
+        /* レスポンシブ調整 */
         @media (max-width: 600px) {
-            .back-arrow-button {
-                /* スマホでも大きめを維持しますが、少し調整 */
-                width: 60px; 
-                height: 60px; 
-                font-size: 1.5rem;
-                top: 15px; 
-                left: 15px;
-            }
-            .main-container {
-                padding-top: 80px; /* ボタンが重ならないように上部余白を調整 */
-            }
+            .main-container { padding: 20px 15px; width: 95%; margin-top: 60px; }
+            .session-title { font-size: 1.5rem; }
+            .timer-display { font-size: 2.8rem; }
+            .set-row-card { gap: 8px; padding: 10px; }
+            .input-group input { font-size: 1rem; padding: 10px; }
         }
-
     </style>
 </head>
-<body class="session-page">
+<body>
 
-<div class="interactive-bg">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <canvas id="bg-canvas"></canvas>
-    <div id="mouse-flare" class="mouse-flare"></div>
-    <div class="bg-cloud cloud-1"></div>
-    <div class="bg-cloud cloud-2"></div>
-    <div class="bg-cloud cloud-3"></div>
-</div>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+    </div>
 
-<div class="main-container">
-    <a th:href="@{/training}" class="back-arrow-button" title="一つ戻る">
+    <a th:href="@{/training}" class="back-arrow-button" title="戻る">
         <i class="fa-solid fa-arrow-left"></i>
     </a>
 
-    <h1 th:text="${trainingTitle}"><i class="fa-solid fa-bolt-lightning header-icon"></i>セッション開始</h1>
-
-    <div class="interval-container">
-        <h3 style="color: #4facfe; margin-bottom: 10px; margin-top: 0; text-align: center; font-weight:700;">
-            <i class="fa-regular fa-clock"></i> インターバルタイマー
-        </h3>
-        <div id="interval-display" class="timer-display" style="text-align: center;">01:00</div>
-        <div class="timer-settings">
-            <input type="number" id="interval-minutes" value="1" min="0" max="59"> 分
-            <input type="number" id="interval-seconds" value="0" min="0" max="59"> 秒
-            <button id="interval-set" class="button timer-button-tertiary" style="margin-left:10px;"><i class="fa-solid fa-gear"></i> 設定</button>
-        </div>
-        <div class="timer-controls">
-            <button id="interval-start-pause" class="button timer-button-primary" style="flex:2;"><i class="fa-solid fa-play"></i> 開始</button>
-            <button id="interval-reset" class="button timer-button-secondary" style="flex:1;"><i class="fa-solid fa-rotate-left"></i></button>
-        </div>
-    </div>
-
-    <div th:if="${trainingType == 'free-weight'}" style="margin-top: 30px;">
-        <button id="toggle-ai-camera" class="button" style="width: 100%; background: linear-gradient(135deg, #a18cd1, #fbc2eb); color:white; border:none; padding:15px; font-weight:800; border-radius:30px; box-shadow:0 5px 15px rgba(161, 140, 209, 0.4);">
-            <i class="fa-solid fa-robot"></i> AI自動カウント (BETA)
-        </button>
-        <p style="font-size: 0.85em; color: #666; text-align: center; margin-top: 8px; font-weight:600;">
-            ※カメラの前で動作を行うと回数を自動入力します。
-        </p>
+    <div class="main-container">
         
-        <div id="ai-verification-container">
-            <video id="input_video" style="display:none" playsinline></video>
-            <canvas id="output_canvas"></canvas>
-            <div id="ai-status-overlay">待機中...</div>
-            <div id="ai-rep-counter-overlay">0 回</div>
-        </div>
-    </div>
+        <header class="session-header">
+            <h1 class="session-title" th:text="${trainingTitle}">トレーニング</h1>
+            <p class="session-subtitle" th:if="${selectedExercise != null}">
+                <i class="fa-solid fa-dumbbell"></i> <span th:text="${selectedExercise}">種目名</span>
+            </p>
+        </header>
 
-    <div th:if="${trainingType == 'free-weight'}" class="record-form-container">
-        <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-            <i class="fa-solid fa-pen-to-square"></i> 実績を記録
-            <span id="ai-verified-badge" class="verification-badge" style="background:#00c853; color:white;"><i class="fa-solid fa-check"></i> AI検知</span>
-        </h3>
-        <form th:action="@{/training-log/save}" method="post" id="weight-form" onsubmit="return validateTrainingTime(this);">
-            <input type="hidden" name="recordDate" th:value="${today}">
-            <input type="hidden" name="type" value="WEIGHT">
-            <input type="hidden" name="exerciseName" th:value="${selectedExercise}">
+        <div class="timer-widget">
+            <div style="font-size: 0.85rem; color: #dfe6e9; font-weight: 700; letter-spacing: 1px;">INTERVAL TIMER</div>
+            <div id="interval-display" class="timer-display">01:00</div>
             
-            <table style="width: 100%; color: white; border-collapse: separate; border-spacing: 0 10px;">
-                <thead>
-                    <tr style="color: #aaa; font-size: 0.9em;">
-                        <th style="text-align: center; width: 15%;">Set</th>
-                        <th style="text-align: center; width: 40%;">重量 (kg)</th>
-                        <th style="text-align: center; width: 40%;">回数 (Reps)</th>
-                        <th style="width: 5%;"></th>
-                    </tr>
-                </thead>
-                <tbody id="sets-container">
-                </tbody>
-            </table>
-
-            <button type="button" id="add-set-btn" class="button secondary" style="width: 100%; margin-top: 10px; padding: 10px; font-size: 0.9em; background:rgba(255,255,255,0.1); color:white; border:1px dashed #666;">
-                <i class="fa-solid fa-plus"></i> セットを追加
-            </button>
-
-            <div style="margin-top: 20px;">
-                <label class="form-label"><i class="fa-regular fa-comment-dots"></i> メモ・感想</label>
-                <textarea name="memo" class="memo-area" placeholder="重量の感覚や、調子などを記録..."></textarea>
+            <div class="timer-input-group">
+                設定: 
+                <input type="number" id="interval-minutes" class="timer-input" value="1" min="0" max="59"> 分
+                <input type="number" id="interval-seconds" class="timer-input" value="0" min="0" max="59"> 秒
             </div>
             
-            <button type="submit" class="btn-finish">
-                記録して終了 <i class="fa-solid fa-check"></i>
-            </button>
-        </form>
-    </div>
-
-    <div th:if="${trainingType == 'cardio'}" class="record-form-container">
-        <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-            <i class="fa-solid fa-pen-to-square"></i> 実績を記録
-        </h3>
-        
-        <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed rgba(255,255,255,0.2);">
-            <div id="gps-status" class="gps-status" style="color:#4facfe; font-weight:700;"><i class="fa-solid fa-location-dot"></i> GPS未計測</div>
-            <button type="button" id="toggle-gps" class="button secondary small" style="width:100%; background:rgba(255,255,255,0.1); color:white; border:none; margin-top:10px;">
-                <i class="fa-solid fa-play"></i> GPS計測開始
-            </button>
+            <div class="timer-controls">
+                <button id="interval-start-pause" class="btn-timer btn-start">
+                    <i class="fa-solid fa-play"></i> スタート
+                </button>
+                <button id="interval-reset" class="btn-timer btn-reset">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </button>
+            </div>
         </div>
 
-        <form th:action="@{/training-log/save}" method="post" id="cardio-form" onsubmit="return validateCardio(this);">
-            <input type="hidden" name="recordDate" th:value="${today}">
-            <input type="hidden" name="type" value="CARDIO">
-            <input type="hidden" name="cardioType" th:value="${selectedExercise}">
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">時間</label>
-                    <input type="number" name="durationMinutes" id="cardio-duration" class="form-input" placeholder="0" required>
-                    <span class="unit">分</span>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">距離</label>
-                    <input type="number" name="distanceKm" id="cardio-distance" class="form-input" step="0.1" placeholder="0.0">
-                    <span class="unit">km</span>
-                </div>
-            </div>
-
-            <div style="margin-top: 20px;">
-                <label class="form-label"><i class="fa-regular fa-comment-dots"></i> メモ・感想</label>
-                <textarea name="memo" class="memo-area" placeholder="コースの状況や感想を記録..."></textarea>
-            </div>
-            
-            <button type="submit" class="btn-finish">
-                記録して終了 <i class="fa-solid fa-check"></i>
+        <div th:if="${trainingType == 'free-weight'}" class="ai-camera-section">
+            <button id="toggle-ai-camera" class="btn-ai-camera">
+                <i class="fa-solid fa-robot"></i> AI自動カウント (BETA)
             </button>
-        </form>
-    </div>
+            <div id="ai-verification-container">
+                <video id="input_video" style="display:none" playsinline></video>
+                <canvas id="output_canvas"></canvas>
+                <div id="ai-status-overlay">待機中...</div>
+                <div id="ai-rep-counter-overlay">0 回</div>
+            </div>
+        </div>
 
-    <div th:if="${trainingType == 'myset'}" class="record-form-container">
-        <h3 style="color:white; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-            <i class="fa-solid fa-list-check"></i> マイセット一括記録
-        </h3>
-        <p style="color:#aaa; font-size:0.9em; margin-bottom:20px;">実施したセットのみ記録されます。</p>
+        <div th:if="${trainingType == 'free-weight'}" class="form-section">
+            <div class="section-heading">
+                <i class="fa-solid fa-pen-to-square"></i> 実績を記録
+                <span id="ai-verified-badge" style="display:none; margin-left:auto; background:#00e676; color:white; padding:2px 8px; border-radius:10px; font-size:0.7rem;">AI計測中</span>
+            </div>
 
-        <form th:action="@{/training-log/save-batch}" method="post" onsubmit="return validateTrainingTime(this);">
-            <input type="hidden" name="recordDate" th:value="${today}">
-            
-            <div th:each="exName, stat : ${mySetExercises}" class="myset-exercise-block" style="background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1);">
+            <form th:action="@{/training-log/save}" method="post" id="weight-form" onsubmit="return validateTrainingTime(this);">
+                <input type="hidden" name="recordDate" th:value="${today}">
+                <input type="hidden" name="type" value="WEIGHT">
+                <input type="hidden" name="exerciseName" th:value="${selectedExercise}">
                 
-                <div th:if="${#lists.contains(cardioList, exName)}">
-                    <div class="myset-exercise-title" style="color:#4facfe; font-weight:700;">
-                        <i class="fa-solid fa-person-running"></i> <span th:text="${exName}">ランニング</span>
+                <div id="sets-container">
                     </div>
-                    <input type="hidden" th:name="|logs[${stat.index}].exerciseName|" th:value="${exName}">
-                    <input type="hidden" th:name="|logs[${stat.index}].type|" value="CARDIO">
-                    <input type="hidden" th:name="|logs[${stat.index}].recordDate|" th:value="${today}">
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">時間</label>
-                            <input type="number" th:name="|logs[${stat.index}].durationMinutes|" class="form-input" placeholder="0">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">距離</label>
-                            <input type="number" th:name="|logs[${stat.index}].distanceKm|" class="form-input" step="0.1" placeholder="0.0">
-                        </div>
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <textarea th:name="|logs[${stat.index}].memo|" class="memo-area" style="min-height:50px; font-size:0.9rem;" placeholder="メモ..."></textarea>
-                    </div>
+
+                <button type="button" id="add-set-btn" class="btn-add-set">
+                    <i class="fa-solid fa-plus-circle"></i> セットを追加
+                </button>
+
+                <div style="margin-top: 25px;">
+                    <label style="font-weight: 700; color: #555; display:block; margin-bottom:5px;">
+                        <i class="fa-regular fa-comment-dots"></i> メモ・感想
+                    </label>
+                    <textarea name="memo" class="memo-area" placeholder="調子はどうだった？重量の感覚は？"></textarea>
                 </div>
+                
+                <button type="submit" class="btn-finish">
+                    記録して終了 <i class="fa-solid fa-check"></i>
+                </button>
+            </form>
+        </div>
 
-                <div th:unless="${#lists.contains(cardioList, exName)}">
-                    <div class="myset-exercise-title" th:text="${exName}" style="color:#4facfe; font-weight:700; margin-bottom:10px;">ベンチプレス</div>
-                    
-                    <input type="hidden" th:name="|logs[${stat.index}].exerciseName|" th:value="${exName}">
-                    <input type="hidden" th:name="|logs[${stat.index}].type|" value="WEIGHT">
-                    <input type="hidden" th:name="|logs[${stat.index}].recordDate|" th:value="${today}">
-                    
-                    <table style="width: 100%; color: white; border-collapse: separate; border-spacing: 0 5px;">
-                        <thead>
-                            <tr style="color: #aaa; font-size: 0.8em;">
-                                <th style="text-align: center; width: 15%;">Set</th>
-                                <th style="text-align: center; width: 40%;">kg</th>
-                                <th style="text-align: center; width: 40%;">Reps</th>
-                                <th style="width: 5%;"></th>
-                            </tr>
-                        </thead>
-                        <tbody th:id="|batch-sets-container-${stat.index}|">
-                            </tbody>
-                    </table>
-                    
-                    <button type="button" class="button small" 
-                            style="width: 100%; padding: 8px; font-size: 0.8em; margin-top:8px; background:rgba(255,255,255,0.1); color:white; border:none;"
-                            th:onclick="|addBatchSetRow(${stat.index})|">
-                        <i class="fa-solid fa-plus"></i>
-                    </button>
-
-                    <div style="margin-top: 10px;">
-                        <textarea th:name="|logs[${stat.index}].memo|" class="memo-area" style="min-height:50px; font-size:0.9rem;" placeholder="メモ..."></textarea>
-                    </div>
-                </div>
-
+        <div th:if="${trainingType == 'cardio'}" class="form-section">
+            <div class="section-heading">
+                <i class="fa-solid fa-person-running"></i> 有酸素運動
             </div>
             
-            <button type="submit" class="btn-finish">
-                一括記録して終了 <i class="fa-solid fa-check"></i>
-            </button>
-        </form>
-    </div>
+            <div style="background: #f0f8ff; border: 1px dashed #4facfe; padding: 15px; border-radius: 15px; margin-bottom: 20px; text-align: center;">
+                <div id="gps-status" style="color:#0288d1; font-weight:800; margin-bottom:10px;">
+                    <i class="fa-solid fa-location-dot"></i> GPS未計測
+                </div>
+                <button type="button" id="toggle-gps" class="btn-ai-camera" style="font-size:0.9rem; padding:8px 20px;">
+                    <i class="fa-solid fa-play"></i> 計測開始
+                </button>
+            </div>
 
-    <div th:if="${trainingType == 'ai-suggested'}">
-         <div class="log-placeholder">
-            <p style="color: #00f2fe; font-weight: 700;">FitBotの提案内容:</p>
-            <ul class="program-list">
-                <li th:each="program : ${programList}" style="border-bottom-color:rgba(255,255,255,0.1);">
-                    <i class="fa-solid fa-circle-check" style="color:#00e676;"></i> 
-                    <span th:text="${program}">メニュー内容</span>
+            <form th:action="@{/training-log/save}" method="post" id="cardio-form" onsubmit="return validateCardio(this);">
+                <input type="hidden" name="recordDate" th:value="${today}">
+                <input type="hidden" name="type" value="CARDIO">
+                <input type="hidden" name="cardioType" th:value="${selectedExercise}">
+                
+                <div class="set-row-card">
+                    <div class="set-num"><i class="fa-regular fa-clock"></i></div>
+                    <div class="input-group">
+                        <input type="number" name="durationMinutes" id="cardio-duration" placeholder="0" required>
+                        <span class="unit-label">分</span>
+                    </div>
+                </div>
+                <div class="set-row-card">
+                    <div class="set-num"><i class="fa-solid fa-route"></i></div>
+                    <div class="input-group">
+                        <input type="number" name="distanceKm" id="cardio-distance" step="0.1" placeholder="0.0">
+                        <span class="unit-label">km</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <label style="font-weight: 700; color: #555; display:block; margin-bottom:5px;">
+                        <i class="fa-regular fa-comment-dots"></i> メモ・感想
+                    </label>
+                    <textarea name="memo" class="memo-area" placeholder="コースの状況や感想を記録..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn-finish">
+                    記録して終了 <i class="fa-solid fa-check"></i>
+                </button>
+            </form>
+        </div>
+
+        <div th:if="${trainingType == 'myset'}" class="form-section">
+            <div class="section-heading">
+                <i class="fa-solid fa-list-check"></i> マイセット一括記録
+            </div>
+            
+            <form th:action="@{/training-log/save-batch}" method="post" onsubmit="return validateTrainingTime(this);">
+                <input type="hidden" name="recordDate" th:value="${today}">
+                
+                <div th:each="exName, stat : ${mySetExercises}" style="background: #fdfdfd; border: 1px solid #eee; border-radius: 15px; padding: 15px; margin-bottom: 20px;">
+                    
+                    <div th:if="${#lists.contains(cardioList, exName)}">
+                        <h4 style="margin:0 0 10px; color:#4facfe;">
+                            <i class="fa-solid fa-person-running"></i> <span th:text="${exName}">Run</span>
+                        </h4>
+                        <input type="hidden" th:name="|logs[${stat.index}].exerciseName|" th:value="${exName}">
+                        <input type="hidden" th:name="|logs[${stat.index}].type|" value="CARDIO">
+                        <input type="hidden" th:name="|logs[${stat.index}].recordDate|" th:value="${today}">
+                        
+                        <div class="set-row-card">
+                            <div class="input-group">
+                                <input type="number" th:name="|logs[${stat.index}].durationMinutes|" placeholder="時間">
+                                <span class="unit-label">分</span>
+                            </div>
+                            <div class="input-group">
+                                <input type="number" th:name="|logs[${stat.index}].distanceKm|" step="0.1" placeholder="距離">
+                                <span class="unit-label">km</span>
+                            </div>
+                        </div>
+                        <textarea th:name="|logs[${stat.index}].memo|" class="memo-area" style="min-height:50px; margin-top:5px;" placeholder="メモ..."></textarea>
+                    </div>
+
+                    <div th:unless="${#lists.contains(cardioList, exName)}">
+                        <h4 style="margin:0 0 10px; color:#6a11cb;">
+                            <i class="fa-solid fa-dumbbell"></i> <span th:text="${exName}">Bench Press</span>
+                        </h4>
+                        <input type="hidden" th:name="|logs[${stat.index}].exerciseName|" th:value="${exName}">
+                        <input type="hidden" th:name="|logs[${stat.index}].type|" value="WEIGHT">
+                        <input type="hidden" th:name="|logs[${stat.index}].recordDate|" th:value="${today}">
+                        
+                        <div th:id="|batch-sets-container-${stat.index}|">
+                            </div>
+                        
+                        <button type="button" class="btn-add-set" style="padding: 8px; font-size: 0.9rem;" th:onclick="|addBatchSetRow(${stat.index})|">
+                            <i class="fa-solid fa-plus"></i> 追加
+                        </button>
+                        
+                        <textarea th:name="|logs[${stat.index}].memo|" class="memo-area" style="min-height:50px; margin-top:10px;" placeholder="メモ..."></textarea>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-finish">
+                    一括記録して終了 <i class="fa-solid fa-check"></i>
+                </button>
+            </form>
+        </div>
+
+        <div th:if="${trainingType == 'ai-suggested'}" class="form-section">
+            <div class="section-heading"><i class="fa-solid fa-wand-magic-sparkles"></i> FitBot提案メニュー</div>
+            <ul style="list-style: none; padding: 0;">
+                <li th:each="program : ${programList}" style="padding: 10px 0; border-bottom: 1px dashed #eee; font-weight: bold; color: #555;">
+                    <i class="fa-solid fa-check-circle" style="color: #00b894; margin-right: 8px;"></i>
+                    <span th:text="${program}">メニュー</span>
                 </li>
             </ul>
-            <p style="margin-top: 20px; color: #fff;">
-                目標: <span th:text="${targetTime}">45</span>分 / 休憩: <span th:text="${restTime}">60</span>秒
-            </p>
+            <div style="margin-top: 20px; font-weight: bold; text-align: center; color: #666;">
+                目標時間: <span th:text="${targetTime}" style="color:#00b894; font-size:1.2rem;"></span>分 / 
+                休憩: <span th:text="${restTime}" style="color:#0984e3; font-size:1.2rem;"></span>秒
+            </div>
+            <a th:href="@{/training-log}" class="btn-finish" style="display:block; text-align:center; text-decoration:none;">
+                セッション完了
+            </a>
         </div>
-        <div class="control-buttons">
-             <a th:href="@{/training-log}" class="button primary" style="background:#4facfe; color:white;">セッション完了</a>
-        </div>
+
     </div>
 
-    <div class="control-buttons">
-        <a th:href="@{/ai-coach}" class="button" style="background:linear-gradient(45deg, #ff9a9e, #fad0c4); color:#fff; border:none;">
-             <i class="fa-solid fa-robot"></i> AI相談
-        </a>
-    </div>
-
-</div>
-
-<script>
-    // === 🌟 CANVAS PARTICLE SYSTEM ===
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    const flare = document.getElementById('mouse-flare');
-    
-    let particlesArray = [];
-    let width, height;
-
-    function resizeCanvas() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width;
-        canvas.height = height;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    const mouse = { x: undefined, y: undefined };
-    window.addEventListener('mousemove', (event) => {
-        mouse.x = event.x;
-        mouse.y = event.y;
-        if(flare) flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
-        for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
-    });
-
-    class Particle {
-        constructor() {
-            this.x = mouse.x;
-            this.y = mouse.y;
-            this.size = Math.random() * 5 + 2;
-            this.speedX = Math.random() * 4 - 2;
-            this.speedY = Math.random() * 4 - 2;
-            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
-        }
-        update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-            if (this.size > 0.2) this.size -= 0.1;
-        }
-        draw() {
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = 'white';
-            ctx.fill();
-            ctx.shadowBlur = 0;
-        }
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < particlesArray.length; i++) {
-            particlesArray[i].update();
-            particlesArray[i].draw();
-            if (particlesArray[i].size <= 0.3) {
-                particlesArray.splice(i, 1);
-                i--;
+    <script>
+        // 背景パーティクル
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1; this.speedX = Math.random() * 1 - 0.5; this.speedY = Math.random() * 1 - 0.5;
             }
+            update() { this.x+=this.speedX; this.y+=this.speedY; if(this.size>0.2) this.size-=0.01; }
+            draw() { ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); }
         }
-        requestAnimationFrame(animate);
-    }
-    
-    // 背景の雲のパララックス効果
-    const cloud1 = document.querySelector('.cloud-1');
-    const cloud2 = document.querySelector('.cloud-2');
-    document.addEventListener('mousemove', (e) => {
-        const x = (window.innerWidth - e.pageX) / 60;
-        const y = (window.innerHeight - e.pageY) / 60;
-        if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
-        if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
-    });
-
-    animate();
-</script>
-
-<script th:inline="javascript">
-    // === グローバル変数: セッション時間管理 ===
-    let sessionStartTime = Date.now();
-    let sessionElapsedTime = 0; // 秒
-    
-    setInterval(() => {
-        sessionElapsedTime = Math.floor((Date.now() - sessionStartTime) / 1000);
-    }, 1000);
-
-    window.validateTrainingTime = function(form) {
-        if (sessionElapsedTime < 30) {
-            if(!confirm("開始から時間が短すぎます（" + sessionElapsedTime + "秒）。本当に記録しますか？")) {
-                return false;
+        function animate() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            if(particles.length<50) particles.push(new Particle());
+            for(let i=0; i<particles.length; i++){
+                particles[i].update(); particles[i].draw();
+                if(particles[i].size<=0.2){ particles.splice(i,1); i--; }
             }
+            requestAnimationFrame(animate);
         }
-        return true;
-    };
+        animate();
+    </script>
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const formatTime = (ms) => {
-            const totalSeconds = Math.max(0, Math.floor(ms / 1000));
-            const minutes = Math.floor(totalSeconds / 60);
-            const seconds = totalSeconds % 60;
-            return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
-        };
+    <script th:inline="javascript">
+        // タイマーなどのロジック
+        let sessionStartTime = Date.now();
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const formatTime = (ms) => {
+                const s = Math.floor((ms/1000)%60);
+                const m = Math.floor(ms/60000);
+                return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            };
 
-        // 1. セット追加
-        const setsContainer = document.getElementById('sets-container');
-        const addSetBtn = document.getElementById('add-set-btn');
-        if (setsContainer && addSetBtn) {
-            let setCounter = 0;
-            const addSetRow = (weight = '', reps = '') => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="text-align: center; font-weight: bold; vertical-align: middle;">${setCounter + 1}</td>
-                    <td style="padding: 0 5px;">
-                        <input type="number" name="setList[${setCounter}].weight" class="form-input" step="0.5" placeholder="kg" value="${weight}" required>
-                    </td>
-                    <td style="padding: 0 5px;">
-                        <input type="number" name="setList[${setCounter}].reps" class="form-input ai-rep-target" placeholder="回" value="${reps}" required>
-                    </td>
-                    <td style="text-align: center; vertical-align: middle;">
-                         <i class="fa-solid fa-trash" onclick="removeRow(this)" style="color: #888; cursor: pointer;"></i>
-                    </td>
+            // セット追加ロジック (カードスタイル)
+            const setsContainer = document.getElementById('sets-container');
+            const addSetBtn = document.getElementById('add-set-btn');
+            if (setsContainer && addSetBtn) {
+                let setCounter = 0;
+                const addSetRow = (w='', r='') => {
+                    setCounter++;
+                    const div = document.createElement('div');
+                    div.className = 'set-row-card';
+                    div.innerHTML = `
+                        <div class="set-num">${setCounter}</div>
+                        <div class="input-group">
+                            <input type="number" name="setList[${setCounter-1}].weight" step="0.5" placeholder="0" value="${w}">
+                            <span class="unit-label">kg</span>
+                        </div>
+                        <div class="input-group">
+                            <input type="number" name="setList[${setCounter-1}].reps" class="ai-rep-target" placeholder="0" value="${r}">
+                            <span class="unit-label">回</span>
+                        </div>
+                        <i class="fa-solid fa-trash btn-remove" onclick="this.parentElement.remove()"></i>
+                    `;
+                    setsContainer.appendChild(div);
+                };
+                addSetRow(); addSetRow(); addSetRow();
+                addSetBtn.addEventListener('click', () => addSetRow());
+            }
+
+            // バッチ記録用セット追加
+            window.addBatchSetRow = function(exIdx) {
+                const container = document.getElementById(`batch-sets-container-${exIdx}`);
+                const idx = container.children.length;
+                const div = document.createElement('div');
+                div.className = 'set-row-card';
+                div.innerHTML = `
+                    <div class="set-num">${idx+1}</div>
+                    <div class="input-group">
+                        <input type="number" name="logs[${exIdx}].setList[${idx}].weight" step="0.5" placeholder="kg">
+                    </div>
+                    <div class="input-group">
+                        <input type="number" name="logs[${exIdx}].setList[${idx}].reps" placeholder="回">
+                    </div>
+                    <i class="fa-solid fa-trash btn-remove" onclick="this.parentElement.remove()"></i>
                 `;
-                setsContainer.appendChild(tr);
-                setCounter++;
-            };
-            addSetRow(); addSetRow(); addSetRow();
-            addSetBtn.addEventListener('click', () => addSetRow());
+                container.appendChild(div);
+            }
             
-            window.updateCurrentSetReps = function(count) {
-                const inputs = document.querySelectorAll('.ai-rep-target');
-                if(inputs.length > 0) {
-                    inputs[0].value = count;
-                    const badge = document.getElementById('ai-verified-badge');
-                    if(badge) badge.style.display = 'inline-block';
-                }
+            /*[# th:if="${trainingType == 'myset'}"]*/
+            const mySetExercises = /*[[${mySetExercises}]]*/ [];
+            const cardioList = /*[[${cardioList}]]*/ []; 
+            if(mySetExercises) {
+                mySetExercises.forEach((ex, i) => {
+                    if(!cardioList.includes(ex)) addBatchSetRow(i);
+                });
+            }
+            /*[/]*/
+
+            // タイマー
+            let timer = null;
+            let remaining = 60000;
+            const display = document.getElementById('interval-display');
+            const btnStart = document.getElementById('interval-start-pause');
+            
+            const updateDisplay = () => {
+                if(display) display.textContent = formatTime(remaining);
             };
-        }
-
-        window.addBatchSetRow = function(exerciseIndex) {
-            const container = document.getElementById(`batch-sets-container-${exerciseIndex}`);
-            if (!container) return;
-            const nextIndex = container.querySelectorAll('tr').length;
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="text-align: center; font-weight: bold; vertical-align: middle;">${nextIndex + 1}</td>
-                <td style="padding: 0 5px;">
-                    <input type="number" name="logs[${exerciseIndex}].setList[${nextIndex}].weight" class="form-input" step="0.5" placeholder="kg">
-                </td>
-                <td style="padding: 0 5px;">
-                    <input type="number" name="logs[${exerciseIndex}].setList[${nextIndex}].reps" class="form-input" placeholder="回">
-                </td>
-                <td style="text-align: center; vertical-align: middle;">
-                     <i class="fa-solid fa-trash" onclick="removeRow(this)" style="color: #888; cursor: pointer;"></i>
-                </td>
-            `;
-            container.appendChild(tr);
-        };
-
-        /*[# th:if="${trainingType == 'myset'}"]*/
-        const mySetExercises = /*[[${mySetExercises}]]*/ [];
-        const cardioList = /*[[${cardioList}]]*/ []; 
-        if (mySetExercises && cardioList) {
-            for (let i = 0; i < mySetExercises.length; i++) {
-                if (!cardioList.includes(mySetExercises[i])) {
-                    addBatchSetRow(i);
-                }
-            }
-        }
-        /*[/]*/
-
-        window.removeRow = function(icon) {
-            const row = icon.closest('tr');
-            const container = row.parentElement;
-            row.remove();
-            Array.from(container.children).forEach((tr, index) => {
-                tr.querySelector('td:first-child').textContent = index + 1;
-            });
-        };
-
-        // 2. タイマー
-        const ivDisplay = document.getElementById('interval-display');
-        const ivMinInput = document.getElementById('interval-minutes');
-        const ivSecInput = document.getElementById('interval-seconds');
-        const ivSetBtn = document.getElementById('interval-set');
-        const ivStartPauseBtn = document.getElementById('interval-start-pause');
-        const ivResetBtn = document.getElementById('interval-reset');
-
-        let ivInitialTime = 60000;
-        let ivRemainingTime = ivInitialTime;
-        let ivTimer = null;
-        let isIvRunning = false;
-
-        const updateIvDisplay = () => {
-            if(!ivDisplay) return;
-            ivDisplay.textContent = formatTime(ivRemainingTime);
-            ivDisplay.style.color = (ivRemainingTime <= 10000 && ivRemainingTime > 0) ? '#ff5252' : '#fff';
-        };
-
-        const handleIvFinish = () => {
-            clearInterval(ivTimer);
-            isIvRunning = false;
-            ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 開始';
-            alert('インターバル終了！次のセットへ！');
-        };
-
-        const startInterval = () => {
-            if (ivRemainingTime <= 0) { resetInterval(); return; }
-            if (!isIvRunning) {
-                isIvRunning = true;
-                ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 停止';
-                const startTime = Date.now() - (ivInitialTime - ivRemainingTime);
-                ivTimer = setInterval(() => {
-                    const elapsedTime = Date.now() - startTime;
-                    ivRemainingTime = ivInitialTime - elapsedTime;
-                    if (ivRemainingTime <= 0) {           
-                        ivRemainingTime = 0;
-                        updateIvDisplay();
-                        handleIvFinish();
-                        return;
-                    }
-                    updateIvDisplay();
-                }, 100);
-            } else {
-                clearInterval(ivTimer);
-                isIvRunning = false;
-                ivInitialTime = ivRemainingTime;
-                ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 再開';
-            }
-        };
-
-        const resetInterval = () => {
-            clearInterval(ivTimer);
-            isIvRunning = false;
-            const minutes = parseInt(ivMinInput.value) || 0;
-            const seconds = parseInt(ivSecInput.value) || 0;
-            ivInitialTime = Math.max(1000, (minutes * 60000) + (seconds * 1000));
-            ivRemainingTime = ivInitialTime;
-            updateIvDisplay();
-            ivStartPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 開始';
-        };
-
-        if(ivSetBtn && ivStartPauseBtn && ivResetBtn) {
-            ivSetBtn.addEventListener('click', resetInterval);
-            ivStartPauseBtn.addEventListener('click', startInterval);
-            ivResetBtn.addEventListener('click', resetInterval);
-            resetInterval();
-        }
-
-        // 3. AI Camera
-        const toggleAiBtn = document.getElementById('toggle-ai-camera');
-        const aiContainer = document.getElementById('ai-verification-container');
-
-        if (toggleAiBtn && aiContainer) {
-            let cameraStream = null;
-            let pose = null;
-            let repCount = 0;
-            let poseState = "UP";
-
-            function calcAngle(a, b, c) {
-                const rad = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
-                let deg = Math.abs((rad * 180) / Math.PI);
-                if (deg > 180) deg = 360 - deg;
-                return deg;
-            }
-
-            async function startAICamera() {
-                const video = document.getElementById("input_video");
-                const canvas = document.getElementById("output_canvas");
-                const status = document.getElementById("ai-status-overlay");
-                const counter = document.getElementById("ai-rep-counter-overlay");
-
-                try {
-                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
-                    video.srcObject = cameraStream;
-                    await video.play();
-                } catch (e) {
-                    alert("カメラ起動失敗: " + e.message);
-                    return;
-                }
-
-                canvas.width = 640; canvas.height = 480;
-                pose = new Pose({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}` });
-                pose.setOptions({ modelComplexity: 0, smoothLandmarks: true, minTrackingConfidence: 0.5, minDetectionConfidence: 0.5 });
-
-                pose.onResults((results) => {
-                    const ctx = canvas.getContext("2d");
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-                    if (performance.now() % 2 > 1) return;
-                    if (!results.poseLandmarks) return;
-                    
-                    const lm = results.poseLandmarks;
-                    const hip = lm[24], knee = lm[26], ankle = lm[28];
-
-                    if (hip.visibility < 0.5 || knee.visibility < 0.5) {
-                        status.innerText = "全身を映してください";
-                        status.style.color = "#ff5252";
-                        return;
-                    }
-                    const angle = calcAngle(hip, knee, ankle);
-                    if (angle > 160) {
-                        poseState = "UP";
-                        status.innerText = "Stand";
-                        status.style.color = "#00e676";
-                    } 
-                    if (angle < 90 && poseState === "UP") {
-                        poseState = "DOWN";
-                        status.innerText = "Down (OK)";
-                        status.style.color = "#ffeb3b";
-                    }
-                    if (angle > 160 && poseState === "DOWN") {
-                        poseState = "UP";
-                        repCount++;
-                        counter.innerText = repCount + " 回";
-                        if (typeof window.updateCurrentSetReps === 'function') window.updateCurrentSetReps(repCount);
+            
+            if(btnStart) {
+                btnStart.addEventListener('click', () => {
+                    if(timer) {
+                        clearInterval(timer); timer = null;
+                        btnStart.innerHTML = '<i class="fa-solid fa-play"></i> 再開';
+                        btnStart.style.background = '#00b894';
+                    } else {
+                        if(remaining <= 0) remaining = (document.getElementById('interval-minutes').value * 60000) + (document.getElementById('interval-seconds').value * 1000);
+                        btnStart.innerHTML = '<i class="fa-solid fa-pause"></i> 停止';
+                        btnStart.style.background = '#e17055'; // 赤っぽく
+                        const end = Date.now() + remaining;
+                        timer = setInterval(() => {
+                            remaining = end - Date.now();
+                            if(remaining <= 0) {
+                                remaining = 0; clearInterval(timer); timer = null;
+                                alert("インターバル終了！");
+                                btnStart.innerHTML = '<i class="fa-solid fa-play"></i> スタート';
+                                btnStart.style.background = '#00b894';
+                            }
+                            updateDisplay();
+                        }, 100);
                     }
                 });
-
-                async function loop() {
-                    if (!cameraStream) return;
-                    if(video.paused || video.ended) { requestAnimationFrame(loop); return; }
-                    await pose.send({ image: video });
-                    requestAnimationFrame(loop);
-                }
-                loop();
+                
+                document.getElementById('interval-reset').addEventListener('click', () => {
+                    clearInterval(timer); timer = null;
+                    remaining = (document.getElementById('interval-minutes').value * 60000) + (document.getElementById('interval-seconds').value * 1000);
+                    updateDisplay();
+                    btnStart.innerHTML = '<i class="fa-solid fa-play"></i> スタート';
+                    btnStart.style.background = '#00b894';
+                });
             }
+        });
 
-            function stopAICamera() {
-                const video = document.getElementById("input_video");
-                if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
-                video.pause(); video.srcObject = null;
-                if (pose) { pose.close(); pose = null; }
-            }
-
-            toggleAiBtn.addEventListener("click", async () => {
-                if (!cameraStream) {
-                    aiContainer.style.display = "block";
-                    toggleAiBtn.innerHTML = '<i class="fa-solid fa-stop"></i> 停止';
-                    await startAICamera();
-                } else {
-                    aiContainer.style.display = "none";
-                    toggleAiBtn.innerHTML = '<i class="fa-solid fa-robot"></i> AI自動カウント (BETA)';
-                    stopAICamera();
-                }
-            });
-        }
-
-        // 4. GPS
-        const toggleGpsBtn = document.getElementById('toggle-gps');
-        const gpsStatus = document.getElementById('gps-status');
-        const distanceInput = document.getElementById('cardio-distance');
-        window.gpsTotalDistanceKm = 0.0; 
-
-        if (toggleGpsBtn) {
-            let watchId = null;
-            let lastLat = null, lastLon = null;
-
-            function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-                var R = 6371; var dLat = (lat2-lat1)*(Math.PI/180); var dLon = (lon2-lon1)*(Math.PI/180);
-                var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*(Math.PI/180))*Math.cos(lat2*(Math.PI/180))*Math.sin(dLon/2)*Math.sin(dLon/2);
-                return R * (2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-            }
-
-            toggleGpsBtn.addEventListener('click', () => {
-                if (watchId === null) {
-                    if (navigator.geolocation) {
-                        gpsStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 測位中...';
-                        toggleGpsBtn.innerHTML = '<i class="fa-solid fa-stop"></i> 停止';
-                        watchId = navigator.geolocation.watchPosition((pos) => {
-                            const lat = pos.coords.latitude, lon = pos.coords.longitude;
-                            if (lastLat != null) {
-                                const dist = getDistanceFromLatLonInKm(lastLat, lastLon, lat, lon);
-                                if(dist > 0.002 && dist < 0.1) { 
-                                    window.gpsTotalDistanceKm += dist;
-                                    const disp = Math.floor(window.gpsTotalDistanceKm*100)/100;
-                                    gpsStatus.innerHTML = `<i class="fa-solid fa-location-arrow"></i> ${disp} km`;
-                                    if(distanceInput) distanceInput.value = disp;
-                                }
-                            }
-                            lastLat = lat; lastLon = lon;
-                        }, (e) => { gpsStatus.innerText = 'エラー: ' + e.message; }, { enableHighAccuracy: true });
-                    } else { alert("GPS非対応"); }
-                } else {
-                    navigator.geolocation.clearWatch(watchId);
-                    watchId = null;
-                    gpsStatus.innerHTML = `<i class="fa-solid fa-check"></i> 終了: ${Math.floor(window.gpsTotalDistanceKm*100)/100} km`;
-                    toggleGpsBtn.innerHTML = '<i class="fa-solid fa-play"></i> 再開';
-                }
-            });
-        }
-        
-        window.validateCardio = function(form) {
-            if (!validateTrainingTime(form)) return false;
-            const inputDist = parseFloat(document.getElementById('cardio-distance').value) || 0;
-            if (window.gpsTotalDistanceKm > 0 && (inputDist - window.gpsTotalDistanceKm) > 1.0) {
-                return confirm("入力距離とGPS計測値が大きく異なります。記録しますか？");
-            }
+        window.validateTrainingTime = function(form) {
+            const elapsed = (Date.now() - sessionStartTime) / 1000;
+            if (elapsed < 10) return confirm("開始から時間が短すぎます。記録しますか？");
             return true;
         };
-    });
-</script>
+    </script>
 </body>
 </html>
