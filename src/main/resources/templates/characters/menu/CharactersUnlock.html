@@ -11,7 +11,120 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
 	<style>
-	    body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; color: #333; }
+        /* ==========================================================================
+           🌌 BACKGROUND & ANIMATION (from start.html)
+           ========================================================================== */
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --primary-color: #4facfe;
+            --accent-color: #00f2fe;
+        }
+
+	    body { 
+            margin: 0; padding: 0; 
+            background-color: #f0f8ff; 
+            min-height: 100vh; 
+            font-family: 'Noto Sans JP', sans-serif; 
+            color: #333; 
+            overflow-x: hidden;
+        }
+
+        /* 背景アニメーション */
+        .interactive-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
+            background-size: 400% 400%;
+            animation: auroraFlow 20s ease infinite;
+            overflow: hidden;
+        }
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
+            animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0;
+        }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        #bg-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none; mix-blend-mode: screen;
+        }
+
+        .bg-cloud {
+            position: absolute; background: #fff; border-radius: 50%;
+            filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none;
+            box-shadow: 0 0 60px rgba(255,255,255,0.9);
+        }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
+
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        .mouse-flare {
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
+            transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen;
+            z-index: 20; filter: blur(15px); transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
+
+        /* -----------------------------------------------------------
+           🔙 戻るボタン (from CharactersStorage.html)
+           ----------------------------------------------------------- */
+        .back-arrow-button {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #555;
+            font-size: 2.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .back-arrow-button:hover {
+            transform: scale(1.1);
+            background: #fff;
+            color: #4facfe;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+        @media (max-width: 600px) {
+            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
+        }
+
+        /* 既存のGlass Wrapper調整 */
+        .glass-wrapper {
+            position: relative; /* 戻るボタンの位置基準 */
+            /* 必要に応じて背景色などを微調整 */
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+        }
+
+	    /* 既存スタイル */
 	    .character-card { display: inline-block; margin: 10px; text-align: center; background: #ffffff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); color: #333; }
 	    .character-img-wrapper { width: 120px; height: 120px; margin: 0 auto; border-radius: 50%; overflow: hidden; border: 3px solid #eee; position: relative; background: #fff; }
 	    .character-img { width: 100%; height: 100%; object-fit: cover; }
@@ -61,7 +174,22 @@
 </head>
 
 <body>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div id="mouse-flare" class="mouse-flare"></div>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+        <div class="bg-cloud cloud-3"></div>
+    </div>
+
     <div class="glass-wrapper">
+        <a th:href="@{/characters/menu/CharactersMenu}" class="back-arrow-button" title="メニューへ戻る">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+
         <header style="text-align: center; margin-bottom: 20px;">
             <h1>キャラクター解放</h1>
             <div class="status-bar">
@@ -240,10 +368,7 @@
 		    </div>
 		</div>
 
-        <div class="back-btn-container" style="margin:40px 0 20px; text-align:center;">
-            <a th:href="@{/characters}" class="btn-back"><i class="fa-solid fa-reply"></i> メニューへ戻る</a>
         </div>
-    </div>
 
     <div id="globalModal" class="modal">
         <div class="modal-content">
@@ -367,6 +492,82 @@
         if (event.target == document.getElementById("globalModal")) closeModal();
       }
 	});
+
+    // === 🌟 CANVAS PARTICLE SYSTEM (from start.html) ===
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    const flare = document.getElementById('mouse-flare');
+    
+    let particlesArray = [];
+    let width, height;
+
+    function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (event) => {
+        mouse.x = event.x;
+        mouse.y = event.y;
+        if(flare) {
+            flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+        }
+        for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
+    });
+    
+    // 雲のパララックス効果
+    const cloud1 = document.querySelector('.cloud-1');
+    const cloud2 = document.querySelector('.cloud-2');
+    document.addEventListener('mousemove', (e) => {
+        const x = (window.innerWidth - e.pageX) / 60;
+        const y = (window.innerHeight - e.pageY) / 60;
+        if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
+        if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
+    });
+
+    class Particle {
+        constructor() {
+            this.x = mouse.x || Math.random() * width;
+            this.y = mouse.y || Math.random() * height;
+            this.size = Math.random() * 5 + 2;
+            this.speedX = Math.random() * 4 - 2;
+            this.speedY = Math.random() * 4 - 2;
+            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.size > 0.2) this.size -= 0.1;
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'white';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw();
+            if (particlesArray[i].size <= 0.3) {
+                particlesArray.splice(i, 1);
+                i--;
+            }
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
 	</script>
 </body>
 </html>
