@@ -21,7 +21,6 @@
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --accent-color: #00f2fe;
             --text-color: #333;
-            --card-bg: rgba(255, 255, 255, 0.95);
         }
 
         body {
@@ -53,7 +52,7 @@
         @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
 
         /* ==========================================================================
-           🏗 LAYOUT
+           🏗 MAIN LAYOUT
            ========================================================================== */
         .main-container {
             max-width: 800px; width: 92%; margin: 40px auto 100px; padding: 30px 25px;
@@ -67,7 +66,12 @@
         }
 
         /* ヘッダー */
-        .session-header { text-align: center; margin-bottom: 30px; position: relative; }
+        .session-header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            position: relative; 
+            padding: 0 40px; /* タイトルがボタンに被らないように余白確保 */
+        }
         .session-title {
             font-size: 1.8rem; font-weight: 900; margin: 0;
             background: linear-gradient(45deg, #6a11cb, #2575fc);
@@ -77,18 +81,46 @@
         }
         .session-subtitle { font-size: 0.9rem; color: #666; font-weight: 700; margin-top: 5px; }
 
-        /* 戻るボタン */
+        /* ==========================================================================
+           🔙 戻るボタン (メインコンテナ内左上配置)
+           ========================================================================== */
         .back-arrow-button {
-            position: absolute; top: 20px; left: 20px;
-            width: 50px; height: 50px;
-            background: #fff; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            text-decoration: none; color: #666; font-size: 1.4rem;
+            position: absolute;
+            top: 25px;  /* コンテナの上端からの距離 */
+            left: 20px; /* コンテナの左端からの距離 */
+            width: 50px; 
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: #555;
+            font-size: 1.5rem;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s; z-index: 100;
-            border: 2px solid #eee;
+            z-index: 100;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .back-arrow-button:hover { transform: scale(1.1); color: #4facfe; border-color: #4facfe; }
+        .back-arrow-button:hover {
+            transform: scale(1.1);
+            color: #4facfe;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+        
+        /* スマホ調整 */
+        @media (max-width: 600px) {
+            .back-arrow-button { 
+                width: 45px; height: 45px; font-size: 1.2rem; 
+                top: 20px; left: 15px; 
+            }
+            .session-header {
+                padding-top: 50px; /* ボタンと被らないように下にずらす */
+                padding-left: 0; padding-right: 0;
+            }
+        }
 
         /* ==========================================================================
            ⏱ WIDGETS & FORMS
@@ -220,7 +252,7 @@
 
         /* レスポンシブ調整 */
         @media (max-width: 600px) {
-            .main-container { padding: 20px 15px; width: 95%; margin-top: 60px; }
+            .main-container { padding: 20px 15px; width: 95%; margin-top: 40px; }
             .session-title { font-size: 1.5rem; }
             .timer-display { font-size: 2.8rem; }
             .set-row-card { gap: 8px; padding: 10px; }
@@ -238,12 +270,12 @@
         <div class="bg-cloud cloud-2"></div>
     </div>
 
-    <a th:href="@{/training}" class="back-arrow-button" title="戻る">
-        <i class="fa-solid fa-arrow-left"></i>
-    </a>
-
     <div class="main-container">
         
+        <a th:href="@{/training}" class="back-arrow-button" title="戻る">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+
         <header class="session-header">
             <h1 class="session-title" th:text="${trainingTitle}">トレーニング</h1>
             <p class="session-subtitle" th:if="${selectedExercise != null}">
