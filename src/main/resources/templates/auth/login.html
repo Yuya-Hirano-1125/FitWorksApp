@@ -15,7 +15,18 @@
         /* =========================================================
            🌌 SPLIT LAYOUT LOGIN SCREEN (横長ワイド版)
            ========================================================= */
-        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; overflow-x: hidden; font-family: 'Noto Sans JP', sans-serif; }
+		   body { 
+		       margin: 0; 
+		       padding: 0; 
+		       background-color: #f0f8ff; 
+		       min-height: 100vh; 
+		       overflow-x: hidden; 
+		       font-family: 'Noto Sans JP', sans-serif; 
+		       
+		       /* ▼▼▼ 以下の2行を追加してください ▼▼▼ */
+		       perspective: none;    /* base.cssの遠近法設定を無効化 */
+		       transform: none;      /* 念のためtransformも無効化 */
+		   }
         .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; z-index: 0; }
