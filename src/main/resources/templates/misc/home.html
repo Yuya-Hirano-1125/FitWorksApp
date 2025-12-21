@@ -272,10 +272,10 @@
     
     <div class="character-section">
         <div class="character-wrapper">
-            <a id="tutorial-char-display" th:href="@{/character}" class="character-display"
-				th:style="'background-image: url(/img/background/' + ${selectedBackground} + '.png);'">
-                <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
-            </a>
+			<div id="tutorial-char-display" class="character-display"
+							th:style="'background-image: url(/img/background/' + ${selectedBackground} + '.png);'">
+			                <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
+			            </div>
             
             <div class="character-side-buttons">
                 <a id="tutorial-title-btn" th:href="@{/titles}" class="side-action-btn title-button">
