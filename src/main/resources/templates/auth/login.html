@@ -75,13 +75,62 @@
         .register-link { text-align: center; margin-top: 30px; font-size: 0.9rem; color: #666; }
         .register-link a { color: #4facfe; font-weight: 800; text-decoration: none; }
         .error-message { color: #ff6b6b; background: rgba(255, 107, 107, 0.1); padding: 12px; border-radius: 10px; margin-bottom: 20px; font-weight: 600; text-align: center; font-size: 0.9rem; }
-        @media (max-width: 900px) {
-            .main-container { flex-direction: column; max-width: 500px; height: auto; }
-            .login-left { width: 100%; padding: 30px 20px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.5); }
-            .login-right { width: 100%; padding: 40px 30px; }
-            .login-logo { width: 80px; height: 80px; }
-            .login-left h1 { font-size: 2rem; }
-        }
+		/* login.html の 88行目付近の @media ブロックをこれに置き換えてください */
+		@media (max-width: 900px) {
+		    /* 0. 安全策：スマホ表示時は全ての要素のサイズ計算を「枠線込み」に統一 */
+		    * {
+		        box-sizing: border-box;
+		    }
+
+		    /* 1. 画面全体の枠：余白を最小限に */
+		    .center-wrapper {
+		        padding: 10px !important;
+		        align-items: flex-start; /* 上寄せにする */
+		        padding-top: 20px;
+		    }
+
+		    /* 2. メインカード：幅を100%にせず、画面内に収める設定 */
+		    .main-container {
+		        flex-direction: column;
+		        width: 100%;
+		        max-width: 100%;
+		        height: auto;
+		        padding: 0 !important; /* base.cssの余白を消す */
+		        overflow: hidden; /* ★重要：中身がはみ出してもカード枠内に収める */
+		    }
+
+		    /* 3. 左・右パネル共通：幅指定を 'auto' にしてFlexboxに任せる */
+		    .login-left, .login-right {
+		        width: auto; /* ★変更: 100%だとパディング分はみ出ることがあるのでautoにする */
+		        display: block;
+		        padding: 30px 20px; /* 余白は維持 */
+		    }
+		    
+		    .login-right {
+		        /* 入力エリアの背景色透過度などを維持 */
+		        background: rgba(255, 255, 255, 0.6); 
+		    }
+
+		    /* 4. 入力欄とボタン：画面幅を超えないように設定 */
+		    input[type="text"], input[type="password"], input[type="tel"], 
+		    .button, .social-btn {
+		        width: 100% !important; /* 親要素に合わせて伸縮 */
+		        max-width: 100%;
+		        margin-left: 0;
+		        margin-right: 0;
+		    }
+
+		    /* 5. ★はみ出しの犯人になりやすいソーシャルボタンを縦並びにする（任意） */
+		    /* 横並びのままだと画面幅が狭い機種ではみ出ることがあるため */
+		    .social-login-group {
+		        flex-direction: column; /* 縦に積む */
+		        gap: 10px;
+		    }
+
+		    /* その他調整 */
+		    .login-logo { width: 70px; height: 70px; }
+		    .login-left h1 { font-size: 1.8rem; }
+		}
 		
 		/* ▼▼▼ register.html から移植したパスワード欄のスタイル ▼▼▼ */
 		.password-wrapper {
