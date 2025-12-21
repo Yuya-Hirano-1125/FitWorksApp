@@ -101,7 +101,111 @@
         .tutorial-backdrop.active, .tutorial-rpg-box.active { pointer-events: auto; }
         .interactive-bg, .mouse-follower-cloud, .bg-cloud { pointer-events: none !important; z-index: -1; }
         #tutorial-rpg-box { z-index: 10001; }
-    </style>
+		/* ▼▼▼ ボタン間の余白を統一するクラス ▼▼▼ */
+	        .menu-item-spacing {
+	            margin-top: 20px !important; /* 全てのボタンの間隔を「20px」に統一 */
+	            width: 100%;                 /* 幅を揃える */
+	            box-sizing: border-box;
+	            display: block;
+	        }
+	        /* ケアセクションの中央揃え用 */
+	        .care-section {
+	            text-align: center; 
+	        }
+	/* ▼▼▼ スマホサイズ（幅600px以下）の時だけ余白を大きくする ▼▼▼ */
+	        /* タブレット（601px以上）やPCは、元の設定（20px）が適用されます */
+	        @media (max-width: 600px) {
+	            #tutorial-ai-btn {
+	                margin-bottom: 110px !important; 
+	            }
+	        }
+			/* ▼▼▼ PC・タブレット表示 (601px以上) 用のナビゲーション完全版 ▼▼▼ */
+			        @media (min-width: 601px) {
+						/* ★追加: メイン画面の下に余白を作って、ボタンが隠れないようにする */
+						            .main-container {
+						                padding-bottom: 150px !important; /* メニューバーの後ろに隠れないよう底上げ */
+						            }
+			            /* 1. ナビゲーションバーの箱（白い背景） */
+			            .bottom-nav {
+			                display: flex;
+			                justify-content: space-evenly; /* ボタン同士の間隔を均等に */
+			                align-items: center;
+			                
+			                /* 画面下部に浮かせて表示 */
+			                position: fixed;
+			                bottom: 20px;
+			                left: 50%;
+			                transform: translateX(-50%); /* 画面中央に配置 */
+			                
+			                width: 95%;            /* 画面幅の95%を使う */
+			                max-width: 800px;      /* 横に広がりすぎないように制限 */
+			                
+			                background: rgba(255, 255, 255, 0.95); /* 白背景（少し透過） */
+			                backdrop-filter: blur(10px);
+			                border-radius: 50px;   /* 角を丸くしてカプセル型に */
+			                box-shadow: 0 5px 20px rgba(0,0,0,0.15); /* 影をつけて浮かせる */
+			                
+			                padding: 10px 15px;    /* 内側の余白を確保して見切れを防ぐ */
+			                box-sizing: border-box; /* パディングをサイズに含める */
+			                z-index: 1000;
+			            }
+				            /* 2. 各ボタンの共通設定 */
+			            .nav-item {
+			                display: flex;
+			                flex-direction: column; /* アイコン上、文字下の縦並び */
+			                justify-content: center;
+			                align-items: center;
+			                
+			                flex: 1;               /* 全ボタンを同じ幅に引き伸ばす */
+			                max-width: 100px;      /* ボタン1つの最大幅 */
+			                height: auto;          /* 高さは中身に合わせて自動調整 */
+			                min-height: 60px;      /* 最低限の高さを確保 */
+			                
+			                text-decoration: none;
+			                color: #555;
+			                border-radius: 12px;
+			                transition: transform 0.2s ease, background 0.2s;
+			                padding: 5px 0;        /* ボタン内部の上下余白 */
+			                margin: 0 5px;         /* ボタン同士の隙間 */
+			            }
+				            /* 3. 1行目：アイコン（<i>タグ）の設定 */
+			            .nav-item i {
+			                display: block;        /* ブロック要素として扱う */
+			                font-size: 22px;       /* 見やすいサイズ */
+			                margin-bottom: 5px;    /* 文字との間隔 */
+			                line-height: 1;        /* 行間を詰めて見切れ防止 */
+			                color: var(--primary-color, #ff69b4);
+			            }
+				            /* 4. 2行目：文字（<span>タグ）の設定 */
+			            .nav-item span {
+			                display: block;        /* 確実に2行目にする */
+			                font-size: 11px;       /* 全角文字が収まるサイズ */
+			                font-weight: bold;
+			                white-space: nowrap;   /* 折り返し禁止（1行に収める） */
+			                line-height: 1.2;
+			                width: 100%;
+			                text-align: center;
+			            }
+				            /* ホバー時のアクション */
+			            .nav-item:hover {
+			                background-color: #f0f8ff;
+			                transform: translateY(-3px);
+			            }
+			        }
+					/* ▼▼▼ ボタンの枠線（フチの色）を修正 ▼▼▼ */
+					        .btn-record, 
+					        .btn-care,
+					        .home-action-btn {
+					            border: none !important;       /* 枠線を完全に消す */
+					            outline: none !important;      /* クリック時の青い枠線なども消す */
+					        }
+					/* 称号ボタンのフチ（枠線）を消す */
+							.side-action-btn, .title-button {
+							    border: none !important;
+							    outline: none !important;
+							}
+		
+   </style>
 </head>
 <body class="home-page">
 
@@ -196,42 +300,41 @@
         </div>
     </div>
     
-    <a id="tutorial-training-btn" th:href="@{/training}" class="home-action-btn btn-training" style="margin-top: 20px;">
-       <i class="fa-solid fa-dumbbell"></i> トレーニングを開始 
-    </a>
+	<a id="tutorial-training-btn" th:href="@{/training}" class="home-action-btn btn-training menu-item-spacing">
+	       <i class="fa-solid fa-dumbbell"></i> トレーニングを開始 
+	    </a>
 
-    <div id="tutorial-record-btn" class="record-container" style="margin-top: 15px;">
-        <button onclick="toggleRecordMenu()" class="home-action-btn btn-record" style="width: 100%;">
-           <i class="fa-solid fa-pen-to-square"></i> 記録をつける
-        </button>
-        
-        <div id="record-options" class="record-options">
-            <a th:href="@{/training-log}" class="record-option-item training-log-opt">
-                <i class="fa-solid fa-calendar-days"></i><br>筋トレ履歴
-            </a>
-            <a th:href="@{/log/meal}" class="record-option-item meal-opt">
-                <i class="fa-solid fa-utensils"></i><br>食事記録
-            </a>
-            <a th:href="@{/training-log/form/body-weight}" class="record-option-item weight-opt">
-                <i class="fa-solid fa-weight-scale"></i><br>体重記録
-            </a>
-        </div>
-    </div>
-    
-    <div class="care-section" style="margin-top: 15px; text-align: center; margin-bottom: 15px;">
-        <a id="tutorial-care-btn" th:href="@{/training/care}" class="home-action-btn btn-care">
-            <i class="fa-solid fa-mug-hot"></i> AIリフレッシュ&ケア
-        </a>
-    </div>
+	    <div id="tutorial-record-btn" class="record-container menu-item-spacing">
+	        <button onclick="toggleRecordMenu()" class="home-action-btn btn-record" style="width: 100%;">
+	           <i class="fa-solid fa-pen-to-square"></i> 記録をつける
+	        </button>
+	        
+	        <div id="record-options" class="record-options">
+	            <a th:href="@{/training-log}" class="record-option-item training-log-opt">
+	                <i class="fa-solid fa-calendar-days"></i><br>筋トレ履歴
+	            </a>
+	            <a th:href="@{/log/meal}" class="record-option-item meal-opt">
+	                <i class="fa-solid fa-utensils"></i><br>食事記録
+	            </a>
+	            <a th:href="@{/training-log/form/body-weight}" class="record-option-item weight-opt">
+	                <i class="fa-solid fa-weight-scale"></i><br>体重記録
+	            </a>
+	        </div>
+	    </div>
+	    
+	    <div class="care-section menu-item-spacing">
+	        <a id="tutorial-care-btn" th:href="@{/training/care}" class="home-action-btn btn-care">
+	            <i class="fa-solid fa-mug-hot"></i> AIリフレッシュ&ケア
+	        </a>
+	    </div>
 
-    <a id="tutorial-map-btn" th:href="@{/training/map}" class="home-action-btn btn-map" style="margin-top: 15px;">
-       <i class="fa-solid fa-map-location-dot"></i> 近くのトレーニング施設 
-    </a>
-    
-    <a id="tutorial-ai-btn" th:href="@{/ai-coach}" class="home-action-btn btn-ai" style="margin-top: 15px; margin-bottom: 20px;">
-	   <i class="fa-solid fa-robot"></i> AIチャット 
-	</a>
-
+	    <a id="tutorial-map-btn" th:href="@{/training/map}" class="home-action-btn btn-map menu-item-spacing">
+	       <i class="fa-solid fa-map-location-dot"></i> 近くのトレーニング施設 
+	    </a>
+	    
+	    <a id="tutorial-ai-btn" th:href="@{/ai-coach}" class="home-action-btn btn-ai menu-item-spacing">
+		   <i class="fa-solid fa-robot"></i> AIチャット 
+		</a>
 
     <nav id="tutorial-menu-nav" class="bottom-nav">
         <a id="nav-gacha" th:href="@{/gacha}" class="nav-item"><i class="fa-solid fa-gift"></i><span>ガチャ　</span></a>
