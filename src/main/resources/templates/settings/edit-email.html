@@ -28,8 +28,7 @@
         .main-container {
             max-width: 500px; width: 92%; margin: 40px auto; 
             padding: 40px;
-            padding-top: 110px; /* 修正: 上部余白追加 */
-            
+            padding-top: 110px; 
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -39,32 +38,22 @@
             position: relative; z-index: 10;
         }
 
-        /* 🔙 戻るボタン */
         .back-arrow-button {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            width: 70px;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            color: #555;
-            font-size: 2.2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            z-index: 1000;
+            position: absolute; top: 25px; left: 25px; width: 70px; height: 70px;
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.9); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            text-decoration: none; color: #555; font-size: 2.2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 1000;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .back-arrow-button:hover {
-            transform: scale(1.1);
-            background: #fff;
-            color: #4facfe;
+            transform: scale(1.1); background: #fff; color: #4facfe;
             box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .field-error {
+            color: #ff4d4f; font-size: 0.85rem; margin-top: 5px; display: block; font-weight: bold;
         }
 
         @media (max-width: 600px) {
@@ -88,17 +77,29 @@
     </a>
 
     <h1><i class="fa-solid fa-envelope header-icon"></i>メールアドレス変更</h1>
-    <p class="sub-heading">新しいメールアドレスを入力してください。</p>
+    <p class="sub-heading">新しいメールアドレスを入力してください。<br>確認のため、現在のパスワードが必要です。</p>
+
+    <p th:if="${errorMessage}" class="error-message">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span th:text="${errorMessage}"></span>
+    </p>
 
     <form th:action="@{/edit-email}" th:object="${form}" method="post">
 
         <div class="form-group">
-            <label for="email">新しいメールアドレス</label>
-            <input type="email" id="email" th:field="*{email}" required placeholder="example@mail.com" autocomplete="off">
+            <label for="currentPassword">現在のパスワード</label>
+            <input type="password" id="currentPassword" th:field="*{currentPassword}" required placeholder="パスワードを入力" autocomplete="off">
+            <span th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}" class="field-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="newEmail">新しいメールアドレス</label>
+            <input type="email" id="newEmail" th:field="*{newEmail}" required placeholder="example@mail.com" autocomplete="off">
+            <span th:if="${#fields.hasErrors('newEmail')}" th:errors="*{newEmail}" class="field-error"></span>
         </div>
 
         <div class="button-container">
-            <button type="submit" class="button primary">更新する</button>
+            <button type="submit" id="submitButton" class="button primary" disabled>更新する</button>
         </div>
 
     </form>
@@ -117,6 +118,35 @@
     }
     function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
     animate();
+
+    // ★追加: 入力値チェックとボタン制御（ユーザー名画面と同じロジック）
+    document.addEventListener('DOMContentLoaded', function() {
+        const passInput = document.getElementById('currentPassword');
+        const emailInput = document.getElementById('newEmail');
+        const submitButton = document.getElementById('submitButton');
+
+        function toggleButtonState() {
+            // パスワードとメールの両方が入力されているかチェック
+            const isPassFilled = passInput.value.trim() !== '';
+            const isEmailFilled = emailInput.value.trim() !== '';
+
+            if (isPassFilled && isEmailFilled) {
+                submitButton.disabled = false;
+                submitButton.style.opacity = "1.0";
+                submitButton.style.cursor = "pointer";
+            } else {
+                submitButton.disabled = true;
+                submitButton.style.opacity = "0.6";
+                submitButton.style.cursor = "not-allowed";
+            }
+        }
+
+        passInput.addEventListener('input', toggleButtonState);
+        emailInput.addEventListener('input', toggleButtonState);
+
+        // 初期チェック
+        toggleButtonState();
+    });
 </script>
 </body>
 </html>

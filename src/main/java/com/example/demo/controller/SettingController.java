@@ -29,6 +29,7 @@ import com.example.demo.form.EditEmailForm;
 import com.example.demo.form.EditPasswordForm;
 import com.example.demo.form.EditUsernameForm;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.security.CustomUserDetails;
 import com.example.demo.service.CustomUserDetailsService;
 import com.example.demo.service.UserService;
 
@@ -173,22 +174,34 @@ public class SettingController {
         SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
 
-    // -------------------------
-    // メールアドレス編集
-    // -------------------------
     @GetMapping("/edit-email")
-    public String editEmail(Model model) {
+    public String showEditEmailForm(Model model) {
         model.addAttribute("form", new EditEmailForm());
         return "settings/edit-email";
     }
 
     @PostMapping("/edit-email")
-    public String updateEmail(@ModelAttribute("form") EditEmailForm form, RedirectAttributes redirectAttributes) {
-        // TODO: DB 更新処理
-        System.out.println("新しいメールアドレス：" + form.getEmail());
-        
-        redirectAttributes.addFlashAttribute("successMessage", "メールアドレスが正常に更新されました！📧");
-        return "redirect:/settings?updated=email";
+    public String updateEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
+                              @Validated @ModelAttribute("form") EditEmailForm form,
+                              BindingResult result,
+                              Model model,
+                              RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            return "settings/edit-email";
+        }
+
+        try {
+            // パスワードと新メールアドレスを渡して更新
+            userService.updateEmail(userDetails.getId(), form.getCurrentPassword(), form.getNewEmail());
+            
+            redirectAttributes.addFlashAttribute("successMessage", "メールアドレスを変更しました。");
+            return "redirect:/settings";
+
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "settings/edit-email";
+        }
     }
 
  // -------------------------

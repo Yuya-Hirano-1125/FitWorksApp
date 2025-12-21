@@ -173,11 +173,10 @@
                 <h2>ログイン</h2>
                 <p>アカウント情報を入力してください。</p>
             </div>
-			<div th:if="${param.passwordChanged}" class="alert alert-success" role="alert"
-			         style="color: #155724; background-color: #d4edda; border-color: #c3e6cb; padding: 15px; margin-bottom: 20px; border-radius: 5px; text-align: center;">
-			        <i class="fa-solid fa-check-circle"></i>
-			        パスワードを変更しました。<br>新しいパスワードでログインしてください。
-			    </div>
+			<div th:if="${param.passwordChanged}" class="success-message">
+			                <i class="fa-solid fa-circle-check"></i>
+			                パスワードを変更しました。<br>新しいパスワードでログインしてください。
+			            </div>
 
             <p th:if="${param.error}" class="error-message">
                 <i class="fa-solid fa-circle-exclamation"></i> ユーザー名またはパスワードが違います

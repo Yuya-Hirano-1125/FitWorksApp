@@ -32,9 +32,10 @@ public class UserService {
     
     private final UserRepository userRepository;
     private final TrainingRecordRepository trainingRecordRepository; 
-    private final PasswordEncoder passwordEncoder; 
     
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
     @Autowired
     private JavaMailSender mailSender;
     
@@ -43,6 +44,8 @@ public class UserService {
 
     @Autowired
     private SmsService smsService;
+    
+    
     
  // ★設定: 変更禁止期間（日数）
     private static final int USERNAME_CHANGE_COOLDOWN_DAYS = 7;
@@ -580,6 +583,29 @@ public class UserService {
         // 3. 更新処理
         user.setUsername(newUsername);
         user.setLastUsernameChangeDate(LocalDateTime.now()); // ★現在時刻を記録
+        userRepository.save(user);
+    }
+    
+    public void updateEmail(Long userId, String currentPassword, String newEmail) throws Exception {
+        // 1. ユーザーを取得
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exception("ユーザーが見つかりません"));
+
+        // 2. 現在のパスワードが正しいかチェック
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new Exception("現在のパスワードが正しくありません");
+        }
+
+        // 3. すでに他の人がそのメールを使っていないかチェック
+        if (userRepository.findByEmail(newEmail).isPresent()) {
+            throw new Exception("このメールアドレスは既に使用されています");
+        }
+
+        // 4. メールアドレス（兼ユーザー名？）を更新
+        user.setEmail(newEmail);
+        // もしusernameとemailが同一の仕様なら以下も必要
+        // user.setUsername(newEmail); 
+        
         userRepository.save(user);
     }
 
