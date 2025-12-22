@@ -37,34 +37,45 @@
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
             display: flex; flex-direction: column;
-            height: 90vh;
+            height: 90vh; /* 画面いっぱいに */
         }
 
         /* ヘッダー */
-        .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 2px solid rgba(255, 255, 255, 0.3); padding-bottom: 15px; gap: 15px; }
-        .page-title { color: #333; font-size: 2.5rem; margin: 0; flex-grow: 1; text-align: center; }
+        .page-header-container { 
+            display: flex; align-items: center; margin-bottom: 20px; 
+            border-bottom: 3px solid #2575fc; 
+            padding-bottom: 10px; gap: 15px; 
+            flex-shrink: 0; /* ヘッダーが潰れないように */
+        }
+        
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; 
+            text-align: left; font-weight: 700; 
+        }
+        .page-title i { margin-right: 10px; color: #2575fc; }
         
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
-            width: 75px; height: 75px; 
-            background-color: white; color: #007bff;
-            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            width: 45px; height: 45px;
+            background-color: white; color: #2575fc;
+            border: 2px solid #2575fc; border-radius: 50%; text-decoration: none;
             transition: all 0.3s ease; 
-            font-size: 2.4rem; 
+            font-size: 1.3rem; 
             flex-shrink: 0;
         }
-        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+        .home-link-icon:hover { background-color: #2575fc; color: white; transform: scale(1.1); }
 
         /* 説明文 */
         .intro-text {
             text-align: center; color: #444; margin-bottom: 25px;
-            font-size: 1.3rem; 
+            font-size: 1.1rem;
             font-weight: 600; 
             line-height: 1.5;
             text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+            flex-shrink: 0; /* 説明文が潰れないように */
         }
 
-        /* チャット画面コンテナ - 白背景 + 青い枠線 */
+        /* チャット画面コンテナ */
         .chat-container {
             width: 100%; max-width: 100%;
             background: rgba(255, 255, 255, 0.9);
@@ -72,142 +83,153 @@
             border-radius: 15px;
             display: flex; flex-direction: column;
             flex-grow: 1; 
-            overflow: hidden;
+            overflow: hidden; /* コンテナからはみ出さない */
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
             border: 3px solid #2575fc; 
         }
-        .chat-window { flex-grow: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
         
-        /* ========================================
-           吹き出し (Speech Bubble) - コミック風スタイル
-           ========================================
-        */
+        .chat-window { 
+            flex-grow: 1; 
+            padding: 25px; 
+            overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 20px; 
+        }
+        
+        /* 吹き出し */
         .message { 
             position: relative;
             max-width: 80%; 
             padding: 18px 25px; 
-            border-radius: 25px; /* 少し丸みを抑えて吹き出し感 */
+            border-radius: 25px; 
             line-height: 1.6; 
             font-size: 1.35rem; 
-            font-weight: 600; /* 文字くっきり */
-            /* ★ 黒い縁取り ★ */
+            font-weight: 600; 
             border: 3px solid #000; 
-            box-shadow: 3px 3px 0px rgba(0,0,0,0.1); /* 立体感を出す影 */
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.1); 
         }
 
-        /* --- Botの吹き出し（薄い水色） --- */
         .message.bot { 
             align-self: flex-start; 
             background: #e1f5fe; 
             color: #333; 
-            margin-left: 25px; /* しっぽのスペース確保 */
+            margin-left: 25px; 
         }
-        
-        /* Botのしっぽ：黒い枠部分 */
         .message.bot::before {
-            content: "";
-            position: absolute;
-            top: 20px;
-            left: -23px; /* 枠線の太さ(3px) + サイズ分調整 */
-            width: 0;
-            height: 0;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-            border-right: 20px solid #000; /* 黒い三角形 */
+            content: ""; position: absolute; top: 20px; left: -23px; width: 0; height: 0;
+            border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 20px solid #000; 
         }
-        /* Botのしっぽ：中身の色部分 */
         .message.bot::after {
-            content: "";
-            position: absolute;
-            top: 20px;
-            left: -17px; /* 黒枠より少し右にずらす */
-            width: 0;
-            height: 0;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-            border-right: 20px solid #e1f5fe; /* 背景色と同じ三角形 */
+            content: ""; position: absolute; top: 20px; left: -17px; width: 0; height: 0;
+            border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 20px solid #e1f5fe; 
         }
 
-        /* --- Userの吹き出し（水色） --- */
         .message.user { 
             align-self: flex-end; 
             background: #4fc3f7; 
             color: #000;
-            margin-right: 25px; /* しっぽのスペース確保 */
+            margin-right: 25px; 
         }
-        
-        /* Userのしっぽ：黒い枠部分 */
         .message.user::before {
-            content: "";
-            position: absolute;
-            top: 20px;
-            right: -23px;
-            width: 0;
-            height: 0;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-            border-left: 20px solid #000; /* 黒い三角形 */
+            content: ""; position: absolute; top: 20px; right: -23px; width: 0; height: 0;
+            border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 20px solid #000; 
         }
-        /* Userのしっぽ：中身の色部分 */
         .message.user::after {
-            content: "";
-            position: absolute;
-            top: 20px;
-            right: -17px;
-            width: 0;
-            height: 0;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-            border-left: 20px solid #4fc3f7; /* 背景色と同じ三角形 */
+            content: ""; position: absolute; top: 20px; right: -17px; width: 0; height: 0;
+            border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 20px solid #4fc3f7; 
         }
 
+        /* 提案エリア（ここを修正） */
+        .suggestions { 
+            padding: 12px 15px; 
+            display: flex; 
+            gap: 12px; 
+            overflow-x: auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            border-top: 1px solid #f0f0f0; 
+            
+            /* ★重要: 縦方向に潰れないようにする */
+            flex-shrink: 0; 
+            
+            /* スクロールバーを少しきれいにする */
+            scrollbar-width: thin;
+            align-items: center; /* チップを縦中央揃え */
+        }
+        
+        .suggestion-chip { 
+            background: #e9ecef; 
+            color: #495057; 
+            padding: 10px 18px; 
+            border-radius: 20px; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            white-space: nowrap; 
+            transition: 0.2s; 
+            border: 1px solid #dee2e6;
+            
+            /* ★重要: チップ自体の幅が縮まないようにする */
+            flex-shrink: 0; 
+            
+            /* 文字を中央に配置 */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: auto; /* 高さを内容に合わせる */
+            min-height: 40px; /* 最低限の高さを確保 */
+        }
+        .suggestion-chip:hover { background: #dee2e6; color: #212529; }
+
         /* 入力エリア */
-        .input-area { padding: 15px; background: rgba(255, 255, 255, 0.95); display: flex; gap: 12px; border-top: 1px solid #eee; align-items: center; }
+        .input-area { 
+            padding: 15px; 
+            background: rgba(255, 255, 255, 0.95); 
+            display: flex; 
+            gap: 12px; 
+            border-top: 1px solid #eee; 
+            align-items: center;
+            
+            /* ★重要: ここも潰れないようにする */
+            flex-shrink: 0;
+        }
         .input-area input { 
-            flex-grow: 1; padding: 18px; border-radius: 35px; border: 2px solid #ccc; background: #fff; color: #333; outline: none; font-size: 1.3rem; 
+            flex-grow: 1; padding: 15px; border-radius: 35px; border: 2px solid #ccc; background: #fff; color: #333; outline: none; font-size: 1.1rem; 
         }
         .input-area input:focus { border-color: #2575fc; box-shadow: 0 0 5px rgba(37, 117, 252, 0.2); }
         .input-area button { 
-            background: #2575fc; color: white; border: none; width: 70px; height: 70px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            background: #2575fc; color: white; border: none; width: 55px; height: 55px; border-radius: 50%; cursor: pointer; transition: transform 0.2s; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
         .input-area button:hover { transform: scale(1.1); }
         
-        /* 提案エリア */
-        .suggestions { padding: 12px 15px; display: flex; gap: 12px; overflow-x: auto; background: rgba(255, 255, 255, 0.95); border-top: 1px solid #f0f0f0; }
-        .suggestion-chip { background: #e9ecef; color: #495057; padding: 10px 18px; border-radius: 20px; font-size: 1.1rem; cursor: pointer; white-space: nowrap; transition: 0.2s; border: 1px solid #dee2e6; }
-        .suggestion-chip:hover { background: #dee2e6; color: #212529; }
-        
-        /* チャット行のレイアウト */
-		.chat-row { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 25px; max-width: 95%; }
+        .chat-row { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 25px; max-width: 95%; }
 		.chat-row.bot { align-self: flex-start; }
 		.chat-row.user { align-self: flex-end; justify-content: flex-end; }
-        
-        /* コーチアイコン (80px) */
 		.profile-icon { 
-            width: 80px; height: 80px; 
+            width: 70px; height: 70px; 
             border-radius: 50%; object-fit: cover; flex-shrink: 0; 
             box-shadow: 0 4px 8px rgba(0,0,0,0.15); 
             border: 2px solid white;
         }
         
-        /* 提案ボタン */
         .start-training-btn { 
-            background: linear-gradient(135deg, #007bff, #2575fc); 
-            color: white; 
-            border: none; 
-            padding: 15px 25px; 
-            font-size: 1.25rem; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            transition: opacity 0.2s, transform 0.2s; 
-            display: block; 
-            margin-top: 15px; 
-            width: fit-content; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+            background: linear-gradient(135deg, #007bff, #2575fc); color: white; border: none; padding: 15px 25px; font-size: 1.25rem; border-radius: 10px; cursor: pointer; transition: opacity 0.2s, transform 0.2s; display: block; margin-top: 15px; width: fit-content; box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
         }
         .start-training-btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .start-training-btn i { margin-right: 8px; }
         h1 { margin-top: 0; }
+
+        @media (max-width: 600px) {
+            .main-container { padding: 15px; padding-top: 25px; width: 95%; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .page-title { font-size: 1.5rem; }
+            .message { font-size: 1.1rem; padding: 15px; }
+            .profile-icon { width: 50px; height: 50px; }
+            
+            /* モバイル用調整: チップを少し小さく */
+            .suggestion-chip {
+                padding: 8px 14px;
+                font-size: 0.9rem;
+                min-height: 36px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -239,10 +261,11 @@
 				    <div class="message bot">
 				        こんにちは、<span th:text="${username}">ユーザー</span>さん！<br>
 				        今日はどこの部位を鍛えたいですか？<br>
-				        トレーニング歴（初心者、中級者、上級者）などトレーニング時間や体調についても教えてくれると、より良い提案ができますよ！💪
+				        トレーニング歴や体調も教えてくれると、より良い提案ができますよ！💪
 				    </div>
 				</div>
             </div>
+            
             <div class="suggestions">
                 <div class="suggestion-chip" onclick="setInput('30分で胸を鍛えたい！')">30分で胸</div>
                 <div class="suggestion-chip" onclick="setInput('今日は疲れてるから軽めに全身')">疲れてるから軽め</div>
@@ -256,7 +279,7 @@
             </div>
         </div>
         
-        </div>
+    </div>
 
     <script>
         // 背景アニメーション
