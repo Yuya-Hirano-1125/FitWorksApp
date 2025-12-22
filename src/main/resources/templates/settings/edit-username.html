@@ -26,9 +26,10 @@
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
 
         .main-container {
-            max-width: 500px; width: 92%; margin: 40px auto; 
-            padding: 40px;
-            padding-top: 110px; /* 修正: ボタンとの重なりを防ぐため上部余白を追加 */
+            /* ★修正: 500px -> 600px に変更 */
+            max-width: 600px; 
+            width: 92%; margin: 40px auto; 
+            padding: 40px; 
             
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(20px) saturate(180%);
@@ -39,37 +40,24 @@
             position: relative; z-index: 10;
         }
 
-        /* 🔙 戻るボタン */
-        .back-arrow-button {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            width: 70px;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            color: #555;
-            font-size: 2.2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* ヘッダーデザイン */
+        .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #4facfe; padding-bottom: 10px; gap: 15px; }
+        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 700; }
+        .page-title i { margin-right: 8px; color: #4facfe; }
+        
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px;
+            background-color: white; color: #4facfe;
+            border: 2px solid #4facfe; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
         }
-        .back-arrow-button:hover {
-            transform: scale(1.1);
-            background: #fff;
-            color: #4facfe;
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
-        }
+        .home-link-icon:hover { background-color: #4facfe; color: white; transform: scale(1.1); }
 
         @media (max-width: 600px) {
-            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
-            .main-container { padding-top: 90px !important; } /* モバイル用の調整 */
+            .main-container { padding: 20px; padding-top: 30px; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .page-title { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -83,11 +71,14 @@
     </div>
 
 <div class="main-container">
-    <a th:href="@{/settings}" class="back-arrow-button" title="設定に戻る">
-        <i class="fa-solid fa-arrow-left"></i>
-    </a>
+    
+    <div class="page-header-container">
+        <a th:href="@{/settings}" class="home-link-icon" title="設定に戻る">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h1 class="page-title"><i class="fa-solid fa-user-pen"></i> ユーザー名変更</h1>
+    </div>
 
-    <h1><i class="fa-solid fa-user-pen header-icon"></i>ユーザー名変更</h1>
     <p class="sub-heading">新しいユーザー名を入力してください。</p>
 
     <p th:if="${errorMessage}" class="error-message" th:text="${errorMessage}">
@@ -132,26 +123,21 @@
 	        const usernameInput = document.getElementById('newUsername');
 	        const submitButton = document.getElementById('submitButton');
 
-	        // 入力欄の監視関数
 	        function toggleButtonState() {
-	            // 空文字または空白のみの場合はボタンを無効化
 	            if (usernameInput.value.trim() === '') {
 	                submitButton.disabled = true;
-	                submitButton.style.opacity = "0.6"; // 見た目も薄くする
+	                submitButton.style.opacity = "0.6";
 	                submitButton.style.cursor = "not-allowed";
 	            } else {
 	                submitButton.disabled = false;
-	                submitButton.style.opacity = "1.0"; // 元に戻す
+	                submitButton.style.opacity = "1.0";
 	                submitButton.style.cursor = "pointer";
 	            }
 	        }
 
-	        // 入力するたびにチェックを実行
 	        usernameInput.addEventListener('input', toggleButtonState);
-
-	        // ページ読み込み時にも一度チェック（ブラウザのオートフィル対策）
 	        toggleButtonState();
-			});
+    });
 </script>
 </body>
 </html>
