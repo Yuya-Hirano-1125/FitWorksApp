@@ -12,186 +12,168 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
-        /* --- 詳細ページ固有のスタイル --- */
+        /* ==========================================================================
+           1. 共通設定 & 背景
+           ========================================================================== */
+        /* ★修正: テーマカラーを青に変更 (#ff69b4 -> #4facfe) */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
         
-        /* 入力欄が被らないように下の余白を多めに確保 */
-        body { 
-            padding-bottom: 120px; 
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; overflow-x: hidden; font-family: 'Noto Sans JP', sans-serif; color: #333; padding-bottom: 120px; }
+        
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+
+        /* ==========================================================================
+           2. メインコンテナ (統一デザイン)
+           ========================================================================== */
+        .main-container {
+            max-width: 800px; width: 92%; margin: 40px auto; padding: 30px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
         }
+
+        /* ヘッダーデザイン（青系に変更） */
+        .page-header-container { display: flex; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #4facfe; padding-bottom: 15px; gap: 15px; }
+        .page-title { color: #343a40; font-size: 1.8rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 700; }
+        .page-title i { margin-right: 10px; color: #4facfe; }
+        
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px;
+            background-color: white; color: #4facfe;
+            border: 2px solid #4facfe; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { background-color: #4facfe; color: white; transform: scale(1.1); }
 
         /* 投稿詳細エリア */
         .post-detail-area {
-            text-align: left;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 2px dashed var(--secondary-color);
+            text-align: left; margin-bottom: 40px; padding-bottom: 30px;
+            border-bottom: 2px dashed #a0c4ff; /* 点線も青っぽく */
             width: 100%;
-            overflow-wrap: break-word; /* 長文折り返し対策 */
-        }
-
-        .post-title {
-            color: var(--primary-color);
-            font-size: 1.8rem;
-            font-weight: 900;
-            margin-bottom: 15px;
-            line-height: 1.3;
-            word-break: break-word;
-        }
-
-        .post-meta {
-            color: #888;
-            font-size: 0.9rem;
-            margin-bottom: 25px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
-        }
-        .post-meta span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .post-content {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: var(--dark-text);
-            white-space: pre-wrap; /* 改行を反映 */
-            word-break: break-word;
-        }
-
-        /* コメントセクション */
-        .comments-section {
-            text-align: left;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        
-        .comments-header {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--dark-text);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .comment-item {
-            background: var(--ai-bubble);
-            padding: 15px 20px;
-            border-radius: 20px;
-            border-bottom-left-radius: 5px;
-            margin-bottom: 15px;
             overflow-wrap: break-word;
         }
 
+        .post-title {
+            color: #333; font-size: 1.6rem; font-weight: 900; margin-bottom: 15px; line-height: 1.3;
+        }
+
+        .post-meta {
+            color: #666; font-size: 0.9rem; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;
+            background: rgba(255, 255, 255, 0.5); padding: 10px 15px; border-radius: 10px;
+        }
+        .post-meta span { display: flex; align-items: center; gap: 6px; }
+
+        .post-content {
+            font-size: 1.1rem; line-height: 1.8; color: #444;
+            white-space: pre-wrap; word-break: break-word;
+            background: rgba(255, 255, 255, 0.7); padding: 20px; border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* コメントセクション */
+        .comments-section { text-align: left; margin-bottom: 20px; width: 100%; }
+        
+        .comments-header {
+            font-size: 1.2rem; font-weight: 800; color: #333; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .comment-item {
+            background: #f0f8ff; /* 薄い青背景 */
+            padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 5px;
+            margin-bottom: 15px; overflow-wrap: break-word;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
         .comment-meta {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 8px;
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding-bottom: 5px;
+            font-size: 0.85rem; color: #666; margin-bottom: 8px; font-weight: 700;
+            display: flex; justify-content: space-between;
+            border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 5px;
         }
-        .comment-author { color: var(--primary-color); }
-        .comment-body { 
-            font-size: 1rem; 
-            line-height: 1.5; 
-            color: var(--dark-text);
-            white-space: pre-wrap; 
-            word-break: break-word;
-        }
+        .comment-author { color: #007bff; }
+        .comment-body { font-size: 1rem; line-height: 1.5; color: #333; white-space: pre-wrap; word-break: break-word; }
         .no-comments { text-align: center; color: #999; padding: 20px; font-style: italic; }
 
         /* 固定コメントフォーム */
         .fixed-comment-form {
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0;
-            width: 100%;
-            z-index: 9999;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            position: fixed !important; bottom: 0 !important; left: 0; width: 100%; z-index: 9999;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
             box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
+            display: flex; justify-content: center;
             border-top: 1px solid rgba(0,0,0,0.05);
-            padding: 15px 20px;
-            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+            padding: 15px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom));
         }
 
-        .form-inner {
-            max-width: 700px;
-            width: 100%;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
+        .form-inner { max-width: 800px; width: 100%; display: flex; gap: 10px; align-items: center; }
 
         .input-comment {
-            flex-grow: 1;
-            padding: 12px 20px;
-            border-radius: 30px;
-            border: 2px solid var(--secondary-color);
-            background: #fff;
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.3s;
+            flex-grow: 1; padding: 12px 20px; border-radius: 30px;
+            border: 2px solid #ddd; background: #fff; font-size: 1rem; outline: none; transition: all 0.3s;
         }
-        .input-comment:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.2);
-        }
+        /* フォーカス時の色も青に */
+        .input-comment:focus { border-color: #4facfe; box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2); }
 
         .btn-send {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0 25px;
-            height: 46px;
-            border-radius: 30px;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(255, 105, 180, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: linear-gradient(135deg, #4facfe, #00f2fe); /* ボタンも青グラデーションに */
+            color: white; border: none;
+            padding: 0 25px; height: 46px; border-radius: 30px; font-weight: 800;
+            cursor: pointer; transition: all 0.2s; white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.4); display: flex; align-items: center; justify-content: center;
         }
-        .btn-send:hover {
-            background: var(--secondary-color);
-            transform: scale(1.05);
-        }
+        .btn-send:hover { transform: scale(1.05); opacity: 0.9; }
         .btn-send i { margin-right: 5px; }
 
-        /* ★ いいねボタンのスタイル */
+        /* いいねボタン */
         .like-form { display: inline-block; }
         .btn-like {
             background: none; border: none; cursor: pointer;
-            font-size: 1.5rem; color: #ccc; /* デフォルトはグレー */
-            transition: all 0.3s; padding: 5px 10px;
+            font-size: 1.5rem; color: #ccc; transition: all 0.3s; padding: 5px 10px;
             display: flex; align-items: center; gap: 5px;
         }
         .btn-like:hover { transform: scale(1.1); }
-        
-        /* いいね済みの場合の色（赤ピンク） */
-        .btn-like.liked { color: #ff4757; }
-        
+        .btn-like.liked { color: #ff4757; } /* いいねの色は赤のままでOK */
         .like-text { font-size: 1rem; font-weight: bold; }
 
+        @media (max-width: 600px) {
+            .main-container { padding: 15px; padding-top: 25px; width: 95%; border-radius: 30px; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .page-title { font-size: 1.4rem; }
+        }
     </style>
 </head>
 <body>
 
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+    </div>
+
     <div class="main-container">
         
-        <div class="header-section" style="margin-bottom: 20px;">
-             <h1><i class="fa-solid fa-file-lines header-icon"></i> 投稿詳細</h1>
+        <div class="page-header-container">
+            <a th:href="@{/community}" class="home-link-icon" title="一覧に戻る">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <h1 class="page-title"><i class="fa-solid fa-file-lines"></i> 投稿詳細</h1>
         </div>
 
         <div class="post-detail-area">
@@ -202,7 +184,7 @@
              </div>
              <div class="post-content" th:text="${post.content}">本文</div>
 
-             <div style="margin-top: 25px; text-align: right; border-top: 1px solid #f0f0f0; padding-top: 15px;">
+             <div style="margin-top: 25px; text-align: right; border-top: 1px solid #ddd; padding-top: 15px;">
                  <form th:action="@{/community/{id}/like(id=${post.id})}" method="post" class="like-form">
                      <button type="submit" class="btn-like" 
                              th:classappend="${post.isLikedBy(currentUser)} ? 'liked' : ''">
@@ -232,12 +214,6 @@
              </div>
         </div>
 
-        <div class="button-container">
-             <a th:href="@{/community}" class="button secondary">
-                 <i class="fa-solid fa-arrow-left"></i> 一覧に戻る
-             </a>
-        </div>
-
     </div> 
     
     <div class="fixed-comment-form">
@@ -248,6 +224,24 @@
             </button>
         </form>
     </div>
+
+    <script>
+        // 背景アニメーション
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+        class Particle {
+            constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+        animate();
+    </script>
 
 </body>
 </html>
