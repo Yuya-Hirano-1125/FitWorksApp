@@ -139,6 +139,7 @@ public class SecurityConfig {
                 // ★ルートパス("/") を許可リストに追加
                 .requestMatchers("/", "/register",
                     "/forgot-password", "/verify-code", "/reset-password",
+                    "/goodbye",
                     "/error", "/terms",
                     "/api/public/**",
                     "/css/**", "/js/**", "/images/**", "/img/**"

@@ -608,5 +608,12 @@ public class UserService {
         
         userRepository.save(user);
     }
-
+    
+    public void deleteUser(Long userId) {
+        // 関連データ（ログなど）の削除が必要な場合はここに記述
+        // 例: trainingLogRepository.deleteByUserId(userId);
+        
+        // ユーザー本体の削除
+        userRepository.deleteById(userId);
+    }
 }

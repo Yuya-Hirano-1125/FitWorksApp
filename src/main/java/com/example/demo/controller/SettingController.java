@@ -256,18 +256,35 @@ public class SettingController {
         return "redirect:/login?passwordChanged=true";
     }
 
-    // -------------------------
-    // アカウント削除関連
-    // -------------------------
+ // アカウント削除画面の表示
     @GetMapping("/delete-account")
-    public String deleteAccountPage() {
+    public String showDeleteAccountForm() {
         return "settings/delete-account";
     }
 
+    // 削除実行
     @PostMapping("/delete-account")
-    public String deleteAccountConfirm() {
-        // TODO: 実際の削除処理（UserServiceなどでDBからユーザーを削除）
-        System.out.println("アカウント削除処理を実行しました。");
+    public String deleteAccount(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                HttpServletRequest request) {
+        try {
+            // ユーザー削除処理
+            userService.deleteUser(userDetails.getId());
+
+            // セッション無効化（強制ログアウト）
+            request.logout(); 
+            
+            // 完了画面へリダイレクト
+            return "redirect:/goodbye";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/settings?error";
+        }
+    }
+
+    // さようなら画面
+    @GetMapping("/goodbye")
+    public String showGoodbyePage() {
         return "settings/goodbye";
     }
     

@@ -7,185 +7,159 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-    <link rel="stylesheet" th:href="@{/css/settings.css}">
-	
-	<script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* ==========================================================================
-           ✨ BACKGROUND & GLASS DESIGN
-           ========================================================================== */
-        body {
-            margin: 0; padding: 0;
-            background-color: #f0f8ff;
-            min-height: 100vh;
-            font-family: 'Noto Sans JP', sans-serif;
-            color: #333; /* 基本文字色を黒に */
-        }
-
-        /* 背景アニメーション */
-        .interactive-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
-        }
-        @keyframes auroraFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .orb {
-            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
-            animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0;
-        }
+        /* 共通背景デザイン */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
-        @keyframes floatOrb {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 30px) scale(1.1); }
-        }
-        
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
-        .mouse-flare {
-            position: absolute; width: 300px; height: 300px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
-            transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px);
-        }
+        .mouse-flare { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%); transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px); }
 
-        /* ガラス風メインコンテナ (base.cssの上書き) */
-        .main-container.glass-mode {
-            background: rgba(255, 255, 255, 0.75) !important; /* 少し濃いめにして文字を見やすく */
+        .main-container {
+            max-width: 600px; width: 92%; margin: 40px auto; 
+            padding: 40px;
+            
+            background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
             border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 20px 50px rgba(100, 149, 237, 0.2) !important;
-            border-radius: 30px;
-            max-width: 600px;
-            margin: 60px auto;
-            padding: 40px;
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
         }
 
-        /* ページ固有スタイル */
-        .always-open {
-            display: block !important;
-            max-height: none !important;
-            padding: 15px !important;
-            border: none !important;
-            background: transparent !important; /* 背景を透明にして親に合わせる */
-        }
-        .warning-text {
-            color: #c0392b; /* 濃い赤 */
-            font-weight: 800;
-            margin-bottom: 15px;
-            line-height: 1.8;
-            font-size: 1.05rem;
-        }
+        /* ヘッダーデザイン */
+        .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #ff4d4f; padding-bottom: 10px; gap: 15px; }
+        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 700; }
+        .page-title i { margin-right: 8px; color: #ff4d4f; }
         
-        h1 {
-            text-align: center;
-            color: #333;
-            text-shadow: 2px 2px 0 rgba(255,255,255,0.8);
-            margin-bottom: 30px;
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px;
+            background-color: white; color: #ff4d4f;
+            border: 2px solid #ff4d4f; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
         }
-        
-        /* セクションスタイル調整 */
-        .setting-section {
-            background: rgba(255,255,255,0.6);
+        .home-link-icon:hover { background-color: #ff4d4f; color: white; transform: scale(1.1); }
+
+        /* 警告エリア */
+        .warning-box {
+            background: rgba(255, 77, 79, 0.1);
+            border: 2px solid rgba(255, 77, 79, 0.3);
             border-radius: 15px;
-            border: 2px solid #e74c3c; /* 赤枠で警告感を出す */
-            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.15);
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .warning-title { color: #ff4d4f; font-weight: 800; font-size: 1.2rem; margin-bottom: 10px; }
+        .warning-text { color: #555; font-size: 0.95rem; line-height: 1.6; }
+
+        /* 削除ボタン特別仕様 */
+        .button.danger {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white; border: none; font-weight: 800;
+            box-shadow: 0 4px 15px rgba(255, 75, 43, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .button.danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 75, 43, 0.6);
         }
         
-        .section-header {
-            color: #c0392b;
-            font-weight: 900;
-            font-size: 1.2rem;
-            border-bottom: 1px solid rgba(231, 76, 60, 0.3);
-            padding: 15px;
+        /* キャンセルボタン */
+        .button.cancel {
+            background: #fff; border: 1px solid #ccc; color: #555; 
+            text-align: center; text-decoration: none; display: block; 
+            padding: 12px; border-radius: 30px; font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .button.cancel:hover {
+            transform: translateY(-2px);
+            background: #f9f9f9;
+        }
+
+        @media (max-width: 600px) {
+            .main-container { padding: 20px; padding-top: 30px; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .page-title { font-size: 1.5rem; }
         }
     </style>
 </head>
-<body class="settings-page">
-
+<body>
     <div class="interactive-bg">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
         <canvas id="bg-canvas"></canvas>
         <div id="mouse-flare" class="mouse-flare"></div>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
     </div>
 
-    <div class="main-container glass-mode">
-        <h1><i class="fa-solid fa-user-slash header-icon" style="color: #e74c3c;"></i> アカウント削除</h1>
-        
-        <div class="setting-section" style="--section-index: 1;">
-            <div class="section-header">
-                <div><span class="section-icon"><i class="fa-solid fa-triangle-exclamation"></i></span> 注意事項</div>
-            </div>
-            <div class="section-content always-open">
-                <p class="warning-text" style="font-size: 1.2rem;">⚠ この操作は取り消せません</p>
-                <p class="warning-text">
-                    アカウントを削除すると、すべてのデータ（トレーニング履歴、進捗、設定など）が完全に失われます。<br>
-                    再度ログインすることはできません。<br>慎重にご確認ください。
-                </p>
-            </div>
-        </div>
+<div class="main-container">
+    
+    <div class="page-header-container">
+        <a th:href="@{/settings}" class="home-link-icon" title="設定に戻る">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h1 class="page-title"><i class="fa-solid fa-user-slash"></i> アカウント削除</h1>
+    </div>
 
-        <div class="button-container" style="margin-top: 40px;">
-            <form th:action="@{/delete-account}" method="post" onsubmit="return confirmDelete()">
-                <button type="submit" class="button primary" 
-                        style="background: linear-gradient(45deg, #ff416c, #ff4b2b); border: none; box-shadow: 0 8px 20px rgba(255, 65, 108, 0.4); color: white; font-weight: 800;">
-                    退会する <i class="fa-solid fa-trash"></i>
-                </button>
-            </form>
+    <div class="warning-box">
+        <div class="warning-title"><i class="fa-solid fa-triangle-exclamation"></i> 注意事項</div>
+        <div class="warning-text">
+            アカウントを削除すると、すべてのデータ（トレーニング記録、レベル、獲得キャラクターなど）が完全に失われます。<br>
+            <strong>この操作は取り消すことができません。</strong>
+        </div>
+    </div>
+
+    <form th:action="@{/delete-account}" method="post" onsubmit="return confirm('本当によろしいですか？\nすべてのデータが削除されます。');">
+        
+        <div class="button-container" style="gap: 15px; display:flex; flex-direction:column;">
+            <button type="submit" class="button danger">
+                同意して退会する
+            </button>
             
-            <a th:href="@{/settings}" class="button secondary" style="margin-top: 15px; background: white; color: #333; border: 2px solid #ccc; font-weight: bold;">
-                キャンセルして戻る <i class="fa-solid fa-rotate-left"></i>
+            <a th:href="@{/settings}" class="button cancel">
+                キャンセル
             </a>
         </div>
-    </div>
 
-    <script>
-        function confirmDelete() {
-            return confirm("本当にアカウントを削除しますか？\nこの操作は元に戻せません。");
-        }
+    </form>
+</div>
 
-        // === 背景アニメーションスクリプト ===
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        const flare = document.getElementById('mouse-flare');
-        let particlesArray = [];
-        let width, height;
+<script>
+    // 背景のCanvasアニメーションのみ維持
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); const flare = document.getElementById('mouse-flare');
+    let particlesArray = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (e) => { 
+        mouse.x = e.x; mouse.y = e.y; 
+        if(flare) flare.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+        for(let i=0; i<2; i++) particlesArray.push(new Particle()); 
+    });
 
-        function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
-        window.addEventListener('resize', resizeCanvas); resizeCanvas();
-
-        const mouse = { x: undefined, y: undefined };
-        window.addEventListener('mousemove', (event) => {
-            mouse.x = event.x; mouse.y = event.y;
-            flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
-            particlesArray.push(new Particle(event.clientX, event.clientY));
-        });
-
-        class Particle {
-            constructor(x, y) {
-                this.x = x || Math.random() * width; this.y = y || Math.random() * height;
-                this.size = Math.random() * 5 + 2;
-                this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2;
-                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
-            }
-            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
-            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update(); particlesArray[i].draw();
-                if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; }
-            }
-            requestAnimationFrame(animate);
-        }
-        animate();
-    </script>
+    class Particle {
+        constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+    }
+    function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+    animate();
+</script>
 </body>
 </html>
