@@ -12,14 +12,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/characters/Backgrounds.css}">
     <style>
-        /* 背景アニメーション */
-        body { font-family: 'Noto Sans JP', sans-serif; }
-        .interactive-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
-        }
+        /* ==========================================================================
+           1. 共通設定 & 背景
+           ========================================================================== */
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; overflow-x: hidden; font-family: 'Noto Sans JP', sans-serif; color: #333; }
+        
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
@@ -27,45 +27,48 @@
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
         .mouse-flare { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%); transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px); }
 
-        /* ガラス効果の上書き */
-        .glass-main {
-            background: rgba(255, 255, 255, 0.65) !important;
+        /* ==========================================================================
+           2. メインコンテナ (統一デザイン)
+           ========================================================================== */
+        .main-container {
+            max-width: 900px; width: 92%; margin: 40px auto; padding: 30px;
+            background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 20px 50px rgba(100, 149, 237, 0.2);
-            border-radius: 30px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
         }
 
-        /* 🔙 戻るボタン */
-        .back-arrow-button {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            width: 70px;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            color: #555;
-            font-size: 2.2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* ヘッダーデザイン（他画面と統一） */
+        .page-header-container { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            border-bottom: 3px solid #4facfe; 
+            padding-bottom: 15px; 
+            gap: 15px; 
         }
-        .back-arrow-button:hover {
-            transform: scale(1.1);
-            background: #fff;
-            color: #4facfe;
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        
+        .page-title { 
+            color: #343a40; font-size: 1.8rem; margin: 0; font-weight: 700; flex-grow: 1; text-align: left;
         }
+        .page-title i { margin-right: 10px; color: #4facfe; }
+        
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px;
+            background-color: white; color: #4facfe;
+            border: 2px solid #4facfe; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { background-color: #4facfe; color: white; transform: scale(1.1); }
+
         @media (max-width: 600px) {
-            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
+            .main-container { padding: 20px; padding-top: 30px; width: 95%; border-radius: 30px; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .page-title { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -78,24 +81,19 @@
         <div id="mouse-flare" class="mouse-flare"></div>
     </div>
 
-    <div class="main-container glass-main p-8 mx-auto my-8 max-w-6xl relative z-10"> 
+    <div class="main-container"> 
         
-        <a th:href="@{/characters/menu/CharactersMenu}" class="back-arrow-button" title="メニューに戻る">
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
-
-        <div class="page-header text-center mb-8">
-            <h1 class="page-title text-3xl font-extrabold flex items-center justify-center gap-2 text-gray-800">
-                <i class="fa-solid fa-image text-blue-500"></i>
-                背景一覧
-            </h1>
+        <div class="page-header-container">
+            <a th:href="@{/characters/menu/CharactersMenu}" class="home-link-icon" title="メニューに戻る">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <h1 class="page-title"><i class="fa-solid fa-image"></i> 背景一覧</h1>
         </div>
 
         <div id="content-area" class="mt-6"></div>
 
         <div class="back-btn-area text-center mt-8">
-
-        </div>
+            </div>
 
     </div>
 
