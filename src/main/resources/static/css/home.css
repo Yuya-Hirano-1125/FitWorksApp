@@ -411,10 +411,13 @@
 
 /* ★リアルタイム時計のスタイル */
 .real-time-clock {
-    position: absolute;
-    top: 20px; left: 20px;
+    position: relative; /* ロゴと重ならないよう通常配置 */
+    margin: 0 0 10px 0; /* 左寄せ(autoを削除) & 下に余白 */
+    width: fit-content; /* 文字数に合わせて幅を調整 */
+    display: block;
+    
     font-family: 'Poppins', sans-serif;
-    font-weight: 800; font-size: 1.2rem;
+    font-weight: 800; font-size: 1.1rem; /* スマホでも見切れにくいよう少しだけサイズ調整 */
     color: #0288d1;
     background: rgba(255, 255, 255, 0.9);
     padding: 6px 14px;
