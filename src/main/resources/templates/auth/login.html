@@ -148,6 +148,34 @@
 		/* ブラウザ標準のパスワード表示ボタンを消す */
 		input::-ms-reveal { display: none; }
 		input::-ms-clear { display: none; }
+		/* ▼▼▼ 追加: ログインボタンのデザイン ▼▼▼ */
+		        .btn-login {
+		            width: 100%;
+		            padding: 16px;
+		            margin-top: 15px;
+		            border: none;
+		            border-radius: 50px;
+		            background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
+		            color: white;
+		            font-size: 1.2rem;
+		            font-weight: 800;
+		            cursor: pointer;
+		            box-shadow: 0 5px 15px rgba(0, 97, 255, 0.4);
+		            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		            display: flex;
+		            align-items: center;
+		            justify-content: center;
+		            gap: 10px;
+		        }
+		        .btn-login:hover {
+		            transform: translateY(-4px) scale(1.02);
+		            box-shadow: 0 10px 25px rgba(0, 97, 255, 0.6);
+		            filter: brightness(1.1);
+		        }
+		        .btn-login:active {
+		            transform: translateY(2px);
+		            box-shadow: 0 2px 5px rgba(0, 97, 255, 0.4);
+		        }
     </style>
 </head>
 <body>
@@ -203,7 +231,9 @@
                     <a th:href="@{/forgot-password}" class="forgot-link">パスワードを忘れた方</a>
                 </div>
 
-                <button type="submit" class="button primary">サインイン</button>
+				<button type="submit" class="btn-login">
+				    <i class="fa-solid fa-right-to-bracket"></i> ログイン
+				</button>
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             </form>
 
