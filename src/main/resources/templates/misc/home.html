@@ -25,15 +25,14 @@
             width: 100%; height: 100%;  
             background-repeat: no-repeat; background-position: center; background-size: cover; 
             border-radius: 25px; 
-            box-shadow: 0 10px 30px rgba(33, 150, 243, 0.25); 
+            box-shadow: 0 10px 30px rgba(33, 150, 243, 0.25); /* 影を調整 */
             text-decoration: none; padding-bottom: 10px; box-sizing: border-box; 
-            border: 4px solid rgba(255,255,255,0.8);
+            border: 4px solid rgba(255,255,255,0.8); /* 白枠追加でポップに */
         }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-50px); } 100% { transform: translateY(0px); } }
         .character-display img { width: auto; height: 85%; max-width: 95%; object-fit: contain; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9)); }
         
-        /* サイドボタンコンテナ: 中央揃え */
-        .character-side-buttons { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 10; top: 40px; right: -125px; }
+        .character-side-buttons { position: absolute; display: flex; flex-direction: column; gap: 12px; z-index: 10; top: 40px; right: -125px; }
         @media (max-width: 650px) { .character-side-buttons { right: 10px; top: 50px; } }
 
         .side-action-btn { 
@@ -45,41 +44,6 @@
         .side-action-btn:hover { transform: scale(1.05); }
         
         .title-button { background: linear-gradient(135deg, #9c27b0, #ba68c8); border: 2px solid rgba(255,255,255,0.3); }
-
-        /* ★修正: デイリーミッション用の正方形ボタン（大）のスタイル */
-        .mission-side-btn {
-            background: linear-gradient(135deg, #ff9a9e, #fad0c4); /* ピンク・オレンジ系 */
-            width: 110px !important;  /* 称号ボタン(110px)と同じ幅 */
-            height: 110px;            /* 幅に合わせて高さも110px（正方形） */
-            padding: 0 !important;
-            border: 2px solid rgba(255,255,255,0.3);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;   /* 縦並び */
-            align-items: center;
-            justify-content: center;
-            color: white;
-            border-radius: 20px;      /* 少し丸みを大きく */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-            text-decoration: none;
-            transition: transform 0.1s;
-            gap: 5px;                 /* アイコンと文字の間隔 */
-        }
-        .mission-side-btn:hover { transform: scale(1.05); }
-        
-        /* アイコンサイズ調整 */
-        .mission-side-btn i {
-            font-size: 2.2rem;
-            margin-bottom: 2px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        /* 文字スタイル */
-        .mission-side-btn span {
-            font-size: 0.85rem;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
 
         .help-menu-dropdown { display: none; position: absolute; top: 60px; right: 20px; left: auto; background: rgba(255, 255, 255, 0.95); border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); padding: 10px; z-index: 2000; width: 220px; flex-direction: column; gap: 10px; }
         .help-menu-dropdown.active { display: flex; }
@@ -95,7 +59,7 @@
         .home-greeting-text { font-family: 'Noto Sans JP', sans-serif; color: #555; font-size: 1.1rem; font-weight: 700; margin-top: 0; line-height: 1.6; }
         .home-username { color: #0288d1; font-size: 1.3rem; font-weight: 900; margin: 0 3px; text-decoration: underline wavy #4facfe; text-underline-offset: 4px; }
 
-        /* 背景解放ポップアップ (省略なし) */
+        /* 背景解放ポップアップ (CSS省略なし) */
         .background-unlock-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 10000; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .background-unlock-content { background: linear-gradient(180deg, #fffef7 0%, #faf8f0 100%); border: 6px solid #d4a373; border-radius: 30px; padding: 0; max-width: 520px; width: 90%; box-shadow: 0 0 0 3px #f5e6d3, 0 0 0 9px #d4a373, 0 15px 35px rgba(0, 0, 0, 0.3); animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); position: relative; overflow: hidden; }
@@ -137,24 +101,109 @@
         .tutorial-backdrop.active, .tutorial-rpg-box.active { pointer-events: auto; }
         .interactive-bg, .mouse-follower-cloud, .bg-cloud { pointer-events: none !important; z-index: -1; }
         #tutorial-rpg-box { z-index: 10001; }
-        
-        .menu-item-spacing { margin-top: 20px !important; width: 100%; box-sizing: border-box; display: block; }
-        .care-section { text-align: center; }
-        @media (max-width: 600px) { #tutorial-ai-btn { margin-bottom: 110px !important; } }
-        
-        @media (min-width: 601px) {
-            .main-container { padding-bottom: 150px !important; }
-            .bottom-nav { display: flex; justify-content: space-evenly; align-items: center; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 800px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); padding: 10px 15px; box-sizing: border-box; z-index: 1000; }
-            .nav-item { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; max-width: 100px; height: auto; min-height: 60px; text-decoration: none; color: #555; border-radius: 12px; transition: transform 0.2s ease, background 0.2s; padding: 5px 0; margin: 0 5px; }
-            .nav-item i { display: block; font-size: 22px; margin-bottom: 5px; line-height: 1; color: var(--primary-color, #ff69b4); }
-            .nav-item span { display: block; font-size: 11px; font-weight: bold; white-space: nowrap; line-height: 1.2; width: 100%; text-align: center; }
-            .nav-item:hover { background-color: #f0f8ff; transform: translateY(-3px); }
-        }
-        
-        .btn-record, .btn-care, .home-action-btn { border: none !important; outline: none !important; }
-        .side-action-btn, .title-button { border: none !important; outline: none !important; }
-        /* 正方形ボタンのフチなし設定 */
-        .mission-side-btn { border: none !important; outline: none !important; }
+		/* ▼▼▼ ボタン間の余白を統一するクラス ▼▼▼ */
+	        .menu-item-spacing {
+	            margin-top: 20px !important; /* 全てのボタンの間隔を「20px」に統一 */
+	            width: 100%;                 /* 幅を揃える */
+	            box-sizing: border-box;
+	            display: block;
+	        }
+	        /* ケアセクションの中央揃え用 */
+	        .care-section {
+	            text-align: center; 
+	        }
+	/* ▼▼▼ スマホサイズ（幅600px以下）の時だけ余白を大きくする ▼▼▼ */
+	        /* タブレット（601px以上）やPCは、元の設定（20px）が適用されます */
+	        @media (max-width: 600px) {
+	            #tutorial-ai-btn {
+	                margin-bottom: 110px !important; 
+	            }
+	        }
+			/* ▼▼▼ PC・タブレット表示 (601px以上) 用のナビゲーション完全版 ▼▼▼ */
+			        @media (min-width: 601px) {
+						/* ★追加: メイン画面の下に余白を作って、ボタンが隠れないようにする */
+						            .main-container {
+						                padding-bottom: 150px !important; /* メニューバーの後ろに隠れないよう底上げ */
+						            }
+			            /* 1. ナビゲーションバーの箱（白い背景） */
+			            .bottom-nav {
+			                display: flex;
+			                justify-content: space-evenly; /* ボタン同士の間隔を均等に */
+			                align-items: center;
+			                
+			                /* 画面下部に浮かせて表示 */
+			                position: fixed;
+			                bottom: 20px;
+			                left: 50%;
+			                transform: translateX(-50%); /* 画面中央に配置 */
+			                
+			                width: 95%;            /* 画面幅の95%を使う */
+			                max-width: 800px;      /* 横に広がりすぎないように制限 */
+			                
+			                background: rgba(255, 255, 255, 0.95); /* 白背景（少し透過） */
+			                backdrop-filter: blur(10px);
+			                border-radius: 50px;   /* 角を丸くしてカプセル型に */
+			                box-shadow: 0 5px 20px rgba(0,0,0,0.15); /* 影をつけて浮かせる */
+			                
+			                padding: 10px 15px;    /* 内側の余白を確保して見切れを防ぐ */
+			                box-sizing: border-box; /* パディングをサイズに含める */
+			                z-index: 1000;
+			            }
+				            /* 2. 各ボタンの共通設定 */
+			            .nav-item {
+			                display: flex;
+			                flex-direction: column; /* アイコン上、文字下の縦並び */
+			                justify-content: center;
+			                align-items: center;
+			                
+			                flex: 1;               /* 全ボタンを同じ幅に引き伸ばす */
+			                max-width: 100px;      /* ボタン1つの最大幅 */
+			                height: auto;          /* 高さは中身に合わせて自動調整 */
+			                min-height: 60px;      /* 最低限の高さを確保 */
+			                
+			                text-decoration: none;
+			                color: #555;
+			                border-radius: 12px;
+			                transition: transform 0.2s ease, background 0.2s;
+			                padding: 5px 0;        /* ボタン内部の上下余白 */
+			                margin: 0 5px;         /* ボタン同士の隙間 */
+			            }
+				            /* 3. 1行目：アイコン（<i>タグ）の設定 */
+			            .nav-item i {
+			                display: block;        /* ブロック要素として扱う */
+			                font-size: 22px;       /* 見やすいサイズ */
+			                margin-bottom: 5px;    /* 文字との間隔 */
+			                line-height: 1;        /* 行間を詰めて見切れ防止 */
+			                color: var(--primary-color, #ff69b4);
+			            }
+				            /* 4. 2行目：文字（<span>タグ）の設定 */
+			            .nav-item span {
+			                display: block;        /* 確実に2行目にする */
+			                font-size: 11px;       /* 全角文字が収まるサイズ */
+			                font-weight: bold;
+			                white-space: nowrap;   /* 折り返し禁止（1行に収める） */
+			                line-height: 1.2;
+			                width: 100%;
+			                text-align: center;
+			            }
+				            /* ホバー時のアクション */
+			            .nav-item:hover {
+			                background-color: #f0f8ff;
+			                transform: translateY(-3px);
+			            }
+			        }
+					/* ▼▼▼ ボタンの枠線（フチの色）を修正 ▼▼▼ */
+					        .btn-record, 
+					        .btn-care,
+					        .home-action-btn {
+					            border: none !important;       /* 枠線を完全に消す */
+					            outline: none !important;      /* クリック時の青い枠線なども消す */
+					        }
+					/* 称号ボタンのフチ（枠線）を消す */
+							.side-action-btn, .title-button {
+							    border: none !important;
+							    outline: none !important;
+							}
 		
    </style>
 </head>
@@ -206,6 +255,10 @@
         </div>
     </div>
     
+    <a id="tutorial-mission-btn" th:href="@{/daily-mission}" class="home-action-btn btn-mission">
+       <i class="fa-solid fa-list-check"></i> デイリーミッション
+    </a>
+    
     <div id="tutorial-title-display" style="text-align: center; margin-top: 5px; min-height: 30px;">
         <th:block th:if="${userTitle != null and userTitle != 'なし'}">
             <th:block th:each="enumT : ${T(com.example.demo.entity.AppTitle).values()}" 
@@ -227,10 +280,6 @@
             <div class="character-side-buttons">
                 <a id="tutorial-title-btn" th:href="@{/titles}" class="side-action-btn title-button">
                     <i class="fa-solid fa-crown"></i> 称号
-                </a>
-                <a id="tutorial-mission-btn" th:href="@{/daily-mission}" class="mission-side-btn" aria-label="デイリーミッション">
-                    <i class="fa-solid fa-list-check"></i>
-                    <span>ミッション</span>
                 </a>
             </div>
         </div>
@@ -406,22 +455,14 @@
 	            });
 	    }
 
-        // ★時計更新処理: 日付・曜日・時刻を表示
+        // ★時計更新処理: 秒数を追加
         function updateRealTimeClock() {
             const now = new Date();
-            
-            // 日付と曜日のオプション (例: 2023/12/23(土))
-            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' };
-            const dateString = now.toLocaleDateString('ja-JP', dateOptions);
-            
-            // 時刻のオプション (例: 10:00:00)
-            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            const timeString = now.toLocaleTimeString('ja-JP', timeOptions);
-            
+            // second: '2-digit' を追加して秒まで表示
+            const timeString = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             const clockEl = document.getElementById('real-time-clock');
             if (clockEl) {
-                // 日付と時刻をスペースで繋いで表示
-                clockEl.textContent = `${dateString} ${timeString}`;
+                clockEl.textContent = timeString;
             }
         }
         setInterval(updateRealTimeClock, 1000);
@@ -471,112 +512,139 @@
         { targetId: 'tutorial-title-display', text: "ここには現在装備している「称号」が輝きます。\nレアな称号を手に入れて、強さをアピールしてください!" },
         { targetId: 'tutorial-char-display', text: "あなたのパートナーキャラクターです。\nレベルアップと共に進化していく姿を見守りましょう。" },
         { targetId: 'tutorial-title-btn', text: "「称号」ボタンからコレクション画面へ。\n獲得した称号を付け替えて、個性を出せます。" },
+        { targetId: 'tutorial-customize-btn', text: "「着せ替え」ボタンでは、ガチャで入手したアイテムを\nキャラクターに装備させることができます。" },
         { targetId: 'tutorial-training-btn', text: "メイン機能はこれ!「トレーニングを開始」ボタン。\nここから日々の運動メニューを作成・記録します。" },
         { targetId: 'tutorial-record-btn', text: "「記録をつける」メニューを開くと、\n過去の履歴確認や、食事・体重の記録が個別にできます。" },
         { targetId: 'tutorial-care-btn', text: "疲れた時は「AIリフレッシュ&ケア」。\n体調に合わせたストレッチや休息法をAIが提案します。" },
         { targetId: 'tutorial-map-btn', text: "「マップ」機能を使えば、\n近くのジムや公園、トレーニング施設をすぐに探せます。" },
         { targetId: 'tutorial-ai-btn', text: "トレーニングや食事の悩みは「AIチャット」へ。\n専属のAIコーチが24時間いつでも相談に乗ります!" },
-        { targetId: 'nav-gacha', text: "ここからは下のメニューです。\n「ガチャ」で新しいキャラクターやアイテムをゲット!" },
-        { targetId: 'tutorial-friends-btn', text: "「フレンド」機能で友達とつながり、\nお互いのトレーニング状況を確認して励まし合えます。" },
-        { targetId: 'nav-community', text: "「掲示板」では、全ユーザーと情報交換したり、\nランキングで上位を目指して競い合ったりできます。" },
-        { targetId: 'nav-char', text: "「キャラ」メニューでは、\n獲得したキャラクターの管理や進化を行えます。" },
-        { targetId: 'tutorial-muscles-btn', text: "「筋肉」図鑑。\n鍛えた部位が記録され、あなたの努力が可視化されます!" },
-        { targetId: 'nav-settings', text: "最後に「設定」。\nアカウント情報の変更や通知設定はこちらから。" },
-        { targetId: null, text: "説明は以上です。\nさあ、FitWorksで理想の体を目指してトレーニングを始めましょう!" }
+        { targetId: 'nav-gacha', text: "ここからは下のメニューです。\n「ガチャ」では、着せ替えアイテムなどの報酬が手に入ります。" },
+        { targetId: 'tutorial-friends-btn', text: "「フレンド」機能で仲間とつながりましょう。\nお互いに励まし合ったり、ランキングで競えます。" },
+        { targetId: 'nav-community', text: "「掲示板」はユーザー同士の交流スペース。\n筋トレ情報の交換や、雑談で盛り上がりましょう。" },
+        { targetId: 'nav-char', text: "「キャラ」メニューでは、キャラクター図鑑を見たり、\nパートナーの詳細ステータスを確認できます。" },
+        { targetId: 'tutorial-muscles-btn', text: "「筋肉」タブでは、鍛えた部位が光る「マッスルパートナー」を表示。\n自分の成長箇所が一目でわかります!" },
+        { targetId: 'nav-settings', text: "最後に「設定」。アカウント情報の変更や通知設定、\n生体認証(FaceID/TouchID)の登録もここから行えます。" },
+        { targetId: null, text: "機能説明は以上です。\nさあ、FitWorksで最高のフィットネスライフを始めましょう!" }
     ];
-
+    
     let currentRpgStep = 0;
+    let typeWriterInterval;
+    let updateLoopId; 
+    const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v16'; 
 
-    function startRpgTutorial(forceStart) {
-        // 初回ログイン判定 (localStorageを使用)
-        const hasSeenTutorial = localStorage.getItem('hasSeenFitWorksTutorial_v2');
-        if (!forceStart && hasSeenTutorial) {
-            return; // 既に見た場合は何もしない
-        }
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!localStorage.getItem(STORAGE_KEY_RPG)) { setTimeout(() => startRpgTutorial(), 800); }
+        window.addEventListener('resize', updateSpotlightPosition);
+        window.addEventListener('scroll', updateSpotlightPosition);
+    });
 
+    function startRpgTutorial(isManual) {
         currentRpgStep = 0;
-        document.getElementById('tutorial-backdrop').classList.add('active');
+        document.getElementById('tutorial-spotlight').classList.add('active');
         document.getElementById('tutorial-rpg-box').classList.add('active');
-        showRpgStep();
+        document.getElementById('tutorial-backdrop').classList.add('active');
+        updateRpgView();
+        startUpdateLoop();
     }
 
-    function showRpgStep() {
-        if (currentRpgStep >= rpgSteps.length) {
-            endRpgTutorial();
-            return;
-        }
-
+    function updateRpgView() {
         const step = rpgSteps[currentRpgStep];
-        const textField = document.getElementById('rpg-text');
+        const textBox = document.getElementById('rpg-text');
+        const charImg = document.getElementById('rpg-char-img');
+        const nextBtn = document.getElementById('rpg-next-btn');
+        textBox.innerHTML = '';
+        if (typeWriterInterval) clearInterval(typeWriterInterval);
+        charImg.classList.add('talking');
+        let i = 0;
+        const chars = [...step.text]; 
+        typeWriterInterval = setInterval(() => {
+            if (i < chars.length) { textBox.innerHTML += (chars[i] === '\n') ? '<br>' : chars[i]; i++; } 
+            else { clearInterval(typeWriterInterval); charImg.classList.remove('talking'); }
+        }, 40);
+        nextBtn.innerHTML = (currentRpgStep === rpgSteps.length - 1) ? '完了' : '次へ';
+        moveSpotlight(step.targetId);
+    }
+
+    function startUpdateLoop() {
+        if (updateLoopId) cancelAnimationFrame(updateLoopId);
+        const loop = () => { updateSpotlightPosition(); updateLoopId = requestAnimationFrame(loop); };
+        loop();
+    }
+    function stopUpdateLoop() { if (updateLoopId) cancelAnimationFrame(updateLoopId); }
+
+    function moveSpotlight(targetId) {
         const spotlight = document.getElementById('tutorial-spotlight');
         const pointer = document.getElementById('tutorial-pointer');
-
-        // テキスト表示 (改行コードを<br>に変換)
-        textField.innerHTML = step.text.replace(/\n/g, '<br>');
-
-        // ターゲットのハイライト
-        if (step.targetId) {
-            const target = document.getElementById(step.targetId);
-            if (target) {
-                const rect = target.getBoundingClientRect();
-                
-                // スポットライトの位置とサイズ調整
-                const pad = 10;
-                spotlight.style.width = (rect.width + pad * 2) + 'px';
-                spotlight.style.height = (rect.height + pad * 2) + 'px';
-                spotlight.style.top = (rect.top + window.scrollY - pad) + 'px';
-                spotlight.style.left = (rect.left + window.scrollX - pad) + 'px';
-                spotlight.style.display = 'block';
-                
-                // ポインターの表示 (ターゲットの上)
-                pointer.style.top = (rect.top + window.scrollY - 60) + 'px';
-                pointer.style.left = (rect.left + window.scrollX + rect.width / 2 - 20) + 'px';
-                pointer.style.display = 'block';
-                
-                // スクロールして要素を表示
-                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                // ターゲットが見つからない場合 (非表示要素など)
-                spotlight.style.display = 'none';
-                pointer.style.display = 'none';
-            }
-        } else {
-            // ターゲットなし (全体説明など)
-            spotlight.style.display = 'none';
+        let targetEl = null;
+        if (targetId) {
+            targetEl = document.getElementById(targetId);
+        }
+        if (!targetId || !targetEl) {
             pointer.style.display = 'none';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        
-        // 最後のステップならボタンの文字を変える
-        const nextBtn = document.getElementById('rpg-next-btn');
-        if (currentRpgStep === rpgSteps.length - 1) {
-            nextBtn.textContent = "完了";
+            spotlight.style.width = '0'; spotlight.style.height = '0';
+            spotlight.style.top = (window.pageYOffset + window.innerHeight/2) + 'px';
+            spotlight.style.left = (window.pageXOffset + window.innerWidth/2) + 'px';
+            const msgBox = document.getElementById('tutorial-rpg-box');
+            msgBox.style.top = (window.pageYOffset + window.innerHeight/2 + 50) + 'px';
+            msgBox.style.left = (window.pageXOffset + window.innerWidth/2) + 'px';
         } else {
-            nextBtn.textContent = "次へ";
+            pointer.style.display = 'block';
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
+    }
+    
+    function updateSpotlightPosition() {
+        const step = rpgSteps[currentRpgStep];
+        const msgBox = document.getElementById('tutorial-rpg-box');
+        if (!step || !step.targetId) {
+             const scrollY = window.pageYOffset; 
+             const scrollX = window.pageXOffset;
+             msgBox.style.top = (scrollY + window.innerHeight/2 + 50) + 'px';
+             msgBox.style.left = (scrollX + window.innerWidth/2) + 'px';
+             return;
+        }
+        const targetEl = document.getElementById(step.targetId);
+        if(!targetEl) return;
+        const rect = targetEl.getBoundingClientRect();
+        const scrollY = window.pageYOffset; const scrollX = window.pageXOffset;
+        const spotlight = document.getElementById('tutorial-spotlight');
+        const pointer = document.getElementById('tutorial-pointer');
+        spotlight.style.width = (rect.width + 20) + 'px';
+        spotlight.style.height = (rect.height + 20) + 'px';
+        spotlight.style.top = (rect.top + scrollY - 10) + 'px';
+        spotlight.style.left = (rect.left + scrollX - 10) + 'px';
+        pointer.style.top = (rect.bottom + scrollY + 10) + 'px';
+        pointer.style.left = (rect.left + scrollX + rect.width/2 - 20) + 'px';
+        
+        let boxTop = rect.top + scrollY - msgBox.offsetHeight - 20;
+        if (boxTop < scrollY + 10 || (step.targetId.startsWith('nav-')) || step.targetId.startsWith('tutorial-friends') || step.targetId.startsWith('tutorial-muscles')) {
+             boxTop = rect.bottom + scrollY + 30;
+        }
+        msgBox.style.top = boxTop + 'px';
+        msgBox.style.left = (rect.left + scrollX + rect.width/2) + 'px';
     }
 
     function nextRpgStep() {
-        currentRpgStep++;
-        showRpgStep();
+        if (currentRpgStep < rpgSteps.length - 1) { currentRpgStep++; updateRpgView(); }
+        else { endRpgTutorial(); }
     }
 
     function endRpgTutorial() {
-        document.getElementById('tutorial-backdrop').classList.remove('active');
         document.getElementById('tutorial-rpg-box').classList.remove('active');
-        document.getElementById('tutorial-spotlight').style.display = 'none';
+        document.getElementById('tutorial-spotlight').classList.remove('active');
+        document.getElementById('tutorial-backdrop').classList.remove('active');
         document.getElementById('tutorial-pointer').style.display = 'none';
-        
-        // チュートリアル完了を記録
-        localStorage.setItem('hasSeenFitWorksTutorial_v2', 'true');
+        stopUpdateLoop();
+        localStorage.setItem(STORAGE_KEY_RPG, 'true');
     }
 
-    // ページ読み込み時に自動開始チェック
-    window.addEventListener('load', function() {
-        // 少し待ってから開始 (画面描画安定待ち)
-        setTimeout(() => startRpgTutorial(false), 800);
+    // マウス追従エフェクト
+    document.addEventListener('mousemove', (e) => {
+        const x = e.clientX / window.innerWidth;
+        const y = e.clientY / window.innerHeight;
+        document.body.style.setProperty('--mouse-x', x);
+        document.body.style.setProperty('--mouse-y', y);
     });
-
 </script>
 </body>
 </html>
