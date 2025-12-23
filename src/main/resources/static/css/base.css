@@ -114,6 +114,13 @@ h1 {
     margin-bottom: 35px; /* スペースを広げる */
     font-size: 18px; /* 少し大きく */
     font-weight: 500;
+    
+    /* ▼▼▼ 追加: 読みやすさ向上のための設定 ▼▼▼ */
+    line-height: 1.8;          /* 行間を広げて、改行しても窮屈にならないように */
+    word-wrap: break-word;     /* 長い単語があってもレイアウトを崩さない */
+    max-width: 90%;            /* 画面いっぱいにならず、適度な余白を持たせる */
+    margin-left: auto;         /* 中央寄せ */
+    margin-right: auto;        /* 中央寄せ */
 }
 
 /* --- COMMON FORM STRUCTURE --- */
@@ -275,10 +282,12 @@ h1 {
         margin-right: 8px;
         animation: none; /* モバイルではアイコンの揺れを無効に */
     }
-    .sub-heading {
-        font-size: 16px;
-        margin-bottom: 25px;
-    }
+	.sub-heading {
+	        font-size: 15px;      /* スマホでは少し文字サイズを調整 */
+	        margin-bottom: 25px;
+	        max-width: 100%;      /* スマホでは横幅をフルに使う */
+	        line-height: 1.6;     /* スマホでは行間を少し詰める（お好みで） */
+	    }
     .button, button.primary, .button.secondary, button.secondary, .button.ai-chat {
         display: block;
         margin: 12px auto;

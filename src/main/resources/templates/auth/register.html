@@ -111,6 +111,60 @@
 		            transform: translateY(2px);
 		            box-shadow: 0 2px 5px rgba(0, 97, 255, 0.4);
 		        }
+				/* ▼▼▼ 追加: ヘッダーデザイン（統一スタイル） ▼▼▼ */
+				        .page-header-container {
+				            display: flex;
+				            align-items: center;
+				            margin-bottom: 25px;
+				            border-bottom: 3px solid #4facfe;
+				            padding-bottom: 10px;
+				            gap: 15px;
+				        }
+				        
+				        .page-title {
+				            color: #343a40;
+				            font-size: 2rem;
+				            margin: 0;
+				            flex-grow: 1;
+				            text-align: left;
+				            font-weight: 700;
+				            /* 既存のh1スタイルを上書き */
+				            text-shadow: none; 
+				            animation: none;
+				        }
+				        .page-title i {
+				            margin-right: 10px;
+				            color: #4facfe;
+				        }
+				        
+				        .home-link-icon {
+				            display: flex;
+				            align-items: center;
+				            justify-content: center;
+				            width: 50px;
+				            height: 50px;
+				            background-color: white;
+				            color: #4facfe;
+				            border: 2px solid #4facfe;
+				            border-radius: 50%;
+				            text-decoration: none;
+				            transition: all 0.3s ease;
+				            font-size: 1.4rem;
+				            flex-shrink: 0;
+				            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+				        }
+				        .home-link-icon:hover {
+				            background-color: #4facfe;
+				            color: white;
+				            transform: scale(1.1);
+				            box-shadow: 0 6px 10px rgba(79, 172, 254, 0.4);
+				        }
+
+				        /* モバイル対応 */
+				        @media (max-width: 600px) {
+				            .page-title { font-size: 1.5rem; }
+				            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+				        }
     </style>
 </head>
 <body>
@@ -123,7 +177,9 @@
     </div>
 
     <div class="main-container">
-        <h1><i class="fa-solid fa-address-card header-icon"></i>アカウント登録</h1>
+		<div class="page-header-container">
+		        <h1 class="page-title"><i class="fa-solid fa-user-plus"></i> 新規登録</h1>
+		    </div>
         <p class="sub-heading">あなたのフィットネスの目標達成へ向け、今すぐサインアップ！</p>
         
         <p th:if="${error}" class="error-message" th:text="${error}"></p>
