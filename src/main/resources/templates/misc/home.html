@@ -45,11 +45,53 @@
         
         .title-button { background: linear-gradient(135deg, #9c27b0, #ba68c8); border: 2px solid rgba(255,255,255,0.3); }
 
-        .help-menu-dropdown { display: none; position: absolute; top: 60px; right: 20px; left: auto; background: rgba(255, 255, 255, 0.95); border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); padding: 10px; z-index: 2000; width: 220px; flex-direction: column; gap: 10px; }
-        .help-menu-dropdown.active { display: flex; }
+        /* ヘルプメニューのスタイル調整 */
+        .help-menu-dropdown { 
+            display: none; 
+            position: absolute; 
+            top: 60px; right: 20px; left: auto; 
+            background: rgba(255, 255, 255, 0.98); 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25); 
+            padding: 15px; 
+            z-index: 2000; 
+            width: 260px; /* 少し幅を広げる */
+            flex-direction: column; 
+            gap: 8px; 
+            max-height: 80vh; /* 画面からはみ出さないように */
+            overflow-y: auto;
+        }
+        .help-menu-dropdown.active { display: flex; animation: fadeInDown 0.3s ease; }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .help-menu-item { display: block; padding: 10px; text-decoration: none; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9em; transition: transform 0.2s; border: none; width: 100%; cursor: pointer; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box; }
-        .help-menu-item:hover { transform: scale(1.03); }
+        .help-section-label {
+            font-size: 0.8rem;
+            color: #888;
+            font-weight: bold;
+            margin: 5px 0 2px 5px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 2px;
+        }
+
+        .help-menu-item { 
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px; 
+            text-decoration: none; 
+            border-radius: 10px; 
+            text-align: left; 
+            font-weight: bold; 
+            font-size: 0.95em; 
+            transition: all 0.2s; 
+            border: none; 
+            width: 100%; 
+            cursor: pointer; 
+            color: #444; 
+            background: #f9f9f9;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            box-sizing: border-box; 
+        }
+        .help-menu-item:hover { transform: translateX(5px); background: #e3f2fd; color: #0288d1; }
+        .help-menu-item i { width: 20px; text-align: center; color: #0288d1; }
 
         .tutorial-pointer { position: absolute; z-index: 10000; font-size: 2.5rem; color: #f1c40f; display: none; animation: point-move 1s infinite alternate; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .tutorial-pointer::before { content: '\f0a6'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
@@ -225,9 +267,24 @@
     </button>
     
     <div id="help-menu" class="help-menu-dropdown">
-        <button class="help-menu-item tutorial-opt" onclick="startRpgTutorial(true); toggleHelpMenu();">
-            <i class="fa-solid fa-play"></i> チュートリアル
+        <div class="help-section-label">🔰 チュートリアル</div>
+        <button class="help-menu-item tutorial-opt" onclick="startRpgTutorial('all'); toggleHelpMenu();">
+            <i class="fa-solid fa-star"></i> 全機能ツアー
         </button>
+        <button class="help-menu-item" onclick="startRpgTutorial('training'); toggleHelpMenu();">
+            <i class="fa-solid fa-dumbbell"></i> トレーニングの始め方
+        </button>
+        <button class="help-menu-item" onclick="startRpgTutorial('record'); toggleHelpMenu();">
+            <i class="fa-solid fa-pen-to-square"></i> 記録の付け方・ケア
+        </button>
+        <button class="help-menu-item" onclick="startRpgTutorial('gacha'); toggleHelpMenu();">
+            <i class="fa-solid fa-gift"></i> ガチャ・キャラについて
+        </button>
+        <button class="help-menu-item" onclick="startRpgTutorial('social'); toggleHelpMenu();">
+            <i class="fa-solid fa-users"></i> 交流・AI・その他
+        </button>
+
+        <div class="help-section-label">📘 ガイド</div>
         <a th:href="@{/supplement-guide}" class="help-menu-item supple-opt">
             <i class="fa-solid fa-book-medical"></i> サプリの飲み方
         </a>
@@ -305,18 +362,18 @@
 	    </a>
 
 	    <div id="tutorial-record-btn" class="record-container menu-item-spacing">
-	        <button onclick="toggleRecordMenu()" class="home-action-btn btn-record" style="width: 100%;">
+	        <button id="tutorial-record-toggle" onclick="toggleRecordMenu()" class="home-action-btn btn-record" style="width: 100%;">
 	           <i class="fa-solid fa-pen-to-square"></i> 記録をつける
 	        </button>
 	        
 	        <div id="record-options" class="record-options">
-	            <a th:href="@{/training-log}" class="record-option-item training-log-opt">
+	            <a id="tutorial-record-log" th:href="@{/training-log}" class="record-option-item training-log-opt">
 	                <i class="fa-solid fa-calendar-days"></i><br>筋トレ履歴
 	            </a>
-	            <a th:href="@{/log/meal}" class="record-option-item meal-opt">
+	            <a id="tutorial-record-meal" th:href="@{/log/meal}" class="record-option-item meal-opt">
 	                <i class="fa-solid fa-utensils"></i><br>食事記録
 	            </a>
-	            <a th:href="@{/training-log/form/body-weight}" class="record-option-item weight-opt">
+	            <a id="tutorial-record-weight" th:href="@{/training-log/form/body-weight}" class="record-option-item weight-opt">
 	                <i class="fa-solid fa-weight-scale"></i><br>体重記録
 	            </a>
 	        </div>
@@ -354,7 +411,7 @@
         <div class="rpg-name-tag">AIコーチ</div>
         <div class="rpg-text-area" id="rpg-text"></div>
         <div class="rpg-controls">
-            <button class="rpg-btn rpg-btn-skip" onclick="endRpgTutorial()">スキップ</button>
+            <button class="rpg-btn rpg-btn-skip" onclick="endRpgTutorial()">終了</button>
             <button class="rpg-btn rpg-btn-next" id="rpg-next-btn" onclick="nextRpgStep()">次へ</button>
         </div>
     </div>
@@ -403,30 +460,17 @@
 	    
 	    if (backgroundUnlocks && backgroundUnlocks.hasNewUnlocks) {
 	        const unlockedBackgrounds = backgroundUnlocks.unlockedBackgrounds || [];
-	        
 	        if (unlockedBackgrounds.length > 0) {
-	            // ポップアップを表示
 	            const popup = document.getElementById('background-unlock-popup');
 	            const listContainer = document.getElementById('background-unlock-list');
-	            
-	            // リストをクリア
 	            listContainer.innerHTML = '';
-	            
-	            // 解放された背景を表示
 	            unlockedBackgrounds.forEach(bg => {
 	                const item = document.createElement('div');
 	                item.className = 'background-unlock-item';
-	                item.innerHTML = `
-	                    <i class="fa-solid fa-unlock-keyhole"></i>
-	                    <strong>${bg.name}</strong> (Lv.${bg.requiredLevel}で解放)
-	                `;
+	                item.innerHTML = `<i class="fa-solid fa-unlock-keyhole"></i><strong>${bg.name}</strong> (Lv.${bg.requiredLevel}で解放)`;
 	                listContainer.appendChild(item);
 	            });
-	            
-	            // ポップアップを表示
 	            popup.style.display = 'flex';
-	            
-	            console.log('背景解放ポップアップを表示:', unlockedBackgrounds);
 	        }
 	    }
 	    
@@ -436,56 +480,48 @@
 	        fetch('/api/ai-coach/home-advice')
 	            .then(res => res.text())
 	            .then(text => {
-	                // タイピングアニメーション風に表示
 	                aiMessageEl.innerHTML = '';
 	                let i = 0;
 	                const speed = 40; 
 	                function typeWriter() {
-	                    if (i < text.length) {
-	                        aiMessageEl.textContent += text.charAt(i);
-	                        i++;
-	                        setTimeout(typeWriter, speed);
-	                    }
+	                    if (i < text.length) { aiMessageEl.textContent += text.charAt(i); i++; setTimeout(typeWriter, speed); }
 	                }
 	                typeWriter();
 	            })
-	            .catch(err => {
-	                console.error("AI Advice Error:", err);
-	                aiMessageEl.textContent = "今日も一緒に頑張るムキ！";
-	            });
+	            .catch(err => { console.error("AI Advice Error:", err); aiMessageEl.textContent = "今日も一緒に頑張るムキ！"; });
 	    }
 
-        // ★時計更新処理: 秒数を追加
+        // 時計更新
         function updateRealTimeClock() {
             const now = new Date();
-            // second: '2-digit' を追加して秒まで表示
             const timeString = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             const clockEl = document.getElementById('real-time-clock');
-            if (clockEl) {
-                clockEl.textContent = timeString;
-            }
+            if (clockEl) { clockEl.textContent = timeString; }
         }
         setInterval(updateRealTimeClock, 1000);
-        updateRealTimeClock(); // 初回実行
+        updateRealTimeClock();
 	});
 
 	function closeBackgroundUnlockPopup() {
-	    const popup = document.getElementById('background-unlock-popup');
-	    popup.style.display = 'none';
+	    document.getElementById('background-unlock-popup').style.display = 'none';
 	}
-
-	// Escapeキーでも閉じられるように
-	document.addEventListener('keydown', (e) => {
-	    if (e.key === 'Escape') {
-	        closeBackgroundUnlockPopup();
-	    }
-	});
+	document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeBackgroundUnlockPopup(); });
 	/*]]>*/
 
     // 記録メニューのトグル
     function toggleRecordMenu() {
         const options = document.getElementById('record-options');
         options.classList.toggle('open');
+    }
+    // メニューを強制的に開くヘルパー（チュートリアル用）
+    function openRecordMenu() {
+        const options = document.getElementById('record-options');
+        if (!options.classList.contains('open')) options.classList.add('open');
+    }
+    // メニューを強制的に閉じるヘルパー
+    function closeRecordMenu() {
+        const options = document.getElementById('record-options');
+        if (options.classList.contains('open')) options.classList.remove('open');
     }
 
     // ヘルプメニューのトグル
@@ -494,7 +530,6 @@
         menu.classList.toggle('active');
     }
 
-    // ヘルプメニュー外クリックで閉じる
     document.addEventListener('click', function(event) {
         const menu = document.getElementById('help-menu');
         const btn = document.getElementById('help-btn');
@@ -503,42 +538,81 @@
         }
     });
 
-    // RPGチュートリアルのステップ定義
-    const rpgSteps = [
-        { targetId: null, text: "FitWorksへようこそ!\nこのチュートリアルでは、アプリの全機能をご紹介します!" },
-        { targetId: 'help-btn', text: "まずは画面左上。「ヘルプ」ボタンから、\nこのガイドの再生や、サプリメントの知識を確認できます。" },
-        { targetId: 'tutorial-xp-area', text: "画面上部にはあなたの「レベル」と「XP(経験値)」が表示されます。\nトレーニングを記録してレベルを上げましょう!" },
-        { targetId: 'tutorial-mission-btn', text: "「デイリーミッション」は毎日更新されます。\nクリアして報酬やXPを効率よくゲットしましょう!" },
-        { targetId: 'tutorial-title-display', text: "ここには現在装備している「称号」が輝きます。\nレアな称号を手に入れて、強さをアピールしてください!" },
-        { targetId: 'tutorial-char-display', text: "あなたのパートナーキャラクターです。\nレベルアップと共に進化していく姿を見守りましょう。" },
-        { targetId: 'tutorial-title-btn', text: "「称号」ボタンからコレクション画面へ。\n獲得した称号を付け替えて、個性を出せます。" },
-        { targetId: 'tutorial-customize-btn', text: "「着せ替え」ボタンでは、ガチャで入手したアイテムを\nキャラクターに装備させることができます。" },
-        { targetId: 'tutorial-training-btn', text: "メイン機能はこれ!「トレーニングを開始」ボタン。\nここから日々の運動メニューを作成・記録します。" },
-        { targetId: 'tutorial-record-btn', text: "「記録をつける」メニューを開くと、\n過去の履歴確認や、食事・体重の記録が個別にできます。" },
-        { targetId: 'tutorial-care-btn', text: "疲れた時は「AIリフレッシュ&ケア」。\n体調に合わせたストレッチや休息法をAIが提案します。" },
-        { targetId: 'tutorial-map-btn', text: "「マップ」機能を使えば、\n近くのジムや公園、トレーニング施設をすぐに探せます。" },
-        { targetId: 'tutorial-ai-btn', text: "トレーニングや食事の悩みは「AIチャット」へ。\n専属のAIコーチが24時間いつでも相談に乗ります!" },
-        { targetId: 'nav-gacha', text: "ここからは下のメニューです。\n「ガチャ」では、着せ替えアイテムなどの報酬が手に入ります。" },
-        { targetId: 'tutorial-friends-btn', text: "「フレンド」機能で仲間とつながりましょう。\nお互いに励まし合ったり、ランキングで競えます。" },
-        { targetId: 'nav-community', text: "「掲示板」はユーザー同士の交流スペース。\n筋トレ情報の交換や、雑談で盛り上がりましょう。" },
-        { targetId: 'nav-char', text: "「キャラ」メニューでは、キャラクター図鑑を見たり、\nパートナーの詳細ステータスを確認できます。" },
-        { targetId: 'tutorial-muscles-btn', text: "「筋肉」タブでは、鍛えた部位が光る「マッスルパートナー」を表示。\n自分の成長箇所が一目でわかります!" },
-        { targetId: 'nav-settings', text: "最後に「設定」。アカウント情報の変更や通知設定、\n生体認証(FaceID/TouchID)の登録もここから行えます。" },
-        { targetId: null, text: "機能説明は以上です。\nさあ、FitWorksで最高のフィットネスライフを始めましょう!" }
-    ];
+    /* =========================================
+       拡張RPGチュートリアルシステム
+       ========================================= */
+    const scenarios = {
+        // ▼ 1. 全機能ツアー (元のチュートリアル)
+        'all': [
+            { text: "FitWorksへようこそ!\nこのチュートリアルでは、アプリの全機能をご紹介します!" },
+            { targetId: 'help-btn', text: "まずは画面左上。「ヘルプ」ボタンから、\n各機能の詳しい使い方や、サプリメントの知識を確認できます。" },
+            { targetId: 'tutorial-xp-area', text: "画面上部にはあなたの「レベル」と「XP(経験値)」が表示されます。\nトレーニングを記録してレベルを上げましょう!" },
+            { targetId: 'tutorial-mission-btn', text: "「デイリーミッション」は毎日更新されます。\nクリアして報酬やXPを効率よくゲットしましょう!" },
+            { targetId: 'tutorial-title-display', text: "ここには現在装備している「称号」が輝きます。\nレアな称号を手に入れて、強さをアピールしてください!" },
+            { targetId: 'tutorial-char-display', text: "あなたのパートナーキャラクターです。\nレベルアップと共に進化していく姿を見守りましょう。" },
+            { targetId: 'tutorial-training-btn', text: "メイン機能はこれ!「トレーニングを開始」ボタン。\nここから日々の運動メニューを作成・記録します。" },
+            { targetId: 'tutorial-record-btn', text: "「記録をつける」メニューからは、\n過去の履歴確認や、食事・体重の記録が個別にできます。" },
+            { targetId: 'tutorial-care-btn', text: "疲れた時は「AIリフレッシュ&ケア」。\n体調に合わせたストレッチや休息法をAIが提案します。" },
+            { targetId: 'nav-gacha', text: "ここからは下のメニューです。\n「ガチャ」では、着せ替えアイテムなどの報酬が手に入ります。" },
+            { targetId: 'tutorial-friends-btn', text: "「フレンド」機能で仲間とつながりましょう。\nお互いに励まし合ったり、ランキングで競えます。" },
+            { targetId: 'nav-community', text: "「掲示板」はユーザー同士の交流スペース。\n筋トレ情報の交換や、雑談で盛り上がりましょう。" },
+            { targetId: null, text: "機能説明は以上です。\n気になる機能の詳細は、ヘルプメニューの個別ガイドも見てね！" }
+        ],
+        // ▼ 2. トレーニングの始め方
+        'training': [
+            { text: "トレーニングの始め方について解説するよ！\n準備はいいかな？" },
+            { targetId: 'tutorial-training-btn', text: "まずはこの「トレーニングを開始」ボタンをタップ！\nここからその日のメニューを作ることができるよ。" },
+            { targetId: 'tutorial-training-btn', text: "中に入ると「メニュー作成」画面になるよ。\n部位を選んで種目を追加していこう！" },
+            { targetId: 'tutorial-record-log', preAction: openRecordMenu, text: "過去にやった筋トレの履歴を見たい時はここ！\n「筋トレ履歴」から前回重量などをチェックできるよ。" },
+            { targetId: 'tutorial-map-btn', preAction: closeRecordMenu, text: "まだジムが決まっていない時はここ！\n近くのジムや公園をマップで探せる便利機能だよ。" },
+            { text: "トレーニングは継続が大事！\nまずは軽いメニューから始めてみよう！" }
+        ],
+        // ▼ 3. 記録の付け方・ケア
+        'record': [
+            { text: "記録とボディケアについて説明するよ！" },
+            { targetId: 'tutorial-record-btn', text: "記録をつけるときは、このボタンをタップしてメニューを開こう。" },
+            { targetId: 'tutorial-record-log', preAction: openRecordMenu, text: "【筋トレ履歴】\n日々のトレーニング結果はここに自動で保存されていくよ。" },
+            { targetId: 'tutorial-record-meal', preAction: openRecordMenu, text: "【食事記録】\n食べたものを記録して、PFCバランス（タンパク質など）を管理しよう！" },
+            { targetId: 'tutorial-record-weight', preAction: openRecordMenu, text: "【体重記録】\n体重や体脂肪率の変化をグラフで確認できるよ。" },
+            { targetId: 'tutorial-care-btn', preAction: closeRecordMenu, text: "トレーニングの後はケアも忘れずに！\nAIが疲れ具合に合わせて、最適なストレッチを教えてくれるよ。" },
+            { text: "しっかり記録して、自分の成長を可視化しよう！" }
+        ],
+        // ▼ 4. ガチャ・キャラについて
+        'gacha': [
+            { text: "お楽しみ要素、ガチャとキャラクターについて紹介するよ！" },
+            { targetId: 'nav-gacha', text: "まずは「ガチャ」！\nトレーニングで貯めたコインやチケットを使ってアイテムをゲット！" },
+            { targetId: 'tutorial-char-display', text: "ゲットしたアイテムで、キャラを着せ替えたり背景を変えたりできるよ。\nレベルが上がるとキャラが進化することも…！？" },
+            { targetId: 'tutorial-title-btn', text: "「称号」も大事なコレクション要素。\n条件を達成して、レアな称号をセットしよう！" },
+            { targetId: 'nav-char', text: "「キャラ」メニューでは、図鑑を見たり、\n所持しているアイテムの確認ができるよ。" },
+            { text: "自分だけの最強でカワイイ相棒に育て上げよう！" }
+        ],
+        // ▼ 5. 交流・AI・その他
+        'social': [
+            { text: "他のユーザーとの交流や、AI機能について説明するよ！" },
+            { targetId: 'tutorial-friends-btn', text: "「フレンド」では友達を検索してフォローできるよ。\nランキングで競い合うとモチベーションUP！" },
+            { targetId: 'nav-community', text: "「掲示板」はみんなの広場。\n質問したり、成果を報告し合ったりして楽しもう！" },
+            { targetId: 'tutorial-ai-btn', text: "悩み事があれば「AIチャット」へ。\nトレーニングメニューの相談から雑談まで何でもOK！" },
+            { targetId: 'tutorial-muscles-btn', text: "「筋肉」タブでは「マッスルパートナー」が見られるよ。\n鍛えた部位が光るから、全身コンプリートを目指そう！" },
+            { targetId: 'nav-settings', text: "通知設定やアカウント管理は「設定」から。\n機種変更時の引き継ぎ設定も忘れずにね！" }
+        ]
+    };
     
     let currentRpgStep = 0;
     let typeWriterInterval;
     let updateLoopId; 
+    let currentScenarioKey = 'all'; // 現在のシナリオキー
     const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v16'; 
 
     document.addEventListener('DOMContentLoaded', function() {
-        if (!localStorage.getItem(STORAGE_KEY_RPG)) { setTimeout(() => startRpgTutorial(), 800); }
+        if (!localStorage.getItem(STORAGE_KEY_RPG)) { setTimeout(() => startRpgTutorial('all'), 800); }
         window.addEventListener('resize', updateSpotlightPosition);
         window.addEventListener('scroll', updateSpotlightPosition);
     });
 
-    function startRpgTutorial(isManual) {
+    function startRpgTutorial(scenarioKey = 'all') {
+        currentScenarioKey = scenarioKey;
+        if (!scenarios[currentScenarioKey]) return;
+        
         currentRpgStep = 0;
         document.getElementById('tutorial-spotlight').classList.add('active');
         document.getElementById('tutorial-rpg-box').classList.add('active');
@@ -548,7 +622,13 @@
     }
 
     function updateRpgView() {
-        const step = rpgSteps[currentRpgStep];
+        const step = scenarios[currentScenarioKey][currentRpgStep];
+        
+        // ステップごとの事前アクションを実行 (メニューを開くなど)
+        if (step.preAction && typeof step.preAction === 'function') {
+            step.preAction();
+        }
+
         const textBox = document.getElementById('rpg-text');
         const charImg = document.getElementById('rpg-char-img');
         const nextBtn = document.getElementById('rpg-next-btn');
@@ -561,7 +641,8 @@
             if (i < chars.length) { textBox.innerHTML += (chars[i] === '\n') ? '<br>' : chars[i]; i++; } 
             else { clearInterval(typeWriterInterval); charImg.classList.remove('talking'); }
         }, 40);
-        nextBtn.innerHTML = (currentRpgStep === rpgSteps.length - 1) ? '完了' : '次へ';
+        
+        nextBtn.innerHTML = (currentRpgStep === scenarios[currentScenarioKey].length - 1) ? '完了' : '次へ';
         moveSpotlight(step.targetId);
     }
 
@@ -585,7 +666,7 @@
             spotlight.style.top = (window.pageYOffset + window.innerHeight/2) + 'px';
             spotlight.style.left = (window.pageXOffset + window.innerWidth/2) + 'px';
             const msgBox = document.getElementById('tutorial-rpg-box');
-            msgBox.style.top = (window.pageYOffset + window.innerHeight/2 + 50) + 'px';
+            msgBox.style.top = (window.pageYOffset + window.innerHeight/2 - msgBox.offsetHeight/2) + 'px';
             msgBox.style.left = (window.pageXOffset + window.innerWidth/2) + 'px';
         } else {
             pointer.style.display = 'block';
@@ -594,17 +675,22 @@
     }
     
     function updateSpotlightPosition() {
-        const step = rpgSteps[currentRpgStep];
+        const step = scenarios[currentScenarioKey][currentRpgStep];
         const msgBox = document.getElementById('tutorial-rpg-box');
         if (!step || !step.targetId) {
              const scrollY = window.pageYOffset; 
              const scrollX = window.pageXOffset;
-             msgBox.style.top = (scrollY + window.innerHeight/2 + 50) + 'px';
+             msgBox.style.top = (scrollY + window.innerHeight/2 - msgBox.offsetHeight/2) + 'px';
              msgBox.style.left = (scrollX + window.innerWidth/2) + 'px';
              return;
         }
         const targetEl = document.getElementById(step.targetId);
         if(!targetEl) return;
+        
+        // ターゲットが非表示の場合はスポットライトを当てない（またはメニューを開く処理を待つ）
+        // ただしボトムナビはfixed要素でoffsetParentがnullの場合があるため除外
+        if (targetEl.offsetParent === null && !step.targetId.startsWith('nav-')) return;
+
         const rect = targetEl.getBoundingClientRect();
         const scrollY = window.pageYOffset; const scrollX = window.pageXOffset;
         const spotlight = document.getElementById('tutorial-spotlight');
@@ -616,20 +702,36 @@
         pointer.style.top = (rect.bottom + scrollY + 10) + 'px';
         pointer.style.left = (rect.left + scrollX + rect.width/2 - 20) + 'px';
         
+        // メッセージボックスの位置決定
+        // 基本は要素の上に表示 (rect.top ... - msgBox.offsetHeight)
         let boxTop = rect.top + scrollY - msgBox.offsetHeight - 20;
-        if (boxTop < scrollY + 10 || (step.targetId.startsWith('nav-')) || step.targetId.startsWith('tutorial-friends') || step.targetId.startsWith('tutorial-muscles')) {
+        
+        // 画面上部にある要素や、ヘッダー付近の特定のIDの場合は「下に表示」に切り替える
+        // 注意: ボトムナビ系(nav-...)は下に行くと見切れるため、ここには含めない(デフォルトの上表示でOK)
+        const forceBelowIds = ['help-btn', 'tutorial-xp-area', 'tutorial-mission-btn', 'tutorial-title-display', 'real-time-clock'];
+        const isForceBelow = forceBelowIds.includes(step.targetId) || (rect.top < 120);
+
+        if (isForceBelow) {
              boxTop = rect.bottom + scrollY + 30;
         }
+        
         msgBox.style.top = boxTop + 'px';
         msgBox.style.left = (rect.left + scrollX + rect.width/2) + 'px';
     }
 
     function nextRpgStep() {
-        if (currentRpgStep < rpgSteps.length - 1) { currentRpgStep++; updateRpgView(); }
-        else { endRpgTutorial(); }
+        if (currentRpgStep < scenarios[currentScenarioKey].length - 1) { 
+            currentRpgStep++; 
+            updateRpgView(); 
+        } else { 
+            endRpgTutorial(); 
+        }
     }
 
     function endRpgTutorial() {
+        // チュートリアル終了時にメニューが開いていたら閉じる
+        closeRecordMenu();
+        
         document.getElementById('tutorial-rpg-box').classList.remove('active');
         document.getElementById('tutorial-spotlight').classList.remove('active');
         document.getElementById('tutorial-backdrop').classList.remove('active');
