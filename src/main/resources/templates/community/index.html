@@ -82,6 +82,51 @@
         .like-count { font-size: 0.9rem; margin-left: 2px; color: #666; font-weight: bold; }
         .button { padding: 10px 15px; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; display: inline-block; }
         .button.primary { background-color: #007bff; color: white; }
+		/* ▼▼▼ 追加: 投稿ボタンのカスタムデザイン ▼▼▼ */
+		        .btn-submit-post {
+		            width: 100%;
+		            padding: 16px;
+		            margin-top: 15px;
+		            border: none;
+		            border-radius: 50px; /* 丸みを強くして親しみやすく */
+		            /* コミュニティの雰囲気に合わせた青～水色の鮮やかなグラデーション */
+		            background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
+		            color: white;
+		            font-size: 1.2rem;
+		            font-weight: 800;
+		            cursor: pointer;
+		            box-shadow: 0 5px 15px rgba(0, 97, 255, 0.4); /* 青い光のような影 */
+		            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 弾むような動き */
+		            display: flex;
+		            align-items: center;
+		            justify-content: center;
+		            gap: 10px;
+		            position: relative;
+		            overflow: hidden;
+		        }
+
+		        /* ホバー時の動き：少し浮き上がり、光る */
+		        .btn-submit-post:hover {
+		            transform: translateY(-4px) scale(1.02);
+		            box-shadow: 0 10px 25px rgba(0, 97, 255, 0.6);
+		            filter: brightness(1.1);
+		        }
+
+		        /* クリック時の動き */
+		        .btn-submit-post:active {
+		            transform: translateY(2px);
+		            box-shadow: 0 2px 5px rgba(0, 97, 255, 0.4);
+		        }
+
+		        /* アイコン（紙飛行機）のアニメーション */
+		        .btn-submit-post i {
+		            transition: transform 0.4s ease;
+		        }
+
+		        /* ホバー時に紙飛行機が飛んでいくような動き */
+		        .btn-submit-post:hover i {
+		            transform: translate(5px, -5px) rotate(-15deg);
+		        }
     </style>
 </head>
 <body>
@@ -113,7 +158,7 @@
             <form th:action="@{/community/post}" method="post">
                 <input type="text" name="title" class="custom-input" placeholder="タイトル (例: おすすめのプロテインは？)" required>
                 <textarea name="content" class="custom-textarea" id="auto-expand-textarea" rows="3" placeholder="本文を入力してください..." required></textarea>
-                <button type="submit" class="button primary"><i class="fa-solid fa-paper-plane"></i> 投稿する</button>
+                <button type="submit" class="btn-submit-post"><i class="fa-solid fa-paper-plane"></i> 投稿する</button>
             </form>
         </div>
 

@@ -59,6 +59,42 @@
             .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
             .page-title { font-size: 1.5rem; }
         }
+		/* ▼▼▼ 追加: 更新ボタンのデザイン ▼▼▼ */
+		        .btn-update {
+		            width: 100%;
+		            padding: 16px;
+		            margin-top: 15px;
+		            border: none;
+		            border-radius: 50px;
+		            background: linear-gradient(135deg, #0061ff 0%, #60efff 100%); /* 鮮やかな青グラデーション */
+		            color: white;
+		            font-size: 1.2rem;
+		            font-weight: 800;
+		            cursor: pointer;
+		            box-shadow: 0 5px 15px rgba(0, 97, 255, 0.4);
+		            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+		            display: flex;
+		            align-items: center;
+		            justify-content: center;
+		            gap: 10px;
+		        }
+		        .btn-update:hover {
+		            transform: translateY(-4px) scale(1.02);
+		            box-shadow: 0 10px 25px rgba(0, 97, 255, 0.6);
+		            filter: brightness(1.1);
+		        }
+		        .btn-update:active {
+		            transform: translateY(2px);
+		            box-shadow: 0 2px 5px rgba(0, 97, 255, 0.4);
+		        }
+		        /* 無効化時のスタイル（JS制御用） */
+		        .btn-update:disabled {
+		            background: #ccc;
+		            cursor: not-allowed;
+		            box-shadow: none;
+		            transform: none;
+		            filter: none;
+		        }
     </style>
 </head>
 <body>
@@ -100,7 +136,9 @@
 	        <input type="text" id="newUsername" th:field="*{newUsername}" class="form-control" />
 	    </div>
 		<div class="button-container">
-	    <button type="submit" id="submitButton" class="button primary" disabled>変更する</button>
+			<button type="submit" id="submitButton" class="btn-update" disabled>
+			    <i class="fa-solid fa-check"></i> 変更する
+			</button>
 		</div>
 	</form>
 </div>
