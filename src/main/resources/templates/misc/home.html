@@ -455,22 +455,14 @@
 	            });
 	    }
 
-        // ★時計更新処理: 日付・曜日・時刻を表示
+        // ★時計更新処理: 秒数を追加
         function updateRealTimeClock() {
             const now = new Date();
-            
-            // 日付と曜日のオプション (例: 2023/12/23(土))
-            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short' };
-            const dateString = now.toLocaleDateString('ja-JP', dateOptions);
-            
-            // 時刻のオプション (例: 10:00:00)
-            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            const timeString = now.toLocaleTimeString('ja-JP', timeOptions);
-            
+            // second: '2-digit' を追加して秒まで表示
+            const timeString = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             const clockEl = document.getElementById('real-time-clock');
             if (clockEl) {
-                // 日付と時刻をスペースで繋いで表示
-                clockEl.textContent = `${dateString} ${timeString}`;
+                clockEl.textContent = timeString;
             }
         }
         setInterval(updateRealTimeClock, 1000);
