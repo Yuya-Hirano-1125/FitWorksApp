@@ -35,6 +35,7 @@
         .character-side-buttons { position: absolute; display: flex; flex-direction: column; gap: 12px; z-index: 10; top: 40px; right: -125px; }
         @media (max-width: 650px) { .character-side-buttons { right: 10px; top: 50px; } }
 
+        /* サイドボタンの基本スタイル */
         .side-action-btn { 
             color: white; padding: 10px 0; border-radius: 15px; text-decoration: none; 
             font-weight: bold; font-size: 0.85em; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
@@ -44,6 +45,19 @@
         .side-action-btn:hover { transform: scale(1.05); }
         
         .title-button { background: linear-gradient(135deg, #9c27b0, #ba68c8); border: 2px solid rgba(255,255,255,0.3); }
+
+        /* ▼▼▼ 追加: 正方形のミッションボタン ▼▼▼ */
+        .mission-square-btn {
+            height: 110px; /* 幅110pxに合わせて高さも110px (正方形) */
+            flex-direction: column; /* アイコンと文字を縦並び */
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            border: 2px solid rgba(255,255,255,0.3);
+            font-size: 0.95em;
+        }
+        .mission-square-btn i {
+            font-size: 2.2rem; /* アイコンを大きく */
+            margin-bottom: 5px;
+        }
 
         /* ヘルプメニューのスタイル調整 */
         .help-menu-dropdown { 
@@ -55,10 +69,10 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.25); 
             padding: 15px; 
             z-index: 2000; 
-            width: 260px; /* 少し幅を広げる */
+            width: 260px; 
             flex-direction: column; 
             gap: 8px; 
-            max-height: 80vh; /* 画面からはみ出さないように */
+            max-height: 80vh; 
             overflow-y: auto;
         }
         .help-menu-dropdown.active { display: flex; animation: fadeInDown 0.3s ease; }
@@ -96,6 +110,14 @@
         .tutorial-pointer { position: absolute; z-index: 10000; font-size: 2.5rem; color: #f1c40f; display: none; animation: point-move 1s infinite alternate; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .tutorial-pointer::before { content: '\f0a6'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
         @keyframes point-move { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+        
+        /* ▼▼▼ チュートリアルの文字サイズを大きく調整 ▼▼▼ */
+        .rpg-text-area {
+            font-size: 1.25rem; /* 文字を大きく */
+            font-weight: bold;
+            line-height: 1.6;
+            color: #333;
+        }
         
         .home-greeting-container { text-align: center; margin-top: 30px; margin-bottom: 15px; }
         .home-greeting-text { font-family: 'Noto Sans JP', sans-serif; color: #555; font-size: 1.1rem; font-weight: 700; margin-top: 0; line-height: 1.6; }
@@ -312,10 +334,6 @@
         </div>
     </div>
     
-    <a id="tutorial-mission-btn" th:href="@{/daily-mission}" class="home-action-btn btn-mission">
-       <i class="fa-solid fa-list-check"></i> デイリーミッション
-    </a>
-    
     <div id="tutorial-title-display" style="text-align: center; margin-top: 5px; min-height: 30px;">
         <th:block th:if="${userTitle != null and userTitle != 'なし'}">
             <th:block th:each="enumT : ${T(com.example.demo.entity.AppTitle).values()}" 
@@ -337,6 +355,10 @@
             <div class="character-side-buttons">
                 <a id="tutorial-title-btn" th:href="@{/titles}" class="side-action-btn title-button">
                     <i class="fa-solid fa-crown"></i> 称号
+                </a>
+                
+                <a id="tutorial-mission-btn" th:href="@{/daily-mission}" class="side-action-btn mission-square-btn">
+                   <i class="fa-solid fa-list-check"></i> ミッション
                 </a>
             </div>
         </div>
@@ -547,7 +569,7 @@
             { text: "FitWorksへようこそ!\nこのチュートリアルでは、アプリの全機能をご紹介します!" },
             { targetId: 'help-btn', text: "まずは画面左上。「ヘルプ」ボタンから、\n各機能の詳しい使い方や、サプリメントの知識を確認できます。" },
             { targetId: 'tutorial-xp-area', text: "画面上部にはあなたの「レベル」と「XP(経験値)」が表示されます。\nトレーニングを記録してレベルを上げましょう!" },
-            { targetId: 'tutorial-mission-btn', text: "「デイリーミッション」は毎日更新されます。\nクリアして報酬やXPを効率よくゲットしましょう!" },
+            { targetId: 'tutorial-mission-btn', text: "「ミッション」ボタンはここに移動しました。\n毎日更新されるミッションをクリアして、報酬をゲットしましょう!" },
             { targetId: 'tutorial-title-display', text: "ここには現在装備している「称号」が輝きます。\nレアな称号を手に入れて、強さをアピールしてください!" },
             { targetId: 'tutorial-char-display', text: "あなたのパートナーキャラクターです。\nレベルアップと共に進化していく姿を見守りましょう。" },
             { targetId: 'tutorial-training-btn', text: "メイン機能はこれ!「トレーニングを開始」ボタン。\nここから日々の運動メニューを作成・記録します。" },
