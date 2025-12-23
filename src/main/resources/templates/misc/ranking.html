@@ -13,216 +13,81 @@
 
     <style>
         /* ==========================================================================
-           🌌 背景用スタイル
+           1. 共通設定 & 背景
            ========================================================================== */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
         
-        body {
-            background-color: #f0f8ff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-top: 40px;
-            padding-bottom: 40px;
+        body { 
+            margin: 0; padding: 0; 
+            background-color: #f0f8ff; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            font-family: 'Noto Sans JP', sans-serif; 
+            color: #333; 
         }
-
-        .interactive-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%;
-            animation: auroraFlow 20s ease infinite;
-            overflow: hidden;
-        }
-
-        @keyframes auroraFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            animation: floatOrb 30s infinite alternate ease-in-out;
-            z-index: 0;
-        }
+        
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
         .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
-
-        @keyframes floatOrb {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 30px) scale(1.1); }
-        }
-
-        #bg-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            mix-blend-mode: screen;
-        }
-
-        .bg-cloud {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            filter: blur(40px);
-            opacity: 0.85;
-            z-index: 2;
-            pointer-events: none;
-            box-shadow: 0 0 60px rgba(255,255,255,0.9);
-        }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; box-shadow: 0 0 60px rgba(255,255,255,0.9); }
         .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
-        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
-
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
-        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
-
-        .mouse-flare {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            mix-blend-mode: screen;
-            z-index: 20;
-            filter: blur(15px);
-            transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
-        }
+        .mouse-flare { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%); transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px); transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1); }
 
         /* ==========================================================================
-           🏆 ランキング画面用コンテナ & スタイル調整
+           2. メインコンテナ
            ========================================================================== */
-        
         .main-container {
-            max-width: 800px;
-            width: 95%;
-            text-align: center;
-            padding: 40px 30px;
-            background: rgba(255, 255, 255, 0.55);
+            max-width: 800px; 
+            width: 92%; 
+            margin: 40px auto; 
+            padding: 30px;
+            
+            background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 45px;
+            border-radius: 40px;
             border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative;
             z-index: 10;
         }
 
-        /* 🔙 戻るボタン */
-        .back-arrow-button {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            color: #555;
-            font-size: 2.2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .back-arrow-button:hover {
-            transform: scale(1.1);
-            background: #fff;
-            color: #4facfe;
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
-        }
-
-        @media (max-width: 600px) {
-            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
-            .main-container { padding-top: 80px !important; }
-        }
-
-        .ranking-list { 
-            list-style: none; 
-            padding: 0; 
-            margin: 20px 0 40px 0;
-            width: 100%;
-        }
-
-        .ranking-item {
+        /* ヘッダーデザイン */
+        .page-header-container { 
             display: flex; 
+            justify-content: space-between; 
             align-items: center; 
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 20px; 
-            padding: 15px 20px; 
-            margin-bottom: 15px;
-            border: 2px solid transparent; 
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .ranking-item:hover { 
-            transform: translateX(5px) scale(1.01); 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            background: #ffffff;
-            border-color: var(--secondary-color);
-        }
-
-        .rank-badge {
-            width: 45px; 
-            height: 45px; 
-            border-radius: 50%; 
-            background: #fff; 
-            color: var(--dark-text);
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            font-weight: 900; 
-            font-size: 1.2rem;
-            margin-right: 20px; 
-            flex-shrink: 0;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-        }
-
-        .rank-1 { background: linear-gradient(135deg, #ffd700, #fff0a0); color: #b8860b; border: 2px solid #fff; box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
-        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #e0e0e0); color: #707070; border: 2px solid #fff; }
-        .rank-3 { background: linear-gradient(135deg, #cd7f32, #eab676); color: #8b4513; border: 2px solid #fff; }
-
-        .ranking-item.top-rank { background: rgba(255, 255, 255, 0.9); border: 2px solid var(--secondary-color); }
-        .ranking-item:has(.rank-1) { border-color: var(--primary-color); background: rgba(255, 240, 245, 0.9); }
-
-        .user-info { flex-grow: 1; text-align: left; }
-        .user-name { font-weight: 800; font-size: 1.1rem; color: #333; margin-bottom: 4px; }
-        .user-stats { font-size: 0.9rem; color: #666; display: flex; align-items: center; gap: 8px; }
-
-        .stat-tag { background: #4facfe; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; }
-        .xp-text { font-weight: 600; color: #4facfe; }
-        
-        .page-header {
-            display: flex; justify-content: center; align-items: center;
-            margin-bottom: 20px;
-            flex-direction: column;
-            gap: 15px;
+            margin-bottom: 25px; 
+            border-bottom: 3px solid #4facfe; 
+            padding-bottom: 15px; 
+            gap: 15px; 
         }
         
-        .header-icon { color: #4facfe; margin-right: 8px; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        
+        .page-title { 
+            color: #343a40; font-size: 1.8rem; margin: 0; font-weight: 700; 
+        }
+        .page-title i { margin-right: 10px; color: #4facfe; }
+        
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px;
+            background-color: white; color: #4facfe;
+            border: 2px solid #4facfe; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { background-color: #4facfe; color: white; transform: scale(1.1); }
 
+        /* プルダウンメニュー */
         .view-selector {
             padding: 8px 12px;
             border-radius: 15px;
@@ -234,9 +99,59 @@
             outline: none;
             transition: 0.3s;
         }
-        .view-selector:hover {
-            background: #4facfe;
-            color: #fff;
+
+        /* ランキングリストスタイル */
+        .ranking-list { list-style: none; padding: 0; margin: 0; }
+
+        .ranking-item {
+            display: flex; 
+            align-items: center; 
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 20px; 
+            padding: 15px 20px; 
+            margin-bottom: 15px;
+            border: 2px solid transparent; 
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .ranking-item:hover { 
+            transform: translateX(5px); 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            background: #ffffff;
+            border-color: #4facfe;
+        }
+
+        .rank-badge {
+            width: 45px; height: 45px; 
+            border-radius: 50%; background: #fff; color: #555;
+            display: flex; justify-content: center; align-items: center; 
+            font-weight: 900; font-size: 1.2rem;
+            margin-right: 20px; flex-shrink: 0;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #fff0a0); color: #b8860b; border: 2px solid #fff; box-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #e0e0e0); color: #707070; border: 2px solid #fff; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #eab676); color: #8b4513; border: 2px solid #fff; }
+
+        .ranking-item.top-rank { background: rgba(255, 255, 255, 0.95); border: 2px solid #a0c4ff; }
+        .ranking-item:has(.rank-1) { border-color: #4facfe; background: rgba(240, 248, 255, 0.95); }
+
+        .user-info { flex-grow: 1; text-align: left; }
+        .user-name { font-weight: 800; font-size: 1.1rem; color: #333; margin-bottom: 4px; }
+        .user-stats { font-size: 0.9rem; color: #666; display: flex; align-items: center; gap: 8px; }
+
+        .stat-tag { background: #4facfe; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; }
+        .xp-text { font-weight: 600; color: #4facfe; }
+
+        @media (max-width: 600px) {
+            .main-container { padding: 20px; padding-top: 30px; width: 95%; border-radius: 30px; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .page-title { font-size: 1.4rem; }
+            .rank-badge { width: 35px; height: 35px; font-size: 1rem; margin-right: 15px; }
         }
     </style>
 </head>
@@ -255,15 +170,12 @@
 
     <div class="main-container">
         
-        <a th:href="@{/friends}" class="back-arrow-button" title="一つ戻る">
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
-        
-        <div class="page-header">
-            <div class="ranking-header" style="margin:0;">
-                <h1 style="font-size: 1.8rem; margin:0; text-align:center;">
-                    <i class="fa-solid fa-trophy header-icon"></i>ランキング
-                </h1>
+        <div class="page-header-container">
+            <div class="header-left">
+                <a th:href="@{/friends}" class="home-link-icon" title="一つ戻る">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <h1 class="page-title"><i class="fa-solid fa-trophy"></i> ランキング</h1>
             </div>
             
             <select class="view-selector" onchange="location.href=this.value">
@@ -272,7 +184,7 @@
             </select>
         </div>
 
-        <p class="sub-heading" style="margin-bottom: 30px; color:#555; font-weight:700;">
+        <p class="sub-heading" style="margin-bottom: 30px; color:#666; font-weight:600; text-align:center;">
             フレンドと競い合って、高みを目指そう！
         </p>
 
@@ -304,81 +216,19 @@
     </div>
 
     <script>
-        // === 🌟 CANVAS PARTICLE SYSTEM ===
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        const flare = document.getElementById('mouse-flare');
-        
-        let particlesArray = [];
-        let width, height;
-
-        function resizeCanvas() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
+        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); const flare = document.getElementById('mouse-flare'); let particlesArray = []; let width, height;
+        function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
         const mouse = { x: undefined, y: undefined };
-        window.addEventListener('mousemove', (event) => {
-            mouse.x = event.x;
-            mouse.y = event.y;
-            if(flare) {
-                flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
-            }
-            for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
-        });
-
+        window.addEventListener('mousemove', (event) => { mouse.x = event.x; mouse.y = event.y; flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`; for(let i = 0; i < 2; i++) particlesArray.push(new Particle()); });
+        const cloud1 = document.querySelector('.cloud-1'); const cloud2 = document.querySelector('.cloud-2');
+        document.addEventListener('mousemove', (e) => { const x = (window.innerWidth - e.pageX) / 60; const y = (window.innerHeight - e.pageY) / 60; if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`; if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`; });
         class Particle {
-            constructor() {
-                this.x = mouse.x;
-                this.y = mouse.y;
-                this.size = Math.random() * 5 + 2;
-                this.speedX = Math.random() * 4 - 2;
-                this.speedY = Math.random() * 4 - 2;
-                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.size > 0.2) this.size -= 0.1;
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = 'white';
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
+            constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+            update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+            draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.shadowBlur = 10; ctx.shadowColor = 'white'; ctx.fill(); ctx.shadowBlur = 0; }
         }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-                particlesArray[i].draw();
-                if (particlesArray[i].size <= 0.3) {
-                    particlesArray.splice(i, 1);
-                    i--;
-                }
-            }
-            requestAnimationFrame(animate);
-        }
-        
-        // 背景の雲のパララックス効果
-        const cloud1 = document.querySelector('.cloud-1');
-        const cloud2 = document.querySelector('.cloud-2');
-        document.addEventListener('mousemove', (e) => {
-            const x = (window.innerWidth - e.pageX) / 60;
-            const y = (window.innerHeight - e.pageY) / 60;
-            if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
-            if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
-        });
-
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
         animate();
     </script>
 
