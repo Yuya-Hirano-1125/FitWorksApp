@@ -36,8 +36,17 @@
         }
         
         /* ヘッダー修正 */
-        .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
-        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
+        .page-header-container { 
+            display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; 
+            flex-shrink: 0; /* 左側要素が潰れないように */
+        }
+        
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left;
+            /* ★修正: 文字の折り返しを禁止 */
+            white-space: nowrap;
+        }
+        
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -59,6 +68,12 @@
         .style-storage .icon-area { color: #4facfe; }
         .style-material .icon-area { color: #feca57; }
         .style-backgrounds .icon-area { color: #1dd1a1; }
+
+        @media (max-width: 600px) {
+            .main-container { padding: 20px; padding-top: 30px; width: 95%; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .page-title { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
