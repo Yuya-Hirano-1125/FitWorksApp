@@ -245,11 +245,7 @@
             align-items: center;
         }
         
-        .filter-label-icon {
-            color: #555;
-            font-size: 0.9rem;
-            margin-right: 5px;
-        }
+        /* 削除: .filter-label-icon は不要になったため削除 */
 
         .filter-btn {
             background-color: #fff;
@@ -435,9 +431,6 @@
             .exercise-card { flex-direction: column; align-items: flex-start; }
             .card-header { padding-right: 35px; }
             .exercise-name { font-size: 1rem; }
-            .card-tags { margin-top: 5px; }
-            .tap-hint { display: none; }
-            .exercise-card > div:first-child { flex: 1; width: 100%; }
             .bookmark-form { top: 20px; right: 15px; }
         }
 
@@ -510,7 +503,6 @@
             </div>
 
             <div class="filter-row difficulty-filters" style="border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 10px;">
-                <span class="filter-label-icon"><i class="fa-solid fa-layer-group"></i></span>
                 <button class="filter-btn active" data-diff="all" onclick="filterByDifficulty('all', this)">全難易度</button>
                 <button class="filter-btn" data-diff="beginner" onclick="filterByDifficulty('beginner', this)">初級</button>
                 <button class="filter-btn" data-diff="intermediate" onclick="filterByDifficulty('intermediate', this)">中級</button>
