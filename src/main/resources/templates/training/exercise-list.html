@@ -10,9 +10,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script th:src="@{/js/theme.js}"></script>
     <style>
+        /* 全要素に box-sizing: border-box を適用 */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         /* ==========================================================================
            🌌 背景用スタイル
            ========================================================================== */
+        
         body {
             background-color: #f0f8ff;
             color: #333;
@@ -20,14 +26,14 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            overflow-x: hidden; /* 横スクロール防止 */
+            overflow-x: hidden;
         }
 
-        /* ▼ スクロールトップボタン（fixedに変更してスムーズに） */
+        /* ▼ スクロールトップボタン */
         #scrollTopBtn {
             position: fixed;
             right: 20px;
-            bottom: 20px; /* 下からの位置で固定 */
+            bottom: 20px;
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -96,7 +102,7 @@
             margin: 40px auto;
             padding: 30px;
             padding-bottom: 120px;
-            background: rgba(255, 255, 255, 0.65); /* 背景色調整 */
+            background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 40px;
@@ -106,12 +112,12 @@
             z-index: 10;
         }
 
-        /* ▼▼▼ 新しいヘッダーデザイン (edit-username.htmlと統一) ▼▼▼ */
+        /* ヘッダーデザイン */
         .page-header-container {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
-            border-bottom: 3px solid #4facfe; /* 青い下線 */
+            border-bottom: 3px solid #4facfe;
             padding-bottom: 10px;
             gap: 15px;
         }
@@ -125,43 +131,25 @@
             font-weight: 700;
             text-shadow: none;
         }
-        .page-title i {
-            margin-right: 8px;
-            color: #4facfe;
-        }
+        .page-title i { margin-right: 8px; color: #4facfe; }
 
-        /* 青い丸アイコンの戻るボタン */
         .home-link-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 45px;
-            height: 45px;
-            background-color: white;
-            color: #4facfe;
-            border: 2px solid #4facfe;
-            border-radius: 50%;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            font-size: 1.3rem;
-            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px; background-color: white; color: #4facfe;
+            border: 2px solid #4facfe; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
         }
-        .home-link-icon:hover {
-            background-color: #4facfe;
-            color: white;
-            transform: scale(1.1);
-        }
-        /* ▲▲▲ ヘッダーデザイン終了 ▲▲▲ */
+        .home-link-icon:hover { background-color: #4facfe; color: white; transform: scale(1.1); }
 
-        /* スティッキーヘッダー */
+        /* ▼ スティッキーヘッダー */
         .sticky-header-area {
             position: sticky;
-            top: 10px; /* ヘッダー変更に伴い少し詰める */
+            top: 10px;
             z-index: 90;
             background-color: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            padding: 15px 0;
+            padding: 20px;
             margin-bottom: 30px;
             border-radius: 20px;
             border: 1px solid rgba(255,255,255,0.6);
@@ -170,77 +158,109 @@
 
         .search-container {
             display: flex;
-            gap: 12px;
-            padding: 0 15px;
+            gap: 15px;
             align-items: center;
             margin-bottom: 15px;
-            max-width: 100%;
-        }
-
-        .search-box {
-            flex: 1;
-            padding: 12px 20px;
-            font-size: 1rem;
-            border: 2px solid transparent;
-            border-radius: 50px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-            outline: none;
-            transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.9);
             width: 100%;
         }
+
+        /* 検索ボックス */
+        .search-box-wrapper {
+            position: relative;
+            flex: 1;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 15px 50px 15px 25px;
+            border-radius: 50px;
+            border: 2px solid rgba(255,255,255,0.8);
+            font-size: 1rem;
+            background: rgba(255,255,255,0.9);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            appearance: none;
+        }
         .search-box:focus {
+            outline: none;
             border-color: #4facfe;
-            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.25);
+            transform: translateY(-2px);
             background: #fff;
         }
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4facfe;
+            font-size: 1.2rem;
+            pointer-events: none;
+            z-index: 10;
+        }
 
+        /* ブックマークボタン */
         .view-bookmarks-btn {
             background-color: #fff;
             color: #f39c12;
             border: 2px solid #f39c12;
-            padding: 10px 18px;
+            padding: 14px 20px;
             border-radius: 50px;
             font-weight: 800;
             text-decoration: none;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             white-space: nowrap;
             transition: all 0.3s;
             box-shadow: 0 4px 10px rgba(243, 156, 18, 0.15);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            flex-shrink: 0;
         }
         .view-bookmarks-btn:hover {
             background-color: #f39c12;
             color: white;
             transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(243, 156, 18, 0.3);
         }
 
-        .filter-scroll-wrapper {
-            overflow-x: auto;
-            white-space: nowrap;
-            padding: 5px 15px;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            mask-image: linear-gradient(to right, transparent, black 10px, black 95%, transparent);
+        /* フィルタボタンエリア */
+        .filters-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        .filter-scroll-wrapper::-webkit-scrollbar { display: none; }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 10px;
+            padding: 5px;
+            justify-content: flex-start;
+            width: 100%;
+            align-items: center;
+        }
+        
+        .filter-label-icon {
+            color: #888;
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
 
         .filter-btn {
             background-color: rgba(255, 255, 255, 0.8);
             color: #555;
             border: 1px solid rgba(0,0,0,0.1);
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 50px;
             font-size: 0.9rem;
             font-weight: 700;
             cursor: pointer;
-            margin-right: 8px;
             transition: all 0.2s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            display: inline-block;
         }
+        
         .filter-btn.active {
             background-color: #2c3e50;
             color: white;
@@ -251,294 +271,180 @@
             background-color: #28a745;
             border-color: #28a745;
         }
+        /* 難易度フィルタ色分け */
+        .filter-btn[data-diff="beginner"].active { background-color: #43a047; border-color: #43a047; }
+        .filter-btn[data-diff="intermediate"].active { background-color: #fb8c00; border-color: #fb8c00; }
+        .filter-btn[data-diff="advanced"].active { background-color: #e53935; border-color: #e53935; }
 
         /* カテゴリ & カード */
-        .category-section {
-            margin-bottom: 40px;
-            animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .category-section { margin-bottom: 40px; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .category-header {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(0,0,0,0.1);
+            display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+            margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid rgba(0,0,0,0.1);
         }
-        .category-title {
-            margin: 0;
-            color: #2c3e50;
-            font-size: 1.5rem;
-            font-weight: 800;
-        }
+        .category-title { margin: 0; color: #2c3e50; font-size: 1.5rem; font-weight: 800; }
         .category-badge {
-            background-color: rgba(255,255,255,0.6);
-            color: #495057;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            border: 1px solid rgba(0,0,0,0.05);
+            background-color: rgba(255,255,255,0.6); color: #495057; padding: 4px 10px;
+            border-radius: 20px; font-size: 0.8rem; font-weight: 700; border: 1px solid rgba(0,0,0,0.05);
         }
 
         .exercise-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 20px;
+            gap: 60px 30px;
         }
 
         .exercise-card {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: pointer;
-            position: relative;
-            border: 1px solid rgba(255,255,255,0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
+            background: rgba(255, 255, 255, 0.85); border-radius: 20px; padding: 20px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer; position: relative; border: 1px solid rgba(255,255,255,0.5);
+            display: flex; flex-direction: column; justify-content: space-between; height: 100%;
         }
         .exercise-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
-            background: #fff;
-            border-color: #4facfe;
+            transform: translateY(-5px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
+            background: #fff; border-color: #4facfe;
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-            padding-right: 40px;
-        }
-        .exercise-name {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #2c3e50;
-            line-height: 1.4;
-        }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; padding-right: 40px; }
         
-        .card-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: auto;
-        }
-        .tag {
-            font-size: 0.7rem;
-            padding: 4px 10px;
-            border-radius: 8px;
-            font-weight: 700;
+        .name-badge-wrapper {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
+        .exercise-name { font-size: 1.1rem; font-weight: 800; color: #2c3e50; line-height: 1.4; }
+        
+        /* 難易度バッジ (リスト用) */
+        .difficulty-badge {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+        .tag { font-size: 0.7rem; padding: 4px 10px; border-radius: 8px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
         .tag-muscle { background-color: #e3f2fd; color: #1565c0; }
         .tag-equip { background-color: #f3e5f5; color: #6a1b9a; }
 
-        .bookmark-form {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 2;
-        }
+        .bookmark-form { position: absolute; top: 15px; right: 15px; z-index: 2; }
         .bookmark-btn {
-            background: rgba(255,255,255,0.5);
-            border-radius: 50%;
-            border: 1px solid rgba(0,0,0,0.05);
-            cursor: pointer;
-            font-size: 1.2rem;
-            color: #ccc;
-            transition: all 0.2s;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: rgba(255,255,255,0.5); border-radius: 50%; border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer; font-size: 1.2rem; color: #ccc; transition: all 0.2s; width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
         }
-        .bookmark-btn.active {
-            color: #ffc107;
-            background: #fff;
-            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
-            border-color: #ffc107;
-        }
+        .bookmark-btn.active { color: #ffc107; background: #fff; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3); border-color: #ffc107; }
 
         .tap-hint {
-            margin-top: 12px;
-            font-size: 0.8rem;
-            color: #adb5bd;
-            text-align: right;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 4px;
+            margin-top: 12px; font-size: 0.8rem; color: #adb5bd; text-align: right;
+            font-weight: 700; display: flex; align-items: center; justify-content: flex-end; gap: 4px;
         }
 
         .no-results {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-            font-weight: 700;
-            display: none;
-            background: rgba(255,255,255,0.5);
-            border-radius: 20px;
+            text-align: center; padding: 40px 20px; color: #666; font-weight: 700; display: none;
+            background: rgba(255,255,255,0.5); border-radius: 20px;
         }
 
         /* モーダル */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(5px);
-            z-index: 2000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center;
+            padding: 15px; opacity: 0; transition: opacity 0.3s ease;
         }
         .modal-overlay.active { display: flex; opacity: 1; }
         .detail-modal {
-            background: rgba(255, 255, 255, 0.98);
-            width: 100%;
-            max-width: 550px;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-            transform: scale(0.95);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
+            background: rgba(255, 255, 255, 0.98); width: 100%; max-width: 550px; border-radius: 24px;
+            overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.2); transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; display: flex; flex-direction: column;
         }
         .modal-overlay.active .detail-modal { transform: scale(1); }
-        
         .modal-header {
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-            padding: 20px 25px;
-            color: white;
-            position: relative;
-            flex-shrink: 0;
+            background: linear-gradient(135deg, #4facfe, #00f2fe); padding: 20px 25px; color: white; position: relative; flex-shrink: 0;
         }
         .modal-title { margin: 0; font-size: 1.4rem; font-weight: 900; padding-right: 30px; }
         .modal-close-btn {
-            position: absolute;
-            top: 15px; right: 15px;
-            background: rgba(255,255,255,0.2);
-            border: none; color: white;
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            font-size: 1rem; cursor: pointer;
+            position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); border: none; color: white;
+            width: 32px; height: 32px; border-radius: 50%; font-size: 1rem; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
         }
-        .modal-body {
-            padding: 25px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .detail-row {
-            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;
-        }
+        .modal-body { padding: 25px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .detail-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
         .detail-tag {
-            font-size: 0.85rem; padding: 6px 12px; border-radius: 8px; font-weight: 700;
-            display: flex; align-items: center; gap: 6px;
+            font-size: 0.85rem; padding: 6px 12px; border-radius: 8px; font-weight: 700; display: flex; align-items: center; gap: 6px;
             background: #f8f9fa; border: 1px solid #e9ecef; color: #495057;
         }
+        .desc-box { background-color: #f0f8ff; border-left: 5px solid #4facfe; padding: 15px; border-radius: 8px; }
+        .desc-text { color: #495057; line-height: 1.7; font-size: 0.95rem; white-space: pre-wrap; margin: 0; }
 
-        .desc-box {
-            background-color: #f0f8ff;
-            border-left: 5px solid #4facfe;
-            padding: 15px;
-            border-radius: 8px;
-        }
-        .desc-text {
-            color: #495057; line-height: 1.7; font-size: 0.95rem; white-space: pre-wrap; margin: 0;
-        }
-
-        /* 📱 レスポンシブ対応 */
+        /* ==========================================================================
+           📱 レスポンシブ対応 (メディアクエリ)
+           ========================================================================== */
         @media (max-width: 768px) {
-            .container {
-                width: 95%;
-                margin: 20px auto;
-                padding: 20px;
-                padding-top: 20px;
-                border-radius: 20px;
-            }
+            .container { width: 95%; margin: 20px auto; padding: 20px; padding-top: 20px; border-radius: 20px; }
             .page-title { font-size: 1.6rem; }
-            .exercise-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+            .exercise-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 40px 15px; }
         }
 
         @media (max-width: 600px) {
             .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
             .page-title { font-size: 1.5rem; }
 
-            .page-header-container {
-                justify-content: flex-start;
-                margin-bottom: 15px;
+            .page-header-container { justify-content: flex-start; margin-bottom: 15px; }
+
+            .sticky-header-area {
+                top: 0;
+                border-radius: 20px;
+                margin-top: 0;
+                width: calc(100% + 40px);
+                margin-left: -20px;
+                padding: 15px 10px;
+                background-color: rgba(255, 255, 255, 0.95);
             }
 
             .search-container {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
+                flex-direction: row; 
+                gap: 8px;
             }
             .view-bookmarks-btn {
-                justify-content: center;
-                width: 100%;
-            }
-            .sticky-header-area {
-                top: 0;
-                border-radius: 0 0 20px 20px;
-                margin-top: -20px;
-                width: calc(100% + 40px);
-                margin-left: -20px;
-                padding: 15px 0;
-                background-color: rgba(255, 255, 255, 0.9);
+                width: auto;
+                font-size: 0.85rem;
+                padding: 12px 12px;
             }
             
-            .exercise-grid {
-                grid-template-columns: 1fr;
+            .search-box {
+                padding: 12px 40px 12px 15px;
+                font-size: 0.9rem;
             }
-            .exercise-card {
-                flex-direction: row;
-                align-items: center;
-                padding: 15px;
-                min-height: auto;
-            }
-            .card-header {
-                margin-bottom: 5px;
-                padding-right: 35px;
-            }
-            .exercise-name {
+            .search-icon {
+                right: 15px;
                 font-size: 1rem;
             }
-            .card-tags {
-                margin-top: 5px;
+
+            .filter-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
             }
-            .tap-hint {
-                display: none;
-            }
-            .exercise-card > div:first-child {
-                flex: 1;
-            }
-            .bookmark-form {
-                top: 50%;
-                transform: translateY(-50%);
-                right: 10px;
-            }
+
+            .exercise-grid { grid-template-columns: 1fr; gap: 40px 0; }
+            .exercise-card { flex-direction: row; align-items: center; padding: 15px; min-height: auto; }
+            .card-header { margin-bottom: 5px; padding-right: 35px; }
+            .exercise-name { font-size: 1rem; }
+            .card-tags { margin-top: 5px; }
+            .tap-hint { display: none; }
+            .exercise-card > div:first-child { flex: 1; }
+            .bookmark-form { top: 50%; transform: translateY(-50%); right: 10px; }
         }
+
+        /* ★重要: 難易度バッジの色定義（最後に記述して詳細度を勝たせる） */
+        .diff-beginner { background-color: #e8f5e9 !important; color: #2e7d32 !important; border: 1px solid #c8e6c9 !important; }
+        .diff-intermediate { background-color: #fff8e1 !important; color: #f57f17 !important; border: 1px solid #ffe082 !important; }
+        .diff-advanced { background-color: #ffebee !important; color: #c62828 !important; border: 1px solid #ffcdd2 !important; }
     </style>
 </head>
 <body>
@@ -570,23 +476,34 @@
 
     <div class="sticky-header-area">
         <div class="search-container">
-            <input type="text" id="exerciseSearchInput" class="search-box" placeholder="🔍 種目名、部位、器具で検索..." onkeyup="filterExercises()">
+            <div class="search-box-wrapper">
+                <input type="text" id="exerciseSearchInput" class="search-box" placeholder="🔍 種目名、部位..." onkeyup="filterExercises()">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            </div>
             
             <a th:href="@{/training/bookmarks}" class="view-bookmarks-btn">
                 <i class="fa-solid fa-star"></i> ブックマーク
             </a>
         </div>
 
-        <div class="filter-scroll-wrapper">
-            <button class="filter-btn active" data-part="all" onclick="filterByPart('all', this)">すべて</button>
-            
-            <button th:each="entry : ${freeWeightExercisesByPart}" 
-                    class="filter-btn" 
-                    th:text="${entry.key}"
-                    th:data-part="${entry.key}"
-                    onclick="filterByPart(this.getAttribute('data-part'), this)">部位名</button>
-            
-            <button class="filter-btn" data-part="cardio" onclick="filterByPart('cardio', this)">有酸素運動</button>
+        <div class="filters-container">
+            <div class="filter-row part-filters">
+                <button class="filter-btn active" data-part="all" onclick="filterByPart('all', this)">すべて</button>
+                <button th:each="entry : ${freeWeightExercisesByPart}" 
+                        class="filter-btn" 
+                        th:text="${entry.key}"
+                        th:data-part="${entry.key}"
+                        onclick="filterByPart(this.getAttribute('data-part'), this)">部位名</button>
+                <button class="filter-btn" data-part="cardio" onclick="filterByPart('cardio', this)">有酸素運動</button>
+            </div>
+
+            <div class="filter-row difficulty-filters" style="border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 10px;">
+                <span class="filter-label-icon"><i class="fa-solid fa-layer-group"></i></span>
+                <button class="filter-btn active" data-diff="all" onclick="filterByDifficulty('all', this)">全難易度</button>
+                <button class="filter-btn" data-diff="beginner" onclick="filterByDifficulty('beginner', this)">初級</button>
+                <button class="filter-btn" data-diff="intermediate" onclick="filterByDifficulty('intermediate', this)">中級</button>
+                <button class="filter-btn" data-diff="advanced" onclick="filterByDifficulty('advanced', this)">上級</button>
+            </div>
         </div>
     </div>
     
@@ -618,7 +535,15 @@
                     
                     <div>
                         <div class="card-header">
-                            <span class="exercise-name" th:text="${exercise.name} + '【' + ${exercise.difficulty} + '】'">ベンチプレス【中級】</span>
+                            <div class="name-badge-wrapper">
+                                <span class="exercise-name" th:text="${exercise.name}">ベンチプレス</span>
+                                <span class="difficulty-badge"
+                                      th:classappend="${
+                                          #strings.contains(exercise.difficulty, '初') || #strings.contains(exercise.difficulty, 'Beginner') ? 'diff-beginner' :
+                                          (#strings.contains(exercise.difficulty, '中') || #strings.contains(exercise.difficulty, 'Intermediate') ? 'diff-intermediate' : 'diff-advanced')
+                                      }"
+                                      th:text="${exercise.difficulty}">中級</span>
+                            </div>
                         </div>
                         
                         <div class="card-tags">
@@ -658,7 +583,15 @@
                     
                     <div>
                         <div class="card-header">
-                            <span class="exercise-name" th:text="${exercise.name} + '【' + ${exercise.difficulty} + '】'">ランニング【初級】</span>
+                            <div class="name-badge-wrapper">
+                                <span class="exercise-name" th:text="${exercise.name}">ランニング</span>
+                                <span class="difficulty-badge"
+                                      th:classappend="${
+                                          #strings.contains(exercise.difficulty, '初') || #strings.contains(exercise.difficulty, 'Beginner') ? 'diff-beginner' :
+                                          (#strings.contains(exercise.difficulty, '中') || #strings.contains(exercise.difficulty, 'Intermediate') ? 'diff-intermediate' : 'diff-advanced')
+                                      }"
+                                      th:text="${exercise.difficulty}">初級</span>
+                            </div>
                         </div>
                         
                         <div class="card-tags">
@@ -692,7 +625,7 @@
             <div class="detail-row">
                 <span class="detail-tag tag-muscle"><i class="fa-solid fa-bullseye"></i> <span id="modalMuscle">部位</span></span>
                 <span class="detail-tag tag-equip"><i class="fa-solid fa-toolbox"></i> <span id="modalEquip">器具</span></span>
-                <span class="detail-tag tag-equip" style="background-color: #fff3e0; color: #e67e22;"><i class="fa-solid fa-layer-group"></i> <span id="modalDifficulty">難易度</span></span>
+                <span id="modalDifficulty" class="detail-tag"><i class="fa-solid fa-layer-group"></i> <span>難易度</span></span>
             </div>
             
             <div class="desc-box">
@@ -804,59 +737,75 @@
 </script>
 
 <script>
-    function filterByPart(part, btnElement) {
-        document.getElementById('exerciseSearchInput').value = '';
-        document.getElementById('noResultsMessage').style.display = 'none';
-
-        const buttons = document.querySelectorAll('.filter-btn');
-        buttons.forEach(btn => btn.classList.remove('active'));
-        if(btnElement) btnElement.classList.add('active');
-
-        const sections = document.querySelectorAll('.category-section');
-        sections.forEach(section => {
-            const cards = section.querySelectorAll('.exercise-card');
-            cards.forEach(card => card.style.display = '');
-
-            if (part === 'all') {
-                section.style.display = '';
-            } else {
-                const sectionPart = section.getAttribute('data-part');
-                if (sectionPart === part) {
-                    section.style.display = '';
-                } else {
-                    section.style.display = 'none';
-                }
-            }
-        });
-        
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
+    // 統合されたフィルタリングロジック
     function filterExercises() {
         const input = document.getElementById('exerciseSearchInput');
         const filter = input.value.toLowerCase().replace(/\s+/g, '');
+        
+        const activePartBtn = document.querySelector('.part-filters .filter-btn.active');
+        const activePart = activePartBtn ? activePartBtn.getAttribute('data-part') : 'all';
+
+        const activeDiffBtn = document.querySelector('.difficulty-filters .filter-btn.active');
+        const activeDiff = activeDiffBtn ? activeDiffBtn.getAttribute('data-diff') : 'all';
+
         const container = document.getElementById('exerciseListContainer');
         const categories = container.getElementsByClassName('category-section');
         let totalVisibleItems = 0;
 
         for (let i = 0; i < categories.length; i++) {
             const category = categories[i];
-            if (category.style.display === 'none') continue;
+            const sectionPart = category.getAttribute('data-part');
+            
+            // 1. 部位フィルタ判定
+            const isPartMatch = (activePart === 'all' || sectionPart === activePart);
+            
+            if (!isPartMatch) {
+                category.style.display = 'none';
+                continue;
+            }
 
+            // 2. カードごとの判定（難易度 & 検索ワード）
             const cards = category.getElementsByClassName('exercise-card');
+            let visibleCardsInCategory = 0;
+
             for (let j = 0; j < cards.length; j++) {
                 const card = cards[j];
                 const name = card.getAttribute('data-name') || "";
                 const muscle = card.getAttribute('data-muscle') || "";
                 const equip = card.getAttribute('data-equip') || "";
-                const textValue = (name + muscle + equip).toLowerCase().replace(/\s+/g, '');
+                const desc = card.getAttribute('data-desc') || "";
+                const difficulty = card.getAttribute('data-difficulty') || "";
 
-                if (textValue.includes(filter)) {
-                    card.style.display = "";
+                // 難易度判定
+                let isDiffMatch = true;
+                if (activeDiff !== 'all') {
+                    if (activeDiff === 'beginner') {
+                        isDiffMatch = difficulty.includes('初') || difficulty.toLowerCase().includes('beginner');
+                    } else if (activeDiff === 'intermediate') {
+                        isDiffMatch = difficulty.includes('中') || difficulty.toLowerCase().includes('intermediate');
+                    } else if (activeDiff === 'advanced') {
+                        isDiffMatch = difficulty.includes('上') || difficulty.toLowerCase().includes('advanced');
+                    }
+                }
+
+                // 検索ワード判定
+                const textValue = (name + muscle + equip + desc + difficulty).toLowerCase().replace(/\s+/g, '');
+                const isSearchMatch = textValue.includes(filter);
+
+                if (isDiffMatch && isSearchMatch) {
+                    card.style.display = ""; // 表示
+                    visibleCardsInCategory++;
                     totalVisibleItems++;
                 } else {
-                    card.style.display = "none";
+                    card.style.display = "none"; // 非表示
                 }
+            }
+
+            // 3. カテゴリヘッダーの表示制御
+            if (visibleCardsInCategory > 0) {
+                category.style.display = ""; 
+            } else {
+                category.style.display = "none";
             }
         }
         
@@ -868,17 +817,51 @@
         }
     }
 
+    function filterByPart(part, btnElement) {
+        const buttons = document.querySelectorAll('.part-filters .filter-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        if(btnElement) btnElement.classList.add('active');
+
+        filterExercises();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function filterByDifficulty(diff, btnElement) {
+        const buttons = document.querySelectorAll('.difficulty-filters .filter-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        if(btnElement) btnElement.classList.add('active');
+
+        filterExercises();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function openDetailModal(cardElement) {
         const name = cardElement.getAttribute('data-name');
         const muscle = cardElement.getAttribute('data-muscle');
         const equip = cardElement.getAttribute('data-equip');
         const desc = cardElement.getAttribute('data-desc');
-        const difficulty = cardElement.getAttribute('data-difficulty');
+        const difficulty = cardElement.getAttribute('data-difficulty') || "不明";
 
         document.getElementById('modalTitle').textContent = name;
         document.getElementById('modalMuscle').textContent = muscle;
         document.getElementById('modalEquip').textContent = equip;
-        document.getElementById('modalDifficulty').textContent = difficulty || "不明";
+        
+        // 難易度タグの設定
+        const diffEl = document.getElementById('modalDifficulty');
+        // テキスト設定（アイコン付き）
+        diffEl.innerHTML = '<i class="fa-solid fa-layer-group"></i> ' + difficulty;
+        
+        // ★修正: tag-equip（紫色）を外して、ベースクラスのみにする
+        diffEl.className = 'detail-tag'; 
+        
+        // 色判定とクラス付与
+        if (difficulty.includes('初') || difficulty.toLowerCase().includes('beginner')) {
+            diffEl.classList.add('diff-beginner');
+        } else if (difficulty.includes('中') || difficulty.toLowerCase().includes('intermediate')) {
+            diffEl.classList.add('diff-intermediate');
+        } else if (difficulty.includes('上') || difficulty.toLowerCase().includes('advanced')) {
+            diffEl.classList.add('diff-advanced');
+        }
         
         if (desc && desc.trim() !== "") {
             document.getElementById('modalDesc').textContent = desc;

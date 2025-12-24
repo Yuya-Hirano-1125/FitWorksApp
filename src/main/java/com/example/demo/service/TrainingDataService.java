@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,32 @@ public class TrainingDataService {
 
     public TrainingDataService() {
         initializeData();
+    }
+
+    // ★追加: 50音順ソート用のコンパレータ
+    private final Comparator<ExerciseData> exerciseComparator = Comparator.comparing(e -> getReading(e.getName()));
+
+    // ★追加: 種目名から読み仮名（ソート用キー）を取得するメソッド
+    private String getReading(String name) {
+        String s = name;
+        
+        // 漢字・アルファベット開始の種目をカタカナ読みに変換
+        if (s.startsWith("懸垂")) return "ケンスイ" + s;
+        if (s.startsWith("水中")) return "スイチュウ" + s;
+        if (s.startsWith("水泳")) return "スイエイ" + s;
+        if (s.startsWith("踏み台")) return "フミダイ" + s;
+        if (s.startsWith("縄跳び")) return "ナワトビ" + s;
+        if (s.startsWith("二重跳び")) return "ニジュウトビ" + s;
+        
+        if (s.startsWith("Tバー")) return "ティーバー" + s;
+        if (s.startsWith("Yレイズ")) return "ワイレイズ" + s;
+        if (s.startsWith("Zプレス")) return "ゼットプレス" + s;
+        if (s.startsWith("JM")) return "ジェイエム" + s;
+        if (s.startsWith("HIIT")) return "ヒット" + s; // またはエイチ...
+        
+        // 数字はそのまま（先頭に来るようにする）
+        
+        return s;
     }
 
     private void initializeData() {
@@ -63,6 +90,9 @@ public class TrainingDataService {
         chest.add(new ExerciseData("デクライン・プッシュアップ", "大胸筋上部", "自重", "足が高い位置にある腕立て伏せ。負荷が高く上部に効く。", "中級"));
         chest.add(new ExerciseData("ディップス(大胸筋狙い)", "大胸筋下部", "自重/加重", "「上半身のスクワット」と呼ばれる。前傾姿勢で行うことで胸下部に強烈な刺激が入る。", "中級"));
         chest.add(new ExerciseData("スベンドプレス", "大胸筋内側", "プレート", "プレートを両手で挟み込み、胸の前で押し出す。収縮感を高める仕上げ種目。", "初級"));
+        
+        // ★並び替え実行
+        chest.sort(exerciseComparator);
         exerciseMap.put("胸", chest);
 
         // ==========================================
@@ -94,6 +124,9 @@ public class TrainingDataService {
         back.add(new ExerciseData("プルオーバー(マシン)", "広背筋", "マシン", "ノーチラスマシンなどで肘パッドを押し下げる。広背筋全体に強いストレッチと収縮を与える。", "初級"));
         back.add(new ExerciseData("ハイロウ(マシン)", "広背筋上部", "マシン", "斜め上から引き下ろす軌道を持つマシン。広背筋と大円筋を狙いやすい。", "初級"));
         back.add(new ExerciseData("スーパーマン", "脊柱起立筋", "自重", "床にうつ伏せになり、手足を同時に持ち上げる。自宅でできる背筋運動。", "初級"));
+        
+        // ★並び替え実行
+        back.sort(exerciseComparator);
         exerciseMap.put("背中", back);
 
         // ==========================================
@@ -125,6 +158,9 @@ public class TrainingDataService {
         legs.add(new ExerciseData("ケトルベル・スイング", "ハム・臀部", "ケトルベル", "股関節の爆発的な伸展を使う全身運動。有酸素効果も高い。", "中級"));
         legs.add(new ExerciseData("シングルレッグ・デッドリフト", "ハム・体幹", "ダンベル/KB", "片足立ちで行うデッドリフト。バランス力ともも裏の強化。", "中級"));
         legs.add(new ExerciseData("ゼルチャースクワット", "大腿四頭筋・体幹", "バーベル", "肘でバーベルを抱えて行うスクワット。体幹への負荷が非常に高い。", "上級"));
+        
+        // ★並び替え実行
+        legs.sort(exerciseComparator);
         exerciseMap.put("脚", legs);
 
         // ==========================================
@@ -154,6 +190,9 @@ public class TrainingDataService {
         shoulders.add(new ExerciseData("シュラッグ", "僧帽筋", "ダンベル/バーベル", "肩をすくめる動作。首回りの迫力を出す。", "初級"));
         shoulders.add(new ExerciseData("キューバンプレス", "ローテーターカフ", "ダンベル", "アップライトロウとプレスを組み合わせた動き。肩のインナーマッスル強化。", "中級"));
         shoulders.add(new ExerciseData("ヘイロー(Halo)", "肩周り柔軟性", "ケトルベル/プレート", "頭の周りで重りを回す。肩甲骨の可動域向上とウォーミングアップに最適。", "初級"));
+        
+        // ★並び替え実行
+        shoulders.sort(exerciseComparator);
         exerciseMap.put("肩", shoulders);
 
         // ==========================================
@@ -190,6 +229,9 @@ public class TrainingDataService {
         arms.add(new ExerciseData("リバース・リストカール", "前腕伸筋群", "ダンベル/バーベル", "手の甲側に手首を返す動き。前腕の外側を鍛える。", "初級"));
         arms.add(new ExerciseData("ファーマーズウォーク", "前腕・握力", "ダンベル/KB", "重いダンベルを持って歩く。握力と体幹、全身の連動性を鍛える。", "初級"));
         arms.add(new ExerciseData("プレートピンチ", "握力", "プレート", "プレートをつまんで持つ。ピンチ力を鍛える。", "初級"));
+        
+        // ★並び替え実行
+        arms.sort(exerciseComparator);
         exerciseMap.put("腕", arms);
 
         // ==========================================
@@ -222,6 +264,9 @@ public class TrainingDataService {
         abs.add(new ExerciseData("トゥ・トゥ・バー(Toes to Bar)", "腹直筋全体", "自重", "ぶら下がった状態からつま先をバーにタッチさせる。クロスフィットで人気。", "上級"));
         abs.add(new ExerciseData("Lシット", "体幹・屈筋", "自重", "体を支えて足を前に伸ばしL字で静止する。体操選手のような体幹が必要。", "上級"));
         abs.add(new ExerciseData("フラッグ(人間鯉のぼり)", "体幹全体", "自重", "柱を掴んで体を横に浮かす超高難易度パフォーマンス種目。", "上級"));
+        
+        // ★並び替え実行
+        abs.sort(exerciseComparator);
         exerciseMap.put("腹筋", abs);
 
         // ==========================================
@@ -258,6 +303,9 @@ public class TrainingDataService {
         cardioList.add(new ExerciseData("タバタ式トレーニング", "全身", "自重", "20秒全力・10秒休憩を8セット繰り返す。究極の時短トレーニング。", "上級"));
         cardioList.add(new ExerciseData("バトルロープ", "全身", "器具", "太いロープを波打たせる。上半身の筋持久力と心肺機能を猛烈に鍛える。", "上級"));
         cardioList.add(new ExerciseData("スレッドプッシュ(ソリ押し)", "全身", "器具", "重りを載せたソリを押して走る。下半身のパワーと心肺機能を極限まで高める。", "上級"));
+        
+        // ★並び替え実行
+        cardioList.sort(exerciseComparator);
     }
 
     // --- Getter Methods ---
@@ -267,9 +315,9 @@ public class TrainingDataService {
         return exerciseMap;
     }
 
- // ドロップダウン表示用 (ExerciseDataのMapを返すように修正)
+    // ドロップダウン表示用
     public Map<String, List<ExerciseData>> getFreeWeightExercisesByPart() {
-        return exerciseMap;  // 文字列に変換せず、そのまま返す
+        return exerciseMap;
     }
 
     // MySet作成フォームなどで使用する簡易Map (名前だけ欲しい場合はこちらを利用)
