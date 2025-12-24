@@ -57,13 +57,12 @@ public class UserService {
         this.trainingRecordRepository = trainingRecordRepository;
     }
     
-    // --- ラッパーメソッド ---
+    // --- ユーザー登録関連 ---
     @Transactional
     public void registerUser(String username, String password, String email, String phoneNumber, LocalDate birthDate) {
         registerNewUser(username, email, phoneNumber, password, birthDate);
     }
     
-    // --- ユーザー登録処理 ---
     @Transactional
     public void registerNewUser(String username, String email, String phoneNumber, String rawPassword, LocalDate birthDate) {
         if (userRepository.findByUsername(username).isPresent()) {
@@ -80,7 +79,7 @@ public class UserService {
         newUser.setUsername(username);
         newUser.setEmail(email);
         newUser.setPhoneNumber(phoneNumber);
-        newUser.setBirthDate(birthDate); // 生年月日を保存
+        newUser.setBirthDate(birthDate); // 生年月日保存
         newUser.setPassword(passwordEncoder.encode(rawPassword));
         newUser.setLevel(1);
         newUser.setExperiencePoints(0);
@@ -90,25 +89,123 @@ public class UserService {
         sendRegistrationEmail(newUser.getEmail(), newUser.getUsername());
     }
 
-    // --- パスワードリセット関連 ---
+    // --- パスワードリセット関連 (認証コード方式) ---
 
-    // ★★★ エラーが出ていたメソッドを追加 ★★★
+    // 1. メールアドレスと生年月日を検証し、認証コードをメール送信する
     @Transactional
-    public boolean processForgotPasswordByEmailAndDob(String email, LocalDate birthDate) {
+    public boolean sendAuthCodeByEmail(String email, LocalDate birthDate) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         
-        // ユーザーが存在し、かつ生年月日が一致するか確認
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            // 生年月日が登録されており、かつ一致する場合
+            // 生年月日の一致確認
             if (user.getBirthDate() != null && user.getBirthDate().equals(birthDate)) {
-                // 一致した場合、既存の処理を利用してリセットメールを送信
-                return processForgotPassword(email);
+                // 6桁の認証コードを生成
+                String code = String.format("%06d", new Random().nextInt(999999));
+                
+                // ユーザーにコードと有効期限(10分)を保存
+                user.setResetPasswordToken(code);
+                user.setTokenExpiration(LocalDateTime.now().plusMinutes(10));
+                userRepository.save(user);
+                
+                // メール送信
+                sendAuthCodeEmail(user.getEmail(), code);
+                return true;
             }
         }
         return false;
     }
 
+    // 2. 認証コードを検証し、成功すればパスワード再設定用トークン(UUID)を発行する
+    @Transactional
+    public String verifyAuthCode(String email, String code) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            
+            // トークンが一致し、かつ有効期限内であるか
+            if (code != null && code.equals(user.getResetPasswordToken()) &&
+                user.getTokenExpiration() != null && 
+                user.getTokenExpiration().isAfter(LocalDateTime.now())) {
+                
+                // 認証成功：推測されにくい再設定用トークン(UUID)を発行して上書き保存
+                String resetToken = UUID.randomUUID().toString();
+                user.setResetPasswordToken(resetToken);
+                user.setTokenExpiration(LocalDateTime.now().plusMinutes(30)); // 再設定画面の有効期限は30分
+                userRepository.save(user);
+                
+                return resetToken; // コントローラーにトークンを返す
+            }
+        }
+        return null; // 失敗
+    }
+    
+    // 3. トークンを使ってパスワードを更新する
+    @Transactional
+    public boolean updatePasswordByToken(String token, String newPassword) {
+        Optional<User> optionalUser = userRepository.findByResetPasswordToken(token);
+        
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            
+            // 有効期限チェック
+            if (user.getTokenExpiration() != null && user.getTokenExpiration().isAfter(LocalDateTime.now())) {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                // トークンを無効化
+                user.setResetPasswordToken(null);
+                user.setTokenExpiration(null);
+                userRepository.save(user);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // --- メール送信ヘルパーメソッド ---
+
+    private void sendAuthCodeEmail(String toEmail, String code) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("noreply@fitworks.com");
+            message.setTo(toEmail);
+            message.setSubject("【FitWorks】パスワード再設定認証コード");
+            message.setText("パスワード再設定のための認証コードをお知らせします。\n\n" +
+                            "認証コード: " + code + "\n\n" +
+                            "このコードの有効期限は10分間です。");
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("メール送信失敗: " + e.getMessage());
+        }
+    }
+    
+    private void sendRegistrationEmail(String toEmail, String username) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("noreply@fitworks.com");
+            message.setTo(toEmail);
+            message.setSubject("【FitWorks】登録完了のお知らせ");
+            message.setText(username + "様、登録ありがとうございます。");
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("メール送信失敗: " + e.getMessage());
+        }
+    }
+
+    private void sendResetEmail(String toEmail, String resetLink) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("noreply@fitworks.com");
+            message.setTo(toEmail);
+            message.setSubject("【FitWorks】パスワード再設定");
+            message.setText("リンクをクリックして再設定してください:\n" + resetLink);
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.err.println("メール送信失敗: " + e.getMessage());
+        }
+    }
+
+    // --- 既存のパスワードリセット（旧方式・互換性のため維持） ---
     @Transactional
     public boolean processForgotPassword(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
@@ -153,6 +250,79 @@ public class UserService {
         user.setResetPasswordToken(null);
         user.setTokenExpiration(null);
         userRepository.save(user);
+    }
+
+    // --- 基本CRUD ---
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
+    }
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    // --- 設定変更関連 ---
+    public boolean changePassword(String username, String oldPassword, String newPassword) {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isEmpty()) return false;
+        User user = optionalUser.get();
+        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+    
+    @Transactional
+    public void updateUsername(String currentUsername, String newUsername) {
+        if (userRepository.findByUsername(newUsername).isPresent()) {
+            throw new IllegalArgumentException("そのユーザー名は既に使用されています。");
+        }
+
+        User user = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (user.getLastUsernameChangeDate() != null) {
+            long daysSinceLastChange = ChronoUnit.DAYS.between(user.getLastUsernameChangeDate(), LocalDateTime.now());
+            
+            if (daysSinceLastChange < USERNAME_CHANGE_COOLDOWN_DAYS) {
+                long daysRemaining = USERNAME_CHANGE_COOLDOWN_DAYS - daysSinceLastChange;
+                throw new IllegalArgumentException(
+                    "ユーザー名は一度変更すると " + USERNAME_CHANGE_COOLDOWN_DAYS + " 日間変更できません。" +
+                    "あと " + daysRemaining + " 日お待ちください。"
+                );
+            }
+        }
+
+        user.setUsername(newUsername);
+        user.setLastUsernameChangeDate(LocalDateTime.now());
+        userRepository.save(user);
+    }
+    
+    public void updateEmail(Long userId, String currentPassword, String newEmail) throws Exception {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exception("ユーザーが見つかりません"));
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new Exception("現在のパスワードが正しくありません");
+        }
+
+        if (userRepository.findByEmail(newEmail).isPresent()) {
+            throw new Exception("このメールアドレスは既に使用されています");
+        }
+
+        user.setEmail(newEmail);
+        userRepository.save(user);
+    }
+    
+    public void deleteUser(Long userId) {
+        userRepository.deleteById(userId);
     }
 
     // --- フレンド機能 ---
@@ -234,58 +404,7 @@ public class UserService {
         return rankingList;
     }
 
-    // --- その他ヘルパー ---
-    private void sendRegistrationEmail(String toEmail, String username) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("noreply@fitworks.com");
-            message.setTo(toEmail);
-            message.setSubject("【FitWorks】登録完了のお知らせ");
-            message.setText(username + "様、登録ありがとうございます。");
-            mailSender.send(message);
-        } catch (Exception e) {
-            System.err.println("メール送信失敗: " + e.getMessage());
-        }
-    }
-
-    private void sendResetEmail(String toEmail, String resetLink) {
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("noreply@fitworks.com");
-            message.setTo(toEmail);
-            message.setSubject("【FitWorks】パスワード再設定");
-            message.setText("リンクをクリックして再設定してください:\n" + resetLink);
-            mailSender.send(message);
-        } catch (Exception e) {
-            System.err.println("メール送信失敗: " + e.getMessage());
-        }
-    }
-
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElse(null);
-    }
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
-    }
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-    public void save(User user) {
-        userRepository.save(user);
-    }
-
-    public boolean changePassword(String username, String oldPassword, String newPassword) {
-        Optional<User> optionalUser = userRepository.findByUsername(username);
-        if (optionalUser.isEmpty()) return false;
-        User user = optionalUser.get();
-        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
-            user.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(user);
-            return true;
-        }
-        return false;
-    }
-    
+    // --- XP・ミッション・その他 ---
     public void addExperience(String username, int xp) {
          userRepository.findByUsername(username).ifPresent(user -> {
              user.addXp(xp); 
@@ -346,6 +465,7 @@ public class UserService {
         user.setIsRewardClaimedToday(false); 
         userRepository.save(user);
     }
+    
     public void addExp(User user, int xp) {
         user.addXp(xp);
         userRepository.save(user);
@@ -381,11 +501,13 @@ public class UserService {
             .map(User::getChipCount)
             .orElse(0);
     }
+    
     public int getUserLevel(String username) {
         return userRepository.findByUsername(username)
                 .map(User::getLevel)
                 .orElse(1); 
     }
+    
     public int getUserMaterialCount(String username, String materialType) {
         return userItemRepository.findByUser_UsernameAndItem_Type(username, materialType)
                 .map(UserItem::getCount)
@@ -414,10 +536,12 @@ public class UserService {
             userRepository.save(user);
         });
     }
+    
     public int getUserMaterialCount(String username, Long item_id) {
         List<UserItem> items = userItemRepository.findAllByUser_UsernameAndItemId(username, item_id);
         return items.size();
     }
+    
     public BackgroundUnlockDto checkNewBackgroundUnlocks(String username) {
         BackgroundUnlockDto dto = new BackgroundUnlockDto();
         
@@ -472,6 +596,7 @@ public class UserService {
         }
         return true;
     }
+    
     @Transactional(readOnly = true)
     public List<Long> getUnlockedCharacterIds(String username) {
         return userRepository.findByUsername(username)
@@ -482,51 +607,5 @@ public class UserService {
                 return new ArrayList<>(user.getUnlockedCharacters());
             })
             .orElseGet(ArrayList::new);
-    }
-
-    @Transactional
-    public void updateUsername(String currentUsername, String newUsername) {
-        if (userRepository.findByUsername(newUsername).isPresent()) {
-            throw new IllegalArgumentException("そのユーザー名は既に使用されています。");
-        }
-
-        User user = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        if (user.getLastUsernameChangeDate() != null) {
-            long daysSinceLastChange = ChronoUnit.DAYS.between(user.getLastUsernameChangeDate(), LocalDateTime.now());
-            
-            if (daysSinceLastChange < USERNAME_CHANGE_COOLDOWN_DAYS) {
-                long daysRemaining = USERNAME_CHANGE_COOLDOWN_DAYS - daysSinceLastChange;
-                throw new IllegalArgumentException(
-                    "ユーザー名は一度変更すると " + USERNAME_CHANGE_COOLDOWN_DAYS + " 日間変更できません。" +
-                    "あと " + daysRemaining + " 日お待ちください。"
-                );
-            }
-        }
-
-        user.setUsername(newUsername);
-        user.setLastUsernameChangeDate(LocalDateTime.now());
-        userRepository.save(user);
-    }
-    
-    public void updateEmail(Long userId, String currentPassword, String newEmail) throws Exception {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new Exception("ユーザーが見つかりません"));
-
-        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new Exception("現在のパスワードが正しくありません");
-        }
-
-        if (userRepository.findByEmail(newEmail).isPresent()) {
-            throw new Exception("このメールアドレスは既に使用されています");
-        }
-
-        user.setEmail(newEmail);
-        userRepository.save(user);
-    }
-    
-    public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
     }
 }

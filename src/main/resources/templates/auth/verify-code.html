@@ -4,28 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>認証コード入力 | FitWorks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <script th:src="@{/js/theme.js}"></script>
+    <style>
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+
+        .main-container {
+            max-width: 500px; width: 92%; margin: 40px auto; padding: 40px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
+        }
+
+        input[type="text"] {
+            width: 100%; padding: 12px 15px; border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.1); background: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem; letter-spacing: 0.2rem; text-align: center;
+            box-sizing: border-box; transition: all 0.3s ease;
+        }
+        input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3); background: white; }
+    </style>
 </head>
 <body>
+    <div class="interactive-bg"><canvas id="bg-canvas"></canvas></div>
+
 <div class="main-container">
-    <h1>認証コード確認</h1>
-    <p class="info-message">SMSに届いた6桁の数字を入力してください。</p>
+    <h1><i class="fa-solid fa-shield-halved header-icon"></i>認証コード入力</h1>
+    
+    <p th:if="${message}" class="success-message" style="color: green; font-weight: bold; text-align: center;" th:text="${message}"></p>
+    
+    <p class="info-message">
+        メールに送信された6桁の認証コードを入力してください。
+    </p>
     
     <p th:if="${error}" class="error-message" th:text="${error}"></p>
-
+    
     <form th:action="@{/verify-code}" method="post">
-        <input type="hidden" name="phoneNumber" th:value="${phoneNumber != null ? phoneNumber : param.phoneNumber}">
+        <input type="hidden" name="email" th:value="${email}">
         
         <div class="form-group">
-            <label for="code">認証コード</label>
-            <input type="text" id="code" name="code" required placeholder="123456" maxlength="6" style="text-align:center; letter-spacing: 5px; font-size: 1.5em;">
+            <label for="code">認証コード (6桁)</label>
+            <input type="text" id="code" name="code" required maxlength="6" pattern="\d{6}" placeholder="000000" autocomplete="off">
         </div>
         
         <div class="button-container">
-            <button type="submit" class="button primary">次へ</button>
+            <button type="submit" class="button primary">認証する</button>
         </div>
     </form>
+    <p class="login-link">
+        コードが届きませんか？<br>
+        <a th:href="@{/forgot-password}">認証コードを再送する</a>
+    </p>
 </div>
+
+<script>
+    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+    const mouse = { x: undefined, y: undefined };
+    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+    class Particle {
+        constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+    }
+    function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+    animate();
+</script>
 </body>
 </html>

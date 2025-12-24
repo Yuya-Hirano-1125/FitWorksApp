@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.BackgroundUnlockDto;
 import com.example.demo.entity.AuthProvider;
@@ -42,7 +43,6 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
-    // --- スタート画面(ルートパス) ---
     @GetMapping("/")
     public String index(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated() && 
@@ -62,7 +62,6 @@ public class AuthController {
         return "auth/register";
     }
 
-    // ★修正: 生年月日と電話番号も受け取るように変更
     @PostMapping("/register")
     public String registerUser(@RequestParam String username,
                                @RequestParam String password,
@@ -79,7 +78,6 @@ public class AuthController {
         }
     }
     
-    // --- ホーム画面表示 ---
     @GetMapping("/home")
     public String home(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
         if (userDetails == null) {
@@ -113,30 +111,92 @@ public class AuthController {
         return "misc/home";
     }
 
-    // --- パスワードリセット関連 (変更) ---
-    
+    // --- パスワードリセットフロー (修正) ---
+
+    // 1. パスワード忘れ画面表示
     @GetMapping("/forgot-password")
     public String forgotPassword() {
         return "auth/forgot-password";
     }
 
-    // ★追加: メールと生年月日でパスワードリセットを処理
+    // 2. 本人確認＆認証コード送信処理
     @PostMapping("/forgot-password")
     public String processForgotPassword(@RequestParam String email,
                                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthDate,
+                                        RedirectAttributes redirectAttributes,
                                         Model model) {
-        // メールと生年月日の一致を確認してリセットメール送信
-        boolean result = userService.processForgotPasswordByEmailAndDob(email, birthDate);
+        // メールと生年月日で認証し、コード送信
+        boolean result = userService.sendAuthCodeByEmail(email, birthDate);
         
         if (result) {
-            model.addAttribute("message", "パスワードリセットリンクをメールで送信しました。");
+            // 成功したらメールアドレスを次の画面に引き継いでリダイレクト
+            redirectAttributes.addFlashAttribute("email", email);
+            redirectAttributes.addFlashAttribute("message", "認証コードをメールで送信しました。");
+            return "redirect:/verify-code";
         } else {
             model.addAttribute("error", "メールアドレスまたは生年月日が一致しません。");
+            return "auth/forgot-password";
         }
-        return "auth/forgot-password";
     }
 
-    // --- SMS認証関連 (必要に応じて残すか削除) ---
+    // 3. 認証コード入力画面表示
+    @GetMapping("/verify-code")
+    public String verifyCodePage() {
+        return "auth/verify-code";
+    }
+
+    // 4. 認証コード検証処理
+    @PostMapping("/verify-code")
+    public String processVerifyCode(@RequestParam String email,
+                                    @RequestParam String code,
+                                    RedirectAttributes redirectAttributes,
+                                    Model model) {
+        // コード検証して再設定用トークンを取得
+        String resetToken = userService.verifyAuthCode(email, code);
+        
+        if (resetToken != null) {
+            // 検証成功: トークンを次の画面に渡す (URLパラメータ経由)
+            return "redirect:/reset-password?token=" + resetToken;
+        } else {
+            model.addAttribute("error", "認証コードが正しくないか、有効期限切れです。");
+            model.addAttribute("email", email); // メールアドレスを再表示用にセット
+            return "auth/verify-code";
+        }
+    }
+    
+    // 5. パスワード再設定画面表示
+    @GetMapping("/reset-password")
+    public String resetPasswordPage(@RequestParam(required = false) String token, Model model) {
+        if (token == null || token.isEmpty()) {
+            return "redirect:/forgot-password";
+        }
+        model.addAttribute("token", token);
+        return "auth/reset-password";
+    }
+    
+    // 6. パスワード更新処理
+    @PostMapping("/reset-password")
+    public String processResetPassword(@RequestParam String token,
+                                       @RequestParam String password,
+                                       @RequestParam String confirmPassword,
+                                       Model model) {
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("error", "パスワードが一致しません。");
+            model.addAttribute("token", token);
+            return "auth/reset-password";
+        }
+        
+        boolean success = userService.updatePasswordByToken(token, password);
+        
+        if (success) {
+            return "redirect:/login?resetSuccess";
+        } else {
+            model.addAttribute("error", "トークンが無効か、有効期限切れです。最初からやり直してください。");
+            return "auth/reset-password";
+        }
+    }
+
+    // --- SMS認証（API） ---
     @PostMapping("/api/auth/send-otp")
     @ResponseBody
     public ResponseEntity<?> sendOtp(@RequestParam String phoneNumber) {
