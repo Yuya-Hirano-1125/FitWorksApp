@@ -51,7 +51,6 @@
         /* ヘッダー修正 */
         .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #4CAF50; padding-bottom: 15px; gap: 15px; }
         .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
-        /* ホームボタンはトレーニング記録(青)と統一 */
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -59,6 +58,184 @@
             transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+
+        /* === レイアウト改善用スタイル === */
+        
+        /* モーダルの幅を広げる（PC用） */
+        .meal-log-modal-wide {
+            max-width: 900px !important; /* デフォルトの450pxを上書き */
+            width: 92% !important;
+            transition: max-width 0.3s;
+        }
+        
+        /* グリッドレイアウト */
+        .modal-layout-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 写真セクション */
+        .photo-section {
+            background-color: #f1f8e9;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px dashed #4CAF50;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .photo-upload-row {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+
+        /* 入力フォームセクション */
+        .form-section {
+            flex: 1;
+        }
+        
+        /* コンパクトな行配置 */
+        .form-row-compact {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .form-row-compact .form-group {
+            flex: 1;
+            margin-bottom: 0; /* reset */
+        }
+        .form-row-compact label {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 2px;
+            display: block;
+        }
+        .form-row-compact input, .form-row-compact select {
+            padding: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* PFC入力欄 */
+        .pfc-container {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+        }
+        .pfc-item {
+            flex: 1;
+            text-align: center;
+        }
+        .pfc-item label {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 2px;
+            display: block;
+        }
+        .pfc-item input {
+            text-align: center;
+            padding: 6px;
+            font-size: 0.9rem;
+        }
+        .p-input { border-color: #ffb74d; }
+        .f-input { border-color: #81c784; }
+        .c-input { border-color: #64b5f6; }
+
+        /* PC以上で2列表示 */
+        @media (min-width: 768px) {
+            .modal-layout-grid {
+                display: grid;
+                grid-template-columns: 1fr 1.3fr; /* 左:右 の比率 */
+                gap: 30px;
+                align-items: stretch;
+            }
+            .photo-section {
+                height: auto;
+            }
+            .modal-content {
+                padding: 40px;
+            }
+        }
+        
+        /* 閉じるボタン調整 */
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 32px;
+            z-index: 10;
+        }
+        
+        .ai-comment-box {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #e65100;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* ★ NEW: 記録保存ボタンの強化デザイン */
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-top: 25px;
+            border: none;
+            border-radius: 50px;
+            /* 鮮やかなピンク～オレンジのグラデーション */
+            background: linear-gradient(45deg, #ff69b4, #ff8e53); 
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(255, 105, 180, 0.3);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        /* ホバー時の浮き上がり */
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255, 105, 180, 0.4);
+            filter: brightness(1.05);
+        }
+
+        /* クリック時の押し込み */
+        .btn-submit:active {
+            transform: translateY(1px);
+            box-shadow: 0 5px 10px rgba(255, 105, 180, 0.3);
+        }
+
+        /* キラッと光るエフェクト */
+        .btn-submit::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-submit:hover::after {
+            left: 100%;
+        }
     </style>
 </head>
 <body class="training-log-page">
@@ -129,45 +306,86 @@
 </div>
 
 <div id="logModal" class="modal" th:classappend="${mealLogForm.date != null} ? 'is-active' : ''">
-    <div class="modal-content">
+    <div class="modal-content meal-log-modal-wide">
         <span class="close-button" onclick="closeLogModal()">&times;</span>
         <h2 id="modalDateTitle" class="modal-title" th:text="${mealLogForm.date}"></h2>
         <div id="logViewArea"></div>
-        <div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #4CAF50;">
-            <h3 style="font-size: 1rem; margin-top: 0; color: #2e7d32;"><i class="fa-solid fa-camera"></i> 写真から自動入力</h3>
-            <form th:action="@{/log/meal/analyze}" method="post" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center;" onsubmit="showLoading(this)">
-                <input type="file" name="mealImage" accept="image/*" class="form-control" style="font-size: 0.9em; padding: 8px;" required>
-                <button type="submit" class="button" style="background-color: #2e7d32; color: white; border: none; font-size: 0.9em; padding: 10px 15px; white-space: nowrap;">解析</button>
-            </form>
-            <p style="font-size: 0.8em; color: #666; margin: 5px 0 0 0;">※写真を選択して「解析」を押すと、内容・カロリー等が自動入力されます</p>
-            <div th:if="${aiComment}" style="margin-top: 10px; font-weight: bold; color: #e65100;"><i class="fa-solid fa-comment-dots"></i> <span th:text="${aiComment}"></span></div>
-        </div>
-        <p class="modal-instruction">食事内容を記録：</p>
-        <div class="meal-form-container">
-            <form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post" onsubmit="showLoading(this)">
-                <div class="form-group"><label for="dateInput"><i class="fa-regular fa-calendar"></i> 日付</label><input type="date" id="dateInput" th:field="*{date}" class="form-control" required></div>
-                <div class="form-row">
-                    <div class="form-group half"><label for="time"><i class="fa-regular fa-clock"></i> 時刻</label><input type="time" id="time" th:field="*{time}" class="form-control" required></div>
-                    <div class="form-group half"><label for="mealType"><i class="fa-solid fa-utensils"></i> 種類</label><select id="mealType" th:field="*{mealType}" class="form-control" required><option value="朝食">朝食</option><option value="昼食">昼食</option><option value="夕食">夕食</option><option value="間食">間食</option></select></div>
-                </div>
-                <div class="form-group">
-                    <label for="content">食事内容</label><textarea id="content" th:field="*{content}" class="form-control" rows="2" placeholder="例: ご飯、焼き魚、味噌汁" required></textarea>
-                    <button type="submit" th:formaction="@{/log/meal/analyze-text}" formnovalidate class="button" style="background-color: #3498db; color: white; width: 100%; margin-top: 10px; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold;"><i class="fa-solid fa-robot"></i> 内容から栄養計算＆トレーニング提案</button>
-                </div>
-                <div class="form-group"><label for="calories">🔥 総カロリー (kcal)</label><input type="number" id="calories" th:field="*{calories}" class="form-control" placeholder="0" min="0" max="5000" required></div>
-                <div class="form-group"><label>PFCバランス (g) <span style="font-size:0.8em; font-weight:normal; color:#888;">※任意</span></label>
-                    <div class="macro-section">
-                        <div class="macro-row">
-                            <div class="macro-item"><label for="protein">P</label><input type="number" id="protein" th:field="*{protein}" class="form-control macro-input p-input" step="0.1" min="0" max="500" placeholder="0.0"></div>
-                            <div class="macro-item"><label for="fat">F</label><input type="number" id="fat" th:field="*{fat}" class="form-control macro-input f-input" step="0.1" min="0" max="500" placeholder="0.0"></div>
-                            <div class="macro-item"><label for="carbohydrate">C</label><input type="number" id="carbohydrate" th:field="*{carbohydrate}" class="form-control macro-input c-input" step="0.1" min="0" max="500" placeholder="0.0"></div>
+        
+        <div class="modal-layout-grid">
+            
+            <div class="photo-section">
+                <h3 style="font-size: 1rem; margin-top: 0; color: #2e7d32; margin-bottom:10px;"><i class="fa-solid fa-camera"></i> 写真から自動入力</h3>
+                <form th:action="@{/log/meal/analyze}" method="post" enctype="multipart/form-data" class="photo-upload-row" onsubmit="showLoading(this)">
+                    <input type="file" name="mealImage" accept="image/*" class="form-control" style="font-size: 0.9em; padding: 6px; width: auto; flex:1;" required>
+                    <button type="submit" class="button" style="background-color: #2e7d32; color: white; border: none; font-size: 0.9em; padding: 8px 15px; white-space: nowrap; border-radius: 6px;">解析</button>
+                </form>
+                <p style="font-size: 0.8em; color: #666; margin: 5px 0;">※写真を解析して内容・栄養を自動入力します</p>
+                <div th:if="${aiComment}" class="ai-comment-box"><i class="fa-solid fa-comment-dots"></i> <span th:text="${aiComment}"></span></div>
+            </div>
+
+            <div class="form-section">
+                <div class="meal-form-container">
+                    <form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post" onsubmit="showLoading(this)">
+                        
+                        <div class="form-row-compact">
+                             <div class="form-group" style="flex: 0.8;">
+                                <label><i class="fa-regular fa-calendar"></i> 日付</label>
+                                <input type="date" id="dateInput" th:field="*{date}" class="form-control" required style="padding: 6px;">
+                             </div>
+                             <div class="form-group">
+                                <label><i class="fa-regular fa-clock"></i> 時刻</label>
+                                <input type="time" id="time" th:field="*{time}" class="form-control" required style="padding: 6px;">
+                             </div>
+                             <div class="form-group">
+                                <label><i class="fa-solid fa-utensils"></i> 種類</label>
+                                <select id="mealType" th:field="*{mealType}" class="form-control" required style="padding: 6px;">
+                                    <option value="朝食">朝食</option>
+                                    <option value="昼食">昼食</option>
+                                    <option value="夕食">夕食</option>
+                                    <option value="間食">間食</option>
+                                </select>
+                             </div>
                         </div>
-                    </div>
+
+                        <div class="form-group">
+                            <label for="content" style="font-size:0.9rem; font-weight:bold;">食事内容</label>
+                            <textarea id="content" th:field="*{content}" class="form-control" rows="3" placeholder="例: ご飯、焼き魚、味噌汁" required></textarea>
+                            <button type="submit" th:formaction="@{/log/meal/analyze-text}" formnovalidate class="button" style="background-color: #3498db; color: white; width: 100%; margin-top: 5px; border: none; padding: 8px; border-radius: 8px; cursor: pointer; font-size: 0.9em; font-weight: bold;">
+                                <i class="fa-solid fa-robot"></i> 内容から栄養計算＆トレーニング提案
+                            </button>
+                        </div>
+                        
+                        <div style="background: #fafafa; padding: 10px; border-radius: 8px; border: 1px solid #eee;">
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <label for="calories" style="font-weight:bold; color: #e67e22;"><i class="fa-solid fa-fire"></i> 総カロリー (kcal)</label>
+                                <input type="number" id="calories" th:field="*{calories}" class="form-control" placeholder="0" min="0" max="5000" required style="font-size: 1.1em; font-weight: bold; text-align: right;">
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label style="font-size:0.85em;">PFCバランス (g) <span style="font-size:0.8em; font-weight:normal; color:#888;">※任意</span></label>
+                                <div class="pfc-container">
+                                    <div class="pfc-item">
+                                        <label for="protein">P タンパク質</label>
+                                        <input type="number" id="protein" th:field="*{protein}" class="form-control p-input" step="0.1" min="0" max="500" placeholder="0.0">
+                                    </div>
+                                    <div class="pfc-item">
+                                        <label for="fat">F 脂質</label>
+                                        <input type="number" id="fat" th:field="*{fat}" class="form-control f-input" step="0.1" min="0" max="500" placeholder="0.0">
+                                    </div>
+                                    <div class="pfc-item">
+                                        <label for="carbohydrate">C 炭水化物</label>
+                                        <input type="number" id="carbohydrate" th:field="*{carbohydrate}" class="form-control c-input" step="0.1" min="0" max="500" placeholder="0.0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit"><i class="fa-solid fa-check"></i> 記録を保存</button>
+                    </form>
                 </div>
-                <button type="submit" class="btn-submit"><i class="fa-solid fa-check"></i> 記録を保存</button>
-            </form>
+                <a th:href="@{/log/meal/all}" class="button secondary view-all-button" style="margin-top: 15px; font-size: 0.85em; padding: 8px;">全記録を見る</a>
+            </div>
         </div>
-        <a th:href="@{/log/meal/all}" class="button secondary view-all-button" style="margin-top: 20px;">全記録を見る</a>
     </div>
 </div>
 
