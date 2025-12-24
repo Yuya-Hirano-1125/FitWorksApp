@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.DailyChartData;
@@ -158,11 +160,30 @@ public class TrainingController {
     }
 
     @GetMapping("/training")
-    public String showTrainingOptions(Authentication authentication, Model model) {
+    public String showTrainingOptions(
+            Authentication authentication,
+            @RequestParam(value = "preselectType", required = false) String preselectType,
+            @RequestParam(value = "preselectExercise", required = false) String preselectExercise,
+            Model model) {
+        
         if (getCurrentUser(authentication) == null) return "redirect:/login";
+        
         model.addAttribute("freeWeightParts", trainingDataService.getMuscleParts());
         model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercisesByPart());
         model.addAttribute("cardioExercises", trainingDataService.getCardioExercises());
+
+        // ★追加: 自動選択用の情報をモデルにセット
+        if (preselectType != null && preselectExercise != null) {
+            model.addAttribute("preselectType", preselectType);
+            model.addAttribute("preselectExercise", preselectExercise);
+
+            // フリーウェイトの場合、種目名から部位を特定して渡す
+            if ("free-weight".equals(preselectType)) {
+                String part = trainingDataService.findPartByExerciseName(preselectExercise);
+                model.addAttribute("preselectPart", part);
+            }
+        }
+
         return "training/training";
     }
 
@@ -275,8 +296,34 @@ public class TrainingController {
     public String showBookmarkList(Authentication authentication, Model model) {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
+        
         List<ExerciseBookmark> bookmarks = exerciseBookmarkRepository.findByUserOrderByIdDesc(currentUser);
-        model.addAttribute("bookmarks", bookmarks);
+        
+        List<Map<String, Object>> displayList = new ArrayList<>();
+        
+        for (ExerciseBookmark bm : bookmarks) {
+            // 名前で検索
+            ExerciseData data = trainingDataService.getExerciseDataByName(bm.getExerciseName());
+            
+            // ★修正: データが見つからない場合（null）でも、仮のデータを作って表示させる
+            if (data == null) {
+                // ExerciseData(name, targetMuscle, equipment, description, difficulty)
+                data = new ExerciseData(
+                    bm.getExerciseName(), // 名前はブックマークから取得
+                    "不明",               // 部位
+                    "不明",               // 器具
+                    "詳細データが見つかりませんでした。", // 説明
+                    "不明"                // 難易度
+                );
+            }
+
+            Map<String, Object> item = new java.util.HashMap<>();
+            item.put("bookmark", bm);
+            item.put("data", data);
+            displayList.add(item);
+        }
+        
+        model.addAttribute("bookmarkList", displayList);
         return "training/bookmark-list";
     }
 
@@ -299,6 +346,52 @@ public class TrainingController {
             redirectAttributes.addFlashAttribute("successMessage", "「" + exerciseName + "」をブックマークしました！");
         }
         return "redirect:" + redirectUrl;
+    }
+    
+    /**
+     * Ajax用: ブックマークの切り替え処理
+     * 画面遷移せず、JSONデータを返します。
+     */
+    @PostMapping("/training/api/bookmark/toggle")
+    @ResponseBody
+    public Map<String, Object> toggleBookmarkApi(
+            @RequestParam("exerciseName") String exerciseName,
+            @RequestParam("type") String type,
+            Authentication authentication) {
+
+        User currentUser = getCurrentUser(authentication);
+        Map<String, Object> response = new HashMap<>();
+
+        if (currentUser == null) {
+            response.put("success", false);
+            response.put("message", "ログインしてください。");
+            return response;
+        }
+
+        // ★修正箇所: .orElse(null) を追加して Optional を解除
+        ExerciseBookmark existing = exerciseBookmarkRepository.findByUserAndExerciseName(currentUser, exerciseName).orElse(null);
+        
+        boolean isBookmarked;
+
+        if (existing != null) {
+            // 既に登録済みなら削除（解除）
+            exerciseBookmarkRepository.delete(existing);
+            isBookmarked = false;
+            response.put("message", exerciseName + " のブックマークを解除しました。");
+        } else {
+            // 未登録なら新規保存
+            ExerciseBookmark newBookmark = new ExerciseBookmark();
+            newBookmark.setUser(currentUser);
+            newBookmark.setExerciseName(exerciseName);
+            newBookmark.setType(type);
+            exerciseBookmarkRepository.save(newBookmark);
+            isBookmarked = true;
+            response.put("message", exerciseName + " をブックマークしました！");
+        }
+
+        response.put("success", true);
+        response.put("isBookmarked", isBookmarked);
+        return response;
     }
 
     @GetMapping("/training/mysets")

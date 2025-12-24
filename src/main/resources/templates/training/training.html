@@ -273,34 +273,71 @@
 		        else if (location === 'home') { checkboxes.forEach(cb => { if (cb.value === 'bodyweight' || cb.value === 'dumbbell') { cb.checked = true; } else { cb.checked = false; } }); }
 		    }
 			document.addEventListener('DOMContentLoaded', function() {
-			    const musclePartSelect = document.getElementById('musclePart');
-			    const exerciseNameSelect = document.getElementById('exerciseName');
-			    const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
+						    const musclePartSelect = document.getElementById('musclePart');
+						    const exerciseNameSelect = document.getElementById('exerciseName');
+						    const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
+						    
+						    // ★追加: サーバーから渡された自動選択用の値を取得
+						    const preselectType = /*[[${preselectType}]]*/ null;
+						    const preselectPart = /*[[${preselectPart}]]*/ null;
+						    const preselectExercise = /*[[${preselectExercise}]]*/ null;
 
-			    if (musclePartSelect && exerciseNameSelect) {
-			        musclePartSelect.addEventListener('change', function() {
-			            const selectedPart = this.value;
-			            exerciseNameSelect.innerHTML = '<option value="">種目を選択してください</option>';
-			            exerciseNameSelect.disabled = true;
-			            startFreeWeightSessionButton.disabled = true;
+						    if (musclePartSelect && exerciseNameSelect) {
+						        musclePartSelect.addEventListener('change', function() {
+						            const selectedPart = this.value;
+						            exerciseNameSelect.innerHTML = '<option value="">種目を選択してください</option>';
+						            exerciseNameSelect.disabled = true;
+						            startFreeWeightSessionButton.disabled = true;
 
-			            if (selectedPart && freeWeightExercisesByPart[selectedPart]) {
-			                const exercises = freeWeightExercisesByPart[selectedPart];
-			                exercises.forEach(exercise => {
-			                    const option = document.createElement('option');
-			                    option.value = exercise.name || exercise; // サーバーに送る値は純粋な種目名
-			                    option.textContent = exercise.fullName2 || exercise.name || exercise; // 表示は「ベンチプレス　【中級】」
-			                    exerciseNameSelect.appendChild(option);
-			                });
-			                exerciseNameSelect.disabled = false; // 部位を選んだら有効化
-			            }
-			        });
+						            if (selectedPart && freeWeightExercisesByPart[selectedPart]) {
+						                const exercises = freeWeightExercisesByPart[selectedPart];
+						                exercises.forEach(exercise => {
+						                    const option = document.createElement('option');
+						                    option.value = exercise.name || exercise; 
+						                    option.textContent = exercise.fullName2 || exercise.name || exercise; 
+						                    exerciseNameSelect.appendChild(option);
+						                });
+						                exerciseNameSelect.disabled = false; 
+						            }
+						        });
 
-			        exerciseNameSelect.addEventListener('change', function() {
-			            startFreeWeightSessionButton.disabled = !this.value;
-			        });
-			    }
-			});
+						        exerciseNameSelect.addEventListener('change', function() {
+						            startFreeWeightSessionButton.disabled = !this.value;
+						        });
+						    }
+						    
+						    // ★追加: 自動選択ロジックの実行
+						    if (preselectType && preselectExercise) {
+						        // ページ内リンクのように該当箇所へスムーズスクロール
+						        
+						        if (preselectType === 'free-weight' && preselectPart) {
+						            // フリーウェイトの場合
+						            const fwSection = document.getElementById('free-weight-option');
+						            if(fwSection) fwSection.scrollIntoView({behavior: 'smooth'});
+
+						            // 1. 部位を選択
+						            if (musclePartSelect) {
+						                musclePartSelect.value = preselectPart;
+						                // 2. changeイベントを手動発火させて種目リストを更新
+						                musclePartSelect.dispatchEvent(new Event('change'));
+						                
+						                // 3. 種目を選択
+						                if (exerciseNameSelect) {
+						                    exerciseNameSelect.value = preselectExercise;
+						                    // 4. ボタン有効化のためにchangeイベント発火
+						                    exerciseNameSelect.dispatchEvent(new Event('change'));
+						                }
+						            }
+						        } else if (preselectType === 'cardio') {
+						            // 有酸素の場合
+						            const cardioSelect = document.getElementById('cardioExerciseName');
+						            if (cardioSelect) {
+						                cardioSelect.scrollIntoView({behavior: 'smooth'});
+						                cardioSelect.value = preselectExercise;
+						            }
+						        }
+						    }
+						});
 		    /*]]>*/
 		</script>
 
