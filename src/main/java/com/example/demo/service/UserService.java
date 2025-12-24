@@ -25,8 +25,9 @@ import com.example.demo.dto.MissionStatusDto;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserItem;
 import com.example.demo.repository.TrainingRecordRepository;
-import com.example.demo.repository.UserItemRepository; // ★追加
+import com.example.demo.repository.UserItemRepository;
 import com.example.demo.repository.UserRepository;
+
 @Service
 public class UserService {
     
@@ -45,9 +46,6 @@ public class UserService {
     @Autowired
     private SmsService smsService;
     
-    
-    
- // ★設定: 変更禁止期間（日数）
     private static final int USERNAME_CHANGE_COOLDOWN_DAYS = 7;
 
     @Value("${app.base-url}")
@@ -59,20 +57,15 @@ public class UserService {
         this.trainingRecordRepository = trainingRecordRepository;
     }
     
-    // --- ★修正: 互換性のためのラッパーメソッド ---
-    // AuthControllerがこのシグネチャ(引数3つ)で呼び出しているため追加
+    // --- ラッパーメソッド ---
     @Transactional
-    public void registerUser(String username, String password, String email) {
-        // 電話番号はnullとして処理
-        registerNewUser(username, email, null, password);
+    public void registerUser(String username, String password, String email, String phoneNumber, LocalDate birthDate) {
+        registerNewUser(username, email, phoneNumber, password, birthDate);
     }
     
-    
-    
-
-    // --- ユーザー登録処理 (既存) ---
+    // --- ユーザー登録処理 ---
     @Transactional
-    public void registerNewUser(String username, String email, String phoneNumber, String rawPassword) {
+    public void registerNewUser(String username, String email, String phoneNumber, String rawPassword, LocalDate birthDate) {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("そのユーザー名は既に使用されています。");
         }
@@ -87,6 +80,7 @@ public class UserService {
         newUser.setUsername(username);
         newUser.setEmail(email);
         newUser.setPhoneNumber(phoneNumber);
+        newUser.setBirthDate(birthDate); // 生年月日を保存
         newUser.setPassword(passwordEncoder.encode(rawPassword));
         newUser.setLevel(1);
         newUser.setExperiencePoints(0);
@@ -97,22 +91,22 @@ public class UserService {
     }
 
     // --- パスワードリセット関連 ---
+
+    // ★★★ エラーが出ていたメソッドを追加 ★★★
     @Transactional
-    public boolean processForgotPasswordBySms(String phoneNumber) {
-        Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
+    public boolean processForgotPasswordByEmailAndDob(String email, LocalDate birthDate) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        
+        // ユーザーが存在し、かつ生年月日が一致するか確認
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            String code = String.format("%06d", new Random().nextInt(999999));
-            user.setResetPasswordToken(code);
-            user.setTokenExpiration(LocalDateTime.now().plusMinutes(10));
-            userRepository.save(user);
-            
-            // ★重要: ここで SmsService の sendVerificationCode を呼んでいます
-            smsService.sendVerificationCode(user.getPhoneNumber(), code);
-            return true;
-        } else {
-            return false;
+            // 生年月日が登録されており、かつ一致する場合
+            if (user.getBirthDate() != null && user.getBirthDate().equals(birthDate)) {
+                // 一致した場合、既存の処理を利用してリセットメールを送信
+                return processForgotPassword(email);
+            }
         }
+        return false;
     }
 
     @Transactional
@@ -129,6 +123,22 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    @Transactional
+    public boolean processForgotPasswordBySms(String phoneNumber) {
+        Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            String code = String.format("%06d", new Random().nextInt(999999));
+            user.setResetPasswordToken(code);
+            user.setTokenExpiration(LocalDateTime.now().plusMinutes(10));
+            userRepository.save(user);
+            smsService.sendVerificationCode(user.getPhoneNumber(), code);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public User getByResetPasswordToken(String token) {
@@ -150,7 +160,6 @@ public class UserService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return new ArrayList<>();
         }
-        // ★ここでのエラーはUserRepositoryの修正で直ります
         List<User> users = userRepository.findByUsernameContainingIgnoreCase(keyword);
         return users.stream()
                 .filter(u -> !u.getUsername().equals(currentUsername))
@@ -341,39 +350,17 @@ public class UserService {
         user.addXp(xp);
         userRepository.save(user);
     }
-    // UserService.java に追加するメソッド
 
-    /**
-     * ログイン中のユーザーオブジェクトを取得する。
-     * * 【重要】
-     * 実際の本番環境では、Spring Securityなどを使用して、
-     * 現在認証されているユーザーのIDやユーザー名を取得するロジックを
-     * ここに実装する必要があります。
-     * * @return ログイン中のUserオブジェクト。認証されていない場合はnullを返す。
-     */
     public User getLoggedInUser() {
-        // --- ★ここにSpring Security連携ロジックを実装します★ ---
-        
-        // 1. Spring Securityのコンテキストから認証情報を取得
-        //    例: String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        // 2. 認証情報（ユーザー名など）を使って、UserRepositoryからUserエンティティを検索
-
-        // --- デバッグ/仮実装として、ここでは一時的に固定のユーザー名で検索します ---
-        // 実際の認証システムに接続後、この行は削除または修正してください。
-        String loggedInUsername = "test"; // 仮のユーザー名
-
-        // findByUsername メソッドはすでに存在するのでそれを利用します。
+        String loggedInUsername = "test"; 
         return userRepository.findByUsername(loggedInUsername).orElse(null);
-        // ----------------------------------------------------------------------
     }
     
-    // --- チップ関連処理 ---
     @Transactional
     public void addChips(String username, int chips) {
         userRepository.findByUsername(username).ifPresent(user -> {
-            user.addChips(chips); // Userエンティティのメソッドで加算
-            userRepository.save(user); // DBに保存
+            user.addChips(chips);
+            userRepository.save(user);
         });
     }
 
@@ -382,9 +369,9 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) return false;
         User user = optionalUser.get();
-        boolean success = user.useChips(cost); // 消費処理
+        boolean success = user.useChips(cost); 
         if (success) {
-            userRepository.save(user); // 消費後の残高を保存
+            userRepository.save(user); 
         }
         return success;
     }
@@ -397,44 +384,38 @@ public class UserService {
     public int getUserLevel(String username) {
         return userRepository.findByUsername(username)
                 .map(User::getLevel)
-                .orElse(1); // ユーザーが見つからない場合はLv.1
+                .orElse(1); 
     }
     public int getUserMaterialCount(String username, String materialType) {
         return userItemRepository.findByUser_UsernameAndItem_Type(username, materialType)
                 .map(UserItem::getCount)
                 .orElse(0);
     }
- // ===== 新規追加: 素材を消費する処理 =====
+
     @Transactional
     public boolean consumeUserMaterial(String username, String materialType, int cost) {
         Optional<UserItem> optItem = userItemRepository.findByUser_UsernameAndItem_Type(username, materialType);
         if (optItem.isEmpty()) {
-            return false; // 素材が存在しない
+            return false; 
         }
         UserItem item = optItem.get();
         if (item.getCount() < cost) {
-            return false; // 足りない
+            return false; 
         }
-        item.setCount(item.getCount() - cost); // 減算
+        item.setCount(item.getCount() - cost); 
         userItemRepository.save(item);
         return true;
     }
 
-    // ===== 新規追加: キャラを解放済みにする処理 =====
     @Transactional
     public void unlockCharacterForUser(String username, Long characterId) {
         userRepository.findByUsername(username).ifPresent(user -> {
-            user.addUnlockedCharacter(characterId); // Userエンティティにこのメソッドを用意
+            user.addUnlockedCharacter(characterId); 
             userRepository.save(user);
         });
     }
     public int getUserMaterialCount(String username, Long item_id) {
-        System.out.println("DEBUG: getUserMaterialCount called - username=" + username + ", item_id=" + item_id);
-        
         List<UserItem> items = userItemRepository.findAllByUser_UsernameAndItemId(username, item_id);
-        
-        System.out.println("DEBUG: Found " + items.size() + " items for username=" + username + ", item_id=" + item_id);
-        
         return items.size();
     }
     public BackgroundUnlockDto checkNewBackgroundUnlocks(String username) {
@@ -448,118 +429,63 @@ public class UserService {
         int currentLevel = user.getLevel();
         int lastCheckedLevel = user.getLastBackgroundCheckLevel();
         
-     // 背景解放レベルの定義
-        // ※ Backgrounds.htmlのdata-unlock-levelと一致させること
         int[][] backgroundLevels = {
-            {40, 0},  // 水の世界: level 40
-            {70, 1},  // 木の世界: level 70
-            {100, 2}, // 光の世界: level 100
-            {130, 3}  // 闇の世界: level 130
+            {40, 0}, 
+            {70, 1}, 
+            {100, 2}, 
+            {130, 3} 
         };
         
         String[] backgroundIds = {"water", "grass", "light", "dark"};
         String[] backgroundNames = {"水の世界", "木の世界", "光の世界", "闇の世界"};
         
-        // 最後にチェックしたレベルから現在のレベルまでの間に解放された背景を検出
         for (int i = 0; i < backgroundLevels.length; i++) {
             int requiredLevel = backgroundLevels[i][0];
             int index = backgroundLevels[i][1];
             
             if (requiredLevel > lastCheckedLevel && requiredLevel <= currentLevel) {
-                // 新しく解放された背景
                 dto.addUnlockedBackground(
                     backgroundIds[index], 
                     backgroundNames[index], 
                     requiredLevel
                 );
-                
-                System.out.println("==========================================");
-                System.out.println("DEBUG: 背景解放検出");
-                System.out.println("==========================================");
-                System.out.println("背景名: " + backgroundNames[index]);
-                System.out.println("必要レベル: " + requiredLevel);
-                System.out.println("現在レベル: " + currentLevel);
-                System.out.println("==========================================");
             }
         }
         
-        // チェック済みレベルを更新
         user.setLastBackgroundCheckLevel(currentLevel);
         userRepository.save(user);
         
         return dto;
     }
- // ===== 新規追加: 素材を消費する処理 =====
-    @Transactional
-    public boolean consumeUserMaterial1(String username, String materialType, int cost) {
-        Optional<UserItem> optItem = userItemRepository.findByUser_UsernameAndItem_Type(username, materialType);
-        if (optItem.isEmpty()) {
-            return false; // 素材が存在しない
-        }
-        UserItem item = optItem.get();
-        if (item.getCount() < cost) {
-            return false; // 足りない
-        }
-        item.setCount(item.getCount() - cost); // 減算
-        userItemRepository.save(item);
-        return true;
-    }
 
-    // ===== 新規追加: キャラを解放済みにする処理 =====
-    @Transactional
-    public void unlockCharacterForUser1(String username, Long characterId) {
-        userRepository.findByUsername(username).ifPresent(user -> {
-            user.addUnlockedCharacter(characterId); // ★Userエンティティにこのメソッドを用意
-            userRepository.save(user);
-        });
-    }
     @Transactional
     public boolean consumeUserMaterialByItemId(String username, Long itemId, int cost) {
-        // ユーザーが持っている該当アイテムのレコードを全て取得
         List<UserItem> items = userItemRepository.findAllByUser_UsernameAndItemId(username, itemId);
-        
-        int totalCount = items.size(); // 1レコード=1個なのでサイズが所持数
-        
-        System.out.println("DEBUG: consumeUserMaterialByItemId - username=" + username + ", itemId=" + itemId + ", totalCount=" + totalCount + ", cost=" + cost);
+        int totalCount = items.size(); 
         
         if (totalCount < cost) {
-            System.out.println("DEBUG: 素材不足 - 必要: " + cost + ", 所持: " + totalCount);
-            return false; // 足りない
+            return false;
         }
         
-        // 必要数だけレコードを削除
         for (int i = 0; i < cost && i < items.size(); i++) {
             userItemRepository.delete(items.get(i));
-            System.out.println("DEBUG: 素材削除 - id=" + items.get(i).getId());
         }
-        
-        System.out.println("DEBUG: 素材消費成功 - " + cost + "個削除しました");
         return true;
     }
     @Transactional(readOnly = true)
     public List<Long> getUnlockedCharacterIds(String username) {
         return userRepository.findByUsername(username)
             .map(user -> {
-                // EAGERフェッチなので即座に取得可能
-                // または、トランザクション内でLazyロードも可能
                 if (user.getUnlockedCharacters() == null) {
-                    System.out.println("DEBUG: unlockedCharacters is null for user: " + username);
                     return new ArrayList<Long>();
                 }
-                System.out.println("DEBUG: getUnlockedCharacterIds - user: " + username + ", count: " + user.getUnlockedCharacters().size());
                 return new ArrayList<>(user.getUnlockedCharacters());
             })
-            .orElseGet(() -> {
-                System.out.println("DEBUG: User not found: " + username);
-                return new ArrayList<>();
-            });
+            .orElseGet(ArrayList::new);
     }
-    /**
-     * ユーザー名を更新する（クールダウン期間チェック付き）
-     */
+
     @Transactional
     public void updateUsername(String currentUsername, String newUsername) {
-        // 1. 新しい名前が既に使われていないかチェック
         if (userRepository.findByUsername(newUsername).isPresent()) {
             throw new IllegalArgumentException("そのユーザー名は既に使用されています。");
         }
@@ -567,7 +493,6 @@ public class UserService {
         User user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // 2. ★クールダウン期間のチェック
         if (user.getLastUsernameChangeDate() != null) {
             long daysSinceLastChange = ChronoUnit.DAYS.between(user.getLastUsernameChangeDate(), LocalDateTime.now());
             
@@ -580,40 +505,28 @@ public class UserService {
             }
         }
 
-        // 3. 更新処理
         user.setUsername(newUsername);
-        user.setLastUsernameChangeDate(LocalDateTime.now()); // ★現在時刻を記録
+        user.setLastUsernameChangeDate(LocalDateTime.now());
         userRepository.save(user);
     }
     
     public void updateEmail(Long userId, String currentPassword, String newEmail) throws Exception {
-        // 1. ユーザーを取得
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new Exception("ユーザーが見つかりません"));
 
-        // 2. 現在のパスワードが正しいかチェック
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             throw new Exception("現在のパスワードが正しくありません");
         }
 
-        // 3. すでに他の人がそのメールを使っていないかチェック
         if (userRepository.findByEmail(newEmail).isPresent()) {
             throw new Exception("このメールアドレスは既に使用されています");
         }
 
-        // 4. メールアドレス（兼ユーザー名？）を更新
         user.setEmail(newEmail);
-        // もしusernameとemailが同一の仕様なら以下も必要
-        // user.setUsername(newEmail); 
-        
         userRepository.save(user);
     }
     
     public void deleteUser(Long userId) {
-        // 関連データ（ログなど）の削除が必要な場合はここに記述
-        // 例: trainingLogRepository.deleteByUserId(userId);
-        
-        // ユーザー本体の削除
         userRepository.deleteById(userId);
     }
 }

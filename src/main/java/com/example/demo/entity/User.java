@@ -31,7 +31,7 @@ public class User {
     private Long id;
 
     private int xp = 0;
- // ★追加: 最後にユーザー名を変更した日時
+    // ★追加: 最後にユーザー名を変更した日時
     private LocalDateTime lastUsernameChangeDate;
 
     @Column(unique = true)
@@ -44,6 +44,9 @@ public class User {
 
     @Column(unique = true)
     private String phoneNumber;
+    
+    // ★追加: 生年月日
+    private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
     private AuthProvider provider = AuthProvider.LOCAL;
@@ -96,7 +99,7 @@ public class User {
     @Column(name = "chip")
     private Integer chipCount;
 
-    @ElementCollection(fetch = FetchType.EAGER) // EAGER を明示的に指定
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_unlocked_characters", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "character_id")
     private Set<Long> unlockedCharacters = new HashSet<>();
@@ -141,6 +144,10 @@ public class User {
 
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    
+    // ★追加: 生年月日 Getter/Setter
+    public LocalDate getBirthDate() { return birthDate; }
+    public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
 
     public AuthProvider getProvider() { return provider; }
     public void setProvider(AuthProvider provider) { this.provider = provider; }
@@ -223,13 +230,8 @@ public class User {
         }
     }
 
-    public int getExperiencePoints() {
-        return getXp();
-    }
-
-    public void setExperiencePoints(int xp) {
-        this.xp = xp;
-    }
+    public int getExperiencePoints() { return getXp(); }
+    public void setExperiencePoints(int xp) { this.xp = xp; }
 
     public int getProgressPercent() {
         int requiredXp = calculateRequiredXp();
@@ -237,13 +239,8 @@ public class User {
     }
 
     // --- チップ関連 ---
-    public Integer getChipCount() { 
-        return chipCount != null ? chipCount : 0; 
-    }
-
-    public void setChipCount(Integer chipCount) { 
-        this.chipCount = chipCount; 
-    }
+    public Integer getChipCount() { return chipCount != null ? chipCount : 0; }
+    public void setChipCount(Integer chipCount) { this.chipCount = chipCount; }
 
     public void addChips(int chips) {
         if (chips > 0) {
@@ -260,52 +257,34 @@ public class User {
         return false;
     }
     
-
- // --- 解放済みキャラクター管理 ---
+    // --- 解放済みキャラクター管理 ---
     public void addUnlockedCharacter(Long characterId) {
-        if (unlockedCharacters == null) {
-            unlockedCharacters = new HashSet<>();
-        }
+        if (unlockedCharacters == null) unlockedCharacters = new HashSet<>();
         unlockedCharacters.add(characterId);
     }
-
     public boolean hasUnlockedCharacter(Long characterId) {
         return unlockedCharacters != null && unlockedCharacters.contains(characterId);
     }
-
     public Set<Long> getUnlockedCharacters() {
-        if (unlockedCharacters == null) {
-            unlockedCharacters = new HashSet<>();
-        }
+        if (unlockedCharacters == null) unlockedCharacters = new HashSet<>();
         return unlockedCharacters;
     }
-
     public void setUnlockedCharacters(Set<Long> unlockedCharacters) {
         this.unlockedCharacters = unlockedCharacters != null ? unlockedCharacters : new HashSet<>();
     }
 
-
- // ★★★ 解放済み背景管理メソッド ★★★
+    // ★★★ 解放済み背景管理メソッド ★★★
     public Set<String> getUnlockedBackgrounds() {
-        if (unlockedBackgrounds == null) {
-            unlockedBackgrounds = new HashSet<>();
-        }
+        if (unlockedBackgrounds == null) unlockedBackgrounds = new HashSet<>();
         return unlockedBackgrounds;
     }
-
     public void setUnlockedBackgrounds(Set<String> unlockedBackgrounds) {
         this.unlockedBackgrounds = (unlockedBackgrounds != null) ? unlockedBackgrounds : new HashSet<>();
     }
-
     public void addUnlockedBackground(String backgroundId) {
-        if (unlockedBackgrounds == null) {
-            unlockedBackgrounds = new HashSet<>();
-        }
-        if (backgroundId != null && !backgroundId.isBlank()) {
-            unlockedBackgrounds.add(backgroundId);
-        }
+        if (unlockedBackgrounds == null) unlockedBackgrounds = new HashSet<>();
+        if (backgroundId != null && !backgroundId.isBlank()) unlockedBackgrounds.add(backgroundId);
     }
-
     public boolean hasUnlockedBackground(String backgroundId) {
         return backgroundId != null && unlockedBackgrounds != null && unlockedBackgrounds.contains(backgroundId);
     }
@@ -314,27 +293,15 @@ public class User {
     public String getSelectedBackground() {
         return (selectedBackground != null && !selectedBackground.isBlank()) ? selectedBackground : "fire-original";
     }
-
     public void setSelectedBackground(String selectedBackground) {
-        this.selectedBackground = (selectedBackground != null && !selectedBackground.isBlank())
-                ? selectedBackground
-                : "fire-original";
+        this.selectedBackground = (selectedBackground != null && !selectedBackground.isBlank()) ? selectedBackground : "fire-original";
     }
 
     // ★★★ 背景解放チェック済みレベル ★★★
-    public Integer getLastBackgroundCheckLevel() {
-        return lastBackgroundCheckLevel != null ? lastBackgroundCheckLevel : 1;
-    }
-
-    public void setLastBackgroundCheckLevel(Integer lastBackgroundCheckLevel) {
-        this.lastBackgroundCheckLevel = (lastBackgroundCheckLevel != null) ? lastBackgroundCheckLevel : 1;
-    }
- // ★追加: Getter / Setter
-    public LocalDateTime getLastUsernameChangeDate() {
-        return lastUsernameChangeDate;
-    }
-
-    public void setLastUsernameChangeDate(LocalDateTime lastUsernameChangeDate) {
-        this.lastUsernameChangeDate = lastUsernameChangeDate;
-    }
+    public Integer getLastBackgroundCheckLevel() { return lastBackgroundCheckLevel != null ? lastBackgroundCheckLevel : 1; }
+    public void setLastBackgroundCheckLevel(Integer lastBackgroundCheckLevel) { this.lastBackgroundCheckLevel = (lastBackgroundCheckLevel != null) ? lastBackgroundCheckLevel : 1; }
+    
+    // ★追加: Getter / Setter
+    public LocalDateTime getLastUsernameChangeDate() { return lastUsernameChangeDate; }
+    public void setLastUsernameChangeDate(LocalDateTime lastUsernameChangeDate) { this.lastUsernameChangeDate = lastUsernameChangeDate; }
 }

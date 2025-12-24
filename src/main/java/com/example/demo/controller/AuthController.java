@@ -1,9 +1,12 @@
 package com.example.demo.controller;
 
+import java.time.LocalDate;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -42,7 +45,6 @@ public class AuthController {
     // --- スタート画面(ルートパス) ---
     @GetMapping("/")
     public String index(Authentication authentication) {
-        // 既にログインしているユーザーがアクセスした場合はホームへリダイレクトさせる(任意)
         if (authentication != null && authentication.isAuthenticated() && 
            !(authentication instanceof AnonymousAuthenticationToken)) {
             return "redirect:/home";
@@ -60,13 +62,16 @@ public class AuthController {
         return "auth/register";
     }
 
+    // ★修正: 生年月日と電話番号も受け取るように変更
     @PostMapping("/register")
     public String registerUser(@RequestParam String username,
                                @RequestParam String password,
                                @RequestParam String email,
+                               @RequestParam String phoneNumber,
+                               @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthDate,
                                Model model) {
         try {
-            userService.registerUser(username, password, email);
+            userService.registerUser(username, password, email, phoneNumber, birthDate);
             return "redirect:/login";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
@@ -94,32 +99,44 @@ public class AuthController {
         model.addAttribute("requiredXp", user.calculateRequiredXp());
         model.addAttribute("progressPercent", user.getProgressPercent());
         
-        // ★ 称号を表示するためにモデルに格納
         model.addAttribute("userTitle", user.getDisplayTitle());
         
-        // ★★★ 選択中の背景を取得
         String selectedBackground = user.getSelectedBackground();
         if (selectedBackground == null || selectedBackground.isEmpty()) {
             selectedBackground = "fire-original";
         }
         model.addAttribute("selectedBackground", selectedBackground);
         
-        // ★★★ 追加: 背景解放チェック
         BackgroundUnlockDto backgroundUnlocks = userService.checkNewBackgroundUnlocks(user.getUsername());
         model.addAttribute("backgroundUnlocks", backgroundUnlocks);
         
-        System.out.println("==========================================");
-        System.out.println("DEBUG: ホーム画面背景情報");
-        System.out.println("==========================================");
-        System.out.println("ユーザー名: " + user.getUsername());
-        System.out.println("選択中の背景: " + selectedBackground);
-        System.out.println("新規解放背景数: " + backgroundUnlocks.getUnlockedBackgrounds().size());
-        System.out.println("==========================================");
-
         return "misc/home";
     }
 
-    // --- SMS認証用 ---
+    // --- パスワードリセット関連 (変更) ---
+    
+    @GetMapping("/forgot-password")
+    public String forgotPassword() {
+        return "auth/forgot-password";
+    }
+
+    // ★追加: メールと生年月日でパスワードリセットを処理
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@RequestParam String email,
+                                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthDate,
+                                        Model model) {
+        // メールと生年月日の一致を確認してリセットメール送信
+        boolean result = userService.processForgotPasswordByEmailAndDob(email, birthDate);
+        
+        if (result) {
+            model.addAttribute("message", "パスワードリセットリンクをメールで送信しました。");
+        } else {
+            model.addAttribute("error", "メールアドレスまたは生年月日が一致しません。");
+        }
+        return "auth/forgot-password";
+    }
+
+    // --- SMS認証関連 (必要に応じて残すか削除) ---
     @PostMapping("/api/auth/send-otp")
     @ResponseBody
     public ResponseEntity<?> sendOtp(@RequestParam String phoneNumber) {
@@ -130,12 +147,6 @@ public class AuthController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send SMS: " + e.getMessage());
         }
-    }
-
-    @GetMapping("/forgot-password")
-    public String forgotPassword() {
-        // templates/auth/forgot-password.html を表示する
-        return "auth/forgot-password";
     }
 
     @PostMapping("/api/auth/verify-otp")
