@@ -165,110 +165,110 @@
         .tutorial-backdrop.active, .tutorial-rpg-box.active { pointer-events: auto; }
         .interactive-bg, .mouse-follower-cloud, .bg-cloud { pointer-events: none !important; z-index: -1; }
         #tutorial-rpg-box { z-index: 10001; }
-		/* ▼▼▼ ボタン間の余白を統一するクラス ▼▼▼ */
-	        .menu-item-spacing {
-	            margin-top: 20px !important; /* 全てのボタンの間隔を「20px」に統一 */
-	            width: 100%;                 /* 幅を揃える */
-	            box-sizing: border-box;
-	            display: block;
-	        }
-	        /* ケアセクションの中央揃え用 */
-	        .care-section {
-	            text-align: center; 
-	        }
-	/* ▼▼▼ スマホサイズ（幅600px以下）の時だけ余白を大きくする ▼▼▼ */
-	        /* タブレット（601px以上）やPCは、元の設定（20px）が適用されます */
-	        @media (max-width: 600px) {
-	            #tutorial-ai-btn {
-	                margin-bottom: 110px !important; 
-	            }
-	        }
-			/* ▼▼▼ PC・タブレット表示 (601px以上) 用のナビゲーション完全版 ▼▼▼ */
-			        @media (min-width: 601px) {
-						/* ★追加: メイン画面の下に余白を作って、ボタンが隠れないようにする */
-						            .main-container {
-						                padding-bottom: 150px !important; /* メニューバーの後ろに隠れないよう底上げ */
-						            }
-			            /* 1. ナビゲーションバーの箱（白い背景） */
-			            .bottom-nav {
-			                display: flex;
-			                justify-content: space-evenly; /* ボタン同士の間隔を均等に */
-			                align-items: center;
-			                
-			                /* 画面下部に浮かせて表示 */
-			                position: fixed;
-			                bottom: 20px;
-			                left: 50%;
-			                transform: translateX(-50%); /* 画面中央に配置 */
-			                
-			                width: 95%;            /* 画面幅の95%を使う */
-			                max-width: 800px;      /* 横に広がりすぎないように制限 */
-			                
-			                background: rgba(255, 255, 255, 0.95); /* 白背景（少し透過） */
-			                backdrop-filter: blur(10px);
-			                border-radius: 50px;   /* 角を丸くしてカプセル型に */
-			                box-shadow: 0 5px 20px rgba(0,0,0,0.15); /* 影をつけて浮かせる */
-			                
-			                padding: 10px 15px;    /* 内側の余白を確保して見切れを防ぐ */
-			                box-sizing: border-box; /* パディングをサイズに含める */
-			                z-index: 1000;
-			            }
-				            /* 2. 各ボタンの共通設定 */
-			            .nav-item {
-			                display: flex;
-			                flex-direction: column; /* アイコン上、文字下の縦並び */
-			                justify-content: center;
-			                align-items: center;
-			                
-			                flex: 1;               /* 全ボタンを同じ幅に引き伸ばす */
-			                max-width: 100px;      /* ボタン1つの最大幅 */
-			                height: auto;          /* 高さは中身に合わせて自動調整 */
-			                min-height: 60px;      /* 最低限の高さを確保 */
-			                
-			                text-decoration: none;
-			                color: #555;
-			                border-radius: 12px;
-			                transition: transform 0.2s ease, background 0.2s;
-			                padding: 5px 0;        /* ボタン内部の上下余白 */
-			                margin: 0 5px;         /* ボタン同士の隙間 */
-			            }
-				            /* 3. 1行目：アイコン（<i>タグ）の設定 */
-			            .nav-item i {
-			                display: block;        /* ブロック要素として扱う */
-			                font-size: 22px;       /* 見やすいサイズ */
-			                margin-bottom: 5px;    /* 文字との間隔 */
-			                line-height: 1;        /* 行間を詰めて見切れ防止 */
-			                color: var(--primary-color, #ff69b4);
-			            }
-				            /* 4. 2行目：文字（<span>タグ）の設定 */
-			            .nav-item span {
-			                display: block;        /* 確実に2行目にする */
-			                font-size: 11px;       /* 全角文字が収まるサイズ */
-			                font-weight: bold;
-			                white-space: nowrap;   /* 折り返し禁止（1行に収める） */
-			                line-height: 1.2;
-			                width: 100%;
-			                text-align: center;
-			            }
-				            /* ホバー時のアクション */
-			            .nav-item:hover {
-			                background-color: #f0f8ff;
-			                transform: translateY(-3px);
-			            }
-			        }
-					/* ▼▼▼ ボタンの枠線（フチの色）を修正 ▼▼▼ */
-					        .btn-record, 
-					        .btn-care,
-					        .home-action-btn {
-					            border: none !important;       /* 枠線を完全に消す */
-					            outline: none !important;      /* クリック時の青い枠線なども消す */
-					        }
-					/* 称号ボタンのフチ（枠線）を消す */
-							.side-action-btn, .title-button {
-							    border: none !important;
-							    outline: none !important;
-							}
-		
+        /* ▼▼▼ ボタン間の余白を統一するクラス ▼▼▼ */
+            .menu-item-spacing {
+                margin-top: 20px !important; /* 全てのボタンの間隔を「20px」に統一 */
+                width: 100%;                 /* 幅を揃える */
+                box-sizing: border-box;
+                display: block;
+            }
+            /* ケアセクションの中央揃え用 */
+            .care-section {
+                text-align: center; 
+            }
+    /* ▼▼▼ スマホサイズ（幅600px以下）の時だけ余白を大きくする ▼▼▼ */
+            /* タブレット（601px以上）やPCは、元の設定（20px）が適用されます */
+            @media (max-width: 600px) {
+                #tutorial-ai-btn {
+                    margin-bottom: 110px !important; 
+                }
+            }
+            /* ▼▼▼ PC・タブレット表示 (601px以上) 用のナビゲーション完全版 ▼▼▼ */
+                    @media (min-width: 601px) {
+                        /* ★追加: メイン画面の下に余白を作って、ボタンが隠れないようにする */
+                                    .main-container {
+                                        padding-bottom: 150px !important; /* メニューバーの後ろに隠れないよう底上げ */
+                                    }
+                        /* 1. ナビゲーションバーの箱（白い背景） */
+                        .bottom-nav {
+                            display: flex;
+                            justify-content: space-evenly; /* ボタン同士の間隔を均等に */
+                            align-items: center;
+                            
+                            /* 画面下部に浮かせて表示 */
+                            position: fixed;
+                            bottom: 20px;
+                            left: 50%;
+                            transform: translateX(-50%); /* 画面中央に配置 */
+                            
+                            width: 95%;            /* 画面幅の95%を使う */
+                            max-width: 800px;      /* 横に広がりすぎないように制限 */
+                            
+                            background: rgba(255, 255, 255, 0.95); /* 白背景（少し透過） */
+                            backdrop-filter: blur(10px);
+                            border-radius: 50px;   /* 角を丸くしてカプセル型に */
+                            box-shadow: 0 5px 20px rgba(0,0,0,0.15); /* 影をつけて浮かせる */
+                            
+                            padding: 10px 15px;    /* 内側の余白を確保して見切れを防ぐ */
+                            box-sizing: border-box; /* パディングをサイズに含める */
+                            z-index: 1000;
+                        }
+                            /* 2. 各ボタンの共通設定 */
+                        .nav-item {
+                            display: flex;
+                            flex-direction: column; /* アイコン上、文字下の縦並び */
+                            justify-content: center;
+                            align-items: center;
+                            
+                            flex: 1;               /* 全ボタンを同じ幅に引き伸ばす */
+                            max-width: 100px;      /* ボタン1つの最大幅 */
+                            height: auto;          /* 高さは中身に合わせて自動調整 */
+                            min-height: 60px;      /* 最低限の高さを確保 */
+                            
+                            text-decoration: none;
+                            color: #555;
+                            border-radius: 12px;
+                            transition: transform 0.2s ease, background 0.2s;
+                            padding: 5px 0;        /* ボタン内部の上下余白 */
+                            margin: 0 5px;         /* ボタン同士の隙間 */
+                        }
+                            /* 3. 1行目：アイコン（<i>タグ）の設定 */
+                        .nav-item i {
+                            display: block;        /* ブロック要素として扱う */
+                            font-size: 22px;       /* 見やすいサイズ */
+                            margin-bottom: 5px;    /* 文字との間隔 */
+                            line-height: 1;        /* 行間を詰めて見切れ防止 */
+                            color: var(--primary-color, #ff69b4);
+                        }
+                            /* 4. 2行目：文字（<span>タグ）の設定 */
+                        .nav-item span {
+                            display: block;        /* 確実に2行目にする */
+                            font-size: 11px;       /* 全角文字が収まるサイズ */
+                            font-weight: bold;
+                            white-space: nowrap;   /* 折り返し禁止（1行に収める） */
+                            line-height: 1.2;
+                            width: 100%;
+                            text-align: center;
+                        }
+                            /* ホバー時のアクション */
+                        .nav-item:hover {
+                            background-color: #f0f8ff;
+                            transform: translateY(-3px);
+                        }
+                    }
+                    /* ▼▼▼ ボタンの枠線（フチの色）を修正 ▼▼▼ */
+                            .btn-record, 
+                            .btn-care,
+                            .home-action-btn {
+                                border: none !important;       /* 枠線を完全に消す */
+                                outline: none !important;      /* クリック時の青い枠線なども消す */
+                            }
+                    /* 称号ボタンのフチ（枠線）を消す */
+                            .side-action-btn, .title-button {
+                                border: none !important;
+                                outline: none !important;
+                            }
+        
    </style>
 </head>
 <body class="home-page">
@@ -282,7 +282,7 @@
 </div>
 
 <div class="main-container" style="position: relative;"> 
-    <div id="real-time-clock" class="real-time-clock">00:00:00</div>
+    <div id="real-time-clock" class="real-time-clock">0000/00/00(月) 00:00</div>
 
     <button id="help-btn" class="help-label-btn" onclick="toggleHelpMenu()">
         <span style="font-size: 1.2em;">📰</span>ヘルプ
@@ -347,10 +347,10 @@
     
     <div class="character-section">
         <div class="character-wrapper">
-			<div id="tutorial-char-display" class="character-display"
-							th:style="'background-image: url(/img/background/' + ${selectedBackground} + '.png);'">
-			                <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
-			            </div>
+            <div id="tutorial-char-display" class="character-display"
+                            th:style="'background-image: url(/img/background/' + ${selectedBackground} + '.png);'">
+                <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
+            </div>
             
             <div class="character-side-buttons">
                 <a id="tutorial-title-btn" th:href="@{/titles}" class="side-action-btn title-button">
@@ -379,41 +379,41 @@
         </div>
     </div>
     
-	<a id="tutorial-training-btn" th:href="@{/training}" class="home-action-btn btn-training menu-item-spacing">
-	       <i class="fa-solid fa-dumbbell"></i> トレーニングを開始 
-	    </a>
+    <a id="tutorial-training-btn" th:href="@{/training}" class="home-action-btn btn-training menu-item-spacing">
+           <i class="fa-solid fa-dumbbell"></i> トレーニングを開始 
+        </a>
 
-	    <div id="tutorial-record-btn" class="record-container menu-item-spacing">
-	        <button id="tutorial-record-toggle" onclick="toggleRecordMenu()" class="home-action-btn btn-record" style="width: 100%;">
-	           <i class="fa-solid fa-pen-to-square"></i> 記録をつける
-	        </button>
-	        
-	        <div id="record-options" class="record-options">
-	            <a id="tutorial-record-log" th:href="@{/training-log}" class="record-option-item training-log-opt">
-	                <i class="fa-solid fa-calendar-days"></i><br>筋トレ履歴
-	            </a>
-	            <a id="tutorial-record-meal" th:href="@{/log/meal}" class="record-option-item meal-opt">
-	                <i class="fa-solid fa-utensils"></i><br>食事記録
-	            </a>
-	            <a id="tutorial-record-weight" th:href="@{/training-log/form/body-weight}" class="record-option-item weight-opt">
-	                <i class="fa-solid fa-weight-scale"></i><br>体重記録
-	            </a>
-	        </div>
-	    </div>
-	    
-	    <div class="care-section menu-item-spacing">
-	        <a id="tutorial-care-btn" th:href="@{/training/care}" class="home-action-btn btn-care">
-	            <i class="fa-solid fa-mug-hot"></i> AIリフレッシュ&ケア
-	        </a>
-	    </div>
+        <div id="tutorial-record-btn" class="record-container menu-item-spacing">
+            <button id="tutorial-record-toggle" onclick="toggleRecordMenu()" class="home-action-btn btn-record" style="width: 100%;">
+               <i class="fa-solid fa-pen-to-square"></i> 記録をつける
+            </button>
+            
+            <div id="record-options" class="record-options">
+                <a id="tutorial-record-log" th:href="@{/training-log}" class="record-option-item training-log-opt">
+                    <i class="fa-solid fa-calendar-days"></i><br>筋トレ履歴
+                </a>
+                <a id="tutorial-record-meal" th:href="@{/log/meal}" class="record-option-item meal-opt">
+                    <i class="fa-solid fa-utensils"></i><br>食事記録
+                </a>
+                <a id="tutorial-record-weight" th:href="@{/training-log/form/body-weight}" class="record-option-item weight-opt">
+                    <i class="fa-solid fa-weight-scale"></i><br>体重記録
+                </a>
+            </div>
+        </div>
+        
+        <div class="care-section menu-item-spacing">
+            <a id="tutorial-care-btn" th:href="@{/training/care}" class="home-action-btn btn-care">
+                <i class="fa-solid fa-mug-hot"></i> AIリフレッシュ&ケア
+            </a>
+        </div>
 
-	    <a id="tutorial-map-btn" th:href="@{/training/map}" class="home-action-btn btn-map menu-item-spacing">
-	       <i class="fa-solid fa-map-location-dot"></i> 近くのトレーニング施設 
-	    </a>
-	    
-	    <a id="tutorial-ai-btn" th:href="@{/ai-coach}" class="home-action-btn btn-ai menu-item-spacing">
-		   <i class="fa-solid fa-robot"></i> AIチャット 
-		</a>
+        <a id="tutorial-map-btn" th:href="@{/training/map}" class="home-action-btn btn-map menu-item-spacing">
+           <i class="fa-solid fa-map-location-dot"></i> 近くのトレーニング施設 
+        </a>
+        
+        <a id="tutorial-ai-btn" th:href="@{/ai-coach}" class="home-action-btn btn-ai menu-item-spacing">
+           <i class="fa-solid fa-robot"></i> AIチャット 
+        </a>
 
     <nav id="tutorial-menu-nav" class="bottom-nav">
         <a id="nav-gacha" th:href="@{/gacha}" class="nav-item"><i class="fa-solid fa-gift"></i><span>ガチャ　</span></a>
@@ -471,64 +471,81 @@
 <div id="tutorial-backdrop" class="tutorial-backdrop"></div>
 
 <script th:inline="javascript">
-	/*<![CDATA[*/
-	document.addEventListener('DOMContentLoaded', function() {
-	    // 背景解放データを取得
-	    const backgroundUnlocks = /*[[${backgroundUnlocks}]]*/ null;
-	    
-	    console.log('========== 背景解放チェック ==========');
-	    console.log('backgroundUnlocks:', backgroundUnlocks);
-	    console.log('====================================');
-	    
-	    if (backgroundUnlocks && backgroundUnlocks.hasNewUnlocks) {
-	        const unlockedBackgrounds = backgroundUnlocks.unlockedBackgrounds || [];
-	        if (unlockedBackgrounds.length > 0) {
-	            const popup = document.getElementById('background-unlock-popup');
-	            const listContainer = document.getElementById('background-unlock-list');
-	            listContainer.innerHTML = '';
-	            unlockedBackgrounds.forEach(bg => {
-	                const item = document.createElement('div');
-	                item.className = 'background-unlock-item';
-	                item.innerHTML = `<i class="fa-solid fa-unlock-keyhole"></i><strong>${bg.name}</strong> (Lv.${bg.requiredLevel}で解放)`;
-	                listContainer.appendChild(item);
-	            });
-	            popup.style.display = 'flex';
-	        }
-	    }
-	    
-	    // AIアドバイス取得
-	    const aiMessageEl = document.getElementById('ai-home-message');
-	    if (aiMessageEl) {
-	        fetch('/api/ai-coach/home-advice')
-	            .then(res => res.text())
-	            .then(text => {
-	                aiMessageEl.innerHTML = '';
-	                let i = 0;
-	                const speed = 40; 
-	                function typeWriter() {
-	                    if (i < text.length) { aiMessageEl.textContent += text.charAt(i); i++; setTimeout(typeWriter, speed); }
-	                }
-	                typeWriter();
-	            })
-	            .catch(err => { console.error("AI Advice Error:", err); aiMessageEl.textContent = "今日も一緒に頑張るムキ！"; });
-	    }
+    /*<![CDATA[*/
+    document.addEventListener('DOMContentLoaded', function() {
+        // 背景解放データを取得
+        const backgroundUnlocks = /*[[${backgroundUnlocks}]]*/ null;
+        
+        console.log('========== 背景解放チェック ==========');
+        console.log('backgroundUnlocks:', backgroundUnlocks);
+        console.log('====================================');
+        
+        if (backgroundUnlocks && backgroundUnlocks.hasNewUnlocks) {
+            const unlockedBackgrounds = backgroundUnlocks.unlockedBackgrounds || [];
+            if (unlockedBackgrounds.length > 0) {
+                const popup = document.getElementById('background-unlock-popup');
+                const listContainer = document.getElementById('background-unlock-list');
+                listContainer.innerHTML = '';
+                unlockedBackgrounds.forEach(bg => {
+                    const item = document.createElement('div');
+                    item.className = 'background-unlock-item';
+                    item.innerHTML = `<i class="fa-solid fa-unlock-keyhole"></i><strong>${bg.name}</strong> (Lv.${bg.requiredLevel}で解放)`;
+                    listContainer.appendChild(item);
+                });
+                popup.style.display = 'flex';
+            }
+        }
+        
+        // AIアドバイス取得
+        const aiMessageEl = document.getElementById('ai-home-message');
+        if (aiMessageEl) {
+            fetch('/api/ai-coach/home-advice')
+                .then(res => res.text())
+                .then(text => {
+                    aiMessageEl.innerHTML = '';
+                    let i = 0;
+                    const speed = 40; 
+                    function typeWriter() {
+                        if (i < text.length) { aiMessageEl.textContent += text.charAt(i); i++; setTimeout(typeWriter, speed); }
+                    }
+                    typeWriter();
+                })
+                .catch(err => { console.error("AI Advice Error:", err); aiMessageEl.textContent = "今日も一緒に頑張るムキ！"; });
+        }
 
-        // 時計更新
+        // ▼▼▼ 時計更新 (日付と曜日も表示) ▼▼▼
         function updateRealTimeClock() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            // 年・月・日
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            
+            // 曜日
+            const days = ['日', '月', '火', '水', '木', '金', '土'];
+            const dayOfWeek = days[now.getDay()];
+            
+            // 時・分
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            // フォーマット: YYYY/MM/DD(曜日) HH:mm
+            const timeString = `${year}/${month}/${day}(${dayOfWeek}) ${hours}:${minutes}`;
+            
             const clockEl = document.getElementById('real-time-clock');
             if (clockEl) { clockEl.textContent = timeString; }
         }
+        
         setInterval(updateRealTimeClock, 1000);
         updateRealTimeClock();
-	});
+    });
 
-	function closeBackgroundUnlockPopup() {
-	    document.getElementById('background-unlock-popup').style.display = 'none';
-	}
-	document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeBackgroundUnlockPopup(); });
-	/*]]>*/
+    function closeBackgroundUnlockPopup() {
+        document.getElementById('background-unlock-popup').style.display = 'none';
+    }
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeBackgroundUnlockPopup(); });
+    /*]]>*/
 
     // 記録メニューのトグル
     function toggleRecordMenu() {
