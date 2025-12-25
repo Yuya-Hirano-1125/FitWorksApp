@@ -5,27 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>マイセット一覧 | FitWorks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-    <link rel="stylesheet" th:href="@{/css/home.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* 全要素に box-sizing: border-box を適用 */
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
+        /* ==========================================================================
+           共通スタイル
+           ========================================================================== */
+        * { box-sizing: border-box; }
         body {
-            background-color: #f0f8ff;
-            color: #333;
+            background-color: #f0f8ff; color: #333;
             font-family: 'Noto Sans JP', sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            overflow-x: hidden;
+            margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden;
         }
 
-        /* 背景アニメーション関連 */
+        /* 背景アニメーション */
         .interactive-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
@@ -80,7 +74,7 @@
         }
         .home-link-icon:hover { background-color: #4facfe; color: white; transform: scale(1.1); }
 
-        /* ▼ スティッキーヘッダー (新規作成ボタンなど) */
+        /* ▼ スティッキーヘッダー */
         .sticky-header-area {
             position: sticky; top: 10px; z-index: 90;
             background-color: rgba(255, 255, 255, 0.9);
@@ -88,28 +82,43 @@
             padding: 20px; margin-bottom: 30px; border-radius: 20px;
             border: 1px solid rgba(255,255,255,0.8);
             box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-            display: flex; justify-content: flex-end; /* 右寄せ */
+            display: flex; justify-content: space-between; align-items: center; gap: 15px;
         }
 
+        /* 検索ボックス */
+        .search-box-wrapper { position: relative; flex: 1; }
+        
+        .search-box {
+            width: 100%; padding: 12px 40px 12px 25px; border-radius: 50px;
+            /* ★修正: 枠線の色を濃くして明確化 */
+            border: 2px solid #a18cd1; 
+            font-size: 1rem;
+            background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease; appearance: none;
+        }
+        .search-box:focus {
+            outline: none; border-color: #6f42c1;
+            box-shadow: 0 8px 25px rgba(161, 140, 209, 0.25);
+            transform: translateY(-2px); background: #fff;
+        }
+        .search-icon {
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+            color: #a18cd1; font-size: 1.2rem; pointer-events: none; z-index: 10;
+        }
+
+        /* 新規作成ボタン */
         .btn-new {
             background: linear-gradient(135deg, #a18cd1, #fbc2eb);
             color: white; border: none; padding: 12px 25px; border-radius: 50px;
-            font-weight: 700; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 8px;
-            box-shadow: 0 4px 10px rgba(161, 140, 209, 0.4);
-            transition: all 0.3s;
+            font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+            box-shadow: 0 4px 10px rgba(161, 140, 209, 0.4); transition: all 0.3s;
+            white-space: nowrap; flex-shrink: 0;
         }
-        .btn-new:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(161, 140, 209, 0.6);
-            color: white;
-        }
+        .btn-new:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(161, 140, 209, 0.6); color: white; }
 
         /* グリッドレイアウト */
         .myset-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* 少し広めに */
-            gap: 30px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;
         }
 
         /* カードデザイン */
@@ -119,13 +128,14 @@
             box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer; position: relative;
-            border: 2px solid #fff; border-left: 6px solid #6f42c1; /* 左側を紫に */
+            border: 2px solid #fff; border-left: 6px solid #6f42c1;
             display: flex; flex-direction: column; justify-content: space-between; height: 100%;
         }
         .myset-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
             background: #fff;
+            border-color: #a18cd1; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1), 0 0 20px rgba(161, 140, 209, 0.5);
         }
 
         /* カードヘッダー */
@@ -133,35 +143,28 @@
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 15px; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 10px;
         }
-        .myset-title {
-            font-size: 1.3rem; font-weight: 800; color: #2c3e50;
-            text-shadow: 1px 1px 0 #fff;
-        }
+        .myset-title { font-size: 1.3rem; font-weight: 800; color: #2c3e50; text-shadow: 1px 1px 0 #fff; }
         .myset-count {
             background-color: #f3e5f5; color: #6a1b9a; padding: 4px 12px;
             border-radius: 20px; font-size: 0.8rem; font-weight: 700; border: 1px solid #e1bee7;
         }
 
-        /* 種目リスト */
-        .myset-exercises {
-            margin: 0; padding: 0; list-style: none; margin-bottom: 20px;
-        }
+        /* 種目リスト (カード内の簡易表示) */
+        .myset-exercises { margin: 0; padding: 0; list-style: none; margin-bottom: 20px; }
         .myset-exercises li {
-            font-size: 0.95rem; color: #555; margin-bottom: 6px;
-            display: flex; align-items: center; gap: 8px;
+            font-size: 0.95rem; color: #555; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
         }
         .myset-exercises li::before {
             content: "\f058"; font-family: "Font Awesome 6 Free"; font-weight: 900;
             color: #6f42c1; font-size: 0.9rem;
         }
-        .more-text {
-            font-size: 0.85rem; color: #999; margin-left: 22px; font-weight: 600;
+        .more-text { 
+            font-size: 0.85rem; color: #999; margin-left: 22px; font-weight: 600; 
+            white-space: nowrap; 
         }
 
         /* アクションボタン */
-        .myset-actions {
-            display: flex; gap: 10px; align-items: center; margin-top: auto;
-        }
+        .myset-actions { display: flex; gap: 10px; align-items: center; margin-top: auto; }
         
         .btn-start {
             flex: 1;
@@ -181,28 +184,75 @@
         }
         .btn-delete:hover { color: #ff4444; background: #ffebee; border-color: #ffcdd2; }
 
-        .empty-state { text-align: center; padding: 60px 20px; color: #666; font-weight: 700; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #666; font-weight: 700; display: none; }
+        
+        /* メッセージ表示エリア */
         .alert { padding: 15px; border-radius: 15px; margin-bottom: 20px; font-weight: 600; text-align: center; }
         .alert-success { background: rgba(212, 237, 218, 0.9); color: #155724; border: 1px solid #c3e6cb; }
         .alert-info { background: rgba(209, 236, 241, 0.9); color: #0c5460; border: 1px solid #bee5eb; }
+        .alert-warning { background: rgba(255, 243, 205, 0.95); color: #856404; border: 1px solid #ffeeba; }
 
-        /* レスポンシブ */
+        /* ▼ モーダルスタイル (詳細表示用) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px); z-index: 2000; display: none; justify-content: center; align-items: center;
+            padding: 15px; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        
+        .detail-modal {
+            background: rgba(255, 255, 255, 0.98); width: 100%; max-width: 550px; border-radius: 24px;
+            overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.2); transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; display: flex; flex-direction: column;
+        }
+        .modal-overlay.active .detail-modal { transform: scale(1); }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #a18cd1, #fbc2eb); 
+            padding: 20px 25px; color: white; position: relative; flex-shrink: 0;
+        }
+        .modal-title { margin: 0; font-size: 1.4rem; font-weight: 900; padding-right: 30px; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        
+        .modal-close-btn {
+            position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); border: none; color: white;
+            width: 32px; height: 32px; border-radius: 50%; font-size: 1rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+        }
+        .modal-close-btn:hover { background: rgba(255,255,255,0.4); }
+
+        .modal-body { padding: 25px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        
+        /* ★修正: カテゴリタイトルのデザイン（見やすく） */
+        .myset-category-section { margin-bottom: 20px; }
+        .myset-category-title {
+            font-size: 1.05rem; font-weight: 800; 
+            color: #6a1b9a; background-color: #f3e5f5; /* 背景色を追加 */
+            padding: 8px 15px; border-radius: 8px; 
+            border-left: 5px solid #a18cd1; /* アクセントの左線 */
+            margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        
+        .myset-exercises-modal { list-style: none; padding: 0; margin: 0; }
+        .myset-exercises-modal li {
+            background: #fff; border: 1px solid #e0e0e0; padding: 12px 15px;
+            border-radius: 12px; margin-bottom: 8px; font-weight: 700; color: #555;
+            display: flex; align-items: center; transition: transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .myset-exercises-modal li:hover { transform: translateX(5px); border-color: #a18cd1; background: #fafafa; }
+        .myset-exercises-modal li i { color: #a18cd1; margin-right: 12px; font-size: 1.1rem; }
+
         @media (max-width: 600px) {
             .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
             .page-title { font-size: 1.5rem; }
             .page-header-container { justify-content: flex-start; margin-bottom: 15px; }
-            
             .sticky-header-area {
-                top: 0;
-                border-radius: 0 0 20px 20px;
-                margin-top: -20px;
-                width: calc(100% + 40px);
-                margin-left: -20px;
-                padding: 15px 20px;
-                justify-content: center; /* スマホでは中央寄せ */
+                top: 0; border-radius: 20px; margin-top: 0;
+                width: calc(100% + 40px); margin-left: -20px; padding: 15px 20px;
+                flex-direction: column; align-items: stretch;
             }
             .btn-new { width: 100%; justify-content: center; }
-
             .container { padding-top: 20px; margin: 20px 10px; width: 95%; }
             .myset-grid { grid-template-columns: 1fr; gap: 25px; }
         }
@@ -233,22 +283,33 @@
     </div>
 
     <div class="sticky-header-area">
+        <div class="search-box-wrapper">
+            <input type="text" id="mysetSearchInput" class="search-box" placeholder="マイセットを検索..." onkeyup="filterMySets()">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        </div>
         <a th:href="@{/training/mysets/new}" class="btn-new">
-            <i class="fa-solid fa-plus"></i> マイセット新規作成
+            <i class="fa-solid fa-plus"></i> 新規作成
         </a>
     </div>
 
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-    <div th:if="${message}" class="alert alert-info" th:text="${message}"></div>
+    <div th:if="${message}" class="alert alert-warning" th:text="${message}"></div>
 
-    <div th:if="${mySets == null || mySets.isEmpty()}" class="empty-state">
+    <div th:if="${mySets == null || mySets.isEmpty()}" class="empty-state" style="display: block;">
         <i class="fa-regular fa-folder-open fa-3x" style="margin-bottom: 15px; color: #ccc;"></i><br>
         まだマイセットがありません。<br>お気に入りの種目を組み合わせてセットを作りましょう！
     </div>
 
-    <div class="myset-grid" th:if="${mySets != null && !mySets.isEmpty()}">
-        
-        <div th:each="set : ${mySets}" class="myset-card">
+    <div id="noResultsMessage" class="empty-state" style="display: none;">
+        <i class="fa-solid fa-circle-exclamation fa-3x" style="margin-bottom: 15px; color: #ccc;"></i><br>
+        一致するマイセットが見つかりません。
+    </div>
+
+    <div id="mysetGrid" class="myset-grid" th:if="${mySets != null && !mySets.isEmpty()}">
+        <div th:each="set : ${mySets}" 
+             class="myset-card" 
+             th:onclick="openMySetModal([[${set.name}]], [[${set.exerciseNames}]])">
+             
             <div class="myset-header">
                 <span class="myset-title" th:text="${set.name}">セット名</span>
                 <span class="myset-count" th:text="${set.exerciseNames.size()} + ' 種目'">3 種目</span>
@@ -257,18 +318,18 @@
             <ul class="myset-exercises">
                 <li th:each="ex, stat : ${set.exerciseNames}" th:if="${stat.index < 3}" th:text="${ex}">種目名</li>
                 <li th:if="${set.exerciseNames.size() > 3}" class="more-text">
-                    ...他 <span th:text="${set.exerciseNames.size() - 3}"></span> 種目
+                    ...他 <span th:text="${set.exerciseNames.size() - 3}"></span> 種目 <span style="font-size:0.75rem; font-weight:normal; opacity:0.8;">(詳細)</span>
                 </li>
             </ul>
 
             <div class="myset-actions">
-                <form th:action="@{/training/mysets/delete/{id}(id=${set.id})}" method="post" onsubmit="return confirm('本当に削除しますか？');">
+                <form th:action="@{/training/mysets/delete/{id}(id=${set.id})}" method="post" onsubmit="return confirm('本当に削除しますか？');" onclick="event.stopPropagation()">
                     <button type="submit" class="btn-delete" title="削除">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </form>
 
-                <form th:action="@{/training/start}" method="post" style="flex:1;">
+                <form th:action="@{/training/start}" method="post" style="flex:1;" onclick="event.stopPropagation()">
                     <input type="hidden" name="type" value="myset">
                     <input type="hidden" name="mySetId" th:value="${set.id}">
                     <button type="submit" class="btn-start">
@@ -280,14 +341,41 @@
     </div>
 </div>
 
+<div id="mySetModalOverlay" class="modal-overlay" onclick="closeMySetModal(event)">
+    <div class="detail-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">マイセット名</h3>
+            <button class="modal-close-btn" onclick="closeMySetModal(event)"><i class="fa-solid fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div style="margin-bottom:15px; font-weight:700; color:#555; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-list-ul" style="color:#a18cd1;"></i> 登録種目一覧 (部位別)
+            </div>
+            <div id="modalExerciseContent"></div>
+
+            <div style="margin-top:20px; text-align:center;">
+                <button onclick="closeMySetModal(event)" style="background:#eee; border:none; padding:10px 30px; border-radius:30px; font-weight:bold; color:#555; cursor:pointer;">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="fragments/footer :: footer"></div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const exerciseCategoryMap = /*[[${exerciseCategoryMap}]]*/ {};
+    
+    // 表示順序の定義
+    const partOrder = ["胸", "背中", "脚", "肩", "腕", "腹筋", "有酸素運動", "その他"];
+    /*]]>*/
+</script>
 
 <script>
     // === 🌟 CANVAS PARTICLE SYSTEM ===
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     const flare = document.getElementById('mouse-flare');
-    
     let particlesArray = [];
     let width, height;
 
@@ -346,7 +434,6 @@
         requestAnimationFrame(animate);
     }
     
-    // 背景の雲のパララックス効果
     const cloud1 = document.querySelector('.cloud-1');
     const cloud2 = document.querySelector('.cloud-2');
     document.addEventListener('mousemove', (e) => {
@@ -357,6 +444,124 @@
     });
 
     animate();
+
+    function filterMySets() {
+        const input = document.getElementById('mysetSearchInput');
+        const filter = input.value.toLowerCase().replace(/\s+/g, '');
+        const grid = document.getElementById('mysetGrid');
+        const noResults = document.getElementById('noResultsMessage');
+        
+        if (!grid) return;
+
+        const cards = grid.getElementsByClassName('myset-card');
+        let visibleCount = 0;
+
+        for (let i = 0; i < cards.length; i++) {
+            const card = cards[i];
+            const title = card.querySelector('.myset-title').textContent || "";
+            const textValue = title.toLowerCase().replace(/\s+/g, '');
+
+            if (textValue.indexOf(filter) > -1) {
+                card.style.display = "";
+                visibleCount++;
+            } else {
+                card.style.display = "none";
+            }
+        }
+
+        if (visibleCount === 0) {
+            noResults.style.display = "block";
+        } else {
+            noResults.style.display = "none";
+        }
+    }
+
+    // ★ モーダルを開く処理 (部位別にグループ化)
+    function openMySetModal(name, exercises) {
+        document.getElementById('modalTitle').textContent = name;
+        const contentDiv = document.getElementById('modalExerciseContent');
+        contentDiv.innerHTML = ''; 
+        
+        if (exercises && exercises.length > 0) {
+            // 1. 部位ごとにグループ化
+            const grouped = {};
+            exercises.forEach(ex => {
+                const part = exerciseCategoryMap[ex] || 'その他';
+                if (!grouped[part]) {
+                    grouped[part] = [];
+                }
+                grouped[part].push(ex);
+            });
+
+            // 2. partOrderの順に表示
+            partOrder.forEach(part => {
+                if (grouped[part] && grouped[part].length > 0) {
+                    // カテゴリコンテナ
+                    const section = document.createElement('div');
+                    section.className = 'myset-category-section';
+
+                    // カテゴリタイトル
+                    const title = document.createElement('div');
+                    title.className = 'myset-category-title';
+                    title.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${part}`;
+                    section.appendChild(title);
+
+                    // リスト
+                    const ul = document.createElement('ul');
+                    ul.className = 'myset-exercises-modal';
+                    
+                    grouped[part].forEach(ex => {
+                        const li = document.createElement('li');
+                        li.innerHTML = '<i class="fa-solid fa-dumbbell"></i> ' + ex;
+                        ul.appendChild(li);
+                    });
+                    
+                    section.appendChild(ul);
+                    contentDiv.appendChild(section);
+                }
+            });
+
+            // partOrderに含まれていない部位があれば最後に追加
+            Object.keys(grouped).forEach(key => {
+                if (!partOrder.includes(key)) {
+                    // 同様の処理で表示...
+                    const section = document.createElement('div');
+                    section.className = 'myset-category-section';
+                    const title = document.createElement('div');
+                    title.className = 'myset-category-title';
+                    title.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${key}`;
+                    section.appendChild(title);
+                    const ul = document.createElement('ul');
+                    ul.className = 'myset-exercises-modal';
+                    grouped[key].forEach(ex => {
+                        const li = document.createElement('li');
+                        li.innerHTML = '<i class="fa-solid fa-dumbbell"></i> ' + ex;
+                        ul.appendChild(li);
+                    });
+                    section.appendChild(ul);
+                    contentDiv.appendChild(section);
+                }
+            });
+
+        } else {
+            contentDiv.innerHTML = '<div style="color:#999; font-weight:normal; text-align:center;">種目が登録されていません</div>';
+        }
+
+        const overlay = document.getElementById('mySetModalOverlay');
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden'; 
+    }
+
+    function closeMySetModal(event) {
+        if (event.target.id === 'mySetModalOverlay' || 
+            event.target.closest('.modal-close-btn') || 
+            event.target.textContent === '閉じる') {
+            
+            const overlay = document.getElementById('mySetModalOverlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = ''; 
+        }
+    }
 </script>
 
 </body>

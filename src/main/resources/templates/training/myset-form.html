@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ja">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>マイセット作成 | FitWorks</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -10,258 +10,324 @@
     <script th:src="@{/js/theme.js}"></script>
     <style>
         /* ==========================================================================
-           🌌 背景用スタイル
+           共通スタイル
            ========================================================================== */
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --primary-color: #4facfe;
-            --accent-color: #00f2fe;
-        }
-
+        * { box-sizing: border-box; }
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #f0f8ff;
-            min-height: 100vh;
+            background-color: #f0f8ff; color: #333;
             font-family: 'Noto Sans JP', sans-serif;
-            overflow-x: hidden;
+            margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden;
         }
 
+        /* 背景アニメーション */
         .interactive-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%;
-            animation: auroraFlow 20s ease infinite;
-            overflow: hidden;
+            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
         }
-
-        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
-        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+        }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; z-index: 0; animation: floatOrb 30s infinite alternate ease-in-out; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
         .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
-        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
-
-        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
-        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; box-shadow: 0 0 60px rgba(255,255,255,0.9); }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+        #bg-canvas, .mouse-flare, .bg-cloud { pointer-events: none; }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; mix-blend-mode: screen; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; box-shadow: 0 0 60px rgba(255,255,255,0.9); }
         .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
         .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
         @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
-        .mouse-flare { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%); transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px); transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1); }
+        .mouse-flare { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%); transform: translate(-50%, -50%); mix-blend-mode: screen; z-index: 20; filter: blur(15px); transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1); }
 
-        /* -----------------------------------------------------------
-           📦 MAIN CONTAINER STYLE
-           ----------------------------------------------------------- */
-        .main-container {
-            max-width: 800px;
-            width: 92%;
-            margin: 40px auto;
-            padding: 30px 40px 40px 40px; /* 上パディング調整 */
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(20px) saturate(180%);
+        /* コンテナ */
+        .container {
+            width: 90%; max-width: 800px; margin: 40px auto; padding: 40px; padding-bottom: 120px;
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 45px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 40px; border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
-            position: relative;
-            z-index: 10;
+            position: relative; z-index: 10;
         }
 
-        /* ヘッダーエリアのスタイル（横並び） */
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            position: relative;
+        /* ヘッダー */
+        .page-header-container {
+            display: flex; align-items: center; margin-bottom: 30px;
+            border-bottom: 3px solid #4facfe; padding-bottom: 10px; gap: 15px;
         }
-        
         .page-title {
-            margin: 0;
-            color: #2c3e50;
-            font-weight: 900;
-            letter-spacing: -1px;
-            font-size: 1.5rem;
-            text-align: center;
-            flex-grow: 1; /* タイトルが余白を埋める */
+            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 700;
+            text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
         }
-
-        /* 共通丸ボタン（戻る・保存） */
-        .header-round-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: none;
-            text-decoration: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            flex-shrink: 0;
+        .page-title i { margin-right: 8px; color: #a18cd1; }
+        
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px; background-color: white; color: #4facfe;
+            border: 2px solid #4facfe; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
         }
-        .header-round-btn:hover { transform: scale(1.1); }
-        .header-round-btn:active { transform: scale(0.95); }
+        .home-link-icon:hover { background-color: #4facfe; color: white; transform: scale(1.1); }
 
-        /* 戻るボタン */
-        .back-btn {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            color: #555;
-        }
-        .back-btn:hover { background: #fff; color: #4facfe; box-shadow: 0 8px 20px rgba(79, 172, 254, 0.3); }
-
-        /* 保存ボタン */
-        .save-btn {
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-            color: white;
-            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
-        }
-        .save-btn:hover { box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6); }
-
-        /* フォーム要素 */
-        .form-group { margin-bottom: 25px; text-align: left; }
-        .form-group label { font-weight: 700; display: block; margin-bottom: 8px; color: #333; font-size: 1.05rem; }
-        .form-control { 
-            width: 100%; padding: 12px; 
-            border: 2px solid rgba(255,255,255,0.5); 
-            border-radius: 12px; font-size: 1rem; 
-            background: rgba(255,255,255,0.8);
-            transition: all 0.3s;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
-            box-sizing: border-box;
+        /* ==========================================================================
+           📝 フォーム & ボタン選択UI
+           ========================================================================== */
+        
+        .form-section { margin-bottom: 30px; }
+        .form-label { display: block; font-weight: 700; color: #555; margin-bottom: 10px; font-size: 1rem; }
+        .form-control {
+            width: 100%; padding: 12px 15px; border-radius: 12px;
+            border: 2px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.9);
+            font-size: 1rem; transition: all 0.3s;
         }
         .form-control:focus {
-            background: #fff;
-            border-color: #4facfe;
-            box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2);
-            outline: none;
+            outline: none; border-color: #a18cd1; background: #fff;
+            box-shadow: 0 4px 15px rgba(161, 140, 209, 0.2);
+        }
+
+        /* 選択エリアの枠 */
+        .selection-box {
+            background: rgba(255, 255, 255, 0.6); border-radius: 20px;
+            padding: 20px; border: 1px solid rgba(255,255,255,0.8);
+            margin-bottom: 20px;
+        }
+
+        .sub-label {
+            font-size: 0.9rem; font-weight: 700; color: #666; margin-bottom: 10px; display: block;
+            border-left: 4px solid #a18cd1; padding-left: 8px;
+        }
+
+        /* ★ 部位ボタンエリア */
+        .part-buttons-container {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px;
+        }
+        .part-btn {
+            background: #fff; border: 1px solid #e0e0e0; padding: 10px 18px;
+            border-radius: 15px; font-size: 0.95rem; font-weight: 700; color: #555;
+            cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .part-btn:hover { background: #f8f9fa; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .part-btn.active {
+            background: #2c3e50; color: white; border-color: #2c3e50;
+            box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+        }
+        /* 有酸素ボタンの特別色 */
+        .part-btn[data-part="有酸素運動"].active {
+            background: #28a745; border-color: #28a745;
+        }
+
+        /* ★ 種目ボタンエリア (修正箇所) */
+        .exercise-buttons-container {
+            /* 最小幅を 160px -> 180px に拡大 */
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px; /* ギャップも少し広げる */
+            min-height: 60px;
+            background: rgba(255,255,255,0.3); padding: 15px; border-radius: 15px;
         }
         
-        .exercise-group h3 {
-            background: linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0));
-            padding: 10px 15px; 
-            border-left: 5px solid #4facfe;
-            border-radius: 5px;
-            margin-top: 30px; 
-            margin-bottom: 15px;
-            font-size: 1.1em; 
-            color: #2c3e50;
-            font-weight: 800;
+        /* 種目ボタン本体 (修正箇所) */
+        .exercise-select-btn {
+            background: #fff; border: 2px solid #fff; 
+            padding: 16px; /* パディングを増やして大きく */
+            border-radius: 16px; 
+            font-size: 0.95rem; font-weight: 700; color: #444;
+            cursor: pointer; transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            text-align: left;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; justify-content: flex-start; gap: 8px;
+            min-height: 90px; /* 最小高さを確保して存在感を出す */
+            position: relative;
+        }
+        .exercise-select-btn:hover {
+            transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-color: #a18cd1;
+        }
+        .exercise-select-btn:active { transform: scale(0.95); }
+
+        /* 追加済み（選択中）状態 */
+        .exercise-select-btn.selected {
+            background: #f3e5f5; /* 薄い紫 */
+            border-color: #a18cd1; 
+            color: #6a1b9a;
+            box-shadow: inset 0 0 5px rgba(161, 140, 209, 0.1);
+        }
+        /* 「選択中」バッジを下部に配置 */
+        .exercise-select-btn.selected::after {
+            content: "選択中"; 
+            display: block; 
+            margin-top: auto; 
+            align-self: center;
+            font-size: 0.8rem; font-weight: 800; color: white; background: #a18cd1;
+            padding: 3px 12px; border-radius: 10px; margin-top: 8px;
+        }
+
+        /* ホバー時は透明度を下げるだけ */
+        .exercise-select-btn.selected:hover {
+            opacity: 0.75; 
+            transform: translateY(-1px);
+        }
+
+        /* 種目名 */
+        .btn-ex-name { font-size: 1rem; line-height: 1.4; margin-bottom: 4px; }
+
+        /* バッジ（タグ）エリア */
+        .btn-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+        .btn-tag {
+            font-size: 0.7rem; padding: 3px 7px; border-radius: 6px; font-weight: 600; white-space: nowrap;
         }
         
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 12px;
-            padding: 5px;
-        }
-        .checkbox-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 15px; 
-            border-radius: 12px; 
-            border: 1px solid rgba(255,255,255,0.6);
-            background: rgba(255,255,255,0.7);
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-        }
-        .checkbox-item:hover { 
-            background-color: #fff; 
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
-            border-color: #4facfe;
-        }
-        .checkbox-item input { transform: scale(1.3); cursor: pointer; accent-color: #4facfe; }
-        .checkbox-item label { cursor: pointer; width: 100%; margin: 0; font-weight: 500; }
+        .btn-tag.muscle { background-color: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+        .btn-tag.equip { background-color: #f3e5f5; color: #6a1b9a; border: 1px solid #e1bee7; }
+        .btn-tag.diff-beginner { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .btn-tag.diff-intermediate { background-color: #fff8e1; color: #f57f17; border: 1px solid #ffe082; }
+        .btn-tag.diff-advanced { background-color: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
         
+        .instruction-text {
+            grid-column: 1 / -1; text-align: center; color: #999; font-weight: 700;
+            padding: 30px; background: rgba(0,0,0,0.02); border-radius: 10px;
+        }
+
+        /* 登録済みリスト */
+        .exercise-list-container { min-height: 50px; }
+        .empty-message {
+            text-align: center; color: #888; font-size: 0.9rem; padding: 20px;
+            border: 2px dashed rgba(0,0,0,0.1); border-radius: 12px; font-weight: 600;
+        }
+
+        .exercise-item {
+            background: #fff; border-radius: 15px; padding: 15px 20px;
+            margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05); border-left: 6px solid #a18cd1;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .exercise-info { display: flex; align-items: center; gap: 12px; font-weight: 800; color: #333; font-size: 1.05rem; }
+        .exercise-icon { color: #a18cd1; font-size: 1.2rem; }
+        
+        .btn-remove {
+            background: #fff0f0; color: #ff4444; border: 1px solid #ffcccc;
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .btn-remove:hover { background: #ff4444; color: white; border-color: #ff4444; }
+
+        /* 登録ボタン */
+        .submit-area { margin-top: 40px; text-align: center; }
+        .btn-submit {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white; border: none; padding: 15px 60px; border-radius: 50px;
+            font-size: 1.2rem; font-weight: 800; cursor: pointer;
+            box-shadow: 0 5px 20px rgba(79, 172, 254, 0.4);
+            transition: all 0.3s; width: 100%; max-width: 400px;
+        }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6); }
+
+        /* レスポンシブ */
         @media (max-width: 600px) {
-            .main-container { padding: 30px 20px; width: 92%; margin-top: 20px; }
-            .page-header { margin-bottom: 20px; }
-            .checkbox-grid { grid-template-columns: 1fr; }
+            .container { padding: 30px 20px; width: 95%; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .page-title { font-size: 1.5rem; }
+            .exercise-buttons-container { grid-template-columns: repeat(2, 1fr); }
+            .part-btn { font-size: 0.85rem; padding: 8px 14px; flex-grow: 1; justify-content: center; }
         }
     </style>
 </head>
 <body>
-    <div class="interactive-bg">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <canvas id="bg-canvas"></canvas>
-        <div id="mouse-flare" class="mouse-flare"></div>
-        <div class="bg-cloud cloud-1"></div>
-        <div class="bg-cloud cloud-2"></div>
-        <div class="bg-cloud cloud-3"></div>
+
+<div class="interactive-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <canvas id="bg-canvas"></canvas>
+    <div id="mouse-flare" class="mouse-flare"></div>
+    <div class="bg-cloud cloud-1"></div>
+    <div class="bg-cloud cloud-2"></div>
+    <div class="bg-cloud cloud-3"></div>
+</div>
+
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container">
+    
+    <div class="page-header-container">
+        <a th:href="@{/training/mysets}" class="home-link-icon" title="一覧に戻る">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h1 class="page-title"><i class="fa-solid fa-pen-to-square"></i> マイセット作成</h1>
     </div>
 
-    <div th:replace="~{fragments/header :: header}"></div>
+    <div th:if="${error}" class="alert alert-danger" style="background:#ffebee; color:#c62828; padding:15px; border-radius:10px; margin-bottom:20px; text-align:center;" th:text="${error}"></div>
 
-    <div class="main-container">
+    <form th:action="@{/training/mysets/create}" method="post" id="mysetForm">
         
-        <form th:action="@{/training/mysets/save}" method="post" th:object="${mySet}">
+        <div class="form-section">
+            <label for="setName" class="form-label">セット名</label>
+            <input type="text" id="setName" name="name" class="form-control" placeholder="例: 胸と背中の日、全身コースなど" required>
+        </div>
+
+        <div class="form-section">
+            <label class="form-label">種目を選択して追加</label>
             
-            <div class="page-header">
-                <a th:href="@{/training/mysets}" class="header-round-btn back-btn" title="キャンセルして戻る">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-
-                <h1 class="page-title">マイセット作成</h1>
-
-                <button type="submit" class="header-round-btn save-btn" title="保存する">
-                    <i class="fa-solid fa-check"></i>
-                </button>
-            </div>
-
-            <div class="form-group">
-                <label for="name"><i class="fa-solid fa-tag"></i> マイセット名</label>
-                <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="例：月曜日の胸トレ" required>
-            </div>
-
-            <div class="form-group">
-                <label style="font-size: 1.2rem; border-bottom: 2px dashed #ccc; padding-bottom: 10px; margin-bottom: 20px;">
-                    <i class="fa-solid fa-list-check"></i> 種目を選択
-                </label>
-                
-                <div th:each="entry : ${freeWeightExercisesByPart}">
-                    <h3 th:text="${entry.key}">部位</h3>
-                    <div class="checkbox-grid">
-                        <div th:each="exercise : ${entry.value}" class="checkbox-item" onclick="this.querySelector('input').click();">
-                            <input type="checkbox" th:field="*{exerciseNames}" th:value="${exercise}" th:id="${#ids.seq('ex')}" onclick="event.stopPropagation();">
-                            <label th:for="${#ids.prev('ex')}" th:text="${exercise}">種目名</label>
-                        </div>
+            <div class="selection-box">
+                <label class="sub-label"><i class="fa-solid fa-1"></i> 部位を選択</label>
+                <div id="partButtonsArea" class="part-buttons-container">
                     </div>
-                </div>
 
-                <div class="exercise-group">
-                    <h3 style="border-left-color: #28a745; color: #28a745;">有酸素運動</h3>
-                    <div class="checkbox-grid">
-                        <div th:each="cardio : ${cardioExercises}" class="checkbox-item" onclick="this.querySelector('input').click();">
-                            <input type="checkbox" th:field="*{exerciseNames}" th:value="${cardio}" th:id="${#ids.seq('cardio')}" onclick="event.stopPropagation();">
-                            <label th:for="${#ids.prev('cardio')}" th:text="${cardio}">有酸素</label>
-                        </div>
-                    </div>
+                <label class="sub-label"><i class="fa-solid fa-2"></i> 種目をタップして追加（選択中は再タップで解除）</label>
+                <div id="exerciseButtonsArea" class="exercise-buttons-container">
+                    <div class="instruction-text">上のボタンから部位を選ぶと<br>ここに種目が表示されます</div>
                 </div>
             </div>
+        </div>
 
-            </form>
-    </div>
+        <div class="form-section">
+            <label class="form-label">登録する種目リスト <span style="font-size:0.8rem; color:#888; font-weight:normal;">(追加順に保存されます)</span></label>
+            <div id="addedExercisesList" class="exercise-list-container">
+                <div class="empty-message">まだ種目が追加されていません。</div>
+            </div>
+            <div id="hiddenInputsContainer"></div>
+        </div>
+
+        <div class="submit-area">
+            <button type="submit" class="btn-submit">
+                <i class="fa-solid fa-check"></i> この内容で作成する
+            </button>
+        </div>
+    </form>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const exercisesByPart = /*[[${exercisesByPart}]]*/ {};
+    const muscleParts = /*[[${parts}]]*/ []; 
+    
+    const partIcons = {
+        '胸': 'fa-child-reaching',
+        '背中': 'fa-person-walking',
+        '脚': 'fa-person-running',
+        '肩': 'fa-user-large',
+        '腕': 'fa-hand-fist',
+        '腹筋': 'fa-table-cells',
+        '有酸素運動': 'fa-heart-pulse',
+        'その他': 'fa-dumbbell'
+    };
+    /*]]>*/
+</script>
 
 <script>
     // === 🌟 CANVAS PARTICLE SYSTEM ===
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     const flare = document.getElementById('mouse-flare');
-    
     let particlesArray = [];
     let width, height;
 
@@ -319,18 +385,171 @@
         }
         requestAnimationFrame(animate);
     }
-    
-    // 背景の雲のパララックス効果
-    const cloud1 = document.querySelector('.cloud-1');
-    const cloud2 = document.querySelector('.cloud-2');
-    document.addEventListener('mousemove', (e) => {
-        const x = (window.innerWidth - e.pageX) / 60;
-        const y = (window.innerHeight - e.pageY) / 60;
-        if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
-        if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
-    });
-
     animate();
+
+    // === 📝 フォーム制御ロジック ===
+    
+    const addedExercisesSet = new Set();
+    let currentPart = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const partArea = document.getElementById('partButtonsArea');
+        const exerciseArea = document.getElementById('exerciseButtonsArea');
+        const listContainer = document.getElementById('addedExercisesList');
+        const hiddenContainer = document.getElementById('hiddenInputsContainer');
+        const form = document.getElementById('mysetForm');
+
+        // 1. 部位ボタンを生成
+        if (muscleParts && muscleParts.length > 0) {
+            muscleParts.forEach(part => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'part-btn';
+                btn.setAttribute('data-part', part);
+                
+                const iconClass = partIcons[part] || 'fa-dumbbell';
+                btn.innerHTML = `<i class="fa-solid ${iconClass}"></i> ${part}`;
+                
+                btn.onclick = () => selectPart(part, btn);
+                partArea.appendChild(btn);
+            });
+        }
+
+        // 部位選択処理
+        function selectPart(part, clickedBtn) {
+            currentPart = part;
+            
+            const allBtns = partArea.querySelectorAll('.part-btn');
+            allBtns.forEach(b => b.classList.remove('active'));
+            if(clickedBtn) clickedBtn.classList.add('active');
+            else {
+                const target = Array.from(allBtns).find(b => b.textContent.trim().includes(part));
+                if(target) target.classList.add('active');
+            }
+
+            exerciseArea.innerHTML = '';
+
+            if (exercisesByPart[part]) {
+                exercisesByPart[part].forEach(ex => {
+                    const exerciseName = ex.name || ex; 
+                    const muscle = ex.targetMuscle || '部位';
+                    const equip = ex.equipment || '器具';
+                    const diff = ex.difficulty || '普通';
+
+                    const btn = document.createElement('div');
+                    btn.className = 'exercise-select-btn';
+                    
+                    // バッジクラスの判定
+                    let diffClass = '';
+                    if (diff.includes('初')) diffClass = 'diff-beginner';
+                    else if (diff.includes('中')) diffClass = 'diff-intermediate';
+                    else if (diff.includes('上')) diffClass = 'diff-advanced';
+
+                    btn.innerHTML = `
+                        <div class="btn-ex-name">${exerciseName}</div>
+                        <div class="btn-tags">
+                            <span class="btn-tag muscle">${muscle}</span>
+                            <span class="btn-tag equip">${equip}</span>
+                            <span class="btn-tag ${diffClass}">${diff}</span>
+                        </div>
+                    `;
+                    
+                    btn.dataset.name = exerciseName;
+
+                    if (addedExercisesSet.has(exerciseName)) {
+                        btn.classList.add('selected');
+                    }
+
+                    // クリックでトグル
+                    btn.onclick = () => toggleExercise(exerciseName);
+
+                    exerciseArea.appendChild(btn);
+                });
+            } else {
+                exerciseArea.innerHTML = '<div class="instruction-text">この部位の種目はありません</div>';
+            }
+        }
+
+        // 追加・削除のトグル
+        function toggleExercise(name) {
+            if (addedExercisesSet.has(name)) {
+                removeExerciseByName(name);
+            } else {
+                addExerciseToList(name);
+            }
+            updateButtonState(name);
+        }
+
+        function updateButtonState(name) {
+            // 表示中のボタンのみ更新
+            const btn = document.querySelector(`.exercise-select-btn[data-name="${name}"]`);
+            if (btn) {
+                if (addedExercisesSet.has(name)) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            }
+        }
+
+        // リストへの追加処理
+        function addExerciseToList(exerciseName) {
+            addedExercisesSet.add(exerciseName);
+
+            const emptyMsg = listContainer.querySelector('.empty-message');
+            if (emptyMsg) emptyMsg.remove();
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'exercise-item';
+            itemDiv.dataset.name = exerciseName; 
+            itemDiv.innerHTML = `
+                <div class="exercise-info">
+                    <i class="fa-solid fa-check exercise-icon"></i>
+                    <span>${exerciseName}</span>
+                </div>
+                <button type="button" class="btn-remove" onclick="removeExerciseByName('${exerciseName}')">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            `;
+            listContainer.appendChild(itemDiv);
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'exerciseNames'; 
+            input.value = exerciseName;
+            input.dataset.name = exerciseName;
+            hiddenContainer.appendChild(input);
+            
+            listContainer.scrollTop = listContainer.scrollHeight;
+        }
+
+        // 削除処理 (グローバル)
+        window.removeExerciseByName = function(name) {
+            addedExercisesSet.delete(name);
+
+            const items = listContainer.querySelectorAll('.exercise-item');
+            items.forEach(item => {
+                if (item.dataset.name === name) item.remove();
+            });
+
+            const input = hiddenContainer.querySelector(`input[value="${name}"]`);
+            if (input) input.remove();
+
+            if (listContainer.children.length === 0) {
+                listContainer.innerHTML = '<div class="empty-message">まだ種目が追加されていません。</div>';
+            }
+
+            updateButtonState(name);
+        };
+
+        form.addEventListener('submit', function(e) {
+            if (hiddenContainer.children.length === 0) {
+                e.preventDefault();
+                alert('種目を少なくとも1つ追加してください。');
+            }
+        });
+    });
 </script>
+
 </body>
 </html>

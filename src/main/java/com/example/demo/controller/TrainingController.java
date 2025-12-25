@@ -8,6 +8,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -394,38 +395,104 @@ public class TrainingController {
         return response;
     }
 
+ // ▼ マイセット一覧画面の表示
     @GetMapping("/training/mysets")
     public String showMySetList(Authentication authentication, Model model) {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
+        
+        // マイセット取得
         List<MySet> mySets = mySetRepository.findByUserOrderByIdDesc(currentUser);
         model.addAttribute("mySets", mySets);
+
+        // 「種目名 -> 部位名」の対応マップを作成
+        Map<String, String> exerciseToPartMap = new HashMap<>();
+
+        // 1. フリーウェイト種目の登録
+        // ★修正: List<String> ではなく List<ExerciseData> で受け取る
+        Map<String, List<ExerciseData>> freeWeightMap = trainingDataService.getFreeWeightExercisesByPart();
+        
+        for (Map.Entry<String, List<ExerciseData>> entry : freeWeightMap.entrySet()) {
+            String part = entry.getKey();
+            // ExerciseDataオブジェクトから名前を取り出す
+            for (ExerciseData exercise : entry.getValue()) {
+                exerciseToPartMap.put(exercise.getName(), part);
+            }
+        }
+
+        // 2. 有酸素運動の登録
+        List<ExerciseData> cardioList = trainingDataService.getCardioExercises();
+        for (ExerciseData cardio : cardioList) {
+            exerciseToPartMap.put(cardio.getName(), "有酸素運動");
+        }
+
+        // JS側に渡す
+        model.addAttribute("exerciseCategoryMap", exerciseToPartMap);
+
         return "training/myset-list";
     }
 
+ // マイセット作成画面の表示
     @GetMapping("/training/mysets/new")
-    public String showMySetForm(Authentication authentication, Model model) {
+    public String showCreateMySetForm(Model model, Authentication authentication) {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
-        model.addAttribute("mySet", new MySet());
-        model.addAttribute("freeWeightExercisesByPart", trainingDataService.getSimpleFreeWeightExercisesMap());
-        model.addAttribute("cardioExercises", trainingDataService.getSimpleCardioExercisesList());
+
+        // 1. 結果を格納するマップ (順序保持のためLinkedHashMap)
+        Map<String, List<ExerciseData>> allExercisesMap = new LinkedHashMap<>();
+        
+        // ★修正: サービスが既に ExerciseData を返しているので、型変換せずそのまま putAll する
+        // エラーが出ていた "rawMap" への代入と forループ変換処理 は削除しました
+        allExercisesMap.putAll(trainingDataService.getFreeWeightExercisesByPart());
+
+        // 2. 有酸素運動を追加
+        List<ExerciseData> cardioList = trainingDataService.getCardioExercises();
+        allExercisesMap.put("有酸素運動", cardioList);
+        
+        // 3. 部位リスト（ボタン表示順）を作成
+        List<String> allParts = new ArrayList<>(trainingDataService.getMuscleParts());
+        if (!allParts.contains("有酸素運動")) {
+            allParts.add("有酸素運動");
+        }
+
+        // 画面に渡す
+        model.addAttribute("exercisesByPart", allExercisesMap); // 詳細データ入りマップ
+        model.addAttribute("parts", allParts);                  // 部位リスト
+        
         return "training/myset-form";
     }
-
-    @PostMapping("/training/mysets/save")
-    public String saveMySet(@ModelAttribute MySet mySet, Authentication authentication, RedirectAttributes redirectAttributes) {
+    // ▼ マイセットの作成処理 (POST)
+    @PostMapping("/training/mysets/create")
+    public String createMySet(
+            @RequestParam("name") String name,
+            @RequestParam(value = "exerciseNames", required = false) List<String> exerciseNames,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+        
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
+
+        if (exerciseNames == null || exerciseNames.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "種目を少なくとも1つ追加してください。");
+            return "redirect:/training/mysets/new";
+        }
+
+        MySet mySet = new MySet();
+        mySet.setName(name);
+        mySet.setExerciseNames(exerciseNames);
         mySet.setUser(currentUser);
+        
         mySetRepository.save(mySet);
-        redirectAttributes.addFlashAttribute("successMessage", "マイセット「" + mySet.getName() + "」を保存しました！");
+
+        redirectAttributes.addFlashAttribute("successMessage", "マイセット「" + name + "」を作成しました！");
         return "redirect:/training/mysets";
     }
 
+    // ▼ マイセットの削除処理
     @PostMapping("/training/mysets/delete/{id}")
     public String deleteMySet(@PathVariable("id") Long id, Authentication authentication, RedirectAttributes redirectAttributes) {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
+        
         MySet target = mySetRepository.findByIdAndUser(id, currentUser);
         if (target != null) {
             mySetRepository.delete(target);

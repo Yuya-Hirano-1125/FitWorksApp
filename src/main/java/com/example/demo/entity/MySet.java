@@ -22,7 +22,7 @@ public class MySet {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private String name; // マイセット名（例：胸の日、月曜メニュー）
+    private String name; // マイセット名
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> exerciseNames; // 種目名のリスト
