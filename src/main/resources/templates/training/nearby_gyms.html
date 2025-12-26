@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>近くのジムを探す</title>
+    <title>トレーニング施設検索</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -13,6 +13,9 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
+        /* ★重要: すべての要素のサイズ計算を枠線込みにする（レイアウト崩れ防止） */
+        *, *::before, *::after { box-sizing: border-box; }
+
         /* 背景アニメーションスタイル */
         :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #ff69b4; }
         body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
@@ -42,7 +45,14 @@
 
         /* ヘッダー修正 */
         .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; width: 100%; }
-        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
+        
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left;
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -51,10 +61,74 @@
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
-        .search-container { width: 100%; max-width: 600px; margin: 20px 0; display: flex; gap: 10px; }
-        .search-input { flex-grow: 1; padding: 12px; border-radius: 25px; border: 1px solid #ddd; font-size: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); background: rgba(255,255,255,0.9); }
-        .search-button { background: var(--primary-color, #ff69b4); color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; white-space: nowrap; box-shadow: 0 4px 10px rgba(255,105,180,0.3); }
-        .search-button:disabled { background: #ccc; cursor: not-allowed; }
+        /* 検索エリア */
+        .search-container { 
+            width: 100%; 
+            max-width: 800px; 
+            margin: 20px 0; 
+            display: flex; 
+            gap: 15px; 
+            align-items: center; 
+            flex-wrap: wrap; /* 折り返しを許可 */
+        }
+        
+        .search-box-wrapper {
+            position: relative;
+            flex: 1; /* 残りのスペースを埋める */
+            min-width: 250px; /* 小さくなりすぎないように */
+        }
+
+        .search-input { 
+            width: 100%; 
+            padding: 15px 50px 15px 25px;
+            border-radius: 50px; 
+            border: 2px solid rgba(255,255,255,0.8); 
+            font-size: 1rem; 
+            background: #fff; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+            transition: all 0.3s ease; 
+            appearance: none; 
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.25);
+            transform: translateY(-2px);
+            background: #fff;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4facfe;
+            font-size: 1.2rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* ★検索ボタンのデザイン変更（青系グラデーション） */
+        .search-button {
+            background: linear-gradient(135deg, #4facfe, #00f2fe); /* 青系 */
+            color: white; 
+            border: none; 
+            padding: 15px 25px; 
+            border-radius: 50px;
+            cursor: pointer; 
+            font-weight: bold; 
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.4); /* 青系の影 */
+            transition: all 0.3s;
+            line-height: 1.2;
+            flex-shrink: 0; 
+        }
+        .search-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(79, 172, 254, 0.6); /* 青系の影（濃いめ） */
+        }
+        .search-button:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
 
         #map-container { 
             width: 100%; height: 50vh; min-height: 400px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: 20px 0; position: relative; border: 2px solid rgba(255,255,255,0.8);
@@ -77,6 +151,37 @@
         .place-dist { font-size: 0.85rem; color: #666; }
         .route-btn { background-color: #4CAF50; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; white-space: nowrap; box-shadow: 0 3px 8px rgba(76,175,80,0.3); }
         .route-btn:hover { background-color: #45a049; }
+
+        /* ★レスポンシブ対応: 768px以下で縦並び */
+        @media (max-width: 768px) {
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            .search-box-wrapper { 
+                width: 100%; 
+                min-width: 0; 
+            }
+            .search-button { 
+                width: 100%; 
+            }
+
+            .page-header-container {
+                flex-wrap: nowrap;
+            }
+            .page-title {
+                font-size: 1.3rem; 
+                white-space: nowrap;
+            }
+            .home-link-icon {
+                width: 40px; height: 40px; font-size: 1.2rem;
+            }
+            .main-container {
+                padding: 25px 20px; 
+                width: 95%;
+            }
+        }
     </style>  
 </head>
 <body>
@@ -95,13 +200,16 @@
         <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
             <i class="fa-solid fa-house"></i>
         </a>
-        <h1 class="page-title"><i class="fa-solid fa-map-location-dot"></i> 近くのトレーニング施設を探す</h1>
+        <h1 class="page-title"><i class="fa-solid fa-map-location-dot"></i> トレーニング施設検索</h1>
     </div>
 
     <p style="color: #666; font-size: 0.9rem;">地図を動かして中心（<i class="fa-solid fa-plus" style="color:red;"></i>）から半径5km以内を検索します</p>
 
     <div class="search-container">
-        <input type="text" id="keyword-input" class="search-input" placeholder="例: chocoZAP, Anytime, JOYFIT">
+        <div class="search-box-wrapper">
+            <input type="text" id="keyword-input" class="search-input" placeholder="例: ジム, 市民体育館, プール">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        </div>
         <button onclick="performSearch()" id="search-btn" class="search-button">この場所で検索</button>
     </div>
 
