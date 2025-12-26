@@ -74,19 +74,6 @@
             font-size: 1.1rem;
         }
 
-        /* 日付入力のネイティブアイコン調整 */
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0; /* 透明にして全面をクリック可能にする */
-            cursor: pointer;
-            z-index: 20;
-        }
-
         input::-ms-reveal { display: none; }
         input::-ms-clear { display: none; }
 
@@ -134,13 +121,10 @@
                 <input type="email" id="email" name="email" required placeholder="contact@example.com" autocomplete="off">
             </div>
             
-            <div class="form-group">
-                <label for="birthDate">生年月日</label>
-                <div class="date-wrapper">
-                    <input type="date" id="birthDate" name="birthDate" required>
-                    <i class="fa-solid fa-calendar-days calendar-icon"></i>
-                </div>
-            </div>
+			<div class="form-group">
+			                <label for="birthDate">生年月日</label>
+			                <input type="date" id="birthDate" name="birthDate" required>
+			            </div>
 
             <div class="form-group">
                 <label for="new-password">パスワード</label>
@@ -201,18 +185,21 @@
             update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
             draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
         }
-        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
-        animate();
-        
-        // 日付入力のアイコンクリックでピッカーを表示する補助スクリプト（ブラウザ互換性のため）
-        document.querySelector('.calendar-icon').addEventListener('click', function() {
-            const dateInput = document.getElementById('birthDate');
-            if (dateInput.showPicker) {
-                dateInput.showPicker();
-            } else {
-                dateInput.focus();
-            }
-        });
+		function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+		        animate();
+		        
+		        // ★以下のスクリプトをすべて削除してください★
+		        // 日付入力のアイコンクリックでピッカーを表示する補助スクリプト（ブラウザ互換性のため）
+		        /*
+		        document.querySelector('.calendar-icon').addEventListener('click', function() {
+		            const dateInput = document.getElementById('birthDate');
+		            if (dateInput.showPicker) {
+		                dateInput.showPicker();
+		            } else {
+		                dateInput.focus();
+		            }
+		        });
+		        */
     </script>
 </body>
 </html>

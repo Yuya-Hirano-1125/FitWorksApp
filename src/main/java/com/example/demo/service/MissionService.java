@@ -18,17 +18,17 @@ import com.example.demo.repository.UserRepository;
 @Service
 public class MissionService {
 
-    // ★追加: デイリーミッション1つあたりの報酬チップ量
+    // 報酬チップ量
     public static final int DAILY_MISSION_REWARD_CHIPS = 300;
 
     private final DailyMissionStatusRepository missionStatusRepository;
     private final UserService userService;
     private final UserRepository userRepository;
 
-    // ★追加: ミッション定義のための内部レコードクラス
+    // ★ ミッション定義
     private record MissionDefinition(String type, String description, int requiredCount, int rewardExp) {}
 
-    // ★追加: 全ミッションのリスト定義
+    // ★ 全ミッションリスト
     private static final List<MissionDefinition> ALL_MISSIONS = List.of(
         new MissionDefinition("TRAINING_LOG", "トレーニングを1回記録する", 1, 1000),
         new MissionDefinition("COMMUNITY_POST", "コミュニティに1回投稿する", 1, 1000),
@@ -48,8 +48,7 @@ public class MissionService {
     }
 
     /**
-     * ユーザーの今日のデイリーミッションを取得します。
-     * まだ生成されていない場合は、ランダムに3つ生成します。
+     * 今日のミッションを取得（なければランダム生成）
      */
     @Transactional
     public List<DailyMissionStatus> getOrCreateTodayMissions(User user) {
@@ -60,19 +59,18 @@ public class MissionService {
             // ★ 今日分がなければランダム生成
             missions = generateRandomDailyMissions(user, today);
         }
-        
         return missions;
     }
 
     /**
-     * ランダムに3つのデイリーミッションを生成・保存します。
+     * ランダムに3つのミッションを生成
      */
     private List<DailyMissionStatus> generateRandomDailyMissions(User user, LocalDate date) {
-        // 全ミッション定義をコピーしてシャッフル
+        // リストをシャッフル
         List<MissionDefinition> candidates = new ArrayList<>(ALL_MISSIONS);
         Collections.shuffle(candidates);
 
-        // 先頭から3つ選ぶ
+        // 先頭3つを選択
         List<MissionDefinition> selected = candidates.subList(0, 3);
         
         List<DailyMissionStatus> newMissions = new ArrayList<>();
@@ -80,9 +78,6 @@ public class MissionService {
             DailyMissionStatus mission = new DailyMissionStatus(
                 user, date, def.type(), def.description(), def.requiredCount()
             );
-            // ※EntityにrewardExpをセットするセッターがない場合はデフォルト(1000)が使われます
-            // 必要に応じて DailyMissionStatus 側に setRewardExp メソッドを追加してください
-            
             newMissions.add(mission);
         }
 
@@ -90,9 +85,7 @@ public class MissionService {
         return newMissions;
     }
 
-    /**
-     * ミッションの進捗を更新します。
-     */
+    // --- 進捗更新 ---
     @Transactional
     public void updateMissionProgress(Long userId, String missionType) {
         User user = userService.findById(userId)
@@ -107,9 +100,7 @@ public class MissionService {
                 });
     }
 
-    /**
-     * 完了したミッションの報酬を獲得します (経験値 + チップ)。
-     */
+    // --- 報酬受け取り ---
     @Transactional
     public boolean claimMissionReward(Long userId, Long missionId) {
         Optional<DailyMissionStatus> optionalStatus = missionStatusRepository.findById(missionId);
@@ -123,30 +114,24 @@ public class MissionService {
 
         if (missionStatus.isCompleted() && !missionStatus.isRewardClaimed()) {
             User user = userService.findById(userId)
-                    .orElseThrow(() -> new IllegalStateException("User not found in claim process."));
+                    .orElseThrow(() -> new IllegalStateException("User not found."));
             
             int rewardExp = missionStatus.getRewardExp();
 
-            // 1. 経験値付与
+            // 経験値とチップを付与
             userService.addExp(user, rewardExp);
-
-            // ★ 2. チップ付与 (ここを追加)
             user.addChips(DAILY_MISSION_REWARD_CHIPS);
 
-            // 報酬受け取り済みに更新
             missionStatus.setRewardClaimed(true);
 
             missionStatusRepository.save(missionStatus);
             userRepository.save(user);
-
             return true;
         }
         return false;
     }
 
-    /**
-     * 毎日午前4時に全ユーザーのミッションを更新するスケジューラ
-     */
+    // --- AM4:00 リセット ---
     @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Tokyo")
     @Transactional
     public void resetDailyMissions() {
@@ -155,8 +140,8 @@ public class MissionService {
 
         for (User user : users) {
             missionStatusRepository.deleteByUserAndDate(user, today);
-            generateRandomDailyMissions(user, today); // ランダム生成を使用
+            generateRandomDailyMissions(user, today);
         }
-        System.out.println("✅ デイリーミッションを午前4時に更新しました");
+        System.out.println("✅ デイリーミッションを更新しました");
     }
 }

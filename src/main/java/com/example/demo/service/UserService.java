@@ -59,26 +59,26 @@ public class UserService {
     
     // --- ユーザー登録関連 ---
     @Transactional
-    public void registerUser(String username, String password, String email, String phoneNumber, LocalDate birthDate) {
-        registerNewUser(username, email, phoneNumber, password, birthDate);
+    public void registerUser(String username, String password, String email, LocalDate birthDate) {
+        // phoneNumber引数を削除して呼び出し
+        registerNewUser(username, email, password, birthDate);
     }
     
     @Transactional
-    public void registerNewUser(String username, String email, String phoneNumber, String rawPassword, LocalDate birthDate) {
+    public void registerNewUser(String username, String email, String rawPassword, LocalDate birthDate) {
         if (userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("そのユーザー名は既に使用されています。");
         }
         if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("そのメールアドレスは既に使用されています。");
         }
-        if (phoneNumber != null && !phoneNumber.isEmpty() && userRepository.findByPhoneNumber(phoneNumber).isPresent()) {
-            throw new IllegalArgumentException("その電話番号は既に使用されています。");
-        }
+        // 電話番号の重複チェックを削除
 
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setEmail(email);
-        newUser.setPhoneNumber(phoneNumber);
+        // 電話番号のセットを削除
+        // newUser.setPhoneNumber(phoneNumber); 
         newUser.setBirthDate(birthDate); // 生年月日保存
         newUser.setPassword(passwordEncoder.encode(rawPassword));
         newUser.setLevel(1);

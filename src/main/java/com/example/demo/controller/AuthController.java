@@ -66,11 +66,12 @@ public class AuthController {
     public String registerUser(@RequestParam String username,
                                @RequestParam String password,
                                @RequestParam String email,
-                               @RequestParam String phoneNumber,
+                               // @RequestParam String phoneNumber, ← この行を削除
                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthDate,
                                Model model) {
         try {
-            userService.registerUser(username, password, email, phoneNumber, birthDate);
+            // phoneNumber 引数を削除して呼び出し
+            userService.registerUser(username, password, email, birthDate);
             return "redirect:/login";
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
