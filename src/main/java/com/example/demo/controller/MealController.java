@@ -35,6 +35,7 @@ import com.example.demo.entity.MealRecord;
 import com.example.demo.entity.User;
 import com.example.demo.service.AICoachService;
 import com.example.demo.service.MealService;
+import com.example.demo.service.MissionService; // ★追加
 import com.example.demo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,14 +43,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RequestMapping("/log/meal")
 public class MealController {
 
+    private final UserService userService;
+    private final MealService mealService;
+    private final AICoachService aiCoachService;
+    private final MissionService missionService; // ★追加
+
+    // コンストラクタ注入に変更
     @Autowired
-    private UserService userService;
-    
-    @Autowired
-    private MealService mealService;
-    
-    @Autowired
-    private AICoachService aiCoachService;
+    public MealController(UserService userService,
+                          MealService mealService,
+                          AICoachService aiCoachService,
+                          MissionService missionService) { // ★追加
+        this.userService = userService;
+        this.mealService = mealService;
+        this.aiCoachService = aiCoachService;
+        this.missionService = missionService;
+    }
 
     @PostMapping("/analyze")
     public String analyzeMeal(@RequestParam("mealImage") MultipartFile file,
@@ -306,6 +315,9 @@ public class MealController {
             User user = userService.findByUsername(userDetails.getUsername());
             MealRecord savedRecord = mealService.saveMealRecord(form, user);
             
+            // ★★★ ミッション進捗更新 ★★★
+            missionService.updateMissionProgress(user.getId(), "MEAL_LOG");
+
             try {
                 String advice = aiCoachService.generateDietBasedTrainingAdvice(user, form);
                 redirectAttributes.addFlashAttribute("aiAdvice", advice); 

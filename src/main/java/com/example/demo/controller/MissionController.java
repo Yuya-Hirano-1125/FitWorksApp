@@ -26,7 +26,7 @@ public class MissionController {
 
     private final UserService userService;
     private final MissionService missionService;
-    private final CommunityService communityService; // ★ コミュニティ投稿用サービス
+    private final CommunityService communityService;
 
     public MissionController(UserService userService,
                              MissionService missionService,
@@ -69,14 +69,6 @@ public class MissionController {
     }
 
     /**
-     * FAQ画面
-     */
-    @GetMapping("/faq")
-    public String showFaq() {
-        return "misc/faq";
-    }
-
-    /**
      * AIコーチ画面に遷移
      */
     @GetMapping("/ai-coach")
@@ -85,7 +77,6 @@ public class MissionController {
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
             if (user != null) {
-                // ★ AIコーチ利用ミッション進捗を更新
                 missionService.updateMissionProgress(user.getId(), "AI_COACH");
             }
         }
@@ -112,17 +103,26 @@ public class MissionController {
 
         if (success) {
             MissionStatusDto status = userService.getDailyMissionStatus(user);
+            User updatedUser = userService.findByUsername(userDetails.getUsername()); // 最新情報を取得
+
+            // ★修正: メッセージはシンプルに
             redirectAttributes.addFlashAttribute("successMessage",
-                    "ミッション報酬 " + status.getRewardXp() + " XPを受け取りました！ " +
-                    "現在のレベル: " + user.getLevel() +
-                    " (経験値: " + user.getExperiencePoints() + "/" + user.calculateRequiredXp() + ")");
+                    "ミッション報酬 " + status.getRewardXp() + " XPと " + 
+                    MissionService.DAILY_MISSION_REWARD_CHIPS + " チップを受け取りました！");
+            
+            // ★追加: 画面表示用に個別にデータを渡す
+            redirectAttributes.addFlashAttribute("rewardLevel", updatedUser.getLevel());
+            redirectAttributes.addFlashAttribute("rewardChips", updatedUser.getChipCount());
+            redirectAttributes.addFlashAttribute("rewardExp", updatedUser.getExperiencePoints());
+            redirectAttributes.addFlashAttribute("rewardReqExp", updatedUser.calculateRequiredXp());
+            
         } else {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "報酬を受け取れませんでした。ミッションを完了しているか、既に受け取り済みか確認してください。");
         }
         return "redirect:/daily-mission";
     }
-
+    
     /**
      * ミッション1: ランニング → トレーニング画面へ遷移
      */
@@ -132,7 +132,6 @@ public class MissionController {
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
             if (user != null) {
-                // ★ トレーニングログミッション進捗を更新
                 missionService.updateMissionProgress(user.getId(), "TRAINING_LOG");
                 redirectAttributes.addFlashAttribute("successMessage", "ランニングを記録しました！ミッション進捗が更新されました。");
             }
@@ -140,9 +139,6 @@ public class MissionController {
         return "training/training";
     }
 
-    /**
-     * ミッション2: コミュニティ投稿
-     */
     @PostMapping("/community/post")
     public String postCommunity(@AuthenticationPrincipal UserDetails userDetails,
                                 @RequestParam String content,
@@ -156,10 +152,7 @@ public class MissionController {
             return "redirect:/login";
         }
 
-        // 投稿処理
         communityService.createPost(user, content, content);
-
-        // ★ コミュニティ投稿ミッション進捗を更新
         missionService.updateMissionProgress(user.getId(), "COMMUNITY_POST");
 
         redirectAttributes.addFlashAttribute("successMessage", "コミュニティに投稿しました！ミッション進捗が更新されました。");

@@ -1,5 +1,5 @@
 /* ========================================================= */
-/* DAILY MISSION STYLE (daily-mission.css) */
+/* DAILY MISSION STYLE (daily-mission.css) - Blue Theme */
 /* ========================================================= */
 
 .mission-page .main-container {
@@ -19,48 +19,54 @@
 
 .mission-card {
     display: flex;
-    align-items: center; /* 垂直方向中央揃え */
-    justify-content: space-between; /* 要素間のスペース調整 */
-    background: #fffafa;
-    padding: 15px 20px; /* パディングを少し調整 */
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff; /* 純白に変更 */
+    padding: 15px 20px;
     border-radius: 15px;
-    border: 3px solid var(--secondary-color);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    /* ★変更: 青系のボーダー */
+    border: 2px solid #e0f0ff; 
+    /* ★変更: 青系のシャドウ */
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.08); 
     transition: all 0.3s cubic-bezier(.17,.67,.83,.67);
     position: relative;
     overflow: hidden;
-    gap: 15px; /* 子要素間の隙間 */
+    gap: 15px;
 }
 
 .mission-card:hover {
     transform: translateY(-5px) scale(1.01);
-    box-shadow: 0 12px 30px rgba(255, 105, 180, 0.3);
+    /* ★変更: ホバー時のシャドウを青く */
+    box-shadow: 0 12px 30px rgba(79, 172, 254, 0.3);
+    border-color: #4facfe;
 }
 
 /* --- ICONS --- */
 .mission-icon {
-    flex-shrink: 0; /* アイコンが潰れないように */
-    font-size: 24px; /* 少しサイズ調整 */
-    color: var(--primary-color);
+    flex-shrink: 0;
+    font-size: 24px;
+    color: #ffffff; /* アイコンは白 */
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: var(--secondary-color);
+    /* ★変更: 青のグラデーション背景 */
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+    /* ★変更: シャドウを青く */
+    box-shadow: 0 4px 10px rgba(0, 198, 255, 0.4);
     animation: iconWiggle 3s ease-in-out infinite alternate-reverse;
 }
 .mission-icon i {
     color: #ffffff;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 /* --- DETAILS --- */
 .mission-details {
     flex-grow: 1;
-    min-width: 0; /* フレックスアイテムの縮小を許可 */
+    min-width: 0;
 }
 
 .mission-header {
@@ -68,23 +74,24 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 5px;
-    flex-wrap: wrap; /* タイトルが長い場合に折り返し */
+    flex-wrap: wrap;
     gap: 10px;
 }
 
 .mission-title {
     font-weight: 800;
     font-size: 16px;
-    color: var(--dark-text);
+    color: #333; /* 文字色はダークグレー */
     line-height: 1.4;
 }
 
 .mission-reward {
     font-weight: 900;
     font-size: 14px;
-    color: var(--ai-accent-color);
-    text-shadow: 0 0 5px rgba(135, 206, 235, 0.4);
-    white-space: nowrap; /* 報酬XPを折り返さない */
+    /* ★変更: アクセントカラーを少し濃い青に */
+    color: #007bff; 
+    text-shadow: none;
+    white-space: nowrap;
 }
 
 /* --- PROGRESS BAR --- */
@@ -97,85 +104,95 @@
 
 .progress-bar-wrap {
     flex-grow: 1;
-    height: 8px; /* 少し細く */
-    background-color: #f0f0f0;
+    height: 8px;
+    background-color: #eff3f8; /* 背景を薄い青グレーに */
     border-radius: 4px;
     overflow: hidden;
-    border: 1px solid #ccc;
+    border: none; /* 枠線を削除してモダンに */
 }
 
 .progress-bar {
     height: 100%;
-    background: linear-gradient(90deg, #ffc8dd, var(--primary-color));
+    /* ★変更: 青のグラデーション */
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
     transition: width 0.5s ease-out;
-    border-radius: 4px 0 0 4px;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(0, 242, 254, 0.5);
 }
 
 .progress-text {
     font-weight: 700;
-    color: var(--dark-text);
-    min-width: 80px; /* テキスト幅確保 */
+    color: #666;
+    min-width: 80px;
     text-align: right;
 }
 
 /* --- BUTTONS --- */
 /* アクションボタンの共通スタイル */
 .mission-cta-button {
-    /* base.cssのスタイルを上書きしてサイズ適正化 */
     width: auto !important; 
     margin: 0 !important;
     display: inline-block;
     
-    background: var(--ai-accent-color);
-    color: #ffffff;
+    /* ★変更: 基本ボタンは落ち着いた青 */
+    background: #e7f5ff;
+    color: #007bff;
+    
     border-radius: 30px;
     font-weight: 700;
-    padding: 8px 16px; /* パディングをコンパクトに */
-    font-size: 0.85rem; /* フォントサイズ微調整 */
-    white-space: nowrap; /* ボタン内改行禁止 */
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    white-space: nowrap;
     text-align: center;
     text-decoration: none;
     transition: all 0.3s cubic-bezier(.68,-0.55,.26,1.55);
-    box-shadow: 0 4px 10px rgba(135, 206, 235, 0.5);
-    border: none;
+    border: 1px solid transparent;
     cursor: pointer;
-    flex-shrink: 0; /* ボタンが潰れないように */
+    flex-shrink: 0;
 }
 
 .mission-cta-button:hover {
     transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 6px 15px rgba(135, 206, 235, 0.7);
+    /* ホバー時は濃い青背景・白文字に反転 */
+    background: #007bff;
+    color: #ffffff;
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
 }
 
 /* 完了（報酬受取）ボタン用の追加スタイル */
+/* 報酬は目立たせるため、ゴールド/オレンジ系のままにするか、あるいは鮮やかな青にする */
+/* ここでは「達成感」のためにオレンジゴールド系を維持しつつ、デザインを合わせます */
 button[type="submit"].mission-cta-button {
-    background: linear-gradient(135deg, var(--primary-color), #ff88c8);
-    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.5);
+    background: linear-gradient(135deg, #ffb347, #ffcc33);
+    color: white;
+    box-shadow: 0 4px 10px rgba(255, 179, 71, 0.4);
+    text-shadow: 0 1px 1px rgba(0,0,0,0.1);
 }
 button[type="submit"].mission-cta-button:hover {
-    box-shadow: 0 8px 20px rgba(255, 105, 180, 0.7);
+    box-shadow: 0 8px 20px rgba(255, 179, 71, 0.6);
+    transform: translateY(-3px) scale(1.05);
 }
 
 /* --- COMPLETED STATE --- */
 .mission-card.completed {
-    background: #e9e9e9;
-    border: 3px solid #ccc;
-    color: #aaa;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
     box-shadow: none;
     animation: none;
+    opacity: 0.9;
 }
 .mission-card.completed .mission-title {
     text-decoration: line-through;
-    color: #999;
+    color: #adb5bd;
 }
 .mission-card.completed .mission-reward {
-    color: var(--success-color);
+    color: #28a745; /* 完了時は緑色 */
     font-weight: 800;
 }
 .mission-card.completed .mission-icon {
-    background: #ccc;
+    background: #dee2e6; /* グレー */
     box-shadow: none;
-    opacity: 0.7;
+    opacity: 0.8;
 }
 
 .completed-stamp {
@@ -183,11 +200,11 @@ button[type="submit"].mission-cta-button:hover {
     top: -10px;
     right: -10px;
     font-size: 40px;
-    color: var(--success-color);
+    color: #28a745;
     transform: rotate(15deg);
     opacity: 0.8;
     animation: gentleFloat 5s ease-in-out infinite alternate;
-    pointer-events: none; /* クリックの邪魔にならないように */
+    pointer-events: none;
     z-index: 10;
 }
 
@@ -195,7 +212,7 @@ button[type="submit"].mission-cta-button:hover {
 @media (max-width: 600px) {
     .mission-card {
         padding: 12px;
-        flex-wrap: wrap; /* 画面が狭いときは折り返す */
+        flex-wrap: wrap;
     }
     
     .mission-icon {
@@ -205,12 +222,10 @@ button[type="submit"].mission-cta-button:hover {
     }
     
     .mission-details {
-        /* アイコンとボタンのスペースを除いた幅 */
         width: calc(100% - 60px); 
         margin-right: 0;
     }
     
-    /* モバイルではボタンを右下に配置しやすくする */
     form {
         width: 100%;
         display: flex;

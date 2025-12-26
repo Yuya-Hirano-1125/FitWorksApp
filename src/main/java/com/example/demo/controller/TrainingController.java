@@ -173,7 +173,7 @@ public class TrainingController {
         model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercisesByPart());
         model.addAttribute("cardioExercises", trainingDataService.getCardioExercises());
 
-        // ★追加: 自動選択用の情報をモデルにセット
+        // 自動選択用の情報をモデルにセット
         if (preselectType != null && preselectExercise != null) {
             model.addAttribute("preselectType", preselectType);
             model.addAttribute("preselectExercise", preselectExercise);
@@ -218,7 +218,7 @@ public class TrainingController {
             @RequestParam(value = "parts", required = false) List<String> parts,
             @RequestParam(value = "location", required = false, defaultValue = "gym") String location,
             @RequestParam(value = "difficulty", required = false, defaultValue = "intermediate") String difficulty,
-            @RequestParam(value = "equipment", required = false) List<String> equipment, // 器具リスト追加
+            @RequestParam(value = "equipment", required = false) List<String> equipment,
             Authentication authentication,
             Model model) {
 
@@ -242,7 +242,6 @@ public class TrainingController {
                     model.addAttribute("targetTime", 45);
                     model.addAttribute("restTime", 60);
                 } else {
-                    // 器具リストを渡す
                     Map<String, Object> aiMenu = trainingLogicService.generateAiSuggestedMenu(duration, parts, location, difficulty, equipment);
                     finalProgramList = (List<String>) aiMenu.get("programList");
                     model.addAttribute("targetTime", aiMenu.get("targetTime"));
@@ -303,18 +302,15 @@ public class TrainingController {
         List<Map<String, Object>> displayList = new ArrayList<>();
         
         for (ExerciseBookmark bm : bookmarks) {
-            // 名前で検索
             ExerciseData data = trainingDataService.getExerciseDataByName(bm.getExerciseName());
             
-            // ★修正: データが見つからない場合（null）でも、仮のデータを作って表示させる
             if (data == null) {
-                // ExerciseData(name, targetMuscle, equipment, description, difficulty)
                 data = new ExerciseData(
-                    bm.getExerciseName(), // 名前はブックマークから取得
-                    "不明",               // 部位
-                    "不明",               // 器具
-                    "詳細データが見つかりませんでした。", // 説明
-                    "不明"                // 難易度
+                    bm.getExerciseName(),
+                    "不明",
+                    "不明",
+                    "詳細データが見つかりませんでした。",
+                    "不明"
                 );
             }
 
@@ -349,10 +345,6 @@ public class TrainingController {
         return "redirect:" + redirectUrl;
     }
     
-    /**
-     * Ajax用: ブックマークの切り替え処理
-     * 画面遷移せず、JSONデータを返します。
-     */
     @PostMapping("/training/api/bookmark/toggle")
     @ResponseBody
     public Map<String, Object> toggleBookmarkApi(
@@ -369,18 +361,15 @@ public class TrainingController {
             return response;
         }
 
-        // ★修正箇所: .orElse(null) を追加して Optional を解除
         ExerciseBookmark existing = exerciseBookmarkRepository.findByUserAndExerciseName(currentUser, exerciseName).orElse(null);
         
         boolean isBookmarked;
 
         if (existing != null) {
-            // 既に登録済みなら削除（解除）
             exerciseBookmarkRepository.delete(existing);
             isBookmarked = false;
             response.put("message", exerciseName + " のブックマークを解除しました。");
         } else {
-            // 未登録なら新規保存
             ExerciseBookmark newBookmark = new ExerciseBookmark();
             newBookmark.setUser(currentUser);
             newBookmark.setExerciseName(exerciseName);
@@ -395,72 +384,56 @@ public class TrainingController {
         return response;
     }
 
- // ▼ マイセット一覧画面の表示
     @GetMapping("/training/mysets")
     public String showMySetList(Authentication authentication, Model model) {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
         
-        // マイセット取得
         List<MySet> mySets = mySetRepository.findByUserOrderByIdDesc(currentUser);
         model.addAttribute("mySets", mySets);
 
-        // 「種目名 -> 部位名」の対応マップを作成
         Map<String, String> exerciseToPartMap = new HashMap<>();
 
-        // 1. フリーウェイト種目の登録
-        // ★修正: List<String> ではなく List<ExerciseData> で受け取る
         Map<String, List<ExerciseData>> freeWeightMap = trainingDataService.getFreeWeightExercisesByPart();
         
         for (Map.Entry<String, List<ExerciseData>> entry : freeWeightMap.entrySet()) {
             String part = entry.getKey();
-            // ExerciseDataオブジェクトから名前を取り出す
             for (ExerciseData exercise : entry.getValue()) {
                 exerciseToPartMap.put(exercise.getName(), part);
             }
         }
 
-        // 2. 有酸素運動の登録
         List<ExerciseData> cardioList = trainingDataService.getCardioExercises();
         for (ExerciseData cardio : cardioList) {
             exerciseToPartMap.put(cardio.getName(), "有酸素運動");
         }
 
-        // JS側に渡す
         model.addAttribute("exerciseCategoryMap", exerciseToPartMap);
 
         return "training/myset-list";
     }
 
- // マイセット作成画面の表示
     @GetMapping("/training/mysets/new")
     public String showCreateMySetForm(Model model, Authentication authentication) {
         if (getCurrentUser(authentication) == null) return "redirect:/login";
 
-        // 1. 結果を格納するマップ (順序保持のためLinkedHashMap)
         Map<String, List<ExerciseData>> allExercisesMap = new LinkedHashMap<>();
-        
-        // ★修正: サービスが既に ExerciseData を返しているので、型変換せずそのまま putAll する
-        // エラーが出ていた "rawMap" への代入と forループ変換処理 は削除しました
         allExercisesMap.putAll(trainingDataService.getFreeWeightExercisesByPart());
 
-        // 2. 有酸素運動を追加
         List<ExerciseData> cardioList = trainingDataService.getCardioExercises();
         allExercisesMap.put("有酸素運動", cardioList);
         
-        // 3. 部位リスト（ボタン表示順）を作成
         List<String> allParts = new ArrayList<>(trainingDataService.getMuscleParts());
         if (!allParts.contains("有酸素運動")) {
             allParts.add("有酸素運動");
         }
 
-        // 画面に渡す
-        model.addAttribute("exercisesByPart", allExercisesMap); // 詳細データ入りマップ
-        model.addAttribute("parts", allParts);                  // 部位リスト
+        model.addAttribute("exercisesByPart", allExercisesMap);
+        model.addAttribute("parts", allParts);
         
         return "training/myset-form";
     }
-    // ▼ マイセットの作成処理 (POST)
+
     @PostMapping("/training/mysets/create")
     public String createMySet(
             @RequestParam("name") String name,
@@ -487,7 +460,6 @@ public class TrainingController {
         return "redirect:/training/mysets";
     }
 
-    // ▼ マイセットの削除処理
     @PostMapping("/training/mysets/delete/{id}")
     public String deleteMySet(@PathVariable("id") Long id, Authentication authentication, RedirectAttributes redirectAttributes) {
         User currentUser = getCurrentUser(authentication);
@@ -532,7 +504,6 @@ public class TrainingController {
                         record.setSets(1);
                         record.setWeight(detail.getWeight());
                         record.setReps(detail.getReps());
-                        // ★メモ保存
                         record.setMemo(form.getMemo());
                         
                         trainingRecordRepository.save(record);
@@ -548,7 +519,6 @@ public class TrainingController {
                 record.setSets(form.getSets());
                 record.setReps(form.getReps());
                 record.setWeight(form.getWeight());
-                // ★メモ保存
                 record.setMemo(form.getMemo());
                 
                 trainingRecordRepository.save(record);
@@ -562,7 +532,6 @@ public class TrainingController {
             record.setCardioType(form.getCardioType());
             record.setDurationMinutes(form.getDurationMinutes());
             record.setDistanceKm(form.getDistanceKm());
-            // ★メモ保存
             record.setMemo(form.getMemo());
             
             exerciseIdentifier = form.getCardioType();
@@ -579,6 +548,9 @@ public class TrainingController {
             bodyWeightRecordRepository.save(record);
             savedCount = 1;
             earnedXP = 10;
+            
+            // ★★★ 体重記録ミッション更新 ★★★
+            missionService.updateMissionProgress(currentUser.getId(), "WEIGHT_LOG");
         }
         ExerciseData exerciseData = trainingDataService.getExerciseDataByName(exerciseIdentifier);
         if (savedCount > 0 && exerciseIdentifier != null) {
@@ -621,6 +593,7 @@ public class TrainingController {
                 form.getRecordDate().toString() + " の記録を保存しました！");
         }
 
+        // 既存のトレーニングミッション更新（WEIGHT/CARDIO/CARE用）
         missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
 
         if (!"BODY_WEIGHT".equals(form.getType())) {
@@ -675,7 +648,6 @@ public class TrainingController {
                         record.setCardioType(form.getExerciseName()); 
                         record.setDurationMinutes(form.getDurationMinutes());
                         record.setDistanceKm(form.getDistanceKm());
-                        // ★メモ保存
                         record.setMemo(form.getMemo());
                         
                         trainingRecordRepository.save(record);
@@ -701,7 +673,6 @@ public class TrainingController {
                                 record.setSets(1);
                                 record.setWeight(detail.getWeight());
                                 record.setReps(detail.getReps());
-                                // ★メモ保存
                                 record.setMemo(form.getMemo());
                                 
                                 trainingRecordRepository.save(record);
