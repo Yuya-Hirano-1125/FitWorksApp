@@ -31,6 +31,9 @@ public class Post {
     private String content; 
     private LocalDateTime createdAt; 
 
+    // ▼▼▼ 追加: 画像のURLを保存するフィールド ▼▼▼
+    private String imageUrl;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User author; 
@@ -62,6 +65,10 @@ public class Post {
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    // ▼▼▼ 追加: imageUrlのGetter/Setter ▼▼▼
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
     
     public User getAuthor() { return author; }
     public void setAuthor(User author) { this.author = author; }
@@ -72,7 +79,7 @@ public class Post {
     public Set<User> getLikedBy() { return likedBy; }
     public void setLikedBy(Set<User> likedBy) { this.likedBy = likedBy; }
 
-    // ★追加: IDを使って「自分がいいね済みか」を確実に判定するメソッド
+    // IDを使って「自分がいいね済みか」を確実に判定するメソッド
     public boolean isLikedBy(User user) {
         if (user == null) return false;
         // ユーザーリストの中に、自分と同じIDのユーザーがいるかチェック

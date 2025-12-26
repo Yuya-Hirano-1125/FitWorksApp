@@ -1,6 +1,12 @@
 package com.example.demo.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -13,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile; // 追加
 
 import com.example.demo.entity.Comment;
 import com.example.demo.entity.Post;
@@ -31,7 +38,7 @@ public class CommunityController {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-    private final MissionService missionService; // ✅ 追加
+    private final MissionService missionService;
 
     private static final List<String> NG_WORDS = List.of("死ね", "バカ", "アホ", "殺す", "暴力");
 
@@ -44,7 +51,7 @@ public class CommunityController {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.userService = userService;
-        this.missionService = missionService; // ✅ 追加
+        this.missionService = missionService;
     }
 
     // 一覧表示
@@ -61,10 +68,11 @@ public class CommunityController {
         return "community/index";
     }
 
-    // 投稿処理
+    // 投稿処理（修正: 画像ファイルを受け取るように変更）
     @PostMapping("/post")
     public String createPost(@RequestParam String title,
                              @RequestParam String content,
+                             @RequestParam("imageFile") MultipartFile imageFile, // ✅ 画像受け取り
                              @AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
         String cleanTitle = filterNgWords(title);
@@ -74,9 +82,37 @@ public class CommunityController {
         post.setTitle(cleanTitle);
         post.setContent(cleanContent);
         post.setAuthor(user);
+
+        // ▼▼▼ 画像保存処理 ▼▼▼
+        if (!imageFile.isEmpty()) {
+            try {
+                // ファイル名をユニークにする
+                String fileName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
+                
+                // 保存先ディレクトリ (src/main/resources/static/uploads)
+                // 開発環境によっては再起動が必要な場合があります
+                Path uploadPath = Paths.get("src/main/resources/static/uploads");
+                
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+
+                // ファイルを保存
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(imageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                // エンティティにパスをセット (/uploads/ファイル名)
+                post.setImageUrl("/uploads/" + fileName);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        // ▲▲▲ 追加終了 ▲▲▲
+
         postRepository.save(post);
 
-        // ✅ ミッション進捗更新
+        // ミッション進捗更新
         missionService.updateMissionProgress(user.getId(), "COMMUNITY_POST");
 
         return "redirect:/community";
