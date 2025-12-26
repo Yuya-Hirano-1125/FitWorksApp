@@ -42,15 +42,21 @@
         
         .header-left { 
             display: flex; align-items: center; gap: 15px; 
-            flex-shrink: 0; /* 左側要素が潰れないようにする */
+            flex-shrink: 0; 
         }
         
         .page-title { 
             color: #343a40; 
             font-size: 2rem; 
             margin: 0;
-            /* ★修正: 文字の折り返しを禁止 */
             white-space: nowrap; 
+            text-shadow: none;
+        }
+
+        /* アイコンの色を青に */
+        .page-title i {
+            color: #007bff;
+            margin-right: 10px;
         }
         
         /* ホームボタン（共通スタイル） */
@@ -63,17 +69,41 @@
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
         .view-selector { padding: 8px 12px; border-radius: 10px; border: 2px solid var(--primary-color); background: #fff; font-weight: bold; color: #333; cursor: pointer; }
+        
         .friend-nav { display: flex; gap: 10px; margin-bottom: 20px; }
-        .nav-btn { flex: 1; padding: 10px; text-align: center; background: rgba(255,255,255,0.5); border-radius: 10px; text-decoration: none; color: #666; font-weight: bold; border: 2px solid transparent; transition: all 0.3s; }
-        .nav-btn:hover { background: rgba(255,255,255,0.8); }
-        .nav-btn.active { background: #fff; border-color: var(--primary-color); color: var(--primary-color); box-shadow: 0 5px 15px rgba(79, 172, 254, 0.2); }
+        
+        .nav-btn { 
+            flex: 1; 
+            padding: 10px; 
+            text-align: center; 
+            background: rgba(255,255,255,0.9); 
+            border-radius: 10px; 
+            text-decoration: none; 
+            color: #555; 
+            font-weight: bold; 
+            border: 2px solid #ccc; 
+            transition: all 0.3s; 
+        }
+        
+        .nav-btn:hover { 
+            background: #fff; 
+            border-color: #aaa;
+        }
+        
+        .nav-btn.active { 
+            background: #fff; 
+            border-color: var(--primary-color); 
+            color: var(--primary-color); 
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.2); 
+        }
+
         .user-list { list-style: none; padding: 0; }
         .user-card { display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.85); border-radius: 15px; padding: 15px; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.2s; }
         .user-card:hover { transform: translateY(-2px); }
         .user-info { display: flex; align-items: center; gap: 10px; }
         .user-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #e0c3fc, #8ec5fc); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
         
-        /* 検索ボックスのデザイン */
+        /* 検索ボックスのアニメーション */
         .search-box {
             display: flex; 
             align-items: center;
@@ -83,12 +113,15 @@
             padding: 8px;
             border-radius: 50px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 1px solid rgba(255,255,255,0.8);
-            transition: box-shadow 0.3s;
+            border: 2px solid rgba(255,255,255,0.8);
+            transition: all 0.3s ease;
         }
+        
         .search-box:focus-within {
-            box-shadow: 0 4px 20px rgba(79, 172, 254, 0.2);
+            background: #fff;
             border-color: #4facfe;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.25);
+            transform: translateY(-2px);
         }
 
         .search-input { 
@@ -122,7 +155,7 @@
 
         h3 { color: #333; }
         
-        /* ボタン設定 */
+        /* ボタン設定 (既存の承認・拒否ボタン用) */
         .button { 
             padding: 10px 15px; border-radius: 8px; border: none; cursor: pointer; 
             text-decoration: none; display: inline-block; 
@@ -141,6 +174,33 @@
             color: white;
             transform: translateY(-2px); 
             box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+        }
+
+        /* ★新: 申請ボタンのデザイン（リッチなアニメーション） */
+        .btn-request {
+            background: linear-gradient(135deg, #00c6ff, #0072ff); /* 鮮やかな青グラデーション */
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 50px; /* 丸みを強く */
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3); /* 青い影 */
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* バネのような動き */
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-request:hover {
+            transform: translateY(-3px) scale(1.05); /* 浮いて拡大 */
+            box-shadow: 0 8px 20px rgba(0, 114, 255, 0.5); /* 影を強調 */
+        }
+        
+        .btn-request:active {
+            transform: translateY(1px) scale(0.95); /* クリック時の沈み込み */
+            box-shadow: 0 2px 10px rgba(0, 114, 255, 0.3);
         }
 
         /* アラートメッセージのデザイン */
@@ -274,7 +334,7 @@
                         <span th:text="${user.username}">User</span>
                     </div>
                     <form th:action="@{/friends/request/{id}(id=${user.id})}" method="post">
-                        <button class="button secondary" style="padding: 5px 15px; font-size: 0.9rem; border-radius: 20px;">申請</button>
+                        <button class="btn-request"><i class="fa-solid fa-paper-plane"></i> 申請</button>
                     </form>
                 </li>
                 <li th:if="${searchResults != null && #lists.isEmpty(searchResults)}" style="text-align: center; color: #666; padding: 20px;">

@@ -66,7 +66,8 @@
             justify-content: space-between; 
             align-items: center; 
             margin-bottom: 25px; 
-            border-bottom: 3px solid #4facfe; 
+            /* ★修正: 下線を青色(#007bff)に変更 */
+            border-bottom: 3px solid #007bff; 
             padding-bottom: 15px; 
             gap: 15px; 
         }
@@ -74,18 +75,22 @@
         .header-left { display: flex; align-items: center; gap: 15px; }
         
         .page-title { 
-            color: #343a40; font-size: 1.8rem; margin: 0; font-weight: 700; 
+            color: #343a40; font-size: 1.8rem; margin: 0; font-weight: 700;
+            /* ★修正: エフェクト（影）を削除 */
+            text-shadow: none; 
         }
-        .page-title i { margin-right: 10px; color: #4facfe; }
+        /* ★修正: アイコン色を青色(#007bff)に変更 */
+        .page-title i { margin-right: 10px; color: #007bff; }
         
+        /* ★修正: 戻るボタンを青色(#007bff)に変更 */
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 45px; height: 45px;
-            background-color: white; color: #4facfe;
-            border: 2px solid #4facfe; border-radius: 50%; text-decoration: none;
+            background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
             transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
         }
-        .home-link-icon:hover { background-color: #4facfe; color: white; transform: scale(1.1); }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
         /* プルダウンメニュー */
         .view-selector {
