@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile; // 追加
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.entity.Comment;
 import com.example.demo.entity.Post;
@@ -83,15 +83,15 @@ public class CommunityController {
         post.setContent(cleanContent);
         post.setAuthor(user);
 
-        // ▼▼▼ 画像保存処理 ▼▼▼
+        // ▼▼▼ 画像保存処理 (修正版) ▼▼▼
         if (!imageFile.isEmpty()) {
             try {
                 // ファイル名をユニークにする
                 String fileName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
                 
-                // 保存先ディレクトリ (src/main/resources/static/uploads)
-                // 開発環境によっては再起動が必要な場合があります
-                Path uploadPath = Paths.get("src/main/resources/static/uploads");
+                // 【重要】保存先をプロジェクト直下の "uploads" フォルダに変更
+                // これにより再起動なしで画像が表示できるようになります
+                Path uploadPath = Paths.get("uploads");
                 
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
@@ -102,13 +102,14 @@ public class CommunityController {
                 Files.copy(imageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
                 // エンティティにパスをセット (/uploads/ファイル名)
+                // WebConfigでこのURLパスを上記フォルダにマッピングします
                 post.setImageUrl("/uploads/" + fileName);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        // ▲▲▲ 追加終了 ▲▲▲
+        // ▲▲▲ 修正終了 ▲▲▲
 
         postRepository.save(post);
 

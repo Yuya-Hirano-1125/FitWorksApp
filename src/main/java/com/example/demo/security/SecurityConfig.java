@@ -136,13 +136,14 @@ public class SecurityConfig {
                 .requestMatchers("/api/webauthn/**").permitAll() // WebAuthn用
                 .requestMatchers("/login/**", "/oauth2/**").permitAll()
                 
-                // ★ルートパス("/") を許可リストに追加
+                // ★ルートパス("/") および 画像フォルダ(/uploads/**) を許可リストに追加
                 .requestMatchers("/", "/register",
                     "/forgot-password", "/verify-code", "/reset-password",
                     "/goodbye",
                     "/error", "/terms",
                     "/api/public/**",
-                    "/css/**", "/js/**", "/images/**", "/img/**"
+                    "/css/**", "/js/**", "/images/**", "/img/**",
+                    "/uploads/**"  // ← ここを追加しました！
                 ).permitAll()
                 .requestMatchers("/home", "/training/**", "/settings/**",
                     "/community/**", "/log/**", "/characters/**",
