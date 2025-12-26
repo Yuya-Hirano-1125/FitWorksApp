@@ -44,22 +44,41 @@
         } 
 
         /* ヘッダー修正 */
-        .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; width: 100%; }
+        .page-header-container { 
+            display: flex; align-items: center; margin-bottom: 20px; 
+            /* ★修正: 下線の色を青(#007bff)に変更 */
+            border-bottom: 3px solid #007bff; 
+            padding-bottom: 15px; gap: 15px; width: 100%; 
+        }
         
         .page-title { 
             color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left;
             white-space: nowrap; 
             overflow: hidden;
             text-overflow: ellipsis;
+            text-shadow: none;
+        }
+        
+        /* ★修正: タイトルのアイコン色を青(#007bff)に変更 */
+        .page-title i {
+            margin-right: 10px;
+            color: #007bff; 
         }
         
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
-            width: 50px; height: 50px; background-color: white; color: #007bff;
-            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            width: 50px; height: 50px; background-color: white; 
+            /* 戻るボタンは青のまま */
+            color: #007bff;
+            border: 2px solid #007bff; 
+            border-radius: 50%; text-decoration: none;
             transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
         }
-        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+        .home-link-icon:hover { 
+            background-color: #007bff; 
+            color: white; 
+            transform: scale(1.1); 
+        }
 
         /* 検索エリア */
         .search-container { 
@@ -69,13 +88,13 @@
             display: flex; 
             gap: 15px; 
             align-items: center; 
-            flex-wrap: wrap; /* 折り返しを許可 */
+            flex-wrap: wrap; 
         }
         
         .search-box-wrapper {
             position: relative;
-            flex: 1; /* 残りのスペースを埋める */
-            min-width: 250px; /* 小さくなりすぎないように */
+            flex: 1; 
+            min-width: 250px; 
         }
 
         .search-input { 
@@ -90,28 +109,30 @@
             appearance: none; 
         }
         
+        /* ★修正: 検索欄のフォーカス色を青(#007bff)に変更 */
         .search-input:focus {
             outline: none;
-            border-color: #4facfe;
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.25);
+            border-color: #007bff;
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.25);
             transform: translateY(-2px);
             background: #fff;
         }
 
+        /* ★修正: 検索アイコン色を青(#007bff)に変更 */
         .search-icon {
             position: absolute;
             right: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: #4facfe;
+            color: #007bff;
             font-size: 1.2rem;
             pointer-events: none;
             z-index: 10;
         }
 
-        /* ★検索ボタンのデザイン変更（青系グラデーション） */
+        /* ★修正: 検索ボタンを青色グラデーションに変更 */
         .search-button {
-            background: linear-gradient(135deg, #4facfe, #00f2fe); /* 青系 */
+            background: linear-gradient(135deg, #007bff, #0062cc);
             color: white; 
             border: none; 
             padding: 15px 25px; 
@@ -119,14 +140,14 @@
             cursor: pointer; 
             font-weight: bold; 
             white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.4); /* 青系の影 */
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
             transition: all 0.3s;
             line-height: 1.2;
             flex-shrink: 0; 
         }
         .search-button:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(79, 172, 254, 0.6); /* 青系の影（濃いめ） */
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.6);
         }
         .search-button:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
 
