@@ -12,10 +12,7 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
-        /* ==========================================================================
-           1. 共通設定 & 背景
-           ========================================================================== */
-        /* ★修正: テーマカラーを青に変更 (#ff69b4 -> #4facfe) */
+        /* 共通設定 & 背景 */
         :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
         
         body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; overflow-x: hidden; font-family: 'Noto Sans JP', sans-serif; color: #333; padding-bottom: 120px; }
@@ -33,9 +30,7 @@
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
 
-        /* ==========================================================================
-           2. メインコンテナ (統一デザイン)
-           ========================================================================== */
+        /* メインコンテナ */
         .main-container {
             max-width: 800px; width: 92%; margin: 40px auto; padding: 30px;
             background: rgba(255, 255, 255, 0.65);
@@ -47,7 +42,6 @@
             position: relative; z-index: 10;
         }
 
-        /* ヘッダーデザイン（青系に変更） */
         .page-header-container { display: flex; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #4facfe; padding-bottom: 15px; gap: 15px; }
         .page-title { color: #343a40; font-size: 1.8rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 700; }
         .page-title i { margin-right: 10px; color: #4facfe; }
@@ -64,7 +58,7 @@
         /* 投稿詳細エリア */
         .post-detail-area {
             text-align: left; margin-bottom: 40px; padding-bottom: 30px;
-            border-bottom: 2px dashed #a0c4ff; /* 点線も青っぽく */
+            border-bottom: 2px dashed #a0c4ff;
             width: 100%;
             overflow-wrap: break-word;
         }
@@ -95,7 +89,7 @@
         }
 
         .comment-item {
-            background: #f0f8ff; /* 薄い青背景 */
+            background: #f0f8ff; 
             padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 5px;
             margin-bottom: 15px; overflow-wrap: break-word;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -126,11 +120,10 @@
             flex-grow: 1; padding: 12px 20px; border-radius: 30px;
             border: 2px solid #ddd; background: #fff; font-size: 1rem; outline: none; transition: all 0.3s;
         }
-        /* フォーカス時の色も青に */
         .input-comment:focus { border-color: #4facfe; box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2); }
 
         .btn-send {
-            background: linear-gradient(135deg, #4facfe, #00f2fe); /* ボタンも青グラデーションに */
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
             color: white; border: none;
             padding: 0 25px; height: 46px; border-radius: 30px; font-weight: 800;
             cursor: pointer; transition: all 0.2s; white-space: nowrap;
@@ -139,7 +132,6 @@
         .btn-send:hover { transform: scale(1.05); opacity: 0.9; }
         .btn-send i { margin-right: 5px; }
 
-        /* いいねボタン */
         .like-form { display: inline-block; }
         .btn-like {
             background: none; border: none; cursor: pointer;
@@ -147,7 +139,7 @@
             display: flex; align-items: center; gap: 5px;
         }
         .btn-like:hover { transform: scale(1.1); }
-        .btn-like.liked { color: #ff4757; } /* いいねの色は赤のままでOK */
+        .btn-like.liked { color: #ff4757; }
         .like-text { font-size: 1rem; font-weight: bold; }
 
         @media (max-width: 600px) {
@@ -181,6 +173,10 @@
              <div class="post-meta">
                  <span><i class="fa-solid fa-user"></i> <span th:text="${post.author.username}">ユーザー名</span></span>
                  <span><i class="fa-regular fa-clock"></i> <span th:text="${#temporals.format(post.createdAt, 'yyyy/MM/dd HH:mm')}">日時</span></span>
+             </div>
+
+             <div th:if="${post.imageUrl != null}" style="margin-bottom: 20px; text-align: center;">
+                 <img th:src="@{${post.imageUrl}}" alt="投稿画像" style="max-width: 100%; max-height: 500px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
              </div>
              <div class="post-content" th:text="${post.content}">本文</div>
 

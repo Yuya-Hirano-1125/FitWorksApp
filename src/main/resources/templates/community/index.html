@@ -30,10 +30,7 @@
 
         .main-container {
             max-width: 900px; width: 92%; margin: 40px auto;
-            
-            /* ★修正: 上下左右のパディングを個別に指定して、下(bottom)を最小限にする */
             padding: 40px 40px 20px 40px; 
-            
             background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 45px; border: 1px solid rgba(255, 255, 255, 0.9);
@@ -41,7 +38,6 @@
             position: relative; z-index: 10;
         }
 
-        /* ヘッダー修正 */
         .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
         .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
         
@@ -59,16 +55,13 @@
         .custom-input, .custom-textarea { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.8); background: rgba(255,255,255,0.9); font-family: inherit; resize: none; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: all 0.3s ease; box-sizing: border-box; }
         .custom-input:focus, .custom-textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.1); }
         
-        /* ★修正: リスト自体のマージン・パディングを完全にリセット */
         .post-list { display: flex; flex-direction: column; gap: 20px; margin: 0; padding: 0; }
         
         .post-card { background: rgba(255, 255, 255, 0.85); border-radius: 20px; padding: 20px 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 2px solid transparent; text-align: left; position: relative; transition: all 0.3s; overflow: hidden; }
         .post-card:hover { transform: translateY(-2px); border-color: var(--accent-color); }
         
-        /* ★修正: 最後のカードのマージンを念のためゼロにする */
         .post-card:last-child { margin-bottom: 0; }
 
-        /* タイトル設定 */
         .post-title { font-size: 1.25rem; font-weight: 800; color: #333; margin-bottom: 8px; word-break: break-word; overflow-wrap: break-word; }
         
         .post-meta { font-size: 0.85rem; color: #666; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 8px; }
@@ -82,51 +75,38 @@
         .like-count { font-size: 0.9rem; margin-left: 2px; color: #666; font-weight: bold; }
         .button { padding: 10px 15px; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; display: inline-block; }
         .button.primary { background-color: #007bff; color: white; }
-		/* ▼▼▼ 追加: 投稿ボタンのカスタムデザイン ▼▼▼ */
-		        .btn-submit-post {
-		            width: 100%;
-		            padding: 16px;
-		            margin-top: 15px;
-		            border: none;
-		            border-radius: 50px; /* 丸みを強くして親しみやすく */
-		            /* コミュニティの雰囲気に合わせた青～水色の鮮やかなグラデーション */
-		            background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
-		            color: white;
-		            font-size: 1.2rem;
-		            font-weight: 800;
-		            cursor: pointer;
-		            box-shadow: 0 5px 15px rgba(0, 97, 255, 0.4); /* 青い光のような影 */
-		            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 弾むような動き */
-		            display: flex;
-		            align-items: center;
-		            justify-content: center;
-		            gap: 10px;
-		            position: relative;
-		            overflow: hidden;
-		        }
 
-		        /* ホバー時の動き：少し浮き上がり、光る */
-		        .btn-submit-post:hover {
-		            transform: translateY(-4px) scale(1.02);
-		            box-shadow: 0 10px 25px rgba(0, 97, 255, 0.6);
-		            filter: brightness(1.1);
-		        }
-
-		        /* クリック時の動き */
-		        .btn-submit-post:active {
-		            transform: translateY(2px);
-		            box-shadow: 0 2px 5px rgba(0, 97, 255, 0.4);
-		        }
-
-		        /* アイコン（紙飛行機）のアニメーション */
-		        .btn-submit-post i {
-		            transition: transform 0.4s ease;
-		        }
-
-		        /* ホバー時に紙飛行機が飛んでいくような動き */
-		        .btn-submit-post:hover i {
-		            transform: translate(5px, -5px) rotate(-15deg);
-		        }
+        .btn-submit-post {
+            width: 100%;
+            padding: 16px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 50px; 
+            background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 97, 255, 0.4); 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-submit-post:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 97, 255, 0.6);
+            filter: brightness(1.1);
+        }
+        .btn-submit-post:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(0, 97, 255, 0.4);
+        }
+        .btn-submit-post i { transition: transform 0.4s ease; }
+        .btn-submit-post:hover i { transform: translate(5px, -5px) rotate(-15deg); }
     </style>
 </head>
 <body>
@@ -155,9 +135,17 @@
         
         <div class="new-post-area">
             <h3><i class="fa-solid fa-pen-nib"></i> 新しい投稿を作成</h3>
-            <form th:action="@{/community/post}" method="post">
+            <form th:action="@{/community/post}" method="post" enctype="multipart/form-data">
                 <input type="text" name="title" class="custom-input" placeholder="タイトル (例: おすすめのプロテインは？)" required>
                 <textarea name="content" class="custom-textarea" id="auto-expand-textarea" rows="3" placeholder="本文を入力してください..." required></textarea>
+                
+                <div style="margin-bottom: 15px;">
+                    <label for="imageFile" style="cursor: pointer; display: inline-flex; align-items: center; gap: 5px; color: #555; font-weight: bold;">
+                        <i class="fa-solid fa-camera"></i> 写真を追加
+                    </label>
+                    <input type="file" name="imageFile" id="imageFile" accept="image/*" class="custom-input" style="padding: 10px;">
+                </div>
+
                 <button type="submit" class="btn-submit-post"><i class="fa-solid fa-paper-plane"></i> 投稿する</button>
             </form>
         </div>
@@ -181,6 +169,10 @@
                 
                 <div class="post-title">
                     <span th:text="${post.title}">タイトル</span>
+                </div>
+                
+                <div th:if="${post.imageUrl != null}" style="margin: 10px 0;">
+                    <img th:src="@{${post.imageUrl}}" alt="投稿画像" style="max-height: 200px; max-width: 100%; border-radius: 10px; object-fit: cover;">
                 </div>
                 
                 <div class="post-excerpt" th:text="${#strings.abbreviate(post.content, 60)}">内容の抜粋...</div>
