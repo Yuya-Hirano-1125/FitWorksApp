@@ -33,9 +33,33 @@
         }
 
         /* ヘッダー修正 */
-        .page-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 10px; gap: 15px; }
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .page-title { color: #343a40; font-size: 2rem; margin: 0; }
+        .page-header-container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff; 
+            padding-bottom: 10px; 
+            gap: 15px;
+            flex-wrap: wrap; 
+        }
+        
+        .header-left { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            /* 幅を確保しつつ縮小も許可 */
+            flex: 1 1 auto;
+            min-width: 0; 
+        }
+        
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; 
+            text-shadow: none;
+            white-space: nowrap;
+        }
+        
+        .page-title i { margin-left: 5px; color: #007bff; }
         
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
@@ -54,24 +78,20 @@
 
         .form-group { margin-bottom: 20px; }
         
-        /* 既存の .form-control スタイルを維持しつつ上書き */
         .form-control { width: 100%; padding: 10px 15px; border: 1px solid #ccc; border-radius: 6px; background-color: rgba(255,255,255,0.9); font-size: 1rem; }
         
-        /* ▼ プルダウンメニュー（セレクトボックス）の改良スタイル ▼ */
         select.form-control {
-            font-size: 1.3rem;         /* 文字サイズを大きく */
-            padding: 15px 20px;        /* 余白を広げてタップしやすく */
-            height: auto;              /* 高さ自動調整 */
-            border: 2px solid #8ec5fc; /* 枠線を少し太く */
-            border-radius: 12px;       /* 角丸を強調 */
+            font-size: 1.3rem;
+            padding: 15px 20px;
+            height: auto;
+            border: 2px solid #8ec5fc;
+            border-radius: 12px;
             background-color: #ffffff;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
             font-weight: 600;
             color: #333;
-            
-            /* ブラウザ標準の矢印を消してカスタム矢印にする（見やすくするため） */
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
@@ -92,20 +112,51 @@
             border-color: #ddd;
             color: #aaa;
             cursor: not-allowed;
-            background-image: none; /* 無効時は矢印なし */
+            background-image: none;
         }
 
         select.form-control option {
             font-size: 1.1rem;
             padding: 10px;
         }
-        /* ▲ 改良ここまで ▲ */
         
         .button { width: 100%; padding: 12px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; transition: background-color 0.2s; text-align: center; display: block; text-decoration: none; box-sizing: border-box; cursor: pointer; }
         .button.primary { background-color: #007bff; color: white; border: none; }
         .button.primary:hover:not(:disabled) { background-color: #0056b3; }
         .button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
         
+        /* 種目一覧ボタン */
+        .btn-exercises {
+            background-color: #28a745; color: white; 
+            width: auto; margin: 0; padding: 8px 16px; 
+            font-size: 1rem; white-space: nowrap; flex-shrink: 0;
+            border: none;
+            box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
+            transition: all 0.2s ease;
+            /* ★重要: どの画面幅でも必ず右寄せ（折り返し時は右下）になるように設定 */
+            margin-left: auto;
+        }
+        .btn-exercises:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        /* マイセットボタン */
+        .btn-myset {
+            background-color: #6f42c1; color: white; 
+            width: 100%; display: block; text-align: center; 
+            padding: 15px; border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(111, 66, 193, 0.2);
+            transition: all 0.2s ease;
+            border: none;
+        }
+        .btn-myset:hover {
+            background-color: #5a32a3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(111, 66, 193, 0.3);
+        }
+
         .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; }
         .checkbox-group label { background: rgba(255,255,255,0.8); border: 1px solid #ddd; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.2s; user-select: none; display: flex; align-items: center; gap: 5px; }
         .checkbox-group label:has(input:checked) { background-color: #2196F3; color: white; border-color: #2196F3; box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3); }
@@ -114,6 +165,33 @@
         .radio-group { display: flex; gap: 15px; }
         .radio-group label { flex: 1; text-align: center; background: rgba(255,255,255,0.8); border: 1px solid #ccc; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; color: #555; }
         .radio-group label:has(input:checked) { background-color: #00BCD4; color: white; border-color: #00BCD4; box-shadow: 0 2px 5px rgba(0, 188, 212, 0.3); }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 600px) {
+            .page-header-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            .header-left {
+                width: 100%;
+                margin-bottom: 0;
+            }
+            .page-title {
+                font-size: 1.7rem; 
+            }
+            .home-link-icon {
+                width: 40px; height: 40px; font-size: 1.2rem;
+            }
+            .main-container {
+                padding: 25px 20px;
+                width: 95%;
+            }
+            /* .btn-exercises に margin-left: auto を共通で当てたのでここは削除しても良いが念のため残す */
+            .btn-exercises {
+                align-self: flex-end; 
+            }
+        }
     </style>
 </head>
 <body>
@@ -134,7 +212,8 @@
                 </a>
                 <h1 class="page-title"><i class="fa-solid fa-dumbbell" style="margin-left: 5px;"></i> トレーニング選択</h1>
             </div>
-            <a th:href="@{/training/exercises}" class="button" style="background-color: #28a745; color: white; width: auto; margin: 0; padding: 8px 16px; font-size: 1rem;">
+            
+            <a th:href="@{/training/exercises}" class="button btn-exercises">
                 <i class="fa-solid fa-list"></i> 種目一覧
             </a>
         </div>
@@ -142,7 +221,7 @@
         <div th:if="${param.logout}" class="alert alert-success" style="color:green; margin-bottom:15px;">ログアウトしました。</div>
 
         <div style="margin-bottom: 25px;">
-            <a th:href="@{/training/mysets}" class="button" style="background-color: #6f42c1; color: white; width: 100%; display: block; text-align: center; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <a th:href="@{/training/mysets}" class="button btn-myset">
                 <i class="fa-solid fa-list-check"></i> マイセットから選ぶ
             </a>
         </div>
