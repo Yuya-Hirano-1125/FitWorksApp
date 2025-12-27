@@ -40,24 +40,25 @@
             display: flex; 
             align-items: center; 
             margin-bottom: 25px; 
-            border-bottom: 3px solid #4facfe; 
+            border-bottom: 3px solid #007bff; 
             padding-bottom: 15px; 
             gap: 15px; 
         }
         
         .page-title { 
-            color: #343a40; font-size: 1.8rem; margin: 0; font-weight: 700; flex-grow: 1; text-align: left;
+            color: #343a40; font-size: 2rem; margin: 0; font-weight: 700; flex-grow: 1; text-align: left;
+			text-shadow: none;
         }
-        .page-title i { margin-right: 10px; color: #4facfe; }
+        .page-title i { margin-right: 10px; color: #007bff; }
         
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 45px; height: 45px;
-            background-color: white; color: #4facfe;
-            border: 2px solid #4facfe; border-radius: 50%; text-decoration: none;
+            background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
             transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
         }
-        .home-link-icon:hover { background-color: #4facfe; color: white; transform: scale(1.1); }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
         /* 既存スタイル */
         .rarity-row { margin-bottom: 40px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 20px; text-align: center; }
@@ -102,12 +103,12 @@
 
     <div class="main-container">
         
-        <div class="page-header-container">
-            <a th:href="@{/characters/menu/CharactersMenu}" class="home-link-icon" title="メニューに戻る">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-            <h1 class="page-title"><i class="fa-solid fa-box-open"></i> 素材一覧</h1>
-        </div>
+		<div class="page-header-container">
+		    <a th:href="@{/characters/menu/CharactersMenu}" class="home-link-icon" title="戻る">
+		        <i class="fa-solid fa-arrow-left"></i>
+		    </a>
+		    <h1 class="page-title"><i class="fa-solid fa-gem"></i> 素材一覧</h1>
+		</div>
 
         <div class="header-section" style="text-align:center; margin-bottom: 30px;">
             <p class="sub-heading">ガチャから出る素材を確認できます</p>

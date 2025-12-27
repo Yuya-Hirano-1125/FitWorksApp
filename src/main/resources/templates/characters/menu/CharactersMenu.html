@@ -38,13 +38,19 @@
         /* ヘッダー修正 */
         .page-header-container { 
             display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; 
-            flex-shrink: 0; /* 左側要素が潰れないように */
+            flex-shrink: 0; 
         }
         
         .page-title { 
             color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left;
-            /* ★修正: 文字の折り返しを禁止 */
             white-space: nowrap;
+            text-shadow: none; /* ★修正: 紫色のエフェクトを削除 */
+        }
+
+        /* ★追加: アイコン色をホームボタンと同じ青色に */
+        .page-title i {
+            color: #007bff;
+            margin-right: 10px;
         }
         
         .home-link-icon {
