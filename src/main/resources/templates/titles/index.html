@@ -30,10 +30,20 @@
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
         }
-        .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
-        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
         
-        /* 修正：ボタンサイズ変更 */
+        .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
+        
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; 
+            text-shadow: none;
+            white-space: nowrap;
+        }
+        
+        .page-title i {
+            color: #007bff;
+            margin-right: 10px;
+        }
+        
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -42,10 +52,41 @@
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
         
+        .current-title-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .current-title-section form {
+            margin: 0;
+        }
+
         .title-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: flex-start; padding-top: 60px; z-index: 10000; animation: fadeIn 0.4s; }
         .title-popup-content { background: linear-gradient(135deg, #fff, #f0f8ff); padding: 40px 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 4px solid #ffd700; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: scale(0.8) translateY(50px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+        @media (min-width: 600px) {
+            .current-title-section {
+                flex-direction: row;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .page-title { 
+                font-size: clamp(1.2rem, 7vw, 1.8rem); 
+            }
+            
+            /* ★追加: ボタン位置の微調整（少し左へ） */
+            .current-title-section form {
+                margin-right: 15px; 
+            }
+        }
     </style>
 </head>
 <body>
@@ -66,12 +107,14 @@
         <p style="text-align: center; color: #666; margin-bottom: 20px;">条件を達成して称号を獲得し、プロフィールを飾りましょう！</p>
         <div th:if="${successMessage}" class="message success" th:text="${successMessage}"></div>
         <div th:if="${errorMessage}" class="message error" th:text="${errorMessage}"></div>
+        
         <div class="current-title-section">
-            <span class="label">現在の称号:</span>
+            <span class="label" style="font-weight: bold; color: #555;">現在の称号:</span>
             <div class="title-badge equipped" th:if="${equippedTitle != null}" th:classappend="${equippedTitle.rarity}" th:text="${equippedTitle.displayName}"></div>
             <div th:if="${equippedTitle == null}" class="no-title">なし</div>
-            <form th:action="@{/titles/equip}" method="post" style="display:inline;" th:if="${equippedTitle != null}"><button type="submit" class="btn-unequip">外す</button></form>
+            <form th:action="@{/titles/equip}" method="post" th:if="${equippedTitle != null}"><button type="submit" class="btn-unequip">外す</button></form>
         </div>
+        
         <div class="title-grid">
             <div th:each="title : ${allTitles}" th:with="isUnlocked=${unlockedTitles.contains(title)}, isEquipped=${title == equippedTitle}" class="title-card" th:classappend="${isUnlocked ? 'unlocked' : 'locked'}">
                 <div class="title-header">
