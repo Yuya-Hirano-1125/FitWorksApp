@@ -4,354 +4,188 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>エラー | FitWorks</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/base.css}">
     
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <script th:src="@{/js/theme.js}"></script>
+
     <style>
-        /* ==========================================================================
-           🌌 BACKGROUND STYLES (FROM START SCREEN)
-           ========================================================================== */
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f0f8ff;
-            min-height: 100vh;
-            overflow-x: hidden;
-            font-family: 'Noto Sans JP', sans-serif;
-        }
-
-        .interactive-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%;
-            animation: auroraFlow 20s ease infinite;
-            overflow: hidden;
-        }
-
-        @keyframes auroraFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            animation: floatOrb 30s infinite alternate ease-in-out;
-            z-index: 0;
-        }
+        /* 共通設定 & 背景 */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; overflow-x: hidden; font-family: 'Noto Sans JP', sans-serif; color: #333; }
+        
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
-        .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
-
-        @keyframes floatOrb {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 30px) scale(1.1); }
-        }
-
-        #bg-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            mix-blend-mode: screen;
-        }
-
-        .bg-cloud {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            filter: blur(40px);
-            opacity: 0.85;
-            z-index: 2;
-            pointer-events: none;
-            box-shadow: 0 0 60px rgba(255,255,255,0.9);
-        }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
         .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
-        .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
-
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
-        @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
 
-        .mouse-flare {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            mix-blend-mode: screen;
-            z-index: 20;
-            filter: blur(15px);
-            transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
-        }
-
-        .mega-sparkle {
-            position: fixed;
-            pointer-events: none;
-            z-index: 99999;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-        }
-
-        /* ==========================================================================
-           Error Page Specific Styles
-           ========================================================================== */
+        /* メインコンテナ */
         .main-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            width: 100%;
-        }
-
-        .error-container {
-            text-align: center;
-            padding: 50px 40px;
-            
-            /* Glassmorphism Effect for readability */
-            background: rgba(255, 255, 255, 0.6);
+            max-width: 600px; width: 90%; margin: 80px auto; padding: 40px;
+            background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 45px;
+            border-radius: 40px;
             border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2);
-            
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-            z-index: 10;
-        }
-
-        .error-code {
-            font-size: 6rem;
-            font-weight: 800;
-            color: #ff9966;
-            margin: 0;
-            line-height: 1;
-            text-shadow: 2px 2px 0px #eee;
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
+            text-align: center;
         }
 
         .error-icon {
-            font-size: 4rem;
-            color: #fff; /* White icon looks better on color */
-            text-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            animation: float 3s ease-in-out infinite;
+            font-size: 5rem; color: #ff6b6b; margin-bottom: 20px;
+            text-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+        
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .error-title {
+            font-size: 2rem; font-weight: 800; color: #333; margin-bottom: 15px;
         }
 
         .error-message {
-            font-size: 1.2rem;
-            color: #555;
-            margin: 20px 0 40px 0;
-            font-weight: bold;
+            font-size: 1.1rem; color: #555; margin-bottom: 30px; line-height: 1.6;
         }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .error-details {
-            font-size: 0.8rem;
-            color: #888;
-            margin-bottom: 20px;
-        }
-
-        /* Button Style override for this page */
-        .button.secondary {
+        .error-code {
             display: inline-block;
-            background: white;
-            color: #4facfe;
-            border: 2px solid #4facfe;
-            padding: 15px 30px;
-            border-radius: 50px;
-            text-decoration: none;
+            padding: 5px 15px;
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+            border-radius: 20px;
             font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            font-family: 'Poppins', sans-serif;
         }
-        .button.secondary:hover {
-            background: #4facfe;
-            color: white;
-            transform: translateY(-3px);
+
+        .btn-home {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 15px 40px; border-radius: 50px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white; font-size: 1.1rem; font-weight: bold; text-decoration: none;
             box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-home:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(79, 172, 254, 0.5);
+        }
+        .btn-home:active { transform: translateY(1px); }
+
+        @media (max-width: 600px) {
+            .main-container { padding: 30px 20px; margin-top: 60px; }
+            .error-icon { font-size: 4rem; }
+            .error-title { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
 
-<div class="interactive-bg">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-    <canvas id="bg-canvas"></canvas>
-    <div id="mouse-flare" class="mouse-flare"></div>
-    <div class="bg-cloud cloud-1"></div>
-    <div class="bg-cloud cloud-2"></div>
-    <div class="bg-cloud cloud-3"></div>
-</div>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+    </div>
 
-<div class="main-container">
-    <div class="error-container">
+    <div class="main-container">
+        
         <div class="error-icon">
             <i class="fa-solid fa-triangle-exclamation" th:if="${status != 404}"></i>
             <i class="fa-solid fa-map-location-dot" th:if="${status == 404}"></i>
         </div>
 
-        <h1 class="error-code" th:text="${status}">404</h1>
+        <h1 class="error-title">
+            <span th:if="${status == 404}">ページが見つかりません</span>
+            <span th:if="${status != 404}">エラーが発生しました</span>
+        </h1>
 
-        <div class="error-message">
-            <p th:if="${status == 404}">
-                お探しのページは見つかりませんでした。<br>
-                URLが間違っているか、削除された可能性があります。
-            </p>
-            <p th:if="${status != 404}">
-                予期せぬエラーが発生しました。<br>
-                しばらく経ってから再度お試しください。
-            </p>
-        </div>
-        
-        <div class="error-details">
-            <span th:text="${error}">Internal Server Error</span>
-        </div>
+        <div class="error-code" th:text="'Error Code: ' + ${status}">Error Code: 500</div>
 
-        <a th:href="@{/}" class="button secondary">
-            <i class="fa-solid fa-house"></i> スタート画面に戻る
+        <p class="error-message">
+            <span th:if="${status == 404}">
+                お探しのページは削除されたか、URLが間違っている可能性があります。
+            </span>
+            <span th:if="${status != 404}">
+                予期せぬエラーが発生しました。<br>しばらく時間をおいてから再度お試しください。
+            </span>
+            <br>
+            <span th:if="${error}" th:text="${error}" style="font-size: 0.9rem; color: #888;">詳細エラー</span>
+        </p>
+
+        <a th:href="@{/home}" class="btn-home">
+            <i class="fa-solid fa-house"></i> ホームに戻る
         </a>
+
     </div>
-</div>
 
-<script>
-    // === 🌟 CANVAS PARTICLE SYSTEM & BACKGROUND JS ===
-    const canvas = document.getElementById('bg-canvas');
-    const ctx = canvas.getContext('2d');
-    const flare = document.getElementById('mouse-flare');
-    
-    let particlesArray = [];
-    let width, height;
-
-    function resizeCanvas() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width;
-        canvas.height = height;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    const mouse = { x: undefined, y: undefined };
-    window.addEventListener('mousemove', (event) => {
-        mouse.x = event.x;
-        mouse.y = event.y;
-        if(flare) flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
-        for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
-    });
-
-    // --- 🚀 クリック時の爆発エフェクト ---
-    document.querySelectorAll('.button').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            // エラー画面なので即遷移でも良いが、エフェクトを入れる
-             const rect = btn.getBoundingClientRect();
-             const x = e.clientX || (rect.left + rect.width / 2);
-             const y = e.clientY || (rect.top + rect.height / 2);
-             createExplosion(x, y);
+    <script>
+        // 背景アニメーション
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (e) => { 
+            mouse.x = e.x; 
+            mouse.y = e.y; 
+            for(let i=0; i<2; i++) particlesArray.push(new Particle()); 
         });
-    });
-
-    document.addEventListener('mousedown', function(e) {
-        if(!e.target.closest('.button')) {
-            createExplosion(e.clientX, e.clientY, 10);
-        }
-    });
-
-    function createExplosion(x, y, count = 60) {
-        const colors = ['#4facfe', '#00f2fe', '#fff', '#ffd700', '#ff0080', '#7fff00'];
-        for (let i = 0; i < count; i++) {
-            const spark = document.createElement('div');
-            spark.classList.add('mega-sparkle');
-            const angle = Math.random() * Math.PI * 2;
-            const velocity = Math.random() * 250 + 50;
-            const size = Math.random() * 12 + 4;
-            spark.style.width = `${size}px`;
-            spark.style.height = `${size}px`;
-            spark.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            spark.style.left = x + 'px';
-            spark.style.top = y + 'px';
-            spark.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-            document.body.appendChild(spark);
-            spark.animate([
-                { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
-                { transform: `translate(calc(-50% + ${Math.cos(angle) * velocity}px), calc(-50% + ${Math.sin(angle) * velocity}px)) scale(0)`, opacity: 0 }
-            ], {
-                duration: 500 + Math.random() * 400,
-                easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-                fill: 'forwards'
-            }).onfinish = () => spark.remove();
-        }
-    }
-
-    class Particle {
-        constructor() {
-            this.x = mouse.x;
-            this.y = mouse.y;
-            this.size = Math.random() * 5 + 2;
-            this.speedX = Math.random() * 4 - 2;
-            this.speedY = Math.random() * 4 - 2;
-            this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
-        }
-        update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-            if (this.size > 0.2) this.size -= 0.1;
-        }
-        draw() {
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = 'white';
-            ctx.fill();
-            ctx.shadowBlur = 0;
-        }
-    }
-
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < particlesArray.length; i++) {
-            particlesArray[i].update();
-            particlesArray[i].draw();
-            if (particlesArray[i].size <= 0.3) {
-                particlesArray.splice(i, 1);
-                i--;
+        
+        class Particle {
+            constructor() { 
+                this.x = mouse.x; 
+                this.y = mouse.y; 
+                this.size = Math.random() * 5 + 2; 
+                this.speedX = Math.random() * 4 - 2; 
+                this.speedY = Math.random() * 4 - 2; 
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; 
+            }
+            update() { 
+                this.x += this.speedX; 
+                this.y += this.speedY; 
+                if (this.size > 0.2) this.size -= 0.1; 
+            }
+            draw() { 
+                ctx.fillStyle = this.color; 
+                ctx.beginPath(); 
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+                ctx.fill(); 
             }
         }
-        requestAnimationFrame(animate);
-    }
-    
-    const cloud1 = document.querySelector('.cloud-1');
-    const cloud2 = document.querySelector('.cloud-2');
-    document.addEventListener('mousemove', (e) => {
-        const x = (window.innerWidth - e.pageX) / 60;
-        const y = (window.innerHeight - e.pageY) / 60;
-        if (cloud1) cloud1.style.transform = `translate(${x}px, ${y}px)`;
-        if (cloud2) cloud2.style.transform = `translate(${-x}px, ${-y}px)`;
-    });
+        
+        function animate() { 
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            for (let i = 0; i < particlesArray.length; i++) { 
+                particlesArray[i].update(); 
+                particlesArray[i].draw(); 
+                if (particlesArray[i].size <= 0.3) { 
+                    particlesArray.splice(i, 1); 
+                    i--; 
+                } 
+            } 
+            requestAnimationFrame(animate); 
+        }
+        animate();
+    </script>
 
-    animate();
-</script>
 </body>
 </html>

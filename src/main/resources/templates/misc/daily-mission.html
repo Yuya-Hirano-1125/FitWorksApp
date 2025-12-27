@@ -31,13 +31,15 @@
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
         }
-		.page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
-		        
-		        /* ★修正: white-space: nowrap を追加して改行を防止 */
-		        .page-title { 
-		            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; 
-		            white-space: nowrap; 
-		        }
+        .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
+        
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; 
+            white-space: nowrap;
+            text-shadow: none; 
+        }
+        
+        .page-title i { margin-right: 10px; color: #007bff; }
         
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
@@ -49,11 +51,30 @@
 
         .mission-card { background: rgba(255, 255, 255, 0.85); border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; padding: 20px; display: flex; align-items: center; gap: 15px; transition: transform 0.2s; }
         .mission-card:hover { transform: translateY(-3px); }
-		/* ★追加: スマホ画面などでタイトルがはみ出さないように文字サイズを調整 */
-		        @media (max-width: 600px) {
-		            .page-title { font-size: 1.4rem; }
-		            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
-		        }
+
+        .mission-header {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .mission-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .mission-reward {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .page-title { font-size: 1.7rem; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body class="mission-page">
@@ -72,28 +93,32 @@
             <h1 class="page-title"><i class="header-icon fa-solid fa-list-check"></i>今日のミッション</h1>
         </div>
         
-		<div th:if="${successMessage}" class="alert alert-success" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-		            <div>
-		                <i class="fa-solid fa-check-circle"></i> <span th:text="${successMessage}"></span>
-		            </div>
-		            
-		            <div th:if="${rewardLevel != null}" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(21, 87, 36, 0.2); font-weight: bold; font-size: 0.95rem;">
-		                <span>
-		                    現在のレベル: <span th:text="${rewardLevel}" style="font-size: 1.1em;"></span> 
-		                    <span style="font-size: 0.85em; font-weight: normal;">(EXP: <span th:text="${rewardExp}"></span>/<span th:text="${rewardReqExp}"></span>)</span>
-		                </span>
-		                <span style="margin: 0 10px;">|</span>
-		                <span>
-		                    所持チップ: <span th:text="${rewardChips}" style="font-size: 1.1em; color: #b8860b;"></span>
-		                </span>
-		            </div>
-		        </div>
+        <div th:if="${successMessage}" class="alert alert-success" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #28a745; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);">
+            <div>
+                <i class="fa-solid fa-check-circle"></i> <span th:text="${successMessage}"></span>
+            </div>
+            
+            <div th:if="${rewardLevel != null}" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(21, 87, 36, 0.2); font-weight: bold; font-size: 0.95rem;">
+                <span>
+                    現在のレベル: <span th:text="${rewardLevel}" style="font-size: 1.1em;"></span> 
+                    <span style="font-size: 0.85em; font-weight: normal;">(EXP: <span th:text="${rewardExp}"></span>/<span th:text="${rewardReqExp}"></span>)</span>
+                </span>
+                <span style="margin: 0 10px;">|</span>
+                <span>
+                    所持チップ: <span th:text="${rewardChips}" style="font-size: 1.1em; color: #b8860b;"></span>
+                </span>
+            </div>
+        </div>
 
-		        <div th:if="${errorMessage}" class="alert alert-danger" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-		            <i class="fa-solid fa-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
-		        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #dc3545; box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);">
+            <i class="fa-solid fa-exclamation-triangle"></i> <span th:text="${errorMessage}"></span>
+        </div>
 
-        <p class="sub-heading" style="text-align: center; color: #666;">達成して、ご褒美をもらいましょう！毎日午前4時に更新されます。</p>
+        <p class="sub-heading" style="text-align: center; color: #666; line-height: 1.6;">
+            達成して、ご褒美をもらいましょう！<br>
+            毎日午前4時に更新されます。
+        </p>
+
         <div class="mission-list">
             <div class="mission-card" th:each="mission : ${missions}">
                 <div class="mission-icon">
@@ -108,14 +133,17 @@
                 </div>
                 <div class="mission-details">
                     <div class="mission-header">
-                        <span class="mission-title" th:text="${mission.description}"></span>
-                        <span class="mission-reward">
-                            <i class="fa-solid fa-gift" style="margin-right: 5px;"></i>
-                            <span th:text="${mission.rewardExp}"></span> XP
+                        <div class="mission-title" th:text="${mission.description}"></div>
+                        <div class="mission-reward">
+                            <i class="fa-solid fa-gift" style="margin-right: 5px; color: #ff4081;"></i>
+                            
+                            <span th:text="${mission.rewardExp}" style="color: #ff4081; font-weight: bold; font-size: 1.1em;"></span> 
+                            <span style="color: #ff4081; font-weight: bold;">XP</span>
+                            
                             <span style="color: #e6b800; font-weight: bold; margin-left: 10px;">
                                 <i class="fa-solid fa-coins"></i> + 300 チップ
                             </span>
-                        </span>
+                        </div>
                     </div>
                     <div class="mission-progress-container">
                         <div class="progress-bar-wrap">
