@@ -1,22 +1,69 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>処方箋 | FitWorks</title>
-    
-    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* ページ固有のスタイル調整 */
+        /* 共通設定 */
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; --ai-accent-color: #4facfe; }
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        
+        /* 背景アニメーション */
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+
+        /* メインコンテナ */
+        .main-container {
+            max-width: 900px; width: 92%; margin: 40px auto; padding: 40px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 45px;
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
+        }
+
+        /* 共通ヘッダー */
+        .page-header-container { 
+            display: flex; align-items: center; margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; 
+        }
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; 
+            text-shadow: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .page-title i { margin-right: 10px; color: #007bff; }
+        
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+
+        /* コンテンツ部分 (処方箋カード) */
         .care-result-container {
             max-width: 600px;
             margin: 0 auto;
             width: 100%;
         }
 
-        /* 処方箋カードの本体 */
         .prescription-card {
             background: #ffffff;
             border-radius: 20px;
@@ -28,304 +75,227 @@
             border: 2px solid #fff;
         }
 
-        /* カードヘッダー */
         .prescription-header {
             background: linear-gradient(135deg, var(--ai-accent-color), #4fc3f7);
-            padding: 20px;
-            text-align: center;
-            color: white;
+            color: white; padding: 20px; text-align: center;
             position: relative;
         }
-        .prescription-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .prescription-header .sub-title {
-            font-size: 0.8rem;
-            opacity: 0.9;
-            margin-top: 5px;
-            font-weight: 600;
+        .ai-icon-large { font-size: 3rem; margin-bottom: 10px; display: block; animation: floatIcon 3s infinite ease-in-out; }
+        .prescription-title { font-size: 1.5rem; font-weight: 800; margin: 0; letter-spacing: 1px; }
+        .symptom-tag {
+            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px);
+            padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;
+            margin-top: 10px; display: inline-block; font-weight: bold;
         }
 
-        /* 診断結果（症状）タグ */
-        .diagnosis-tag {
-            background: #fff;
-            color: var(--ai-accent-color);
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* カードの中身 */
-        .card-body {
-            padding: 25px;
-        }
-
-        /* AIアドバイスエリア */
-        .ai-advice-section {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            align-items: flex-start;
-        }
-        .ai-avatar {
-            width: 50px;
-            height: 50px;
-            background: #e1f5fe;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--ai-accent-color);
-            flex-shrink: 0;
-            border: 2px solid white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .speech-bubble {
-            background: #f1f8e9;
-            padding: 15px;
-            border-radius: 0 15px 15px 15px;
-            color: #33691e;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            flex-grow: 1;
-        }
-        .speech-bubble::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -10px;
-            border-top: 10px solid #f1f8e9;
-            border-left: 10px solid transparent;
-        }
-
-        /* 処方メニューボックス */
-        .rx-box {
-            border: 3px dashed var(--primary-color);
-            border-radius: 15px;
-            padding: 25px 20px 20px 20px;
-            background: #fffbfd;
-            position: relative;
-            text-align: center;
-        }
-        .rx-label {
-            position: absolute;
-            top: -14px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary-color);
-            color: white;
-            padding: 4px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 800;
-            box-shadow: 0 2px 5px rgba(255, 105, 180, 0.4);
-            white-space: nowrap;
-        }
-        .rx-title {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: var(--dark-text);
-            margin-bottom: 10px;
-            display: block;
-        }
-        .rx-desc {
-            font-size: 0.95rem;
-            color: #666;
-            margin-bottom: 15px;
-            text-align: left;
-            line-height: 1.6;
-        }
-
-        /* コツ（Tips） */
-        .tips-box {
-            background: #fff3e0;
-            border-left: 4px solid #ff9800;
-            padding: 10px 15px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            color: #e65100;
-            text-align: left;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* アクションエリア */
-        .action-area {
-            margin-top: 25px;
-        }
-
-        /* メイン完了ボタン */
-        .btn-complete {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(45deg, #43a047, #66bb6a);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-complete:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
-        }
-        .btn-complete::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 50%; height: 100%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
-            transform: skewX(-20deg);
-            animation: shine 3s infinite;
-        }
-        @keyframes shine {
-            0% { left: -100%; }
-            20% { left: 200%; }
-            100% { left: 200%; }
-        }
-
-        /* 戻るボタン（デザイン変更） */
-        .btn-back {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 30px;
-            margin-top: 20px;
-            background: #ffffff;
-            color: #90a4ae;
-            border: 2px solid #cfd8dc;
-            border-radius: 50px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-        .btn-back:hover {
-            background: #eceff1;
-            color: #546e7a;
-            border-color: #b0bec5;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
+        .prescription-body { padding: 30px; }
         
-        .note {
-            font-size: 0.8rem;
-            color: #999;
-            text-align: center;
-            margin-top: 10px;
+        .advice-box {
+            background: #f8fcfd; border-left: 5px solid var(--ai-accent-color);
+            padding: 20px; border-radius: 10px; margin-bottom: 25px;
+        }
+        .advice-label {
+            color: var(--ai-accent-color); font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 1.1rem;
+        }
+        .advice-text { color: #333; line-height: 1.8; font-size: 1rem; white-space: pre-wrap; }
+
+        .rx-section {
+            background: #fff; border: 2px dashed #e0e0e0; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 25px;
+        }
+        .rx-label { color: #888; font-size: 0.9rem; font-weight: bold; margin-bottom: 10px; display: block; }
+        .rx-title { color: #333; font-size: 1.3rem; font-weight: 800; margin-bottom: 10px; }
+        .rx-desc { color: #666; font-size: 0.95rem; line-height: 1.6; }
+
+        /* ★追加: 「安らぎの処方」用のスタイル（オレンジ系） */
+        .rx-section.rx-relax {
+            border-color: #ffd0a8; /* 薄いオレンジのボーダー */
+            background-color: #fff5ec; /* 非常に薄いオレンジの背景 */
+        }
+        .rx-section.rx-relax .rx-label {
+            color: #ff8c42; /* アクセントカラー（オレンジ） */
+        }
+        .rx-section.rx-relax .rx-label i {
+            color: #ff8c42; /* ハートアイコンの色 */
+        }
+        .rx-section.rx-relax .rx-title {
+            color: #d35400; /* タイトルは少し濃いオレンジ */
+        }
+
+        .action-area { text-align: center; }
+        .btn-complete {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white; border: none; padding: 15px 40px; border-radius: 50px;
+            font-size: 1.1rem; font-weight: bold; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+            transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px;
+            width: 100%; justify-content: center;
+        }
+        .btn-complete:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6); }
+        .note { font-size: 0.8rem; color: #999; margin-top: 15px; }
+
+        .btn-back {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: #666; text-decoration: none; font-weight: bold;
+            padding: 10px 20px; border-radius: 30px; background: rgba(255,255,255,0.8);
+            transition: all 0.2s;
+        }
+        .btn-back:hover { background: #fff; color: #333; transform: translateX(-3px); }
+
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes floatIcon { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        @media (max-width: 600px) {
+            .page-title { font-size: 1.7rem; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .main-container { padding: 25px; width: 95%; }
+            .prescription-body { padding: 20px; }
         }
     </style>
 </head>
 <body>
-    <div th:replace="~{fragments/header :: header}"></div>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+    </div>
 
-    <div class="care-result-container">
-        
-        <div class="prescription-card">
-            <div class="prescription-header">
-                <h2><i class="fa-solid fa-file-medical"></i> PRESCRIPTION</h2>
-                <div class="sub-title">AIトレーナーからの処方箋</div>
-                
-                <div class="diagnosis-tag">
-                    <i class="fa-solid fa-stethoscope"></i>
-                    <span th:text="${symptom}">肩こり</span>
-                </div>
-            </div>
-
-            <div class="card-body">
-                
-                <div class="ai-advice-section">
-                    <div class="ai-avatar">
-                        <i class="fa-solid fa-robot"></i>
-                    </div>
-                    <div class="speech-bubble">
-                        <strong style="display:block; margin-bottom:5px; color:#2e7d32; font-size:0.85rem;">
-                            Dr. AI Trainer
-                        </strong>
-                        <span th:text="${aiAdvice != null ? aiAdvice : '現在AIサービスが混み合っていますが、こちらのケアがおすすめです！'}">
-                            アドバイス読み込み中...
-                        </span>
-                    </div>
-                </div>
-
-                <div class="rx-box" th:if="${suggestedExercise != null}">
-                    <div class="rx-label">
-                        <i class="fa-solid fa-prescription"></i> 本日の処方メニュー
-                    </div>
-                    
-                    <span class="rx-title" th:text="${suggestedExercise.fullName}">種目名</span>
-                    
-                    <div class="rx-desc" th:text="${suggestedExercise.description}">
-                        ここにエクササイズの説明が入ります。ゆっくりと呼吸をしながら行いましょう。
-                    </div>
-                    
-                    <div class="tips-box" th:if="${suggestedExercise.tips != null and suggestedExercise.tips != ''}">
-                        <i class="fa-regular fa-lightbulb"></i>
-                        <span th:text="${suggestedExercise.tips}">ここにコツが表示されます</span>
-                    </div>
-                </div>
-                
-                <div class="rx-box" th:if="${suggestedExercise == null}">
-                    <div class="rx-label">
-                        <i class="fa-solid fa-heart"></i> 安らぎの処方
-                    </div>
-                    <p class="rx-title">深呼吸＆リラックス</p>
-                    <p class="rx-desc">
-                        今は特定のメニューを行わず、目を閉じてゆっくり深呼吸をしましょう。<br>
-                        心のケアも大切なトレーニングです。
-                    </p>
-                </div>
-
-                <div class="action-area">
-                    <form th:action="@{/training-log/save}" method="post" th:object="${trainingLogForm}">
-                        <input type="hidden" th:field="*{recordDate}">
-                        <input type="hidden" th:field="*{type}">
-                        <input type="hidden" th:field="*{exerciseName}">
-                        <input type="hidden" th:field="*{sets}">
-                        <input type="hidden" th:field="*{reps}">
-                        <input type="hidden" th:field="*{weight}">
-
-                        <button type="submit" class="btn-complete">
-                            <i class="fa-solid fa-check-circle"></i> 
-                            <span>ケアを完了してXP獲得</span>
-                        </button>
-                    </form>
-                    <p class="note">※無理は禁物です。できる範囲で行いましょう。</p>
-                </div>
-
-            </div>
+    <div class="main-container">
+        <div class="page-header-container">
+            <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <h1 class="page-title"><i class="fa-solid fa-file-prescription"></i> 診断結果</h1>
         </div>
 
-        <div style="text-align:center;">
-             <a th:href="@{/training/care}" class="btn-back">
-                <i class="fa-solid fa-arrow-left"></i> 診断に戻る
-             </a>
+        <div class="care-result-container">
+            <div class="prescription-card">
+                <div class="prescription-header">
+                    <i class="fa-solid fa-user-doctor ai-icon-large"></i>
+                    <h2 class="prescription-title">AI Trainer's Prescription</h2>
+                    <span class="symptom-tag">
+                        症状: <span th:text="${symptom}">症状なし</span>
+                    </span>
+                </div>
+
+                <div class="prescription-body">
+                    <div class="advice-box" th:if="${aiAdvice}">
+                        <div class="advice-label"><i class="fa-solid fa-comment-medical"></i> アドバイス</div>
+                        <p class="advice-text" th:text="${aiAdvice}"></p>
+                    </div>
+
+                    <div class="rx-section" th:if="${suggestedExercise != null}">
+                        <div class="rx-label">
+                            <i class="fa-solid fa-pills"></i> 今回の処方箋メニュー
+                        </div>
+                        <p class="rx-title" th:text="${suggestedExercise.name}">ストレッチ</p>
+                        <p class="rx-desc" th:text="${suggestedExercise.description}">
+                            ゆっくり伸ばしましょう。
+                        </p>
+                        <div style="margin-top:10px;" th:if="${suggestedExercise.targetMuscle}">
+                            <span style="font-size:0.8rem; background:#eee; padding:3px 8px; border-radius:10px;">
+                                <i class="fa-solid fa-bullseye"></i> <span th:text="${suggestedExercise.targetMuscle}"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="rx-section rx-relax" th:if="${suggestedExercise == null}">
+                        <div class="rx-label">
+                            <i class="fa-solid fa-heart"></i> 安らぎの処方
+                        </div>
+                        <p class="rx-title">深呼吸＆リラックス</p>
+                        <p class="rx-desc">
+                            今は特定のメニューを行わず、目を閉じてゆっくり深呼吸をしましょう。<br>
+                            心のケアも大切なトレーニングです。
+                        </p>
+                    </div>
+
+                    <div class="action-area">
+                        <form th:action="@{/training-log/save}" method="post" th:object="${trainingLogForm}">
+                            <input type="hidden" th:field="*{recordDate}">
+                            <input type="hidden" th:field="*{type}">
+                            <input type="hidden" th:field="*{exerciseName}">
+                            <input type="hidden" th:field="*{sets}">
+                            <input type="hidden" th:field="*{reps}">
+                            <input type="hidden" th:field="*{weight}">
+
+                            <button type="submit" class="btn-complete">
+                                <i class="fa-solid fa-check-circle"></i> 
+                                <span>ケアを完了してXP獲得</span>
+                            </button>
+                        </form>
+                        <p class="note">※無理は禁物です。できる範囲で行いましょう。</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div style="text-align:center;">
+                 <a th:href="@{/training/care}" class="btn-back">
+                    <i class="fa-solid fa-arrow-left"></i> 診断に戻る
+                 </a>
+            </div>
         </div>
     </div>
 
     <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+        // 背景アニメーション
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const mouse = { x: undefined, y: undefined };
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+            for(let i=0; i<2; i++) particlesArray.push(new Particle());
+        });
+
+        class Particle {
+            constructor() {
+                this.x = mouse.x;
+                this.y = mouse.y;
+                this.size = Math.random() * 5 + 2;
+                this.speedX = Math.random() * 4 - 2;
+                this.speedY = Math.random() * 4 - 2;
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.size > 0.2) this.size -= 0.1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+                if (particlesArray[i].size <= 0.3) {
+                    particlesArray.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
 </body>
 </html>
