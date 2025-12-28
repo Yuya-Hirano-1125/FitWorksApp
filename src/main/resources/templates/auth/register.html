@@ -38,18 +38,33 @@
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
         }
-        /* 入力フォーム共通スタイル（念のため明示） */
+        
+        /* 入力フォーム共通スタイル */
         input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="date"] {
             width: 100%;
-            padding: 12px 15px; /* パディングを統一 */
-            border-radius: 12px; /* 角丸を統一 */
+            padding: 12px 15px;
+            border-radius: 12px;
             border: 1px solid rgba(0,0,0,0.1);
             background: rgba(255, 255, 255, 0.8);
             font-size: 1rem;
-            font-family: inherit;
+            /* ★修正: フォントを明示的に継承し、デザインを統一 */
+            font-family: 'Poppins', 'Noto Sans JP', sans-serif;
             box-sizing: border-box;
             transition: all 0.3s ease;
+            /* ★修正: デフォルトのスタイルリセットと高さの確保 */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            min-height: 48px; /* 他の入力欄と高さを揃える */
+            color: #333; /* 文字色を統一 */
         }
+        
+        /* date入力特有の調整 */
+        input[type="date"] {
+            /* プレースホルダー色などの調整が必要な場合 */
+            color: #333; 
+        }
+
         input:focus {
             outline: none;
             border-color: var(--primary-color);
@@ -57,13 +72,12 @@
             background: white;
         }
 
-        /* パスワードと日付のラッパー用スタイル */
-        .password-wrapper, .date-wrapper { position: relative !important; display: block !important; width: 100% !important; }
-        .password-wrapper input, .date-wrapper input { padding-right: 45px !important; }
+        /* パスワードラッパー用スタイル */
+        .password-wrapper { position: relative !important; display: block !important; width: 100% !important; }
+        .password-wrapper input { padding-right: 45px !important; }
         
         /* アイコンのスタイル */
-        .password-wrapper .toggle-password-icon, 
-        .date-wrapper .calendar-icon { 
+        .password-wrapper .toggle-password-icon { 
             position: absolute !important; 
             top: 50% !important; 
             right: 15px !important; 
@@ -88,10 +102,10 @@
         .btn-register { width: 100%; padding: 16px; margin-top: 15px; border: none; border-radius: 50px; background: linear-gradient(135deg, #0061ff 0%, #60efff 100%); color: white; font-size: 1.2rem; font-weight: 800; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 97, 255, 0.4); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-register:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 10px 25px rgba(0, 97, 255, 0.6); filter: brightness(1.1); }
         .btn-register:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0, 97, 255, 0.4); }
-        .page-header-container { display: flex; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #4facfe; padding-bottom: 10px; gap: 15px; }
+        .page-header-container { display: flex; align-items: center; margin-bottom: 25px; border-bottom: 3px solid #0061ff; padding-bottom: 10px; gap: 15px; }
         .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 700; text-shadow: none; animation: none; }
-        .page-title i { margin-right: 10px; color: #4facfe; }
-        @media (max-width: 600px) { .page-title { font-size: 1.5rem; } }
+        .page-title i { margin-right: 10px; color: #0061ff; }
+        @media (max-width: 600px) { .page-title { font-size: 1.8rem; } }
     </style>
 </head>
 <body>
@@ -122,9 +136,9 @@
             </div>
             
 			<div class="form-group">
-			                <label for="birthDate">生年月日</label>
-			                <input type="date" id="birthDate" name="birthDate" required>
-			            </div>
+			    <label for="birthDate">生年月日</label>
+			    <input type="date" id="birthDate" name="birthDate" required>
+			</div>
 
             <div class="form-group">
                 <label for="new-password">パスワード</label>
@@ -186,20 +200,7 @@
             draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
         }
 		function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
-		        animate();
-		        
-		        // ★以下のスクリプトをすべて削除してください★
-		        // 日付入力のアイコンクリックでピッカーを表示する補助スクリプト（ブラウザ互換性のため）
-		        /*
-		        document.querySelector('.calendar-icon').addEventListener('click', function() {
-		            const dateInput = document.getElementById('birthDate');
-		            if (dateInput.showPicker) {
-		                dateInput.showPicker();
-		            } else {
-		                dateInput.focus();
-		            }
-		        });
-		        */
+		animate();
     </script>
 </body>
 </html>
