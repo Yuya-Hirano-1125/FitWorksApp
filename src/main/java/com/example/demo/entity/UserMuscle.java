@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // ★このインポートを追加
+
 @Entity
 public class UserMuscle {
 
@@ -16,6 +18,7 @@ public class UserMuscle {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore // ★ここにアノテーションを追加（超重要！）
     private User user;
 
     // 部位名 (胸, 背中, 脚, 肩, 腕, 腹筋, その他)
@@ -62,14 +65,19 @@ public class UserMuscle {
     // Getter / Setter
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
+    
     public String getTargetPart() { return targetPart; }
     public void setTargetPart(String targetPart) { this.targetPart = targetPart; }
+    
     public String getCustomName() { return customName; }
     public void setCustomName(String customName) { this.customName = customName; }
+    
     public int getLevel() { return level; }
     public void setLevel(int level) { this.level = level; }
+    
     public int getXp() { return xp; }
     public void setXp(int xp) { this.xp = xp; }
 }
