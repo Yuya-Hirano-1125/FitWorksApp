@@ -71,24 +71,19 @@
             color: white; border: none; font-weight: 800;
             box-shadow: 0 4px 15px rgba(255, 75, 43, 0.4);
             cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .button.danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 75, 43, 0.6);
+            transition: all 0.3s ease; /* シンプルなトランジションに変更 */
         }
         
-        /* キャンセルボタン */
-        .button.cancel {
-            background: #fff; border: 1px solid #ccc; color: #555; 
-            text-align: center; text-decoration: none; display: block; 
-            padding: 12px; border-radius: 30px; font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
+        /* ホバー時の挙動（浮き上がるだけ） */
+        .button.danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 75, 43, 0.6);
         }
-        .button.cancel:hover {
-            transform: translateY(-2px);
-            background: #f9f9f9;
+
+        /* クリック時の挙動（少し沈む） */
+        .button.danger:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(255, 75, 43, 0.4);
         }
 
         @media (max-width: 600px) {
@@ -131,17 +126,12 @@
             <button type="submit" class="button danger">
                 同意して退会する
             </button>
-            
-            <a th:href="@{/settings}" class="button cancel">
-                キャンセル
-            </a>
         </div>
 
     </form>
 </div>
 
 <script>
-    // 背景のCanvasアニメーションのみ維持
     const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); const flare = document.getElementById('mouse-flare');
     let particlesArray = [];
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }

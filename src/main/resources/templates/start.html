@@ -264,9 +264,13 @@
             transition: 0.4s;
         }
         .button.primary:hover::after { left: 100%; }
+        
         .button.primary:hover {
+            /* ★修正: ホバー時の色変化を無効化（優先度を上げて強制） */
+            background: linear-gradient(90deg, #4facfe, #00f2fe) !important;
             transform: translateY(-4px) scale(1.03);
             box-shadow: 0 15px 35px rgba(79, 172, 254, 0.6);
+            color: white !important;
         }
         .button:active { transform: scale(0.95); }
 
