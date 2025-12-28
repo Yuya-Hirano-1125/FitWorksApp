@@ -34,8 +34,15 @@
 
         /* ヘッダー修正 */
         .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
-        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; text-shadow: none}
+        
+        /* ★修正: 改行禁止設定を追加 */
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; 
+            text-shadow: none;
+            white-space: nowrap; /* 改行しない */
+        }
 		.page-title i { margin-right: 8px; color: #007bff; }
+        
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -67,6 +74,14 @@
         .rename-input { flex: 1; padding: 5px; border: 1px solid #ddd; border-radius: 5px; }
         .rename-btn { background: var(--secondary-color); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
         #tooltip { position: absolute; background: rgba(0, 0, 0, 0.9); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 100; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.3); white-space: nowrap; }
+
+        /* ★追加: スマホ表示時の調整 */
+        @media (max-width: 600px) {
+            .page-title { 
+                /* 画面幅に合わせてフォントサイズを縮小して、改行せずに収まるようにする */
+                font-size: 1.6rem; 
+            }
+        }
     </style>
 </head>
 <body>
