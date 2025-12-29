@@ -10,9 +10,14 @@
     <link rel="stylesheet" th:href="@{/css/training-log.css}">
     <script th:src="@{/js/theme.js}"></script>
     <style>
+        /* ★重要: すべての要素のサイズ計算を枠線込みにする */
+        *, *::before, *::after { box-sizing: border-box; }
+
         /* 共通背景デザイン */
-        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; --weight-color: #009688; }
+        
         body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
+        
         .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
@@ -34,11 +39,19 @@
             border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
+            
+            animation: none !important; transform: none !important; transition: none !important;
         }
 
-        /* ヘッダー修正 */
-        .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
-        .page-title { color: #444; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
+        /* ヘッダーデザイン */
+        .page-header-container { 
+            display: flex; align-items: center; margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; flex-wrap: nowrap;
+        }
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left;
+            text-shadow: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -47,17 +60,146 @@
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
-        /* 体重ログ用スタイル */
-        .header-icon-weight { color: #009688; }
-        .calendar-day-cell.weight-logged { background-color: #e0f2f1; border-color: #009688; }
-        .weight-value-display { font-size: 0.85em; color: #00796b; font-weight: 800; display: block; margin-top: 2px; }
+        /* カレンダーナビゲーション */
+        .calendar-nav-container { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .calendar-title { font-size: 1.5rem; color: #333; margin: 0; font-weight: 800; }
+        .nav-arrow {
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px; border-radius: 50%; background: white; color: #007bff; text-decoration: none; font-size: 1.2rem;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid transparent;
+        }
+        .nav-arrow:hover { background: #007bff; color: white; transform: scale(1.15); box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3); }
+        .nav-arrow:active { transform: scale(0.95); }
+
+        /* カレンダーグリッド */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 30px; }
+        .calendar-day-header { border: 1px solid rgba(200,200,200,0.5); padding: 5px; text-align: center; background-color: rgba(255,255,255,0.8); font-weight: bold; border-radius: 8px; }
+        .calendar-day-cell { border: 1px solid rgba(200,200,200,0.5); min-height: 60px; text-align: center; vertical-align: top; background-color: rgba(255,255,255,0.9); transition: background 0.2s; cursor: pointer; border-radius: 8px; }
+        .calendar-day-cell:hover { background-color: #fff; transform: translateY(-2px); box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
         
-        .calendar-day-header { border: 1px solid rgba(200,200,200,0.5); padding: 5px; text-align: center; background-color: rgba(255,255,255,0.8); font-weight: bold; }
-        .calendar-day-cell { border: 1px solid rgba(200,200,200,0.5); min-height: 60px; text-align: center; vertical-align: top; background-color: rgba(255,255,255,0.9); transition: background 0.2s; cursor: pointer; }
-        .calendar-day-cell:hover { background-color: #fff; }
         .calendar-day-header.sun, .calendar-day-cell.sun .day-number { color: #FF3B30; }
         .calendar-day-header.sat, .calendar-day-cell.sat .day-number { color: #007BFF; }
         .calendar-day-header.weekday, .calendar-day-cell.weekday .day-number { color: #000; }
+        .calendar-day-cell.today { background-color: #fff8e1; border: 2px solid #ff9800; font-weight: bold; }
+
+        /* 未来の日付 */
+        .calendar-day-cell.future-day {
+            background-color: #f0f0f0; color: #ccc; cursor: not-allowed; pointer-events: none; opacity: 0.6;
+        }
+        .calendar-day-cell.future-day .day-number { color: #aaa; }
+        .calendar-day-cell.future-day:hover { transform: none; box-shadow: none; background-color: #f0f0f0; }
+
+        /* 体重ログ用独自スタイル */
+        .header-icon-weight { color: var(--weight-color); margin-right: 10px; }
+        .calendar-day-cell.weight-logged { background-color: #e0f2f1; border: 2px solid var(--weight-color); }
+        .weight-value-display { font-size: 0.9em; color: #00796b; font-weight: 800; display: block; margin-top: 5px; }
+        .log-indicator { color: #ccc; font-size: 0.8em; display: block; margin-top: 5px; }
+
+        /* ★変更: 「グラフで推移を確認」ボタンの色を変更 */
+        .btn-view-all {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            /* 指定色に変更 */
+            background: linear-gradient(135deg, #009688 0%, #4db6ac 100%); 
+            color: white; text-decoration: none; width: 100%; max-width: 400px;
+            padding: 16px; border-radius: 50px; font-weight: bold; font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0, 150, 136, 0.3); transition: all 0.3s ease; border: none;
+        }
+        .btn-view-all:hover { 
+            transform: translateY(-3px) scale(1.02); 
+            box-shadow: 0 8px 25px rgba(0, 150, 136, 0.5); 
+            filter: brightness(1.1); 
+        }
+        .btn-view-all:active { transform: translateY(1px); }
+
+        /* モーダル */
+        .modal {
+            display: none; justify-content: center; align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2000; background-color: rgba(0,0,0,0.4);
+        }
+        .modal.is-active { display: flex; animation: fadeInOverlay 0.4s ease-out forwards; }
+        @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8) translateY(20px); } 60% { opacity: 1; transform: scale(1.03) translateY(0); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.98); border-radius: 24px; padding: 30px;
+            position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 1px solid rgba(255, 255, 255, 0.8);
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            max-width: 400px; width: 90%;
+        }
+
+        .close-button {
+            position: absolute; top: 15px; right: 20px; font-size: 2rem; font-weight: bold; color: #aaa; cursor: pointer;
+            transition: color 0.2s; z-index: 100; line-height: 1;
+        }
+        .close-button:hover { color: #555; }
+
+        /* 体重入力フォーム */
+        .scale-display-area {
+            background: #f0fdfc; /* ほんのり緑 */
+            border-radius: 20px; padding: 25px; text-align: center;
+            border: 2px solid #b2dfdb; margin-bottom: 20px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .scale-label { display: block; color: #00796b; font-size: 0.9rem; font-weight: 700; margin-bottom: 10px; letter-spacing: 1px; }
+        
+        .scale-control-wrapper {
+            display: flex; align-items: center; justify-content: center; gap: 15px;
+        }
+        
+        /* 巨大入力フィールド */
+        .scale-input {
+            font-size: 3.5rem; font-weight: 700; color: #333; width: 140px; text-align: center;
+            border: none; background: transparent; border-bottom: none;
+            font-family: 'Poppins', sans-serif;
+            padding: 0; margin: 0;
+        }
+        .scale-input:focus { outline: none; }
+        
+        /* ★追加: スピンボタン（矢印）を消す */
+        /* Chrome, Safari, Edge, Opera */
+        .scale-input::-webkit-outer-spin-button,
+        .scale-input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        /* Firefox */
+        .scale-input[type=number] {
+          -moz-appearance: textfield;
+        }
+
+        .scale-unit { font-size: 1.5rem; font-weight: 700; color: #009688; margin-bottom: 10px; }
+
+        /* 増減ボタン */
+        .adjust-btn {
+            width: 50px; height: 50px; border-radius: 50%; border: none;
+            background: #fff; color: #009688; font-size: 1.5rem; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; border: 2px solid #e0f2f1;
+        }
+        .adjust-btn:hover { transform: scale(1.1); background: #e0f2f1; }
+        .adjust-btn:active { transform: scale(0.95); }
+
+        .btn-submit-weight {
+            width: 100%; padding: 16px; margin-top: 10px; border: none; border-radius: 50px;
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+            color: white; font-size: 1.2rem; font-weight: 800; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 176, 155, 0.3); transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-submit-weight:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 176, 155, 0.4); filter: brightness(1.05); }
+        .btn-submit-weight:active { transform: translateY(1px); }
+
+        @media (max-width: 600px) {
+            .page-title { font-size: 1.5rem; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .main-container { padding: 20px; width: 95%; }
+            .calendar-day-cell { min-height: 50px; font-size: 0.9rem; }
+            .nav-arrow { width: 35px; height: 35px; font-size: 1rem; }
+            .scale-input { font-size: 3rem; }
+            .adjust-btn { width: 40px; height: 40px; font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body class="training-log-page">
@@ -70,7 +212,7 @@
     </div>
 
     <div class="main-container">
-        <div th:replace="fragments/header :: header"></div>
+        <div th:replace="~{fragments/header :: header}"></div>
 
         <div class="page-header-container">
             <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
@@ -94,48 +236,71 @@
         <div class="calendar-grid">
             <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')"></div>
             <th:block th:each="date : ${calendarDays}">
-                <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''}, dayOfWeek=${date != null ? date.dayOfWeek.name() : ''}, isToday=${date != null and date.isEqual(currentDate)}, record=${date != null ? weightMap.get(date) : null}"
+                <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''}, 
+                              dayOfWeek=${date != null ? date.dayOfWeek.name() : ''}, 
+                              isToday=${date != null and date.isEqual(currentDate)}, 
+                              record=${date != null ? weightMap.get(date) : null},
+                              isFuture=${date != null and date.isAfter(currentDate)}"
                      class="calendar-day-cell"
-                     th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today ' : '') + ((${dayOfWeek == 'SATURDAY'} ? 'sat' : (${dayOfWeek == 'SUNDAY'} ? 'sun' : ''))) + (${record != null} ? ' weight-logged' : ''))"
+                     th:classappend="${date == null} ? 'empty-day' : 
+                                    ((${isToday} ? 'today ' : '') + 
+                                    (${isFuture} ? 'future-day ' : '') + 
+                                    ((${dayOfWeek == 'SATURDAY'} ? 'sat' : (${dayOfWeek == 'SUNDAY'} ? 'sun' : ''))) + 
+                                    (${record != null} ? ' weight-logged' : ''))"
                      th:attr="data-date=${date != null ? date.toString() : ''}, data-weight=${record != null ? record.weight : ''}"
-                     onclick="openWeightModal(this)">
+                     th:onclick="${date != null and !isFuture} ? 'openWeightModal(this)' : ''">
                     <span class="day-number" th:text="${dateNumber}">1</span>
                     <span th:if="${record != null}" class="weight-value-display"><span th:text="${record.weight}"></span>kg</span>
-                    <span th:if="${record == null and isToday}" class="log-indicator" style="color:#ccc; font-size:0.8em;"><i class="fa-solid fa-plus"></i></span>
+                    <span th:if="${record == null and isToday}" class="log-indicator"><i class="fa-solid fa-plus"></i></span>
                 </div>
             </th:block>
         </div>
         
         <div style="text-align: center; margin-top: 20px;">
-            <a th:href="@{/training-log/all(period='month')}" class="button secondary" style="border-radius: 50px;"><i class="fa-solid fa-chart-line"></i> グラフで推移を確認</a>
+            <a th:href="@{/training-log/all(period='month')}" class="btn-view-all">
+                <i class="fa-solid fa-chart-line"></i> グラフで推移を確認
+            </a>
         </div>
-        
-        </div>
+    </div>
 
     <div id="weightModal" class="modal">
-        <div class="modal-content" style="max-width: 400px; padding: 25px;">
+        <div class="modal-content">
             <span class="close-button" onclick="closeWeightModal()">&times;</span>
-            <h3 id="modalDateTitle" class="modal-title" style="color: #009688;">2025/12/15</h3>
-            <p class="sub-heading" style="margin-bottom: 20px;">の体重を入力</p>
-            <form th:action="@{/training-log/save}" method="post" class="weight-record-form" style="padding: 0;">
+            <h3 id="modalDateTitle" class="modal-title" style="color: var(--weight-color); text-align: center; margin-bottom: 5px;">2025/12/15</h3>
+            <p class="sub-heading" style="margin-bottom: 20px; text-align: center;">の体重を入力</p>
+            
+            <form th:action="@{/training/log/body-weight/save}" method="post" class="weight-record-form" style="padding: 0;">
                 <input type="hidden" id="recordDateInput" name="recordDate" />
                 <input type="hidden" name="type" value="BODY_WEIGHT" />
-                <div class="scale-display-area" style="margin-bottom: 20px;">
-                    <label for="weightInput" class="scale-label">CURRENT WEIGHT</label>
-                    <div class="scale-input-wrapper">
-                        <input type="number" id="weightInput" name="weight" class="scale-input" step="0.1" min="10" max="300" placeholder="00.0" required oninput="this.value = this.value.replace(/[^0-9.]/g, '');"/>
-                        <span class="scale-unit">kg</span>
+                
+                <div class="scale-display-area">
+                    <label class="scale-label">CURRENT WEIGHT</label>
+                    <div class="scale-control-wrapper">
+                        <button type="button" class="adjust-btn minus" onclick="adjustWeight(-0.1)">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                        
+                        <div style="display:flex; align-items:baseline;">
+                            <input type="number" id="weightInput" name="weight" class="scale-input" 
+                                   step="0.1" min="10" max="300" placeholder="00.0" 
+                                   required inputmode="decimal">
+                            <span class="scale-unit">kg</span>
+                        </div>
+
+                        <button type="button" class="adjust-btn plus" onclick="adjustWeight(0.1)">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
                     </div>
                 </div>
+                
                 <button type="submit" class="btn-submit-weight"><i class="fa-solid fa-check"></i> 保存する</button>
             </form>
         </div>
     </div>
 
-    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 
     <script th:inline="javascript">
-        // ... (script content unchanged) ...
         function openWeightModal(element) {
             const dateStr = element.getAttribute('data-date');
             if (!dateStr) return;
@@ -145,13 +310,27 @@
             const weightInput = document.getElementById('weightInput');
             weightInput.value = currentWeight ? currentWeight : '';
             document.getElementById('weightModal').classList.add('is-active');
+            
+            // 少し遅れてフォーカス
             setTimeout(() => weightInput.focus(), 100);
         }
+        
         function closeWeightModal() { document.getElementById('weightModal').classList.remove('is-active'); }
+        
         window.onclick = function(event) {
             const modal = document.getElementById('weightModal');
             if (event.target === modal) closeWeightModal();
         }
+
+        function adjustWeight(delta) {
+            const input = document.getElementById('weightInput');
+            let val = parseFloat(input.value);
+            if (isNaN(val)) val = 60.0; // デフォルト値
+            
+            val += delta;
+            input.value = val.toFixed(1); // 小数点1桁に整形
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const selectedDate = /*[[${selectedDate}]]*/ null;
             if (selectedDate) {

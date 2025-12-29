@@ -618,6 +618,43 @@ public class TrainingController {
         return "redirect:/training-log?year=" + date.getYear() + "&month=" + date.getMonthValue();
     }
     
+    @PostMapping("/training/log/body-weight/save")
+    public String saveBodyWeightLog(
+            @RequestParam("recordDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam("weight") Double weight,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) return "redirect:/login";
+
+        try {
+            // 既存の記録があるか確認（日付重複を防ぐ）
+            // ※リポジトリに findByUserAndDate がない場合の汎用的な実装
+            List<BodyWeightRecord> records = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
+            BodyWeightRecord record = records.stream()
+                    .filter(r -> r.getDate().isEqual(date))
+                    .findFirst()
+                    .orElse(new BodyWeightRecord());
+
+            if (record.getId() == null) {
+                record.setUser(currentUser);
+                record.setDate(date);
+            }
+            record.setWeight(weight);
+
+            bodyWeightRecordRepository.save(record);
+            redirectAttributes.addFlashAttribute("successMessage", date + " の体重(" + weight + "kg)を保存しました。");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "体重の保存に失敗しました。");
+        }
+
+        // カレンダー画面に戻る（該当の年月を表示）
+        return "redirect:/training-log/form/body-weight?year=" + date.getYear() + "&month=" + date.getMonthValue();
+    }
+    
     @PostMapping("/training-log/save-batch")
     public String saveBatchTrainingLog(@ModelAttribute BatchTrainingLogForm batchForm, 
                                        @RequestParam("recordDate") LocalDate recordDate,
