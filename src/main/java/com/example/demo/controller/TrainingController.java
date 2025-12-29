@@ -480,13 +480,13 @@ public class TrainingController {
     @PostMapping("/training/log/save")
     public String saveTrainingLog(
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam("type") String type, // "WEIGHT" または "CARDIO"
+            @RequestParam("type") String type,
             @RequestParam("exerciseName") String exerciseName,
-            // フリーウェイト用（任意）
-            @RequestParam(value = "weight", required = false) Double weight,
-            @RequestParam(value = "reps", required = false) Integer reps,
+            // リストで受け取る
+            @RequestParam(value = "weights", required = false) List<Double> weights,
+            @RequestParam(value = "repsList", required = false) List<Integer> repsList,
+            // ★復活: 簡易フォームのセット数を受け取るために必要です
             @RequestParam(value = "sets", required = false, defaultValue = "1") Integer sets,
-            // 有酸素用（任意）
             @RequestParam(value = "duration", required = false) Integer duration,
             @RequestParam(value = "distance", required = false) Double distance,
             Authentication authentication,
@@ -496,107 +496,118 @@ public class TrainingController {
         if (currentUser == null) return "redirect:/login";
 
         try {
-            TrainingRecord record = new TrainingRecord();
-            record.setUser(currentUser);
-            record.setRecordDate(date);
-            record.setExerciseName(exerciseName); 
+            int savedCount = 0;
+            double totalVolume = 0; // XP計算用の合計負荷
 
-            // 種別ごとの値セット
-            if ("WEIGHT".equals(type)) {
-                record.setType("WEIGHT");
-                record.setWeight(weight);
-                record.setReps(reps);
-                record.setSets(sets);
-            } else if ("CARDIO".equals(type)) {
-                record.setType("CARDIO");
-                record.setCardioType(exerciseName); // CARDIOの場合、exerciseNameをcardioTypeにもセット（既存ロジック準拠）
-                record.setDurationMinutes(duration);
-                record.setDistanceKm(distance);
-                // 消費カロリーは入力欄を削除したため、ここでの処理は不要
-            }
-
-            trainingRecordRepository.save(record);
-
-            // --- ゲーミフィケーション処理 (XP, チップ, 筋肉経験値) ---
-            // ※既存のsaveTrainingRecordメソッドと同様のロジックで実装
-            ExerciseData exerciseData = trainingDataService.getExerciseDataByName(exerciseName);
-            int earnedXP = 0;
-            int muscleXp = 0;
-            String targetPart = "その他";
-
-            if (exerciseData != null) {
-                // 基本XP取得
-                int baseDifficultyXp = trainingLogicService.getExperiencePoints(exerciseData);
-                int additionalXp = 0;
-
-                if ("WEIGHT".equals(type)) {
-                    // 簡易的な負荷量計算 (既存ロジックがTrainingLogFormを必要とするため簡易計算で代用)
-                    double totalVol = (weight != null ? weight : 0) * (reps != null ? reps : 0) * (sets != null ? sets : 1);
-                    additionalXp = (int) (totalVol / 100); 
-                } else if ("CARDIO".equals(type) && duration != null) {
-                    additionalXp = duration;
-                }
-
-                earnedXP = baseDifficultyXp + additionalXp;
-                muscleXp = Math.max(10, earnedXP / 2);
+            // ■ ウェイトトレーニングの場合
+            if ("WEIGHT".equals(type) && weights != null && !weights.isEmpty()) {
                 
-                // 部位特定
-                if ("WEIGHT".equals(type)) {
-                    targetPart = trainingDataService.findPartByExerciseName(exerciseName);
-                } else {
-                    targetPart = "有酸素";
+                // ★簡易フォーム対応ロジック
+                // 「重量リストが1つ」かつ「セット数が2以上」の場合は、その内容を指定セット数分繰り返す
+                int loopCount = weights.size();
+                boolean isSimpleMode = (weights.size() == 1 && sets != null && sets > 1);
+                
+                if (isSimpleMode) {
+                    loopCount = sets;
                 }
-            } else {
-                // 登録がない種目の場合のデフォルト値
-                earnedXP = 10;
-                muscleXp = 5;
-            }
 
-            // レベルアップ・経験値付与
-            if (earnedXP > 0) {
-                levelService.addXpAndCheckLevelUp(currentUser, earnedXP);
-                userRepository.save(currentUser);
+                for (int i = 0; i < loopCount; i++) {
+                    // SimpleModeなら常に0番目（入力された1つの値）を使う。そうでなければi番目を使う。
+                    Double w = weights.get(isSimpleMode ? 0 : i);
+                    
+                    // 回数の取得（安全策）
+                    Integer r = 0;
+                    if (isSimpleMode) {
+                        r = (repsList != null && !repsList.isEmpty()) ? repsList.get(0) : 0;
+                    } else {
+                        r = (repsList != null && i < repsList.size()) ? repsList.get(i) : 0;
+                    }
 
-                // 部位別経験値
-                if (targetPart != null) {
-                    String levelUpMsg = muscleService.addExperience(currentUser, targetPart, muscleXp);
-                    if (levelUpMsg != null) {
-                        redirectAttributes.addFlashAttribute("muscleLevelUpMessage", levelUpMsg);
+                    if (w != null) {
+                        TrainingRecord record = new TrainingRecord();
+                        record.setUser(currentUser);
+                        record.setRecordDate(date);
+                        record.setExerciseName(exerciseName);
+                        record.setType("WEIGHT");
+                        record.setWeight(w);
+                        record.setReps(r);
+                        record.setSets(i + 1); // セット番号として保存
+                        
+                        trainingRecordRepository.save(record);
+                        
+                        savedCount++;
+                        totalVolume += (w * r);
                     }
                 }
-
-                // チップ付与
-                int earnedChips = 0;
-                if (exerciseData != null) {
-                     earnedChips = trainingLogicService.calculateChipReward(exerciseData);
-                }
+            } 
+            // ■ 有酸素運動の場合
+            else if ("CARDIO".equals(type)) {
+                TrainingRecord record = new TrainingRecord();
+                record.setUser(currentUser);
+                record.setRecordDate(date);
+                record.setExerciseName(exerciseName);
+                record.setType("CARDIO");
+                record.setCardioType(exerciseName);
+                record.setDurationMinutes(duration);
+                record.setDistanceKm(distance);
                 
-                if (earnedChips > 0) {
-                    userService.addChips(currentUser.getUsername(), earnedChips);
-                }
-                
-                // メッセージ作成
-                String successMsg = date.toString() + " 「" + exerciseName + "」を記録しました！";
-                // チップが0枚の場合はチップ情報を表示しない
-                if (earnedChips > 0) {
-                    successMsg += " (" + earnedXP + " XP, " + earnedChips + " 枚のチップ獲得)";
-                } else {
-                    successMsg += " (" + earnedXP + " XP獲得)";
-                }
-                redirectAttributes.addFlashAttribute("successMessage", successMsg);
-            } else {
-                redirectAttributes.addFlashAttribute("successMessage", "トレーニングを記録しました！");
+                trainingRecordRepository.save(record);
+                savedCount = 1;
             }
 
-            // ミッション更新
-            missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
+            // --- ゲーミフィケーション処理 (XP, チップ) ---
+            if (savedCount > 0) {
+                ExerciseData exerciseData = trainingDataService.getExerciseDataByName(exerciseName);
+                int earnedXP = 0;
+                int muscleXp = 0;
+                String targetPart = "その他";
 
-            // AIアドバイス生成
-            try {
-                String advice = aiCoachService.generateTrainingAdvice(currentUser, exerciseName + " のトレーニング");
-                redirectAttributes.addFlashAttribute("aiAdvice", advice);
-            } catch (Exception e) {
-                System.out.println("AI Advice Error: " + e.getMessage());
+                if (exerciseData != null) {
+                    int baseDifficultyXp = trainingLogicService.getExperiencePoints(exerciseData);
+                    int additionalXp = 0;
+
+                    if ("WEIGHT".equals(type)) {
+                        additionalXp = (int) (totalVolume / 100);
+                        targetPart = trainingDataService.findPartByExerciseName(exerciseName);
+                    } else if ("CARDIO".equals(type) && duration != null) {
+                        additionalXp = duration;
+                        targetPart = "有酸素";
+                    }
+
+                    earnedXP = baseDifficultyXp + additionalXp;
+                    muscleXp = Math.max(10, earnedXP / 2);
+                } else {
+                    earnedXP = 10;
+                    muscleXp = 5;
+                }
+
+                // レベルアップ・経験値付与
+                levelService.addXpAndCheckLevelUp(currentUser, earnedXP);
+                if (targetPart != null) {
+                    String levelUpMsg = muscleService.addExperience(currentUser, targetPart, muscleXp);
+                    if (levelUpMsg != null) redirectAttributes.addFlashAttribute("muscleLevelUpMessage", levelUpMsg);
+                }
+                userRepository.save(currentUser);
+
+                // チップ付与
+                int earnedChips = (exerciseData != null) ? trainingLogicService.calculateChipReward(exerciseData) : 0;
+                if (earnedChips > 0) userService.addChips(currentUser.getUsername(), earnedChips);
+
+                // メッセージ作成
+                String successMsg = date.toString() + " 「" + exerciseName + "」を" + savedCount + "セット記録しました！";
+                if (earnedChips > 0) successMsg += " (" + earnedXP + " XP, " + earnedChips + " チップ)";
+                else successMsg += " (" + earnedXP + " XP)";
+                
+                redirectAttributes.addFlashAttribute("successMessage", successMsg);
+                
+                // ミッション更新 & AIアドバイス
+                missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
+                try {
+                    String advice = aiCoachService.generateTrainingAdvice(currentUser, exerciseName);
+                    redirectAttributes.addFlashAttribute("aiAdvice", advice);
+                } catch (Exception e) {}
+            } else {
+                redirectAttributes.addFlashAttribute("error", "記録するデータが入力されていません。");
             }
 
         } catch (Exception e) {
