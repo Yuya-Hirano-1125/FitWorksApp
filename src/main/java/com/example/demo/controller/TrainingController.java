@@ -477,12 +477,16 @@ public class TrainingController {
     /**
      * 新しいトレーニング記録モーダルからの保存処理（統合版）
      */
-    @PostMapping("/training/log/save")
+    // ▼▼▼ 修正1: HTMLの送信先 (/training-log/save) とURLを一致させる
+    @PostMapping("/training-log/save")
     public String saveTrainingLog(
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam("type") String type, // "WEIGHT" または "CARDIO"
-            @RequestParam("exerciseName") String exerciseName,
-            // フリーウェイト用（任意）
+            // ▼▼▼ 修正2: HTMLから送信される recordDate と既存の date 両方を受け取れるようにする
+            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(value = "recordDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate recordDate,
+            @RequestParam("type") String type, // "WEIGHT", "CARDIO", "BODY_WEIGHT"
+            // ▼▼▼ 修正3: 体重記録の場合は種目名がないため、必須をfalseに変更
+            @RequestParam(value = "exerciseName", required = false) String exerciseName,
+            // フリーウェイト・体重用（任意）
             @RequestParam(value = "weight", required = false) Double weight,
             @RequestParam(value = "reps", required = false) Integer reps,
             @RequestParam(value = "sets", required = false, defaultValue = "1") Integer sets,
@@ -495,10 +499,45 @@ public class TrainingController {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
 
+        // 日付の決定処理
+        LocalDate finalDate = (recordDate != null) ? recordDate : date;
+        if (finalDate == null) {
+            redirectAttributes.addFlashAttribute("error", "日付が必要です。");
+            return "redirect:/training-log";
+        }
+
         try {
+            // ▼▼▼ 修正4: BODY_WEIGHT（体重記録）の処理を追加
+            if ("BODY_WEIGHT".equals(type)) {
+                if (weight == null) {
+                    redirectAttributes.addFlashAttribute("error", "体重を入力してください。");
+                    return "redirect:/training-log";
+                }
+                
+                // 既存の記録があるか確認
+                List<BodyWeightRecord> records = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
+                BodyWeightRecord record = records.stream()
+                        .filter(r -> r.getDate().isEqual(finalDate))
+                        .findFirst()
+                        .orElse(new BodyWeightRecord(currentUser, finalDate, weight));
+                
+                record.setWeight(weight);
+                bodyWeightRecordRepository.save(record);
+                
+                redirectAttributes.addFlashAttribute("successMessage", "体重を記録しました！");
+                return "redirect:/training-log?year=" + finalDate.getYear() + "&month=" + finalDate.getMonthValue();
+            }
+
+            // --- 以下、既存のトレーニング記録(WEIGHT/CARDIO)の処理 ---
+
+            if (exerciseName == null || exerciseName.trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "種目名が必要です。");
+                return "redirect:/training-log";
+            }
+
             TrainingRecord record = new TrainingRecord();
             record.setUser(currentUser);
-            record.setRecordDate(date);
+            record.setRecordDate(finalDate); // 決定した日付を使用
             record.setExerciseName(exerciseName); 
 
             // 種別ごとの値セット
@@ -509,16 +548,14 @@ public class TrainingController {
                 record.setSets(sets);
             } else if ("CARDIO".equals(type)) {
                 record.setType("CARDIO");
-                record.setCardioType(exerciseName); // CARDIOの場合、exerciseNameをcardioTypeにもセット（既存ロジック準拠）
+                record.setCardioType(exerciseName);
                 record.setDurationMinutes(duration);
                 record.setDistanceKm(distance);
-                // 消費カロリーは入力欄を削除したため、ここでの処理は不要
             }
 
             trainingRecordRepository.save(record);
 
             // --- ゲーミフィケーション処理 (XP, チップ, 筋肉経験値) ---
-            // ※既存のsaveTrainingRecordメソッドと同様のロジックで実装
             ExerciseData exerciseData = trainingDataService.getExerciseDataByName(exerciseName);
             int earnedXP = 0;
             int muscleXp = 0;
@@ -530,7 +567,7 @@ public class TrainingController {
                 int additionalXp = 0;
 
                 if ("WEIGHT".equals(type)) {
-                    // 簡易的な負荷量計算 (既存ロジックがTrainingLogFormを必要とするため簡易計算で代用)
+                    // 簡易的な負荷量計算
                     double totalVol = (weight != null ? weight : 0) * (reps != null ? reps : 0) * (sets != null ? sets : 1);
                     additionalXp = (int) (totalVol / 100); 
                 } else if ("CARDIO".equals(type) && duration != null) {
@@ -576,8 +613,7 @@ public class TrainingController {
                 }
                 
                 // メッセージ作成
-                String successMsg = date.toString() + " 「" + exerciseName + "」を記録しました！";
-                // チップが0枚の場合はチップ情報を表示しない
+                String successMsg = finalDate.toString() + " 「" + exerciseName + "」を記録しました！";
                 if (earnedChips > 0) {
                     successMsg += " (" + earnedXP + " XP, " + earnedChips + " 枚のチップ獲得)";
                 } else {
@@ -604,7 +640,7 @@ public class TrainingController {
             redirectAttributes.addFlashAttribute("error", "記録の保存に失敗しました。");
         }
 
-        return "redirect:/training-log?year=" + date.getYear() + "&month=" + date.getMonthValue();
+        return "redirect:/training-log?year=" + finalDate.getYear() + "&month=" + finalDate.getMonthValue();
     }
     
     @PostMapping("/training-log/save-batch")
