@@ -11,8 +11,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script th:src="@{/js/theme.js}"></script>
     <style>
+        /* ★重要: すべての要素のサイズ計算を枠線込みにする */
+        *, *::before, *::after { box-sizing: border-box; }
+
         /* 共通背景デザイン */
-        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
+        :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; --meal-color: #4CAF50; }
         body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
         .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -35,22 +38,20 @@
             border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
+            
+            animation: none !important; transform: none !important; transition: none !important;
         }
 
-        /* 既存の食事ログ用スタイル */
-        .header-icon-meal { color: #4CAF50; }
-        .log-indicator-meal { color: #4CAF50 !important; }
-        .calendar-day-header { border: 1px solid rgba(200,200,200,0.5); padding: 5px; text-align: center; background-color: rgba(255,255,255,0.8); font-weight: bold; }
-        .calendar-day-cell { border: 1px solid rgba(200,200,200,0.5); min-height: 60px; text-align: center; vertical-align: top; background-color: rgba(255,255,255,0.9); transition: background 0.2s; cursor: pointer; }
-        .calendar-day-cell:hover { background-color: #fff; }
-        .calendar-day-header.sun, .calendar-day-cell.sun .day-number { color: #FF3B30; }
-        .calendar-day-header.sat, .calendar-day-cell.sat .day-number { color: #007BFF; }
-        .calendar-day-header.weekday, .calendar-day-cell.weekday .day-number { color: #000; }
-        .calendar-day-cell.today { background-color: #ffeeba; border: 2px solid #ff9800; }
-
-        /* ヘッダー修正 */
-        .page-header-container { display: flex; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #4CAF50; padding-bottom: 15px; gap: 15px; }
-        .page-title { color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; }
+        /* ヘッダーデザイン (統一) */
+        .page-header-container { 
+            display: flex; align-items: center; margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff; /* 青線統一 */
+            padding-bottom: 15px; gap: 15px; flex-wrap: nowrap;
+        }
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left;
+            text-shadow: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -59,182 +60,177 @@
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
-        /* === レイアウト改善用スタイル === */
+        /* カレンダーナビゲーション */
+        .calendar-nav-container { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .calendar-title { font-size: 1.5rem; color: #333; margin: 0; font-weight: 800; }
+        .nav-arrow {
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px; border-radius: 50%; background: white; color: #007bff; text-decoration: none; font-size: 1.2rem;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid transparent;
+        }
+        .nav-arrow:hover { background: #007bff; color: white; transform: scale(1.15); box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3); }
+        .nav-arrow:active { transform: scale(0.95); }
+
+        /* カレンダーグリッド */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 30px; }
+        .calendar-day-header { border: 1px solid rgba(200,200,200,0.5); padding: 5px; text-align: center; background-color: rgba(255,255,255,0.8); font-weight: bold; border-radius: 8px; }
+        .calendar-day-cell { border: 1px solid rgba(200,200,200,0.5); min-height: 60px; text-align: center; vertical-align: top; background-color: rgba(255,255,255,0.9); transition: background 0.2s; cursor: pointer; border-radius: 8px; }
+        .calendar-day-cell:hover { background-color: #fff; transform: translateY(-2px); box-shadow: 0 3px 6px rgba(0,0,0,0.05); }
         
-        /* モーダルの幅を広げる（PC用） */
+        .calendar-day-header.sun, .calendar-day-cell.sun .day-number { color: #FF3B30; }
+        .calendar-day-header.sat, .calendar-day-cell.sat .day-number { color: #007BFF; }
+        .calendar-day-header.weekday, .calendar-day-cell.weekday .day-number { color: #000; }
+        .calendar-day-cell.today { background-color: #fff8e1; border: 2px solid #ff9800; font-weight: bold; }
+
+        /* 未来の日付 */
+        .calendar-day-cell.future-day {
+            background-color: #f0f0f0; color: #ccc; cursor: not-allowed; pointer-events: none; opacity: 0.6;
+        }
+        .calendar-day-cell.future-day .day-number { color: #aaa; }
+        .calendar-day-cell.future-day:hover { transform: none; box-shadow: none; background-color: #f0f0f0; }
+
+        /* 食事ログ用独自スタイル */
+        .header-icon-meal { color: var(--meal-color); margin-right: 10px; }
+        .log-indicator-meal { color: var(--meal-color) !important; font-size: 1.2rem; display: block; margin-top: 5px; }
+
+        /* 統一されたボタンデザイン */
+        .btn-view-all {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; width: 100%; max-width: 400px;
+            padding: 16px; border-radius: 50px; font-weight: bold; font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3); transition: all 0.3s ease; border: none;
+        }
+        .btn-view-all:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px rgba(118, 75, 162, 0.5); filter: brightness(1.1); }
+        .btn-view-all:active { transform: translateY(1px); }
+
+        .btn-analysis {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 12px; border-radius: 50px; font-weight: bold; cursor: pointer; border: none;
+            color: white; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .btn-month { background: linear-gradient(135deg, #e67e22, #f39c12); }
+        .btn-week { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .btn-analysis:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        /* モーダル */
+        .modal {
+            display: none; justify-content: center; align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 2000; background-color: rgba(0,0,0,0.4);
+            /* ↓モーダルが開いているときはここでスクロールを受け止める */
+            overflow-y: hidden; 
+        }
+        .modal.is-active { display: flex; animation: fadeInOverlay 0.4s ease-out forwards; }
+        @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8) translateY(20px); } 60% { opacity: 1; transform: scale(1.03) translateY(0); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+
+        /* === 記録入力モーダルのレイアウト (PC幅広対応) === */
         .meal-log-modal-wide {
-            max-width: 900px !important; /* デフォルトの450pxを上書き */
-            width: 92% !important;
-            transition: max-width 0.3s;
+            max-width: 900px !important; width: 92% !important; transition: max-width 0.3s;
+            background: rgba(255, 255, 255, 0.98); border-radius: 24px; padding: 25px;
+            position: relative; max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 1px solid rgba(255, 255, 255, 0.8);
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         
-        /* グリッドレイアウト */
-        .modal-layout-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        /* デフォルトは縦並び (スマホ・タブレット) */
+        .modal-layout-grid { display: flex; flex-direction: column; gap: 20px; }
+
+        @media (min-width: 960px) {
+            .modal-layout-grid { display: grid; grid-template-columns: 1fr 1.3fr; gap: 30px; align-items: stretch; }
+            .meal-log-modal-wide { padding: 40px; }
         }
 
-        /* 写真セクション */
         .photo-section {
-            background-color: #f1f8e9;
-            padding: 15px;
-            border-radius: 12px;
-            border: 2px dashed #4CAF50;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            background-color: #f1f8e9; padding: 20px; border-radius: 20px; border: 2px dashed #4CAF50;
+            text-align: center; display: flex; flex-direction: column; justify-content: center;
         }
+        .photo-upload-row { display: flex; gap: 5px; align-items: center; justify-content: center; margin-bottom: 5px; }
         
-        .photo-upload-row {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 5px;
-        }
-
-        /* 入力フォームセクション */
-        .form-section {
-            flex: 1;
-        }
+        .form-section { flex: 1; }
+        .form-row-compact { display: flex; gap: 10px; margin-bottom: 10px; }
+        .form-row-compact .form-group { flex: 1; margin-bottom: 0; }
+        .form-row-compact label { font-size: 0.85rem; color: #555; margin-bottom: 2px; display: block; font-weight: bold; }
+        .form-control { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #ccc; font-size: 1rem; background: #fff; }
         
-        /* コンパクトな行配置 */
-        .form-row-compact {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .form-row-compact .form-group {
-            flex: 1;
-            margin-bottom: 0; /* reset */
-        }
-        .form-row-compact label {
-            font-size: 0.85rem;
-            color: #555;
-            margin-bottom: 2px;
-            display: block;
-        }
-        .form-row-compact input, .form-row-compact select {
-            padding: 8px;
-            font-size: 0.95rem;
-        }
-
         /* PFC入力欄 */
-        .pfc-container {
-            display: flex;
-            gap: 8px;
-            justify-content: space-between;
-        }
-        .pfc-item {
-            flex: 1;
-            text-align: center;
-        }
-        .pfc-item label {
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: #666;
-            margin-bottom: 2px;
-            display: block;
-        }
-        .pfc-item input {
-            text-align: center;
-            padding: 6px;
-            font-size: 0.9rem;
-        }
-        .p-input { border-color: #ffb74d; }
-        .f-input { border-color: #81c784; }
-        .c-input { border-color: #64b5f6; }
+        .pfc-container { display: flex; gap: 8px; justify-content: space-between; }
+        .pfc-item { flex: 1; text-align: center; }
+        .pfc-item label { font-size: 0.75rem; font-weight: bold; color: #666; margin-bottom: 2px; display: block; }
+        .pfc-item input { text-align: center; padding: 6px; font-size: 0.9rem; }
+        .p-input { border-color: #ffb74d; } .f-input { border-color: #81c784; } .c-input { border-color: #64b5f6; }
 
-        /* PC以上で2列表示 */
-        @media (min-width: 768px) {
-            .modal-layout-grid {
-                display: grid;
-                grid-template-columns: 1fr 1.3fr; /* 左:右 の比率 */
-                gap: 30px;
-                align-items: stretch;
-            }
-            .photo-section {
-                height: auto;
-            }
-            .modal-content {
-                padding: 40px;
-            }
-        }
-        
-        /* 閉じるボタン調整 */
-        .close-button {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 32px;
-            z-index: 10;
-        }
-        
-        .ai-comment-box {
-            margin-top: 10px;
-            font-weight: bold;
-            color: #e65100;
-            background: rgba(255, 255, 255, 0.5);
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
-
-        /* ★ NEW: 記録保存ボタンの強化デザイン */
+        /* 保存ボタン */
         .btn-submit {
-            display: block;
-            width: 100%;
-            padding: 16px;
-            margin-top: 25px;
-            border: none;
-            border-radius: 50px;
-            /* 鮮やかなピンク～オレンジのグラデーション */
-            background: linear-gradient(45deg, #ff69b4, #ff8e53); 
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(255, 105, 180, 0.3);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            display: flex; width: 100%; padding: 16px; margin-top: 25px; border: none; border-radius: 50px;
+            background: linear-gradient(45deg, #ff69b4, #ff8e53); color: white; font-size: 1.2rem; font-weight: 800;
+            cursor: pointer; box-shadow: 0 10px 20px rgba(255, 105, 180, 0.3); transition: all 0.3s;
+            align-items: center; justify-content: center; gap: 10px;
         }
-        
-        /* ホバー時の浮き上がり */
-        .btn-submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(255, 105, 180, 0.4);
-            filter: brightness(1.05);
-        }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255, 105, 180, 0.4); filter: brightness(1.05); }
+        .btn-submit:active { transform: translateY(1px); }
 
-        /* クリック時の押し込み */
-        .btn-submit:active {
-            transform: translateY(1px);
-            box-shadow: 0 5px 10px rgba(255, 105, 180, 0.3);
+        .close-button {
+            position: absolute; top: 15px; right: 20px; font-size: 2rem; font-weight: bold; color: #aaa; cursor: pointer;
+            transition: color 0.2s; z-index: 100; line-height: 1;
         }
+        .close-button:hover { color: #555; }
 
-        /* キラッと光るエフェクト */
-        .btn-submit::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: 0.5s;
+        /* AIアドバイスモーダル (training-log.htmlと統一) */
+        .ai-modal-content {
+            max-width: 450px !important; width: 90%; margin: auto; text-align: center;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); border-radius: 35px !important;
+            padding: 40px 30px !important; position: relative; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2); border: 1px solid rgba(255, 255, 255, 0.8);
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
-        
-        .btn-submit:hover::after {
-            left: 100%;
+        .ai-title {
+            background: linear-gradient(135deg, #007bff, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 2rem; margin-bottom: 15px; font-weight: 900; letter-spacing: 1px;
+        }
+        .ai-message-box {
+            background: #f0f8ff; padding: 20px; padding-top: 25px; border-radius: 20px; text-align: left;
+            margin-bottom: 25px; position: relative; border: 2px solid #e1f0ff;
+        }
+        .ai-message-box i.fa-quote-left {
+            color: #4facfe; font-size: 1.8em; position: absolute; top: 15px; left: 15px; background: transparent; z-index: 1;
+        }
+        .ai-message-box p {
+            position: relative; z-index: 2; margin: 0; padding: 5px 5px 5px 35px; color: #333; font-weight: 500; line-height: 1.7; font-size: 1.05rem;
+        }
+        .btn-share-main {
+            background: linear-gradient(135deg, #4facfe, #00f2fe); width: 100%; justify-content: center; font-size: 1.1rem; margin-bottom: 15px;
+            padding: 15px; border-radius: 50px; color: white; border: none; font-weight: bold; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4); transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-share-main:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6); }
+        .btn-sns-small {
+            font-size: 0.9rem; padding: 10px 15px; border-radius: 20px; border: none; background: #f5f5f5; color: #555;
+            cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px; font-weight: bold;
+        }
+        .btn-sns-small:hover { background: #e0e0e0; transform: translateY(-2px); }
+
+        /* スマホ・タブレット対応 */
+        @media (max-width: 959px) {
+            .page-title { font-size: 1.5rem; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .main-container { padding: 20px; width: 95%; }
+            .calendar-day-cell { min-height: 50px; font-size: 0.9rem; }
+            .nav-arrow { width: 35px; height: 35px; font-size: 1rem; }
+            
+            /* モーダルスクロール対応 */
+            .meal-log-modal-wide {
+                padding: 20px 20px 20px 15px; 
+                max-height: 85vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                max-width: 600px;
+                margin: auto;
+            }
+            .meal-log-modal-wide::-webkit-scrollbar { width: 6px; }
+            .meal-log-modal-wide::-webkit-scrollbar-track { background: transparent; margin-block: 15px; }
+            .meal-log-modal-wide::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 10px; }
+            .meal-log-modal-wide::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
         }
     </style>
 </head>
@@ -249,6 +245,8 @@
 
 <div class="main-container">
     
+    <div th:replace="~{fragments/header :: header}"></div>
+
     <div class="page-header-container">
         <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
             <i class="fa-solid fa-house"></i>
@@ -260,8 +258,15 @@
 
     <p class="sub-heading" th:text="${username} + 'さんの食事を管理しましょう。'">食事記録カレンダー</p>
 
-    <div th:if="${successMessage}" class="success-message" th:text="${successMessage}"></div>
-    <div th:if="${error}" class="error-message" style="color:red; text-align:center; margin-bottom:10px;" th:text="${error}"></div>
+    <div th:if="${successMessage}" class="success-message" 
+         th:text="${successMessage
+            .replace('と 0 枚のチップ', '')
+            .replace('と0 枚のチップ', '')
+            .replace('、 0 枚のチップ', '')
+            .replace('、0 枚のチップ', '')
+            .replace(' 0 枚のチップ', '')
+            .replace('0 枚のチップ', '')}"></div>
+    <div th:if="${error}" class="error-message" th:text="${error}"></div>
     
     <div class="calendar-nav-container">
         <a th:href="@{/log/meal(year=${prevYear}, month=${prevMonth})}" class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></a>
@@ -272,11 +277,19 @@
     <div class="calendar-grid">
         <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')">曜日</div>
         <th:block th:each="date : ${calendarDays}">
-            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''}, dayOfWeek=${date != null ? date.dayOfWeek.name() : ''}, isToday=${date != null and date.isEqual(currentDate)}, isLogged=${date != null and loggedDates.containsKey(date)}"
+            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''}, 
+                          dayOfWeek=${date != null ? date.dayOfWeek.name() : ''}, 
+                          isToday=${date != null and date.isEqual(currentDate)}, 
+                          isLogged=${date != null and loggedDates.containsKey(date)},
+                          isFuture=${date != null and date.isAfter(currentDate)}"
                  class="calendar-day-cell"
-                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today' : '') + ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + ((${dayOfWeek == 'SUNDAY'} ? ' sun' : ''))))"
+                 th:classappend="${date == null} ? 'empty-day' : 
+                                ((${isToday} ? 'today ' : '') + 
+                                (${isFuture} ? 'future-day ' : '') +
+                                ((${dayOfWeek == 'SATURDAY'} ? ' sat' : '') + 
+                                ((${dayOfWeek == 'SUNDAY'} ? ' sun' : ''))))"
                  th:attr="data-date=${date != null ? date.toString() : ''}"
-                 th:onclick="${date != null} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
+                 th:onclick="${date != null and !isFuture} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
                 <span class="day-number" th:text="${dateNumber}">1</span>
                 <span th:if="${isLogged}" class="log-indicator log-indicator-meal"><i class="fa-solid fa-utensils"></i></span>
             </div>
@@ -284,19 +297,19 @@
     </div>
 
     <div style="text-align: center; margin: 20px 0;">
-        <a th:href="@{/log/meal/all}" class="button" style="background-color: #555; color: white; width: 100%; display: block; text-align: center; margin-bottom: 10px;">
+        <a th:href="@{/log/meal/all}" class="btn-view-all" style="margin-bottom: 20px;">
             <i class="fa-solid fa-list"></i> 全記録をリストで見る
         </a>
         <div style="display: flex; gap: 10px;">
             <form th:action="@{/log/meal/analyze-month}" method="post" onsubmit="showLoading(this)" style="flex: 1;">
                 <input type="hidden" name="year" th:value="${currentYearMonth.year}" />
                 <input type="hidden" name="month" th:value="${currentYearMonth.monthValue}" />
-                <button type="submit" class="button" style="background-color: #e67e22; color: white; width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                <button type="submit" class="btn-analysis btn-month">
                     <i class="fa-solid fa-chart-pie"></i> 月間分析
                 </button>
             </form>
             <form th:action="@{/log/meal/analyze-week}" method="post" onsubmit="showLoading(this)" style="flex: 1;">
-                <button type="submit" class="button" style="background-color: #9b59b6; color: white; width: 100%; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                <button type="submit" class="btn-analysis btn-week">
                     <i class="fa-solid fa-calendar-week"></i> 今週の分析
                 </button>
             </form>
@@ -308,8 +321,8 @@
 <div id="logModal" class="modal" th:classappend="${mealLogForm.date != null} ? 'is-active' : ''">
     <div class="modal-content meal-log-modal-wide">
         <span class="close-button" onclick="closeLogModal()">&times;</span>
-        <h2 id="modalDateTitle" class="modal-title" th:text="${mealLogForm.date}"></h2>
-        <div id="logViewArea"></div>
+        <h2 id="modalDateTitle" class="modal-title" th:text="${mealLogForm.date}" style="text-align:center; margin-bottom:20px; color:#333;"></h2>
+        <div id="logViewArea" style="margin-bottom:20px;"></div>
         
         <div class="modal-layout-grid">
             
@@ -320,18 +333,17 @@
                     <button type="submit" class="button" style="background-color: #2e7d32; color: white; border: none; font-size: 0.9em; padding: 8px 15px; white-space: nowrap; border-radius: 6px;">解析</button>
                 </form>
                 <p style="font-size: 0.8em; color: #666; margin: 5px 0;">※写真を解析して内容・栄養を自動入力します</p>
-                <div th:if="${aiComment}" class="ai-comment-box"><i class="fa-solid fa-comment-dots"></i> <span th:text="${aiComment}"></span></div>
+                <div th:if="${aiComment}" class="ai-comment-box" style="margin-top: 10px; font-weight: bold; color: #e65100; background: rgba(255, 255, 255, 0.5); padding: 8px; border-radius: 8px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-comment-dots"></i> <span th:text="${aiComment}"></span>
+                </div>
             </div>
 
             <div class="form-section">
                 <div class="meal-form-container">
                     <form th:action="@{/log/meal/save}" th:object="${mealLogForm}" method="post" onsubmit="showLoading(this)">
-                        
+                        <input type="hidden" id="dateInput" th:field="*{date}">
+
                         <div class="form-row-compact">
-                             <div class="form-group" style="flex: 0.8;">
-                                <label><i class="fa-regular fa-calendar"></i> 日付</label>
-                                <input type="date" id="dateInput" th:field="*{date}" class="form-control" required style="padding: 6px;">
-                             </div>
                              <div class="form-group">
                                 <label><i class="fa-regular fa-clock"></i> 時刻</label>
                                 <input type="time" id="time" th:field="*{time}" class="form-control" required style="padding: 6px;">
@@ -383,36 +395,49 @@
                         <button type="submit" class="btn-submit"><i class="fa-solid fa-check"></i> 記録を保存</button>
                     </form>
                 </div>
-                <a th:href="@{/log/meal/all}" class="button secondary view-all-button" style="margin-top: 15px; font-size: 0.85em; padding: 8px;">全記録を見る</a>
             </div>
         </div>
     </div>
 </div>
 
+<div th:replace="~{fragments/footer :: footer}"></div>
+
 <div th:if="${aiAdvice}" id="aiAdviceModal" class="modal is-active" style="z-index: 2000;">
-    <div id="shareTarget" class="modal-content" style="max-width: 400px; text-align: center; background: #fff; border-radius: 15px; padding: 30px; position: relative; overflow: hidden;">
+    <div id="shareTarget" class="ai-modal-content">
         <span class="close-button no-capture" onclick="document.getElementById('aiAdviceModal').style.display='none'">&times;</span>
-        <div style="margin-bottom: 15px;"><img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid #4CAF50; padding: 2px;"></div>
-        <h3 style="color: #4CAF50; margin-bottom: 15px; font-weight: bold;">AI Trainer's Advice!</h3>
-        <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; position: relative;">
-            <i class="fa-solid fa-quote-left" style="color: #bcdbf3; font-size: 1.5em; position: absolute; top: 10px; left: 10px;"></i>
-            <p id="aiAdviceText" th:text="${aiAdvice}" style="margin: 0; padding: 5px 10px; color: #333; font-weight: 500; line-height: 1.6;">ここにAIからのアドバイスが表示されます。</p>
+        
+        <div style="margin-bottom: 20px;">
+            <img th:src="@{/img/AIcoach.png}" alt="AI Coach" style="width: 90px; height: 90px; border-radius: 50%; border: 4px solid #4facfe; padding: 2px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
         </div>
-        <div style="margin-top: 10px; margin-bottom: 10px; font-size: 0.8em; color: #aaa; font-weight: bold;">FitWorks Meal Log</div>
+        
+        <h3 class="ai-title">AI Trainer's Advice!</h3>
+        
+        <div class="ai-message-box">
+            <i class="fa-solid fa-quote-left"></i>
+            <p id="aiAdviceText" th:text="${aiAdvice}">ここにAIからのアドバイスが表示されます。</p>
+        </div>
+        
+        <div style="margin-top: 10px; margin-bottom: 20px; font-size: 0.85em; color: #aaa; font-weight: 800; letter-spacing: 1px;">FITWORKS MEAL LOG</div>
+        
         <div class="sns-buttons-container no-capture">
-            <button onclick="shareScreenImage()" class="btn-sns" style="background: linear-gradient(135deg, #4CAF50, #2E7D32); width: 100%; justify-content: center; font-size: 1em; margin-bottom: 10px; padding: 12px;"><i class="fa-solid fa-share-nodes"></i> 画像としてシェアする</button>
+            <button onclick="shareScreenImage()" class="btn-share-main">
+                <i class="fa-solid fa-camera-retro"></i> 画像として保存・シェア
+            </button>
+            
             <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                <button onclick="shareToX()" class="btn-sns btn-sns-x" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-x-twitter"></i> Text</button>
-                <button onclick="shareToLine()" class="btn-sns btn-sns-line" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-line"></i> Text</button>
-                <button onclick="shareToInstagram()" class="btn-sns btn-sns-insta" style="font-size: 0.8em; padding: 8px 12px;"><i class="fa-brands fa-instagram"></i> Copy</button>
-                <button onclick="document.getElementById('aiAdviceModal').style.display='none'" class="btn-sns" style="background-color: #777; font-size: 0.8em; padding: 8px 12px;">閉じる</button>
-            </div>
+                <button onclick="shareToX()" class="btn-sns-small"><i class="fa-brands fa-x-twitter"></i> Post</button>
+                <button onclick="shareToLine()" class="btn-sns-small"><i class="fa-brands fa-line"></i> LINE</button>
+                <button onclick="shareToInstagram()" class="btn-sns-small"><i class="fa-brands fa-instagram"></i> Insta</button>
+                </div>
         </div>
     </div>
 </div>
 
 <script th:inline="javascript">
     function openLogModal(dateString, isLogged) {
+        // ★修正: モーダルを開くときは背景をスクロール不可にする
+        document.body.style.overflow = 'hidden';
+        
         document.getElementById('dateInput').value = dateString;
         document.getElementById('modalDateTitle').innerText = dateString.replace(/-/g, '/');
         const logViewArea = document.getElementById('logViewArea');
@@ -425,7 +450,13 @@
         }
         document.getElementById('logModal').classList.add('is-active');
     }
-    function closeLogModal() { document.getElementById('logModal').classList.remove('is-active'); }
+    
+    function closeLogModal() { 
+        // ★修正: モーダルを閉じるときは背景のスクロールロックを解除
+        document.body.style.overflow = '';
+        document.getElementById('logModal').classList.remove('is-active'); 
+    }
+    
     window.onclick = function(e) {
         const m = document.getElementById('logModal'); const a = document.getElementById('aiAdviceModal');
         if (m && m.classList.contains('is-active') && e.target === m) closeLogModal();
