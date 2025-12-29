@@ -387,6 +387,28 @@ public class UserService {
         }
     }
 
+    // ★追加: フレンド解除メソッド
+    @Transactional
+    public void removeFriend(String currentUsername, Long friendId) {
+        Optional<User> userOpt = userRepository.findByUsername(currentUsername);
+        Optional<User> friendOpt = userRepository.findById(friendId);
+
+        if (userOpt.isPresent() && friendOpt.isPresent()) {
+            User user = userOpt.get();
+            User friend = friendOpt.get();
+
+            // 双方向で削除
+            // getFriends()で取得したSetからremoveすることで、JoinTableから削除される想定
+            if (user.getFriends().contains(friend)) {
+                user.getFriends().remove(friend);
+                friend.getFriends().remove(user);
+                
+                userRepository.save(user);
+                userRepository.save(friend);
+            }
+        }
+    }
+
     public List<User> getFriendRanking(String username) {
         Optional<User> userOpt = userRepository.findByUsername(username);
         if (userOpt.isEmpty()) return new ArrayList<>();

@@ -94,4 +94,17 @@ public class FriendController {
         userService.rejectFriendRequest(principal.getName(), userId);
         return "redirect:/friends";
     }
+
+    // フレンド解除
+    @PostMapping("/remove/{userId}")
+    public String removeFriend(@PathVariable("userId") Long userId, Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            userService.removeFriend(principal.getName(), userId);
+            // ★変更: 'successMessage' ではなく 'infoMessage' を使用して色を変える
+            redirectAttributes.addFlashAttribute("infoMessage", "フレンドを解除しました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "解除に失敗しました。");
+        }
+        return "redirect:/friends";
+    }
 }

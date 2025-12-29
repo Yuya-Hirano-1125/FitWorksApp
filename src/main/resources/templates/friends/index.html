@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* 共通背景デザイン省略（既存のまま） */
+        /* 共通背景デザイン */
         :root { --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(255, 255, 255, 0.8); --primary-color: #4facfe; --accent-color: #00f2fe; }
         body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
         .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; overflow: hidden; }
@@ -37,29 +37,11 @@
             position: relative; z-index: 10;
         }
 
-        /* ヘッダー修正 */
+        /* ヘッダー */
         .page-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
-        
-        .header-left { 
-            display: flex; align-items: center; gap: 15px; 
-            flex-shrink: 0; 
-        }
-        
-        .page-title { 
-            color: #343a40; 
-            font-size: 2rem; 
-            margin: 0;
-            white-space: nowrap; 
-            text-shadow: none;
-        }
-
-        /* アイコンの色を青に */
-        .page-title i {
-            color: #007bff;
-            margin-right: 10px;
-        }
-        
-        /* ホームボタン（共通スタイル） */
+        .header-left { display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
+        .page-title { color: #343a40; font-size: 2rem; margin: 0; white-space: nowrap; text-shadow: none; }
+        .page-title i { color: #007bff; margin-right: 10px; }
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -67,176 +49,121 @@
             transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
-
         .view-selector { padding: 8px 12px; border-radius: 10px; border: 2px solid var(--primary-color); background: #fff; font-weight: bold; color: #333; cursor: pointer; }
         
         .friend-nav { display: flex; gap: 10px; margin-bottom: 20px; }
-        
         .nav-btn { 
-            flex: 1; 
-            padding: 10px; 
-            text-align: center; 
-            background: rgba(255,255,255,0.9); 
-            border-radius: 10px; 
-            text-decoration: none; 
-            color: #555; 
-            font-weight: bold; 
-            border: 2px solid #ccc; 
-            transition: all 0.3s; 
+            flex: 1; padding: 10px; text-align: center; background: rgba(255,255,255,0.9); 
+            border-radius: 10px; text-decoration: none; color: #555; font-weight: bold; 
+            border: 2px solid #ccc; transition: all 0.3s; 
         }
-        
-        .nav-btn:hover { 
-            background: #fff; 
-            border-color: #aaa;
-        }
-        
-        .nav-btn.active { 
-            background: #fff; 
-            border-color: var(--primary-color); 
-            color: var(--primary-color); 
-            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.2); 
-        }
+        .nav-btn:hover { background: #fff; border-color: #aaa; }
+        .nav-btn.active { background: #fff; border-color: var(--primary-color); color: var(--primary-color); box-shadow: 0 5px 15px rgba(79, 172, 254, 0.2); }
 
         .user-list { list-style: none; padding: 0; }
-        .user-card { display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.85); border-radius: 15px; padding: 15px; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.8); transition: transform 0.2s; }
+        .user-card { 
+            display: flex; align-items: center; justify-content: space-between; 
+            background: rgba(255, 255, 255, 0.85); border-radius: 15px; padding: 15px; 
+            margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); 
+            border: 1px solid rgba(255,255,255,0.8); transition: transform 0.2s; 
+        }
         .user-card:hover { transform: translateY(-2px); }
         .user-info { display: flex; align-items: center; gap: 10px; }
         .user-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #e0c3fc, #8ec5fc); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
         
-        /* 検索ボックスのアニメーション */
+        /* 承認待ちカードのデザイン */
+        .user-card.request-card {
+            background: #fff8f0; /* 薄いオレンジ背景 */
+            border: 1px solid #ffe0b2;
+            border-left: 6px solid #e67e22; /* 左側にアクセント */
+        }
+
+        /* 承認・拒否ボタンのデザイン */
+        .action-buttons { display: flex; gap: 8px; }
+
+        .btn-approve {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: white; border: none; padding: 8px 16px; border-radius: 50px;
+            font-weight: bold; font-size: 0.9rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-approve:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(0, 114, 255, 0.5); }
+        .btn-approve:active { transform: translateY(1px) scale(0.95); box-shadow: 0 2px 10px rgba(0, 114, 255, 0.3); }
+
+        .btn-reject {
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            color: white; border: none; padding: 8px 16px; border-radius: 50px;
+            font-weight: bold; font-size: 0.9rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 94, 98, 0.3);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-reject:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(255, 94, 98, 0.5); filter: brightness(1.05); }
+        .btn-reject:active { transform: translateY(1px) scale(0.95); box-shadow: 0 2px 10px rgba(255, 94, 98, 0.3); }
+
+        /* 解除ボタンのデザイン */
+        .btn-remove {
+            background: transparent; color: #999; border: 1px solid #ccc;
+            padding: 5px 12px; border-radius: 50px; font-weight: bold; font-size: 0.8rem;
+            cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-remove:hover { background: #ffebee; color: #d32f2f; border-color: #ef9a9a; }
+
+        /* 検索ボックス */
         .search-box {
-            display: flex; 
-            align-items: center;
-            gap: 10px; 
-            margin-bottom: 30px;
-            background: rgba(255,255,255,0.8);
-            padding: 8px;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 2px solid rgba(255,255,255,0.8);
+            display: flex; align-items: center; gap: 10px; margin-bottom: 30px;
+            background: rgba(255,255,255,0.8); padding: 8px; border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 2px solid rgba(255,255,255,0.8);
             transition: all 0.3s ease;
         }
+        .search-box:focus-within { background: #fff; border-color: #4facfe; box-shadow: 0 8px 25px rgba(79, 172, 254, 0.25); transform: translateY(-2px); }
+        .search-input { flex: 1; padding: 12px 20px; border: none; background: transparent; font-size: 1rem; outline: none; color: #333; }
         
-        .search-box:focus-within {
-            background: #fff;
-            border-color: #4facfe;
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.25);
-            transform: translateY(-2px);
-        }
-
-        .search-input { 
-            flex: 1; 
-            padding: 12px 20px; 
-            border: none; 
-            background: transparent; 
-            font-size: 1rem; 
-            outline: none;
-            color: #333;
-        }
-        
-        /* 検索ボタンのデザイン */
         .search-btn {
-            width: 45px; height: 45px; 
-            border-radius: 50%; 
-            background: linear-gradient(135deg, #4facfe, #00f2fe); 
-            color: white; 
-            border: none; 
-            cursor: pointer; 
-            font-size: 1.1rem; 
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(79, 172, 254, 0.4);
-            flex-shrink: 0;
+            width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white; border: none; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s; box-shadow: 0 2px 8px rgba(79, 172, 254, 0.4); flex-shrink: 0;
         }
-        .search-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.6);
-        }
+        .search-btn:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(79, 172, 254, 0.6); }
 
-        h3 { color: #333; }
+        h3 { color: #333; margin-bottom: 15px; }
         
-        /* ボタン設定 (既存の承認・拒否ボタン用) */
-        .button { 
-            padding: 10px 15px; border-radius: 8px; border: none; cursor: pointer; 
-            text-decoration: none; display: inline-block; 
-            transition: all 0.3s;
-        }
-        .button.primary { background-color: #007bff; color: white; }
-        .button.secondary { background-color: #6c757d; color: white; }
-        
-        .button.primary:hover { 
-            background-color: #0056b3; 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-        }
-        .button.secondary:hover { 
-            background-color: #545b62; 
-            color: white;
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
-        }
-
-        /* ★新: 申請ボタンのデザイン（リッチなアニメーション） */
+        /* 申請ボタン */
         .btn-request {
-            background: linear-gradient(135deg, #00c6ff, #0072ff); /* 鮮やかな青グラデーション */
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 50px; /* 丸みを強く */
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3); /* 青い影 */
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* バネのような動き */
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            background: linear-gradient(135deg, #00c6ff, #0072ff); color: white; border: none; padding: 8px 20px;
+            border-radius: 50px; cursor: pointer; font-weight: bold; font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.3); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex; align-items: center; gap: 6px;
         }
-        
-        .btn-request:hover {
-            transform: translateY(-3px) scale(1.05); /* 浮いて拡大 */
-            box-shadow: 0 8px 20px rgba(0, 114, 255, 0.5); /* 影を強調 */
-        }
-        
-        .btn-request:active {
-            transform: translateY(1px) scale(0.95); /* クリック時の沈み込み */
-            box-shadow: 0 2px 10px rgba(0, 114, 255, 0.3);
-        }
+        .btn-request:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(0, 114, 255, 0.5); }
+        .btn-request:active { transform: translateY(1px) scale(0.95); box-shadow: 0 2px 10px rgba(0, 114, 255, 0.3); }
 
-        /* アラートメッセージのデザイン */
-        .alert {
-            padding: 12px 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            animation: slideIn 0.3s ease-out;
+        /* アラート */
+        .alert { padding: 12px 20px; border-radius: 12px; margin-bottom: 25px; font-weight: bold; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); animation: slideIn 0.3s ease-out; }
+        .alert.success { background-color: rgba(46, 204, 113, 0.15); border: 1px solid rgba(46, 204, 113, 0.4); color: #27ae60; border-left: 5px solid #2ecc71; }
+        .alert.error { background-color: rgba(255, 77, 79, 0.15); border: 1px solid rgba(255, 77, 79, 0.4); color: #c0392b; border-left: 5px solid #e74c3c; }
+        
+        /* ★追加: 情報(Info)アラートのデザイン */
+        .alert.info { 
+            background-color: rgba(63, 81, 181, 0.1); 
+            border: 1px solid rgba(63, 81, 181, 0.3); 
+            color: #3949ab; 
+            border-left: 5px solid #3f51b5; 
         }
-        .alert.success {
-            background-color: rgba(46, 204, 113, 0.15);
-            border: 1px solid rgba(46, 204, 113, 0.4);
-            color: #27ae60;
-            border-left: 5px solid #2ecc71;
-        }
-        .alert.error {
-            background-color: rgba(255, 77, 79, 0.15);
-            border: 1px solid rgba(255, 77, 79, 0.4);
-            color: #c0392b;
-            border-left: 5px solid #e74c3c;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 600px) {
             .main-container { padding: 20px; padding-top: 30px; width: 95%; border-radius: 30px; }
             .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
-            /* スマホ時はフォントサイズを少し調整 */
             .page-title { font-size: 1.5rem; }
+            .user-card { flex-direction: column; align-items: stretch; gap: 15px; }
+            .user-info { justify-content: flex-start; }
+            .action-buttons { flex-direction: row; gap: 10px; width: 100%; }
+            .action-buttons form { flex: 1; display: flex; }
+            .btn-approve, .btn-reject { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -281,22 +208,28 @@
             <i class="fa-solid fa-circle-exclamation"></i>
             <span th:text="${errorMessage}">エラーメッセージ</span>
         </div>
+        <div th:if="${infoMessage}" class="alert info">
+            <i class="fa-solid fa-circle-info"></i>
+            <span th:text="${infoMessage}">情報メッセージ</span>
+        </div>
 
         <div th:if="${currentSection == 'list'}">
             <div th:if="${!#lists.isEmpty(requests)}" style="margin-bottom: 30px;">
                 <h3 style="color: #e67e22;"><i class="fa-solid fa-envelope"></i> 承認待ち</h3>
                 <ul class="user-list">
-                    <li th:each="req : ${requests}" class="user-card" style="border: 2px solid #e67e22;">
+                    <li th:each="req : ${requests}" 
+                        th:if="${friends == null || !#lists.contains(friends.![id], req.id)}"
+                        class="user-card request-card">
                         <div class="user-info">
                             <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
-                            <span th:text="${req.username}" style="font-weight: bold;">User</span>
+                            <span th:text="${req.username}" style="font-weight: bold; color: #d35400;">User</span>
                         </div>
-                        <div style="display: flex; gap: 5px;">
+                        <div class="action-buttons">
                             <form th:action="@{/friends/approve/{id}(id=${req.id})}" method="post">
-                                <button class="button primary" style="padding: 5px 15px; font-size: 0.8rem; border-radius: 20px;">承認</button>
+                                <button class="btn-approve"><i class="fa-solid fa-check"></i> 承認</button>
                             </form>
                             <form th:action="@{/friends/reject/{id}(id=${req.id})}" method="post">
-                                <button class="button secondary" style="padding: 5px 15px; font-size: 0.8rem; border-radius: 20px;">拒否</button>
+                                <button class="btn-reject"><i class="fa-solid fa-xmark"></i> 拒否</button>
                             </form>
                         </div>
                     </li>
@@ -313,7 +246,14 @@
                             <div style="font-size: 0.8rem; color: #666;" th:text="'Lv.' + ${friend.level}">Lv.10</div>
                         </div>
                     </div>
-                    <span style="color: var(--primary-color); font-size: 0.8rem; font-weight:bold;">フレンド</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span style="color: var(--primary-color); font-size: 0.8rem; font-weight:800; display:flex; align-items:center; gap:5px;">
+                            <i class="fa-solid fa-handshake"></i> フレンド
+                        </span>
+                        <form th:action="@{/friends/remove/{id}(id=${friend.id})}" method="post" onsubmit="return confirm('本当に解除しますか？');">
+                            <button class="btn-remove"><i class="fa-solid fa-user-xmark"></i> 解除</button>
+                        </form>
+                    </div>
                 </li>
                 <li th:if="${#lists.isEmpty(friends)}" style="text-align: center; color: #666; padding: 20px;">
                     まだフレンドがいません。「検索」から探してみよう！
