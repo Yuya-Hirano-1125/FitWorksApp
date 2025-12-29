@@ -8,7 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <script th:src="@{/js/theme.js}"></script>
     <style>
-        /* 共通背景デザイン省略 */
+        /* 共通背景デザイン */
         :root { --glass-bg: rgba(255, 255, 255, 0.65); --glass-border: rgba(255, 255, 255, 0.8); --primary-color: #4facfe; }
         body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; }
         .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
@@ -34,14 +34,11 @@
 
         /* ヘッダー修正 */
         .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
-        
         .page-title { 
             color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; 
-            text-shadow: none;
-            white-space: nowrap;
+            text-shadow: none; white-space: nowrap;
         }
-		.page-title i { margin-right: 8px; color: #007bff; }
-        
+        .page-title i { margin-right: 8px; color: #007bff; }
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -50,8 +47,17 @@
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
-        /* 既存スタイル */
+        /* アバターセクション */
         .avatar-section { background-color: rgba(255, 255, 255, 0.8); border-radius: 15px; padding: 20px; margin-bottom: 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; }
+        
+        /* ▼▼▼ 追加: アバターセクションの見出しサイズ変更 ▼▼▼ */
+        .avatar-section h2 {
+            font-size: 2.2rem; /* 文字を大きく */
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 900;
+        }
+
         .avatar-container { position: relative; width: 100%; max-width: 360px; height: 520px; margin: 0 auto; perspective: 1000px; }
         .body-shape { width: 100%; height: 100%; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.15)); animation: bodyFloat 6s ease-in-out infinite alternate; }
         @keyframes bodyFloat { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
@@ -60,19 +66,92 @@
         .muscle-group:hover .muscle-part { filter: brightness(1.2); transform: scale(1.05); z-index: 10; }
         .glowing .muscle-part { filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8)); animation: musclePulse 2s infinite alternate; }
         @keyframes musclePulse { 0% { transform: scale(var(--current-scale, 1.05)); } 100% { transform: scale(calc(var(--current-scale, 1.05) * 1.05)); filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8)); } }
-        .muscle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding-bottom: 20px; }
-        .muscle-card { background: rgba(255, 255, 255, 0.9); border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; align-items: center; position: relative; border: 2px solid transparent; transition: transform 0.2s; }
-        .muscle-card:hover { transform: translateY(-3px); border-color: var(--primary-color); }
-        .muscle-icon { font-size: 3rem; margin-bottom: 10px; color: var(--primary-color); background: rgba(255,255,255,0.8); width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-        .muscle-part-badge { background: #666; color: white; padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; margin-bottom: 5px; }
-        .muscle-name { font-weight: 800; font-size: 1.3rem; margin-bottom: 5px; color: #333; }
-        .level-info { font-weight: bold; color: var(--secondary-color); margin-bottom: 10px; }
-        .xp-bar-bg { width: 100%; height: 10px; background: #eee; border-radius: 5px; overflow: hidden; margin-bottom: 15px; }
-        .xp-bar-fill { height: 100%; background: linear-gradient(90deg, #ff9966, #ff5e62); border-radius: 5px; }
-        .rename-form { width: 100%; display: flex; gap: 5px; }
-        .rename-input { flex: 1; padding: 5px; border: 1px solid #ddd; border-radius: 5px; }
-        .rename-btn { background: var(--secondary-color); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
         #tooltip { position: absolute; background: rgba(0, 0, 0, 0.9); color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 100; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 10px rgba(0,0,0,0.3); white-space: nowrap; }
+
+        /* カードと文字を大きく調整 */
+        .muscle-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px; 
+            padding-bottom: 20px; 
+        }
+        .muscle-card { 
+            background: rgba(255, 255, 255, 0.95); 
+            border-radius: 20px; 
+            padding: 25px; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08); 
+            display: flex; flex-direction: column; align-items: center; 
+            position: relative; border: 2px solid transparent; 
+            transition: transform 0.2s; 
+        }
+        .muscle-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+        
+        .muscle-icon { 
+            font-size: 4rem; 
+            margin-bottom: 15px; 
+            color: var(--primary-color); 
+            background: rgba(255,255,255,0.8); 
+            width: 100px; height: 100px; 
+            display: flex; align-items: center; justify-content: center; 
+            border-radius: 50%; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .muscle-part-badge { 
+            background: #666; color: white; 
+            padding: 5px 15px; 
+            border-radius: 20px; 
+            font-size: 1rem; 
+            margin-bottom: 10px; 
+            font-weight: bold;
+        }
+        
+        .muscle-name { 
+            font-weight: 900; 
+            font-size: 1.6rem; 
+            margin-bottom: 8px; 
+            color: #333; 
+        }
+        
+        .level-info { 
+            font-weight: bold; 
+            font-size: 1.3rem; 
+            color: var(--secondary-color); 
+            margin-bottom: 15px; 
+        }
+        
+        .xp-bar-bg { 
+            width: 100%; 
+            height: 15px; 
+            background: #eee; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            margin-bottom: 10px; 
+        }
+        .xp-bar-fill { height: 100%; background: linear-gradient(90deg, #ff9966, #ff5e62); border-radius: 8px; }
+        
+        .rename-form { 
+            width: 100%; display: flex; gap: 10px; margin-top: 10px;
+        }
+        .rename-input { 
+            flex: 1; 
+            padding: 12px; 
+            font-size: 1.1rem; 
+            border: 2px solid #ddd; 
+            border-radius: 10px; 
+        }
+        .rename-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        .rename-btn { 
+            background: var(--secondary-color); 
+            color: white; border: none; 
+            padding: 0 20px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 1.2rem; 
+        }
 
         @media (max-width: 600px) {
             .page-title { 
@@ -100,11 +179,13 @@
         </div>
         
         <div class="avatar-section">
-            <h3>現在の筋肉ステータス</h3>
-            <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">
+            <h2>現在の筋肉ステータス</h2>
+            
+            <p style="font-size: 1.3rem; color: #555; margin-bottom: 15px; font-weight: bold; line-height: 1.6;">
                 レベルに応じて色が変化します！<br>
-                <span style="color:rgb(0,0,255); font-weight:bold;">青(初期)</span> → <span style="color:rgb(0,255,0); font-weight:bold;">緑</span> → <span style="color:rgb(255,255,0); font-weight:bold;">黄</span> → <span style="color:rgb(255,0,0); font-weight:bold;">赤(Lv30〜)</span>
+                <span style="color:rgb(0,0,255);">青(初期)</span> → <span style="color:rgb(0,255,0);">緑</span> → <span style="color:rgb(255,255,0);">黄</span> → <span style="color:rgb(255,0,0);">赤(Lv30〜)</span>
             </p>
+            
             <div class="avatar-container">
                 <svg class="body-shape" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
                     <defs><linearGradient id="muscleShine" x1="0%" y1="0%" x2="100%" y2="50%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.3);stop-opacity:1" /><stop offset="100%" style="stop-color:rgba(255,255,255,0);stop-opacity:1" /></linearGradient></defs>
@@ -120,7 +201,7 @@
                 <div id="tooltip"></div>
             </div>
         </div>
-        <div th:if="${successMessage}" style="color: green; text-align: center; margin-bottom: 15px;" th:text="${successMessage}"></div>
+        <div th:if="${successMessage}" style="color: green; text-align: center; margin-bottom: 15px; font-weight: bold; font-size: 1.1rem;" th:text="${successMessage}"></div>
 
         <div class="muscle-grid">
             <div th:each="muscle : ${muscles}" class="muscle-card">
@@ -131,7 +212,7 @@
                 <div class="muscle-name" th:text="${muscle.customName}">胸筋太郎</div>
                 <div class="level-info" th:text="'Lv.' + ${muscle.level}">Lv.1</div>
                 <div class="xp-bar-bg"><div class="xp-bar-fill" th:style="'width:' + ${muscle.progressPercent} + '%;'"></div></div>
-                <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;" th:text="'Next Lv: ' + ${muscle.xp} + ' / ' + ${muscle.requiredXp} + ' XP'"></div>
+                <div style="font-size: 0.9rem; color: #777; margin-bottom: 10px; font-weight: bold;" th:text="'あと ' + (${muscle.requiredXp} - ${muscle.xp}) + ' XP でレベルアップ！'"></div>
                 <form th:action="@{/muscles/rename}" method="post" class="rename-form">
                     <input type="hidden" name="id" th:value="${muscle.id}">
                     <input type="text" name="newName" class="rename-input" placeholder="名前を変更" required>
@@ -146,12 +227,22 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         const muscleData = /*[[${muscles}]]*/ [];
+        
+        console.log("Muscle Data Loaded:", muscleData);
+
         document.addEventListener('DOMContentLoaded', () => {
             const tooltip = document.getElementById('tooltip');
+
+            if (!muscleData || muscleData.length === 0) {
+                console.warn("筋肉データがありません。");
+                return;
+            }
+
             muscleData.forEach(muscle => {
                 const level = parseInt(muscle.level, 10) || 1; 
                 const partName = muscle.targetPart; 
                 let svgId = null;
+
                 if (partName.includes('胸')) svgId = 'part-chest'; 
                 else if (partName.includes('背')) svgId = 'part-back'; 
                 else if (partName.includes('脚') || partName.includes('足')) svgId = 'part-legs'; 
@@ -163,37 +254,35 @@
                     const el = document.getElementById(svgId);
                     if(el) { 
                         applyMuscleStyle(el, level); 
-                        el.addEventListener('mousemove', (e) => { showTooltip(e, `${muscle.targetPart}: Lv.${level} (${muscle.customName})`); }); 
+                        el.addEventListener('mousemove', (e) => { 
+                            showTooltip(e, `${muscle.targetPart}: Lv.${level} (${muscle.customName})`); 
+                        }); 
                         el.addEventListener('mouseleave', hideTooltip); 
                     }
                 }
             });
 
-            // RGB計算ロジックを実装した関数
+            // 色計算ロジック
             function getRGBColor(level) {
-                // 安全策：レベル範囲制限
                 if (level < 1) level = 1;
-                // 30以上は赤で固定
                 if (level > 30) level = 30;
 
                 let r, g, b;
 
-                // レベルごとの色指定ロジック
                 if (level <= 10) {
-                    // Lv1(青: 0,0,255) -> Lv10(緑: 0,255,0)
-                    // 進捗率 (0.0 ~ 1.0)
+                    // Lv1〜10: 青(0,0,255) → 緑(0,255,0)
                     const ratio = (level - 1) / 9; 
                     r = 0;
                     g = Math.round(255 * ratio);
                     b = Math.round(255 * (1 - ratio));
                 } else if (level <= 20) {
-                    // Lv10(緑: 0,255,0) -> Lv20(黄: 255,255,0)
+                    // Lv10〜20: 緑(0,255,0) → 黄(255,255,0)
                     const ratio = (level - 10) / 10; 
                     r = Math.round(255 * ratio);
                     g = 255;
                     b = 0;
                 } else {
-                    // Lv20(黄: 255,255,0) -> Lv30(赤: 255,0,0)
+                    // Lv20〜30: 黄(255,255,0) → 赤(255,0,0)
                     const ratio = (level - 20) / 10;
                     r = 255;
                     g = Math.round(255 * (1 - ratio));
@@ -204,42 +293,69 @@
 
             function applyMuscleStyle(element, level) {
                 const targets = (element.tagName.toLowerCase() === 'g') ? element.querySelectorAll('path') : [element];
-                
-                // ここでRGBカラーを取得
                 const color = getRGBColor(level);
-
                 const maxLevel = 30; 
                 let ratio = level / maxLevel; 
                 if (ratio > 1) ratio = 1;
-                
                 const scale = 1 + (ratio * 0.15); 
                 
                 targets.forEach(target => { 
-                    // RGB色を適用
                     target.style.fill = color; 
                     target.style.transform = `scale(${scale})`; 
-                    if(level >= 10) { target.style.setProperty('--current-scale', scale); } 
+                    if(level >= 10) { 
+                        target.style.setProperty('--current-scale', scale); 
+                    } 
                 });
                 
                 if (level >= 10) { element.classList.add('glowing'); }
             }
 
-            function showTooltip(e, text) { tooltip.textContent = text; tooltip.style.opacity = '1'; const containerRect = document.querySelector('.avatar-container').getBoundingClientRect(); let x = e.clientX - containerRect.left + 15; let y = e.clientY - containerRect.top - 10; if (x > containerRect.width - 100) x -= 120; tooltip.style.left = x + 'px'; tooltip.style.top = y + 'px'; }
+            function showTooltip(e, text) { 
+                tooltip.textContent = text; 
+                tooltip.style.opacity = '1'; 
+                const containerRect = document.querySelector('.avatar-container').getBoundingClientRect(); 
+                let x = e.clientX - containerRect.left + 15; 
+                let y = e.clientY - containerRect.top - 10; 
+                if (x > containerRect.width - 100) x -= 120; 
+                tooltip.style.left = x + 'px'; 
+                tooltip.style.top = y + 'px'; 
+            }
             function hideTooltip() { tooltip.style.opacity = '0'; }
         });
         
-        // 背景アニメーション
-        const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
+        const canvas = document.getElementById('bg-canvas'); 
+        const ctx = canvas.getContext('2d'); 
+        let particlesArray = [];
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        window.addEventListener('resize', resizeCanvas); 
+        resizeCanvas();
+        
         const mouse = { x: undefined, y: undefined };
-        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+        window.addEventListener('mousemove', (e) => { 
+            mouse.x = e.x; mouse.y = e.y; 
+            for(let i=0; i<2; i++) particlesArray.push(new Particle()); 
+        });
+        
         class Particle {
-            constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+            constructor() { 
+                this.x = mouse.x; this.y = mouse.y; 
+                this.size = Math.random() * 5 + 2; 
+                this.speedX = Math.random() * 4 - 2; 
+                this.speedY = Math.random() * 4 - 2; 
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; 
+            }
             update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
             draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
         }
-        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+        function animate() { 
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            for (let i = 0; i < particlesArray.length; i++) { 
+                particlesArray[i].update(); 
+                particlesArray[i].draw(); 
+                if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } 
+            } 
+            requestAnimationFrame(animate); 
+        }
         animate();
         /*]]>*/
     </script>
