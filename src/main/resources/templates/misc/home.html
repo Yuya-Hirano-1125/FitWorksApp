@@ -59,24 +59,20 @@
             margin-bottom: 5px;
         }
 
-        /* ★変更: 記録メニューボタンのアニメーション (見切れ防止) */
+        /* 記録メニューボタンのアニメーション */
         .record-option-item {
-            /* 滑らかな動き */
             transition: all 0.3s ease-out !important;
             transform: translateY(0);
         }
         
         .record-option-item:hover {
-            /* 控えめに浮き上がる（拡大scaleは削除して見切れ防止） */
             transform: translateY(-3px) !important;
-            /* 影で浮遊感を出す */
             box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
             z-index: 10;
             filter: brightness(1.05);
         }
         
         .record-option-item:active {
-            /* クリック時は少し押し込む */
             transform: translateY(1px) !important;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
             transition: all 0.1s ease !important;
@@ -246,7 +242,7 @@
     <div id="real-time-clock" class="real-time-clock">0000/00/00(月) 00:00</div>
 
     <button id="help-btn" class="help-label-btn" onclick="toggleHelpMenu()">
-        <span style="font-size: 1.2em;">📰</span>ヘルプ
+        <i class="fa-solid fa-circle-question" style="font-size: 1.2em;"></i> ヘルプ
     </button>
     
     <div id="help-menu" class="help-menu-dropdown">
