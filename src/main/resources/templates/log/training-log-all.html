@@ -39,11 +39,15 @@
             border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
+            
+            /* base.cssのアニメーションを無効化 */
+            animation: none !important;
+            transform: none !important;
         }
 
         /* ヘッダーデザイン */
         .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; gap: 15px; }
-        .page-title { color: #343a40; font-size: 1.8rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 700; }
+        .page-title { color: #343a40; font-size: 1.8rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 700; text-shadow: none; animation: none; }
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 45px; height: 45px;
@@ -61,43 +65,44 @@
             background: rgba(255, 255, 255, 0.8);
             border-radius: 20px; padding: 15px; text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5);
+            /* ★重要: 基本状態ではtransitionなし（戻るときは即座） */
+            transition: none; 
+        }
+        .stat-card:hover { 
+            transform: translateY(-3px); 
+            /* ★重要: ホバー時のみアニメーション */
             transition: transform 0.3s;
         }
-        .stat-card:hover { transform: translateY(-3px); }
         
         .stat-label { font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; display: block; }
         .stat-value { font-size: 1.5rem; font-weight: 800; margin: 0; font-family: 'Poppins', sans-serif; line-height: 1.2; }
         .stat-trend { font-size: 0.75rem; margin-top: 5px; display: block; font-weight: 600; }
 
-        /* ★変更: 見やすいカラーデザイン (パステル背景 + 濃い文字) */
-        
-        /* 青カード (総トレーニング時間) */
+        /* カラーデザイン */
         .stat-card.blue {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); /* 淡いブルー */
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
             border: 1px solid #90caf9;
             box-shadow: 0 4px 15px rgba(33, 150, 243, 0.15);
         }
-        .stat-card.blue .stat-label { color: #1565c0; } /* 濃い青 */
+        .stat-card.blue .stat-label { color: #1565c0; }
         .stat-card.blue .stat-value { color: #0d47a1; }
         .stat-card.blue .stat-trend { color: #1976d2; }
 
-        /* ピンクカード (現在の体重) */
         .stat-card.pink {
-            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); /* 淡いピンク */
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
             border: 1px solid #f48fb1;
             box-shadow: 0 4px 15px rgba(233, 30, 99, 0.15);
         }
-        .stat-card.pink .stat-label { color: #c2185b; } /* 濃いピンク */
+        .stat-card.pink .stat-label { color: #c2185b; }
         .stat-card.pink .stat-value { color: #880e4f; }
         .stat-card.pink .stat-trend { color: #d81b60; }
 
-        /* オレンジカード (記録日数) */
         .stat-card.orange {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); /* 淡いオレンジ */
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
             border: 1px solid #ffcc80;
             box-shadow: 0 4px 15px rgba(255, 152, 0, 0.15);
         }
-        .stat-card.orange .stat-label { color: #ef6c00; } /* 濃いオレンジ */
+        .stat-card.orange .stat-label { color: #ef6c00; }
         .stat-card.orange .stat-value { color: #e65100; }
         .stat-card.orange .stat-trend { color: #f57c00; }
 
@@ -111,29 +116,209 @@
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
         .chart-title { font-size: 1rem; font-weight: bold; color: #444; }
 
-        .chart-options .button { padding: 5px 14px; font-size: 0.85rem; border-radius: 15px; transition: all 0.3s; text-decoration: none; display: inline-block;}
-        .button.secondary { background: #fff; color: #666; border: 1px solid #ddd; }
-        .button.secondary:hover { background: #f0f0f0; }
-        .button.primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; box-shadow: 0 4px 10px rgba(118, 75, 162, 0.3); }
+        /* ==========================================================================
+           ★ ボタンデザインの強力な上書き
+           ========================================================================== */
+        
+        /* base.cssのふわふわアニメーションを無効化 */
+        .button, button.primary, .button.secondary, button.secondary,
+        .chart-options .button {
+            animation: none !important;
+        }
 
-        /* フィルターフォーム */
+        /* 共通ボタン設定 */
+        .button { 
+            padding: 5px 14px; 
+            font-size: 0.85rem; 
+            border-radius: 15px; 
+            text-decoration: none; 
+            display: inline-block;
+            margin: 0; /* base.cssのマージンをリセット */
+            width: auto; /* base.cssのwidth:100%をリセット */
+            
+            /* ★重要: base.cssの transition: all ... を打ち消す */
+            /* transform を含めないことで、戻るときのアニメーションを無効化 */
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s !important;
+        }
+        
+        .button:hover {
+            transform: translateY(-3px);
+            /* ★重要: ホバー時のみ transform のアニメーションを有効化 */
+            transition: transform 0.3s, background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s !important;
+        }
+
+        /* Secondary Button (日次・週次・月次など) */
+        .button.secondary, 
+        .chart-options .button.secondary { 
+            background: #fff; 
+            color: #666; 
+            border: 1px solid #ddd; 
+            box-shadow: none; /* base.cssの影を消す */
+        }
+        
+        .button.secondary:hover,
+        .chart-options .button.secondary:hover { 
+            background: #f0f0f0; 
+            /* base.cssのピンク枠線を無効化 */
+            border-color: #ddd !important; 
+            color: #666;
+        }
+
+        /* Primary Button (トレーニングを始める、選択中のタブ) */
+        .button.primary,
+        .chart-options .button.primary { 
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            color: white; 
+            border: none; 
+            box-shadow: 0 4px 10px rgba(118, 75, 162, 0.3); 
+        }
+        
+        /* Primary Button Hover */
+        .button.primary:hover, .button.primary:active, .button.primary:focus,
+        .chart-options .button.primary:hover {
+            /* base.cssの色反転を無効化 */
+            background: linear-gradient(135deg, #667eea, #764ba2) !important;
+            color: white;
+            box-shadow: 0 4px 10px rgba(118, 75, 162, 0.3);
+            
+            transform: translateY(-3px); 
+            transition: transform 0.3s !important;
+            opacity: 1;
+        }
+
+        /* ★変更: チャートオプションボタンのサイズ調整（少し大きく） */
+        .chart-options .button {
+            padding: 8px 18px;   /* 元: 5px 14px */
+            font-size: 0.95rem;  /* 元: 0.85rem */
+        }
+
+        /* ==========================================================================
+           ★ カスタムセレクトボックス
+           ========================================================================== */
         .filter-form {
             background: rgba(255,255,255,0.6); padding: 10px 15px; border-radius: 15px;
             margin-bottom: 20px; display: flex; justify-content: center;
             border: 1px solid rgba(255,255,255,0.5);
-        }
-        .filter-select {
-            width: 100%; max-width: 300px; border: none; background: transparent;
-            font-size: 1rem; font-weight: bold; color: #555; outline: none; cursor: pointer; text-align: center;
+            position: relative; z-index: 100;
         }
 
-        /* リストスタイル */
+        .custom-select-container {
+            position: relative;
+            width: 100%; max-width: 320px;
+            font-size: 1rem; font-weight: bold; color: #555;
+            cursor: pointer; user-select: none;
+        }
+
+        .selected-option {
+            background: rgba(255,255,255,0.8);
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 10px 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1);
+        }
+        
+        .selected-option:hover {
+            background: #fff;
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .selected-option i {
+            margin-right: 8px; color: #667eea;
+        }
+        
+        .arrow-icon {
+            transition: transform 0.3s ease;
+            font-size: 0.8em; color: #888;
+        }
+
+        .custom-select-container.active .arrow-icon {
+            transform: rotate(180deg);
+        }
+
+        .options-list {
+            position: absolute;
+            top: 110%; left: 0; right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+            z-index: 200;
+            
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.95);
+            transform-origin: top center;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .custom-select-container.active .options-list {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .option-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+            display: flex; align-items: center;
+        }
+        
+        .option-item:last-child { border-bottom: none; }
+        
+        .option-item:hover {
+            background-color: #f0f8ff;
+            color: #667eea;
+            padding-left: 20px;
+        }
+        
+        .option-item i {
+            margin-right: 10px;
+            color: #aaa;
+            transition: color 0.2s;
+            width: 20px; text-align: center;
+        }
+        
+        .option-item:hover i {
+            color: #667eea;
+        }
+
+
+        /* スクロールエリア設定 */
+        .records-scroll-area {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+            margin-bottom: 20px;
+            
+            scrollbar-width: thin;
+            scrollbar-color: #667eea rgba(255,255,255,0.5);
+        }
+        .records-scroll-area::-webkit-scrollbar {
+            width: 8px;
+        }
+        .records-scroll-area::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+        .records-scroll-area::-webkit-scrollbar-thumb {
+            background-color: #667eea;
+            border-radius: 4px;
+        }
+
         .record-card {
             background: rgba(255,255,255,0.9);
             border-radius: 12px; padding: 12px 18px; margin-bottom: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 5px solid #ccc;
             display: flex; justify-content: space-between; align-items: center;
             transition: transform 0.2s;
+            margin-right: 5px;
+            
+            /* ★追加: テキストを左詰めにする */
+            text-align: left;
         }
         .record-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .record-card.type-weight { border-left-color: #667eea; }
@@ -142,12 +327,33 @@
         .badge-weight { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7em; }
         .badge-cardio { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7em; }
 
-        @media (max-width: 600px) {
-            .main-container { padding: 15px; padding-top: 25px; width: 95%; border-radius: 30px; }
-            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
-            .page-title { font-size: 1.4rem; }
-            .record-card { flex-direction: column; align-items: flex-start; gap: 5px; }
-        }
+		/* スマホ向けレスポンシブ設定 */
+		        @media (max-width: 600px) {
+		            .page-title { font-size: 1.7rem; }
+		            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+		            
+		            /* ★変更: 画面幅を最大限使う */
+		            .main-container { 
+		                padding: 20px 5px; 
+		                width: 98%; 
+		                border-radius: 20px; 
+		            }
+		            
+		            .calendar-grid { gap: 2px; }
+
+		            .calendar-day-cell { 
+		                min-height: 85px; 
+		                font-size: 1.1rem;
+		                display: flex;
+		                flex-direction: column;
+		                justify-content: flex-start;
+		                height: 100%; 
+		            }
+		            
+		            .nav-arrow { width: 35px; height: 35px; font-size: 1rem; }
+		            .scale-input { font-size: 3rem; }
+		            .adjust-btn { width: 40px; height: 40px; font-size: 1.2rem; }
+		        }
     </style>
 </head>
 <body>
@@ -219,18 +425,40 @@
         </div>
         
         <div class="filter-form">
-            <form th:action="@{/training-log/all}" method="get" style="width: 100%;">
+            <form id="filterForm" th:action="@{/training-log/all}" method="get" style="display:none;">
                 <input type="hidden" name="period" th:value="${period}">
                 <input type="hidden" name="source" th:value="${param.source != null ? param.source[0] : ''}">
-                <select name="part" class="filter-select" onchange="this.form.submit()">
-                    <option value="">📊 全種目を表示</option>
-                    <option th:each="p : ${allParts}" 
-                            th:value="${p}" 
-                            th:text="${p}" 
-                            th:selected="${selectedPart == p}">部位名</option>
-                    <option value="有酸素" th:selected="${selectedPart == '有酸素'}">🏃 有酸素運動</option>
-                </select>
+                <input type="hidden" name="part" id="hiddenPartInput" th:value="${selectedPart}">
             </form>
+
+            <div class="custom-select-container" id="customSelect">
+                <div class="selected-option">
+                    <span th:if="${selectedPart == null or selectedPart == ''}">
+                        <i class="fa-solid fa-layer-group"></i> 全種目を表示
+                    </span>
+                    <span th:if="${selectedPart == '有酸素'}">
+                        <i class="fa-solid fa-person-running"></i> 有酸素運動
+                    </span>
+                    <span th:if="${selectedPart != null and selectedPart != '' and selectedPart != '有酸素'}">
+                        <i class="fa-solid fa-dumbbell"></i> <span th:text="${selectedPart}"></span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                </div>
+                
+                <div class="options-list">
+                    <div class="option-item" onclick="selectPart('')">
+                        <i class="fa-solid fa-layer-group"></i> 全種目を表示
+                    </div>
+                    
+                    <div th:each="p : ${allParts}" class="option-item" th:data-part="${p}" onclick="selectPart(this.getAttribute('data-part'))">
+                        <i class="fa-solid fa-dumbbell"></i> <span th:text="${p}"></span>
+                    </div>
+                    
+                    <div class="option-item" onclick="selectPart('有酸素')">
+                        <i class="fa-solid fa-person-running"></i> 有酸素運動
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div style="position: relative; height: 250px; width: 100%;">
@@ -244,27 +472,29 @@
         <a th:href="@{/training}" class="button primary" style="display:inline-block; margin-top:10px; padding:10px 20px; text-decoration:none; border-radius:20px;">トレーニングを始める</a>
     </div>
 
-    <div th:each="record : ${records}">
-        <div th:if="${record.type == 'WEIGHT'}" class="record-card type-weight">
-            <div>
-                <div class="record-date"><i class="fa-regular fa-clock"></i> <span th:text="${record.recordDate}"></span></div>
-                <div class="record-title">
-                    <span th:text="${record.exerciseName}"></span> <span class="badge-weight">筋トレ</span>
-                </div>
-                <div class="record-details">
-                    <span th:text="${record.weight}"></span>kg × <span th:text="${record.reps}"></span>回 × <span th:text="${record.sets}"></span>セット
+    <div class="records-scroll-area" th:unless="${records.empty}">
+        <div th:each="record : ${records}">
+            <div th:if="${record.type == 'WEIGHT'}" class="record-card type-weight">
+                <div>
+                    <div class="record-date"><i class="fa-regular fa-clock"></i> <span th:text="${record.recordDate}"></span></div>
+                    <div class="record-title">
+                        <span th:text="${record.exerciseName}"></span> <span class="badge-weight">筋トレ</span>
+                    </div>
+                    <div class="record-details">
+                        <span th:text="${record.weight}"></span>kg × <span th:text="${record.reps}"></span>回 × <span th:text="${record.sets}"></span>セット
+                    </div>
                 </div>
             </div>
-        </div>
-        <div th:if="${record.type == 'CARDIO'}" class="record-card type-cardio">
-            <div>
-                <div class="record-date"><i class="fa-regular fa-clock"></i> <span th:text="${record.recordDate}"></span></div>
-                <div class="record-title">
-                    <span th:text="${record.cardioType}"></span> <span class="badge-cardio">有酸素</span>
-                </div>
-                <div class="record-details">
-                    <span th:text="${record.durationMinutes}"></span>分 
-                    <span th:if="${record.distanceKm != null}"> / <span th:text="${record.distanceKm}"></span>km</span>
+            <div th:if="${record.type == 'CARDIO'}" class="record-card type-cardio">
+                <div>
+                    <div class="record-date"><i class="fa-regular fa-clock"></i> <span th:text="${record.recordDate}"></span></div>
+                    <div class="record-title">
+                        <span th:text="${record.cardioType}"></span> <span class="badge-cardio">有酸素</span>
+                    </div>
+                    <div class="record-details">
+                        <span th:text="${record.durationMinutes}"></span>分 
+                        <span th:if="${record.distanceKm != null}"> / <span th:text="${record.distanceKm}"></span>km</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -284,8 +514,6 @@
         });
 
         document.getElementById('total-time').innerHTML = totalMins + '<span style="font-size:0.5em">分</span>';
-        
-        // ★修正: ここでの体重上書き処理を削除し、サーバーサイドの値 (th:text) を優先します。
 
         const ctx = document.getElementById('trainingChart').getContext('2d');
         let gradientWeight = ctx.createLinearGradient(0, 0, 0, 400);
@@ -347,6 +575,23 @@
     let width, height;
     function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+    const customSelect = document.getElementById('customSelect');
+    
+    customSelect.addEventListener('click', function(e) {
+        this.classList.toggle('active');
+        e.stopPropagation(); 
+    });
+
+    document.addEventListener('click', function() {
+        customSelect.classList.remove('active');
+    });
+
+    function selectPart(val) {
+        const hiddenInput = document.getElementById('hiddenPartInput');
+        hiddenInput.value = val;
+        document.getElementById('filterForm').submit();
+    }
 </script>
 </body>
 </html>

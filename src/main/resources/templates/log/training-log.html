@@ -258,13 +258,33 @@
             }
         }
 
-        @media (max-width: 600px) {
-            .page-title { font-size: 1.5rem; }
-            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
-            .main-container { padding: 20px; width: 95%; }
-            .calendar-day-cell { min-height: 50px; font-size: 0.9rem; }
-            .nav-arrow { width: 35px; height: 35px; font-size: 1rem; }
-        }
+		/* スマホ向けレスポンシブ設定 */
+		        @media (max-width: 600px) {
+		            .page-title { font-size: 1.7rem; }
+		            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+		            
+		            /* ★変更: 画面幅を最大限使う */
+		            .main-container { 
+		                padding: 20px 5px; 
+		                width: 98%; 
+		                border-radius: 20px; 
+		            }
+		            
+		            /* ★変更: 隙間を詰める */
+		            .calendar-grid { gap: 2px; }
+
+		            /* ★変更: セルを大きく、タップしやすく */
+		            .calendar-day-cell { 
+		                min-height: 85px; 
+		                font-size: 1.1rem;
+		                display: flex;
+		                flex-direction: column;
+		                justify-content: flex-start;
+		                height: 100%;
+		            }
+		            
+		            .nav-arrow { width: 35px; height: 35px; font-size: 1rem; }
+		        }
     </style>
 </head>
 <body class="training-log-page">
