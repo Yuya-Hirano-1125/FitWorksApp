@@ -34,42 +34,42 @@
             position: relative; z-index: 10;
         }
 
-        /* 🔙 戻るボタン */
-        .back-arrow-button {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            width: 70px;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            color: #555;
-            font-size: 2.2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* ★変更: ヘッダーデザインの統一 */
+        .page-header-container { 
+            display: flex; align-items: center; margin-bottom: 25px; 
+            border-bottom: 3px solid #0061ff; /* 青線 */
+            padding-bottom: 10px; gap: 15px; 
         }
-        .back-arrow-button:hover {
-            transform: scale(1.1);
-            background: #fff;
-            color: #4facfe;
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 700; text-shadow: none;
+        }
+        .page-title i { 
+            margin-right: 10px; color: #0061ff; /* アイコン色 */
+        }
+        
+        /* 戻るボタン */
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px;
+            background-color: white; color: #0061ff; /* 文字色 */
+            border: 2px solid #0061ff; /* 枠線 */
+            border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { 
+            background-color: #0061ff; /* ホバー背景 */
+            color: white; transform: scale(1.1); 
         }
 
         @media (max-width: 600px) {
-            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
-            .main-container { padding-top: 80px !important; }
+            .main-container { padding: 20px; padding-top: 30px; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .page-title { font-size: 1.5rem; }
         }
 
         /* 規約・ポリシー専用スタイル */
         .terms-container { background-color: rgba(255,255,255,0.9); padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-top: 20px; text-align: left; }
-        .terms-content h2 { font-size: 1.1rem; color: var(--primary-color, #ff69b4); border-bottom: 2px dashed #eee; padding-bottom: 5px; margin-top: 25px; margin-bottom: 10px; }
+        .terms-content h2 { font-size: 1.1rem; color: #0061ff; border-bottom: 2px dashed #eee; padding-bottom: 5px; margin-top: 25px; margin-bottom: 10px; }
         .terms-content h2:first-child { margin-top: 0; }
         .terms-content p { font-size: 0.95rem; line-height: 1.8; color: #555; margin-bottom: 10px; }
         .terms-content ul { padding-left: 20px; margin-bottom: 15px; color: #555; }
@@ -86,11 +86,12 @@
     </div>
 
 <div class="main-container">
-    <a th:href="@{/settings}" class="back-arrow-button" title="設定に戻る">
-        <i class="fa-solid fa-arrow-left"></i>
-    </a>
-
-    <h1><i class="fa-solid fa-file-contract header-icon"></i> 利用規約</h1>
+    <div class="page-header-container">
+        <a th:href="@{/settings}" class="home-link-icon" title="設定に戻る">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <h1 class="page-title"><i class="fa-solid fa-file-contract"></i> 利用規約</h1>
+    </div>
     
     <div class="terms-container">
         <div class="terms-content">

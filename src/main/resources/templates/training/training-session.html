@@ -70,7 +70,7 @@
             text-align: center; 
             margin-bottom: 30px; 
             position: relative; 
-            padding: 0 40px; /* タイトルがボタンに被らないように余白確保 */
+            padding: 0 40px;
         }
         .session-title {
             font-size: 1.8rem; font-weight: 900; margin: 0;
@@ -81,58 +81,30 @@
         }
         .session-subtitle { font-size: 0.9rem; color: #666; font-weight: 700; margin-top: 5px; }
 
-        /* ==========================================================================
-           🔙 戻るボタン (メインコンテナ内左上配置)
-           ========================================================================== */
+        /* 戻るボタン */
         .back-arrow-button {
-            position: absolute;
-            top: 25px;  /* コンテナの上端からの距離 */
-            left: 20px; /* コンテナの左端からの距離 */
-            width: 50px; 
-            height: 50px;
+            position: absolute; top: 25px; left: 20px;
+            width: 50px; height: 50px;
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(5px);
-            border: 2px solid #fff;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            color: #555;
-            font-size: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            z-index: 100;
+            border: 2px solid #fff; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            text-decoration: none; color: #555; font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 100;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .back-arrow-button:hover {
-            transform: scale(1.1);
-            color: #4facfe;
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
-        }
+        .back-arrow-button:hover { transform: scale(1.1); color: #4facfe; box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3); }
         
-        /* スマホ調整 */
         @media (max-width: 600px) {
-            .back-arrow-button { 
-                width: 45px; height: 45px; font-size: 1.2rem; 
-                top: 20px; left: 15px; 
-            }
-            .session-header {
-                padding-top: 50px; /* ボタンと被らないように下にずらす */
-                padding-left: 0; padding-right: 0;
-            }
+            .back-arrow-button { width: 45px; height: 45px; font-size: 1.2rem; top: 20px; left: 15px; }
+            .session-header { padding-top: 50px; padding-left: 0; padding-right: 0; }
         }
 
-        /* ==========================================================================
-           ⏱ WIDGETS & FORMS
-           ========================================================================== */
-        
         /* タイマーウィジェット */
         .timer-widget {
             background: #2d3436; color: #fff;
-            border-radius: 25px; padding: 25px;
-            margin-bottom: 30px; text-align: center;
-            box-shadow: 0 10px 30px rgba(45, 52, 54, 0.3);
-            border: 3px solid #636e72;
+            border-radius: 25px; padding: 25px; margin-bottom: 30px; text-align: center;
+            box-shadow: 0 10px 30px rgba(45, 52, 54, 0.3); border: 3px solid #636e72;
             position: relative; overflow: hidden;
         }
         .timer-widget::before {
@@ -144,7 +116,6 @@
             letter-spacing: 3px; color: #81ecec; margin: 10px 0;
             text-shadow: 0 0 20px rgba(129, 236, 236, 0.4);
         }
-        
         .timer-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
         .btn-timer {
             padding: 10px 20px; border-radius: 20px; border: none; font-weight: 700; cursor: pointer;
@@ -154,15 +125,13 @@
         .btn-start:active { transform: translateY(4px); box-shadow: none; }
         .btn-reset { background: #636e72; color: white; flex: 1; justify-content: center; box-shadow: 0 4px 0 #2d3436; }
         .btn-reset:active { transform: translateY(4px); box-shadow: none; }
-        
         .timer-input-group { display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 10px; color: #b2bec3; font-size: 0.9rem; }
         .timer-input { background: #636e72; border: 1px solid #b2bec3; color: white; width: 50px; text-align: center; border-radius: 8px; padding: 5px; font-weight: bold; }
 
-        /* 入力フォームエリア */
+        /* フォーム */
         .form-section {
             background: #fff; border-radius: 25px; padding: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            margin-bottom: 30px; border: 1px solid #eee;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #eee;
         }
         .section-heading {
             font-size: 1.2rem; font-weight: 800; color: #333; margin-bottom: 20px;
@@ -170,15 +139,12 @@
         }
         .section-heading i { color: #a18cd1; }
 
-        /* セット入力行（カードスタイル） */
         .set-row-card {
             display: flex; align-items: center; gap: 10px;
             background: #f8f9fa; border: 2px solid #eee;
-            padding: 12px; border-radius: 15px; margin-bottom: 12px;
-            transition: all 0.2s;
+            padding: 12px; border-radius: 15px; margin-bottom: 12px; transition: all 0.2s;
         }
         .set-row-card:focus-within { border-color: #a18cd1; background: #fff; box-shadow: 0 5px 15px rgba(161, 140, 209, 0.2); }
-        
         .set-num {
             background: #333; color: #fff; width: 28px; height: 28px;
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
@@ -195,11 +161,9 @@
             position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
             color: #999; font-size: 0.8rem; font-weight: 700; pointer-events: none;
         }
-        
         .btn-remove { color: #ff7675; cursor: pointer; padding: 5px; transition: 0.2s; font-size: 1.1rem; }
         .btn-remove:hover { color: #d63031; transform: scale(1.2); }
 
-        /* 追加ボタン */
         .btn-add-set {
             width: 100%; padding: 12px; border: 2px dashed #b2bec3;
             background: #f0f0f0; color: #636e72; border-radius: 15px;
@@ -207,7 +171,6 @@
         }
         .btn-add-set:hover { background: #dfe6e9; border-color: #636e72; color: #333; }
 
-        /* メモ欄 */
         .memo-area {
             width: 100%; padding: 15px; border-radius: 15px; border: 2px solid #eee;
             background: #fdfdfd; font-family: inherit; font-size: 1rem; color: #333;
@@ -215,7 +178,6 @@
         }
         .memo-area:focus { outline: none; border-color: #a18cd1; background: #fff; }
 
-        /* 完了ボタン */
         .btn-finish {
             width: 100%; padding: 18px; margin-top: 25px;
             background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
@@ -227,7 +189,6 @@
         .btn-finish:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 176, 155, 0.4); }
         .btn-finish:active { transform: scale(0.98); }
 
-        /* AI関連 */
         .ai-camera-section { margin-bottom: 25px; text-align: center; }
         .btn-ai-camera {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -250,7 +211,6 @@
             color: #00e676; padding: 5px 15px; border-radius: 5px; font-size: 1.5rem; font-weight: 900;
         }
 
-        /* レスポンシブ調整 */
         @media (max-width: 600px) {
             .main-container { padding: 20px 15px; width: 95%; margin-top: 40px; }
             .session-title { font-size: 1.5rem; }
@@ -321,8 +281,8 @@
                 <span id="ai-verified-badge" style="display:none; margin-left:auto; background:#00e676; color:white; padding:2px 8px; border-radius:10px; font-size:0.7rem;">AI計測中</span>
             </div>
 
-            <form th:action="@{/training-log/save}" method="post" id="weight-form" onsubmit="return validateTrainingTime(this);">
-                <input type="hidden" name="recordDate" th:value="${today}">
+            <form th:action="@{/training/log/save}" method="post" id="weight-form" onsubmit="return validateTrainingTime(this);">
+                <input type="hidden" name="date" th:value="${today}">
                 <input type="hidden" name="type" value="WEIGHT">
                 <input type="hidden" name="exerciseName" th:value="${selectedExercise}">
                 
@@ -360,22 +320,22 @@
                 </button>
             </div>
 
-            <form th:action="@{/training-log/save}" method="post" id="cardio-form" onsubmit="return validateCardio(this);">
-                <input type="hidden" name="recordDate" th:value="${today}">
+            <form th:action="@{/training/log/save}" method="post" id="cardio-form" onsubmit="return validateCardio(this);">
+                <input type="hidden" name="date" th:value="${today}">
                 <input type="hidden" name="type" value="CARDIO">
-                <input type="hidden" name="cardioType" th:value="${selectedExercise}">
+                <input type="hidden" name="exerciseName" th:value="${selectedExercise}">
                 
                 <div class="set-row-card">
                     <div class="set-num"><i class="fa-regular fa-clock"></i></div>
                     <div class="input-group">
-                        <input type="number" name="durationMinutes" id="cardio-duration" placeholder="0" required>
+                        <input type="number" name="duration" id="cardio-duration" placeholder="0" required>
                         <span class="unit-label">分</span>
                     </div>
                 </div>
                 <div class="set-row-card">
                     <div class="set-num"><i class="fa-solid fa-route"></i></div>
                     <div class="input-group">
-                        <input type="number" name="distanceKm" id="cardio-distance" step="0.1" placeholder="0.0">
+                        <input type="number" name="distance" id="cardio-distance" step="0.1" placeholder="0.0">
                         <span class="unit-label">km</span>
                     </div>
                 </div>
@@ -497,7 +457,6 @@
     </script>
 
     <script th:inline="javascript">
-        // タイマーなどのロジック
         let sessionStartTime = Date.now();
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -519,11 +478,11 @@
                     div.innerHTML = `
                         <div class="set-num">${setCounter}</div>
                         <div class="input-group">
-                            <input type="number" name="setList[${setCounter-1}].weight" step="0.5" placeholder="0" value="${w}">
+                            <input type="number" name="weights" step="0.5" placeholder="0" value="${w}">
                             <span class="unit-label">kg</span>
                         </div>
                         <div class="input-group">
-                            <input type="number" name="setList[${setCounter-1}].reps" class="ai-rep-target" placeholder="0" value="${r}">
+                            <input type="number" name="repsList" class="ai-rep-target" placeholder="0" value="${r}">
                             <span class="unit-label">回</span>
                         </div>
                         <i class="fa-solid fa-trash btn-remove" onclick="this.parentElement.remove()"></i>

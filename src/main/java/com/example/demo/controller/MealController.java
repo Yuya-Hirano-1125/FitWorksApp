@@ -35,7 +35,7 @@ import com.example.demo.entity.MealRecord;
 import com.example.demo.entity.User;
 import com.example.demo.service.AICoachService;
 import com.example.demo.service.MealService;
-import com.example.demo.service.MissionService; // ★追加
+import com.example.demo.service.MissionService;
 import com.example.demo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -46,14 +46,13 @@ public class MealController {
     private final UserService userService;
     private final MealService mealService;
     private final AICoachService aiCoachService;
-    private final MissionService missionService; // ★追加
+    private final MissionService missionService;
 
-    // コンストラクタ注入に変更
     @Autowired
     public MealController(UserService userService,
                           MealService mealService,
                           AICoachService aiCoachService,
-                          MissionService missionService) { // ★追加
+                          MissionService missionService) {
         this.userService = userService;
         this.mealService = mealService;
         this.aiCoachService = aiCoachService;
@@ -308,7 +307,8 @@ public class MealController {
             for (ObjectError error : result.getAllErrors()) {
                 System.out.println("Validation Error: " + error.getDefaultMessage());
             }
-            return "redirect:/log/meal?error";
+            redirectAttributes.addFlashAttribute("error", "入力内容に不備があります。");
+            return "redirect:/log/meal";
         }
         
         try {
@@ -324,6 +324,9 @@ public class MealController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            // ★追加: 成功メッセージを設定
+            redirectAttributes.addFlashAttribute("successMessage", "食事を記録しました！");
 
             LocalDate date = savedRecord.getMealDateTime().toLocalDate();
             return "redirect:/log/meal?year=" + date.getYear() + "&month=" + date.getMonthValue();

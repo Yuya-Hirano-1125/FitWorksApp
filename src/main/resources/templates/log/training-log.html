@@ -40,26 +40,19 @@
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
             
-            /* カレンダー（メイン画面）が表示される際のアニメーションを無効化 */
-            animation: none !important;
-            transform: none !important;
-            transition: none !important;
+            animation: none !important; transform: none !important; transition: none !important;
         }
 
-        /* ヘッダー修正 */
+        /* ヘッダー */
         .page-header-container { 
             display: flex; align-items: center; margin-bottom: 30px; 
-            border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; 
-            flex-wrap: nowrap;
+            border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; flex-wrap: nowrap;
         }
-        
         .page-title { 
             color: #343a40; font-size: 2rem; margin: 0; flex-grow: 1; text-align: left;
             text-shadow: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        
         .page-title i { margin-right: 10px; color: #007bff; }
-        
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -68,10 +61,9 @@
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
-        /* カレンダー関連 */
+        /* カレンダー */
         .calendar-nav-container { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .calendar-title { font-size: 1.5rem; color: #333; margin: 0; font-weight: 800; }
-
         .nav-arrow {
             display: flex; align-items: center; justify-content: center;
             width: 45px; height: 45px; border-radius: 50%; background: white; color: #007bff; text-decoration: none; font-size: 1.2rem;
@@ -90,7 +82,22 @@
         .calendar-day-cell.today { background-color: #fff8e1; border: 2px solid #ff9800; font-weight: bold; }
         .log-indicator { color: gold; text-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 1.2rem; display: block; margin-top: 5px; }
 
-        .log-date { margin-right: 15px; display: inline-block; }
+        /* ★追加: 未来の日付用スタイル */
+        .calendar-day-cell.future-day {
+            background-color: #f0f0f0;
+            color: #ccc;
+            cursor: not-allowed;
+            pointer-events: none; /* クリック無効化 */
+            opacity: 0.6;
+        }
+        .calendar-day-cell.future-day .day-number {
+            color: #aaa;
+        }
+        .calendar-day-cell.future-day:hover {
+            transform: none;
+            box-shadow: none;
+            background-color: #f0f0f0;
+        }
 
         .btn-view-all {
             display: inline-flex; align-items: center; justify-content: center; gap: 10px;
@@ -101,11 +108,10 @@
         .btn-view-all:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px rgba(118, 75, 162, 0.5); filter: brightness(1.1); }
         .btn-view-all:active { transform: translateY(1px); }
 
-        /* アニメーションキーフレーム */
         @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popIn { 0% { opacity: 0; transform: scale(0.8) translateY(20px); } 60% { opacity: 1; transform: scale(1.03) translateY(0); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
 
-        /* モーダル共通 */
+        /* モーダル */
         .modal {
             display: none; justify-content: center; align-items: center;
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -147,7 +153,7 @@
         }
         .btn-sns-small:hover { background: #e0e0e0; transform: translateY(-2px); }
 
-        /* === 記録入力モーダルのレイアウト === */
+        /* 記録入力モーダル */
         .training-log-modal-wide {
             max-width: 700px !important; width: 92% !important; transition: max-width 0.3s;
             background: rgba(255, 255, 255, 0.98); border-radius: 24px; padding: 25px;
@@ -155,22 +161,15 @@
         }
         
         .modal-layout-grid { display: block; }
-
         .form-section { flex: 1; text-align: left; }
-        
         .form-row-compact { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
         .form-row-compact .form-group { flex: 1; margin-bottom: 0; min-width: 140px; }
-        
-        .form-group label {
-            font-size: 0.9rem; color: #555; margin-bottom: 5px; display: block; font-weight: bold;
-        }
-        
+        .form-group label { font-size: 0.9rem; color: #555; margin-bottom: 5px; display: block; font-weight: bold; }
         .form-control {
             width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; font-size: 1rem;
             background: #fff; transition: all 0.3s;
         }
         .form-control:focus { border-color: #4facfe; box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2); outline: none; }
-        
         .input-group-unit { display: flex; align-items: center; gap: 5px; }
         .unit-label { font-weight: bold; color: #666; font-size: 0.9rem; white-space: nowrap; }
 
@@ -189,10 +188,7 @@
         }
         .close-button:hover { color: #555; }
 
-        @media (min-width: 768px) {
-            .training-log-modal-wide { padding: 40px; }
-        }
-
+        @media (min-width: 768px) { .training-log-modal-wide { padding: 40px; } }
         @media (max-width: 600px) {
             .page-title { font-size: 1.5rem; }
             .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
@@ -243,11 +239,18 @@
     <div class="calendar-grid">
         <div class="calendar-day-header" th:each="dayLabel : ${dayLabels}" th:text="${dayLabel}" th:classappend="${dayLabel == '土'} ? 'sat' : (${dayLabel == '日'} ? 'sun' : 'weekday')">曜日</div>
         <th:block th:each="date : ${calendarDays}">
-            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''}, dayOfWeek=${date != null ? date.dayOfWeek.name() : ''}, isToday=${date != null and date.isEqual(currentDate)}, isLogged=${date != null and loggedDates.containsKey(date)}"
+            <div th:with="dateNumber=${date != null ? date.dayOfMonth : ''}, 
+                          dayOfWeek=${date != null ? date.dayOfWeek.name() : ''}, 
+                          isToday=${date != null and date.isEqual(currentDate)}, 
+                          isLogged=${date != null and loggedDates.containsKey(date)},
+                          isFuture=${date != null and date.isAfter(currentDate)}"
                  class="calendar-day-cell"
-                 th:classappend="${date == null} ? 'empty-day' : ((${isToday} ? 'today ' : '') + (${dayOfWeek == 'SATURDAY'} ? 'sat' : (${dayOfWeek == 'SUNDAY'} ? 'sun' : 'weekday')))"
+                 th:classappend="${date == null} ? 'empty-day' : 
+                                ((${isToday} ? 'today ' : '') + 
+                                (${isFuture} ? 'future-day ' : '') + 
+                                (${dayOfWeek == 'SATURDAY'} ? 'sat' : (${dayOfWeek == 'SUNDAY'} ? 'sun' : 'weekday')))"
                  th:attr="data-date=${date != null ? date.toString() : ''}"
-                 th:onclick="${date != null} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
+                 th:onclick="${date != null and !isFuture} ? 'openLogModal(this.getAttribute(\'data-date\'), ' + ${isLogged} + ')' : ''">
                 <span class="day-number" th:text="${dateNumber}">1</span>
                 <span th:if="${isLogged}" class="log-indicator"><i class="fa-solid fa-star"></i></span>
             </div>
@@ -294,27 +297,25 @@
                     </div>
 
                     <div id="weightFields">
-                        <div class="form-row-compact">
-                            <div class="form-group">
-                                <label>重量</label>
-                                <div class="input-group-unit">
-                                    <input type="number" name="weight" class="form-control" step="0.5" placeholder="0">
-                                    <span class="unit-label">kg</span>
-                                </div>
+                        <div class="form-group">
+                            <label>重量</label>
+                            <div class="input-group-unit">
+                                <input type="number" name="weights" class="form-control" step="0.5" placeholder="0">
+                                <span class="unit-label">kg</span>
                             </div>
-                            <div class="form-group">
-                                <label>回数</label>
-                                <div class="input-group-unit">
-                                    <input type="number" name="reps" class="form-control" placeholder="0">
-                                    <span class="unit-label">回</span>
-                                </div>
+                        </div>
+                        <div class="form-group">
+                            <label>回数</label>
+                            <div class="input-group-unit">
+                                <input type="number" name="repsList" class="form-control" placeholder="0">
+                                <span class="unit-label">回</span>
                             </div>
-                            <div class="form-group">
-                                <label>セット数</label>
-                                <div class="input-group-unit">
-                                    <input type="number" name="sets" class="form-control" value="1" placeholder="1">
-                                    <span class="unit-label">set</span>
-                                </div>
+                        </div>
+                        <div class="form-group">
+                            <label>セット数</label>
+                            <div class="input-group-unit">
+                                <input type="number" name="sets" class="form-control" value="1" placeholder="1">
+                                <span class="unit-label">セット</span>
                             </div>
                         </div>
                     </div>
@@ -399,15 +400,17 @@
     // フォームの表示切り替え（ウェイト/有酸素）
     function toggleFormFields() {
         const type = document.getElementById('trainingTypeSelect').value;
-        const weightFields = document.getElementById('weightFields');
+        const weightFields = document.getElementById('weightFields'); 
         const cardioFields = document.getElementById('cardioFields');
         
-        if (type === 'WEIGHT') {
-            weightFields.style.display = 'block';
-            cardioFields.style.display = 'none';
-        } else {
-            weightFields.style.display = 'none';
-            cardioFields.style.display = 'block';
+        if (weightFields && cardioFields) {
+            if (type === 'WEIGHT') {
+                weightFields.style.display = 'block';
+                cardioFields.style.display = 'none';
+            } else {
+                weightFields.style.display = 'none';
+                cardioFields.style.display = 'block';
+            }
         }
     }
 
