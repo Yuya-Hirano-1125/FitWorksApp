@@ -477,20 +477,16 @@ public class TrainingController {
     /**
      * 新しいトレーニング記録モーダルからの保存処理（統合版）
      */
-    // ▼▼▼ 修正1: HTMLの送信先 (/training-log/save) とURLを一致させる
-    @PostMapping("/training-log/save")
+    @PostMapping("/training/log/save")
     public String saveTrainingLog(
-            // ▼▼▼ 修正2: HTMLから送信される recordDate と既存の date 両方を受け取れるようにする
-            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(value = "recordDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate recordDate,
-            @RequestParam("type") String type, // "WEIGHT", "CARDIO", "BODY_WEIGHT"
-            // ▼▼▼ 修正3: 体重記録の場合は種目名がないため、必須をfalseに変更
-            @RequestParam(value = "exerciseName", required = false) String exerciseName,
-            // フリーウェイト・体重用（任意）
-            @RequestParam(value = "weight", required = false) Double weight,
-            @RequestParam(value = "reps", required = false) Integer reps,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam("type") String type,
+            @RequestParam("exerciseName") String exerciseName,
+            // リストで受け取る
+            @RequestParam(value = "weights", required = false) List<Double> weights,
+            @RequestParam(value = "repsList", required = false) List<Integer> repsList,
+            // ★復活: 簡易フォームのセット数を受け取るために必要です
             @RequestParam(value = "sets", required = false, defaultValue = "1") Integer sets,
-            // 有酸素用（任意）
             @RequestParam(value = "duration", required = false) Integer duration,
             @RequestParam(value = "distance", required = false) Double distance,
             Authentication authentication,
@@ -499,140 +495,119 @@ public class TrainingController {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
 
-        // 日付の決定処理
-        LocalDate finalDate = (recordDate != null) ? recordDate : date;
-        if (finalDate == null) {
-            redirectAttributes.addFlashAttribute("error", "日付が必要です。");
-            return "redirect:/training-log";
-        }
-
         try {
-            // ▼▼▼ 修正4: BODY_WEIGHT（体重記録）の処理を追加
-            if ("BODY_WEIGHT".equals(type)) {
-                if (weight == null) {
-                    redirectAttributes.addFlashAttribute("error", "体重を入力してください。");
-                    return "redirect:/training-log";
+            int savedCount = 0;
+            double totalVolume = 0; // XP計算用の合計負荷
+
+            // ■ ウェイトトレーニングの場合
+            if ("WEIGHT".equals(type) && weights != null && !weights.isEmpty()) {
+                
+                // ★簡易フォーム対応ロジック
+                // 「重量リストが1つ」かつ「セット数が2以上」の場合は、その内容を指定セット数分繰り返す
+                int loopCount = weights.size();
+                boolean isSimpleMode = (weights.size() == 1 && sets != null && sets > 1);
+                
+                if (isSimpleMode) {
+                    loopCount = sets;
                 }
-                
-                // 既存の記録があるか確認
-                List<BodyWeightRecord> records = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
-                BodyWeightRecord record = records.stream()
-                        .filter(r -> r.getDate().isEqual(finalDate))
-                        .findFirst()
-                        .orElse(new BodyWeightRecord(currentUser, finalDate, weight));
-                
-                record.setWeight(weight);
-                bodyWeightRecordRepository.save(record);
-                
-                redirectAttributes.addFlashAttribute("successMessage", "体重を記録しました！");
-                return "redirect:/training-log?year=" + finalDate.getYear() + "&month=" + finalDate.getMonthValue();
-            }
 
-            // --- 以下、既存のトレーニング記録(WEIGHT/CARDIO)の処理 ---
+                for (int i = 0; i < loopCount; i++) {
+                    // SimpleModeなら常に0番目（入力された1つの値）を使う。そうでなければi番目を使う。
+                    Double w = weights.get(isSimpleMode ? 0 : i);
+                    
+                    // 回数の取得（安全策）
+                    Integer r = 0;
+                    if (isSimpleMode) {
+                        r = (repsList != null && !repsList.isEmpty()) ? repsList.get(0) : 0;
+                    } else {
+                        r = (repsList != null && i < repsList.size()) ? repsList.get(i) : 0;
+                    }
 
-            if (exerciseName == null || exerciseName.trim().isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "種目名が必要です。");
-                return "redirect:/training-log";
-            }
-
-            TrainingRecord record = new TrainingRecord();
-            record.setUser(currentUser);
-            record.setRecordDate(finalDate); // 決定した日付を使用
-            record.setExerciseName(exerciseName); 
-
-            // 種別ごとの値セット
-            if ("WEIGHT".equals(type)) {
-                record.setType("WEIGHT");
-                record.setWeight(weight);
-                record.setReps(reps);
-                record.setSets(sets);
-            } else if ("CARDIO".equals(type)) {
+                    if (w != null) {
+                        TrainingRecord record = new TrainingRecord();
+                        record.setUser(currentUser);
+                        record.setRecordDate(date);
+                        record.setExerciseName(exerciseName);
+                        record.setType("WEIGHT");
+                        record.setWeight(w);
+                        record.setReps(r);
+                        record.setSets(i + 1); // セット番号として保存
+                        
+                        trainingRecordRepository.save(record);
+                        
+                        savedCount++;
+                        totalVolume += (w * r);
+                    }
+                }
+            } 
+            // ■ 有酸素運動の場合
+            else if ("CARDIO".equals(type)) {
+                TrainingRecord record = new TrainingRecord();
+                record.setUser(currentUser);
+                record.setRecordDate(date);
+                record.setExerciseName(exerciseName);
                 record.setType("CARDIO");
                 record.setCardioType(exerciseName);
                 record.setDurationMinutes(duration);
                 record.setDistanceKm(distance);
-            }
-
-            trainingRecordRepository.save(record);
-
-            // --- ゲーミフィケーション処理 (XP, チップ, 筋肉経験値) ---
-            ExerciseData exerciseData = trainingDataService.getExerciseDataByName(exerciseName);
-            int earnedXP = 0;
-            int muscleXp = 0;
-            String targetPart = "その他";
-
-            if (exerciseData != null) {
-                // 基本XP取得
-                int baseDifficultyXp = trainingLogicService.getExperiencePoints(exerciseData);
-                int additionalXp = 0;
-
-                if ("WEIGHT".equals(type)) {
-                    // 簡易的な負荷量計算
-                    double totalVol = (weight != null ? weight : 0) * (reps != null ? reps : 0) * (sets != null ? sets : 1);
-                    additionalXp = (int) (totalVol / 100); 
-                } else if ("CARDIO".equals(type) && duration != null) {
-                    additionalXp = duration;
-                }
-
-                earnedXP = baseDifficultyXp + additionalXp;
-                muscleXp = Math.max(10, earnedXP / 2);
                 
-                // 部位特定
-                if ("WEIGHT".equals(type)) {
-                    targetPart = trainingDataService.findPartByExerciseName(exerciseName);
-                } else {
-                    targetPart = "有酸素";
-                }
-            } else {
-                // 登録がない種目の場合のデフォルト値
-                earnedXP = 10;
-                muscleXp = 5;
+                trainingRecordRepository.save(record);
+                savedCount = 1;
             }
 
-            // レベルアップ・経験値付与
-            if (earnedXP > 0) {
-                levelService.addXpAndCheckLevelUp(currentUser, earnedXP);
-                userRepository.save(currentUser);
+            // --- ゲーミフィケーション処理 (XP, チップ) ---
+            if (savedCount > 0) {
+                ExerciseData exerciseData = trainingDataService.getExerciseDataByName(exerciseName);
+                int earnedXP = 0;
+                int muscleXp = 0;
+                String targetPart = "その他";
 
-                // 部位別経験値
+                if (exerciseData != null) {
+                    int baseDifficultyXp = trainingLogicService.getExperiencePoints(exerciseData);
+                    int additionalXp = 0;
+
+                    if ("WEIGHT".equals(type)) {
+                        additionalXp = (int) (totalVolume / 100);
+                        targetPart = trainingDataService.findPartByExerciseName(exerciseName);
+                    } else if ("CARDIO".equals(type) && duration != null) {
+                        additionalXp = duration;
+                        targetPart = "有酸素";
+                    }
+
+                    earnedXP = baseDifficultyXp + additionalXp;
+                    muscleXp = Math.max(10, earnedXP / 2);
+                } else {
+                    earnedXP = 10;
+                    muscleXp = 5;
+                }
+
+                // レベルアップ・経験値付与
+                levelService.addXpAndCheckLevelUp(currentUser, earnedXP);
                 if (targetPart != null) {
                     String levelUpMsg = muscleService.addExperience(currentUser, targetPart, muscleXp);
-                    if (levelUpMsg != null) {
-                        redirectAttributes.addFlashAttribute("muscleLevelUpMessage", levelUpMsg);
-                    }
+                    if (levelUpMsg != null) redirectAttributes.addFlashAttribute("muscleLevelUpMessage", levelUpMsg);
                 }
+                userRepository.save(currentUser);
 
                 // チップ付与
-                int earnedChips = 0;
-                if (exerciseData != null) {
-                     earnedChips = trainingLogicService.calculateChipReward(exerciseData);
-                }
-                
-                if (earnedChips > 0) {
-                    userService.addChips(currentUser.getUsername(), earnedChips);
-                }
-                
+                int earnedChips = (exerciseData != null) ? trainingLogicService.calculateChipReward(exerciseData) : 0;
+                if (earnedChips > 0) userService.addChips(currentUser.getUsername(), earnedChips);
+
                 // メッセージ作成
-                String successMsg = finalDate.toString() + " 「" + exerciseName + "」を記録しました！";
-                if (earnedChips > 0) {
-                    successMsg += " (" + earnedXP + " XP, " + earnedChips + " 枚のチップ獲得)";
-                } else {
-                    successMsg += " (" + earnedXP + " XP獲得)";
-                }
+                String successMsg = date.toString() + " 「" + exerciseName + "」を" + savedCount + "セット記録しました！";
+                if (earnedChips > 0) successMsg += " (" + earnedXP + " XP, " + earnedChips + " チップ)";
+                else successMsg += " (" + earnedXP + " XP)";
+                
                 redirectAttributes.addFlashAttribute("successMessage", successMsg);
+                
+                // ミッション更新 & AIアドバイス
+                missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
+                try {
+                    String advice = aiCoachService.generateTrainingAdvice(currentUser, exerciseName);
+                    redirectAttributes.addFlashAttribute("aiAdvice", advice);
+                } catch (Exception e) {}
             } else {
-                redirectAttributes.addFlashAttribute("successMessage", "トレーニングを記録しました！");
-            }
-
-            // ミッション更新
-            missionService.updateMissionProgress(currentUser.getId(), "TRAINING_LOG");
-
-            // AIアドバイス生成
-            try {
-                String advice = aiCoachService.generateTrainingAdvice(currentUser, exerciseName + " のトレーニング");
-                redirectAttributes.addFlashAttribute("aiAdvice", advice);
-            } catch (Exception e) {
-                System.out.println("AI Advice Error: " + e.getMessage());
+                redirectAttributes.addFlashAttribute("error", "記録するデータが入力されていません。");
             }
 
         } catch (Exception e) {
@@ -640,7 +615,44 @@ public class TrainingController {
             redirectAttributes.addFlashAttribute("error", "記録の保存に失敗しました。");
         }
 
-        return "redirect:/training-log?year=" + finalDate.getYear() + "&month=" + finalDate.getMonthValue();
+        return "redirect:/training-log?year=" + date.getYear() + "&month=" + date.getMonthValue();
+    }
+    
+    @PostMapping("/training/log/body-weight/save")
+    public String saveBodyWeightLog(
+            @RequestParam("recordDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam("weight") Double weight,
+            Authentication authentication,
+            RedirectAttributes redirectAttributes) {
+
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser == null) return "redirect:/login";
+
+        try {
+            // 既存の記録があるか確認（日付重複を防ぐ）
+            // ※リポジトリに findByUserAndDate がない場合の汎用的な実装
+            List<BodyWeightRecord> records = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
+            BodyWeightRecord record = records.stream()
+                    .filter(r -> r.getDate().isEqual(date))
+                    .findFirst()
+                    .orElse(new BodyWeightRecord());
+
+            if (record.getId() == null) {
+                record.setUser(currentUser);
+                record.setDate(date);
+            }
+            record.setWeight(weight);
+
+            bodyWeightRecordRepository.save(record);
+            redirectAttributes.addFlashAttribute("successMessage", date + " の体重(" + weight + "kg)を保存しました。");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "体重の保存に失敗しました。");
+        }
+
+        // カレンダー画面に戻る（該当の年月を表示）
+        return "redirect:/training-log/form/body-weight?year=" + date.getYear() + "&month=" + date.getMonthValue();
     }
     
     @PostMapping("/training-log/save-batch")
