@@ -95,10 +95,9 @@
         .weight-value-display { font-size: 0.9em; color: #00796b; font-weight: 800; display: block; margin-top: 5px; }
         .log-indicator { color: #ccc; font-size: 0.8em; display: block; margin-top: 5px; }
 
-        /* ★変更: 「グラフで推移を確認」ボタンの色を変更 */
+        /* 「グラフで推移を確認」ボタン */
         .btn-view-all {
             display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-            /* 指定色に変更 */
             background: linear-gradient(135deg, #009688 0%, #4db6ac 100%); 
             color: white; text-decoration: none; width: 100%; max-width: 400px;
             padding: 16px; border-radius: 50px; font-weight: bold; font-size: 1.1rem;
@@ -156,14 +155,12 @@
         }
         .scale-input:focus { outline: none; }
         
-        /* ★追加: スピンボタン（矢印）を消す */
-        /* Chrome, Safari, Edge, Opera */
+        /* スピンボタン（矢印）を消す */
         .scale-input::-webkit-outer-spin-button,
         .scale-input::-webkit-inner-spin-button {
           -webkit-appearance: none;
           margin: 0;
         }
-        /* Firefox */
         .scale-input[type=number] {
           -moz-appearance: textfield;
         }
@@ -257,7 +254,7 @@
         </div>
         
         <div style="text-align: center; margin-top: 20px;">
-            <a th:href="@{/training-log/all(period='month')}" class="btn-view-all">
+            <a th:href="@{/training-log/all(period='month', source='weight')}" class="btn-view-all">
                 <i class="fa-solid fa-chart-line"></i> グラフで推移を確認
             </a>
         </div>

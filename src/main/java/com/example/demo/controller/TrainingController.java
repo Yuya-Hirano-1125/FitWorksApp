@@ -858,6 +858,18 @@ public class TrainingController {
         List<BodyWeightRecord> weightRecords = new ArrayList<>();
         if (bodyWeightRecordRepository != null) { weightRecords = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser); }
         
+        // ★追加: 最新体重をサーバー側で計算 (今日以前で最も新しい日付の記録)
+        Double currentWeightVal = null;
+        if (!weightRecords.isEmpty()) {
+            LocalDate today = LocalDate.now();
+            currentWeightVal = weightRecords.stream()
+                .filter(r -> r.getDate() != null && !r.getDate().isAfter(today))
+                .reduce((first, second) -> second) // 並び順が日付昇順なので最後を取得
+                .map(BodyWeightRecord::getWeight)
+                .orElse(null);
+        }
+        model.addAttribute("latestWeight", currentWeightVal);
+        
         Map<String, int[]> durationMap = new TreeMap<>();
         Map<String, List<Double>> weightMap = new TreeMap<>();
         
@@ -886,10 +898,20 @@ public class TrainingController {
         for (String key : allKeys) {
             int[] durations = durationMap.getOrDefault(key, new int[]{0, 0});
             List<Double> weights = weightMap.get(key);
-            Double avgWeight = null;
-            if (weights != null && !weights.isEmpty()) { double avg = weights.stream().mapToDouble(Double::doubleValue).average().orElse(0.0); avgWeight = Math.round(avg * 10.0) / 10.0; }
+            Double displayWeight = null;
+            
+            if (weights != null && !weights.isEmpty()) {
+                // ★修正: 週次・月次の場合は最大値(Max)を使用、日次は平均値(Average)を使用
+                if ("week".equals(period) || "month".equals(period)) {
+                    displayWeight = weights.stream().mapToDouble(Double::doubleValue).max().orElse(0.0);
+                } else {
+                    double avg = weights.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+                    displayWeight = Math.round(avg * 10.0) / 10.0;
+                }
+            }
+            
             String displayDate = getLabel(key, period);
-            chartDataList.add(new DailyChartData(displayDate, durations[0], durations[1], avgWeight));
+            chartDataList.add(new DailyChartData(displayDate, durations[0], durations[1], displayWeight));
         }
         
         try { ObjectMapper mapper = new ObjectMapper(); String jsonChartData = mapper.writeValueAsString(chartDataList); model.addAttribute("chartDataJson", jsonChartData); } catch (Exception e) { e.printStackTrace(); model.addAttribute("chartDataJson", "[]"); }

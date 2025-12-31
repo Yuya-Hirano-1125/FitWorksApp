@@ -24,18 +24,18 @@
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
 
         /* ==========================================================================
-           2. メインコンテナ (サイズ調整版)
+           2. メインコンテナ
            ========================================================================== */
         .main-container {
-            max-width: 800px; /* ★修正: 1000pxから800pxに縮小 */
+            max-width: 800px;
             width: 92%; 
             margin: 40px auto; 
-            padding: 30px; /* ★修正: パディングを少し減らしてスッキリさせる */
+            padding: 30px;
             
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 40px; /* 角丸を少し小さく */
+            border-radius: 40px;
             border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
@@ -43,10 +43,10 @@
 
         /* ヘッダーデザイン */
         .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #667eea; padding-bottom: 10px; gap: 15px; }
-        .page-title { color: #343a40; font-size: 1.8rem; /* 少し小さく */ margin: 0; flex-grow: 1; text-align: left; font-weight: 700; }
+        .page-title { color: #343a40; font-size: 1.8rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 700; }
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
-            width: 45px; height: 45px; /* 少し小さく */
+            width: 45px; height: 45px;
             background-color: white; color: #667eea;
             border: 2px solid #667eea; border-radius: 50%; text-decoration: none;
             transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
@@ -55,17 +55,51 @@
 
         /* 統計サマリーカード */
         .stats-summary {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px;
         }
         .stat-card {
             background: rgba(255, 255, 255, 0.8);
-            border-radius: 15px; padding: 12px; text-align: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 20px; padding: 15px; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5);
+            transition: transform 0.3s;
         }
-        .stat-label { font-size: 0.8rem; color: #666; font-weight: bold; }
-        .stat-value { font-size: 1.3rem; color: #333; font-weight: 800; margin: 4px 0; font-family: 'Poppins', sans-serif; }
-        .stat-trend { font-size: 0.75rem; }
-        .trend-up { color: #ff6b6b; }
+        .stat-card:hover { transform: translateY(-3px); }
+        
+        .stat-label { font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; display: block; }
+        .stat-value { font-size: 1.5rem; font-weight: 800; margin: 0; font-family: 'Poppins', sans-serif; line-height: 1.2; }
+        .stat-trend { font-size: 0.75rem; margin-top: 5px; display: block; font-weight: 600; }
+
+        /* ★変更: 見やすいカラーデザイン (パステル背景 + 濃い文字) */
+        
+        /* 青カード (総トレーニング時間) */
+        .stat-card.blue {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); /* 淡いブルー */
+            border: 1px solid #90caf9;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.15);
+        }
+        .stat-card.blue .stat-label { color: #1565c0; } /* 濃い青 */
+        .stat-card.blue .stat-value { color: #0d47a1; }
+        .stat-card.blue .stat-trend { color: #1976d2; }
+
+        /* ピンクカード (現在の体重) */
+        .stat-card.pink {
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%); /* 淡いピンク */
+            border: 1px solid #f48fb1;
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.15);
+        }
+        .stat-card.pink .stat-label { color: #c2185b; } /* 濃いピンク */
+        .stat-card.pink .stat-value { color: #880e4f; }
+        .stat-card.pink .stat-trend { color: #d81b60; }
+
+        /* オレンジカード (記録日数) */
+        .stat-card.orange {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); /* 淡いオレンジ */
+            border: 1px solid #ffcc80;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.15);
+        }
+        .stat-card.orange .stat-label { color: #ef6c00; } /* 濃いオレンジ */
+        .stat-card.orange .stat-value { color: #e65100; }
+        .stat-card.orange .stat-trend { color: #f57c00; }
 
         /* チャートコンテナ */
         .chart-container {
@@ -127,27 +161,47 @@
 <div class="main-container">
     
     <div class="page-header-container">
-        <a th:href="@{/training-log}" class="home-link-icon" title="カレンダーに戻る">
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
+        <th:block th:if="${param.source != null and param.source[0] == 'weight'}">
+            <a th:href="@{/training-log/form/body-weight}" 
+               class="home-link-icon" 
+               title="体重記録に戻る">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+        </th:block>
+        
+        <th:block th:unless="${param.source != null and param.source[0] == 'weight'}">
+            <a th:href="@{/training-log}" 
+               class="home-link-icon" 
+               title="カレンダーに戻る">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+        </th:block>
+
         <h1 class="page-title"><i class="fa-solid fa-chart-line" style="color:#667eea; margin-right:10px;"></i>成長の記録</h1>
     </div>
     
     <div class="stats-summary">
-        <div class="stat-card">
+        <div class="stat-card blue">
             <div class="stat-label">総トレーニング時間</div>
             <div class="stat-value" id="total-time">0<span style="font-size:0.5em">分</span></div>
-            <div class="stat-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> 積み上げ</div>
+            <div class="stat-trend"><i class="fa-solid fa-arrow-trend-up"></i> 積み上げ</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card pink">
             <div class="stat-label">現在の体重</div>
-            <div class="stat-value" id="current-weight">--<span style="font-size:0.5em">kg</span></div>
-            <div class="stat-trend" style="color:#888;">最新記録</div>
+            <div class="stat-value" id="current-weight">
+                <th:block th:if="${latestWeight != null}">
+                    <span th:text="${latestWeight}"></span><span style="font-size:0.5em">kg</span>
+                </th:block>
+                <th:block th:unless="${latestWeight != null}">
+                    --<span style="font-size:0.5em">kg</span>
+                </th:block>
+            </div>
+            <div class="stat-trend">最新記録</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card orange">
             <div class="stat-label">記録日数</div>
             <div class="stat-value" th:text="${records.size()}">0</div>
-            <div class="stat-trend" style="color:#667eea;">Days</div>
+            <div class="stat-trend">Days</div>
         </div>
     </div>
 
@@ -155,11 +209,11 @@
         <div class="chart-header">
             <div class="chart-title">推移グラフ</div>
             <div class="chart-options">
-                <a th:href="@{/training-log/all(period='day', part=${selectedPart})}" 
+                <a th:href="@{/training-log/all(period='day', part=${selectedPart}, source=${param.source != null ? param.source[0] : null})}" 
                    class="button" th:classappend="${period == 'day' or period == null} ? 'primary' : 'secondary'">日次</a>
-                <a th:href="@{/training-log/all(period='week', part=${selectedPart})}" 
+                <a th:href="@{/training-log/all(period='week', part=${selectedPart}, source=${param.source != null ? param.source[0] : null})}" 
                    class="button" th:classappend="${period == 'week'} ? 'primary' : 'secondary'">週次</a>
-                <a th:href="@{/training-log/all(period='month', part=${selectedPart})}" 
+                <a th:href="@{/training-log/all(period='month', part=${selectedPart}, source=${param.source != null ? param.source[0] : null})}" 
                    class="button" th:classappend="${period == 'month'} ? 'primary' : 'secondary'">月次</a>
             </div>
         </div>
@@ -167,6 +221,7 @@
         <div class="filter-form">
             <form th:action="@{/training-log/all}" method="get" style="width: 100%;">
                 <input type="hidden" name="period" th:value="${period}">
+                <input type="hidden" name="source" th:value="${param.source != null ? param.source[0] : ''}">
                 <select name="part" class="filter-select" onchange="this.form.submit()">
                     <option value="">📊 全種目を表示</option>
                     <option th:each="p : ${allParts}" 
@@ -223,13 +278,14 @@
 
     if(chartData && chartData.length > 0) {
         let totalMins = 0;
-        let latestWeight = "--";
+
         chartData.forEach(d => {
             totalMins += (d.cardioMinutes || 0) + (d.weightMinutes || 0);
-            if(d.bodyWeight > 0) latestWeight = d.bodyWeight;
         });
+
         document.getElementById('total-time').innerHTML = totalMins + '<span style="font-size:0.5em">分</span>';
-        document.getElementById('current-weight').innerHTML = latestWeight + '<span style="font-size:0.5em">kg</span>';
+        
+        // ★修正: ここでの体重上書き処理を削除し、サーバーサイドの値 (th:text) を優先します。
 
         const ctx = document.getElementById('trainingChart').getContext('2d');
         let gradientWeight = ctx.createLinearGradient(0, 0, 0, 400);
