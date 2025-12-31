@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import java.security.Principal;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +38,19 @@ public class FriendController {
         // 承認待ちリクエスト
         Set<User> requests = currentUser.getReceivedFriendRequests();
 
+        // 既にフレンドになっているユーザーからの申請があればDBから削除する（念のためのクリーンアップ）
+        List<User> invalidRequests = requests.stream()
+            .filter(req -> friends.stream().anyMatch(f -> f.getId().equals(req.getId())))
+            .collect(Collectors.toList());
+
+        if (!invalidRequests.isEmpty()) {
+            for (User u : invalidRequests) {
+                currentUser.removeReceivedFriendRequest(u);
+            }
+            userService.save(currentUser); 
+            requests = currentUser.getReceivedFriendRequests(); // 最新化
+        }
+
         model.addAttribute("friends", friends);
         model.addAttribute("requests", requests);
         model.addAttribute("currentSection", "list"); 
@@ -69,9 +83,14 @@ public class FriendController {
     public String sendRequest(@PathVariable("userId") Long userId, 
                               Principal principal, RedirectAttributes redirectAttributes) {
         try {
-            boolean sent = userService.sendFriendRequest(principal.getName(), userId);
-            if (sent) {
+            // ★修正: 戻り値(int)で分岐
+            // 0: 失敗, 1: 申請送信, 2: フレンド成立
+            int status = userService.sendFriendRequest(principal.getName(), userId);
+            
+            if (status == 1) {
                 redirectAttributes.addFlashAttribute("successMessage", "フレンド申請を送りました！");
+            } else if (status == 2) {
+                redirectAttributes.addFlashAttribute("successMessage", "フレンドになりました！");
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "既にフレンドか、申請済みです。");
             }
@@ -92,6 +111,18 @@ public class FriendController {
     @PostMapping("/reject/{userId}")
     public String rejectRequest(@PathVariable("userId") Long userId, Principal principal) {
         userService.rejectFriendRequest(principal.getName(), userId);
+        return "redirect:/friends";
+    }
+
+    // フレンド解除
+    @PostMapping("/remove/{userId}")
+    public String removeFriend(@PathVariable("userId") Long userId, Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            userService.removeFriend(principal.getName(), userId);
+            redirectAttributes.addFlashAttribute("infoMessage", "フレンドを解除しました。");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "解除に失敗しました。");
+        }
         return "redirect:/friends";
     }
 }

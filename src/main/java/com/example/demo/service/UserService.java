@@ -336,23 +336,47 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    // ★修正: 相互申請時に自動承認するロジックに変更 (戻り値をintへ: 0=失敗, 1=申請, 2=成立)
     @Transactional
-    public boolean sendFriendRequest(String currentUsername, Long targetUserId) {
+    public int sendFriendRequest(String currentUsername, Long targetUserId) {
         Optional<User> senderOpt = userRepository.findByUsername(currentUsername);
         Optional<User> receiverOpt = userRepository.findById(targetUserId);
 
         if (senderOpt.isPresent() && receiverOpt.isPresent()) {
             User sender = senderOpt.get();
             User receiver = receiverOpt.get();
-            if (sender.getId().equals(receiver.getId())) return false;
-            if (sender.getFriends().contains(receiver)) return false;
-            if (receiver.getReceivedFriendRequests().contains(sender)) return false;
+            
+            // バリデーション
+            if (sender.getId().equals(receiver.getId())) return 0; // 自分自身
+            if (sender.getFriends().contains(receiver)) return 0; // 既にフレンド
+            
+            // ★相互申請チェック: 相手から自分への申請が既にあるか？
+            if (sender.getReceivedFriendRequests().contains(receiver)) {
+                // 自動承認処理
+                
+                // 1. お互いをフレンドに追加
+                sender.addFriend(receiver);
+                receiver.addFriend(sender);
+                
+                // 2. 申請データを双方から削除 (念のため両方向チェックして削除)
+                sender.removeReceivedFriendRequest(receiver);
+                receiver.removeReceivedFriendRequest(sender);
+                
+                // 3. 保存
+                userRepository.save(sender);
+                userRepository.save(receiver);
+                
+                return 2; // フレンド成立 (Matched)
+            }
+
+            // 通常の申請処理
+            if (receiver.getReceivedFriendRequests().contains(sender)) return 0; // 既に申請済み
 
             receiver.addReceivedFriendRequest(sender);
             userRepository.save(receiver);
-            return true;
+            return 1; // 申請送信 (Sent)
         }
-        return false;
+        return 0; // ユーザーが見つからない等
     }
 
     @Transactional
@@ -384,6 +408,27 @@ public class UserService {
             User sender = senderOpt.get();
             receiver.removeReceivedFriendRequest(sender);
             userRepository.save(receiver);
+        }
+    }
+
+    // フレンド解除メソッド
+    @Transactional
+    public void removeFriend(String currentUsername, Long friendId) {
+        Optional<User> userOpt = userRepository.findByUsername(currentUsername);
+        Optional<User> friendOpt = userRepository.findById(friendId);
+
+        if (userOpt.isPresent() && friendOpt.isPresent()) {
+            User user = userOpt.get();
+            User friend = friendOpt.get();
+
+            // 双方向で削除
+            if (user.getFriends().contains(friend)) {
+                user.getFriends().remove(friend);
+                friend.getFriends().remove(user); // 相手側のリストからも削除
+                
+                userRepository.save(user);
+                userRepository.save(friend);
+            }
         }
     }
 
