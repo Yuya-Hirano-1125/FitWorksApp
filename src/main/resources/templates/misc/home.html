@@ -9,369 +9,110 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/home.css}">
     <link rel="stylesheet" th:href="@{/css/title.css}">
-    
     <script th:src="@{/js/theme.js}"></script>
 	<style>
-	        /* --- HTML内スタイル (CSSファイル化していない動的部分のみ) --- */
-	        :root { --primary-color: #ff69b4; }
-
-	        .xp-bar { width: 100%; height: 25px; background: #e3f2fd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
-	        .xp-progress { height: 100%; background: linear-gradient(90deg, #42a5f5, #2196f3); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
-	        
-	        .character-section { position: relative; display: flex; justify-content: center; margin-top: 0px; }
-	        
-	        /* PC・大画面用レイアウト (基本設定) */
-	        .character-wrapper { 
-	            position: relative; 
-	            width: 400px; 
-	            max-width: 100%; 
-	            margin: 0 auto; 
-	            overflow: visible; 
-	            display: block; 
-	        }
-
-	        /* 画像エリア */
-	        .character-display { 
-	            display: flex; justify-content: center; align-items: flex-end; 
-	            width: 100%; 
-	            height: 400px; 
-	            background-repeat: no-repeat; background-position: center; background-size: cover; 
-	            border-radius: 25px; 
-	            box-shadow: 0 10px 30px rgba(33, 150, 243, 0.25); 
-	            text-decoration: none; padding-bottom: 10px; box-sizing: border-box; 
-	            border: 4px solid rgba(255,255,255,0.8);
-	            z-index: 1; 
-	        }
-	        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-50px); } 100% { transform: translateY(0px); } }
-	        .character-display img { width: auto; height: 85%; max-width: 95%; object-fit: contain; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9)); }
-	        
-	        /* PC配置時の位置調整 (top: 0 で上辺を揃える) */
-	        .character-side-buttons { 
-	            position: absolute; 
-	            display: flex; 
-	            flex-direction: column; 
-	            gap: 15px; 
-	            z-index: 10; 
-	            top: 80px; 
-	            right: -115px; 
-	        }
-
-	        /* ボタンサイズ (PC用) */
-	        .side-action-btn { 
-	            color: white; padding: 10px 0; border-radius: 15px; text-decoration: none; 
-	            font-weight: bold; 
-	            font-size: 0.9em; 
-	            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-	            transition: transform 0.1s; display: flex; align-items: center; justify-content: center; 
-	            gap: 6px; 
-	            width: 100px; 
-	            backdrop-filter: blur(4px);
-	        }
-	        .side-action-btn:hover { transform: scale(1.05); }
-	        
-	        .title-button { background: linear-gradient(135deg, #9c27b0, #ba68c8); border: 2px solid rgba(255,255,255,0.3); }
-
-	        /* 正方形のミッションボタン (PC用) */
-	        .mission-square-btn {
-	            height: 100px; 
-	            flex-direction: column; 
-	            background: linear-gradient(135deg, #ff9800, #f57c00);
-	            border: 2px solid rgba(255,255,255,0.3);
-	            font-size: 0.95em;
-	        }
-	        .mission-square-btn i {
-	            font-size: 2.0rem; 
-	            margin-bottom: 5px;
-	        }
-
-	        /* 記録メニューボタンのアニメーション */
-	        .record-option-item {
-	            transition: all 0.3s ease-out !important;
-	            transform: translateY(0);
-	        }
-	        
-	        .record-option-item:hover {
-	            transform: translateY(-3px) !important;
-	            box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
-	            z-index: 10;
-	            filter: brightness(1.05);
-	        }
-	        
-	        .record-option-item:active {
-	            transform: translateY(1px) !important;
-	            box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
-	            transition: all 0.1s ease !important;
-	        }
-
-	        /* ヘルプメニューのスタイル */
-	        .help-menu-dropdown { 
-	            display: none; 
-	            position: absolute; 
-	            top: 60px; right: 20px; left: auto; 
-	            background: rgba(255, 255, 255, 0.98); 
-	            border-radius: 15px; 
-	            box-shadow: 0 10px 30px rgba(0,0,0,0.25); 
-	            padding: 15px; 
-	            z-index: 2000; 
-	            width: 260px; 
-	            flex-direction: column; 
-	            gap: 8px; 
-	            max-height: 80vh; 
-	            overflow-y: auto;
-	        }
-	        .help-menu-dropdown.active { display: flex; animation: fadeInDown 0.3s ease; }
-	        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-	        
-	        .help-section-label {
-	            font-size: 0.8rem;
-	            color: #888;
-	            font-weight: bold;
-	            margin: 5px 0 2px 5px;
-	            border-bottom: 1px solid #eee;
-	            padding-bottom: 2px;
-	        }
-
-	        .help-menu-item { 
-	            display: flex; align-items: center; gap: 10px;
-	            padding: 12px; 
-	            text-decoration: none; 
-	            border-radius: 10px; 
-	            text-align: left; 
-	            font-weight: bold; 
-	            font-size: 0.95em; 
-	            transition: all 0.2s; 
-	            border: none; 
-	            width: 100%; 
-	            cursor: pointer; 
-	            color: #444; 
-	            background: #f9f9f9;
-	            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-	            box-sizing: border-box; 
-	        }
-	        .help-menu-item:hover { transform: translateX(5px); background: #e3f2fd; color: #0288d1; }
-	        .help-menu-item i { width: 20px; text-align: center; color: #0288d1; }
-
-	        .tutorial-pointer { position: absolute; z-index: 10000; font-size: 2.5rem; color: #f1c40f; display: none; animation: point-move 1s infinite alternate; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-	        .tutorial-pointer::before { content: '\f0a6'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
-	        @keyframes point-move { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-	        
-	        .rpg-text-area { font-size: 1.25rem; font-weight: bold; line-height: 1.6; color: #333; }
-	        
-	        .home-greeting-container { text-align: center; margin-top: 30px; margin-bottom: 15px; }
-	        .home-greeting-text { font-family: 'Noto Sans JP', sans-serif; color: #555; font-size: 1.1rem; font-weight: 700; margin-top: 0; line-height: 1.6; }
-	        .home-username { color: #0288d1; font-size: 1.3rem; font-weight: 900; margin: 0 3px; text-decoration: underline wavy #4facfe; text-underline-offset: 4px; }
-
-	        /* 背景解放ポップアップ */
-	        .background-unlock-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 10000; animation: fadeIn 0.3s ease-in-out; }
-	        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-	        .background-unlock-content { background: linear-gradient(180deg, #fffef7 0%, #faf8f0 100%); border: 6px solid #d4a373; border-radius: 30px; padding: 0; max-width: 520px; width: 90%; box-shadow: 0 0 0 3px #f5e6d3, 0 0 0 9px #d4a373, 0 15px 35px rgba(0, 0, 0, 0.3); animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); position: relative; overflow: hidden; }
-	        @keyframes popIn { 0% { transform: scale(0.5) rotate(-5deg); opacity: 0; } 60% { transform: scale(1.05) rotate(2deg); } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
-	        .leaf-decoration { position: absolute; font-size: 2rem; opacity: 0.15; pointer-events: none; animation: leafFloat 4s ease-in-out infinite; }
-	        .leaf-decoration::before { content: '🍃'; }
-	        .leaf-decoration:nth-child(1) { top: 15px; left: 15px; animation-delay: 0s; }
-	        .leaf-decoration:nth-child(2) { top: 15px; right: 15px; animation-delay: 1s; }
-	        .leaf-decoration:nth-child(3) { bottom: 15px; left: 15px; animation-delay: 2s; }
-	        .leaf-decoration:nth-child(4) { bottom: 15px; right: 15px; animation-delay: 3s; }
-	        @keyframes leafFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
-	        .ff-header { background: linear-gradient(180deg, #9bcc7a 0%, #7db85e 100%); border-bottom: 5px solid #6a9c4f; border-radius: 24px 24px 0 0; padding: 25px 20px; position: relative; box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 3px 0 rgba(106, 156, 79, 0.3); }
-	        .ff-header::before { content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: rgba(255, 255, 255, 0.5); border-radius: 2px; }
-	        .background-unlock-title { color: #ffffff; font-size: 1.35rem; font-weight: bold; margin: 0; text-align: center; letter-spacing: 0.5px; font-family: Arial, sans-serif; text-shadow: 2px 2px 0 rgba(106, 156, 79, 0.8), -1px -1px 0 rgba(106, 156, 79, 0.3); }
-	        .ff-content { padding: 30px 25px; position: relative; }
-	        .background-unlock-list { background: #ffffff; border: 4px solid #e8d5b7; border-radius: 20px; padding: 20px; margin-bottom: 25px; box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.03), 0 3px 10px rgba(0, 0, 0, 0.1); position: relative; }
-	        .background-unlock-item { background: linear-gradient(135deg, #fff9f0 0%, #fef5e7 100%); border: 3px solid #f4d9a6; border-radius: 15px; color: #5a4a3a; font-size: 1.05rem; font-weight: bold; margin: 12px 0; padding: 14px 18px; position: relative; animation: itemBounce 0.5s ease-out forwards; opacity: 0; box-shadow: 0 4px 0 #e8c78e, 0 5px 10px rgba(0, 0, 0, 0.1); transition: all 0.2s ease; }
-	        .background-unlock-item:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 7px 0 #e8c78e, 0 8px 15px rgba(0, 0, 0, 0.15); }
-	        @keyframes itemBounce { 0% { transform: scale(0.3) translateY(-20px); opacity: 0; } 50% { transform: scale(1.1) translateY(0); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
-	        .background-unlock-item:nth-child(1) { animation-delay: 0.1s; }
-	        .background-unlock-item:nth-child(2) { animation-delay: 0.2s; }
-	        .background-unlock-item:nth-child(3) { animation-delay: 0.3s; }
-	        .background-unlock-item:nth-child(4) { animation-delay: 0.4s; }
-	        .background-unlock-item::before { content: '✿'; position: absolute; left: -18px; top: 50%; transform: translateY(-50%); color: #9bcc7a; font-size: 1.3rem; animation: flowerSpin 3s ease-in-out infinite; }
-	        @keyframes flowerSpin { 0%, 100% { transform: translateY(-50%) rotate(0deg); } 50% { transform: translateY(-50%) rotate(180deg); } }
-	        .background-unlock-item i { color: #f4a460; margin-right: 10px; font-size: 1.1rem; }
-	        .background-unlock-item strong { color: #6a5a4a; }
-	        .background-unlock-buttons { display: flex; gap: 12px; justify-content: center; padding: 0 25px 30px; position: relative; }
-	        .background-unlock-buttons button, .background-unlock-buttons a { padding: 14px 26px; border: 4px solid #d4a373; border-radius: 50px; font-weight: bold; font-size: 0.95rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; position: relative; transition: all 0.2s ease; font-family: Arial, sans-serif; box-shadow: 0 5px 0 #b8906a, 0 6px 12px rgba(0, 0, 0, 0.15); }
-	        .background-unlock-buttons button:active, .background-unlock-buttons a:active { transform: translateY(3px); box-shadow: 0 2px 0 #b8906a, 0 3px 6px rgba(0, 0, 0, 0.15); }
-	        .background-unlock-buttons button:hover, .background-unlock-buttons a:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #b8906a, 0 8px 16px rgba(0, 0, 0, 0.2); }
-	        .btn-later { background: linear-gradient(180deg, #f4e4c1 0%, #e8d5b7 100%); color: #6a5a4a; border-color: #d4a373; }
-	        .btn-go-backgrounds { background: linear-gradient(180deg, #9bcc7a 0%, #7db85e 100%); color: #ffffff; border-color: #6a9c4f; box-shadow: 0 5px 0 #5a8c3f, 0 6px 12px rgba(0, 0, 0, 0.15); }
-	        .btn-go-backgrounds:active { box-shadow: 0 2px 0 #5a8c3f, 0 3px 6px rgba(0, 0, 0, 0.15); }
-	        .btn-go-backgrounds:hover { box-shadow: 0 7px 0 #5a8c3f, 0 8px 16px rgba(0, 0, 0, 0.2); }
-	        .btn-go-backgrounds i { color: #f4d9a6; }
-	        
-	        .tutorial-backdrop, .tutorial-spotlight, .tutorial-pointer, .tutorial-rpg-box { pointer-events: none; }
-	        .tutorial-backdrop.active, .tutorial-rpg-box.active { pointer-events: auto; }
-	        .interactive-bg, .mouse-follower-cloud, .bg-cloud { pointer-events: none !important; z-index: -1; }
-	        #tutorial-rpg-box { z-index: 10001; }
-	        
-	        .menu-item-spacing { margin-top: 20px !important; width: 100%; box-sizing: border-box; display: block; }
-	        .care-section { text-align: center; }
-			/* 枠線削除などのユーティリティ */
-			        .btn-record, .btn-care, .home-action-btn, .side-action-btn, .title-button { 
-			            border: none !important; outline: none !important; 
-			        }
-
-			/* ---------------------------------------------------------
-			           ▼▼▼ ボトムナビゲーション (全画面共通) ▼▼▼
-			           ※メディアクエリの外に出してスマホでも適用されるように修正
-			           --------------------------------------------------------- */
-			        .main-container { padding-bottom: 150px !important; }
-			        
-			        #tutorial-menu-nav.bottom-nav {
-			            display: flex !important; /* 強制的に表示 */
-			            justify-content: space-evenly; 
-			            align-items: center;
-			            position: fixed; 
-			            bottom: 20px; 
-			            left: 50%; 
-			            transform: translateX(-50%);
-			            width: 95%; 
-			            max-width: 800px;
-			            background: rgba(255, 255, 255, 0.95); 
-			            backdrop-filter: blur(10px);
-			            border-radius: 50px; 
-			            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-			            padding: 10px 15px; 
-			            box-sizing: border-box; 
-			            z-index: 1000;
-			            visibility: visible !important;
-			            opacity: 1 !important;
-			        }
-			        
-			        #tutorial-menu-nav .nav-item {
-			            display: flex; 
-			            flex-direction: column; 
-			            justify-content: center; 
-			            align-items: center;
-			            flex: 1; 
-			            height: auto; 
-			            min-height: 60px;
-			            text-decoration: none; 
-			            color: #555; 
-			            border-radius: 12px;
-			            transition: transform 0.2s ease, background 0.2s; 
-			            padding: 5px 0; 
-			            margin: 0 5px;
-			        }
-			        
-			        #tutorial-menu-nav .nav-item i { 
-			            display: block; 
-			            font-size: 22px; 
-			            margin-bottom: 5px; 
-			            line-height: 1; 
-			            color: var(--primary-color, #ff69b4); 
-			        }
-			        
-			        #tutorial-menu-nav .nav-item span { 
-			            display: block; 
-			            font-size: 11px; 
-			            font-weight: bold; 
-			            white-space: nowrap; 
-			            line-height: 1.2; 
-			            width: 100%; 
-			            text-align: center; 
-			        }
-			        
-			        #tutorial-menu-nav .nav-item:hover { 
-			            background-color: #f0f8ff; 
-			            transform: translateY(-3px); 
-			        }
-
-					/* ミッション達成通知 */
-					        .mission-notification {
-					            position: fixed;
-					            top: 20px;
-					            left: 50%;
-					            transform: translateX(-50%);
-					            background: linear-gradient(135deg, #ff9800, #f57c00);
-					            color: white;
-					            padding: 15px 30px;
-					            border-radius: 50px;
-					            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-					            z-index: 20000;
-					            font-weight: bold;
-					            font-size: 1.1rem;
-					            display: flex;
-					            align-items: center;
-					            gap: 10px;
-					            animation: slideDownFade 0.5s ease-out forwards;
-					            pointer-events: none; 
-					        }
-					        @keyframes slideDownFade { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
-					        .mission-notification.fade-out { animation: fadeOutUp 0.5s ease-in forwards; }
-					        @keyframes fadeOutUp { from { top: 20px; opacity: 1; } to { top: -50px; opacity: 0; } }
-
-							/* ---------------------------------------------------------
-							           ▼▼▼ スマホサイズ余白調整 & レイアウト切り替え ▼▼▼
-							           --------------------------------------------------------- */
-							        @media (max-width: 750px) {
-							            /* 全体の下部余白を少し増やす */
-							            .main-container { padding-bottom: 120px !important; }
-
-							            /* AIボタン下の余白を広げて間隔をあける */
-							            #tutorial-ai-btn { margin-bottom: 40px !important; }
-
-							            /* スマホ用レイアウト */
-							            .character-wrapper {
-							                display: flex;
-							                flex-direction: column;
-							                height: auto; 
-							                width: 95%;
-							                overflow: visible;
-							                margin-top: 10px;
-							            }
-
-							            .character-display {
-							                width: 80%; 
-							                margin: 0 auto; 
-							                height: auto;
-							                aspect-ratio: 1 / 1; 
-							                order: 3; 
-							            }
-
-							            .character-side-buttons {
-							                position: static; 
-							                display: flex;
-							                flex-direction: row; 
-							                justify-content: space-between;
-							                width: 100%;
-							                margin: -10px 0 20px 0;
-							                gap: 10px;
-							                order: 1; 
-							                top: auto;
-							                right: auto;
-							            }
-
-							            #tutorial-title-display {
-							                order: 2; 
-							                margin-top: 30px !important;
-							                margin-bottom: 0px;
-							            }
-
-							            /* ★修正: ボタンサイズを小さく調整 */
-							            .side-action-btn {
-							                width: 48%;       
-							                height: 45px;     /* 55px -> 45px */
-							                font-size: 0.85rem; /* 0.95rem -> 0.85rem */
-							                margin: 0;
-							                display: flex;
-							                align-items: center;
-							                justify-content: center;
-							                flex-direction: row;
-							            }
-
-							            .mission-square-btn {
-							                height: 45px;     /* 55px -> 45px */
-							                flex-direction: row;
-							            }
-							            
-							            .mission-square-btn i {
-							                font-size: 1.1rem; /* 1.2rem -> 1.1rem */
-							                margin-bottom: 0;
-							                margin-right: 6px;
-							            }
-							        }
-	    </style>
+	    :root { --primary-color: #ff69b4; }
+	    .xp-bar { width: 100%; height: 25px; background: #e3f2fd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
+	    .xp-progress { height: 100%; background: linear-gradient(90deg, #42a5f5, #2196f3); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
+	    .character-section { position: relative; display: flex; justify-content: center; margin-top: 0px; }
+	    .character-wrapper { position: relative; width: 400px; max-width: 100%; margin: 0 auto; overflow: visible; display: block; }
+	    .character-display { display: flex; justify-content: center; align-items: flex-end; width: 100%; height: 400px; background-repeat: no-repeat; background-position: center; background-size: cover; border-radius: 25px; box-shadow: 0 10px 30px rgba(33, 150, 243, 0.25); text-decoration: none; padding-bottom: 10px; box-sizing: border-box; border: 4px solid rgba(255,255,255,0.8); z-index: 1; }
+	    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-50px); } 100% { transform: translateY(0px); } }
+	    .character-display img { width: auto; height: 85%; max-width: 95%; object-fit: contain; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9)); }
+	    .character-side-buttons { position: absolute; display: flex; flex-direction: column; gap: 15px; z-index: 10; top: 80px; right: -115px; }
+	    .side-action-btn { color: white; padding: 10px 0; border-radius: 15px; text-decoration: none; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); transition: transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100px; backdrop-filter: blur(4px); }
+	    .side-action-btn:hover { transform: scale(1.05); }
+	    .title-button { background: linear-gradient(135deg, #9c27b0, #ba68c8); border: 2px solid rgba(255,255,255,0.3); }
+	    .mission-square-btn { height: 100px; flex-direction: column; background: linear-gradient(135deg, #ff9800, #f57c00); border: 2px solid rgba(255,255,255,0.3); font-size: 0.95em; }
+	    .mission-square-btn i { font-size: 2.0rem; margin-bottom: 5px; }
+	    .record-option-item { transition: all 0.3s ease-out !important; transform: translateY(0); }
+	    .record-option-item:hover { transform: translateY(-3px) !important; box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important; z-index: 10; filter: brightness(1.05); }
+	    .record-option-item:active { transform: translateY(1px) !important; box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important; transition: all 0.1s ease !important; }
+	    .help-menu-dropdown { display: none; position: absolute; top: 60px; right: 20px; left: auto; background: rgba(255, 255, 255, 0.98); border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); padding: 15px; z-index: 2000; width: 260px; flex-direction: column; gap: 8px; max-height: 80vh; overflow-y: auto; }
+	    .help-menu-dropdown.active { display: flex; animation: fadeInDown 0.3s ease; }
+	    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+	    .help-section-label { font-size: 0.8rem; color: #888; font-weight: bold; margin: 5px 0 2px 5px; border-bottom: 1px solid #eee; padding-bottom: 2px; }
+	    .help-menu-item { display: flex; align-items: center; gap: 10px; padding: 12px; text-decoration: none; border-radius: 10px; text-align: left; font-weight: bold; font-size: 0.95em; transition: all 0.2s; border: none; width: 100%; cursor: pointer; color: #444; background: #f9f9f9; box-shadow: 0 2px 4px rgba(0,0,0,0.05); box-sizing: border-box; }
+	    .help-menu-item:hover { transform: translateX(5px); background: #e3f2fd; color: #0288d1; }
+	    .help-menu-item i { width: 20px; text-align: center; color: #0288d1; }
+	    .tutorial-pointer { position: absolute; z-index: 10000; font-size: 2.5rem; color: #f1c40f; display: none; animation: point-move 1s infinite alternate; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+	    .tutorial-pointer::before { content: '\f0a6'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+	    @keyframes point-move { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+	    .rpg-text-area { font-size: 1.25rem; font-weight: bold; line-height: 1.6; color: #333; }
+	    .home-greeting-container { text-align: center; margin-top: 30px; margin-bottom: 15px; }
+	    .home-greeting-text { font-family: 'Noto Sans JP', sans-serif; color: #555; font-size: 1.1rem; font-weight: 700; margin-top: 0; line-height: 1.6; }
+	    .home-username { color: #0288d1; font-size: 1.3rem; font-weight: 900; margin: 0 3px; text-decoration: underline wavy #4facfe; text-underline-offset: 4px; }
+	    .background-unlock-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 10000; animation: fadeIn 0.3s ease-in-out; }
+	    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+	    .background-unlock-content { background: linear-gradient(180deg, #fffef7 0%, #faf8f0 100%); border: 6px solid #d4a373; border-radius: 30px; padding: 0; max-width: 520px; width: 90%; box-shadow: 0 0 0 3px #f5e6d3, 0 0 0 9px #d4a373, 0 15px 35px rgba(0, 0, 0, 0.3); animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); position: relative; overflow: hidden; }
+	    @keyframes popIn { 0% { transform: scale(0.5) rotate(-5deg); opacity: 0; } 60% { transform: scale(1.05) rotate(2deg); } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+	    .leaf-decoration { position: absolute; font-size: 2rem; opacity: 0.15; pointer-events: none; animation: leafFloat 4s ease-in-out infinite; }
+	    .leaf-decoration::before { content: '🍃'; }
+	    .leaf-decoration:nth-child(1) { top: 15px; left: 15px; animation-delay: 0s; }
+	    .leaf-decoration:nth-child(2) { top: 15px; right: 15px; animation-delay: 1s; }
+	    .leaf-decoration:nth-child(3) { bottom: 15px; left: 15px; animation-delay: 2s; }
+	    .leaf-decoration:nth-child(4) { bottom: 15px; right: 15px; animation-delay: 3s; }
+	    @keyframes leafFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+	    .ff-header { background: linear-gradient(180deg, #9bcc7a 0%, #7db85e 100%); border-bottom: 5px solid #6a9c4f; border-radius: 24px 24px 0 0; padding: 25px 20px; position: relative; box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 3px 0 rgba(106, 156, 79, 0.3); }
+	    .ff-header::before { content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: rgba(255, 255, 255, 0.5); border-radius: 2px; }
+	    .background-unlock-title { color: #ffffff; font-size: 1.35rem; font-weight: bold; margin: 0; text-align: center; letter-spacing: 0.5px; font-family: Arial, sans-serif; text-shadow: 2px 2px 0 rgba(106, 156, 79, 0.8), -1px -1px 0 rgba(106, 156, 79, 0.3); }
+	    .ff-content { padding: 30px 25px; position: relative; }
+	    .background-unlock-list { background: #ffffff; border: 4px solid #e8d5b7; border-radius: 20px; padding: 20px; margin-bottom: 25px; box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.03), 0 3px 10px rgba(0, 0, 0, 0.1); position: relative; }
+	    .background-unlock-item { background: linear-gradient(135deg, #fff9f0 0%, #fef5e7 100%); border: 3px solid #f4d9a6; border-radius: 15px; color: #5a4a3a; font-size: 1.05rem; font-weight: bold; margin: 12px 0; padding: 14px 18px; position: relative; animation: itemBounce 0.5s ease-out forwards; opacity: 0; box-shadow: 0 4px 0 #e8c78e, 0 5px 10px rgba(0, 0, 0, 0.1); transition: all 0.2s ease; }
+	    .background-unlock-item:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 7px 0 #e8c78e, 0 8px 15px rgba(0, 0, 0, 0.15); }
+	    @keyframes itemBounce { 0% { transform: scale(0.3) translateY(-20px); opacity: 0; } 50% { transform: scale(1.1) translateY(0); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+	    .background-unlock-item:nth-child(1) { animation-delay: 0.1s; } .background-unlock-item:nth-child(2) { animation-delay: 0.2s; }
+	    .background-unlock-item:nth-child(3) { animation-delay: 0.3s; } .background-unlock-item:nth-child(4) { animation-delay: 0.4s; }
+	    .background-unlock-item::before { content: '✿'; position: absolute; left: -18px; top: 50%; transform: translateY(-50%); color: #9bcc7a; font-size: 1.3rem; animation: flowerSpin 3s ease-in-out infinite; }
+	    @keyframes flowerSpin { 0%, 100% { transform: translateY(-50%) rotate(0deg); } 50% { transform: translateY(-50%) rotate(180deg); } }
+	    .background-unlock-item i { color: #f4a460; margin-right: 10px; font-size: 1.1rem; }
+	    .background-unlock-item strong { color: #6a5a4a; }
+	    .background-unlock-buttons { display: flex; gap: 12px; justify-content: center; padding: 0 25px 30px; position: relative; }
+	    .background-unlock-buttons button, .background-unlock-buttons a { padding: 14px 26px; border: 4px solid #d4a373; border-radius: 50px; font-weight: bold; font-size: 0.95rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; position: relative; transition: all 0.2s ease; font-family: Arial, sans-serif; box-shadow: 0 5px 0 #b8906a, 0 6px 12px rgba(0, 0, 0, 0.15); }
+	    .background-unlock-buttons button:active, .background-unlock-buttons a:active { transform: translateY(3px); box-shadow: 0 2px 0 #b8906a, 0 3px 6px rgba(0, 0, 0, 0.15); }
+	    .background-unlock-buttons button:hover, .background-unlock-buttons a:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #b8906a, 0 8px 16px rgba(0, 0, 0, 0.2); }
+	    .btn-later { background: linear-gradient(180deg, #f4e4c1 0%, #e8d5b7 100%); color: #6a5a4a; border-color: #d4a373; }
+	    .btn-go-backgrounds { background: linear-gradient(180deg, #9bcc7a 0%, #7db85e 100%); color: #ffffff; border-color: #6a9c4f; box-shadow: 0 5px 0 #5a8c3f, 0 6px 12px rgba(0, 0, 0, 0.15); }
+	    .btn-go-backgrounds:active { box-shadow: 0 2px 0 #5a8c3f, 0 3px 6px rgba(0, 0, 0, 0.15); }
+	    .btn-go-backgrounds:hover { box-shadow: 0 7px 0 #5a8c3f, 0 8px 16px rgba(0, 0, 0, 0.2); }
+	    .btn-go-backgrounds i { color: #f4d9a6; }
+	    .tutorial-backdrop, .tutorial-spotlight, .tutorial-pointer, .tutorial-rpg-box { pointer-events: none; }
+	    .tutorial-backdrop.active, .tutorial-rpg-box.active { pointer-events: auto; }
+	    .interactive-bg, .mouse-follower-cloud, .bg-cloud { pointer-events: none !important; z-index: -1; }
+	    #tutorial-rpg-box { z-index: 10001; }
+	    .menu-item-spacing { margin-top: 20px !important; width: 100%; box-sizing: border-box; display: block; }
+	    .care-section { text-align: center; }
+	    .btn-record, .btn-care, .home-action-btn, .side-action-btn, .title-button { border: none !important; outline: none !important; }
+	    .main-container { padding-bottom: 150px !important; }
+	    #tutorial-menu-nav.bottom-nav { display: flex !important; justify-content: space-evenly; align-items: center; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 800px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); padding: 10px 15px; box-sizing: border-box; z-index: 1000; visibility: visible !important; opacity: 1 !important; }
+	    #tutorial-menu-nav .nav-item { display: flex; flex-direction: column; justify-content: center; align-items: center; flex: 1; height: auto; min-height: 60px; text-decoration: none; color: #555; border-radius: 12px; transition: transform 0.2s ease, background 0.2s; padding: 5px 0; margin: 0 5px; }
+	    #tutorial-menu-nav .nav-item i { display: block; font-size: 22px; margin-bottom: 5px; line-height: 1; color: var(--primary-color, #ff69b4); }
+	    #tutorial-menu-nav .nav-item span { display: block; font-size: 11px; font-weight: bold; white-space: nowrap; line-height: 1.2; width: 100%; text-align: center; }
+	    #tutorial-menu-nav .nav-item:hover { background-color: #f0f8ff; transform: translateY(-3px); }
+	    .mission-notification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #ff9800, #f57c00); color: white; padding: 15px 30px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 20000; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; animation: slideDownFade 0.5s ease-out forwards; pointer-events: none; }
+	    @keyframes slideDownFade { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
+	    .mission-notification.fade-out { animation: fadeOutUp 0.5s ease-in forwards; }
+	    @keyframes fadeOutUp { from { top: 20px; opacity: 1; } to { top: -50px; opacity: 0; } }
+	    
+	    /* メディアクエリ */
+	    @media (max-width: 750px) {
+	        .main-container { padding-bottom: 120px !important; }
+	        #tutorial-ai-btn { margin-bottom: 40px !important; }
+	        .character-wrapper { display: flex; flex-direction: column; height: auto; width: 95%; overflow: visible; margin-top: 10px; }
+	        .character-display { width: 80%; margin: 0 auto; height: auto; aspect-ratio: 1 / 1; order: 3; }
+	        .character-side-buttons { position: static; display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin: -10px 0 20px 0; gap: 10px; order: 1; top: auto; right: auto; }
+	        /* ★修正: margin-bottomを15pxに変更して隙間を作る */
+	        #tutorial-title-display { order: 2; margin-top: 5px !important; margin-bottom: 15px !important; }
+	        .side-action-btn { width: 48%; height: 45px; font-size: 1.0rem; margin: 0; display: flex; align-items: center; justify-content: center; flex-direction: row; }
+	        .mission-square-btn { height: 45px; flex-direction: row; }
+	        .mission-square-btn i { font-size: 1.1rem; margin-bottom: 0; margin-right: 6px; }
+	    }
+	    @media (max-width: 600px) {
+	        #tutorial-ai-btn { margin-bottom: 15px !important; }
+	        /* ★追加: アプリロゴを大きく表示 */
+	        .app-logo-display img { width: 300px !important; max-width: 90%; }
+	    }
+	</style>
 </head>
 <body class="home-page">
 
