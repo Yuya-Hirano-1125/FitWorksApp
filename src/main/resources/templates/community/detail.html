@@ -159,11 +159,40 @@
         .btn-like.liked { color: #ff4757; }
         .like-text { font-size: 1rem; font-weight: bold; }
 
-        @media (max-width: 600px) {
-            .main-container { padding: 15px; padding-top: 25px; width: 95%; border-radius: 30px; }
-            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
-            .page-title { font-size: 1.4rem; }
-        }
+		@media (max-width: 600px) {
+				            /* ★修正: メインコンテナの下部余白を増やして、最下部の要素が隠れないようにする */
+				            .main-container { 
+				                padding: 15px; 
+				                padding-top: 25px; 
+				                padding-bottom: 100px; /* 余白追加 */
+				                width: 95%; 
+				                border-radius: 30px; 
+				            }
+				            
+				            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+				            
+				            /* ★修正: 文字サイズをさらに大きく (1.6rem -> 1.8rem) */
+				            .page-title { font-size: 1.8rem; }
+
+				            /* 画面幅が小さい時のフォーム調整 */
+				            .fixed-comment-form {
+				                padding: 10px 10px; 
+				                /* ★修正: 下部の余白を少し増やして、システムバーやスクロールバーとの干渉を防ぐ */
+				                padding-bottom: calc(15px + env(safe-area-inset-bottom));
+				            }
+
+				            .form-inner {
+				                gap: 5px; 
+				            }
+
+				            .btn-send {
+				                padding: 0 15px; 
+				            }
+				            
+				            .input-comment {
+				                padding: 10px 15px; 
+				            }
+				        }
     </style>
 </head>
 <body>

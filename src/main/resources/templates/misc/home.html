@@ -304,74 +304,73 @@
 							/* ---------------------------------------------------------
 							           ▼▼▼ スマホサイズ余白調整 & レイアウト切り替え ▼▼▼
 							           --------------------------------------------------------- */
-						   @media (max-width: 750px) {
-					            /* ★修正1: 全体の下部余白を詰める (150px -> 100px) */
-						               .main-container { padding-bottom: 120px !important; }
+							        @media (max-width: 750px) {
+							            /* 全体の下部余白を少し増やす */
+							            .main-container { padding-bottom: 120px !important; }
 
-						               /* ★修正2: AIボタン下の余白をさらに詰める (20px -> 10px) */
-						               #tutorial-ai-btn { margin-bottom: 10px !important; }
+							            /* AIボタン下の余白を広げて間隔をあける */
+							            #tutorial-ai-btn { margin-bottom: 40px !important; }
 
-						               /* スマホ用レイアウト */
-						               .character-wrapper {
-						                   display: flex;
-						                   flex-direction: column;
-						                   height: auto; 
-						                   width: 95%;
-						                   overflow: visible;
-						                   margin-top: 10px;
-						               }
+							            /* スマホ用レイアウト */
+							            .character-wrapper {
+							                display: flex;
+							                flex-direction: column;
+							                height: auto; 
+							                width: 95%;
+							                overflow: visible;
+							                margin-top: 10px;
+							            }
 
-						               .character-display {
-						                   width: 100%;
-						                   /* アスペクト比で正方形を維持 */
-						                   height: auto;
-						                   aspect-ratio: 1 / 1; 
-						                   order: 3; 
-						               }
+							            .character-display {
+							                width: 80%; 
+							                margin: 0 auto; 
+							                height: auto;
+							                aspect-ratio: 1 / 1; 
+							                order: 3; 
+							            }
 
-						               .character-side-buttons {
-						                   position: static; 
-						                   display: flex;
-						                   flex-direction: row; 
-						                   justify-content: space-between;
-						                   width: 100%;
-									                   /* 上にマージンを追加してボタン位置を下げる (-10px -> -10pxのまま維持、もしくは調整) */
-									                   /* 今回は間隔詰めが目的なので、ここのマージンは維持します */
-									                   margin: -10px 0 20px 0;
-									                   gap: 10px;
-									                   order: 1; 
-									                   top: auto;
-									                   right: auto;
-									               }
+							            .character-side-buttons {
+							                position: static; 
+							                display: flex;
+							                flex-direction: row; 
+							                justify-content: space-between;
+							                width: 100%;
+							                margin: -10px 0 20px 0;
+							                gap: 10px;
+							                order: 1; 
+							                top: auto;
+							                right: auto;
+							            }
 
-									               #tutorial-title-display {
-									                   order: 2; 
-									                   margin-top: 30px !important;
-									                   margin-bottom: 0px;
-									               }
+							            #tutorial-title-display {
+							                order: 2; 
+							                margin-top: 30px !important;
+							                margin-bottom: 0px;
+							            }
 
-									               .side-action-btn {
-									                   width: 48%;       
-									                   height: 55px;     
-									                   font-size: 0.95rem;
-									                   margin: 0;
-									                   display: flex;
-									                   align-items: center;
-									                   justify-content: center;
-									                   flex-direction: row;
-									               }
+							            /* ★修正: ボタンサイズを小さく調整 */
+							            .side-action-btn {
+							                width: 48%;       
+							                height: 45px;     /* 55px -> 45px */
+							                font-size: 0.85rem; /* 0.95rem -> 0.85rem */
+							                margin: 0;
+							                display: flex;
+							                align-items: center;
+							                justify-content: center;
+							                flex-direction: row;
+							            }
 
-									               .mission-square-btn {
-									                   height: 55px;
-									                   flex-direction: row;
-									               }
-									               
-									               .mission-square-btn i {
-									                   font-size: 1.2rem;
-									                   margin-bottom: 0;
-									                   margin-right: 8px;
-									               }
-									           }
+							            .mission-square-btn {
+							                height: 45px;     /* 55px -> 45px */
+							                flex-direction: row;
+							            }
+							            
+							            .mission-square-btn i {
+							                font-size: 1.1rem; /* 1.2rem -> 1.1rem */
+							                margin-bottom: 0;
+							                margin-right: 6px;
+							            }
+							        }
 	    </style>
 </head>
 <body class="home-page">
