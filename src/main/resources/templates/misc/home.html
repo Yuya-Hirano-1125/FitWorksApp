@@ -39,7 +39,8 @@
 	    .tutorial-pointer::before { content: '\f0a6'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
 	    @keyframes point-move { from { transform: translateY(0); } to { transform: translateY(-10px); } }
 	    .rpg-text-area { font-size: 1.25rem; font-weight: bold; line-height: 1.6; color: #333; }
-	    .home-greeting-container { text-align: center; margin-top: 30px; margin-bottom: 15px; }
+	    /* ★修正: デフォルトのマージンを10pxに縮小 */
+	    .home-greeting-container { text-align: center; margin-top: 10px; margin-bottom: 15px; }
 	    .home-greeting-text { font-family: 'Noto Sans JP', sans-serif; color: #555; font-size: 1.1rem; font-weight: 700; margin-top: 0; line-height: 1.6; }
 	    .home-username { color: #0288d1; font-size: 1.3rem; font-weight: 900; margin: 0 3px; text-decoration: underline wavy #4facfe; text-underline-offset: 4px; }
 	    .background-unlock-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 10000; animation: fadeIn 0.3s ease-in-out; }
@@ -101,16 +102,17 @@
 	        .character-wrapper { display: flex; flex-direction: column; height: auto; width: 95%; overflow: visible; margin-top: 10px; }
 	        .character-display { width: 80%; margin: 0 auto; height: auto; aspect-ratio: 1 / 1; order: 3; }
 	        .character-side-buttons { position: static; display: flex; flex-direction: row; justify-content: space-between; width: 100%; margin: -10px 0 20px 0; gap: 10px; order: 1; top: auto; right: auto; }
-	        /* ★修正: margin-bottomを15pxに変更して隙間を作る */
+	        /* スマホ時のマージン設定 */
 	        #tutorial-title-display { order: 2; margin-top: 5px !important; margin-bottom: 15px !important; }
 	        .side-action-btn { width: 48%; height: 45px; font-size: 1.0rem; margin: 0; display: flex; align-items: center; justify-content: center; flex-direction: row; }
 	        .mission-square-btn { height: 45px; flex-direction: row; }
 	        .mission-square-btn i { font-size: 1.1rem; margin-bottom: 0; margin-right: 6px; }
+	        /* ★追加: スマホ時は挨拶マージンを元に戻す */
+	        .home-greeting-container { margin-top: 30px !important; }
 	    }
 	    @media (max-width: 600px) {
 	        #tutorial-ai-btn { margin-bottom: 15px !important; }
-	        /* ★追加: アプリロゴを大きく表示 */
-	        .app-logo-display img { width: 300px !important; max-width: 90%; }
+	        .app-logo-display img { width: 220px !important; max-width: 90%; }
 	    }
 	</style>
 </head>
