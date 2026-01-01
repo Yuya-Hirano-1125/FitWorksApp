@@ -76,7 +76,7 @@
             color: #333; font-size: 1.6rem; font-weight: 900; margin-bottom: 15px; line-height: 1.3;
         }
 
-        /* ★修正: メタ情報の枠線を水色に設定 */
+        /* メタ情報の枠線を水色に設定 */
         .post-meta {
             color: #666; font-size: 0.9rem; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;
             background: rgba(255, 255, 255, 0.8); 
@@ -86,7 +86,7 @@
         }
         .post-meta span { display: flex; align-items: center; gap: 6px; }
 
-        /* ★修正: 投稿本文の枠線を濃い青色に設定 */
+        /* 投稿本文の枠線を濃い青色に設定 */
         .post-content {
             font-size: 1.1rem; line-height: 1.8; color: #444;
             white-space: pre-wrap; word-break: break-word;
@@ -109,13 +109,16 @@
             background: #f0f8ff; 
             padding: 15px 20px; border-radius: 20px; border-bottom-left-radius: 5px;
             margin-bottom: 15px; overflow-wrap: break-word;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            /* ★修正: 枠線を追加して境界をはっきりさせる */
+            border: 2px solid #b3e5fc;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         .comment-meta {
             font-size: 0.85rem; color: #666; margin-bottom: 8px; font-weight: 700;
             display: flex; justify-content: space-between;
-            border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 5px;
+            /* ★修正: 区切り線も少し濃く */
+            border-bottom: 1px solid #b3e5fc; padding-bottom: 5px;
         }
         .comment-author { color: #007bff; }
         .comment-body { font-size: 1rem; line-height: 1.5; color: #333; white-space: pre-wrap; word-break: break-word; }
@@ -131,23 +134,57 @@
             padding: 15px 20px; padding-bottom: calc(15px + env(safe-area-inset-bottom));
         }
 
-        .form-inner { max-width: 800px; width: 100%; display: flex; gap: 10px; align-items: center; }
+        .form-inner { 
+            max-width: 800px; width: 100%; 
+            display: flex; gap: 10px; 
+            align-items: flex-end; /* 下揃え */
+        }
 
+        /* inputの見た目(30px丸み)に戻しつつtextarea化 */
         .input-comment {
-            flex-grow: 1; padding: 12px 20px; border-radius: 30px;
+            flex-grow: 1; padding: 12px 20px; 
+            border-radius: 30px; /* 以前の丸み */
             border: 2px solid #ddd; background: #fff; font-size: 1rem; outline: none; transition: all 0.3s;
+            resize: none; 
+            height: 50px; /* 以前の高さに合わせる */
+            max-height: 120px; 
+            line-height: 1.4;
+            overflow-y: auto;
+            font-family: inherit;
         }
         .input-comment:focus { border-color: #4facfe; box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2); }
 
+        /* スクロールバーのデザインカスタマイズ */
+        .input-comment::-webkit-scrollbar {
+            width: 8px; /* 細く */
+        }
+        .input-comment::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 10px 0; /* 上下に余白 */
+        }
+        .input-comment::-webkit-scrollbar-thumb {
+            background: #ccc; /* 控えめなグレー */
+            border-radius: 10px; /* 丸み */
+            border: 2px solid #fff; /* 白い枠線で余白を作る */
+        }
+        .input-comment::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
+        /* アイコンのみの円形ボタン */
         .btn-send {
             background: linear-gradient(135deg, #4facfe, #00f2fe);
             color: white; border: none;
-            padding: 0 25px; height: 46px; border-radius: 30px; font-weight: 800;
-            cursor: pointer; transition: all 0.2s; white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.4); display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; border-radius: 50%; /* 正円 */
+            font-size: 1.2rem;
+            cursor: pointer; transition: all 0.2s; 
+            box-shadow: 0 4px 10px rgba(79, 172, 254, 0.4); 
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; 
         }
-        .btn-send:hover { transform: scale(1.05); opacity: 0.9; }
-        .btn-send i { margin-right: 5px; }
+        .btn-send:hover { transform: scale(1.1); opacity: 0.9; }
+        .btn-send:active { transform: scale(0.95); }
+        .btn-send i { margin-right: 0; margin-left: -2px; }
 
         .like-form { display: inline-block; }
         .btn-like {
@@ -159,40 +196,43 @@
         .btn-like.liked { color: #ff4757; }
         .like-text { font-size: 1rem; font-weight: bold; }
 
+        /* 850px以下で送信ボタンを少し左にずらす */
+        @media (max-width: 850px) {
+            .btn-send {
+                margin-right: 15px; /* 右に余白を作って左に寄せる */
+            }
+        }
+
 		@media (max-width: 600px) {
-				            /* ★修正: メインコンテナの下部余白を増やして、最下部の要素が隠れないようにする */
-				            .main-container { 
-				                padding: 15px; 
-				                padding-top: 25px; 
-				                padding-bottom: 100px; /* 余白追加 */
-				                width: 95%; 
-				                border-radius: 30px; 
-				            }
-				            
-				            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
-				            
-				            /* ★修正: 文字サイズをさらに大きく (1.6rem -> 1.8rem) */
-				            .page-title { font-size: 1.8rem; }
+            /* メインコンテナの下部余白を増やして、最下部の要素が隠れないようにする */
+            .main-container { 
+                padding: 15px; 
+                padding-top: 25px; 
+                padding-bottom: 100px; /* 余白追加 */
+                width: 95%; 
+                border-radius: 30px; 
+            }
+            
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            
+            /* 文字サイズをさらに大きく */
+            .page-title { font-size: 1.8rem; }
 
-				            /* 画面幅が小さい時のフォーム調整 */
-				            .fixed-comment-form {
-				                padding: 10px 10px; 
-				                /* ★修正: 下部の余白を少し増やして、システムバーやスクロールバーとの干渉を防ぐ */
-				                padding-bottom: calc(15px + env(safe-area-inset-bottom));
-				            }
+            /* 画面幅が小さい時のフォーム調整 */
+            .fixed-comment-form {
+                padding: 10px 10px; 
+                /* 下部の余白を少し増やして、システムバーやスクロールバーとの干渉を防ぐ */
+                padding-bottom: calc(15px + env(safe-area-inset-bottom));
+            }
 
-				            .form-inner {
-				                gap: 5px; 
-				            }
+            .form-inner {
+                gap: 8px; 
+            }
 
-				            .btn-send {
-				                padding: 0 15px; 
-				            }
-				            
-				            .input-comment {
-				                padding: 10px 15px; 
-				            }
-				        }
+            .input-comment {
+                padding: 10px 15px; 
+            }
+        }
     </style>
 </head>
 <body>
@@ -260,9 +300,9 @@
     
     <div class="fixed-comment-form">
         <form th:action="@{/community/{id}/comment(id=${post.id})}" method="post" class="form-inner">
-            <input type="text" name="content" class="input-comment" placeholder="コメントを入力して応援しよう..." required autocomplete="off">
-            <button type="submit" class="btn-send">
-                <i class="fa-solid fa-paper-plane"></i> 送信
+            <textarea name="content" class="input-comment" rows="1" placeholder="コメントを入力して応援しよう..." required></textarea>
+            <button type="submit" class="btn-send" title="送信">
+                <i class="fa-solid fa-paper-plane"></i>
             </button>
         </form>
     </div>
@@ -283,6 +323,19 @@
         }
         function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
         animate();
+
+        // テキストエリアの自動リサイズ処理
+        document.addEventListener('DOMContentLoaded', () => {
+            const textarea = document.querySelector('.input-comment');
+            if(textarea) {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto'; // 一旦高さをリセット
+                    // 50px(最小) ~ 120px(最大) の範囲で自動調整
+                    const newHeight = Math.min(Math.max(this.scrollHeight, 50), 120);
+                    this.style.height = newHeight + 'px';
+                });
+            }
+        });
     </script>
 
 </body>
