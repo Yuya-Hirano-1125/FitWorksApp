@@ -11,224 +11,374 @@
     <link rel="stylesheet" th:href="@{/css/title.css}">
     
     <script th:src="@{/js/theme.js}"></script>
-    <style>
-        /* --- HTML内スタイル (CSSファイル化していない動的部分のみ) --- */
-        .xp-bar { width: 100%; height: 25px; background: #e3f2fd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
-        .xp-progress { height: 100%; background: linear-gradient(90deg, #42a5f5, #2196f3); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
-        
-        .character-section { position: relative; display: flex; justify-content: center; margin-top: 0px; }
-        
-        .character-wrapper { position: relative; width: 400px; height: 400px; max-width: 100%; margin: 0 auto; overflow: visible; }
+	<style>
+	        /* --- HTML内スタイル (CSSファイル化していない動的部分のみ) --- */
+	        :root { --primary-color: #ff69b4; }
 
-        .character-display { 
-            display: flex; justify-content: center; align-items: flex-end; 
-            width: 100%; height: 100%;  
-            background-repeat: no-repeat; background-position: center; background-size: cover; 
-            border-radius: 25px; 
-            box-shadow: 0 10px 30px rgba(33, 150, 243, 0.25); /* 影を調整 */
-            text-decoration: none; padding-bottom: 10px; box-sizing: border-box; 
-            border: 4px solid rgba(255,255,255,0.8); /* 白枠追加でポップに */
-        }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-50px); } 100% { transform: translateY(0px); } }
-        .character-display img { width: auto; height: 85%; max-width: 95%; object-fit: contain; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9)); }
-        
-        .character-side-buttons { position: absolute; display: flex; flex-direction: column; gap: 12px; z-index: 10; top: 40px; right: -125px; }
-        @media (max-width: 650px) { .character-side-buttons { right: 10px; top: 50px; } }
+	        .xp-bar { width: 100%; height: 25px; background: #e3f2fd; border-radius: 12px; overflow: hidden; margin-top: 8px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
+	        .xp-progress { height: 100%; background: linear-gradient(90deg, #42a5f5, #2196f3); color: #fff; font-size: 12px; font-weight: bold; text-align: center; line-height: 25px; border-radius: 12px; transition: width 1s ease-in-out; }
+	        
+	        .character-section { position: relative; display: flex; justify-content: center; margin-top: 0px; }
+	        
+	        /* PC・大画面用レイアウト (基本設定) */
+	        .character-wrapper { 
+	            position: relative; 
+	            width: 400px; 
+	            max-width: 100%; 
+	            margin: 0 auto; 
+	            overflow: visible; 
+	            display: block; 
+	        }
 
-        /* サイドボタンの基本スタイル */
-        .side-action-btn { 
-            color: white; padding: 10px 0; border-radius: 15px; text-decoration: none; 
-            font-weight: bold; font-size: 0.85em; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-            transition: transform 0.1s; display: flex; align-items: center; justify-content: center; 
-            gap: 6px; width: 110px; backdrop-filter: blur(4px);
-        }
-        .side-action-btn:hover { transform: scale(1.05); }
-        
-        .title-button { background: linear-gradient(135deg, #9c27b0, #ba68c8); border: 2px solid rgba(255,255,255,0.3); }
+	        /* 画像エリア */
+	        .character-display { 
+	            display: flex; justify-content: center; align-items: flex-end; 
+	            width: 100%; 
+	            height: 400px; 
+	            background-repeat: no-repeat; background-position: center; background-size: cover; 
+	            border-radius: 25px; 
+	            box-shadow: 0 10px 30px rgba(33, 150, 243, 0.25); 
+	            text-decoration: none; padding-bottom: 10px; box-sizing: border-box; 
+	            border: 4px solid rgba(255,255,255,0.8);
+	            z-index: 1; 
+	        }
+	        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-50px); } 100% { transform: translateY(0px); } }
+	        .character-display img { width: auto; height: 85%; max-width: 95%; object-fit: contain; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 20px 15px rgba(0,0,0,0.9)); }
+	        
+	        /* PC配置時の位置調整 (top: 0 で上辺を揃える) */
+	        .character-side-buttons { 
+	            position: absolute; 
+	            display: flex; 
+	            flex-direction: column; 
+	            gap: 15px; 
+	            z-index: 10; 
+	            top: 80px; 
+	            right: -115px; 
+	        }
 
-        /* 正方形のミッションボタン */
-        .mission-square-btn {
-            height: 110px; 
-            flex-direction: column; 
-            background: linear-gradient(135deg, #ff9800, #f57c00);
-            border: 2px solid rgba(255,255,255,0.3);
-            font-size: 0.95em;
-        }
-        .mission-square-btn i {
-            font-size: 2.2rem; 
-            margin-bottom: 5px;
-        }
+	        /* ボタンサイズ (PC用) */
+	        .side-action-btn { 
+	            color: white; padding: 10px 0; border-radius: 15px; text-decoration: none; 
+	            font-weight: bold; 
+	            font-size: 0.9em; 
+	            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+	            transition: transform 0.1s; display: flex; align-items: center; justify-content: center; 
+	            gap: 6px; 
+	            width: 100px; 
+	            backdrop-filter: blur(4px);
+	        }
+	        .side-action-btn:hover { transform: scale(1.05); }
+	        
+	        .title-button { background: linear-gradient(135deg, #9c27b0, #ba68c8); border: 2px solid rgba(255,255,255,0.3); }
 
-        /* 記録メニューボタンのアニメーション */
-        .record-option-item {
-            transition: all 0.3s ease-out !important;
-            transform: translateY(0);
-        }
-        
-        .record-option-item:hover {
-            transform: translateY(-3px) !important;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
-            z-index: 10;
-            filter: brightness(1.05);
-        }
-        
-        .record-option-item:active {
-            transform: translateY(1px) !important;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
-            transition: all 0.1s ease !important;
-        }
+	        /* 正方形のミッションボタン (PC用) */
+	        .mission-square-btn {
+	            height: 100px; 
+	            flex-direction: column; 
+	            background: linear-gradient(135deg, #ff9800, #f57c00);
+	            border: 2px solid rgba(255,255,255,0.3);
+	            font-size: 0.95em;
+	        }
+	        .mission-square-btn i {
+	            font-size: 2.0rem; 
+	            margin-bottom: 5px;
+	        }
 
-        /* ヘルプメニューのスタイル調整 */
-        .help-menu-dropdown { 
-            display: none; 
-            position: absolute; 
-            top: 60px; right: 20px; left: auto; 
-            background: rgba(255, 255, 255, 0.98); 
-            border-radius: 15px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.25); 
-            padding: 15px; 
-            z-index: 2000; 
-            width: 260px; 
-            flex-direction: column; 
-            gap: 8px; 
-            max-height: 80vh; 
-            overflow-y: auto;
-        }
-        .help-menu-dropdown.active { display: flex; animation: fadeInDown 0.3s ease; }
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .help-section-label {
-            font-size: 0.8rem;
-            color: #888;
-            font-weight: bold;
-            margin: 5px 0 2px 5px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 2px;
-        }
+	        /* 記録メニューボタンのアニメーション */
+	        .record-option-item {
+	            transition: all 0.3s ease-out !important;
+	            transform: translateY(0);
+	        }
+	        
+	        .record-option-item:hover {
+	            transform: translateY(-3px) !important;
+	            box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
+	            z-index: 10;
+	            filter: brightness(1.05);
+	        }
+	        
+	        .record-option-item:active {
+	            transform: translateY(1px) !important;
+	            box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+	            transition: all 0.1s ease !important;
+	        }
 
-        .help-menu-item { 
-            display: flex; align-items: center; gap: 10px;
-            padding: 12px; 
-            text-decoration: none; 
-            border-radius: 10px; 
-            text-align: left; 
-            font-weight: bold; 
-            font-size: 0.95em; 
-            transition: all 0.2s; 
-            border: none; 
-            width: 100%; 
-            cursor: pointer; 
-            color: #444; 
-            background: #f9f9f9;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-            box-sizing: border-box; 
-        }
-        .help-menu-item:hover { transform: translateX(5px); background: #e3f2fd; color: #0288d1; }
-        .help-menu-item i { width: 20px; text-align: center; color: #0288d1; }
+	        /* ヘルプメニューのスタイル */
+	        .help-menu-dropdown { 
+	            display: none; 
+	            position: absolute; 
+	            top: 60px; right: 20px; left: auto; 
+	            background: rgba(255, 255, 255, 0.98); 
+	            border-radius: 15px; 
+	            box-shadow: 0 10px 30px rgba(0,0,0,0.25); 
+	            padding: 15px; 
+	            z-index: 2000; 
+	            width: 260px; 
+	            flex-direction: column; 
+	            gap: 8px; 
+	            max-height: 80vh; 
+	            overflow-y: auto;
+	        }
+	        .help-menu-dropdown.active { display: flex; animation: fadeInDown 0.3s ease; }
+	        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+	        
+	        .help-section-label {
+	            font-size: 0.8rem;
+	            color: #888;
+	            font-weight: bold;
+	            margin: 5px 0 2px 5px;
+	            border-bottom: 1px solid #eee;
+	            padding-bottom: 2px;
+	        }
 
-        .tutorial-pointer { position: absolute; z-index: 10000; font-size: 2.5rem; color: #f1c40f; display: none; animation: point-move 1s infinite alternate; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        .tutorial-pointer::before { content: '\f0a6'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
-        @keyframes point-move { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-        
-        /* チュートリアルの文字サイズ */
-        .rpg-text-area {
-            font-size: 1.25rem; 
-            font-weight: bold;
-            line-height: 1.6;
-            color: #333;
-        }
-        
-        .home-greeting-container { text-align: center; margin-top: 30px; margin-bottom: 15px; }
-        .home-greeting-text { font-family: 'Noto Sans JP', sans-serif; color: #555; font-size: 1.1rem; font-weight: 700; margin-top: 0; line-height: 1.6; }
-        .home-username { color: #0288d1; font-size: 1.3rem; font-weight: 900; margin: 0 3px; text-decoration: underline wavy #4facfe; text-underline-offset: 4px; }
+	        .help-menu-item { 
+	            display: flex; align-items: center; gap: 10px;
+	            padding: 12px; 
+	            text-decoration: none; 
+	            border-radius: 10px; 
+	            text-align: left; 
+	            font-weight: bold; 
+	            font-size: 0.95em; 
+	            transition: all 0.2s; 
+	            border: none; 
+	            width: 100%; 
+	            cursor: pointer; 
+	            color: #444; 
+	            background: #f9f9f9;
+	            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+	            box-sizing: border-box; 
+	        }
+	        .help-menu-item:hover { transform: translateX(5px); background: #e3f2fd; color: #0288d1; }
+	        .help-menu-item i { width: 20px; text-align: center; color: #0288d1; }
 
-        /* 背景解放ポップアップ (CSS省略なし) */
-        .background-unlock-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 10000; animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .background-unlock-content { background: linear-gradient(180deg, #fffef7 0%, #faf8f0 100%); border: 6px solid #d4a373; border-radius: 30px; padding: 0; max-width: 520px; width: 90%; box-shadow: 0 0 0 3px #f5e6d3, 0 0 0 9px #d4a373, 0 15px 35px rgba(0, 0, 0, 0.3); animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); position: relative; overflow: hidden; }
-        @keyframes popIn { 0% { transform: scale(0.5) rotate(-5deg); opacity: 0; } 60% { transform: scale(1.05) rotate(2deg); } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
-        .leaf-decoration { position: absolute; font-size: 2rem; opacity: 0.15; pointer-events: none; animation: leafFloat 4s ease-in-out infinite; }
-        .leaf-decoration::before { content: '🍃'; }
-        .leaf-decoration:nth-child(1) { top: 15px; left: 15px; animation-delay: 0s; }
-        .leaf-decoration:nth-child(2) { top: 15px; right: 15px; animation-delay: 1s; }
-        .leaf-decoration:nth-child(3) { bottom: 15px; left: 15px; animation-delay: 2s; }
-        .leaf-decoration:nth-child(4) { bottom: 15px; right: 15px; animation-delay: 3s; }
-        @keyframes leafFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
-        .ff-header { background: linear-gradient(180deg, #9bcc7a 0%, #7db85e 100%); border-bottom: 5px solid #6a9c4f; border-radius: 24px 24px 0 0; padding: 25px 20px; position: relative; box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 3px 0 rgba(106, 156, 79, 0.3); }
-        .ff-header::before { content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: rgba(255, 255, 255, 0.5); border-radius: 2px; }
-        .background-unlock-title { color: #ffffff; font-size: 1.35rem; font-weight: bold; margin: 0; text-align: center; letter-spacing: 0.5px; font-family: Arial, sans-serif; text-shadow: 2px 2px 0 rgba(106, 156, 79, 0.8), -1px -1px 0 rgba(106, 156, 79, 0.3); }
-        .ff-content { padding: 30px 25px; position: relative; }
-        .background-unlock-list { background: #ffffff; border: 4px solid #e8d5b7; border-radius: 20px; padding: 20px; margin-bottom: 25px; box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.03), 0 3px 10px rgba(0, 0, 0, 0.1); position: relative; }
-        .background-unlock-item { background: linear-gradient(135deg, #fff9f0 0%, #fef5e7 100%); border: 3px solid #f4d9a6; border-radius: 15px; color: #5a4a3a; font-size: 1.05rem; font-weight: bold; margin: 12px 0; padding: 14px 18px; position: relative; animation: itemBounce 0.5s ease-out forwards; opacity: 0; box-shadow: 0 4px 0 #e8c78e, 0 5px 10px rgba(0, 0, 0, 0.1); transition: all 0.2s ease; }
-        .background-unlock-item:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 7px 0 #e8c78e, 0 8px 15px rgba(0, 0, 0, 0.15); }
-        @keyframes itemBounce { 0% { transform: scale(0.3) translateY(-20px); opacity: 0; } 50% { transform: scale(1.1) translateY(0); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
-        .background-unlock-item:nth-child(1) { animation-delay: 0.1s; }
-        .background-unlock-item:nth-child(2) { animation-delay: 0.2s; }
-        .background-unlock-item:nth-child(3) { animation-delay: 0.3s; }
-        .background-unlock-item:nth-child(4) { animation-delay: 0.4s; }
-        .background-unlock-item::before { content: '✿'; position: absolute; left: -18px; top: 50%; transform: translateY(-50%); color: #9bcc7a; font-size: 1.3rem; animation: flowerSpin 3s ease-in-out infinite; }
-        @keyframes flowerSpin { 0%, 100% { transform: translateY(-50%) rotate(0deg); } 50% { transform: translateY(-50%) rotate(180deg); } }
-        .background-unlock-item i { color: #f4a460; margin-right: 10px; font-size: 1.1rem; }
-        .background-unlock-item strong { color: #6a5a4a; }
-        .background-unlock-buttons { display: flex; gap: 12px; justify-content: center; padding: 0 25px 30px; position: relative; }
-        .background-unlock-buttons button, .background-unlock-buttons a { padding: 14px 26px; border: 4px solid #d4a373; border-radius: 50px; font-weight: bold; font-size: 0.95rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; position: relative; transition: all 0.2s ease; font-family: Arial, sans-serif; box-shadow: 0 5px 0 #b8906a, 0 6px 12px rgba(0, 0, 0, 0.15); }
-        .background-unlock-buttons button:active, .background-unlock-buttons a:active { transform: translateY(3px); box-shadow: 0 2px 0 #b8906a, 0 3px 6px rgba(0, 0, 0, 0.15); }
-        .background-unlock-buttons button:hover, .background-unlock-buttons a:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #b8906a, 0 8px 16px rgba(0, 0, 0, 0.2); }
-        .btn-later { background: linear-gradient(180deg, #f4e4c1 0%, #e8d5b7 100%); color: #6a5a4a; border-color: #d4a373; }
-        .btn-go-backgrounds { background: linear-gradient(180deg, #9bcc7a 0%, #7db85e 100%); color: #ffffff; border-color: #6a9c4f; box-shadow: 0 5px 0 #5a8c3f, 0 6px 12px rgba(0, 0, 0, 0.15); }
-        .btn-go-backgrounds:active { box-shadow: 0 2px 0 #5a8c3f, 0 3px 6px rgba(0, 0, 0, 0.15); }
-        .btn-go-backgrounds:hover { box-shadow: 0 7px 0 #5a8c3f, 0 8px 16px rgba(0, 0, 0, 0.2); }
-        .btn-go-backgrounds i { color: #f4d9a6; }
-        
-        .tutorial-backdrop, .tutorial-spotlight, .tutorial-pointer, .tutorial-rpg-box { pointer-events: none; }
-        .tutorial-backdrop.active, .tutorial-rpg-box.active { pointer-events: auto; }
-        .interactive-bg, .mouse-follower-cloud, .bg-cloud { pointer-events: none !important; z-index: -1; }
-        #tutorial-rpg-box { z-index: 10001; }
-        
-        /* ボタン間の余白を統一 */
-        .menu-item-spacing {
-            margin-top: 20px !important;
-            width: 100%;
-            box-sizing: border-box;
-            display: block;
-        }
-        .care-section { text-align: center; }
+	        .tutorial-pointer { position: absolute; z-index: 10000; font-size: 2.5rem; color: #f1c40f; display: none; animation: point-move 1s infinite alternate; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+	        .tutorial-pointer::before { content: '\f0a6'; font-family: "Font Awesome 6 Free"; font-weight: 900; }
+	        @keyframes point-move { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+	        
+	        .rpg-text-area { font-size: 1.25rem; font-weight: bold; line-height: 1.6; color: #333; }
+	        
+	        .home-greeting-container { text-align: center; margin-top: 30px; margin-bottom: 15px; }
+	        .home-greeting-text { font-family: 'Noto Sans JP', sans-serif; color: #555; font-size: 1.1rem; font-weight: 700; margin-top: 0; line-height: 1.6; }
+	        .home-username { color: #0288d1; font-size: 1.3rem; font-weight: 900; margin: 0 3px; text-decoration: underline wavy #4facfe; text-underline-offset: 4px; }
 
-        /* スマホサイズ余白調整 */
-        @media (max-width: 600px) {
-            #tutorial-ai-btn { margin-bottom: 110px !important; }
-        }
-        
-        /* PC・タブレット用ナビゲーション */
-        @media (min-width: 601px) {
-            .main-container { padding-bottom: 150px !important; }
-            .bottom-nav {
-                display: flex; justify-content: space-evenly; align-items: center;
-                position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-                width: 95%; max-width: 800px;
-                background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-                border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-                padding: 10px 15px; box-sizing: border-box; z-index: 1000;
-            }
-            .nav-item {
-                display: flex; flex-direction: column; justify-content: center; align-items: center;
-                flex: 1; max-width: 100px; height: auto; min-height: 60px;
-                text-decoration: none; color: #555; border-radius: 12px;
-                transition: transform 0.2s ease, background 0.2s; padding: 5px 0; margin: 0 5px;
-            }
-            .nav-item i { display: block; font-size: 22px; margin-bottom: 5px; line-height: 1; color: var(--primary-color, #ff69b4); }
-            .nav-item span { display: block; font-size: 11px; font-weight: bold; white-space: nowrap; line-height: 1.2; width: 100%; text-align: center; }
-            .nav-item:hover { background-color: #f0f8ff; transform: translateY(-3px); }
-        }
-        
-        /* ボタン枠線削除 */
-        .btn-record, .btn-care, .home-action-btn, .side-action-btn, .title-button {
-            border: none !important; outline: none !important;
-        }
-        
-   </style>
+	        /* 背景解放ポップアップ */
+	        .background-unlock-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 10000; animation: fadeIn 0.3s ease-in-out; }
+	        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+	        .background-unlock-content { background: linear-gradient(180deg, #fffef7 0%, #faf8f0 100%); border: 6px solid #d4a373; border-radius: 30px; padding: 0; max-width: 520px; width: 90%; box-shadow: 0 0 0 3px #f5e6d3, 0 0 0 9px #d4a373, 0 15px 35px rgba(0, 0, 0, 0.3); animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); position: relative; overflow: hidden; }
+	        @keyframes popIn { 0% { transform: scale(0.5) rotate(-5deg); opacity: 0; } 60% { transform: scale(1.05) rotate(2deg); } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+	        .leaf-decoration { position: absolute; font-size: 2rem; opacity: 0.15; pointer-events: none; animation: leafFloat 4s ease-in-out infinite; }
+	        .leaf-decoration::before { content: '🍃'; }
+	        .leaf-decoration:nth-child(1) { top: 15px; left: 15px; animation-delay: 0s; }
+	        .leaf-decoration:nth-child(2) { top: 15px; right: 15px; animation-delay: 1s; }
+	        .leaf-decoration:nth-child(3) { bottom: 15px; left: 15px; animation-delay: 2s; }
+	        .leaf-decoration:nth-child(4) { bottom: 15px; right: 15px; animation-delay: 3s; }
+	        @keyframes leafFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+	        .ff-header { background: linear-gradient(180deg, #9bcc7a 0%, #7db85e 100%); border-bottom: 5px solid #6a9c4f; border-radius: 24px 24px 0 0; padding: 25px 20px; position: relative; box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 3px 0 rgba(106, 156, 79, 0.3); }
+	        .ff-header::before { content: ''; position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 60px; height: 4px; background: rgba(255, 255, 255, 0.5); border-radius: 2px; }
+	        .background-unlock-title { color: #ffffff; font-size: 1.35rem; font-weight: bold; margin: 0; text-align: center; letter-spacing: 0.5px; font-family: Arial, sans-serif; text-shadow: 2px 2px 0 rgba(106, 156, 79, 0.8), -1px -1px 0 rgba(106, 156, 79, 0.3); }
+	        .ff-content { padding: 30px 25px; position: relative; }
+	        .background-unlock-list { background: #ffffff; border: 4px solid #e8d5b7; border-radius: 20px; padding: 20px; margin-bottom: 25px; box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.03), 0 3px 10px rgba(0, 0, 0, 0.1); position: relative; }
+	        .background-unlock-item { background: linear-gradient(135deg, #fff9f0 0%, #fef5e7 100%); border: 3px solid #f4d9a6; border-radius: 15px; color: #5a4a3a; font-size: 1.05rem; font-weight: bold; margin: 12px 0; padding: 14px 18px; position: relative; animation: itemBounce 0.5s ease-out forwards; opacity: 0; box-shadow: 0 4px 0 #e8c78e, 0 5px 10px rgba(0, 0, 0, 0.1); transition: all 0.2s ease; }
+	        .background-unlock-item:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 7px 0 #e8c78e, 0 8px 15px rgba(0, 0, 0, 0.15); }
+	        @keyframes itemBounce { 0% { transform: scale(0.3) translateY(-20px); opacity: 0; } 50% { transform: scale(1.1) translateY(0); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+	        .background-unlock-item:nth-child(1) { animation-delay: 0.1s; }
+	        .background-unlock-item:nth-child(2) { animation-delay: 0.2s; }
+	        .background-unlock-item:nth-child(3) { animation-delay: 0.3s; }
+	        .background-unlock-item:nth-child(4) { animation-delay: 0.4s; }
+	        .background-unlock-item::before { content: '✿'; position: absolute; left: -18px; top: 50%; transform: translateY(-50%); color: #9bcc7a; font-size: 1.3rem; animation: flowerSpin 3s ease-in-out infinite; }
+	        @keyframes flowerSpin { 0%, 100% { transform: translateY(-50%) rotate(0deg); } 50% { transform: translateY(-50%) rotate(180deg); } }
+	        .background-unlock-item i { color: #f4a460; margin-right: 10px; font-size: 1.1rem; }
+	        .background-unlock-item strong { color: #6a5a4a; }
+	        .background-unlock-buttons { display: flex; gap: 12px; justify-content: center; padding: 0 25px 30px; position: relative; }
+	        .background-unlock-buttons button, .background-unlock-buttons a { padding: 14px 26px; border: 4px solid #d4a373; border-radius: 50px; font-weight: bold; font-size: 0.95rem; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; position: relative; transition: all 0.2s ease; font-family: Arial, sans-serif; box-shadow: 0 5px 0 #b8906a, 0 6px 12px rgba(0, 0, 0, 0.15); }
+	        .background-unlock-buttons button:active, .background-unlock-buttons a:active { transform: translateY(3px); box-shadow: 0 2px 0 #b8906a, 0 3px 6px rgba(0, 0, 0, 0.15); }
+	        .background-unlock-buttons button:hover, .background-unlock-buttons a:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #b8906a, 0 8px 16px rgba(0, 0, 0, 0.2); }
+	        .btn-later { background: linear-gradient(180deg, #f4e4c1 0%, #e8d5b7 100%); color: #6a5a4a; border-color: #d4a373; }
+	        .btn-go-backgrounds { background: linear-gradient(180deg, #9bcc7a 0%, #7db85e 100%); color: #ffffff; border-color: #6a9c4f; box-shadow: 0 5px 0 #5a8c3f, 0 6px 12px rgba(0, 0, 0, 0.15); }
+	        .btn-go-backgrounds:active { box-shadow: 0 2px 0 #5a8c3f, 0 3px 6px rgba(0, 0, 0, 0.15); }
+	        .btn-go-backgrounds:hover { box-shadow: 0 7px 0 #5a8c3f, 0 8px 16px rgba(0, 0, 0, 0.2); }
+	        .btn-go-backgrounds i { color: #f4d9a6; }
+	        
+	        .tutorial-backdrop, .tutorial-spotlight, .tutorial-pointer, .tutorial-rpg-box { pointer-events: none; }
+	        .tutorial-backdrop.active, .tutorial-rpg-box.active { pointer-events: auto; }
+	        .interactive-bg, .mouse-follower-cloud, .bg-cloud { pointer-events: none !important; z-index: -1; }
+	        #tutorial-rpg-box { z-index: 10001; }
+	        
+	        .menu-item-spacing { margin-top: 20px !important; width: 100%; box-sizing: border-box; display: block; }
+	        .care-section { text-align: center; }
+			/* 枠線削除などのユーティリティ */
+			        .btn-record, .btn-care, .home-action-btn, .side-action-btn, .title-button { 
+			            border: none !important; outline: none !important; 
+			        }
+
+			/* ---------------------------------------------------------
+			           ▼▼▼ ボトムナビゲーション (全画面共通) ▼▼▼
+			           ※メディアクエリの外に出してスマホでも適用されるように修正
+			           --------------------------------------------------------- */
+			        .main-container { padding-bottom: 150px !important; }
+			        
+			        #tutorial-menu-nav.bottom-nav {
+			            display: flex !important; /* 強制的に表示 */
+			            justify-content: space-evenly; 
+			            align-items: center;
+			            position: fixed; 
+			            bottom: 20px; 
+			            left: 50%; 
+			            transform: translateX(-50%);
+			            width: 95%; 
+			            max-width: 800px;
+			            background: rgba(255, 255, 255, 0.95); 
+			            backdrop-filter: blur(10px);
+			            border-radius: 50px; 
+			            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+			            padding: 10px 15px; 
+			            box-sizing: border-box; 
+			            z-index: 1000;
+			            visibility: visible !important;
+			            opacity: 1 !important;
+			        }
+			        
+			        #tutorial-menu-nav .nav-item {
+			            display: flex; 
+			            flex-direction: column; 
+			            justify-content: center; 
+			            align-items: center;
+			            flex: 1; 
+			            height: auto; 
+			            min-height: 60px;
+			            text-decoration: none; 
+			            color: #555; 
+			            border-radius: 12px;
+			            transition: transform 0.2s ease, background 0.2s; 
+			            padding: 5px 0; 
+			            margin: 0 5px;
+			        }
+			        
+			        #tutorial-menu-nav .nav-item i { 
+			            display: block; 
+			            font-size: 22px; 
+			            margin-bottom: 5px; 
+			            line-height: 1; 
+			            color: var(--primary-color, #ff69b4); 
+			        }
+			        
+			        #tutorial-menu-nav .nav-item span { 
+			            display: block; 
+			            font-size: 11px; 
+			            font-weight: bold; 
+			            white-space: nowrap; 
+			            line-height: 1.2; 
+			            width: 100%; 
+			            text-align: center; 
+			        }
+			        
+			        #tutorial-menu-nav .nav-item:hover { 
+			            background-color: #f0f8ff; 
+			            transform: translateY(-3px); 
+			        }
+
+					/* ミッション達成通知 */
+					        .mission-notification {
+					            position: fixed;
+					            top: 20px;
+					            left: 50%;
+					            transform: translateX(-50%);
+					            background: linear-gradient(135deg, #ff9800, #f57c00);
+					            color: white;
+					            padding: 15px 30px;
+					            border-radius: 50px;
+					            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+					            z-index: 20000;
+					            font-weight: bold;
+					            font-size: 1.1rem;
+					            display: flex;
+					            align-items: center;
+					            gap: 10px;
+					            animation: slideDownFade 0.5s ease-out forwards;
+					            pointer-events: none; 
+					        }
+					        @keyframes slideDownFade { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
+					        .mission-notification.fade-out { animation: fadeOutUp 0.5s ease-in forwards; }
+					        @keyframes fadeOutUp { from { top: 20px; opacity: 1; } to { top: -50px; opacity: 0; } }
+
+							/* ---------------------------------------------------------
+							           ▼▼▼ スマホサイズ余白調整 & レイアウト切り替え ▼▼▼
+							           --------------------------------------------------------- */
+						   @media (max-width: 750px) {
+					            /* ★修正1: 全体の下部余白を詰める (150px -> 100px) */
+						               .main-container { padding-bottom: 120px !important; }
+
+						               /* ★修正2: AIボタン下の余白をさらに詰める (20px -> 10px) */
+						               #tutorial-ai-btn { margin-bottom: 10px !important; }
+
+						               /* スマホ用レイアウト */
+						               .character-wrapper {
+						                   display: flex;
+						                   flex-direction: column;
+						                   height: auto; 
+						                   width: 95%;
+						                   overflow: visible;
+						                   margin-top: 10px;
+						               }
+
+						               .character-display {
+						                   width: 100%;
+						                   /* アスペクト比で正方形を維持 */
+						                   height: auto;
+						                   aspect-ratio: 1 / 1; 
+						                   order: 3; 
+						               }
+
+						               .character-side-buttons {
+						                   position: static; 
+						                   display: flex;
+						                   flex-direction: row; 
+						                   justify-content: space-between;
+						                   width: 100%;
+									                   /* 上にマージンを追加してボタン位置を下げる (-10px -> -10pxのまま維持、もしくは調整) */
+									                   /* 今回は間隔詰めが目的なので、ここのマージンは維持します */
+									                   margin: -10px 0 20px 0;
+									                   gap: 10px;
+									                   order: 1; 
+									                   top: auto;
+									                   right: auto;
+									               }
+
+									               #tutorial-title-display {
+									                   order: 2; 
+									                   margin-top: 30px !important;
+									                   margin-bottom: 0px;
+									               }
+
+									               .side-action-btn {
+									                   width: 48%;       
+									                   height: 55px;     
+									                   font-size: 0.95rem;
+									                   margin: 0;
+									                   display: flex;
+									                   align-items: center;
+									                   justify-content: center;
+									                   flex-direction: row;
+									               }
+
+									               .mission-square-btn {
+									                   height: 55px;
+									                   flex-direction: row;
+									               }
+									               
+									               .mission-square-btn i {
+									                   font-size: 1.2rem;
+									                   margin-bottom: 0;
+									                   margin-right: 8px;
+									               }
+									           }
+	    </style>
 </head>
 <body class="home-page">
+
+<div th:if="${missionAchieved}" id="mission-notification" class="mission-notification">
+    <i class="fa-solid fa-trophy"></i> ミッション達成！報酬を受け取りましょう！
+</div>
 
 <div class="interactive-bg">
     <div class="mouse-follower-cloud"></div>
@@ -291,19 +441,19 @@
         </div>
     </div>
     
-    <div id="tutorial-title-display" style="text-align: center; margin-top: 5px; min-height: 30px;">
-        <th:block th:if="${userTitle != null and userTitle != 'なし'}">
-            <th:block th:each="enumT : ${T(com.example.demo.entity.AppTitle).values()}" 
-                      th:if="${enumT.displayName == userTitle}">
-                <div class="title-badge" th:classappend="${enumT.rarity}">
-                    <i class="fa-solid fa-crown"></i> <span th:text="${userTitle}"></span>
-                </div>
-            </th:block>
-        </th:block>
-    </div>
-    
     <div class="character-section">
         <div class="character-wrapper">
+            <div id="tutorial-title-display" style="text-align: center; margin-top: 5px; min-height: 30px;">
+                <th:block th:if="${userTitle != null and userTitle != 'なし'}">
+                    <th:block th:each="enumT : ${T(com.example.demo.entity.AppTitle).values()}" 
+                              th:if="${enumT.displayName == userTitle}">
+                        <div class="title-badge" th:classappend="${enumT.rarity}">
+                            <i class="fa-solid fa-crown"></i> <span th:text="${userTitle}"></span>
+                        </div>
+                    </th:block>
+                </th:block>
+            </div>
+
             <div id="tutorial-char-display" class="character-display"
                             th:style="'background-image: url(/img/background/' + ${selectedBackground} + '.png);'">
                 <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
@@ -430,7 +580,6 @@
 <script th:inline="javascript">
     /*<![CDATA[*/
     document.addEventListener('DOMContentLoaded', function() {
-        // 背景解放データを取得
         const backgroundUnlocks = /*[[${backgroundUnlocks}]]*/ null;
         
         console.log('========== 背景解放チェック ==========');
@@ -453,7 +602,16 @@
             }
         }
         
-        // AIアドバイス取得
+        const notification = document.getElementById('mission-notification');
+        if (notification) {
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    if (notification.parentNode) notification.parentNode.removeChild(notification);
+                }, 500); 
+            }, 4000); 
+        }
+        
         const aiMessageEl = document.getElementById('ai-home-message');
         if (aiMessageEl) {
             fetch('/api/ai-coach/home-advice')
@@ -470,26 +628,16 @@
                 .catch(err => { console.error("AI Advice Error:", err); aiMessageEl.textContent = "今日も一緒に頑張るムキ！"; });
         }
 
-        // ▼▼▼ 時計更新 (日付と曜日も表示) ▼▼▼
         function updateRealTimeClock() {
             const now = new Date();
-            
-            // 年・月・日
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
-            
-            // 曜日
             const days = ['日', '月', '火', '水', '木', '金', '土'];
             const dayOfWeek = days[now.getDay()];
-            
-            // 時・分
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
-            
-            // フォーマット: YYYY/MM/DD(曜日) HH:mm
             const timeString = `${year}/${month}/${day}(${dayOfWeek}) ${hours}:${minutes}`;
-            
             const clockEl = document.getElementById('real-time-clock');
             if (clockEl) { clockEl.textContent = timeString; }
         }
@@ -504,23 +652,19 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeBackgroundUnlockPopup(); });
     /*]]>*/
 
-    // 記録メニューのトグル
     function toggleRecordMenu() {
         const options = document.getElementById('record-options');
         options.classList.toggle('open');
     }
-    // メニューを強制的に開くヘルパー（チュートリアル用）
     function openRecordMenu() {
         const options = document.getElementById('record-options');
         if (!options.classList.contains('open')) options.classList.add('open');
     }
-    // メニューを強制的に閉じるヘルパー
     function closeRecordMenu() {
         const options = document.getElementById('record-options');
         if (options.classList.contains('open')) options.classList.remove('open');
     }
 
-    // ヘルプメニューのトグル
     function toggleHelpMenu() {
         const menu = document.getElementById('help-menu');
         menu.classList.toggle('active');
@@ -534,11 +678,7 @@
         }
     });
 
-    /* =========================================
-       拡張RPGチュートリアルシステム
-       ========================================= */
     const scenarios = {
-        // ▼ 1. 全機能ツアー (元のチュートリアル)
         'all': [
             { text: "FitWorksへようこそ!\nこのチュートリアルでは、アプリの全機能をご紹介します!" },
             { targetId: 'help-btn', text: "まずは画面左上。「ヘルプ」ボタンから、\n各機能の詳しい使い方や、サプリメントの知識を確認できます。" },
@@ -554,7 +694,6 @@
             { targetId: 'nav-community', text: "「掲示板」はユーザー同士の交流スペース。\n筋トレ情報の交換や、雑談で盛り上がりましょう。" },
             { targetId: null, text: "機能説明は以上です。\n気になる機能の詳細は、ヘルプメニューの個別ガイドも見てね！" }
         ],
-        // ▼ 2. トレーニングの始め方
         'training': [
             { text: "トレーニングの始め方について解説するよ！\n準備はいいかな？" },
             { targetId: 'tutorial-training-btn', text: "まずはこの「トレーニングを開始」ボタンをタップ！\nここからその日のメニューを作ることができるよ。" },
@@ -563,7 +702,6 @@
             { targetId: 'tutorial-map-btn', preAction: closeRecordMenu, text: "まだジムが決まっていない時はここ！\n近くのジムや公園をマップで探せる便利機能だよ。" },
             { text: "トレーニングは継続が大事！\nまずは軽いメニューから始めてみよう！" }
         ],
-        // ▼ 3. 記録の付け方・ケア
         'record': [
             { text: "記録とボディケアについて説明するよ！" },
             { targetId: 'tutorial-record-btn', text: "記録をつけるときは、このボタンをタップしてメニューを開こう。" },
@@ -573,7 +711,6 @@
             { targetId: 'tutorial-care-btn', preAction: closeRecordMenu, text: "トレーニングの後はケアも忘れずに！\nAIが疲れ具合に合わせて、最適なストレッチを教えてくれるよ。" },
             { text: "しっかり記録して、自分の成長を可視化しよう！" }
         ],
-        // ▼ 4. ガチャ・キャラについて
         'gacha': [
             { text: "お楽しみ要素、ガチャとキャラクターについて紹介するよ！" },
             { targetId: 'nav-gacha', text: "まずは「ガチャ」！\nトレーニングで貯めたコインやチケットを使ってアイテムをゲット！" },
@@ -582,7 +719,6 @@
             { targetId: 'nav-char', text: "「キャラ」メニューでは、図鑑を見たり、\n所持しているアイテムの確認ができるよ。" },
             { text: "自分だけの最強でカワイイ相棒に育て上げよう！" }
         ],
-        // ▼ 5. 交流・AI・その他
         'social': [
             { text: "他のユーザーとの交流や、AI機能について説明するよ！" },
             { targetId: 'tutorial-friends-btn', text: "「フレンド」では友達を検索してフォローできるよ。\nランキングで競い合うとモチベーションUP！" },
@@ -596,7 +732,7 @@
     let currentRpgStep = 0;
     let typeWriterInterval;
     let updateLoopId; 
-    let currentScenarioKey = 'all'; // 現在のシナリオキー
+    let currentScenarioKey = 'all'; 
     const STORAGE_KEY_RPG = 'fitworks_rpg_tutorial_v16'; 
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -620,7 +756,6 @@
     function updateRpgView() {
         const step = scenarios[currentScenarioKey][currentRpgStep];
         
-        // ステップごとの事前アクションを実行 (メニューを開くなど)
         if (step.preAction && typeof step.preAction === 'function') {
             step.preAction();
         }
@@ -683,8 +818,6 @@
         const targetEl = document.getElementById(step.targetId);
         if(!targetEl) return;
         
-        // ターゲットが非表示の場合はスポットライトを当てない（またはメニューを開く処理を待つ）
-        // ただしボトムナビはfixed要素でoffsetParentがnullの場合があるため除外
         if (targetEl.offsetParent === null && !step.targetId.startsWith('nav-')) return;
 
         const rect = targetEl.getBoundingClientRect();
@@ -698,12 +831,8 @@
         pointer.style.top = (rect.bottom + scrollY + 10) + 'px';
         pointer.style.left = (rect.left + scrollX + rect.width/2 - 20) + 'px';
         
-        // メッセージボックスの位置決定
-        // 基本は要素の上に表示 (rect.top ... - msgBox.offsetHeight)
         let boxTop = rect.top + scrollY - msgBox.offsetHeight - 20;
         
-        // 画面上部にある要素や、ヘッダー付近の特定のIDの場合は「下に表示」に切り替える
-        // 注意: ボトムナビ系(nav-...)は下に行くと見切れるため、ここには含めない(デフォルトの上表示でOK)
         const forceBelowIds = ['help-btn', 'tutorial-xp-area', 'tutorial-mission-btn', 'tutorial-title-display', 'real-time-clock'];
         const isForceBelow = forceBelowIds.includes(step.targetId) || (rect.top < 120);
 
@@ -725,7 +854,6 @@
     }
 
     function endRpgTutorial() {
-        // チュートリアル終了時にメニューが開いていたら閉じる
         closeRecordMenu();
         
         document.getElementById('tutorial-rpg-box').classList.remove('active');
@@ -736,7 +864,6 @@
         localStorage.setItem(STORAGE_KEY_RPG, 'true');
     }
 
-    // マウス追従エフェクト
     document.addEventListener('mousemove', (e) => {
         const x = e.clientX / window.innerWidth;
         const y = e.clientY / window.innerHeight;

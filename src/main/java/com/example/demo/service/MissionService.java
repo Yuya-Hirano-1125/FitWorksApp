@@ -61,6 +61,15 @@ public class MissionService {
         }
         return missions;
     }
+    
+    /**
+     * ★追加: 達成済みかつ報酬未受け取りのミッションがあるか確認
+     */
+    @Transactional(readOnly = true)
+    public boolean hasCompletedUnclaimedMissions(User user) {
+        List<DailyMissionStatus> missions = getOrCreateTodayMissions(user);
+        return missions.stream().anyMatch(m -> m.isCompleted() && !m.isRewardClaimed());
+    }
 
     /**
      * ランダムに3つのミッションを生成

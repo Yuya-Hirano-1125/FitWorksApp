@@ -28,6 +28,7 @@ import com.example.demo.entity.AuthProvider;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.CustomUserDetails;
+import com.example.demo.service.MissionService; // ★追加
 import com.example.demo.service.SmsService;
 import com.example.demo.service.UserService;
 
@@ -39,6 +40,9 @@ public class AuthController {
 
     @Autowired
     private SmsService smsService;
+    
+    @Autowired
+    private MissionService missionService; // ★追加
 
     @Autowired
     private UserRepository userRepository;
@@ -108,6 +112,11 @@ public class AuthController {
         
         BackgroundUnlockDto backgroundUnlocks = userService.checkNewBackgroundUnlocks(user.getUsername());
         model.addAttribute("backgroundUnlocks", backgroundUnlocks);
+        
+        // ★追加: ミッション達成状況をチェックして通知フラグをセット
+        if (missionService.hasCompletedUnclaimedMissions(user)) {
+            model.addAttribute("missionAchieved", true);
+        }
         
         return "misc/home";
     }

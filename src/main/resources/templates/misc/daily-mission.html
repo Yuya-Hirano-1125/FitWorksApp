@@ -52,6 +52,24 @@
         .mission-card { background: rgba(255, 255, 255, 0.85); border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; padding: 20px; display: flex; align-items: center; gap: 15px; transition: transform 0.2s; }
         .mission-card:hover { transform: translateY(-3px); }
 
+        .mission-card.claimed-mission {
+            opacity: 0.6; /* 全体を薄く */
+            background: rgba(240, 240, 240, 0.8); /* 背景をグレーに */
+            box-shadow: none; /* 影を消す */
+            border: 1px solid #ddd;
+        }
+        .mission-card.claimed-mission:hover {
+            transform: none; /* ホバー時の動きを止める */
+        }
+        .mission-card.claimed-mission .mission-icon {
+            filter: grayscale(100%); /* アイコンをモノクロに */
+            opacity: 0.7;
+        }
+        .mission-card.claimed-mission .mission-title,
+        .mission-card.claimed-mission .mission-reward {
+            color: #888; /* 文字色を薄く */
+        }
+
         .mission-header {
             display: flex;
             flex-direction: column;
@@ -99,14 +117,13 @@
             </div>
             
             <div th:if="${rewardLevel != null}" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(21, 87, 36, 0.2); font-weight: bold; font-size: 0.95rem;">
-                <span>
+                <div style="margin-bottom: 4px;">
                     現在のレベル: <span th:text="${rewardLevel}" style="font-size: 1.1em;"></span> 
                     <span style="font-size: 0.85em; font-weight: normal;">(EXP: <span th:text="${rewardExp}"></span>/<span th:text="${rewardReqExp}"></span>)</span>
-                </span>
-                <span style="margin: 0 10px;">|</span>
-                <span>
-                    所持チップ: <span th:text="${rewardChips}" style="font-size: 1.1em; color: #b8860b;"></span>
-                </span>
+                </div>
+                <div>
+                    所持チップ: <span th:text="${rewardChips}" style="font-size: 1.1em;"></span>
+                </div>
             </div>
         </div>
 
@@ -120,7 +137,7 @@
         </p>
 
         <div class="mission-list">
-            <div class="mission-card" th:each="mission : ${missions}">
+            <div class="mission-card" th:each="mission : ${missions}" th:classappend="${mission.rewardClaimed} ? 'claimed-mission' : ''">
                 <div class="mission-icon">
                     <i class="fa-solid fa-running" th:if="${mission.missionType == 'TRAINING_LOG'}"></i>
                     <i class="fa-solid fa-dumbbell" th:if="${mission.missionType == 'COMMUNITY_POST'}"></i>
