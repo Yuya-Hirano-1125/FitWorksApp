@@ -2,236 +2,252 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ガチャ結果 | FitWorks</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
         /* ==========================================================================
-           🌌 BACKGROUND STYLES (start.htmlと同様)
+           🎨 THEME & VARIABLES (gacha.htmlと統一)
            ========================================================================== */
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.65);
-            --primary-color: #4facfe; 
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.9);
+            
+            /* パステル & マジカルテーマカラー */
+            --theme-pink: #ff9a9e;
+            --theme-purple: #a18cd1;
+            --theme-blue: #a2d2ff;
+            --theme-yellow: #fbc2eb;
+            --text-main: #5d54a4;
+            --text-accent: #ff6b81;
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            background-color: #f0f8ff;
-            min-height: 100vh;
-            overflow-x: hidden;
-            font-family: 'Noto Sans JP', sans-serif;
+            margin: 0; padding: 0; background-color: #f0f8ff;
+            min-height: 100vh; overflow-x: hidden;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            color: var(--text-main);
         }
 
+        /* ==========================================================================
+           🌌 BACKGROUND ANIMATION
+           ========================================================================== */
         .interactive-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%;
-            animation: auroraFlow 20s ease infinite;
-            overflow: hidden;
+            background-size: 400% 400%; animation: auroraFlow 20s ease infinite; overflow: hidden;
         }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        @keyframes auroraFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
-            animation: floatOrb 30s infinite alternate ease-in-out;
-            z-index: 0;
-        }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
         .orb-3 { width: 40vh; height: 40vh; background: #ff9a9e; top: 40%; left: 60%; animation-delay: -10s; opacity: 0.4; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
 
-        @keyframes floatOrb {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 30px) scale(1.1); }
-        }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
 
-        #bg-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            mix-blend-mode: screen;
-        }
-
-        .bg-cloud {
-            position: absolute;
-            background: #fff;
-            border-radius: 50%;
-            filter: blur(40px);
-            opacity: 0.85;
-            z-index: 2;
-            pointer-events: none;
-            box-shadow: 0 0 60px rgba(255,255,255,0.9);
-        }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; box-shadow: 0 0 60px rgba(255,255,255,0.9); }
         .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
         .cloud-3 { top: 30%; left: 70%; width: 300px; height: 300px; opacity: 0.5; animation: breatheCloud 10s infinite alternate ease-in-out; }
-
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
         @keyframes breatheCloud { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
 
         .mouse-flare {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
             background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%);
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            mix-blend-mode: screen;
-            z-index: 20;
-            filter: blur(15px);
+            transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px);
             transition: transform 0.08s cubic-bezier(0.075, 0.82, 0.165, 1);
         }
 
         /* ==========================================================================
-           🎁 GACHA RESULT SPECIFIC STYLES
+           🏗 MAIN LAYOUT
            ========================================================================== */
-        
-        /* メインコンテナをすりガラス風にする */
-        .gacha-page .main-container {
-            max-width: 800px;
-            width: 90%;
-            margin: 40px auto;
-            padding: 40px;
-            
-            background: rgba(255, 255, 255, 0.65); /* 半透明 */
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 45px;
-            border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
-            
-            position: relative;
-            z-index: 10;
+        .main-container {
+            max-width: 800px; width: 95%; margin: 30px auto; padding: 40px 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-radius: 40px;
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 20px 50px rgba(100, 100, 255, 0.2), inset 0 0 0 1px rgba(255,255,255,0.5);
+            position: relative; z-index: 10;
             text-align: center;
         }
 
-        h1 {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
-            color: #333;
-            margin-bottom: 10px;
+        /* ヘッダー周り */
+        .page-header-container { 
+            position: relative; margin-bottom: 30px; display: flex; justify-content: center; align-items: center;
+            border-bottom: none; padding-bottom: 0;
+        }
+        
+        .home-link-icon {
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 45px; height: 45px; background: rgba(255,255,255,0.9);
+            color: var(--theme-purple); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; text-decoration: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: all 0.3s;
+            border: 2px solid var(--theme-purple);
+        }
+        .home-link-icon:hover { transform: translateY(-50%) scale(1.1); background: var(--theme-purple); color: white; }
+
+        .page-title { 
+            font-family: 'Fredoka One', 'M PLUS Rounded 1c', sans-serif;
+            font-size: 2.5rem; margin: 0; line-height: 1;
+            background: linear-gradient(to right, #ff9a9e, #a18cd1);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(2px 2px 0px rgba(255,255,255,0.8));
+            letter-spacing: 2px; transform: rotate(-2deg); display: inline-block;
+            text-align: center; flex-grow: 0;
+        }
+        .page-title::after {
+            content: '✨'; position: absolute; top: -10px; right: -20px;
+            font-size: 1.5rem; -webkit-text-fill-color: #ffd700;
+            animation: twinkle 1s infinite alternate;
         }
 
+        .sub-heading { color: #666; font-weight: 700; margin-bottom: 30px; }
+
+        /* ==========================================================================
+           🃏 RESULT CARDS
+           ========================================================================== */
         .result-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px; margin-top: 20px;
         }
 
         .result-card {
-            background: rgba(255, 255, 255, 0.85); /* カードも少し透過 */
-            padding: 20px;
-            border: 2px solid transparent;
-            border-radius: 20px;
-            text-align: center;
-            animation: fadeIn 0.8s;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 20px; border-radius: 20px; text-align: center;
+            animation: fadeIn 0.8s; 
             box-shadow: 0 10px 20px rgba(0,0,0,0.05);
             transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid transparent;
+            position: relative; overflow: hidden;
         }
-        
-        .result-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-        }
+        /* 通常カードのホバー */
+        .result-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
 
         .result-card img {
-            width: 90px;
-            height: 90px;
-            object-fit: contain;
-            margin-bottom: 15px;
+            width: 90px; height: 90px; object-fit: contain; margin-bottom: 15px;
             filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+            z-index: 2; position: relative;
         }
         
-        .result-name {
-            font-weight: 700;
-            color: #444;
-            font-size: 0.95rem;
-            margin-bottom: 5px;
+        .result-name { font-weight: 800; color: var(--text-main); font-size: 0.95rem; margin-bottom: 5px; position: relative; z-index: 2; }
+
+        /* レアリティスタイル */
+        .rarity-UR { 
+            font-weight: 900; font-size: 1.2rem;
+            background: linear-gradient(135deg, #ff00cc, #333399); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            position: relative; z-index: 2;
+        }
+        .rarity-SSR { 
+            font-weight: 800; 
+            background: linear-gradient(135deg, #ff9900, #ffcc00); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); 
+            position: relative; z-index: 2;
+        }
+        .rarity-SR { 
+            font-weight: 700; 
+            background: linear-gradient(135deg, #2196f3, #4facfe); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .rarity-R { 
+            font-weight: 700; 
+            background: linear-gradient(135deg, #9c27b0, #a18cd1); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        /* レアリティごとのスタイル */
-        .rarity-UR {
-            font-weight: 900;
-            background: linear-gradient(45deg, #ff00cc, #3333ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.2rem;
+        /* --- エフェクトアニメーション --- */
+        @keyframes goldPulse {
+            0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); border-color: #ffd700; }
+            50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.8); border-color: #fffacd; }
+            100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); border-color: #ffd700; }
+        }
+        /* ★追加: UR用の明滅アニメーション (ピンク〜紫) */
+        @keyframes urPulse {
+            0% { box-shadow: 0 0 15px rgba(255, 0, 204, 0.4); border-color: #ff00cc; }
+            50% { box-shadow: 0 0 30px rgba(255, 0, 204, 0.8); border-color: #333399; }
+            100% { box-shadow: 0 0 15px rgba(255, 0, 204, 0.4); border-color: #ff00cc; }
         }
 
-        .rarity-SSR {
-            color: #FFD700;
-            font-weight: 800;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        /* --- SSRカード --- */
+        .result-card.rarity-card-SSR {
+            border: 3px solid #ffd700;
+            background: linear-gradient(135deg, #fffcf5 0%, #fff 100%);
+            animation: goldPulse 2s infinite alternate ease-in-out;
+        }
+        .result-card.rarity-card-SSR:hover {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); /* ホバー時も金色の光 */
+            transform: translateY(-5px);
+        }
+        .result-card.rarity-card-SSR::after {
+            content: "✨"; position: absolute; top: 5px; right: 5px; font-size: 1.2rem;
+            animation: fadeIn 1s infinite alternate;
         }
 
-        .rarity-SR {
-            color: #a0a0a0;
-            font-weight: 700;
+        /* --- URカード (SSR風のUR版) --- */
+        .result-card.rarity-card-UR {
+            border: 3px solid #ff00cc;
+            background: linear-gradient(135deg, #fff0f5 0%, #fff 100%); /* 薄いピンク背景 */
+            animation: urPulse 2s infinite alternate ease-in-out;
+        }
+        /* URホバー: ピンクの輝きを維持・強化 */
+        .result-card.rarity-card-UR:hover {
+            box-shadow: 0 0 40px rgba(255, 0, 204, 0.8);
+            transform: translateY(-5px) scale(1.02);
+        }
+        .result-card.rarity-card-UR::after {
+            content: "👑"; position: absolute; top: 5px; right: 5px; font-size: 1.5rem;
+            filter: drop-shadow(0 0 5px gold);
         }
 
-        .rarity-R {
-            color: #cd7f32;
-            font-weight: 700;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes twinkle { from { opacity: 0.5; transform: scale(0.8); } to { opacity: 1; transform: scale(1.1); } }
 
-        /* ボタンデザインの統一 */
+        /* ==========================================================================
+           🔘 ACTION BUTTONS
+           ========================================================================== */
+        .button-container { margin-top: 50px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
         .button {
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            border-radius: 50px;
-            display: inline-block;
-            text-decoration: none;
-            transition: all 0.3s;
-            width: 100%;
-            max-width: 300px;
-            box-sizing: border-box;
+            position: relative;
+            padding: 15px 40px; 
+            font-size: 1.2rem; font-weight: 800; border-radius: 50px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            text-decoration: none; transition: all 0.2s; 
+            width: 100%; max-width: 350px; box-sizing: border-box; cursor: pointer;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
         }
         
         .button.primary {
-            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            color: white; border: 4px solid #fff;
+            box-shadow: 0 10px 20px rgba(161, 140, 209, 0.4);
+        }
+        .button.primary:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 15px 25px rgba(161, 140, 209, 0.6);
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
             color: white;
-            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
-            border: none;
         }
-        .button.primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(79, 172, 254, 0.5);
-        }
+        .button.primary:active { transform: scale(0.95); }
 
-        .button.secondary {
-            background: rgba(255, 255, 255, 0.8);
-            color: #555;
-            border: 2px solid #ddd;
-        }
-        .button.secondary:hover {
-            background: #fff;
-            border-color: #aaa;
-            transform: translateY(-3px);
+        @media (max-width: 600px) {
+            .main-container { padding: 30px 15px; width: 95%; border-radius: 30px; }
+            .page-title { font-size: 1.8rem; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .result-list { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
         }
 
     </style>
@@ -252,11 +268,19 @@
 
 <div class="main-container">
 
-    <h1><i class="fa-solid fa-gift" style="color: #ff6b6b;"></i> ガチャ結果</h1>
-    <p class="sub-heading" style="color:#666;">おめでとう！以下のアイテムを獲得しました！</p>
+    <div class="page-header-container">
+        <a th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <h1 class="page-title">RESULT</h1>
+    </div>
+
+    <p class="sub-heading">おめでとう！以下のアイテムを獲得しました！</p>
 
     <div class="result-list">
-        <div class="result-card" th:each="item : ${results}">
+        <div class="result-card" th:each="item : ${results}"
+             th:classappend="' rarity-card-' + ${item.rarity}">
+            
             <img th:src="@{${item.imagePath}}" alt="result">
 
             <div class="result-name" th:text="${item.name}"></div>
@@ -268,16 +292,10 @@
         </div>
     </div>
 
-    <div class="button-container" style="margin-top: 50px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
-
-        <a th:href="@{/gacha(userId=${userId})}" class="button primary">
-            <i class="fa-solid fa-rotate-right"></i> もう一度引く
+    <div class="button-container">
+        <a th:href="@{/gacha}" class="button primary">
+            <i class="fa-solid fa-arrow-left"></i> ガチャ画面に戻る
         </a>
-
-        <a th:href="@{/home}" class="button secondary">
-            <i class="fa-solid fa-house"></i> ホームに戻る
-        </a>
-
     </div>
 </div>
 
