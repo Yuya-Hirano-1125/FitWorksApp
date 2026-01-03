@@ -25,10 +25,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.dto.BackgroundUnlockDto;
 import com.example.demo.entity.AuthProvider;
+import com.example.demo.entity.CharacterEntity; // ★追加
 import com.example.demo.entity.User;
+import com.example.demo.repository.CharacterRepository; // ★追加
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.CustomUserDetails;
-import com.example.demo.service.MissionService; // ★追加
 import com.example.demo.service.SmsService;
 import com.example.demo.service.UserService;
 
@@ -39,25 +40,22 @@ public class AuthController {
     private UserService userService;
 
     @Autowired
-    private SmsService smsService;
-    
-    @Autowired
-    private MissionService missionService; // ★追加
-
-    @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("/")
-    public String index(Authentication authentication) {
-        if (authentication != null && authentication.isAuthenticated() && 
-           !(authentication instanceof AnonymousAuthenticationToken)) {
-            return "redirect:/home";
-        }
-        return "start";
-    }
+    @Autowired
+    private SmsService smsService;
+
+    // ★追加: CharacterRepositoryを注入
+    @Autowired
+    private CharacterRepository characterRepository;
 
     @GetMapping("/login")
     public String login() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && 
+            !(authentication instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/home";
+        }
         return "auth/login";
     }
 
@@ -67,155 +65,165 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String registerUser(@RequestParam String username,
-                               @RequestParam String password,
-                               @RequestParam String email,
-                               // @RequestParam String phoneNumber, ← この行を削除
-                               @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthDate,
-                               Model model) {
+    public String registerUser(@RequestParam("username") String username,
+                               @RequestParam("email") String email,
+                               @RequestParam("password") String password,
+                               @RequestParam("birthDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthDate,
+                               RedirectAttributes redirectAttributes) {
         try {
-            // phoneNumber 引数を削除して呼び出し
-            userService.registerUser(username, password, email, birthDate);
+            userService.registerNewUser(username, email, password, birthDate);
+            redirectAttributes.addFlashAttribute("successMessage", "登録が完了しました。ログインしてください。");
             return "redirect:/login";
         } catch (IllegalArgumentException e) {
-            model.addAttribute("error", e.getMessage());
-            return "auth/register";
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/register";
         }
     }
-    
-    @GetMapping("/home")
-    public String home(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
-        if (userDetails == null) {
-            return "redirect:/login";
-        }
-        
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                                  .orElse(null);
-        
-        if (user == null) {
-            return "redirect:/logout";
-        }
 
+    @GetMapping("/home")
+    public String showHome(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // ログインユーザー情報の取得
+        User user = userService.findByUsername(userDetails.getUsername());
+        
+        // 既存のユーザー情報設定
         model.addAttribute("username", user.getUsername());
         model.addAttribute("level", user.getLevel());
-        model.addAttribute("experiencePoints", user.getXp());
+        model.addAttribute("experiencePoints", user.getExperiencePoints());
         model.addAttribute("requiredXp", user.calculateRequiredXp());
         model.addAttribute("progressPercent", user.getProgressPercent());
-        
         model.addAttribute("userTitle", user.getDisplayTitle());
         
-        String selectedBackground = user.getSelectedBackground();
-        if (selectedBackground == null || selectedBackground.isEmpty()) {
-            selectedBackground = "fire-original";
+        // 背景画像の判定
+        String bgImage = user.getSelectedBackground();
+        if (bgImage == null || bgImage.isEmpty()) {
+            bgImage = "fire-original";
         }
-        model.addAttribute("selectedBackground", selectedBackground);
-        
-        BackgroundUnlockDto backgroundUnlocks = userService.checkNewBackgroundUnlocks(user.getUsername());
-        model.addAttribute("backgroundUnlocks", backgroundUnlocks);
-        
-        // ★追加: ミッション達成状況をチェックして通知フラグをセット
-        if (missionService.hasCompletedUnclaimedMissions(user)) {
-            model.addAttribute("missionAchieved", true);
+        model.addAttribute("selectedBackground", bgImage);
+
+        // 背景解放チェック
+        BackgroundUnlockDto unlockDto = userService.checkNewBackgroundUnlocks(user.getUsername());
+        model.addAttribute("backgroundUnlocks", unlockDto);
+
+        // ミッション達成状況
+        boolean missionAchieved = false;
+        if (user.getLastMissionCompletionDate() != null && 
+            user.getLastMissionCompletionDate().equals(LocalDate.now()) && 
+            (user.getIsRewardClaimedToday() == null || !user.getIsRewardClaimedToday())) {
+            missionAchieved = true;
         }
-        
+        model.addAttribute("missionAchieved", missionAchieved);
+
+        // ▼▼▼▼▼ キャラクター画像決定ロジック (追加) ▼▼▼▼▼
+        String characterImagePath;
+
+        if (user.getSelectedCharacterId() != null) {
+            // 選択されたIDからキャラクター情報を取得
+            CharacterEntity selectedChar = characterRepository.findById(user.getSelectedCharacterId()).orElse(null);
+            
+            if (selectedChar != null) {
+                characterImagePath = selectedChar.getImagePath();
+            } else {
+                // キャラが見つからない場合のフォールバック（レベル連動）
+                characterImagePath = "/img/character/" + ((user.getLevel() / 10) * 10) + ".png";
+            }
+        } else {
+            // 未選択の場合のデフォルト挙動（レベル連動）
+            characterImagePath = "/img/character/" + ((user.getLevel() / 10) * 10) + ".png";
+        }
+
+        model.addAttribute("characterImagePath", characterImagePath);
+        // ▲▲▲▲▲ 追加ここまで ▲▲▲▲▲
+
         return "misc/home";
     }
 
-    // --- パスワードリセットフロー (修正) ---
-
-    // 1. パスワード忘れ画面表示
     @GetMapping("/forgot-password")
-    public String forgotPassword() {
+    public String showForgotPasswordForm() {
         return "auth/forgot-password";
     }
 
-    // 2. 本人確認＆認証コード送信処理
-    @PostMapping("/forgot-password")
-    public String processForgotPassword(@RequestParam String email,
-                                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthDate,
-                                        RedirectAttributes redirectAttributes,
-                                        Model model) {
-        // メールと生年月日で認証し、コード送信
-        boolean result = userService.sendAuthCodeByEmail(email, birthDate);
-        
-        if (result) {
-            // 成功したらメールアドレスを次の画面に引き継いでリダイレクト
+    @PostMapping("/forgot-password/email")
+    public String processForgotPasswordEmail(@RequestParam("email") String email,
+                                             @RequestParam("birthDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthDate,
+                                             RedirectAttributes redirectAttributes) {
+        boolean sent = userService.sendAuthCodeByEmail(email, birthDate);
+        if (sent) {
             redirectAttributes.addFlashAttribute("email", email);
             redirectAttributes.addFlashAttribute("message", "認証コードをメールで送信しました。");
             return "redirect:/verify-code";
         } else {
-            model.addAttribute("error", "メールアドレスまたは生年月日が一致しません。");
-            return "auth/forgot-password";
+            redirectAttributes.addFlashAttribute("error", "メールアドレスまたは生年月日が一致しません。");
+            return "redirect:/forgot-password";
         }
     }
 
-    // 3. 認証コード入力画面表示
+    @PostMapping("/forgot-password/sms")
+    public String processForgotPasswordSms(@RequestParam("phoneNumber") String phoneNumber,
+                                           RedirectAttributes redirectAttributes) {
+        boolean sent = userService.processForgotPasswordBySms(phoneNumber);
+        if (sent) {
+            redirectAttributes.addFlashAttribute("phoneNumber", phoneNumber);
+            redirectAttributes.addFlashAttribute("message", "認証コードをSMSで送信しました。");
+            return "redirect:/verify-code";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "電話番号が登録されていません。");
+            return "redirect:/forgot-password";
+        }
+    }
+    
     @GetMapping("/verify-code")
-    public String verifyCodePage() {
+    public String showVerifyCodeForm(@RequestParam(value = "email", required = false) String email,
+                                     @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
+                                     Model model) {
+        model.addAttribute("email", email);
+        model.addAttribute("phoneNumber", phoneNumber);
         return "auth/verify-code";
     }
 
-    // 4. 認証コード検証処理
     @PostMapping("/verify-code")
-    public String processVerifyCode(@RequestParam String email,
-                                    @RequestParam String code,
-                                    RedirectAttributes redirectAttributes,
-                                    Model model) {
-        // コード検証して再設定用トークンを取得
-        String resetToken = userService.verifyAuthCode(email, code);
+    public String verifyCode(@RequestParam(value = "email", required = false) String email,
+                             @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
+                             @RequestParam("code") String code,
+                             RedirectAttributes redirectAttributes) {
         
+        String resetToken = null;
+        if (email != null && !email.isEmpty()) {
+            resetToken = userService.verifyAuthCode(email, code);
+        } else if (phoneNumber != null && !phoneNumber.isEmpty()) {
+            // SMS認証の実装が必要であればここに記述
+        }
+
         if (resetToken != null) {
-            // 検証成功: トークンを次の画面に渡す (URLパラメータ経由)
             return "redirect:/reset-password?token=" + resetToken;
         } else {
-            model.addAttribute("error", "認証コードが正しくないか、有効期限切れです。");
-            model.addAttribute("email", email); // メールアドレスを再表示用にセット
-            return "auth/verify-code";
-        }
-    }
-    
-    // 5. パスワード再設定画面表示
-    @GetMapping("/reset-password")
-    public String resetPasswordPage(@RequestParam(required = false) String token, Model model) {
-        if (token == null || token.isEmpty()) {
-            return "redirect:/forgot-password";
-        }
-        model.addAttribute("token", token);
-        return "auth/reset-password";
-    }
-    
-    // 6. パスワード更新処理
-    @PostMapping("/reset-password")
-    public String processResetPassword(@RequestParam String token,
-                                       @RequestParam String password,
-                                       @RequestParam String confirmPassword,
-                                       Model model) {
-        if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "パスワードが一致しません。");
-            model.addAttribute("token", token);
-            return "auth/reset-password";
-        }
-        
-        boolean success = userService.updatePasswordByToken(token, password);
-        
-        if (success) {
-            return "redirect:/login?resetSuccess";
-        } else {
-            model.addAttribute("error", "トークンが無効か、有効期限切れです。最初からやり直してください。");
-            return "auth/reset-password";
+            redirectAttributes.addFlashAttribute("error", "認証コードが正しくないか、有効期限切れです。");
+            redirectAttributes.addFlashAttribute("email", email);
+            return "redirect:/verify-code";
         }
     }
 
-    // --- SMS認証（API） ---
-    @PostMapping("/api/auth/send-otp")
-    @ResponseBody
-    public ResponseEntity<?> sendOtp(@RequestParam String phoneNumber) {
-        try {
-            smsService.sendOtp(phoneNumber);
-            return ResponseEntity.ok("SMS sent successfully");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send SMS: " + e.getMessage());
+    @GetMapping("/reset-password")
+    public String showResetPasswordForm(@RequestParam("token") String token, Model model) {
+        User user = userService.getByResetPasswordToken(token);
+        if (user == null) {
+            model.addAttribute("error", "無効なトークンです。");
+        } else {
+            model.addAttribute("token", token);
+        }
+        return "auth/reset-password";
+    }
+
+    @PostMapping("/reset-password")
+    public String processResetPassword(@RequestParam("token") String token,
+                                       @RequestParam("password") String password,
+                                       RedirectAttributes redirectAttributes) {
+        boolean updated = userService.updatePasswordByToken(token, password);
+        if (updated) {
+            redirectAttributes.addFlashAttribute("successMessage", "パスワードを再設定しました。ログインしてください。");
+            return "redirect:/login";
+        } else {
+            redirectAttributes.addFlashAttribute("error", "パスワードの再設定に失敗しました（有効期限切れなど）。");
+            return "redirect:/forgot-password";
         }
     }
 
@@ -230,6 +238,7 @@ public class AuthController {
                     User newUser = new User();
                     newUser.setPhoneNumber(phoneNumber);
                     newUser.setProvider(AuthProvider.PHONE);
+                    // 仮のユーザー名を設定
                     newUser.setUsername("phone_" + phoneNumber.substring(phoneNumber.length() - 4)); 
                     return userRepository.save(newUser);
                 });

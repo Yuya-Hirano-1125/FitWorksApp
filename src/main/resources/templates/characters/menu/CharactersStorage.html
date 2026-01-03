@@ -4,82 +4,151 @@
     <meta charset="UTF-8">
     <title>キャラクター保管庫</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/characters/CharactersStorage.css}">
-    <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/characters/CharactersStorage.css}">
+    
     <style>
-        /* 背景・コンテナスタイル */
-        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif;}
+        /* 画面固有のスタイル調整 */
+        body { 
+            margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; 
+            font-family: 'Noto Sans JP', sans-serif; 
+        }
+
+        /* 共通背景（home.html等と同じ） */
         .interactive-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
             background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
         }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
         @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
         .mouse-flare { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%); transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px); }
 
-        /* ガラス風ラッパー */
-        .glass-wrapper {
-            max-width: 1200px; margin: 20px auto; padding: 40px 20px;
+        /* メインコンテナ（共通デザイン） */
+        .main-container {
+            max-width: 1000px; /* 必要に応じて調整 */
+            width: 92%; margin: 40px auto; padding: 40px;
             background: rgba(255, 255, 255, 0.65);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 20px 50px rgba(100, 149, 237, 0.2);
-            position: relative; /* 戻るボタン配置用に追加 */
-        }
-
-        /* 既存スタイルの調整 */
-        .storage-tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
-        .tab-btn { padding: 10px 20px; border: none; border-radius: 20px; cursor: pointer; background: rgba(255,255,255,0.8); font-weight: bold; }
-        .tab-btn.active { background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; }
-        .character-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
-        .character-card { 
-            text-align: center; border: 3px solid #ccc; border-radius: 12px; padding: 10px; 
-            background: white; /* 視認性確保のため白背景 */
-            position: relative;
-        }
-        .character-img { width: 80px; height: 80px; object-fit: contain; margin: 0 auto; display: block; }
-        .character-card.fire { border-color: #ff7675; }
-        .character-card.water { border-color: #74b9ff; }
-        .character-card.grass { border-color: #55efc4; }
-        .character-card.light { border-color: #ffeaa7; }
-        .character-card.dark { border-color: #a29bfe; }
-
-        /* 🔙 戻るボタン */
-        .back-arrow-button {
-            position: absolute;
-            top: 25px;
-            left: 25px;
-            width: 70px;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
+            border-radius: 45px;
             border: 1px solid rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
-            color: #555;
-            font-size: 2.2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
+            position: relative; z-index: 10;
         }
-        .back-arrow-button:hover {
-            transform: scale(1.1);
-            background: #fff;
-            color: #4facfe;
-            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+
+        /* 共通ヘッダーデザイン */
+        .page-header-container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            border-bottom: 3px solid #007bff; 
+            padding-bottom: 10px; 
+            flex-wrap: wrap; gap: 15px;
         }
+        .header-left { 
+            display: flex; align-items: center; gap: 15px; 
+        }
+        .home-link-icon {
+            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; background-color: white; color: #007bff;
+            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
+            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
+        }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+        .page-title { 
+            color: #343a40; font-size: 2rem; margin: 0; 
+            text-shadow: none; white-space: nowrap;
+        }
+        
+        .user-level-badge {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white; padding: 5px 15px; border-radius: 20px;
+            font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        /* タブデザイン調整 */
+        .storage-tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0 30px; flex-wrap: wrap; }
+        .tab-btn { 
+            padding: 10px 25px; border: none; border-radius: 20px; cursor: pointer; 
+            background: rgba(255,255,255,0.9); font-weight: bold; color: #555;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: all 0.2s;
+        }
+        .tab-btn:hover { transform: translateY(-2px); }
+        .tab-btn.active { background: linear-gradient(135deg, #007bff, #00d2ff); color: white; }
+
+        /* グリッドレイアウト */
+        .character-grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+            gap: 20px; padding: 10px; 
+        }
+        
+        /* キャラクターカード */
+        .character-card { 
+            text-align: center; border: 2px solid rgba(0,0,0,0.1); border-radius: 20px; 
+            padding: 15px 10px; background: rgba(255,255,255,0.9); 
+            position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            height: 100%; min-height: 220px; /* 高さ揃え */
+        }
+        .character-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
+
+        .character-img { 
+            width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px; 
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+        }
+        
+        .character-name { font-weight: bold; margin: 5px 0; color: #333; font-size: 1rem; }
+
+        /* 属性ごとのボーダー色（アクセント） */
+        .character-card.fire { border-bottom: 4px solid #ff7675; }
+        .character-card.water { border-bottom: 4px solid #74b9ff; }
+        .character-card.grass { border-bottom: 4px solid #55efc4; }
+        .character-card.light { border-bottom: 4px solid #ffeaa7; }
+        .character-card.dark { border-bottom: 4px solid #a29bfe; }
+        
+        /* 選択中のスタイル */
+        .character-card.selected {
+            border: 4px solid gold;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            background-color: #fff9e6;
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        .selected-badge {
+            position: absolute; top: -10px; left: -10px;
+            background: #ff4757; color: white; padding: 5px 10px;
+            border-radius: 20px; font-weight: bold; font-size: 0.8rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: none;
+        }
+        .character-card.selected .selected-badge { display: block; }
+
+        /* 選択ボタン */
+        .select-btn {
+            width: 100%; margin-top: auto; /* 下寄せ */
+            padding: 8px 0; border: none; border-radius: 15px;
+            background: #4facfe; color: white; font-weight: bold;
+            cursor: pointer; transition: all 0.2s; font-size: 0.9rem;
+        }
+        .select-btn:hover:not(:disabled) { background: #00f2fe; box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4); }
+        .select-btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.8; }
+
         @media (max-width: 600px) {
-            .back-arrow-button { width: 60px; height: 60px; font-size: 1.5rem; top: 15px; left: 15px; }
+            .main-container { padding: 25px 20px; width: 95%; margin: 20px auto; }
+            .page-title { font-size: 1.5rem; }
+            .character-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .character-card { min-height: 200px; }
+            .character-img { width: 80px; height: 80px; }
         }
     </style>
 </head>
@@ -91,17 +160,18 @@
         <div id="mouse-flare" class="mouse-flare"></div>
     </div>
 
-    <div class="glass-wrapper">
-        <a th:href="@{/characters/menu/CharactersMenu}" class="back-arrow-button" title="メニューに戻る">
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
-
-        <header>
-            <h1>キャラクター保管庫</h1>
-            <p class="user-level" style="text-align:center; font-weight:bold; color:#555;">
+    <div class="main-container">
+        <div class="page-header-container">
+            <div class="header-left">
+                <a th:href="@{/characters/menu/CharactersMenu}" class="home-link-icon" title="メニューに戻る">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <h1 class="page-title"><i class="fa-solid fa-box-open" style="margin-right: 5px;"></i> キャラ保管庫</h1>
+            </div>
+            <div class="user-level-badge">
                 Lv.<span th:text="${currentLevel}">1</span>
-            </p>
-        </header>
+            </div>
+        </div>
 
         <div class="storage-tabs">
             <button class="tab-btn active" data-target="all">ALL</button>
@@ -116,30 +186,39 @@
             <div id="storage-container" class="character-grid">
                 <th:block th:each="chara : ${charaList}">
                     <div class="character-card storage-item" 
-                         th:classappend="${chara.attribute}" 
+                         th:classappend="${chara.attribute} + (${chara.isSelected} ? ' selected' : '')" 
                          th:data-attribute="${chara.attribute}" 
                          th:style="${!chara.isUnlocked} ? 'opacity: 0.6; background: #eee;' : ''">
                         
-                        <div class="evolution-tag" th:text="${chara.evolutionTag}" style="position:absolute; top:5px; right:5px; background:gold; color:white; padding:2px 5px; border-radius:4px; font-size:0.7em;">★1</div>
+                        <div class="selected-badge"><i class="fa-solid fa-check"></i> 選択中</div>
+                        
+                        <div class="evolution-tag" th:text="${chara.rarity}" style="position:absolute; top:5px; right:5px; background:gold; color:white; padding:2px 5px; border-radius:4px; font-size:0.7em;">★1</div>
+                        
                         <img class="character-img" 
                              th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" 
                              th:alt="${chara.name}"
                              onerror="this.src='https://placehold.co/100x100?text=No+Img';">
                         
-                        <p class="character-name" th:text="${chara.name}" style="font-weight:bold; margin:5px 0;">Name</p>
+                        <p class="character-name" th:text="${chara.name}">Name</p>
                         
-                        <p class="required-level" th:if="${!chara.isUnlocked}" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'" style="color:red; font-size:0.8em;"></p>
-                        <p class="required-level" th:if="${chara.isUnlocked}" style="color:green; font-weight:bold; font-size:0.8em;">所持済み</p>
+                        <div th:if="${!chara.isUnlocked}" style="margin-top:auto;">
+                            <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'" style="color:red; font-size:0.8em; font-weight:bold;"></p>
+                        </div>
+                        <div th:if="${chara.isUnlocked}" style="width:100%; margin-top:auto;">
+                            <button class="select-btn" 
+                                    th:onclick="'selectCharacter(' + ${chara.id} + ')'"
+                                    th:text="${chara.isSelected} ? '選択中' : '選択する'"
+                                    th:disabled="${chara.isSelected}">
+                            </button>
+                        </div>
                     </div>
                 </th:block>
             </div>
         </div>
-        
-        <div class="back-btn-container" style="text-align:center; margin:20px;">
-            
     </div>
 
-    <script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
         // タブ切り替えロジック
         document.addEventListener('DOMContentLoaded', () => {
             const tabs = document.querySelectorAll('.tab-btn');
@@ -151,12 +230,36 @@
                     const target = tab.getAttribute('data-target');
                     items.forEach(item => {
                         const attr = item.getAttribute('data-attribute');
-                        if (target === 'all' || attr === target) item.style.display = 'block';
+                        if (target === 'all' || attr === target) item.style.display = 'flex'; // flexに変更
                         else item.style.display = 'none';
                     });
                 });
             });
         });
+
+        // キャラクター選択
+        function selectCharacter(characterId) {
+            fetch('/characters/select', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ characterId: characterId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('変更できませんでした: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('通信エラーが発生しました');
+            });
+        }
 
         // 背景アニメーション
         const canvas = document.getElementById('bg-canvas');
@@ -167,7 +270,7 @@
         function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
         window.addEventListener('resize', resizeCanvas); resizeCanvas();
         window.addEventListener('mousemove', (event) => {
-            flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
+            if(flare) flare.style.transform = `translate(${event.clientX}px, ${event.clientY}px) translate(-50%, -50%)`;
             particlesArray.push(new Particle(event.clientX, event.clientY));
         });
         class Particle {
@@ -188,6 +291,7 @@
             requestAnimationFrame(animate);
         }
         animate();
+        /*]]>*/
     </script>
 </body>
 </html>

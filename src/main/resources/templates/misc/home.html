@@ -198,7 +198,7 @@
 
             <div id="tutorial-char-display" class="character-display"
                             th:style="'background-image: url(/img/background/' + ${selectedBackground} + '.png);'">
-                <img th:src="@{'/img/character/' + ${(level / 10) * 10} + '.png'}" alt="Character" />
+               <img th:src="@{${characterImagePath != null ? characterImagePath : '/img/character/' + (level / 10) * 10 + '.png'}}" alt="Character" />
             </div>
             
             <div class="character-side-buttons">

@@ -47,6 +47,10 @@ public class User {
     
     // ★追加: 生年月日
     private LocalDate birthDate;
+    
+    // ★追加: 選択中のキャラクターID (nullの場合はレベル連動などのデフォルト挙動)
+    @Column(name = "selected_character_id")
+    private Long selectedCharacterId;
 
     @Enumerated(EnumType.STRING)
     private AuthProvider provider = AuthProvider.LOCAL;
@@ -160,6 +164,10 @@ public class User {
 
     public int getXp() { return xp; }
     public void setXp(int xp) { this.xp = xp; }
+    
+ // ★追加: Getter / Setter
+    public Long getSelectedCharacterId() { return selectedCharacterId; }
+    public void setSelectedCharacterId(Long selectedCharacterId) { this.selectedCharacterId = selectedCharacterId; }
 
     public LocalDate getLastMissionCompletionDate() { return lastMissionCompletionDate; }
     public void setLastMissionCompletionDate(LocalDate lastMissionCompletionDate) { this.lastMissionCompletionDate = lastMissionCompletionDate; }

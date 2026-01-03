@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,7 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.demo.entity.CharacterEntity;
 import com.example.demo.entity.User;
+import com.example.demo.repository.CharacterRepository;
 import com.example.demo.repository.UserItemRepository;
 import com.example.demo.service.UserService;
 
@@ -29,6 +33,10 @@ public class CharactersMenuController {
     @Autowired
     private UserItemRepository userItemRepository;
 
+    // ★追加: キャラクター情報を取得するために必要です
+    @Autowired
+    private CharacterRepository characterRepository;
+
     // 夢幻の鍵のアイテムID
     private static final Long DREAM_KEY_ITEM_ID = 16L;
 
@@ -38,16 +46,89 @@ public class CharactersMenuController {
         return "characters/menu/CharactersMenu"; 
     }
 
-    // キャラクター一覧画面へ遷移
+    // キャラクター一覧画面へ遷移 (ここを修正: データをModelに追加)
     @GetMapping("/characters/menu/CharactersStorage")
-    public String showCharactersStorage() {
+    public String showCharactersStorage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+        if (userDetails == null) return "redirect:/login";
+
+        User user = userService.findByUsername(userDetails.getUsername());
+        
+        // 全キャラクターを取得
+        List<CharacterEntity> allCharacters = characterRepository.findAll(); 
+
+        // 表示用リストの作成
+        List<Map<String, Object>> displayList = new ArrayList<>();
+        
+        Long selectedId = user.getSelectedCharacterId();
+
+        for (CharacterEntity chara : allCharacters) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", chara.getId());
+            map.put("name", chara.getName());
+            map.put("attribute", chara.getAttribute()); // fire, water, etc.
+            map.put("imgUrl", chara.getImagePath());
+            map.put("requiredLevel", chara.getRequiredLevel());
+            map.put("rarity", chara.getRarity()); // ★1 など
+
+            // 解放済みかチェック (所持リストに含まれている か 初期キャラ(ID=0)なら解放)
+            boolean isUnlocked = user.hasUnlockedCharacter(chara.getId()) || (chara.getId() == 0); 
+            map.put("isUnlocked", isUnlocked);
+            
+            // 選択中かどうか
+            boolean isSelected = (selectedId != null && selectedId.equals(chara.getId()));
+            map.put("isSelected", isSelected);
+
+            displayList.add(map);
+        }
+
+        // 画面にデータを渡す
+        model.addAttribute("charaList", displayList);
+        model.addAttribute("currentLevel", user.getLevel());
+
         return "characters/menu/CharactersStorage"; 
     }
 
-    // キャラクター解放画面へ遷移
-    @GetMapping("/characters/menu/CharactersUnlock")
-    public String showCharactersUnlock() {
-        return "characters/menu/CharactersUnlock"; 
+    /**
+     * キャラクター選択API (この機能も追加が必要です)
+     */
+    @PostMapping("/characters/select")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> selectCharacter(
+            @RequestBody Map<String, Long> request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        
+        Map<String, Object> response = new HashMap<>();
+        if (userDetails == null) {
+            response.put("success", false);
+            response.put("message", "ログインが必要です");
+            return ResponseEntity.status(401).body(response);
+        }
+
+        try {
+            Long characterId = request.get("characterId");
+            User user = userService.findByUsername(userDetails.getUsername());
+
+            // 所持チェック (初期キャラID=0は常にOK、それ以外は所持確認)
+            if (characterId != 0 && !user.hasUnlockedCharacter(characterId)) {
+                response.put("success", false);
+                response.put("message", "このキャラクターはまだ解放されていません。");
+                return ResponseEntity.ok(response);
+            }
+
+            // 選択中のキャラクターIDを保存
+            user.setSelectedCharacterId(characterId);
+            userService.save(user);
+
+            response.put("success", true);
+            response.put("message", "ホームキャラクターを変更しました！");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("success", false);
+            response.put("message", "エラーが発生しました: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
     }
 
     // 背景一覧画面へ遷移
@@ -66,24 +147,13 @@ public class CharactersMenuController {
                 userLevel = currentUser.getLevel();
                 // 夢幻の鍵の所持数を取得
                 dreamKeyCount = userService.getUserMaterialCount(username, DREAM_KEY_ITEM_ID);
-                // ★ 解放済み背景リストを取得
+                // 解放済み背景リストを取得
                 unlockedBackgrounds = currentUser.getUnlockedBackgrounds();
-                // ★★★ 選択中の背景を取得
+                // 選択中の背景を取得
                 selectedBackground = currentUser.getSelectedBackground();
                 if (selectedBackground == null || selectedBackground.isEmpty()) {
                     selectedBackground = "fire-original";
                 }
-                
-                System.out.println("==========================================");
-                System.out.println("DEBUG: 背景一覧画面初期化");
-                System.out.println("==========================================");
-                System.out.println("ユーザー名: " + username);
-                System.out.println("ユーザーレベル: " + userLevel);
-                System.out.println("夢幻の鍵所持数: " + dreamKeyCount);
-                System.out.println("解放済み背景数: " + unlockedBackgrounds.size());
-                System.out.println("解放済み背景: " + unlockedBackgrounds);
-                System.out.println("選択中の背景: " + selectedBackground);
-                System.out.println("==========================================");
             }
         }
         
@@ -115,14 +185,6 @@ public class CharactersMenuController {
 
             String username = userDetails.getUsername();
             String backgroundId = (String) request.get("backgroundId");
-            Integer materialId = (Integer) request.get("materialId");
-
-            System.out.println("==========================================");
-            System.out.println("DEBUG: 背景解放リクエスト");
-            System.out.println("==========================================");
-            System.out.println("ユーザー名: " + username);
-            System.out.println("背景ID: " + backgroundId);
-            System.out.println("素材ID: " + materialId);
 
             User currentUser = userService.findByUsername(username);
             if (currentUser == null) {
@@ -131,20 +193,8 @@ public class CharactersMenuController {
                 return ResponseEntity.status(404).body(response);
             }
 
-            // ★★★ デバッグ: 現在の解放済み背景を表示 ★★★
-            System.out.println("現在の解放済み背景: " + currentUser.getUnlockedBackgrounds());
-            System.out.println("解放済み背景数: " + currentUser.getUnlockedBackgrounds().size());
-            System.out.println("backgroundId '" + backgroundId + "' は解放済み？: " + currentUser.hasUnlockedBackground(backgroundId));
-            
-            // ★★★ 個別にチェック ★★★
-            for (String bg : currentUser.getUnlockedBackgrounds()) {
-                System.out.println("  - 解放済み: '" + bg + "' (equals: " + bg.equals(backgroundId) + ")");
-            }
-            System.out.println("==========================================");
-
-            // ★ 既に解放済みかチェック
+            // 既に解放済みかチェック
             if (currentUser.hasUnlockedBackground(backgroundId)) {
-                System.out.println("ERROR: この背景は既に解放されています!");
                 response.put("success", false);
                 response.put("message", "この背景は既に解放されています");
                 return ResponseEntity.ok(response);
@@ -152,7 +202,6 @@ public class CharactersMenuController {
 
             // 所持数チェック
             int dreamKeyCount = userService.getUserMaterialCount(username, DREAM_KEY_ITEM_ID);
-            System.out.println("夢幻の鍵所持数: " + dreamKeyCount);
             
             if (dreamKeyCount <= 0) {
                 response.put("success", false);
@@ -169,18 +218,9 @@ public class CharactersMenuController {
                 return ResponseEntity.ok(response);
             }
 
-            // ★ 背景を解放済みとして保存
+            // 背景を解放済みとして保存
             currentUser.addUnlockedBackground(backgroundId);
             userService.save(currentUser);
-
-            // 保存後の状態を確認
-            User savedUser = userService.findByUsername(username);
-            System.out.println("==========================================");
-            System.out.println("DEBUG: 保存後の確認");
-            System.out.println("==========================================");
-            System.out.println("保存後の解放済み背景: " + savedUser.getUnlockedBackgrounds());
-            System.out.println("解放済み背景数: " + savedUser.getUnlockedBackgrounds().size());
-            System.out.println("==========================================");
 
             // 残りの所持数を取得
             int remainingCount = userService.getUserMaterialCount(username, DREAM_KEY_ITEM_ID);
@@ -192,9 +232,7 @@ public class CharactersMenuController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            System.err.println("エラー: " + e.getMessage());
             e.printStackTrace();
-            
             response.put("success", false);
             response.put("message", "エラーが発生しました: " + e.getMessage());
             return ResponseEntity.status(500).body(response);
@@ -223,13 +261,6 @@ public class CharactersMenuController {
             String username = userDetails.getUsername();
             String backgroundCode = (String) request.get("backgroundCode");
 
-            System.out.println("==========================================");
-            System.out.println("DEBUG: 背景選択リクエスト");
-            System.out.println("==========================================");
-            System.out.println("ユーザー名: " + username);
-            System.out.println("背景コード: " + backgroundCode);
-            System.out.println("==========================================");
-
             // ユーザー情報取得
             User currentUser = userService.findByUsername(username);
             if (currentUser == null) {
@@ -242,21 +273,13 @@ public class CharactersMenuController {
             currentUser.setSelectedBackground(backgroundCode);
             userService.save(currentUser);
             
-            System.out.println("==========================================");
-            System.out.println("DEBUG: 背景選択成功");
-            System.out.println("==========================================");
-            System.out.println("選択した背景コード: " + backgroundCode);
-            System.out.println("==========================================");
-
             response.put("success", true);
             response.put("message", "背景を選択しました!");
             
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            System.err.println("エラー: " + e.getMessage());
             e.printStackTrace();
-            
             response.put("success", false);
             response.put("message", "エラーが発生しました: " + e.getMessage());
             return ResponseEntity.status(500).body(response);
@@ -279,7 +302,6 @@ public class CharactersMenuController {
             // 指定された個数分だけレコードを削除
             for (int i = 0; i < amount; i++) {
                 userItemRepository.delete(items.get(i));
-                System.out.println("削除: UserItem ID = " + items.get(i).getId());
             }
 
             return true;
