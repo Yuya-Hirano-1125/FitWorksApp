@@ -11,336 +11,81 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     
     <style>
-        /* ==========================================================================
-           デザイン統一用スタイル
-           ========================================================================== */
+        /* ... CSSは既存のまま ... */
+        /* 前回追加したボタン用スタイルなども含めてください */
         :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
-        
-        body { 
-            margin: 0; padding: 0; 
-            background-color: #f0f8ff; 
-            min-height: 100vh; 
-            font-family: 'Noto Sans JP', sans-serif; 
-            overflow-x: hidden;
-            padding-bottom: 50px;
-        }
-
-        /* 背景アニメーション */
+        body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; padding-bottom: 50px; }
         .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
         @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
-        
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
         .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
         .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
-
-        /* メインコンテナ */
-        .main-container {
-            max-width: 1000px; width: 92%; margin: 40px auto; padding: 30px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-radius: 45px; border: 1px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
-            position: relative; z-index: 10;
-        }
-        
-        /* ヘッダー */
-        .page-header-container { 
-            display: flex; align-items: center; margin-bottom: 20px; 
-            border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; 
-        }
-        
-        .page-title { 
-            color: #343a40; font-size: 1.8rem; margin: 0; flex-grow: 1; 
-            text-align: left; font-weight: 800; white-space: nowrap;
-            text-shadow: none !important;
-        }
+        .main-container { max-width: 1000px; width: 92%; margin: 40px auto; padding: 30px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-radius: 45px; border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset; position: relative; z-index: 10; }
+        .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
+        .page-title { color: #343a40; font-size: 1.8rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 800; white-space: nowrap; text-shadow: none !important; }
         .page-title i { color: #007bff; margin-right: 10px; }
-        
-        .home-link-icon {
-            display: flex; align-items: center; justify-content: center;
-            width: 45px; height: 45px; background-color: white; color: #007bff;
-            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
-            transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0;
-        }
+        .home-link-icon { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 50%; text-decoration: none; transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0; }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
-
-        /* ステータスバー */
-        .status-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,248,255,0.95));
-            padding: 12px 25px; border-radius: 50px;
-            margin-bottom: 30px; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            border: 2px solid rgba(255,255,255,0.8);
-            backdrop-filter: blur(5px);
-        }
-        
-        /* レベル表示 */
-        .level-badge {
-            background: linear-gradient(135deg, #2c3e50, #4ca1af);
-            color: #fff; padding: 8px 24px; border-radius: 30px; 
-            font-weight: 800; font-size: 1.1rem;
-            display: flex; align-items: center; gap: 10px;
-            box-shadow: 0 4px 10px rgba(44, 62, 80, 0.3);
-            text-shadow: 0 2px 2px rgba(0,0,0,0.3);
-            border: 2px solid rgba(255,255,255,0.3);
-        }
-        .level-badge i { 
-            color: #f1c40f; font-size: 1.3rem; 
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); 
-        }
-        
-        /* 素材確認ボタン */
-        .material-link {
-            text-decoration: none; 
-            color: #fff; font-weight: bold; 
-            display: flex; align-items: center; gap: 8px;
-            padding: 10px 25px; border-radius: 30px; 
-            background: linear-gradient(135deg, #8E2DE2, #4A00E0);
-            box-shadow: 0 4px 15px rgba(142, 45, 226, 0.4);
-            transition: all 0.3s ease;
-            border: 2px solid rgba(255,255,255,0.4);
-            font-size: 0.95rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-        .material-link:hover { 
-            transform: translateY(-2px) scale(1.03); 
-            box-shadow: 0 6px 20px rgba(142, 45, 226, 0.5);
-            filter: brightness(1.1);
-        }
+        .status-bar { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,248,255,0.95)); padding: 12px 25px; border-radius: 50px; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border: 2px solid rgba(255,255,255,0.8); backdrop-filter: blur(5px); }
+        .level-badge { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: #fff; padding: 8px 24px; border-radius: 30px; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.3); text-shadow: 0 2px 2px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.3); }
+        .level-badge i { color: #f1c40f; font-size: 1.3rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
+        .material-link { text-decoration: none; color: #fff; font-weight: bold; display: flex; align-items: center; gap: 8px; padding: 10px 25px; border-radius: 30px; background: linear-gradient(135deg, #8E2DE2, #4A00E0); box-shadow: 0 4px 15px rgba(142, 45, 226, 0.4); transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.4); font-size: 0.95rem; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .material-link:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 20px rgba(142, 45, 226, 0.5); filter: brightness(1.1); }
         .material-link i { font-size: 1.1rem; }
-
-        /* グリッドレイアウト & 属性別デザイン調整 */
-        .attribute-section { 
-            margin-bottom: 30px; 
-            border-radius: 20px;
-            padding: 20px;
-            border: 2px solid transparent;
-        }
-        
-        .attribute-heading {
-            font-size: 1.3rem; font-weight: 900; margin-bottom: 15px; margin-top: 0;
-            display: flex; align-items: center; gap: 8px;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-        }
-        
-        /* 属性ごとの背景色 */
-        .section-fire { 
-            background: rgba(255, 107, 107, 0.25); 
-            border-color: rgba(255, 107, 107, 0.5);
-        }
+        .attribute-section { margin-bottom: 30px; border-radius: 20px; padding: 20px; border: 2px solid transparent; }
+        .attribute-heading { font-size: 1.3rem; font-weight: 900; margin-bottom: 15px; margin-top: 0; display: flex; align-items: center; gap: 8px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
+        .section-fire { background: rgba(255, 107, 107, 0.25); border-color: rgba(255, 107, 107, 0.5); }
         .section-fire .attribute-heading { color: #c0392b; }
-
-        .section-water { 
-            background: rgba(79, 172, 254, 0.25); 
-            border-color: rgba(79, 172, 254, 0.5);
-        }
+        .section-water { background: rgba(79, 172, 254, 0.25); border-color: rgba(79, 172, 254, 0.5); }
         .section-water .attribute-heading { color: #2980b9; }
-
-        .section-grass { 
-            background: rgba(46, 204, 113, 0.25); 
-            border-color: rgba(46, 204, 113, 0.5);
-        }
+        .section-grass { background: rgba(46, 204, 113, 0.25); border-color: rgba(46, 204, 113, 0.5); }
         .section-grass .attribute-heading { color: #27ae60; }
-
-        .section-light { 
-            background: rgba(241, 196, 15, 0.25); 
-            border-color: rgba(241, 196, 15, 0.5);
-        }
+        .section-light { background: rgba(241, 196, 15, 0.25); border-color: rgba(241, 196, 15, 0.5); }
         .section-light .attribute-heading { color: #d35400; }
-
-        .section-dark { 
-            background: rgba(155, 89, 182, 0.25); 
-            border-color: rgba(155, 89, 182, 0.5);
-        }
+        .section-dark { background: rgba(155, 89, 182, 0.25); border-color: rgba(155, 89, 182, 0.5); }
         .section-dark .attribute-heading { color: #8e44ad; }
-
-        .section-secret { 
-            background: rgba(255, 159, 243, 0.25); 
-            border-color: rgba(255, 159, 243, 0.5);
-        }
+        .section-secret { background: rgba(255, 159, 243, 0.25); border-color: rgba(255, 159, 243, 0.5); }
         .section-secret .attribute-heading { color: #c0392b; }
-
-        /* ★変更: Flexboxでの並び替えに変更（進化順をわかりやすくするため） */
-        .evolution-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center; /* カードが少ない時に中央寄せ */
-            align-items: center;
-            gap: 15px;
-        }
-
-        /* ★追加: 進化矢印のスタイル */
-        .evolution-arrow {
-            color: rgba(0, 0, 0, 0.3);
-            font-size: 1.5rem;
-            margin: 0 5px;
-            animation: pulseArrow 2s infinite;
-        }
-        @keyframes pulseArrow {
-            0%, 100% { opacity: 0.3; transform: translateX(0); }
-            50% { opacity: 0.8; transform: translateX(3px); }
-        }
-
-        /* キャラクターカード */
-        .char-card {
-            background: #ffffff;
-            border-radius: 15px;
-            padding: 15px 10px;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
-            position: relative;
-            border: 2px solid transparent;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 100%;
-            width: 150px; /* 固定幅にして並びを綺麗に */
-            box-sizing: border-box;
-        }
-        
-        /* 未解放カードのみホバー時に浮き上がる */
-        .char-card:not(.unlocked):hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            border-color: rgba(0,123,255,0.3);
-        }
-        
-        /* 解放済みカード */
-        .char-card.unlocked {
-            background: linear-gradient(to bottom right, #ffffff, #f0f8ff);
-            border: 2px solid #2ecc71;
-            transform: none !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
-        }
-
-        .char-img-wrapper {
-            width: 90px; height: 90px; margin: 0 auto 10px;
-            background: #fff; border-radius: 50%;
-            overflow: hidden; border: 3px solid #eee;
-            position: relative;
-            display: flex; align-items: center; justify-content: center;
-        }
+        .evolution-container { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 15px; }
+        .evolution-arrow { color: rgba(0, 0, 0, 0.3); font-size: 1.5rem; margin: 0 5px; animation: pulseArrow 2s infinite; }
+        @keyframes pulseArrow { 0%, 100% { opacity: 0.3; transform: translateX(0); } 50% { opacity: 0.8; transform: translateX(3px); } }
+        .char-card { background: #ffffff; border-radius: 15px; padding: 15px 10px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; position: relative; border: 2px solid transparent; display: flex; flex-direction: column; justify-content: space-between; height: 100%; width: 150px; box-sizing: border-box; }
+        .char-card:not(.unlocked):hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: rgba(0,123,255,0.3); }
+        .char-card.unlocked { background: linear-gradient(to bottom right, #ffffff, #f0f8ff); border: 2px solid #2ecc71; transform: none !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important; }
+        .char-img-wrapper { width: 90px; height: 90px; margin: 0 auto 10px; background: #fff; border-radius: 50%; overflow: hidden; border: 3px solid #eee; position: relative; display: flex; align-items: center; justify-content: center; }
         .char-img { width: 100%; height: 100%; object-fit: contain; }
-        
-        /* 黒シルエット化 */
-        .char-img-wrapper.locked .char-img {
-            filter: brightness(0);
-            opacity: 0.8;
-        }
-        .lock-icon {
-            position: absolute; font-size: 1.8rem; color: #fff;
-            text-shadow: 0 0 5px rgba(0,0,0,0.8);
-            z-index: 2;
-        }
-
-        .char-name { 
-            font-size: 0.9rem; font-weight: 800; margin-bottom: 8px; 
-            color: #333; height: 2.4em; display: flex; 
-            align-items: center; justify-content: center; line-height: 1.2;
-        }
-        .req-level { 
-            font-size: 0.75rem; color: #666; background: #f0f0f0; 
-            padding: 4px 8px; border-radius: 12px; display: inline-block; 
-            margin-bottom: 12px; font-weight: bold;
-        }
-        
-        /* ボタン */
-        .btn-unlock {
-            width: 100%; border: none; padding: 10px 0; border-radius: 25px;
-            font-weight: bold; font-size: 0.85rem; cursor: pointer;
-            color: #fff; background: linear-gradient(135deg, #00c6ff, #0072ff);
-            box-shadow: 0 4px 10px rgba(0,114,255,0.3);
-            transition: all 0.2s;
-        }
+        .char-img-wrapper.locked .char-img { filter: brightness(0); opacity: 0.8; }
+        .lock-icon { position: absolute; font-size: 1.8rem; color: #fff; text-shadow: 0 0 5px rgba(0,0,0,0.8); z-index: 2; }
+        .char-name { font-size: 0.9rem; font-weight: 800; margin-bottom: 8px; color: #333; height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
+        .req-level { font-size: 0.75rem; color: #666; background: #f0f0f0; padding: 4px 8px; border-radius: 12px; display: inline-block; margin-bottom: 12px; font-weight: bold; }
+        .btn-unlock { width: 100%; border: none; padding: 10px 0; border-radius: 25px; font-weight: bold; font-size: 0.85rem; cursor: pointer; color: #fff; background: linear-gradient(135deg, #00c6ff, #0072ff); box-shadow: 0 4px 10px rgba(0,114,255,0.3); transition: all 0.2s; }
         .btn-unlock:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,114,255,0.4); }
-        
-        /* 解放済みボタン (ホバー無効化) */
-        .btn-unlocked {
-            background: transparent; color: #2ecc71; box-shadow: none; cursor: default;
-            padding: 10px 0;
-            pointer-events: none;
-        }
-        
-        /* 無効ボタン */
-        .btn-disabled {
-            background: #e0e0e0 !important;
-            color: #888 !important;
-            box-shadow: none !important;
-            cursor: not-allowed !important;
-            pointer-events: none;
-        }
-        .lock-reason {
-            font-size: 0.7rem; color: #e74c3c; font-weight: bold;
-            display: block; margin-top: 4px;
-        }
-
-        /* モーダル */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 2000;
-            display: none; justify-content: center; align-items: center;
-            backdrop-filter: blur(3px);
-        }
+        .btn-unlocked { background: transparent; color: #2ecc71; box-shadow: none; cursor: default; padding: 10px 0; pointer-events: none; }
+        .btn-disabled { background: #e0e0e0 !important; color: #888 !important; box-shadow: none !important; cursor: not-allowed !important; pointer-events: none; }
+        .lock-reason { font-size: 0.7rem; color: #e74c3c; font-weight: bold; display: block; margin-top: 4px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
         .modal-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
-        
-        .modal-content {
-            background: #fff; width: 90%; max-width: 400px;
-            border-radius: 20px; padding: 25px;
-            text-align: center; position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            border: 4px solid #4facfe;
-        }
-        .modal-close {
-            position: absolute; top: 10px; right: 15px; font-size: 1.5rem;
-            color: #ccc; cursor: pointer;
-        }
+        .modal-content { background: #fff; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 4px solid #4facfe; }
+        .modal-close { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; color: #ccc; cursor: pointer; }
         .modal-title { font-size: 1.2rem; font-weight: 800; color: #333; margin-bottom: 15px; border-bottom: 2px dashed #eee; padding-bottom: 10px; }
-        
-        .modal-materials {
-            display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0;
-        }
-        .mat-badge {
-            display: flex; flex-direction: column; align-items: center;
-            background: #f9f9f9; padding: 8px; border-radius: 10px; border: 1px solid #eee; width: 60px;
-        }
+        .modal-materials { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+        .mat-badge { display: flex; flex-direction: column; align-items: center; background: #f9f9f9; padding: 8px; border-radius: 10px; border: 1px solid #eee; width: 60px; }
         .mat-badge img { width: 35px; height: 35px; object-fit: contain; margin-bottom: 5px; }
         .mat-count { font-size: 0.8rem; font-weight: bold; }
         .mat-count.ok { color: #2ecc71; }
         .mat-count.ng { color: #e74c3c; }
-
-        .modal-btn {
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            border: none; padding: 12px 40px; border-radius: 30px;
-            color: #fff; font-weight: bold; font-size: 1rem; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(253, 160, 133, 0.4);
-        }
+        .modal-btn { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); border: none; padding: 12px 40px; border-radius: 30px; color: #fff; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(253, 160, 133, 0.4); }
         .modal-btn:hover { transform: translateY(-2px); }
-
         @media (max-width: 600px) {
             .main-container { padding: 20px; width: 95%; }
-            
-            /* スマホ: 矢印を目立たなくするか、あるいは折り返しレイアウトに対応 */
-            .evolution-container { 
-                justify-content: space-evenly; 
-                gap: 10px; 
-            }
-            .evolution-arrow {
-                font-size: 1.0rem;
-                margin: 0;
-                transform: rotate(90deg); /* スマホで縦並びになる場合は下向き矢印にするなどの調整 */
-                display: none; /* 狭い画面では矢印を消してスッキリさせる案を採用 */
-            }
-            
+            .evolution-container { justify-content: space-evenly; gap: 10px; }
+            .evolution-arrow { font-size: 1.0rem; margin: 0; transform: rotate(90deg); display: none; }
             .char-card { width: 45%; padding: 10px 5px; margin-bottom: 10px; }
             .char-img-wrapper { width: 70px; height: 70px; }
             .char-name { font-size: 0.8rem; }
@@ -351,8 +96,22 @@
             .level-badge { padding: 5px 15px; font-size: 0.9rem; }
             .material-link { padding: 8px 15px; font-size: 0.85rem; }
         }
-        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* 選択ボタン用CSS */
+        .btn-select {
+            width: 100%; border: none; padding: 10px 0; border-radius: 25px;
+            font-weight: bold; font-size: 0.85rem; cursor: pointer;
+            color: #fff; background: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); transition: all 0.2s;
+        }
+        .btn-select:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4); }
+        .btn-selected {
+            width: 100%; border: none; padding: 10px 0; border-radius: 25px;
+            font-weight: bold; font-size: 0.85rem; cursor: default;
+            color: #fff; background: linear-gradient(135deg, #3498db, #2980b9);
+            box-shadow: none; opacity: 1; pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -381,26 +140,19 @@
             </a>
         </div>
 
-        <div th:each="entry : ${ {
-            'fire': {'name': '炎属性', 'list': fireChars, 'icon': 'fa-fire'},
-            'water': {'name': '水属性', 'list': waterChars, 'icon': 'fa-droplet'},
-            'grass': {'name': '草属性', 'list': grassChars, 'icon': 'fa-leaf'},
-            'light': {'name': '光属性', 'list': lightChars, 'icon': 'fa-sun'},
-            'dark': {'name': '闇属性', 'list': darkChars, 'icon': 'fa-moon'},
-            'secret': {'name': 'シークレット', 'list': secretChars, 'icon': 'fa-star'}
-        } }">
+        <div th:each="category : ${categoryList}">
             <div class="attribute-section" 
-                 th:if="${not #lists.isEmpty(entry.value.list)}"
-                 th:classappend="'section-' + ${entry.key}">
+                 th:if="${not #lists.isEmpty(category.list)}"
+                 th:classappend="'section-' + ${category.key}">
                  
                 <h2 class="attribute-heading">
-                    <i class="fa-solid" th:classappend="${entry.value.icon}"></i> 
-                    <span th:text="${entry.value.name}">属性</span>
+                    <i class="fa-solid" th:classappend="${category.icon}"></i> 
+                    <span th:text="${category.name}">属性</span>
                 </h2>
                 
                 <div class="evolution-container">
                     
-                    <th:block th:each="chara, iterStat : ${entry.value.list}">
+                    <th:block th:each="chara, iterStat : ${category.list}">
                         
                         <div class="char-card" 
                              th:classappend="${unlockedIds.contains(chara.id)} ? 'unlocked' : ''">
@@ -418,36 +170,35 @@
                             <div class="req-level">Lv.<span th:text="${chara.requiredLevel}">1</span>解放</div>
                             
                             <div th:if="${unlockedIds.contains(chara.id)}">
-                                <button class="btn-unlock btn-unlocked" disabled>
-                                    <i class="fa-solid fa-check"></i> 解放済み
+                                <button th:if="${chara.id == selectedCharacterId}" class="btn-selected">
+                                    <i class="fa-solid fa-check"></i> 選択中
+                                </button>
+                                <button th:unless="${chara.id == selectedCharacterId}" 
+                                        type="button" class="btn-select"
+                                        th:onclick="'selectCharacter(' + ${chara.id} + ')'">
+                                    選択する
                                 </button>
                             </div>
                             
                             <div th:unless="${unlockedIds.contains(chara.id)}">
                                 <th:block th:with="status=${unlockStatusMap != null ? unlockStatusMap.get(chara.id) : 'OK'}">
-                                    
                                     <button th:if="${status == 'OK'}" 
                                             type="button" class="btn-unlock"
                                             th:attr="onclick='openUnlockModal(' + ${chara.id} + ', \'' + ${chara.name} + '\', ' + ${chara.unlockCost} + ', \'' + ${chara.evolutionMaterials} + '\')'">
                                         解放する
                                     </button>
-
                                     <div th:unless="${status == 'OK'}">
                                         <button type="button" class="btn-unlock btn-disabled" disabled>
                                             <i class="fa-solid fa-lock"></i> 未解放
                                         </button>
-                                        
-                                        <span class="lock-reason" th:if="${status == 'LEVEL_LOCKED'}">
-                                            Lv不足
-                                        </span>
-                                        <span class="lock-reason" th:if="${status == 'PREREQ_LOCKED'}">
-                                            進化元未解放
-                                        </span>
+                                        <span class="lock-reason" th:if="${status == 'LEVEL_LOCKED'}">Lv不足</span>
+                                        <span class="lock-reason" th:if="${status == 'PREREQ_LOCKED'}">進化元未解放</span>
                                     </div>
-                                    
                                 </th:block>
                             </div>
-                        </div> <div class="evolution-arrow" th:if="${!iterStat.last}">
+                        </div> 
+                        
+                        <div class="evolution-arrow" th:if="${!iterStat.last}">
                             <i class="fa-solid fa-angle-right"></i>
                         </div>
                         
@@ -462,10 +213,7 @@
             <span class="modal-close" onclick="closeModal()">&times;</span>
             <h3 class="modal-title" id="modalCharName">キャラ名</h3>
             <p>このキャラクターを解放しますか？</p>
-            
-            <div id="modalMaterials" class="modal-materials">
-                </div>
-            
+            <div id="modalMaterials" class="modal-materials"></div>
             <input type="hidden" id="targetCharId">
             <button class="modal-btn" onclick="executeUnlock()">解放する！</button>
         </div>
@@ -473,6 +221,7 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
+        // ... JavaScriptは既存のまま ...
         const materialCounts = /*[[${materialCounts}]]*/ {};
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
@@ -503,7 +252,6 @@
             const container = document.getElementById('modalMaterials');
             container.innerHTML = '';
 
-            // materialsStr (Map.toString() "{1=3, 2=3}") をパース
             let cleanStr = materialsStr.replace('{', '').replace('}', '');
             if (!cleanStr) {
                 container.innerHTML = '<span>素材不要</span>';
@@ -526,71 +274,54 @@
                     }
                 });
             }
-            
             document.getElementById('unlockModal').classList.add('show');
         }
 
-        function closeModal() {
-            document.getElementById('unlockModal').classList.remove('show');
-        }
+        function closeModal() { document.getElementById('unlockModal').classList.remove('show'); }
 
         function executeUnlock() {
             const charId = document.getElementById('targetCharId').value;
-            
             fetch('/unlock', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                },
+                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
                 body: JSON.stringify({ characterId: charId })
             })
             .then(res => res.json())
             .then(data => {
-                if(data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert(data.message);
-                }
+                if(data.success) { alert(data.message); location.reload(); }
+                else { alert(data.message); }
             })
-            .catch(err => {
-                console.error(err);
-                alert('通信エラーが発生しました');
-            });
+            .catch(err => { console.error(err); alert('通信エラーが発生しました'); });
         }
 
-        // 背景パーティクル (共通)
+        function selectCharacter(characterId) {
+            fetch('/characters/select', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
+                body: JSON.stringify({ characterId: characterId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) { alert(data.message); location.reload(); }
+                else { alert('変更できませんでした: ' + data.message); }
+            })
+            .catch(error => { console.error('Error:', error); alert('通信エラーが発生しました'); });
+        }
+
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let particlesArray = [];
-        
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas); resizeCanvas();
-        
         const mouse = { x: undefined, y: undefined };
         window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
-        
         class Particle {
-            constructor() { 
-                this.x = Math.random() * canvas.width; 
-                this.y = Math.random() * canvas.height; 
-                this.size = Math.random() * 2; 
-                this.speedX = Math.random() * 1 - 0.5; 
-                this.speedY = Math.random() * 1 - 0.5; 
-            }
+            constructor() { this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height; this.size = Math.random() * 2; this.speedX = Math.random() * 1 - 0.5; this.speedY = Math.random() * 1 - 0.5; }
             update() { this.x += this.speedX; this.y += this.speedY; }
             draw() { ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
         }
         function init() { for(let i=0; i<50; i++) particlesArray.push(new Particle()); }
-        function animate() { 
-            ctx.clearRect(0, 0, canvas.width, canvas.height); 
-            for(let i=0; i<particlesArray.length; i++) { 
-                particlesArray[i].update(); 
-                particlesArray[i].draw(); 
-            } 
-            requestAnimationFrame(animate); 
-        }
+        function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for(let i=0; i<particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); } requestAnimationFrame(animate); }
         init(); animate();
         /*]]>*/
     </script>

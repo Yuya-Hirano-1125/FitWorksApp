@@ -44,6 +44,11 @@ public class CharactersUnlockViewController {
         Set<Long> unlockedIds = (user != null) ? user.getUnlockedCharacters() : new HashSet<>();
         if (unlockedIds == null) unlockedIds = new HashSet<>();
 
+        // 選択中のキャラクターID
+        Long selectedCharacterId = (user != null) ? user.getSelectedCharacterId() : null;
+        if (selectedCharacterId == null) selectedCharacterId = 0L; 
+        model.addAttribute("selectedCharacterId", selectedCharacterId);
+
         // 2. 素材所持数の取得
         Map<String, Integer> materialCounts = new HashMap<>();
         for (int i = 1; i <= 16; i++) {
@@ -58,7 +63,6 @@ public class CharactersUnlockViewController {
 
         // 3. 全キャラクターを取得し、進化条件をセット
         List<CharacterEntity> allChars = characterRepository.findAll();
-        // 名前からIDを引けるマップを作成 (前提キャラ判定用)
         Map<String, Long> nameToIdMap = allChars.stream()
             .collect(Collectors.toMap(CharacterEntity::getName, CharacterEntity::getId));
 
@@ -66,44 +70,51 @@ public class CharactersUnlockViewController {
             characterService.applyEvolutionData(chara);
         }
 
-        // ★追加: 各キャラの解放可否状態("OK", "LEVEL_LOCKED", "PREREQ_LOCKED")を判定
+        // 解放可否状態の判定
         Map<Long, String> unlockStatusMap = new HashMap<>();
-        
         for (CharacterEntity chara : allChars) {
             String status = "OK";
-            
-            // 判定1: 前提キャラチェック
             Map<String, String> conditions = chara.getEvolutionConditions();
             if (conditions != null && conditions.containsKey("前提キャラ")) {
                 String prereqName = conditions.get("前提キャラ");
                 Long prereqId = nameToIdMap.get(prereqName);
                 if (prereqId != null && !unlockedIds.contains(prereqId)) {
-                    status = "PREREQ_LOCKED"; // 前提キャラ未所持
+                    status = "PREREQ_LOCKED";
                 }
             }
-            
-            // 判定2: レベルチェック (前提チェックでNGなら上書きしない)
             if ("OK".equals(status) && userLevel < chara.getRequiredLevel()) {
                 status = "LEVEL_LOCKED";
             }
-            
             unlockStatusMap.put(chara.getId(), status);
         }
 
-        // 4. モデルへの追加
-        model.addAttribute("fireChars", filterByAttr(allChars, "fire"));
-        model.addAttribute("waterChars", filterByAttr(allChars, "water"));
-        model.addAttribute("grassChars", filterByAttr(allChars, "grass"));
-        model.addAttribute("lightChars", filterByAttr(allChars, "light"));
-        model.addAttribute("darkChars", filterByAttr(allChars, "dark"));
-        model.addAttribute("secretChars", filterByAttr(allChars, "secret"));
+        // ★★★ 修正箇所: カテゴリーリストをJava側で作成 ★★★
+        List<Map<String, Object>> categoryList = new ArrayList<>();
+        categoryList.add(createCategoryMap("fire", "炎属性", "fa-fire", filterByAttr(allChars, "fire")));
+        categoryList.add(createCategoryMap("water", "水属性", "fa-droplet", filterByAttr(allChars, "water")));
+        categoryList.add(createCategoryMap("grass", "草属性", "fa-leaf", filterByAttr(allChars, "grass")));
+        categoryList.add(createCategoryMap("light", "光属性", "fa-sun", filterByAttr(allChars, "light")));
+        categoryList.add(createCategoryMap("dark", "闇属性", "fa-moon", filterByAttr(allChars, "dark")));
+        categoryList.add(createCategoryMap("secret", "シークレット", "fa-star", filterByAttr(allChars, "secret")));
 
+        model.addAttribute("categoryList", categoryList);
+        
         model.addAttribute("userLevel", userLevel);
         model.addAttribute("unlockedIds", unlockedIds);
         model.addAttribute("materialCounts", materialCounts);
-        model.addAttribute("unlockStatusMap", unlockStatusMap); // ★追加
+        model.addAttribute("unlockStatusMap", unlockStatusMap);
 
         return "characters/menu/CharactersUnlock";
+    }
+
+    // ヘルパーメソッド: カテゴリーマップの作成
+    private Map<String, Object> createCategoryMap(String key, String name, String icon, List<CharacterEntity> list) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("key", key);
+        map.put("name", name);
+        map.put("icon", icon);
+        map.put("list", list);
+        return map;
     }
 
     private List<CharacterEntity> filterByAttr(List<CharacterEntity> list, String attr) {

@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable; // ★追加
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -33,12 +34,35 @@ public class CharactersMenuController {
     @Autowired
     private UserItemRepository userItemRepository;
 
-    // ★追加: キャラクター情報を取得するために必要です
     @Autowired
     private CharacterRepository characterRepository;
 
     // 夢幻の鍵のアイテムID
     private static final Long DREAM_KEY_ITEM_ID = 16L;
+
+    // ★追加: IDと詳細画面ファイル名のマッピング
+    private final Map<Long, String> detailMap = new HashMap<>() {{
+        put(0L, "dracoegg");
+        put(10L, "draco");
+        put(20L, "dracos");
+        put(30L, "dragonoid");
+        put(40L, "dollyegg");
+        put(50L, "dolly");
+        put(60L, "dolphy");
+        put(70L, "dolphinas");
+        put(80L, "shiruegg");
+        put(90L, "shiru");
+        put(100L, "shirufa");
+        put(110L, "shirufina");
+        put(120L, "merryegg");
+        put(130L, "merry");
+        put(140L, "meriru");
+        put(150L, "merinoa");
+        put(160L, "robiegg");
+        put(170L, "robi");
+        put(180L, "robus");
+        put(190L, "robius");
+    }};
 
     // ホームのキャラクターボタンからキャラクターメニューへ遷移
     @GetMapping("/characters/menu/CharactersMenu")
@@ -46,7 +70,7 @@ public class CharactersMenuController {
         return "characters/menu/CharactersMenu"; 
     }
 
- // キャラクター一覧画面へ遷移
+    // キャラクター図鑑画面へ遷移 (Storage)
     @GetMapping("/characters/menu/CharactersStorage")
     public String showCharactersStorage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         if (userDetails == null) return "redirect:/login";
@@ -58,18 +82,13 @@ public class CharactersMenuController {
         List<Map<String, Object>> displayList = new ArrayList<>();
         
         Long selectedId = user.getSelectedCharacterId();
-        
-     // ★追加: デフォルト(未選択)時に表示されているはずの画像パスを計算
-        String defaultImgPath = "/img/character/" + ((user.getLevel() / 10) * 10) + ".png";
+        if (selectedId == null) selectedId = 0L; // null対策
 
         for (CharacterEntity chara : allCharacters) {
-            // 解放済みかチェック (所持リストに含まれている か 初期キャラ(ID=0)なら解放)
+            // 解放済みかチェック
             boolean isUnlocked = user.hasUnlockedCharacter(chara.getId()) || (chara.getId() == 0); 
             
-            // ★追加: 未所持の場合はリストに追加せずスキップする
-            if (!isUnlocked) {
-                continue;
-            }
+            // 全キャラクターを表示するため、未所持でもスキップしない
 
             Map<String, Object> map = new HashMap<>();
             map.put("id", chara.getId());
@@ -78,23 +97,15 @@ public class CharactersMenuController {
             map.put("imgUrl", chara.getImagePath());
             map.put("requiredLevel", chara.getRequiredLevel());
             map.put("rarity", chara.getRarity());
+            
+            // 解放状態をセット
+            map.put("isUnlocked", isUnlocked); 
+            
+            // 選択中かどうか（図鑑では表示に使わない場合もありますが、データとして渡しておく）
+            map.put("isSelected", selectedId.equals(chara.getId()));
 
-            map.put("isUnlocked", true); // ここに来る時点で必ずtrue
-            
-         // ★修正: 選択中かどうかの判定ロジック
-            boolean isSelected = false;
-            
-            if (selectedId != null) {
-                // ユーザーが明示的に選択している場合、IDで判定
-                isSelected = selectedId.equals(chara.getId());
-            } else {
-                // まだ選択していない場合、デフォルト画像パスと一致するキャラを選択中とみなす
-                if (chara.getImagePath() != null && chara.getImagePath().equals(defaultImgPath)) {
-                    isSelected = true;
-                }
-            }
-            
-            map.put("isSelected", isSelected);
+            // ★追加: 詳細画面のファイル名をセット
+            map.put("filename", detailMap.get(chara.getId()));
 
             displayList.add(map);
         }
@@ -105,8 +116,15 @@ public class CharactersMenuController {
         return "characters/menu/CharactersStorage"; 
     }
 
+    // ★追加: 詳細画面への遷移用エンドポイント
+    @GetMapping("/characters/detail/{name}")
+    public String showCharacterDetail(@PathVariable String name) {
+        // characterdetailフォルダ内のHTMLを返す
+        return "characters/characterdetail/" + name;
+    }
+
     /**
-     * キャラクター選択API (この機能も追加が必要です)
+     * キャラクター選択API
      */
     @PostMapping("/characters/select")
     @ResponseBody
@@ -162,11 +180,8 @@ public class CharactersMenuController {
             
             if (currentUser != null) {
                 userLevel = currentUser.getLevel();
-                // 夢幻の鍵の所持数を取得
                 dreamKeyCount = userService.getUserMaterialCount(username, DREAM_KEY_ITEM_ID);
-                // 解放済み背景リストを取得
                 unlockedBackgrounds = currentUser.getUnlockedBackgrounds();
-                // 選択中の背景を取得
                 selectedBackground = currentUser.getSelectedBackground();
                 if (selectedBackground == null || selectedBackground.isEmpty()) {
                     selectedBackground = "fire-original";
@@ -210,14 +225,12 @@ public class CharactersMenuController {
                 return ResponseEntity.status(404).body(response);
             }
 
-            // 既に解放済みかチェック
             if (currentUser.hasUnlockedBackground(backgroundId)) {
                 response.put("success", false);
                 response.put("message", "この背景は既に解放されています");
                 return ResponseEntity.ok(response);
             }
 
-            // 所持数チェック
             int dreamKeyCount = userService.getUserMaterialCount(username, DREAM_KEY_ITEM_ID);
             
             if (dreamKeyCount <= 0) {
@@ -226,7 +239,6 @@ public class CharactersMenuController {
                 return ResponseEntity.ok(response);
             }
 
-            // 夢幻の鍵を1個消費
             boolean consumed = consumeItem(username, DREAM_KEY_ITEM_ID, 1);
             
             if (!consumed) {
@@ -235,11 +247,9 @@ public class CharactersMenuController {
                 return ResponseEntity.ok(response);
             }
 
-            // 背景を解放済みとして保存
             currentUser.addUnlockedBackground(backgroundId);
             userService.save(currentUser);
 
-            // 残りの所持数を取得
             int remainingCount = userService.getUserMaterialCount(username, DREAM_KEY_ITEM_ID);
             
             response.put("success", true);
@@ -268,7 +278,6 @@ public class CharactersMenuController {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            // 認証チェック
             if (userDetails == null) {
                 response.put("success", false);
                 response.put("message", "ログインが必要です");
@@ -278,7 +287,6 @@ public class CharactersMenuController {
             String username = userDetails.getUsername();
             String backgroundCode = (String) request.get("backgroundCode");
 
-            // ユーザー情報取得
             User currentUser = userService.findByUsername(username);
             if (currentUser == null) {
                 response.put("success", false);
@@ -286,7 +294,6 @@ public class CharactersMenuController {
                 return ResponseEntity.status(404).body(response);
             }
 
-            // 背景を選択状態として保存
             currentUser.setSelectedBackground(backgroundCode);
             userService.save(currentUser);
             
@@ -308,15 +315,12 @@ public class CharactersMenuController {
      */
     private boolean consumeItem(String username, Long itemId, int amount) {
         try {
-            // 該当するアイテムを全て取得
             var items = userItemRepository.findAllByUser_UsernameAndItemId(username, itemId);
             
-            // 所持数チェック
             if (items.size() < amount) {
                 return false;
             }
 
-            // 指定された個数分だけレコードを削除
             for (int i = 0; i < amount; i++) {
                 userItemRepository.delete(items.get(i));
             }

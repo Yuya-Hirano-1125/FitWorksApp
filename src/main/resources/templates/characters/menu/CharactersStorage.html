@@ -2,7 +2,7 @@
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>キャラクター保管庫</title>
+    <title>キャラクター図鑑</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
@@ -28,8 +28,8 @@
         /* メインコンテナ */
         .main-container {
             max-width: 1000px;
-            width: 92%; margin: 40px auto; padding: 40px;
-            background: rgba(255, 255, 255, 0.85); 
+            width: 92%; margin: 40px auto; padding: 30px;
+            background: rgba(255, 255, 255, 0.95); 
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 45px;
@@ -37,7 +37,6 @@
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
             min-height: 500px;
-            /* 高さは自動で伸びるようにし、スクロールバーを出さない */
             height: auto; 
             overflow: visible; 
             padding-bottom: 60px;
@@ -76,7 +75,6 @@
         .tab-btn:hover { transform: translateY(-2px); filter: brightness(0.95); }
         .tab-btn i { margin-right: 5px; }
 
-        /* 属性ごとのアクティブカラー設定 */
         .tab-btn.active { color: white; transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .tab-btn[data-target="all"].active { background: linear-gradient(135deg, #007bff, #00d2ff); border-color: #007bff; }
         .tab-btn[data-target="fire"].active { background: linear-gradient(135deg, #ff7675, #ff4757); border-color: #ff4757; }
@@ -90,32 +88,77 @@
             display: flex; flex-direction: column; align-items: center; width: 100%;
         }
 
-        /* PC・大画面: 4列 */
+        /* Flexboxリスト設定 (Unlock画面と統一) */
         .character-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 20px; 
-            padding: 10px; 
-            width: 100%; 
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; 
+            align-items: stretch;
+            gap: 15px;
+            width: 100%;
+            padding: 0;
+            max-width: 680px; /* カード4つ分程度の幅に制限 */
+            margin: 0 auto; 
+        }
+        
+        /* カードをリンクにするためのスタイル調整 */
+        .character-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: contents; /* Flexアイテムとしての挙動をカード自体に任せる */
+        }
+        
+        /* カードデザイン */
+        .character-card { 
+            text-align: center; 
+            border: 2px solid transparent; 
+            border-radius: 15px; 
+            padding: 15px 10px; 
+            background: #ffffff; 
+            position: relative; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05); 
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            height: 100%; min-height: 230px;
+            width: 150px; /* PC固定幅 */
             box-sizing: border-box;
         }
         
-        /* カード */
-        .character-card { 
-            text-align: center; border: 2px solid rgba(0,0,0,0.1); border-radius: 20px; 
-            padding: 15px 10px; background: rgba(255,255,255,0.95); 
-            position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            height: 100%; min-height: 230px;
+        /* リンク有効時のホバー */
+        a.character-card-link .character-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); 
+            cursor: pointer;
         }
-        .character-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
+
+        /* 画像ラッパー */
+        .character-img-wrapper {
+            width: 90px; height: 90px; margin: 0 auto 10px;
+            background: #fff; border-radius: 50%;
+            overflow: hidden; border: 3px solid #eee;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
 
         .character-img { 
-            width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px; 
-            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
+            width: 100%; height: 100%; object-fit: contain;
         }
-        .character-name { font-weight: bold; margin: 5px 0; color: #333; font-size: 1rem; word-break: break-word; }
+        
+        /* 未所持時のスタイル */
+        .character-img-wrapper.locked {
+            background-color: #ddd;
+            border-color: #ccc;
+        }
+        .character-img-wrapper.locked .character-img {
+            filter: brightness(0) opacity(0.6);
+        }
+        .lock-icon {
+            position: absolute; font-size: 2rem; color: #fff;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+            z-index: 2;
+        }
+        
+        .character-name { font-weight: 800; margin: 5px 0; color: #333; font-size: 0.95rem; word-break: break-word; line-height: 1.2; }
 
         /* 属性別ボーダー */
         .character-card.fire { border-bottom: 4px solid #ff7675; }
@@ -124,46 +167,47 @@
         .character-card.light { border-bottom: 4px solid #ffeaa7; }
         .character-card.dark { border-bottom: 4px solid #a29bfe; }
         
-        /* 選択中キャラのスタイル（青系） */
-        .character-card.selected {
-            border: 4px solid #007bff;
-            background-color: #f0f7ff;
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 123, 255, 0.4);
-            z-index: 10;
+        /* 未解放バッジ */
+        .locked-badge {
+            width: 100%; margin-top: auto;
+            padding: 8px 0; border-radius: 25px;
+            background: #eee; color: #888;
+            font-weight: bold; font-size: 0.8rem;
+            border: 1px solid #ccc;
+            cursor: default;
         }
         
-        /* 選択中リボン */
-        .selected-badge-ribbon {
-            position: absolute;
-            top: -8px; right: -8px;
-            background: #007bff;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-            display: flex; align-items: center; gap: 5px;
-            z-index: 20;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
-
-        /* ボタン */
-        .select-btn {
+        /* 詳細を見るラベル */
+        .detail-label {
             width: 100%; margin-top: auto;
-            padding: 8px 0; border: none; border-radius: 15px;
-            background: #4facfe; color: white; font-weight: bold;
-            cursor: pointer; transition: all 0.2s; font-size: 0.9rem;
+            padding: 8px 0; border-radius: 20px;
+            background: #f0f8ff; color: #007bff;
+            font-weight: bold; font-size: 0.8rem;
+            border: 1px solid #cce5ff;
+            transition: all 0.2s;
         }
-        .select-btn:hover:not(:disabled) { background: #00f2fe; box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4); }
-        .select-btn:disabled { 
-            background: linear-gradient(to right, #007bff, #0056b3);
-            color: #fff;
-            cursor: default; opacity: 1; 
-            box-shadow: none;
-            border: 2px solid #007bff;
+        /* 親のカードホバー時に色を変える */
+        a.character-card-link .character-card:hover .detail-label {
+            background: #007bff; color: white;
+        }
+
+        /* レアリティタグ */
+        .evolution-tag {
+            position: absolute; top: 8px; left: 8px;
+            background: linear-gradient(135deg, #f6d365, #fda085);
+            color: white; padding: 2px 8px; border-radius: 10px;
+            font-size: 0.7em; font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 5;
+        }
+
+        /* 図鑑ナンバー */
+        .char-id {
+            position: absolute; top: 8px; right: 8px;
+            font-size: 0.75rem; color: #888; font-weight: bold;
+            background: rgba(255,255,255,0.8); padding: 2px 6px; border-radius: 10px;
+            border: 1px solid #eee;
+            z-index: 4;
         }
 
         /* データなしメッセージ */
@@ -174,14 +218,7 @@
             box-sizing: border-box;
         }
 
-        /* タブレット (601px - 850px): 3列 */
-        @media (max-width: 850px) {
-            .character-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        /* スマホ (600px以下): 2列 & さらにコンパクト化 */
+        /* スマホ表示 (600px以下) */
         @media (max-width: 600px) {
             .main-container { 
                 padding: 20px 10px; width: 96%; margin: 20px auto; 
@@ -189,40 +226,39 @@
             .page-title { font-size: 1.4rem; }
             
             .character-grid { 
-                grid-template-columns: repeat(2, 1fr); 
+                justify-content: space-evenly; 
                 gap: 10px; 
                 padding: 5px;
+                max-width: none; 
             }
             .character-card { 
-                /* 高さを200pxに縮小 */
+                width: 45%; 
                 min-height: 200px; 
-                padding: 8px 4px; 
+                padding: 10px 5px; 
             }
-            .character-img { 
-                /* 画像サイズを55pxに縮小 */
-                width: 55px; height: 55px; 
-                margin-bottom: 5px;
+            .character-img-wrapper { 
+                width: 60px; height: 60px; 
             }
             .character-name {
-                /* 文字サイズを縮小 */
                 font-size: 0.85rem; 
                 margin: 3px 0;
             }
             .evolution-tag {
                 font-size: 0.55em;
                 padding: 1px 4px;
-                top: 2px; left: 2px;
+                top: 5px; left: 5px;
             }
-            .select-btn {
-                padding: 4px 0;
+            .char-id {
+                font-size: 0.6rem;
+                padding: 1px 4px;
+                top: 5px; right: 5px;
+            }
+            .locked-badge, .detail-label {
                 font-size: 0.7rem;
-                border-radius: 8px;
-                margin-top: 5px;
+                padding: 6px 0;
             }
-            .selected-badge-ribbon {
-                font-size: 0.65rem;
-                padding: 2px 6px;
-                top: -5px; right: -5px;
+            .lock-icon {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -241,7 +277,7 @@
                 <a th:href="@{/characters/menu/CharactersMenu}" class="home-link-icon" title="メニューに戻る">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
-                <h1 class="page-title"><i class="fa-solid fa-box-open" style="margin-right: 5px;"></i> キャラ保管庫</h1>
+                <h1 class="page-title"><i class="fa-solid fa-book-open" style="margin-right: 5px;"></i> キャラクター図鑑</h1>
             </div>
             <div class="user-level-badge">
                 Lv.<span th:text="${currentLevel}">1</span>
@@ -259,42 +295,71 @@
 
         <div class="character-list-wrapper">
             <div id="storage-container" class="character-grid">
-                <th:block th:each="chara : ${charaList}">
-                    <div class="character-card storage-item" 
-                         th:classappend="${chara.attribute} + (${chara.isSelected} ? ' selected' : '')" 
-                         th:data-attribute="${chara.attribute}">
+                <th:block th:each="chara, iterStat : ${charaList}">
+                    
+                    <a th:if="${chara.isUnlocked && chara.attribute != 'secret' && chara.filename != null}" 
+                       th:href="@{'/characters/detail/' + ${chara.filename}}" 
+                       class="character-card-link">
                         
-                        <div th:if="${chara.isSelected}" class="selected-badge-ribbon">
-                            <i class="fa-solid fa-check"></i> 選択中
+                        <div class="character-card storage-item" 
+                             th:classappend="${chara.attribute}" 
+                             th:data-attribute="${chara.attribute}">
+                            
+                            <div class="evolution-tag" th:text="${chara.rarity}">★1</div>
+                            <div class="char-id" th:text="'No.' + ${iterStat.count}">No.1</div>
+                            
+                            <div class="character-img-wrapper">
+                                <img class="character-img" th:src="${chara.imgUrl}" th:alt="${chara.name}"
+                                     onerror="this.src='https://placehold.co/100x100?text=No+Img';">
+                            </div>
+                            
+                            <p class="character-name" th:text="${chara.name}">Name</p>
+                            
+                            <div style="width:100%; margin-top:auto;">
+                                <div class="detail-label"><i class="fa-solid fa-book"></i> 詳細を見る</div>
+                            </div>
                         </div>
+                    </a>
+
+                    <div th:unless="${chara.isUnlocked && chara.attribute != 'secret' && chara.filename != null}" 
+                         class="character-card-link-disabled" style="display:contents">
                         
-                        <div class="evolution-tag" th:text="${chara.rarity}" style="position:absolute; top:5px; left:5px; background:gold; color:white; padding:2px 8px; border-radius:10px; font-size:0.7em; box-shadow:0 2px 4px rgba(0,0,0,0.1);">★1</div>
-                        
-                        <img class="character-img" 
-                             th:src="${chara.imgUrl}" 
-                             th:alt="${chara.name}"
-                             onerror="this.src='https://placehold.co/100x100?text=No+Img';">
-                        
-                        <p class="character-name" th:text="${chara.name}">Name</p>
-                        
-                        <div style="width:100%; margin-top:auto;">
-                            <button class="select-btn" 
-                                    th:onclick="'selectCharacter(' + ${chara.id} + ')'"
-                                    th:text="${chara.isSelected} ? '選択中' : '選択する'"
-                                    th:disabled="${chara.isSelected}">
-                            </button>
+                        <div class="character-card storage-item" 
+                             th:classappend="${chara.attribute}" 
+                             th:data-attribute="${chara.attribute}">
+                            
+                            <div class="evolution-tag" th:text="${chara.rarity}">★1</div>
+                            <div class="char-id" th:text="'No.' + ${iterStat.count}">No.1</div>
+                            
+                            <div class="character-img-wrapper" th:classappend="${!chara.isUnlocked} ? 'locked' : ''">
+                                <img class="character-img" th:src="${chara.imgUrl}" th:alt="${chara.name}"
+                                     onerror="this.src='https://placehold.co/100x100?text=No+Img';">
+                                <i th:if="${!chara.isUnlocked}" class="fa-solid fa-lock lock-icon"></i>
+                            </div>
+                            
+                            <p class="character-name" th:text="${chara.isUnlocked} ? ${chara.name} : '???'">???</p>
+                            
+                            <div style="width:100%; margin-top:auto;">
+                                <div th:unless="${chara.isUnlocked}" class="locked-badge">
+                                    <i class="fa-solid fa-lock"></i> 未解放
+                                </div>
+                                <div th:if="${chara.isUnlocked}" class="detail-label" style="background:#eee; color:#888; border-color:#ccc; cursor:default;">
+                                    <i class="fa-solid fa-ban"></i> 詳細なし
+                                </div>
+                            </div>
                         </div>
                     </div>
+
                 </th:block>
             </div>
             
             <div id="no-data-msg" class="no-data-message">
                 <i class="fa-solid fa-ghost" style="font-size: 2em; margin-bottom: 10px; display:block;"></i>
-                この属性のキャラクターは所持していません
+                この属性のキャラクターはいません
             </div>
         </div>
     </div>
-
+    
     <script th:inline="javascript">
         /*<![CDATA[*/
         document.addEventListener('DOMContentLoaded', () => {
@@ -322,27 +387,7 @@
             });
         });
 
-        function selectCharacter(characterId) {
-            fetch('/characters/select', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ characterId: characterId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert('変更できませんでした: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('通信エラーが発生しました');
-            });
-        }
-
+        // 背景アニメーション
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         const flare = document.getElementById('mouse-flare');
