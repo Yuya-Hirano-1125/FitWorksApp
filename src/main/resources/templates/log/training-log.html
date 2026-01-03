@@ -306,14 +306,14 @@
 
     <p class="sub-heading" th:text="${username} + 'さんの頑張りをチェックしましょう。'">トレーニング記録カレンダー</p>
 
-    <div th:if="${successMessage}" class="success-message" 
-         th:text="${successMessage
-            .replace('と 0 枚のチップ', '')
-            .replace('と0 枚のチップ', '')
-            .replace('、 0 枚のチップ', '')
-            .replace('、0 枚のチップ', '')
-            .replace(' 0 枚のチップ', '')
-            .replace('0 枚のチップ', '')}"></div>
+	<div th:if="${successMessage}" class="success-message" 
+	         th:text="${successMessage
+	            .replace('と 0 枚のコイン', '')
+	            .replace('と0 枚のコイン', '')
+	            .replace('、 0 枚のコイン', '')
+	            .replace('、0 枚のコイン', '')
+	            .replace(' 0 枚のコイン', '')
+	            .replace('0 枚のコイン', '')}"></div>
     
     <div class="calendar-nav-container">
         <a th:href="@{/training-log(year=${prevYear}, month=${prevMonth})}" class="nav-arrow" title="前の月へ">

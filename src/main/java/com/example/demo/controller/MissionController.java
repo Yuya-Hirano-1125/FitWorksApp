@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.demo.dto.MissionStatusDto;
 import com.example.demo.entity.DailyMissionStatus;
 import com.example.demo.entity.User;
-import com.example.demo.service.CommunityService; // ★ コミュニティ投稿用サービス（必要なら）
+import com.example.demo.service.CommunityService;
 import com.example.demo.service.MissionService;
 import com.example.demo.service.UserService;
 
@@ -105,14 +105,15 @@ public class MissionController {
             MissionStatusDto status = userService.getDailyMissionStatus(user);
             User updatedUser = userService.findByUsername(userDetails.getUsername()); // 最新情報を取得
 
-            // ★修正: メッセージはシンプルに
+            // ★修正: メッセージを「コイン」に変更
             redirectAttributes.addFlashAttribute("successMessage",
                     "ミッション報酬 " + status.getRewardXp() + " XPと " + 
-                    MissionService.DAILY_MISSION_REWARD_CHIPS + " チップを受け取りました！");
+                    MissionService.DAILY_MISSION_REWARD_CHIPS + " コインを受け取りました！");
             
             // ★追加: 画面表示用に個別にデータを渡す
             redirectAttributes.addFlashAttribute("rewardLevel", updatedUser.getLevel());
-            redirectAttributes.addFlashAttribute("rewardChips", updatedUser.getChipCount());
+            // ★修正: 変数名を rewardCoins に変更
+            redirectAttributes.addFlashAttribute("rewardCoins", updatedUser.getChipCount());
             redirectAttributes.addFlashAttribute("rewardExp", updatedUser.getExperiencePoints());
             redirectAttributes.addFlashAttribute("rewardReqExp", updatedUser.calculateRequiredXp());
             

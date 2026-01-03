@@ -16,16 +16,12 @@
         :root {
             --glass-bg: rgba(255, 255, 255, 0.75);
             --glass-border: rgba(255, 255, 255, 0.9);
-            
-            /* パステル & マジカルテーマカラー */
             --theme-pink: #ff9a9e;
             --theme-purple: #a18cd1;
             --theme-blue: #a2d2ff;
             --theme-yellow: #fbc2eb;
             --text-main: #5d54a4;
             --text-accent: #ff6b81;
-            
-            /* レアリティカラー */
             --ur-color: #ff00cc;
             --ssr-color: #ff9900;
         }
@@ -36,16 +32,9 @@
             overflow-x: hidden; color: var(--text-main);
         }
 
-        /* ==========================================================================
-           🌌 BACKGROUND ANIMATION (Aurora & Particles)
-           ========================================================================== */
-        .interactive-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
-            background-size: 400% 400%; animation: auroraFlow 20s ease infinite;
-        }
+        /* 背景アニメーションなどは変更なし */
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-
         .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
         .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
         .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
@@ -54,149 +43,106 @@
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
         @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
-        
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
 
-        /* ==========================================================================
-           🏗 MAIN LAYOUT
-           ========================================================================== */
+        /* メインコンテナ */
         .gacha-page .main-container {
             max-width: 600px; width: 95%; margin: 30px auto; padding: 30px 20px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            border-radius: 40px;
-            border: 2px solid var(--glass-border);
+            background: var(--glass-bg); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-radius: 40px; border: 2px solid var(--glass-border);
             box-shadow: 0 20px 50px rgba(100, 100, 255, 0.2), inset 0 0 0 1px rgba(255,255,255,0.5);
             position: relative; z-index: 10; text-align: center;
         }
 
-        /* ヘッダー周り */
         .gacha-header { margin-bottom: 20px; position: relative; }
-        
         .home-link-icon {
-            position: absolute; left: 0; top: 5px;
-            width: 45px; height: 45px; background: rgba(255,255,255,0.9);
-            color: var(--theme-purple); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; text-decoration: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: all 0.3s;
+            position: absolute; left: 0; top: 5px; width: 45px; height: 45px; background: rgba(255,255,255,0.9);
+            color: var(--theme-purple); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: all 0.3s;
             border: 2px solid var(--theme-purple);
         }
         .home-link-icon:hover { transform: scale(1.1); background: var(--theme-purple); color: white; }
 
         .gacha-title {
-            font-family: 'Fredoka One', 'M PLUS Rounded 1c', sans-serif;
-            font-size: 3.5rem; margin: 0; line-height: 1;
-            background: linear-gradient(to right, #ff9a9e, #a18cd1);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(2px 2px 0px rgba(255,255,255,0.8));
-            letter-spacing: 2px; transform: rotate(-2deg); display: inline-block;
+            font-family: 'Fredoka One', 'M PLUS Rounded 1c', sans-serif; font-size: 3.5rem; margin: 0; line-height: 1;
+            background: linear-gradient(to right, #ff9a9e, #a18cd1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(2px 2px 0px rgba(255,255,255,0.8)); letter-spacing: 2px; transform: rotate(-2deg); display: inline-block;
         }
-        .gacha-title::after {
-            content: '✨'; position: absolute; top: -10px; right: -20px;
-            font-size: 1.5rem; -webkit-text-fill-color: #ffd700;
-            animation: twinkle 1s infinite alternate;
-        }
+        .gacha-title::after { content: '✨'; position: absolute; top: -10px; right: -20px; font-size: 1.5rem; -webkit-text-fill-color: #ffd700; animation: twinkle 1s infinite alternate; }
 
-        /* 所持チップ表示 */
+        /* 所持コイン表示 */
         .chip-status {
             display: inline-flex; align-items: center; gap: 10px;
             background: #fff; padding: 8px 25px; border-radius: 50px;
-            box-shadow: 0 5px 15px rgba(161, 140, 209, 0.3);
-            margin-bottom: 25px; border: 2px solid var(--theme-yellow);
+            box-shadow: 0 5px 15px rgba(161, 140, 209, 0.3); margin-bottom: 25px; border: 2px solid var(--theme-yellow);
         }
         .chip-icon { color: #f1c40f; font-size: 1.4rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
         .chip-count { font-size: 1.5rem; font-weight: 900; color: var(--text-main); font-family: 'Fredoka One', sans-serif; }
         .chip-label { font-size: 0.9rem; font-weight: 700; color: #888; }
 
-        /* ==========================================================================
-           🎁 PICKUP BANNER (LINEUP AREA)
-           ========================================================================== */
         .pickup-banner {
-            position: relative; width: 100%; height: 320px;
-            background: radial-gradient(circle at center, #ffffff 0%, #f3e7ff 100%);
-            border-radius: 30px; overflow: hidden;
-            box-shadow: 0 10px 30px rgba(161, 140, 209, 0.4);
-            border: 4px solid #fff; margin-bottom: 30px;
+            position: relative; width: 100%; height: 320px; background: radial-gradient(circle at center, #ffffff 0%, #f3e7ff 100%);
+            border-radius: 30px; overflow: hidden; box-shadow: 0 10px 30px rgba(161, 140, 209, 0.4); border: 4px solid #fff; margin-bottom: 30px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        
-        /* バナー背景エフェクト */
         .banner-bg-pattern {
             position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
-            background-image: 
-                radial-gradient(#e0c3fc 2px, transparent 2px),
-                radial-gradient(#8ec5fc 2px, transparent 2px);
-            background-size: 30px 30px; background-position: 0 0, 15px 15px;
-            animation: rotateBg 60s linear infinite; opacity: 0.5; z-index: 0;
+            background-image: radial-gradient(#e0c3fc 2px, transparent 2px), radial-gradient(#8ec5fc 2px, transparent 2px);
+            background-size: 30px 30px; background-position: 0 0, 15px 15px; animation: rotateBg 60s linear infinite; opacity: 0.5; z-index: 0;
         }
         @keyframes rotateBg { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* ピックアップラベル */
         .pickup-label {
-            position: absolute; top: 15px; left: -30px;
-            background: linear-gradient(90deg, #ff9a9e, #fad0c4);
-            color: #fff; font-weight: 900; padding: 5px 40px;
-            transform: rotate(-15deg); font-size: 1rem;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.1); z-index: 10;
-            border: 2px solid #fff;
+            position: absolute; top: 15px; left: -30px; background: linear-gradient(90deg, #ff9a9e, #fad0c4);
+            color: #fff; font-weight: 900; padding: 5px 40px; transform: rotate(-15deg); font-size: 1rem;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1); z-index: 10; border: 2px solid #fff;
         }
 
-        /* アイテム表示エリア */
         .item-showcase { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
         
+        /* エフェクト関連 */
         .main-item-img {
             width: 140px; height: 140px; object-fit: contain;
-            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
-            animation: floatItem 3s ease-in-out infinite;
+            animation: floatItem 3s ease-in-out infinite, urRainbowGlow 4s linear infinite;
+            z-index: 2;
         }
-        @keyframes floatItem { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.05); } }
-
         .sub-item-img {
-            width: 70px; height: 70px; object-fit: contain;
-            position: absolute; opacity: 0.8; filter: blur(0.5px);
+            width: 70px; height: 70px; object-fit: contain; position: absolute; opacity: 1;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
             animation: floatSub 4s ease-in-out infinite;
+            z-index: 1;
         }
         .sub-1 { top: 20%; left: 10%; animation-delay: -1s; }
         .sub-2 { bottom: 20%; right: 10%; animation-delay: -2s; }
+        @keyframes floatItem { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.05); } }
         @keyframes floatSub { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes urRainbowGlow {
+            0% { filter: drop-shadow(0 0 15px rgba(255, 0, 204, 0.7)); }
+            25% { filter: drop-shadow(0 0 20px rgba(161, 140, 209, 0.9)); }
+            50% { filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.7)); }
+            75% { filter: drop-shadow(0 0 20px rgba(255, 255, 0, 0.5)); }
+            100% { filter: drop-shadow(0 0 15px rgba(255, 0, 204, 0.7)); }
+        }
 
-        /* バナーテキスト */
         .banner-text {
-            position: absolute; bottom: 15px; width: 90%;
-            background: rgba(255,255,255,0.85); backdrop-filter: blur(5px);
-            padding: 8px; border-radius: 15px; z-index: 5;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: absolute; bottom: 15px; width: 90%; background: rgba(255,255,255,0.85); backdrop-filter: blur(5px);
+            padding: 8px; border-radius: 15px; z-index: 5; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         .banner-title { font-size: 1.1rem; font-weight: 900; color: var(--text-main); margin: 0; }
         .banner-desc { font-size: 0.8rem; color: var(--text-accent); font-weight: 700; margin: 0; }
 
-        /* 提供割合ボタン */
         .rate-btn {
-            position: absolute; top: 15px; right: 15px; z-index: 10;
-            background: rgba(255,255,255,0.9); color: var(--text-main);
-            border: 2px solid var(--theme-purple); border-radius: 20px;
-            padding: 5px 12px; font-size: 0.8rem; font-weight: 800;
+            position: absolute; top: 15px; right: 15px; z-index: 10; background: rgba(255,255,255,0.9); color: var(--text-main);
+            border: 2px solid var(--theme-purple); border-radius: 20px; padding: 5px 12px; font-size: 0.8rem; font-weight: 800;
             cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .rate-btn:hover { background: var(--theme-purple); color: white; }
 
-        /* ==========================================================================
-           🔘 ACTION BUTTONS
-           ========================================================================== */
-        .action-area {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-            padding: 0 5px; margin-bottom: 20px;
-        }
-
+        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 5px; margin-bottom: 20px; }
         .gacha-btn {
-            position: relative; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            padding: 20px 10px; border-radius: 25px; text-decoration: none;
-            color: #fff; transition: all 0.2s; cursor: pointer;
-            border: 4px solid #fff; overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px 10px; border-radius: 25px; text-decoration: none; color: #fff; transition: all 0.2s; cursor: pointer;
+            border: 4px solid #fff; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         }
         .gacha-btn:active { transform: scale(0.95); box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
         .gacha-btn::before {
@@ -205,86 +151,59 @@
             transform: scale(0); transition: transform 0.4s;
         }
         .gacha-btn:hover::before { transform: scale(1); }
-
         .btn-label { font-size: 1.4rem; font-weight: 900; z-index: 2; margin-bottom: 5px; text-shadow: 0 2px 3px rgba(0,0,0,0.2); }
-        .btn-cost {
-            font-size: 0.9rem; font-weight: 800; background: rgba(0,0,0,0.2);
-            padding: 4px 12px; border-radius: 12px; z-index: 2;
-        }
-
-        /* 1回ボタン */
-        .btn-single {
-            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
-            box-shadow: 0 10px 20px rgba(161, 140, 209, 0.4);
-        }
-        /* 11連ボタン */
+        .btn-cost { font-size: 0.9rem; font-weight: 800; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 12px; z-index: 2; }
+        .btn-single { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); box-shadow: 0 10px 20px rgba(161, 140, 209, 0.4); }
         .btn-multi {
             background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-            box-shadow: 0 10px 20px rgba(255, 154, 158, 0.4);
-            border-color: #fff5ba; /* 金色っぽい枠 */
+            box-shadow: 0 10px 20px rgba(255, 154, 158, 0.4); border-color: #fff5ba;
         }
         .btn-multi .btn-label { color: #fff; text-shadow: 0 2px 5px rgba(255, 107, 129, 0.5); }
         .discount-badge {
             position: absolute; top: 0; right: 0; background: #ffeb3b; color: #e67e22;
-            font-size: 0.7rem; font-weight: 900; padding: 3px 8px;
-            border-bottom-left-radius: 10px; z-index: 5;
+            font-size: 0.7rem; font-weight: 900; padding: 3px 8px; border-bottom-left-radius: 10px; z-index: 5;
         }
 
-        /* エラーメッセージ */
         .chip-error-box {
             display: none; background: #ffe6e6; border: 2px solid #ff5252; color: #d32f2f;
-            padding: 10px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; font-size: 0.9rem;
-            animation: shakeBox 0.3s;
+            padding: 10px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; font-size: 0.9rem; animation: shakeBox 0.3s;
         }
         @keyframes shakeBox { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-        /* ==========================================================================
-           📜 RATE MODAL
-           ========================================================================== */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(93, 84, 164, 0.6); backdrop-filter: blur(5px); }
         .modal-content {
-            background: #fff; margin: 10% auto; padding: 25px; border-radius: 25px;
+            background: #fff; margin: 60px auto; padding: 25px; border-radius: 25px;
             width: 90%; max-width: 650px; position: relative;
             box-shadow: 0 25px 50px rgba(0,0,0,0.3); border: 4px solid var(--theme-purple);
             max-height: 80vh; overflow-y: auto; text-align: left;
         }
+        .modal-content::-webkit-scrollbar { width: 6px; }
+        .modal-content::-webkit-scrollbar-track { background: transparent; margin-block: 15px; }
+        .modal-content::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 10px; }
+        .modal-content::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
+
         .close { position: absolute; right: 20px; top: 15px; font-size: 2rem; color: #ccc; cursor: pointer; font-weight: bold; line-height: 1; }
         .close:hover { color: var(--theme-purple); }
-        
-        .modal-title { 
-            text-align: center; color: var(--text-main); font-weight: 900; 
-            margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px;
-            font-size: 1.4rem;
-        }
+        .modal-title { text-align: center; color: var(--text-main); font-weight: 900; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.4rem; }
 
-        /* テーブルスタイル調整 */
         .rate-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        .rate-table th { 
-            background: linear-gradient(135deg, #a18cd1, #fbc2eb);
-            color: #fff; padding: 12px; font-weight: 900; 
-            position: sticky; top: 0; z-index: 1; 
-        }
+        .rate-table th { background: linear-gradient(135deg, #a18cd1, #fbc2eb); color: #fff; padding: 12px; font-weight: 900; }
         .rate-table th:first-child { border-top-left-radius: 10px; }
         .rate-table th:last-child { border-top-right-radius: 10px; }
-        
         .rate-table td { padding: 10px 12px; text-align: center; font-weight: 700; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; color: #555; }
         .rate-table tr:nth-child(even) td { background: #fafafa; }
         .rate-table tr:hover td { background: #fff5fa; }
         
-        /* レアリティバッジ */
         .rarity-badge { padding: 4px 10px; border-radius: 12px; font-weight: 900; font-size: 0.8rem; color:white; display:inline-block; min-width:45px; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
         .rarity-UR { background: linear-gradient(135deg, #ff00cc, #333399); }
         .rarity-SSR { background: linear-gradient(135deg, #ff9900, #ffcc00); }
         .rarity-SR { background: linear-gradient(135deg, #a2d2ff, #4facfe); }
         .rarity-R { background: linear-gradient(135deg, #cdb4db, #a29bfe); }
-
         .rarity-UR-text { font-weight: 900; font-size: 1rem; color: #ff00cc; animation: rainbowColor 6s linear infinite; }
         @keyframes rainbowColor { 0% { color: red; } 16% { color: orange; } 32% { color: yellow; } 48% { color: green; } 64% { color: blue; } 80% { color: indigo; } 100% { color: violet; } }
-
         .rarity-summary { margin-top: 15px; font-size: 0.9rem; text-align: right; font-weight: 800; color: var(--text-main); background: #f0f8ff; padding: 10px; border-radius: 10px; }
         .rarity-summary p { margin: 2px 0; }
         .total-rate { text-align: right; font-weight: 900; margin-top: 5px; font-size: 0.9rem; color: var(--text-accent); }
-
         @keyframes twinkle { from { opacity: 0.5; transform: scale(0.8); } to { opacity: 1; transform: scale(1.1); } }
     </style>
 </head>
@@ -308,53 +227,48 @@
     </div>
 
     <div class="chip-status">
-        <i class="fa-solid fa-cookie-bite chip-icon"></i>
-        <div class="chip-count" th:text="${chipCount}">0</div>
+        <i class="fa-solid fa-coins chip-icon"></i>
+        <div class="chip-count" th:text="${coinCount}">0</div>
         <div class="chip-label">Coins</div>
     </div>
 
     <div class="pickup-banner">
         <div class="banner-bg-pattern"></div>
         <div class="pickup-label">PICK UP!</div>
-        
-        <button id="openModal" class="rate-btn">
-            <i class="fa-solid fa-circle-info"></i> 提供割合
-        </button>
-
+        <button id="openModal" class="rate-btn"><i class="fa-solid fa-circle-info"></i> 提供割合</button>
         <div class="item-showcase">
             <img th:src="@{/img/item/SSR-red.png}" class="sub-item-img sub-1" alt="Sub Item">
             <img th:src="@{/img/item/UR-niji.png}" class="main-item-img" alt="Main UR Item">
             <img th:src="@{/img/item/SSR-blue.png}" class="sub-item-img sub-2" alt="Sub Item">
         </div>
-
         <div class="banner-text">
             <p class="banner-title">✨ 夢幻の鍵 & 属性装備ピックアップ ✨</p>
             <p class="banner-desc">UR出現率 1.0%！ 進化素材を手に入れよう！</p>
         </div>
     </div>
 
-    <input type="hidden" id="chipCount" th:value="${chipCount}" />
+    <input type="hidden" id="coinCount" th:value="${coinCount}" />
 
     <div id="chipErrorBox" class="chip-error-box">
-        <i class="fa-solid fa-triangle-exclamation"></i> チップが足りません！
+        <i class="fa-solid fa-triangle-exclamation"></i> コインが足りません！
     </div>
     
     <div class="action-area">
         <a href="#"
            th:href="@{/gacha/animation(userId=${userId}, count=1)}"
            class="gacha-btn btn-single"
-           onclick="return checkChips(1)">
+           onclick="return checkCoins(1)">
             <span class="btn-label">1回引く</span>
-            <span class="btn-cost"><i class="fa-solid fa-cookie"></i> 1枚</span>
+            <span class="btn-cost"><i class="fa-solid fa-coins"></i> 1枚</span>
         </a>
         
         <a href="#"
            th:href="@{/gacha/animation(userId=${userId}, count=11)}"
            class="gacha-btn btn-multi"
-           onclick="return checkChips(10)">
+           onclick="return checkCoins(10)">
             <div class="discount-badge">おトク!</div>
             <span class="btn-label">11連ガチャ</span>
-            <span class="btn-cost"><i class="fa-solid fa-cookie"></i> 10枚</span>
+            <span class="btn-cost"><i class="fa-solid fa-coins"></i> 10枚</span>
         </a>
     </div>
 
@@ -366,7 +280,6 @@
         <h3 class="modal-title">
             <i class="fa-solid fa-star"></i> 提供割合・ラインナップ
         </h3>
-        
         <table class="rate-table">
             <thead>
                 <tr>
@@ -376,24 +289,17 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><span class="rarity-badge rarity-UR">UR</span></td>
-                    <td class="rarity-UR-text">夢幻の鍵</td>
-                    <td class="rarity-UR-text">1.00%</td>
-                </tr>
-
+                <tr><td><span class="rarity-badge rarity-UR">UR</span></td><td class="rarity-UR-text">夢幻の鍵</td><td class="rarity-UR-text">1.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>赫焔鱗</td><td>5.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>氷華の杖</td><td>5.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>緑晶灯</td><td>5.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>夢紡ぎの枕</td><td>5.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SSR">SSR</span></td><td>月詠みの杖</td><td>5.00%</td></tr>
-
                 <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>赤の聖結晶</td><td>6.80%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>青の聖結晶</td><td>6.80%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>緑の聖結晶</td><td>6.80%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>黄の聖結晶</td><td>6.80%</td></tr>
                 <tr><td><span class="rarity-badge rarity-SR">SR</span></td><td>紫の聖結晶</td><td>6.80%</td></tr>
-
                 <tr><td><span class="rarity-badge rarity-R">R</span></td><td>紅玉</td><td>12.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-R">R</span></td><td>蒼玉</td><td>12.00%</td></tr>
                 <tr><td><span class="rarity-badge rarity-R">R</span></td><td>翠玉</td><td>12.00%</td></tr>
@@ -401,30 +307,26 @@
                 <tr><td><span class="rarity-badge rarity-R">R</span></td><td>闇玉</td><td>12.00%</td></tr>
             </tbody>
         </table>
-        
         <div class="rarity-summary">
             <p>UR：1.00% / SSR：5.00%</p>
             <p>SR：34.00% / R：60.00%</p>
             <p class="total-rate">合計確率：100%</p>
         </div>
-        
     </div>
 </div>
 
 <script>
-    // --- モーダル制御 ---
     const modal = document.getElementById("rateModal");
     const openBtn = document.getElementById("openModal");
     const closeBtn = document.getElementById("closeModal");
-
     openBtn.onclick = () => { modal.style.display = "block"; }
     closeBtn.onclick = () => { modal.style.display = "none"; }
     window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
 
-    // --- チップ不足チェック ---
-    function checkChips(cost) {
-        const chipCount = parseInt(document.getElementById("chipCount").value, 10);
-        if (isNaN(chipCount) || chipCount < cost) {
+    // ★変更: 関数名と参照IDをCoinsに変更
+    function checkCoins(cost) {
+        const coinCount = parseInt(document.getElementById("coinCount").value, 10);
+        if (isNaN(coinCount) || coinCount < cost) {
             showChipError();
             return false;
         }
@@ -434,23 +336,16 @@
     function showChipError() {
         const box = document.getElementById("chipErrorBox");
         box.style.display = "block";
-        setTimeout(() => {
-            box.style.display = "none";
-        }, 3000);
+        setTimeout(() => { box.style.display = "none"; }, 3000);
     }
 
-    // --- 🌟 パーティクルアニメーション (Background) ---
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     let particlesArray = [];
-    
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
-    
     const mouse = { x: undefined, y: undefined };
     window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
-    
-    // 自動生成用
     setInterval(() => {
         if(particlesArray.length < 50) {
             const x = Math.random() * canvas.width;
@@ -458,7 +353,6 @@
             particlesArray.push(new Particle(x, y));
         }
     }, 200);
-
     class Particle {
         constructor(x, y) {
             this.x = x || mouse.x; this.y = y || mouse.y;
@@ -478,7 +372,6 @@
             ctx.fill(); ctx.shadowBlur = 0;
         }
     }
-    
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (let i = 0; i < particlesArray.length; i++) {

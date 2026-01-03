@@ -555,7 +555,7 @@ public class TrainingController {
                 savedCount = 1;
             }
 
-            // --- ゲーミフィケーション処理 (XP, チップ) ---
+            // --- ゲーミフィケーション処理 (XP, コイン) ---
             if (savedCount > 0) {
                 ExerciseData exerciseData = trainingDataService.getExerciseDataByName(exerciseName);
                 int earnedXP = 0;
@@ -589,13 +589,15 @@ public class TrainingController {
                 }
                 userRepository.save(currentUser);
 
-                // チップ付与
-                int earnedChips = (exerciseData != null) ? trainingLogicService.calculateChipReward(exerciseData) : 0;
-                if (earnedChips > 0) userService.addChips(currentUser.getUsername(), earnedChips);
+             // コイン付与
+                int earnedCoins = (exerciseData != null) ? trainingLogicService.calculateChipReward(exerciseData) : 0;
+                if (earnedCoins > 0) userService.addChips(currentUser.getUsername(), earnedCoins); // メソッド名はaddChipsのままでOK
 
                 // メッセージ作成
                 String successMsg = date.toString() + " 「" + exerciseName + "」を" + savedCount + "セット記録しました！";
-                if (earnedChips > 0) successMsg += " (" + earnedXP + " XP, " + earnedChips + " チップ)";
+                
+               
+                if (earnedCoins > 0) successMsg += " (" + earnedXP + " XP, " + earnedCoins + " コイン)";
                 else successMsg += " (" + earnedXP + " XP)";
                 
                 redirectAttributes.addFlashAttribute("successMessage", successMsg);

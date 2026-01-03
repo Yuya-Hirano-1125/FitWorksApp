@@ -304,14 +304,14 @@
 
     <p class="sub-heading" th:text="${username} + 'さんの食事を管理しましょう。'">食事記録カレンダー</p>
 
-    <div th:if="${successMessage}" class="success-message" 
-         th:text="${successMessage
-            .replace('と 0 枚のチップ', '')
-            .replace('と0 枚のチップ', '')
-            .replace('、 0 枚のチップ', '')
-            .replace('、0 枚のチップ', '')
-            .replace(' 0 枚のチップ', '')
-            .replace('0 枚のチップ', '')}"></div>
+	<div th:if="${successMessage}" class="success-message" 
+	         th:text="${successMessage
+	            .replace('と 0 枚のコイン', '')
+	            .replace('と0 枚のコイン', '')
+	            .replace('、 0 枚のコイン', '')
+	            .replace('、0 枚のコイン', '')
+	            .replace(' 0 枚のコイン', '')
+	            .replace('0 枚のコイン', '')}"></div>
     <div th:if="${error}" class="error-message" th:text="${error}"></div>
     
     <div class="calendar-nav-container">

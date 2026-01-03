@@ -8,11 +8,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.entity.User;
 import com.example.demo.model.GachaItem;
-import com.example.demo.repository.ItemRepository; // 追加
-import com.example.demo.repository.UserItemRepository; // 追加
+import com.example.demo.repository.ItemRepository;
+import com.example.demo.repository.UserItemRepository;
 import com.example.demo.service.GachaService;
 import com.example.demo.service.UserService;
 
@@ -21,10 +22,9 @@ public class GachaController {
 
     private final GachaService gachaService;
     private final UserService userService;
-    private final UserItemRepository userItemRepository; // 追加
-    private final ItemRepository itemRepository; // 追加
+    private final UserItemRepository userItemRepository;
+    private final ItemRepository itemRepository;
 
-    // コンストラクタ注入に追加
     public GachaController(GachaService gachaService, UserService userService, 
                            UserItemRepository userItemRepository, ItemRepository itemRepository) {
         this.gachaService = gachaService;
@@ -33,23 +33,21 @@ public class GachaController {
         this.itemRepository = itemRepository;
     }
 
- // 1. ガチャ画面
+    // 1. ガチャ画面
     @GetMapping("/gacha")
     public String index(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        // ログインユーザー情報の取得
         if (userDetails != null) {
             User user = userService.findByUsername(userDetails.getUsername());
             Long userId = user.getId();
 
-            model.addAttribute("userId", userId); // HTMLでのリンク生成に使用
+            model.addAttribute("userId", userId);
 
-            // ★修正: usersテーブルのchipカラムを直接参照
-            int chipCount = user.getChipCount();  // Userエンティティのgetter
-            model.addAttribute("chipCount", chipCount);
+            // ★変更: 変数名を coinCount に変更 (メソッド名は getChipCount のままでOK)
+            int coinCount = user.getChipCount();
+            model.addAttribute("coinCount", coinCount);
 
         } else {
-            // 未ログイン時は0を表示
-            model.addAttribute("chipCount", 0);
+            model.addAttribute("coinCount", 0); // ★変更
             model.addAttribute("userId", 0L);
         }
 
@@ -61,15 +59,15 @@ public class GachaController {
     @GetMapping("/gacha/animation")
     public String animation(@RequestParam("count") int count, @RequestParam("userId") Long userId, Model model) {
         model.addAttribute("count", count);
-        model.addAttribute("userId", userId); // 結果画面へ遷移するために必要なら渡す
+        model.addAttribute("userId", userId);
         return "gacha/gacha_animation";
     }
 
- // 3. ガチャ結果画面
-    @GetMapping("/gacha/roll")
-    public String roll(@RequestParam("count") int count,
+    // 3. ガチャ抽選処理
+    @GetMapping("/gacha/draw") 
+    public String draw(@RequestParam("count") int count,
                        @AuthenticationPrincipal UserDetails userDetails,
-                       Model model) {
+                       RedirectAttributes redirectAttributes) {
 
         if (userDetails == null) {
             return "redirect:/login";
@@ -78,26 +76,34 @@ public class GachaController {
         User user = userService.findByUsername(userDetails.getUsername());
         Long userId = user.getId();
 
-        // ★チップ消費ロジック
-        int cost = (count == 1) ? 1 : 10; // 1回なら1枚、11連なら10枚
-        boolean success = user.useChips(cost);
+        // コイン消費ロジック
+        int cost = (count == 1) ? 1 : 10;
+        boolean success = user.useChips(cost); // メソッド名は useChips のままでOK
 
         if (!success) {
-            // チップ不足ならガチャできない
-            model.addAttribute("errorMessage", "チップが不足しています！");
-            return "gacha/error"; // エラーページを用意するか、同じ画面に戻す
+            // ★変更: メッセージを「コイン」に変更
+            redirectAttributes.addFlashAttribute("errorMessage", "コインが不足しています！");
+            return "redirect:/gacha";
         }
 
-        // 消費後の状態を保存
         userService.save(user);
 
-        // ガチャ結果を生成
         List<GachaItem> results = gachaService.roll(count, userId);
-        model.addAttribute("results", results);
+        
+        redirectAttributes.addFlashAttribute("results", results);
+        // ★変更: 変数名を coinCount に変更
+        redirectAttributes.addFlashAttribute("coinCount", user.getChipCount());
+        redirectAttributes.addFlashAttribute("userId", userId);
 
-        // 最新のチップ数を渡す
-        model.addAttribute("chipCount", user.getChipCount());
+        return "redirect:/gacha/result";
+    }
 
+    // 4. ガチャ結果表示
+    @GetMapping("/gacha/result")
+    public String result(Model model) {
+        if (!model.containsAttribute("results")) {
+            return "redirect:/gacha";
+        }
         return "gacha/result";
     }
 }

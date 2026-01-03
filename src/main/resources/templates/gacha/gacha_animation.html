@@ -94,11 +94,11 @@
         const count = /*[[${count}]]*/ 1;
         const userId = /*[[${userId}]]*/ 0;
 
-        function goResult() {
-            window.location.replace(
-                '/gacha/roll?userId=' + userId + '&count=' + count
-            );
-        }
+		function goResult() {
+		    window.location.replace(
+		        '/gacha/draw?userId=' + userId + '&count=' + count // ★ roll -> draw に変更
+		    );
+		}
 
         setTimeout(() => {
             goResult();
