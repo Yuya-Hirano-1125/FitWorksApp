@@ -6,7 +6,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/base.css}">
-    <link rel="stylesheet" th:href="@{/css/characters/CharactersStorage.css}">
     
     <style>
         /* 画面固有のスタイル調整 */
@@ -15,7 +14,7 @@
             font-family: 'Noto Sans JP', sans-serif; 
         }
 
-        /* 共通背景（home.html等と同じ） */
+        /* 共通背景 */
         .interactive-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
@@ -23,40 +22,35 @@
         }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         
-        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
-        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
-        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
-        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
-        
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
         .mouse-flare { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%); transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px); }
 
-        /* メインコンテナ（共通デザイン） */
+        /* メインコンテナ */
         .main-container {
-            max-width: 1000px; /* 必要に応じて調整 */
+            max-width: 1000px;
             width: 92%; margin: 40px auto; padding: 40px;
-            background: rgba(255, 255, 255, 0.65);
+            background: rgba(255, 255, 255, 0.85); 
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-radius: 45px;
             border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset;
             position: relative; z-index: 10;
+            min-height: 500px;
+            /* 高さは自動で伸びるようにし、スクロールバーを出さない */
+            height: auto; 
+            overflow: visible; 
+            padding-bottom: 60px;
+            box-sizing: border-box;
         }
 
-        /* 共通ヘッダーデザイン */
+        /* ヘッダー */
         .page-header-container { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 30px; 
-            border-bottom: 3px solid #007bff; 
-            padding-bottom: 10px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 10px; 
             flex-wrap: wrap; gap: 15px;
         }
-        .header-left { 
-            display: flex; align-items: center; gap: 15px; 
-        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
         .home-link-icon {
             display: flex; align-items: center; justify-content: center;
             width: 50px; height: 50px; background-color: white; color: #007bff;
@@ -64,41 +58,56 @@
             transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
-        .page-title { 
-            color: #343a40; font-size: 2rem; margin: 0; 
-            text-shadow: none; white-space: nowrap;
-        }
-        
+        .page-title { color: #343a40; font-size: 2rem; margin: 0; text-shadow: none; white-space: nowrap; }
         .user-level-badge {
             background: linear-gradient(135deg, #6c5ce7, #a29bfe);
             color: white; padding: 5px 15px; border-radius: 20px;
             font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        /* タブデザイン調整 */
+        /* タブのスタイル調整 */
         .storage-tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0 30px; flex-wrap: wrap; }
         .tab-btn { 
             padding: 10px 25px; border: none; border-radius: 20px; cursor: pointer; 
             background: rgba(255,255,255,0.9); font-weight: bold; color: #555;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: all 0.2s;
+            border: 2px solid transparent;
         }
-        .tab-btn:hover { transform: translateY(-2px); }
-        .tab-btn.active { background: linear-gradient(135deg, #007bff, #00d2ff); color: white; }
+        .tab-btn:hover { transform: translateY(-2px); filter: brightness(0.95); }
+        .tab-btn i { margin-right: 5px; }
 
-        /* グリッドレイアウト */
+        /* 属性ごとのアクティブカラー設定 */
+        .tab-btn.active { color: white; transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .tab-btn[data-target="all"].active { background: linear-gradient(135deg, #007bff, #00d2ff); border-color: #007bff; }
+        .tab-btn[data-target="fire"].active { background: linear-gradient(135deg, #ff7675, #ff4757); border-color: #ff4757; }
+        .tab-btn[data-target="water"].active { background: linear-gradient(135deg, #74b9ff, #0984e3); border-color: #0984e3; }
+        .tab-btn[data-target="grass"].active { background: linear-gradient(135deg, #55efc4, #00b894); border-color: #00b894; }
+        .tab-btn[data-target="light"].active { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); border-color: #fdcb6e; color: #635338; }
+        .tab-btn[data-target="dark"].active { background: linear-gradient(135deg, #a29bfe, #6c5ce7); border-color: #6c5ce7; }
+
+        /* リストのラッパー */
+        .character-list-wrapper {
+            display: flex; flex-direction: column; align-items: center; width: 100%;
+        }
+
+        /* PC・大画面: 4列 */
         .character-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
-            gap: 20px; padding: 10px; 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 20px; 
+            padding: 10px; 
+            width: 100%; 
+            box-sizing: border-box;
         }
         
-        /* キャラクターカード */
+        /* カード */
         .character-card { 
             text-align: center; border: 2px solid rgba(0,0,0,0.1); border-radius: 20px; 
-            padding: 15px 10px; background: rgba(255,255,255,0.9); 
+            padding: 15px 10px; background: rgba(255,255,255,0.95); 
             position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            height: 100%; min-height: 220px; /* 高さ揃え */
+            height: 100%; min-height: 230px;
         }
         .character-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
 
@@ -106,49 +115,115 @@
             width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px; 
             filter: drop-shadow(0 5px 5px rgba(0,0,0,0.2));
         }
-        
-        .character-name { font-weight: bold; margin: 5px 0; color: #333; font-size: 1rem; }
+        .character-name { font-weight: bold; margin: 5px 0; color: #333; font-size: 1rem; word-break: break-word; }
 
-        /* 属性ごとのボーダー色（アクセント） */
+        /* 属性別ボーダー */
         .character-card.fire { border-bottom: 4px solid #ff7675; }
         .character-card.water { border-bottom: 4px solid #74b9ff; }
         .character-card.grass { border-bottom: 4px solid #55efc4; }
         .character-card.light { border-bottom: 4px solid #ffeaa7; }
         .character-card.dark { border-bottom: 4px solid #a29bfe; }
         
-        /* 選択中のスタイル */
+        /* 選択中キャラのスタイル（青系） */
         .character-card.selected {
-            border: 4px solid gold;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
-            background-color: #fff9e6;
+            border: 4px solid #007bff;
+            background-color: #f0f7ff;
             transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.4);
             z-index: 10;
         }
-        .selected-badge {
-            position: absolute; top: -10px; left: -10px;
-            background: #ff4757; color: white; padding: 5px 10px;
-            border-radius: 20px; font-weight: bold; font-size: 0.8rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            display: none;
+        
+        /* 選択中リボン */
+        .selected-badge-ribbon {
+            position: absolute;
+            top: -8px; right: -8px;
+            background: #007bff;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            display: flex; align-items: center; gap: 5px;
+            z-index: 20;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .character-card.selected .selected-badge { display: block; }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
 
-        /* 選択ボタン */
+        /* ボタン */
         .select-btn {
-            width: 100%; margin-top: auto; /* 下寄せ */
+            width: 100%; margin-top: auto;
             padding: 8px 0; border: none; border-radius: 15px;
             background: #4facfe; color: white; font-weight: bold;
             cursor: pointer; transition: all 0.2s; font-size: 0.9rem;
         }
         .select-btn:hover:not(:disabled) { background: #00f2fe; box-shadow: 0 4px 8px rgba(79, 172, 254, 0.4); }
-        .select-btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.8; }
+        .select-btn:disabled { 
+            background: linear-gradient(to right, #007bff, #0056b3);
+            color: #fff;
+            cursor: default; opacity: 1; 
+            box-shadow: none;
+            border: 2px solid #007bff;
+        }
 
+        /* データなしメッセージ */
+        .no-data-message {
+            text-align: center; width: 100%; padding: 40px; color: #888;
+            font-weight: bold; font-size: 1.1rem; display: none; 
+            background: rgba(255,255,255,0.5); border-radius: 15px; margin-top: 20px;
+            box-sizing: border-box;
+        }
+
+        /* タブレット (601px - 850px): 3列 */
+        @media (max-width: 850px) {
+            .character-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* スマホ (600px以下): 2列 & さらにコンパクト化 */
         @media (max-width: 600px) {
-            .main-container { padding: 25px 20px; width: 95%; margin: 20px auto; }
-            .page-title { font-size: 1.5rem; }
-            .character-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .character-card { min-height: 200px; }
-            .character-img { width: 80px; height: 80px; }
+            .main-container { 
+                padding: 20px 10px; width: 96%; margin: 20px auto; 
+            }
+            .page-title { font-size: 1.4rem; }
+            
+            .character-grid { 
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 10px; 
+                padding: 5px;
+            }
+            .character-card { 
+                /* 高さを200pxに縮小 */
+                min-height: 200px; 
+                padding: 8px 4px; 
+            }
+            .character-img { 
+                /* 画像サイズを55pxに縮小 */
+                width: 55px; height: 55px; 
+                margin-bottom: 5px;
+            }
+            .character-name {
+                /* 文字サイズを縮小 */
+                font-size: 0.85rem; 
+                margin: 3px 0;
+            }
+            .evolution-tag {
+                font-size: 0.55em;
+                padding: 1px 4px;
+                top: 2px; left: 2px;
+            }
+            .select-btn {
+                padding: 4px 0;
+                font-size: 0.7rem;
+                border-radius: 8px;
+                margin-top: 5px;
+            }
+            .selected-badge-ribbon {
+                font-size: 0.65rem;
+                padding: 2px 6px;
+                top: -5px; right: -5px;
+            }
         }
     </style>
 </head>
@@ -187,24 +262,22 @@
                 <th:block th:each="chara : ${charaList}">
                     <div class="character-card storage-item" 
                          th:classappend="${chara.attribute} + (${chara.isSelected} ? ' selected' : '')" 
-                         th:data-attribute="${chara.attribute}" 
-                         th:style="${!chara.isUnlocked} ? 'opacity: 0.6; background: #eee;' : ''">
+                         th:data-attribute="${chara.attribute}">
                         
-                        <div class="selected-badge"><i class="fa-solid fa-check"></i> 選択中</div>
+                        <div th:if="${chara.isSelected}" class="selected-badge-ribbon">
+                            <i class="fa-solid fa-check"></i> 選択中
+                        </div>
                         
-                        <div class="evolution-tag" th:text="${chara.rarity}" style="position:absolute; top:5px; right:5px; background:gold; color:white; padding:2px 5px; border-radius:4px; font-size:0.7em;">★1</div>
+                        <div class="evolution-tag" th:text="${chara.rarity}" style="position:absolute; top:5px; left:5px; background:gold; color:white; padding:2px 8px; border-radius:10px; font-size:0.7em; box-shadow:0 2px 4px rgba(0,0,0,0.1);">★1</div>
                         
                         <img class="character-img" 
-                             th:src="${chara.isUnlocked} ? ${chara.imgUrl} : '/img/placeholder_locked.png'" 
+                             th:src="${chara.imgUrl}" 
                              th:alt="${chara.name}"
                              onerror="this.src='https://placehold.co/100x100?text=No+Img';">
                         
                         <p class="character-name" th:text="${chara.name}">Name</p>
                         
-                        <div th:if="${!chara.isUnlocked}" style="margin-top:auto;">
-                            <p class="required-level" th:text="'Lv.' + ${chara.requiredLevel} + ' 解放'" style="color:red; font-size:0.8em; font-weight:bold;"></p>
-                        </div>
-                        <div th:if="${chara.isUnlocked}" style="width:100%; margin-top:auto;">
+                        <div style="width:100%; margin-top:auto;">
                             <button class="select-btn" 
                                     th:onclick="'selectCharacter(' + ${chara.id} + ')'"
                                     th:text="${chara.isSelected} ? '選択中' : '選択する'"
@@ -214,36 +287,45 @@
                     </div>
                 </th:block>
             </div>
+            
+            <div id="no-data-msg" class="no-data-message">
+                <i class="fa-solid fa-ghost" style="font-size: 2em; margin-bottom: 10px; display:block;"></i>
+                この属性のキャラクターは所持していません
+            </div>
         </div>
     </div>
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // タブ切り替えロジック
         document.addEventListener('DOMContentLoaded', () => {
             const tabs = document.querySelectorAll('.tab-btn');
             const items = document.querySelectorAll('.storage-item');
+            const noDataMsg = document.getElementById('no-data-msg');
+
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
                     tabs.forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     const target = tab.getAttribute('data-target');
+                    let count = 0;
                     items.forEach(item => {
                         const attr = item.getAttribute('data-attribute');
-                        if (target === 'all' || attr === target) item.style.display = 'flex'; // flexに変更
-                        else item.style.display = 'none';
+                        if (target === 'all' || attr === target) {
+                            item.style.display = 'flex';
+                            count++;
+                        } else {
+                            item.style.display = 'none';
+                        }
                     });
+                    if (count === 0) { noDataMsg.style.display = 'block'; } else { noDataMsg.style.display = 'none'; }
                 });
             });
         });
 
-        // キャラクター選択
         function selectCharacter(characterId) {
             fetch('/characters/select', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ characterId: characterId })
             })
             .then(response => response.json())
@@ -261,7 +343,6 @@
             });
         }
 
-        // 背景アニメーション
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         const flare = document.getElementById('mouse-flare');

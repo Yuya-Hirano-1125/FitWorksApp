@@ -46,42 +46,59 @@ public class CharactersMenuController {
         return "characters/menu/CharactersMenu"; 
     }
 
-    // キャラクター一覧画面へ遷移 (ここを修正: データをModelに追加)
+ // キャラクター一覧画面へ遷移
     @GetMapping("/characters/menu/CharactersStorage")
     public String showCharactersStorage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         if (userDetails == null) return "redirect:/login";
 
         User user = userService.findByUsername(userDetails.getUsername());
         
-        // 全キャラクターを取得
         List<CharacterEntity> allCharacters = characterRepository.findAll(); 
 
-        // 表示用リストの作成
         List<Map<String, Object>> displayList = new ArrayList<>();
         
         Long selectedId = user.getSelectedCharacterId();
+        
+     // ★追加: デフォルト(未選択)時に表示されているはずの画像パスを計算
+        String defaultImgPath = "/img/character/" + ((user.getLevel() / 10) * 10) + ".png";
 
         for (CharacterEntity chara : allCharacters) {
+            // 解放済みかチェック (所持リストに含まれている か 初期キャラ(ID=0)なら解放)
+            boolean isUnlocked = user.hasUnlockedCharacter(chara.getId()) || (chara.getId() == 0); 
+            
+            // ★追加: 未所持の場合はリストに追加せずスキップする
+            if (!isUnlocked) {
+                continue;
+            }
+
             Map<String, Object> map = new HashMap<>();
             map.put("id", chara.getId());
             map.put("name", chara.getName());
-            map.put("attribute", chara.getAttribute()); // fire, water, etc.
+            map.put("attribute", chara.getAttribute());
             map.put("imgUrl", chara.getImagePath());
             map.put("requiredLevel", chara.getRequiredLevel());
-            map.put("rarity", chara.getRarity()); // ★1 など
+            map.put("rarity", chara.getRarity());
 
-            // 解放済みかチェック (所持リストに含まれている か 初期キャラ(ID=0)なら解放)
-            boolean isUnlocked = user.hasUnlockedCharacter(chara.getId()) || (chara.getId() == 0); 
-            map.put("isUnlocked", isUnlocked);
+            map.put("isUnlocked", true); // ここに来る時点で必ずtrue
             
-            // 選択中かどうか
-            boolean isSelected = (selectedId != null && selectedId.equals(chara.getId()));
+         // ★修正: 選択中かどうかの判定ロジック
+            boolean isSelected = false;
+            
+            if (selectedId != null) {
+                // ユーザーが明示的に選択している場合、IDで判定
+                isSelected = selectedId.equals(chara.getId());
+            } else {
+                // まだ選択していない場合、デフォルト画像パスと一致するキャラを選択中とみなす
+                if (chara.getImagePath() != null && chara.getImagePath().equals(defaultImgPath)) {
+                    isSelected = true;
+                }
+            }
+            
             map.put("isSelected", isSelected);
 
             displayList.add(map);
         }
 
-        // 画面にデータを渡す
         model.addAttribute("charaList", displayList);
         model.addAttribute("currentLevel", user.getLevel());
 
