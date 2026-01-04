@@ -11,8 +11,6 @@
     <link rel="stylesheet" th:href="@{/css/base.css}">
     
     <style>
-        /* ... CSSは既存のまま ... */
-        /* 前回追加したボタン用スタイルなども含めてください */
         :root { --glass-bg: rgba(255, 255, 255, 0.65); --primary-color: #4facfe; }
         body { margin: 0; padding: 0; background-color: #f0f8ff; min-height: 100vh; font-family: 'Noto Sans JP', sans-serif; overflow-x: hidden; padding-bottom: 50px; }
         .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
@@ -26,18 +24,20 @@
         .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        
         .main-container { max-width: 1000px; width: 92%; margin: 40px auto; padding: 30px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-radius: 45px; border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 30px 60px rgba(100, 149, 237, 0.2), 0 0 0 2px rgba(255, 255, 255, 0.6) inset; position: relative; z-index: 10; }
         .page-header-container { display: flex; align-items: center; margin-bottom: 20px; border-bottom: 3px solid #007bff; padding-bottom: 15px; gap: 15px; }
         .page-title { color: #343a40; font-size: 1.8rem; margin: 0; flex-grow: 1; text-align: left; font-weight: 800; white-space: nowrap; text-shadow: none !important; }
         .page-title i { color: #007bff; margin-right: 10px; }
         .home-link-icon { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 50%; text-decoration: none; transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0; }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
+        
         .status-bar { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,248,255,0.95)); padding: 12px 25px; border-radius: 50px; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border: 2px solid rgba(255,255,255,0.8); backdrop-filter: blur(5px); }
         .level-badge { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: #fff; padding: 8px 24px; border-radius: 30px; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.3); text-shadow: 0 2px 2px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.3); }
         .level-badge i { color: #f1c40f; font-size: 1.3rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
         .material-link { text-decoration: none; color: #fff; font-weight: bold; display: flex; align-items: center; gap: 8px; padding: 10px 25px; border-radius: 30px; background: linear-gradient(135deg, #8E2DE2, #4A00E0); box-shadow: 0 4px 15px rgba(142, 45, 226, 0.4); transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.4); font-size: 0.95rem; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
         .material-link:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 20px rgba(142, 45, 226, 0.5); filter: brightness(1.1); }
-        .material-link i { font-size: 1.1rem; }
+        
         .attribute-section { margin-bottom: 30px; border-radius: 20px; padding: 20px; border: 2px solid transparent; }
         .attribute-heading { font-size: 1.3rem; font-weight: 900; margin-bottom: 15px; margin-top: 0; display: flex; align-items: center; gap: 8px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
         .section-fire { background: rgba(255, 107, 107, 0.25); border-color: rgba(255, 107, 107, 0.5); }
@@ -52,25 +52,42 @@
         .section-dark .attribute-heading { color: #8e44ad; }
         .section-secret { background: rgba(255, 159, 243, 0.25); border-color: rgba(255, 159, 243, 0.5); }
         .section-secret .attribute-heading { color: #c0392b; }
+        
         .evolution-container { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 15px; }
         .evolution-arrow { color: rgba(0, 0, 0, 0.3); font-size: 1.5rem; margin: 0 5px; animation: pulseArrow 2s infinite; }
         @keyframes pulseArrow { 0%, 100% { opacity: 0.3; transform: translateX(0); } 50% { opacity: 0.8; transform: translateX(3px); } }
+        
         .char-card { background: #ffffff; border-radius: 15px; padding: 15px 10px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; position: relative; border: 2px solid transparent; display: flex; flex-direction: column; justify-content: space-between; height: 100%; width: 150px; box-sizing: border-box; }
         .char-card:not(.unlocked):hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-color: rgba(0,123,255,0.3); }
         .char-card.unlocked { background: linear-gradient(to bottom right, #ffffff, #f0f8ff); border: 2px solid #2ecc71; transform: none !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important; }
+        
         .char-img-wrapper { width: 90px; height: 90px; margin: 0 auto 10px; background: #fff; border-radius: 50%; overflow: hidden; border: 3px solid #eee; position: relative; display: flex; align-items: center; justify-content: center; }
         .char-img { width: 100%; height: 100%; object-fit: contain; }
         .char-img-wrapper.locked .char-img { filter: brightness(0); opacity: 0.8; }
         .lock-icon { position: absolute; font-size: 1.8rem; color: #fff; text-shadow: 0 0 5px rgba(0,0,0,0.8); z-index: 2; }
+        
         .char-name { font-size: 0.9rem; font-weight: 800; margin-bottom: 8px; color: #333; height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
         .req-level { font-size: 0.75rem; color: #666; background: #f0f0f0; padding: 4px 8px; border-radius: 12px; display: inline-block; margin-bottom: 12px; font-weight: bold; }
+        
         .btn-unlock { width: 100%; border: none; padding: 10px 0; border-radius: 25px; font-weight: bold; font-size: 0.85rem; cursor: pointer; color: #fff; background: linear-gradient(135deg, #00c6ff, #0072ff); box-shadow: 0 4px 10px rgba(0,114,255,0.3); transition: all 0.2s; }
         .btn-unlock:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,114,255,0.4); }
+        
+        .btn-insufficient { width: 100%; border: none; padding: 10px 0; border-radius: 25px; font-weight: bold; font-size: 0.85rem; cursor: pointer; color: #fff; background: linear-gradient(135deg, #bdc3c7, #95a5a6); box-shadow: 0 4px 10px rgba(149,165,166,0.3); transition: all 0.2s; }
+        .btn-insufficient:hover { transform: translateY(-2px); background: linear-gradient(135deg, #95a5a6, #7f8c8d); }
+        
         .btn-unlocked { background: transparent; color: #2ecc71; box-shadow: none; cursor: default; padding: 10px 0; pointer-events: none; }
         .btn-disabled { background: #e0e0e0 !important; color: #888 !important; box-shadow: none !important; cursor: not-allowed !important; pointer-events: none; }
         .lock-reason { font-size: 0.7rem; color: #e74c3c; font-weight: bold; display: block; margin-top: 4px; }
+        
+        .btn-select { width: 100%; border: none; padding: 10px 0; border-radius: 25px; font-weight: bold; font-size: 0.85rem; cursor: pointer; color: #fff; background: linear-gradient(135deg, #2ecc71, #27ae60); box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); transition: all 0.2s; }
+        .btn-select:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4); }
+        .btn-selected { width: 100%; border: none; padding: 10px 0; border-radius: 25px; font-weight: bold; font-size: 0.85rem; cursor: default; color: #fff; background: linear-gradient(135deg, #3498db, #2980b9); box-shadow: none; opacity: 1; pointer-events: none; }
+        
+        /* モーダル共通 */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
         .modal-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+        
+        /* 確認モーダル & 素材不足モーダル */
         .modal-content { background: #fff; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; text-align: center; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 4px solid #4facfe; }
         .modal-close { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; color: #ccc; cursor: pointer; }
         .modal-title { font-size: 1.2rem; font-weight: 800; color: #333; margin-bottom: 15px; border-bottom: 2px dashed #eee; padding-bottom: 10px; }
@@ -82,132 +99,56 @@
         .mat-count.ng { color: #e74c3c; }
         .modal-btn { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); border: none; padding: 12px 40px; border-radius: 30px; color: #fff; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(253, 160, 133, 0.4); }
         .modal-btn:hover { transform: translateY(-2px); }
+        
+        /* 成功モーダル用スタイル */
+        .success-content { background: linear-gradient(135deg, #fff 0%, #f0f8ff 100%); border: 4px solid #4facfe; box-shadow: 0 0 20px rgba(79, 172, 254, 0.6), 0 0 50px rgba(0, 0, 0, 0.5); animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: hidden; }
+        .success-header h2 { margin: 0; color: #4facfe; font-family: 'Poppins', sans-serif; font-weight: 900; font-size: 2.5rem; text-transform: uppercase; letter-spacing: 2px; background: linear-gradient(to right, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        .unlocked-img { width: 150px; height: 150px; object-fit: contain; margin: 1.5rem auto; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2)); animation: bounceIn 0.8s ease; }
+        .sparkles { font-size: 2rem; position: absolute; top: 10%; right: 10%; animation: spin 3s linear infinite; }
+        .unlock-message { font-weight: bold; color: #555; margin-bottom: 0.5rem; }
+        .character-name { font-size: 1.2rem; font-weight: 800; color: #333; margin-top: 0; }
+        .success-btn { background: linear-gradient(to right, #4facfe, #00f2fe); margin-top: 1rem; }
+        
+        /* トースト通知用CSS */
+        .toast {
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 50px;
+            padding: 16px;
+            position: fixed;
+            z-index: 3000;
+            left: 50%;
+            bottom: 30px;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
+        }
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+        .toast i { margin-right: 8px; color: #2ecc71; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes bounceIn { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 70% { transform: scale(0.9); } 100% { transform: scale(1); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
         @media (max-width: 600px) {
             .main-container { padding: 20px; width: 95%; }
             .evolution-container { justify-content: space-evenly; gap: 10px; }
-            .evolution-arrow { font-size: 1.0rem; margin: 0; transform: rotate(90deg); display: none; }
+            .evolution-arrow { display: none; }
             .char-card { width: 45%; padding: 10px 5px; margin-bottom: 10px; }
             .char-img-wrapper { width: 70px; height: 70px; }
             .char-name { font-size: 0.8rem; }
-            .req-level { font-size: 0.7rem; padding: 3px 8px; }
-            .btn-unlock { font-size: 0.8rem; padding: 8px 0; }
-            .page-title { font-size: 1.4rem; }
-            .status-bar { padding: 10px 15px; }
-            .level-badge { padding: 5px 15px; font-size: 0.9rem; }
-            .material-link { padding: 8px 15px; font-size: 0.85rem; }
+            .btn-unlock, .btn-insufficient { font-size: 0.8rem; padding: 8px 0; }
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* 選択ボタン用CSS */
-        .btn-select {
-            width: 100%; border: none; padding: 10px 0; border-radius: 25px;
-            font-weight: bold; font-size: 0.85rem; cursor: pointer;
-            color: #fff; background: linear-gradient(135deg, #2ecc71, #27ae60);
-            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); transition: all 0.2s;
-        }
-        .btn-select:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4); }
-        .btn-selected {
-            width: 100%; border: none; padding: 10px 0; border-radius: 25px;
-            font-weight: bold; font-size: 0.85rem; cursor: default;
-            color: #fff; background: linear-gradient(135deg, #3498db, #2980b9);
-            box-shadow: none; opacity: 1; pointer-events: none;
-        }
-		/* モーダル全体のオーバーレイ */
-		.modal-overlay {
-		    position: fixed;
-		    top: 0; left: 0;
-		    width: 100%; height: 100%;
-		    background: rgba(0, 0, 0, 0.85);
-		    z-index: 9999;
-		    display: flex;
-		    justify-content: center;
-		    align-items: center;
-		    animation: fadeIn 0.3s ease;
-		}
-
-		/* モーダル本体 */
-		.modal-content {
-		    background: linear-gradient(135deg, #fff 0%, #f0f8ff 100%);
-		    padding: 2rem;
-		    border-radius: 20px;
-		    text-align: center;
-		    width: 90%;
-		    max-width: 400px;
-		    box-shadow: 0 0 20px rgba(79, 172, 254, 0.6), 0 0 50px rgba(0, 0, 0, 0.5);
-		    border: 4px solid #4facfe;
-		    animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-		    position: relative;
-		    overflow: hidden;
-		}
-
-		/* ヘッダー ("UNLOCKED!") */
-		.modal-header h2 {
-		    margin: 0;
-		    color: #4facfe;
-		    font-family: 'Poppins', sans-serif;
-		    font-weight: 900;
-		    font-size: 2.5rem;
-		    text-transform: uppercase;
-		    letter-spacing: 2px;
-		    background: linear-gradient(to right, #4facfe, #00f2fe);
-		    -webkit-background-clip: text;
-		    -webkit-text-fill-color: transparent;
-		    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-		}
-
-		/* キャラクター画像 */
-		.unlocked-img {
-		    width: 150px;
-		    height: 150px;
-		    object-fit: contain;
-		    margin: 1.5rem auto;
-		    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.2));
-		    animation: bounceIn 0.8s ease;
-		}
-
-		/* テキスト */
-		.unlock-message {
-		    font-weight: bold;
-		    color: #555;
-		    margin-bottom: 0.5rem;
-		}
-		.character-name {
-		    font-size: 1.2rem;
-		    font-weight: 800;
-		    color: #333;
-		    margin-top: 0;
-		}
-
-		/* ボタン */
-		.modal-btn {
-		    background: linear-gradient(to right, #4facfe, #00f2fe);
-		    color: white;
-		    border: none;
-		    padding: 12px 40px;
-		    font-size: 1.1rem;
-		    font-weight: bold;
-		    border-radius: 50px;
-		    cursor: pointer;
-		    transition: transform 0.2s, box-shadow 0.2s;
-		    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
-		}
-		.modal-btn:hover {
-		    transform: translateY(-2px);
-		    box-shadow: 0 6px 20px rgba(79, 172, 254, 0.6);
-		}
-		.modal-btn:active {
-		    transform: translateY(1px);
-		}
-
-		/* アニメーション定義 */
-		@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-		@keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-		@keyframes bounceIn {
-		    0% { transform: scale(0); }
-		    50% { transform: scale(1.2); }
-		    70% { transform: scale(0.9); }
-		    100% { transform: scale(1); }
-		}
     </style>
 </head>
 <body>
@@ -247,77 +188,100 @@
                 </h2>
                 
                 <div class="evolution-container">
-                    
                     <th:block th:each="chara, iterStat : ${category.list}">
                         
-                        <div class="char-card" 
-                             th:classappend="${unlockedIds.contains(chara.id)} ? 'unlocked' : ''">
+                        <div class="char-card" th:id="'card-' + ${chara.id}"
+                             th:classappend="${unlockedIds.contains(chara.id)} ? 'unlocked' : ''"
+                             th:attr="data-req-level=${chara.requiredLevel}, data-unlock-cost=${chara.unlockCost}, data-materials=${chara.evolutionMaterials}, data-char-name=${chara.name}, data-image-path=${chara.imagePath}">
                             
-                            <div class="char-img-wrapper" th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
+                            <div class="char-img-wrapper" th:id="'img-wrapper-' + ${chara.id}"
+                                 th:classappend="${!unlockedIds.contains(chara.id)} ? 'locked' : ''">
                                 <img class="char-img" th:src="@{${chara.imagePath}}" th:alt="${chara.name}">
                                 <i th:if="${!unlockedIds.contains(chara.id)}" class="fa-solid fa-lock lock-icon"></i>
                             </div>
                             
-                            <div class="char-name" 
-                                 th:text="${unlockedIds.contains(chara.id)} ? ${chara.name} : '???'">
-                                 キャラ名
-                            </div>
+                            <div class="char-name" th:id="'name-' + ${chara.id}"
+                                 th:text="${unlockedIds.contains(chara.id)} ? ${chara.name} : '???'">キャラ名</div>
                             
                             <div class="req-level">Lv.<span th:text="${chara.requiredLevel}">1</span>解放</div>
                             
-                            <div th:if="${unlockedIds.contains(chara.id)}">
-                                <button th:if="${chara.id == selectedCharacterId}" class="btn-selected">
-                                    <i class="fa-solid fa-check"></i> 選択中
-                                </button>
-                                <button th:unless="${chara.id == selectedCharacterId}" 
-                                        type="button" class="btn-select"
-                                        th:onclick="'selectCharacter(' + ${chara.id} + ')'">
-                                    選択する
-                                </button>
-                            </div>
-                            
-                            <div th:unless="${unlockedIds.contains(chara.id)}">
-                                <th:block th:with="status=${unlockStatusMap != null ? unlockStatusMap.get(chara.id) : 'OK'}">
-                                    <button th:if="${status == 'OK'}" 
-                                            type="button" class="btn-unlock"
-                                            th:attr="onclick='openUnlockModal(' + ${chara.id} + ', \'' + ${chara.name} + '\', ' + ${chara.unlockCost} + ', \'' + ${chara.evolutionMaterials} + '\')'">
-                                        解放する
+                            <div th:id="'action-area-' + ${chara.id}">
+                                <div th:if="${unlockedIds.contains(chara.id)}">
+                                    <button th:if="${chara.id == selectedCharacterId}" class="btn-selected">
+                                        <i class="fa-solid fa-check"></i> 選択中
                                     </button>
-                                    <div th:unless="${status == 'OK'}">
-                                        <button type="button" class="btn-unlock btn-disabled" disabled>
-                                            <i class="fa-solid fa-lock"></i> 未解放
+                                    <button th:unless="${chara.id == selectedCharacterId}" 
+                                            type="button" class="btn-select"
+                                            th:onclick="'selectCharacter(' + ${chara.id} + ')'">
+                                        選択する
+                                    </button>
+                                </div>
+                                
+                                <div th:unless="${unlockedIds.contains(chara.id)}">
+                                    <th:block th:with="status=${unlockStatusMap != null ? unlockStatusMap.get(chara.id) : 'OK'}">
+                                        
+                                        <button th:if="${status == 'OK'}" 
+                                                type="button" class="btn-unlock"
+                                                th:attr="onclick='openConfirmModal(' + ${chara.id} + ', \'' + ${chara.name} + '\', ' + ${chara.unlockCost} + ', \'' + ${chara.evolutionMaterials} + '\', \'' + ${chara.imagePath} + '\')'">
+                                            解放する
                                         </button>
-                                        <span class="lock-reason" th:if="${status == 'LEVEL_LOCKED'}">Lv不足</span>
-                                        <span class="lock-reason" th:if="${status == 'PREREQ_LOCKED'}">進化元未解放</span>
-                                    </div>
-                                </th:block>
+                                        
+                                        <div th:unless="${status == 'OK'}">
+                                            <button th:if="${status != 'LEVEL_LOCKED' and status != 'PREREQ_LOCKED'}"
+                                                    type="button" class="btn-insufficient"
+                                                    th:attr="onclick='openInsufficientModal(' + ${chara.id} + ', \'' + ${chara.name} + '\', ' + ${chara.unlockCost} + ', \'' + ${chara.evolutionMaterials} + '\')'">
+                                                <i class="fa-solid fa-lock"></i> 素材不足
+                                            </button>
+
+                                            <button th:if="${status == 'LEVEL_LOCKED' or status == 'PREREQ_LOCKED'}"
+                                                    type="button" class="btn-unlock btn-disabled" disabled>
+                                                <i class="fa-solid fa-lock"></i> 未解放
+                                            </button>
+                                            
+                                            <span class="lock-reason" th:id="'lock-reason-' + ${chara.id}"
+                                                  th:if="${status == 'LEVEL_LOCKED'}">Lv不足</span>
+                                            <span class="lock-reason" th:id="'lock-reason-' + ${chara.id}"
+                                                  th:if="${status == 'PREREQ_LOCKED'}">進化元未解放</span>
+                                        </div>
+                                    </th:block>
+                                </div>
                             </div>
                         </div> 
-                        
                         <div class="evolution-arrow" th:if="${!iterStat.last}">
                             <i class="fa-solid fa-angle-right"></i>
                         </div>
-                        
                     </th:block>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="unlockModal" class="modal-overlay">
+    <div id="confirmModal" class="modal-overlay">
         <div class="modal-content">
-            <span class="modal-close" onclick="closeModal()">&times;</span>
-            <h3 class="modal-title" id="modalCharName">キャラ名</h3>
+            <span class="modal-close" onclick="closeModal('confirmModal')">&times;</span>
+            <h3 class="modal-title" id="confirmModalCharName">キャラ名</h3>
             <p>このキャラクターを解放しますか？</p>
-            <div id="modalMaterials" class="modal-materials"></div>
+            <div id="confirmModalMaterials" class="modal-materials"></div>
             <input type="hidden" id="targetCharId">
+            <input type="hidden" id="targetCharImage">
             <button class="modal-btn" onclick="executeUnlock()">解放する！</button>
         </div>
     </div>
+
+    <div id="insufficientModal" class="modal-overlay">
+        <div class="modal-content" style="border-color: #95a5a6;">
+            <span class="modal-close" onclick="closeModal('insufficientModal')">&times;</span>
+            <h3 class="modal-title" style="color: #7f8c8d;">素材が足りません</h3>
+            <p id="insufficientModalCharName"></p>
+            <p style="font-size: 0.9rem; color: #e74c3c;">以下の素材を集めてください</p>
+            <div id="insufficientModalMaterials" class="modal-materials"></div>
+            <button class="modal-btn" style="background: #95a5a6;" onclick="closeModal('insufficientModal')">閉じる</button>
+        </div>
+    </div>
 	
-	<div id="unlockModal" class="modal-overlay" style="display: none;">
-	    <div class="modal-content">
-	        <div class="modal-header">
+    <div id="successModal" class="modal-overlay" style="display: none;">
+	    <div class="modal-content success-content">
+	        <div class="modal-header success-header">
 	            <h2>UNLOCKED!</h2>
 	        </div>
 	        <div class="modal-body">
@@ -327,14 +291,19 @@
 	            <p id="unlockedCharacterName" class="character-name"></p>
 	        </div>
 	        <div class="modal-footer">
-	            <button onclick="closeModalAndReload()" class="modal-btn">OK</button>
+	            <button onclick="closeModalAndReload()" class="modal-btn success-btn">OK</button>
 	        </div>
 	    </div>
 	</div>
 
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-circle-check"></i> <span id="toast-message">メッセージ</span>
+    </div>
+
     <script th:inline="javascript">
         /*<![CDATA[*/
-        // ... JavaScriptは既存のまま ...
+        // ★修正: ユーザーレベルを取得
+        const userLevel = /*[[${userLevel}]]*/ 1;
         const materialCounts = /*[[${materialCounts}]]*/ {};
         const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
         const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
@@ -358,55 +327,263 @@
             "16": { name: "夢幻の鍵", img: "/img/item/UR-niji.png" }
         };
 
-        function openUnlockModal(id, name, cost, materialsStr) {
-            document.getElementById('targetCharId').value = id;
-            document.getElementById('modalCharName').textContent = name + " の解放";
-            
-            const container = document.getElementById('modalMaterials');
-            container.innerHTML = '';
-
+        function generateMaterialHtml(materialsStr) {
+            let html = '';
             let cleanStr = materialsStr.replace('{', '').replace('}', '');
             if (!cleanStr) {
-                container.innerHTML = '<span>素材不要</span>';
-            } else {
-                let pairs = cleanStr.split(',');
-                pairs.forEach(pair => {
-                    let [matId, reqNum] = pair.split('=').map(s => s.trim());
-                    if(matId && reqNum) {
-                        let owned = materialCounts[matId] || 0;
-                        let itemInfo = itemMap[matId] || { name: '未知', img: '' };
-                        let isOk = owned >= parseInt(reqNum);
-                        
-                        let html = `
-                            <div class="mat-badge">
-                                <img src="${itemInfo.img}" alt="${itemInfo.name}">
-                                <span class="mat-count ${isOk ? 'ok' : 'ng'}">${owned}/${reqNum}</span>
-                            </div>
-                        `;
-                        container.innerHTML += html;
-                    }
-                });
+                return '<span>素材不要</span>';
             }
-            document.getElementById('unlockModal').classList.add('show');
+            let pairs = cleanStr.split(',');
+            pairs.forEach(pair => {
+                let [matId, reqNum] = pair.split('=').map(s => s.trim());
+                if(matId && reqNum) {
+                    let owned = materialCounts[matId] || 0;
+                    let itemInfo = itemMap[matId] || { name: '未知', img: '' };
+                    let isOk = owned >= parseInt(reqNum);
+                    
+                    html += `
+                        <div class="mat-badge">
+                            <img src="${itemInfo.img}" alt="${itemInfo.name}">
+                            <span class="mat-count ${isOk ? 'ok' : 'ng'}">${owned}/${reqNum}</span>
+                        </div>
+                    `;
+                }
+            });
+            return html;
+        }
+		// ★追加: 全キャラクターのボタン状態を再チェックして更新する関数
+				function updateAllButtonsState() {
+				    // まだ解放されていないカードをすべて取得
+				    const lockedCards = document.querySelectorAll('.char-card:not(.unlocked)');
+
+				    lockedCards.forEach(card => {
+				        // カードから必要な情報を取得
+				        const id = card.id.replace('card-', '');
+				        const actionArea = document.getElementById('action-area-' + id);
+				        
+				        // すでに「Lv不足」や「前提未解放」で無効化(disabled)されているボタンは対象外
+				        // (素材数に関係なく押せないため)
+				        if (actionArea.querySelector('.btn-disabled')) return;
+
+				        // データ属性から条件を取得
+				        const materialsStr = card.getAttribute('data-materials');
+				        const cost = card.getAttribute('data-unlock-cost');
+				        const charName = card.getAttribute('data-char-name');
+				        const imagePath = card.getAttribute('data-image-path');
+
+				        // 最新の素材数でチェック
+				        const isMaterialOk = checkMaterialRequirements(materialsStr);
+
+				        // ボタンを書き換え
+				        if (isMaterialOk) {
+				            // 素材が足りている -> 解放ボタン
+				            actionArea.innerHTML = `
+				                <button type="button" class="btn-unlock"
+				                        onclick="openConfirmModal(${id}, '${charName}', ${cost}, '${materialsStr}', '${imagePath}')">
+				                    解放する
+				                </button>
+				            `;
+				        } else {
+				            // 素材が足りない -> 素材不足ボタン
+				            actionArea.innerHTML = `
+				                <button type="button" class="btn-insufficient"
+				                        onclick="openInsufficientModal(${id}, '${charName}', ${cost}, '${materialsStr}')">
+				                    <i class="fa-solid fa-lock"></i> 素材不足
+				                </button>
+				            `;
+				        }
+				    });
+				}
+        
+        // 素材条件チェック用ヘルパー
+        function checkMaterialRequirements(materialsStr) {
+            let cleanStr = materialsStr.replace('{', '').replace('}', '');
+            if (!cleanStr) return true; // 素材不要ならOK
+            let pairs = cleanStr.split(',');
+            for (let pair of pairs) {
+                let [matId, reqNum] = pair.split('=').map(s => s.trim());
+                if(matId && reqNum) {
+                    let owned = materialCounts[matId] || 0;
+                    if (owned < parseInt(reqNum)) return false; // 一つでも足りなければNG
+                }
+            }
+            return true;
         }
 
-        function closeModal() { document.getElementById('unlockModal').classList.remove('show'); }
+        // 確認モーダルを開く
+        function openConfirmModal(id, name, cost, materialsStr, imagePath) {
+            document.getElementById('targetCharId').value = id;
+            document.getElementById('targetCharImage').value = imagePath;
+            document.getElementById('confirmModalCharName').textContent = name + " の解放";
+            document.getElementById('confirmModalMaterials').innerHTML = generateMaterialHtml(materialsStr);
+            document.getElementById('confirmModal').classList.add('show');
+        }
 
-        function executeUnlock() {
-            const charId = document.getElementById('targetCharId').value;
-            fetch('/unlock', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
-                body: JSON.stringify({ characterId: charId })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) { alert(data.message); location.reload(); }
-                else { alert(data.message); }
+        // 素材不足モーダルを開く
+        function openInsufficientModal(id, name, cost, materialsStr) {
+            document.getElementById('insufficientModalCharName').textContent = name + " を解放するには...";
+            document.getElementById('insufficientModalMaterials').innerHTML = generateMaterialHtml(materialsStr);
+            document.getElementById('insufficientModal').classList.add('show');
+        }
+
+        function closeModal(modalId) { 
+            document.getElementById(modalId).classList.remove('show'); 
+        }
+
+		// 解放実行
+		        function executeUnlock() {
+		            const charId = document.getElementById('targetCharId').value;
+		            const charName = document.getElementById('confirmModalCharName').textContent.replace(" の解放", "");
+		            const charImage = document.getElementById('targetCharImage').value;
+
+		            fetch('/unlock', {
+		                method: 'POST',
+		                headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
+		                body: JSON.stringify({ characterId: charId })
+		            })
+		            .then(res => res.json())
+		            .then(data => {
+		                if(data.success) { 
+		                    closeModal('confirmModal');
+		                    
+		                    // ★追加: クライアント側の素材所持数を最新の値に更新
+		                    if (data.newMaterialCounts) {
+		                        for (const key in data.newMaterialCounts) {
+		                            if (data.newMaterialCounts.hasOwnProperty(key)) {
+		                                materialCounts[key] = data.newMaterialCounts[key];
+		                            }
+		                        }
+		                    }
+							
+							// ★追加: 素材数が変わったので、全ボタンの「解放可/素材不足」を更新する
+							                    updateAllButtonsState();
+                    // 1. 今解放したキャラの見た目を更新
+                    const unlockedCard = updateUiToUnlocked(charId, charName);
+                    
+                    // 2. ★新規: 解放したキャラの「次のキャラ」のステータスを更新（進化元未開放解除）
+                    if (unlockedCard) {
+                        updateNextCharacterState(unlockedCard);
+                    }
+                    
+                    // 解放完了時のトースト通知
+                    showToast(charName + ' を解放しました！');
+                    
+                    // 成功モーダルを開く
+                    showSuccessModal(charName, charImage);
+                } else { 
+                    alert(data.message); 
+                }
             })
             .catch(err => { console.error(err); alert('通信エラーが発生しました'); });
         }
 
+        // リスト上の見た目を「解放済み」にし、「選択する」ボタンを表示する関数
+        // 戻り値: 更新したカード要素
+        function updateUiToUnlocked(id, name) {
+            const card = document.getElementById('card-' + id);
+            if(card) card.classList.add('unlocked');
+
+            const imgWrapper = document.getElementById('img-wrapper-' + id);
+            if(imgWrapper) {
+                imgWrapper.classList.remove('locked');
+                const lockIcon = imgWrapper.querySelector('.lock-icon');
+                if(lockIcon) lockIcon.style.display = 'none';
+            }
+
+            const nameEl = document.getElementById('name-' + id);
+            if(nameEl) nameEl.textContent = name;
+
+            const actionArea = document.getElementById('action-area-' + id);
+            if(actionArea) {
+                actionArea.innerHTML = `
+                    <button type="button" class="btn-select"
+                            onclick="selectCharacter(${id})">
+                        選択する
+                    </button>
+                `;
+            }
+            return card;
+        }
+
+        // ★ 新規追加: 次のキャラクターの状態をチェックして更新する関数
+        function updateNextCharacterState(currentCard) {
+            // currentCard の次の要素(矢印)の、さらに次の要素(次のキャラカード)を取得
+            const arrow = currentCard.nextElementSibling;
+            if (!arrow || !arrow.classList.contains('evolution-arrow')) return;
+            
+            const nextCard = arrow.nextElementSibling;
+            if (!nextCard || !nextCard.classList.contains('char-card')) return;
+            
+            // 既に解放済みなら何もしない
+            if (nextCard.classList.contains('unlocked')) return;
+
+            // データ属性から次のキャラの情報を取得
+            const nextId = nextCard.id.replace('card-', '');
+            const reqLevel = parseInt(nextCard.getAttribute('data-req-level'));
+            const cost = nextCard.getAttribute('data-unlock-cost');
+            const materials = nextCard.getAttribute('data-materials');
+            const charName = nextCard.getAttribute('data-char-name');
+            const imagePath = nextCard.getAttribute('data-image-path');
+
+            // 条件チェック
+            const isLevelOk = userLevel >= reqLevel;
+            const isMaterialOk = checkMaterialRequirements(materials);
+
+            const actionArea = document.getElementById('action-area-' + nextId);
+            const lockReasonSpan = document.getElementById('lock-reason-' + nextId);
+
+            if (isLevelOk) {
+                // レベル条件OK (進化元も今解放されたのでOK)
+                if (isMaterialOk) {
+                    // 全条件クリア -> 「解放する」ボタンを表示
+                    actionArea.innerHTML = `
+                        <button type="button" class="btn-unlock"
+                                onclick="openConfirmModal(${nextId}, '${charName}', ${cost}, '${materials}', '${imagePath}')">
+                            解放する
+                        </button>
+                    `;
+                } else {
+                    // 素材不足 -> 「素材不足」ボタンを表示
+                    actionArea.innerHTML = `
+                        <button type="button" class="btn-insufficient"
+                                onclick="openInsufficientModal(${nextId}, '${charName}', ${cost}, '${materials}')">
+                            <i class="fa-solid fa-lock"></i> 素材不足
+                        </button>
+                    `;
+                }
+                // ロック理由テキストがあれば消す
+                if (lockReasonSpan) lockReasonSpan.remove();
+                
+            } else {
+                // レベル不足 -> ボタンはdisabledだが、理由を「進化元未開放」から「Lv不足」に変更
+                if (lockReasonSpan) {
+                    lockReasonSpan.textContent = 'Lv不足';
+                } else {
+                    // spanがない場合（元々Lv不足だった等）は既存のままでOKだが、念のため追加しても良い
+                    const btn = actionArea.querySelector('button');
+                    if (btn) {
+                        const span = document.createElement('span');
+                        span.id = 'lock-reason-' + nextId;
+                        span.className = 'lock-reason';
+                        span.textContent = 'Lv不足';
+                        actionArea.appendChild(span);
+                    }
+                }
+            }
+        }
+
+        function showSuccessModal(name, imagePath) {
+            document.getElementById('unlockedCharacterName').innerText = name;
+            document.getElementById('unlockedCharacterImage').src = imagePath;
+            document.getElementById('successModal').classList.add('show');
+        }
+
+        function closeModalAndReload() {
+            document.getElementById('successModal').classList.remove('show');
+            location.reload(); 
+        }
+
+        // キャラクター選択 (アラート廃止 & トースト通知)
         function selectCharacter(characterId) {
             fetch('/characters/select', {
                 method: 'POST',
@@ -415,10 +592,64 @@
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) { alert(data.message); location.reload(); }
-                else { alert('変更できませんでした: ' + data.message); }
+                if (data.success) {
+                    showToast(data.message);
+                    updateUiToSelected(characterId);
+                } else {
+                    alert('変更できませんでした: ' + data.message);
+                }
             })
             .catch(error => { console.error('Error:', error); alert('通信エラーが発生しました'); });
+        }
+
+        function updateUiToSelected(newId) {
+            const allSelectedBtns = document.querySelectorAll('.btn-selected');
+            allSelectedBtns.forEach(btn => {
+                const parent = btn.parentElement; 
+                let charId = null;
+                if(parent.id && parent.id.startsWith('action-area-')) {
+                     charId = parent.id.replace('action-area-', '');
+                } else if(parent.parentElement.id && parent.parentElement.id.startsWith('action-area-')) {
+                     charId = parent.parentElement.id.replace('action-area-', '');
+                }
+
+                if (charId) {
+                    btn.outerHTML = `<button type="button" class="btn-select" onclick="selectCharacter(${charId})">選択する</button>`;
+                }
+            });
+
+            const actionArea = document.getElementById('action-area-' + newId);
+            if(actionArea) {
+                const selectBtn = actionArea.querySelector('.btn-select');
+                if(selectBtn) {
+                    selectBtn.outerHTML = `
+                        <button class="btn-selected">
+                            <i class="fa-solid fa-check"></i> 選択中
+                        </button>
+                    `;
+                }
+            }
+        }
+
+        // トースト通知表示関数 (アニメーションリセット対応)
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            const msgSpan = document.getElementById("toast-message");
+            
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+            }
+
+            toast.classList.remove("show");
+            void toast.offsetWidth; 
+
+            msgSpan.innerText = message;
+            toast.classList.add("show");
+            
+            toastTimeout = setTimeout(function(){ 
+                toast.classList.remove("show"); 
+            }, 3000);
         }
 
         const canvas = document.getElementById('bg-canvas');
@@ -436,7 +667,11 @@
         function init() { for(let i=0; i<50; i++) particlesArray.push(new Particle()); }
         function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for(let i=0; i<particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); } requestAnimationFrame(animate); }
         init(); animate();
+		// ★追加: ページ読み込み時にも全ボタンの状態をチェックして更新する
+		        updateAllButtonsState();
         /*]]>*/
+		
+		
     </script>
 </body>
 </html>

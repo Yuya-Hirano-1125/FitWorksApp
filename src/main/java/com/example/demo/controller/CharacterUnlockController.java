@@ -132,6 +132,9 @@ public class CharacterUnlockController {
         
         if (failureReasons.isEmpty()) {
             // ===== 解放成功: 素材消費とアンロック =====
+        	
+        	// ★追加: 最新の所持数を格納するマップ
+            Map<String, Integer> newMaterialCounts = new HashMap<>();
             
             for (Map.Entry<String, Integer> entry : requiredMaterials.entrySet()) {
                 String matKey = entry.getKey();
@@ -145,6 +148,11 @@ public class CharacterUnlockController {
                 }
                 
                 userService.consumeUserMaterialByItemId(user.getUsername(), matItemId, amount);
+                
+             // ★追加: 消費後の最新所持数を取得してマップに格納
+                // (matKeyはフロントエンドのmaterialCountsのキーと一致させるためそのまま使用)
+                int currentAmount = userService.getUserMaterialCount(user.getUsername(), matItemId);
+                newMaterialCounts.put(matKey, currentAmount);
             }
             
             // キャラクター解放
@@ -152,6 +160,8 @@ public class CharacterUnlockController {
             
             response.put("success", true);
             response.put("message", chara.getName() + " を解放しました!");
+         // ★追加: レスポンスに最新の素材数をセット
+            response.put("newMaterialCounts", newMaterialCounts);
             
         } else {
             // ===== 解放失敗 =====

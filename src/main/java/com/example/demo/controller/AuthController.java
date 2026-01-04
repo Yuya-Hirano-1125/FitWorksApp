@@ -94,10 +94,9 @@ public class AuthController {
         model.addAttribute("userTitle", user.getDisplayTitle());
         
         // 背景画像の判定
+     // デフォルト値("fire-original")の設定を削除し、未設定ならnullのままにする
         String bgImage = user.getSelectedBackground();
-        if (bgImage == null || bgImage.isEmpty()) {
-            bgImage = "fire-original";
-        }
+        // if (bgImage == null || bgImage.isEmpty()) { bgImage = "fire-original"; } // ←削除
         model.addAttribute("selectedBackground", bgImage);
 
         // 背景解放チェック
@@ -114,7 +113,7 @@ public class AuthController {
         model.addAttribute("missionAchieved", missionAchieved);
 
         // ▼▼▼▼▼ キャラクター画像決定ロジック (追加) ▼▼▼▼▼
-        String characterImagePath;
+        String characterImagePath = null; // 初期値をnullに
 
         if (user.getSelectedCharacterId() != null) {
             // 選択されたIDからキャラクター情報を取得
@@ -122,18 +121,9 @@ public class AuthController {
             
             if (selectedChar != null) {
                 characterImagePath = selectedChar.getImagePath();
-            } else {
-                // キャラが見つからない場合のフォールバック（レベル連動）
-                characterImagePath = "/img/character/" + ((user.getLevel() / 10) * 10) + ".png";
             }
-        } else {
-            // 未選択の場合のデフォルト挙動（レベル連動）
-            characterImagePath = "/img/character/" + ((user.getLevel() / 10) * 10) + ".png";
-        }
-
+        } 
         model.addAttribute("characterImagePath", characterImagePath);
-        // ▲▲▲▲▲ 追加ここまで ▲▲▲▲▲
-
         return "misc/home";
     }
 
