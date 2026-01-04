@@ -12,426 +12,277 @@
     <link rel="stylesheet" th:href="@{/css/title.css}">
     <script th:src="@{/js/theme.js}"></script>
 
-    <style>
-        :root { 
-            --primary-color: #ff69b4; 
-            --accent-color: #42a5f5; 
-            --glass-bg: rgba(255, 255, 255, 0.95); 
-            
-            /* レイヤー定義 */
-            --z-bg: -1;
-            --z-content: 10;
-            --z-header: 100;
-            --z-nav: 1000;
-            --z-overlay: 2000;
-            --z-modal: 5000;
-            --z-tutorial: 6000;
-            --z-notification: 7000; /* 最前面：通知 */
-        }
-        
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
-            margin: 0; padding: 0;
-            background-color: #f0f4f8;
-            min-height: 100vh;
-            overflow-x: hidden; 
-            padding-bottom: 120px;
-        }
+	<style>
+	        :root { 
+	            --primary-color: #ff69b4; 
+	            --accent-color: #42a5f5; 
+	            --glass-bg: rgba(255, 255, 255, 0.95); 
+	            
+	            /* レイヤー定義 */
+	            --z-bg: -1;
+	            --z-content: 10;
+	            --z-header: 100;
+	            --z-nav: 1000;
+	            --z-overlay: 2000;
+	            --z-modal: 5000;
+	            --z-tutorial: 6000;
+	            --z-notification: 7000; /* 最前面：通知 */
+	        }
+	        
+	        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+	        
+	        body {
+	            font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
+	            margin: 0; padding: 0;
+	            background-color: #f0f4f8;
+	            min-height: 100vh;
+	            overflow-x: hidden; 
+	            padding-bottom: 120px;
+	        }
 
-        /* --------------------------------------------------------- */
-        /* 1. 邪魔な装飾だけを「触れない」ようにする                 */
-        /* --------------------------------------------------------- */
-        .interactive-bg, 
-        .bg-cloud, 
-        .mouse-follower-cloud,
-        .tutorial-spotlight,
-        .tutorial-pointer,
-        .tutorial-backdrop:not(.active) { 
-            pointer-events: none !important;
-        }
-        
-        .tutorial-backdrop.active { pointer-events: auto !important; }
-        .tutorial-rpg-box, .tutorial-rpg-box * { pointer-events: auto !important; }
+	        /* --------------------------------------------------------- */
+	        /* 1. 邪魔な装飾だけを「触れない」ようにする                 */
+	        /* --------------------------------------------------------- */
+	        .interactive-bg, 
+	        .bg-cloud, 
+	        .mouse-follower-cloud,
+	        .tutorial-spotlight,
+	        .tutorial-pointer,
+	        .tutorial-backdrop:not(.active) { 
+	            pointer-events: none !important;
+	        }
+	        
+	        .tutorial-backdrop.active { pointer-events: auto !important; }
+	        
+	        .tutorial-rpg-box { pointer-events: none; }
+	        .tutorial-rpg-box.active, .tutorial-rpg-box.active * { pointer-events: auto !important; }
 
-        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: var(--z-bg); }
+	        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: var(--z-bg); }
 
-        /* --------------------------------------------------------- */
-        /* 2. 通知メッセージ (ミッション達成など)                   */
-        /* --------------------------------------------------------- */
-        .mission-notification {
-            position: fixed;
-            top: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
-            
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-            border: 2px solid #fff;
-            color: #d63384;
-            
-            padding: 15px 20px;
-            border-radius: 30px;
-            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.4);
-            
-            font-weight: 800;
-            font-size: 0.95rem;
-            text-align: center;
-            
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            
-            z-index: var(--z-notification);
-            
-            opacity: 0;
-            animation: notificationPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            pointer-events: none;
-        }
-        
-        .mission-notification i {
-            color: #fff;
-            font-size: 1.4rem;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+	        /* --------------------------------------------------------- */
+	        /* 2. 通知メッセージ                                        */
+	        /* --------------------------------------------------------- */
+	        .mission-notification {
+	            position: fixed; top: 15%; left: 50%; transform: translateX(-50%);
+	            width: 90%; max-width: 400px;
+	            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+	            border: 2px solid #fff; color: #d63384;
+	            padding: 15px 20px; border-radius: 30px;
+	            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.4);
+	            font-weight: 800; font-size: 0.95rem; text-align: center;
+	            display: flex; align-items: center; justify-content: center; gap: 10px;
+	            z-index: var(--z-notification);
+	            opacity: 0; animation: notificationPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+	            pointer-events: none;
+	        }
+	        .mission-notification i { color: #fff; font-size: 1.4rem; text-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+	        @keyframes notificationPopIn { from { opacity: 0; transform: translate(-50%, -20px) scale(0.9); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+	        .fade-out { animation: notificationFadeOut 0.5s forwards; }
+	        @keyframes notificationFadeOut { to { opacity: 0; transform: translate(-50%, -20px); } }
 
-        @keyframes notificationPopIn {
-            from { opacity: 0; transform: translate(-50%, -20px) scale(0.9); }
-            to { opacity: 1; transform: translate(-50%, 0) scale(1); }
-        }
+	        /* --------------------------------------------------------- */
+	        /* 3. メインレイアウト                                      */
+	        /* --------------------------------------------------------- */
+	        .main-container {
+	            width: 100%; max-width: 600px; margin: 0 auto; position: relative;
+	            padding: 15px 20px 140px 20px; z-index: var(--z-content); 
+	        }
 
-        .fade-out {
-            animation: notificationFadeOut 0.5s forwards;
-        }
-        @keyframes notificationFadeOut {
-            to { opacity: 0; transform: translate(-50%, -20px); }
-        }
+	        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: var(--z-header); }
+	        
+	        /* ▼▼▼ 修正: 日付の色を変更 (#0288d1:鮮やかな青) ▼▼▼ */
+	        .real-time-clock { 
+	            font-size: 0.9rem; 
+	            color: #0288d1; 
+	            font-weight: 800; 
+	            letter-spacing: 0.05em;
+	            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+	        }
+	        
+	        .app-logo-display { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; width: 100%; position: relative; z-index: 5; }
+	        .app-logo-display img { height: 75px; object-fit: contain; margin-bottom: 8px; max-width: 100%; }
 
-        /* --------------------------------------------------------- */
-        /* 3. メインレイアウト                                      */
-        /* --------------------------------------------------------- */
-        .main-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            position: relative;
-            padding: 15px 20px 140px 20px;
-            z-index: var(--z-content); 
-        }
+	        #tutorial-xp-area { width: 100%; background: #fff; padding: 10px 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+	        .xp-bar-container { display: flex; flex-direction: column; width: 100%; }
+	        .xp-bar-container span { font-size: 0.8rem; font-weight: bold; color: #555; display: flex; justify-content: space-between; margin-bottom: 5px; }
+	        .xp-bar { width: 100%; height: 12px; background: #e3f2fd; border-radius: 6px; overflow: hidden; }
+	        .xp-progress { height: 100%; background: linear-gradient(90deg, #42a5f5, #2196f3); border-radius: 6px; color: transparent; transition: width 1s ease; }
 
-        /* ヘッダーエリア */
-        .header-top { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 10px; 
-            position: relative; 
-            z-index: var(--z-header);
-        }
-        
-        .real-time-clock { font-size: 0.85rem; color: #666; font-weight: bold; }
-        
-        .app-logo-display { 
-            display: flex; flex-direction: column; align-items: center; 
-            margin-bottom: 15px; width: 100%; 
-            position: relative; z-index: 5;
-        }
-        .app-logo-display img { height: 75px; object-fit: contain; margin-bottom: 8px; max-width: 100%; }
+	        .home-greeting-container { text-align: center; margin: 15px 0 15px 0; position: relative; z-index: 5; }
+	        .home-greeting-text { margin: 0; font-weight: bold; color: #555; font-size: 0.95rem; }
+	        .home-username { color: var(--accent-color); font-size: 1.1em; font-weight: 800; }
 
-        /* XPバー */
-        #tutorial-xp-area { width: 100%; background: #fff; padding: 10px 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .xp-bar-container { display: flex; flex-direction: column; width: 100%; }
-        .xp-bar-container span { font-size: 0.8rem; font-weight: bold; color: #555; display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .xp-bar { width: 100%; height: 12px; background: #e3f2fd; border-radius: 6px; overflow: hidden; }
-        .xp-progress { height: 100%; background: linear-gradient(90deg, #42a5f5, #2196f3); border-radius: 6px; color: transparent; transition: width 1s ease; }
+	        /* キャラクターセクション（生き生きアニメーション + 長押し防止） */
+	        .character-section { width: 100%; margin-bottom: 10px; position: relative; z-index: 5; }
+	        .character-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; gap: 10px; }
+	        
+			/* ▼▼▼ 修正箇所: キャラクター表示エリア ▼▼▼ */
+			    .character-display {
+			        /* 既存のスタイルを維持 */
+			        width: 100%; aspect-ratio: 3 / 4; min-height: 400px; 
+			        background-color: #fff; background-size: cover; background-repeat: no-repeat; background-position: center center;
+			        border-radius: 25px; border: 4px solid #fff;
+			        box-shadow: 0 5px 20px rgba(66, 165, 245, 0.15);
+			        position: relative; overflow: hidden;
+			        display: flex; align-items: flex-end; justify-content: center;
+			    }
+			    
+			    .char-anim-wrapper {
+			        width: 100%; height: 90%; 
+			        display: flex; align-items: flex-end; justify-content: center;
+			        transform-origin: bottom center;
+			        /* animation: breathe ... ← 削除 (JSでクラス制御するため) */
+			        z-index: 2;
+			        cursor: pointer;
+			        user-select: none;
+			        -webkit-user-select: none;
+			        -webkit-touch-callout: none;
+			    }
 
-        /* 挨拶エリア */
-        .home-greeting-container { 
-            text-align: center; 
-            margin: 15px 0 15px 0; 
-            position: relative; 
-            z-index: 5; 
-        }
-        .home-greeting-text { margin: 0; font-weight: bold; color: #555; font-size: 0.95rem; }
-        .home-username { color: var(--accent-color); font-size: 1.1em; font-weight: 800; }
+			    /* --- アニメーション定義 --- */
 
-        /* キャラクターセクション */
-        .character-section { width: 100%; margin-bottom: 10px; position: relative; z-index: 5; }
-        .character-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; gap: 10px; }
-        
-        .character-display {
-            width: 100%; aspect-ratio: 1 / 1;
-            background-color: #fff; background-size: contain; background-repeat: no-repeat; background-position: center bottom;
-            border-radius: 25px; border: 4px solid #fff;
-            box-shadow: 0 5px 20px rgba(66, 165, 245, 0.15);
-            position: relative; overflow: hidden;
-            display: flex; align-items: flex-end; justify-content: center;
-        }
-        .character-display img {
-            max-width: 90%; max-height: 90%; width: auto; height: auto;
-            object-fit: contain; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
-            animation: float 3s ease-in-out infinite; z-index: 2; margin-bottom: 20px;
-        }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+			    /* 1. 通常キャラ: ゆったりとした呼吸と浮遊 */
+			    @keyframes breatheNormal {
+			        0%   { transform: translateY(0) scale(1, 1); }
+			        50%  { transform: translateY(-6px) scale(1.02, 0.99); } /* 少し伸びて浮く */
+			        100% { transform: translateY(0) scale(1, 1); }
+			    }
 
-        /* バッジ・吹き出し */
-        #tutorial-title-display { position: absolute; top: 15px; left: 15px; z-index: 10; width: auto; min-height: 0; margin: 0; pointer-events: none; }
-        .title-badge { font-size: 0.8rem; padding: 6px 12px; border-radius: 20px; background: rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-weight: bold; color: #333; display: inline-flex; align-items: center; gap: 5px; }
+			    /* 2. 卵キャラ: プルプル震える・鼓動する */
+			    @keyframes eggWobble {
+			        0%   { transform: scale(1, 1) rotate(0deg); }
+			        25%  { transform: scale(1.03, 0.97) rotate(-2deg); } /* 横に潰れて傾く */
+			        50%  { transform: scale(0.98, 1.02) rotate(1deg); }  /* 縦に伸びて戻る */
+			        75%  { transform: scale(1.01, 0.99) rotate(-1deg); }
+			        100% { transform: scale(1, 1) rotate(0deg); }
+			    }
 
-        .ai-home-advice-container {
-            position: relative; width: 100%; display: flex; align-items: flex-start; gap: 10px; 
-            margin-bottom: 10px; background: rgba(255, 255, 255, 0.6); padding: 10px; border-radius: 15px;
-            z-index: 5;
-        }
-        .ai-avatar-small { width: 45px; height: 45px; background: #fff; border-radius: 50%; border: 2px solid var(--accent-color); overflow: hidden; flex-shrink: 0; }
-        .ai-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
-        .ai-bubble-content { background: #fff; padding: 10px 15px; border-radius: 15px; border-top-left-radius: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.85rem; font-weight: bold; color: #444; flex: 1; display: flex; align-items: center; line-height: 1.4; }
-        .ai-bubble-content p { margin: 0; }
-        .loading-dots { animation: blink 1.5s infinite; }
-        @keyframes blink { 0% { opacity: .2; } 20% { opacity: 1; } 100% { opacity: .2; } }
+			    /* ジャンプアニメーション (共通) */
+			    @keyframes bounce {
+			        0% { transform: translateY(0) scale(1, 1); }
+			        40% { transform: translateY(-30px) scale(0.9, 1.1); } 
+			        100% { transform: translateY(0) scale(1, 1); }
+			    }
 
-        /* --------------------------------------------------------- */
-        /* 4. ボタン類 (光沢アニメーション & ホバー)                */
-        /* --------------------------------------------------------- */
-        
-        /* 共通: 光沢エフェクト */
-        .side-action-btn::after,
-        .home-action-btn::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
-            transform: skewX(-25deg);
-            transition: left 0.5s;
-            pointer-events: none;
-            z-index: 10;
-        }
-        /* ホバー時に光る */
-        .side-action-btn:hover::after,
-        .home-action-btn:hover::after {
-            left: 150%;
-            transition: left 0.7s ease-in-out;
-        }
+			    /* クラス適用時の動作 */
+			    .char-anim-wrapper.normal-mode {
+			        animation: breatheNormal 5s ease-in-out infinite;
+			    }
 
-        /* ショートカットバー */
-        .shortcut-bar { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
-            margin-bottom: 20px; 
-            position: relative; z-index: 20; 
-        }
-        .side-action-btn {
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            width: 100%; height: 100%; 
-            padding: 15px; border-radius: 18px; text-decoration: none; color: #fff;
-            font-weight: bold; font-size: 0.95rem; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            transition: transform 0.1s, box-shadow 0.1s;
-            cursor: pointer;
-            position: relative; 
-            overflow: hidden;
-            box-sizing: border-box;
-        }
-        /* ★追加: 称号・ミッションボタンのホバーアニメーション */
-        .side-action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        .side-action-btn:active { transform: scale(0.97); }
-        
-        .title-button { background: linear-gradient(135deg, #ab47bc, #df78ef); }
-        .mission-square-btn { background: linear-gradient(135deg, #ffa726, #ffcc80); }
-        .mission-square-btn i { font-size: 1.2rem; }
+			    .char-anim-wrapper.egg-mode {
+			        animation: eggWobble 2.5s ease-in-out infinite; /* 少し早めの鼓動 */
+			    }
 
-        /* アクションボタン・グリッド */
-        .action-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%;
-            position: relative; 
-            z-index: 20;
-        }
-        @media (max-width: 350px) {
-            .action-grid { grid-template-columns: 1fr; }
-            .btn-training { grid-column: span 1 !important; }
-        }
+			    .char-anim-wrapper.jump {
+			        animation: bounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+			    }
 
-        /* 共通ボタンスタイル */
-        .home-action-btn {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            width: 100% !important; 
-            height: 100% !important; 
-            min-height: 100px;
-            padding: 15px; border-radius: 20px; text-decoration: none; color: #fff;
-            font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
-            transition: transform 0.1s;
-            border: none; text-align: center; margin: 0; font-size: 0.95rem;
-            
-            cursor: pointer;
-            position: relative; 
-            touch-action: manipulation;
-            overflow: hidden;
-            box-sizing: border-box;
-        }
-        .home-action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-        .home-action-btn:active { transform: scale(0.97); }
-        .home-action-btn i { font-size: 1.8rem; margin-bottom: 8px; }
+	        /* バッジ・吹き出し */
+	        #tutorial-title-display { position: absolute; top: 15px; left: 15px; z-index: 10; width: auto; min-height: 0; margin: 0; pointer-events: none; }
+	        .title-badge { font-size: 0.8rem; padding: 6px 12px; border-radius: 20px; background: rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-weight: bold; color: #333; display: inline-flex; align-items: center; gap: 5px; }
 
-        /* トレーニングボタン: 横長・アイコン左仕様 */
-        .btn-training { 
-            grid-column: span 2; 
-            background: linear-gradient(135deg, #ff6b6b, #ff8e8e); 
-            flex-direction: row; 
-            gap: 15px; 
-            font-size: 1.2rem; 
-            min-height: 80px; 
-        }
-        .btn-training i { 
-            margin-bottom: 0; 
-            font-size: 1.5rem; 
-        }
+	        .ai-home-advice-container {
+	            position: relative; width: 100%; display: flex; align-items: flex-start; gap: 10px; 
+	            margin-bottom: 10px; background: rgba(255, 255, 255, 0.6); padding: 10px; border-radius: 15px;
+	            z-index: 5;
+	        }
+	        .ai-avatar-small { width: 45px; height: 45px; background: #fff; border-radius: 50%; border: 2px solid var(--accent-color); overflow: hidden; flex-shrink: 0; }
+	        .ai-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
+	        .ai-bubble-content { background: #fff; padding: 10px 15px; border-radius: 15px; border-top-left-radius: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.85rem; font-weight: bold; color: #444; flex: 1; display: flex; align-items: center; line-height: 1.4; }
+	        .ai-bubble-content p { margin: 0; }
+	        .loading-dots { animation: blink 1.5s infinite; }
+	        @keyframes blink { 0% { opacity: .2; } 20% { opacity: 1; } 100% { opacity: .2; } }
 
-        .btn-record { background: linear-gradient(135deg, #42a5f5, #64b5f6); }
-        .btn-care { background: linear-gradient(135deg, #66bb6a, #81c784); }
-        .btn-map { background: linear-gradient(135deg, #ec407a, #f48fb1); }
-        .btn-ai { background: linear-gradient(135deg, #7e57c2, #9575cd); }
+	        /* --------------------------------------------------------- */
+	        /* 4. ボタン類 (光沢アニメーション & ホバー)                */
+	        /* --------------------------------------------------------- */
+	        
+	        .side-action-btn::after, .home-action-btn::after {
+	            content: ""; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+	            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+	            transform: skewX(-25deg); transition: left 0.5s; pointer-events: none; z-index: 10;
+	        }
+	        .side-action-btn:hover::after, .home-action-btn:hover::after { left: 150%; transition: left 0.7s ease-in-out; }
 
-        /* --------------------------------------------------------- */
-        /* 5. ヘルプボタン & メニュー                               */
-        /* --------------------------------------------------------- */
-        
-        .help-label-btn {
-            background: rgba(255, 255, 255, 0.95); border: 2px solid #fff;
-            color: #555; font-weight: bold; cursor: pointer; font-size: 0.85rem; 
-            padding: 6px 16px; display: flex; align-items: center; gap: 6px;
-            border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: all 0.2s ease;
-            position: relative; 
-            z-index: 2002;
-        }
-        .help-label-btn:hover { 
-            transform: translateY(-2px); 
-            background-color: var(--accent-color); /* 背景を青に */
-            color: #fff; /* 文字を白に */
-            border-color: var(--accent-color);
-            box-shadow: 0 6px 15px rgba(66, 165, 245, 0.4);
-        }
-        .help-label-btn:hover i { color: #fff; }
+	        .shortcut-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; position: relative; z-index: 20; }
+	        .side-action-btn {
+	            display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 100%; 
+	            padding: 15px; border-radius: 18px; text-decoration: none; color: #fff; font-weight: bold; font-size: 0.95rem; 
+	            box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: transform 0.1s, box-shadow 0.1s; cursor: pointer; position: relative; overflow: hidden; box-sizing: border-box;
+	        }
+	        .side-action-btn:hover { transform: scale(1.03); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+	        .side-action-btn:active { transform: scale(0.97); }
+	        
+	        .title-button { background: linear-gradient(135deg, #ab47bc, #df78ef); }
+	        .mission-square-btn { background: linear-gradient(135deg, #ffa726, #ffcc80); }
+	        .mission-square-btn i { font-size: 1.2rem; }
 
-        .help-menu-dropdown { 
-            display: none; 
-            position: absolute; 
-            top: 50px; 
-            right: 0; 
-            background: rgba(255, 255, 255, 0.98); 
-            padding: 15px; border-radius: 20px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
-            width: 280px; max-width: 90vw; 
-            flex-direction: column; gap: 8px;
-            border: 1px solid rgba(255,255,255,0.8);
-            z-index: 10000; 
-        }
-        .help-menu-dropdown.active { display: flex; animation: fadeInDown 0.2s ease-out; }
-        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+	        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; position: relative; z-index: 20; }
+	        @media (max-width: 350px) { .action-grid { grid-template-columns: 1fr; } .btn-training { grid-column: span 1 !important; } }
 
-        .help-section-label { font-size: 0.85rem; color: #888; font-weight: 800; margin: 5px 0 2px 5px; }
-        
-        .help-menu-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px 15px; 
-            text-decoration: none; border-radius: 12px; text-align: left; 
-            font-weight: bold; font-size: 0.95em; 
-            border: none; width: 100%; 
-            color: #555; background: #f8f9fa;
-            cursor: pointer;
-            user-select: none;
-            position: relative;
-        }
-        .help-menu-item:hover { background: #e3f2fd; color: var(--accent-color); }
-        .help-menu-item:active { background: #d0e7ff; transform: scale(0.98); }
-        .help-menu-item i { width: 24px; text-align: center; color: var(--accent-color); font-size: 1.1em; }
-        
-        .help-line-area { text-align: center; margin-top: 10px; padding-top: 15px; border-top: 2px dashed #eee; }
-        .help-line-text { margin: 0 0 8px 0; font-size: 0.85rem; font-weight: 800; color: #06c755; display: flex; align-items: center; justify-content: center; gap: 5px; }
+	        .home-action-btn {
+	            display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100% !important; height: 100% !important; min-height: 100px;
+	            padding: 15px; border-radius: 20px; text-decoration: none; color: #fff; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+	            transition: transform 0.1s; border: none; text-align: center; margin: 0; font-size: 0.95rem; cursor: pointer; position: relative; touch-action: manipulation; overflow: hidden; box-sizing: border-box;
+	        }
+	        .home-action-btn:hover { transform: scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+	        .home-action-btn:active { transform: scale(0.98); }
+	        .home-action-btn i { font-size: 1.8rem; margin-bottom: 8px; }
 
-        /* --------------------------------------------------------- */
-        /* 6. 記録モーダル                                          */
-        /* --------------------------------------------------------- */
-        .record-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); 
-            backdrop-filter: blur(3px); 
-            display: none; align-items: center; justify-content: center;
-            z-index: var(--z-modal);
-        }
-        .record-overlay.open { display: flex; animation: fadeIn 0.2s; }
-        
-        .record-modal-content {
-            background: #fff; width: 85%; max-width: 320px; border-radius: 25px;
-            padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            display: flex; flex-direction: column; gap: 15px;
-            align-items: stretch;
-            position: relative;
-            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        .record-option-item {
-            display: flex; align-items: center; width: 100%; padding: 18px 20px; gap: 15px;
-            background: #f8f9fa; border-radius: 15px; text-decoration: none;
-            color: #444; font-weight: bold; border: 1px solid #eee; 
-            cursor: pointer; position: relative;
-        }
-        .record-option-item:active { background: #d0e7ff; transform: scale(0.98); }
-        .record-option-item i { font-size: 1.4rem; color: var(--accent-color); width: 30px; text-align: center; }
-        
-        .modal-title { text-align: center; font-weight: bold; color: #555; margin-bottom: 5px; }
-        .modal-close-area { margin-top: 15px; text-align: center; }
-        .modal-close-btn { 
-            background: #555; color: #fff; border: none; padding: 14px 0; width: 100%; 
-            border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 1rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-        .modal-close-btn:active { transform: scale(0.98); }
+	        .btn-training { grid-column: span 2; background: linear-gradient(135deg, #ff6b6b, #ff8e8e); flex-direction: row; gap: 15px; font-size: 1.2rem; min-height: 80px; }
+	        .btn-training i { margin-bottom: 0; font-size: 1.5rem; }
+	        .btn-record { background: linear-gradient(135deg, #42a5f5, #64b5f6); }
+	        .btn-care { background: linear-gradient(135deg, #66bb6a, #81c784); }
+	        .btn-map { background: linear-gradient(135deg, #ec407a, #f48fb1); }
+	        .btn-ai { background: linear-gradient(135deg, #7e57c2, #9575cd); }
 
-        /* --------------------------------------------------------- */
-        /* 7. ボトムナビ                                            */
-        /* --------------------------------------------------------- */
-        .bottom-nav {
-            position: fixed; bottom: 20px; left: 0; right: 0; margin: 0 auto;
-            width: 95%; max-width: 600px;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px); border-radius: 40px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5);
-            display: flex; justify-content: space-evenly; align-items: center;
-            padding: 10px 0; 
-            z-index: var(--z-nav);
-        }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center;
-            text-decoration: none; color: #999; font-weight: bold;
-            transition: 0.2s; flex: 1; min-width: 0;
-        }
-        .nav-item i { font-size: 1.4rem; margin-bottom: 3px; color: #bbb; }
-        .nav-item span { font-size: 0.65rem; white-space: nowrap; transform: scale(0.9); }
-        .nav-item:hover i, .nav-item:hover span { color: var(--primary-color); }
+	        /* --------------------------------------------------------- */
+	        /* 5. ヘルプボタン & メニュー                               */
+	        /* --------------------------------------------------------- */
+	        
+	        .help-label-btn {
+	            background: rgba(255, 255, 255, 0.95); border: 2px solid #fff; color: #555; font-weight: bold; cursor: pointer; font-size: 0.85rem; 
+	            padding: 6px 16px; display: flex; align-items: center; gap: 6px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: all 0.2s ease; position: relative; z-index: 2002;
+	        }
+	        .help-label-btn:hover { transform: translateY(-2px); background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); box-shadow: 0 6px 15px rgba(66, 165, 245, 0.4); }
+	        .help-label-btn:hover i { color: #fff; }
 
-        /* チュートリアルBOX */
-        .tutorial-rpg-box { 
-            position: absolute; top: 50%; left: 50%; transform: translateX(-50%); 
-            width: 95vw; max-width: 600px; 
-            background: rgba(255, 255, 255, 0.95); border: 3px solid #4facfe; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 20px; 
-            padding: 15px; z-index: var(--z-tutorial); 
-            display: flex; align-items: flex-start; gap: 15px; opacity: 0; transition: opacity 0.3s;
-        }
-        .tutorial-rpg-box.active { opacity: 1; }
-        .tutorial-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5900; display: none; }
-        .tutorial-backdrop.active { display: block; }
-    </style>
+	        .help-menu-dropdown { display: none; position: absolute; top: 50px; right: 0; background: rgba(255, 255, 255, 0.98); padding: 15px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 280px; max-width: 90vw; flex-direction: column; gap: 8px; border: 1px solid rgba(255,255,255,0.8); z-index: 10000; }
+	        .help-menu-dropdown.active { display: flex; animation: fadeInDown 0.2s ease-out; }
+	        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+	        .help-section-label { font-size: 0.85rem; color: #888; font-weight: 800; margin: 5px 0 2px 5px; }
+	        .help-menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; text-decoration: none; border-radius: 12px; text-align: left; font-weight: bold; font-size: 0.95em; border: none; width: 100%; color: #555; background: #f8f9fa; cursor: pointer; user-select: none; position: relative; }
+	        .help-menu-item:hover { background: #e3f2fd; color: var(--accent-color); }
+	        .help-menu-item:active { background: #d0e7ff; transform: scale(0.98); }
+	        .help-menu-item i { width: 24px; text-align: center; color: var(--accent-color); font-size: 1.1em; }
+	        .help-line-area { text-align: center; margin-top: 10px; padding-top: 15px; border-top: 2px dashed #eee; }
+	        .help-line-text { margin: 0 0 8px 0; font-size: 0.85rem; font-weight: 800; color: #06c755; display: flex; align-items: center; justify-content: center; gap: 5px; }
+
+	        /* --------------------------------------------------------- */
+	        /* 6. 記録モーダル                                          */
+	        /* --------------------------------------------------------- */
+	        .record-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); display: none; align-items: center; justify-content: center; z-index: var(--z-modal); }
+	        .record-overlay.open { display: flex; animation: fadeIn 0.2s; }
+	        .record-modal-content { background: #fff; width: 85%; max-width: 320px; border-radius: 25px; padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 15px; align-items: stretch; position: relative; animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+	        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+	        .record-option-item { display: flex; align-items: center; width: 100%; padding: 18px 20px; gap: 15px; background: #f8f9fa; border-radius: 15px; text-decoration: none; color: #444; font-weight: bold; border: 1px solid #eee; cursor: pointer; position: relative; }
+	        .record-option-item:active { background: #d0e7ff; transform: scale(0.98); }
+	        .record-option-item i { font-size: 1.4rem; color: var(--accent-color); width: 30px; text-align: center; }
+	        .modal-title { text-align: center; font-weight: bold; color: #555; margin-bottom: 5px; }
+	        .modal-close-area { margin-top: 15px; text-align: center; }
+	        .modal-close-btn { background: #555; color: #fff; border: none; padding: 14px 0; width: 100%; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+	        .modal-close-btn:active { transform: scale(0.98); }
+
+	        /* --------------------------------------------------------- */
+	        /* 7. ボトムナビ                                            */
+	        /* --------------------------------------------------------- */
+	        .bottom-nav { position: fixed; bottom: 20px; left: 0; right: 0; margin: 0 auto; width: 95%; max-width: 600px; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border-radius: 40px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5); display: flex; justify-content: space-evenly; align-items: center; padding: 10px 0; z-index: var(--z-nav); }
+	        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #999; font-weight: bold; transition: 0.2s; flex: 1; min-width: 0; }
+	        .nav-item i { font-size: 1.4rem; margin-bottom: 3px; color: #bbb; }
+	        .nav-item span { font-size: 0.65rem; white-space: nowrap; transform: scale(0.9); }
+	        .nav-item:hover i, .nav-item:hover span { color: var(--primary-color); }
+	    </style>
 </head>
 <body class="home-page">
 
@@ -525,7 +376,9 @@
                        </th:block>
                    </div>
 
-                   <img th:src="@{${characterImagePath != null ? characterImagePath : '/img/character/' + (level / 10) * 10 + '.png'}}" alt="Character" />
+                   <div id="char-anim-wrapper" class="char-anim-wrapper" onclick="triggerCharJump()" oncontextmenu="return false;">
+                       <img id="char-img-element" th:src="@{${characterImagePath != null ? characterImagePath : '/img/character/' + (level / 10) * 10 + '.png'}}" alt="Character" />
+                   </div>
                 </div>
                 
                 <div class="ai-home-advice-container">
@@ -608,6 +461,61 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
+		// 卵画像のファイル名リスト (CharactersMenuController.java の detailMap 等から特定)
+		    // 0:dracoegg, 40:dollyegg, 80:shiruegg, 120:merryegg, 160:robiegg
+		    const EGG_IMAGE_FILENAMES = ['0.png', '40.png', '80.png', '120.png', '160.png'];
+
+		    function initCharacterAnimation() {
+		        const img = document.getElementById('char-img-element');
+		        const wrapper = document.getElementById('char-anim-wrapper');
+		        
+		        if (!img || !wrapper) return;
+
+		        // src属性からファイル名を取得 (例: /img/character/0.png -> 0.png)
+		        const src = img.getAttribute('src');
+		        let isEgg = false;
+
+		        // ファイル名に卵IDが含まれているかチェック
+		        for (const eggFile of EGG_IMAGE_FILENAMES) {
+		            if (src.indexOf(eggFile) !== -1) {
+		                isEgg = true;
+		                break;
+		            }
+		        }
+
+		        // アニメーションクラスを適用
+		        wrapper.classList.remove('normal-mode', 'egg-mode');
+		        if (isEgg) {
+		            wrapper.classList.add('egg-mode');
+		        } else {
+		            wrapper.classList.add('normal-mode');
+		        }
+		    }
+
+		    // 1. キャラクタージャンプ (既存のものを微修正不要だが確認)
+		    function triggerCharJump() {
+		        const wrapper = document.getElementById('char-anim-wrapper');
+		        if (!wrapper.classList.contains('jump')) {
+		            wrapper.classList.add('jump');
+		            setTimeout(() => wrapper.classList.remove('jump'), 400);
+		        }
+		    }
+
+		    // 2. 時々キョロキョロする (既存処理)
+		    function randomLookAround() {
+		        // ... (既存のまま) ...
+		        const img = document.getElementById('char-img-element');
+		        if (!img) return;
+		        
+		        // 卵も「転がる」ような表現として反転しても面白いのでそのまま残します
+		        if (Math.random() < 0.3) {
+		            img.classList.toggle('char-mirror');
+		            setTimeout(() => {
+		                img.classList.toggle('char-mirror');
+		            }, 1000 + Math.random() * 2000);
+		        }
+		        setTimeout(randomLookAround, 3000 + Math.random() * 5000);
+		    }
         function openRecordModal() { const overlay = document.getElementById('record-overlay'); overlay.style.display = 'flex'; setTimeout(() => overlay.classList.add('open'), 10); }
         function closeRecordModal() { const overlay = document.getElementById('record-overlay'); overlay.classList.remove('open'); setTimeout(() => overlay.style.display = 'none', 300); }
         function openRecordMenu() { openRecordModal(); } function closeRecordMenu() { closeRecordModal(); }
@@ -622,9 +530,41 @@
             if (clockEl) clockEl.textContent = timeString;
         }
         setInterval(updateRealTimeClock, 1000);
+
+        /* ▼▼▼ 生き生きアクション用スクリプト ▼▼▼ */
         
+        // 1. キャラクタージャンプ
+        function triggerCharJump() {
+            const wrapper = document.getElementById('char-anim-wrapper');
+            if (!wrapper.classList.contains('jump')) {
+                wrapper.classList.add('jump');
+                setTimeout(() => wrapper.classList.remove('jump'), 400); // 0.4秒後にクラス削除
+            }
+        }
+
+        // 2. 時々キョロキョロする (ランダムな間隔で左右反転)
+        function randomLookAround() {
+            const img = document.getElementById('char-img-element');
+            if (!img) return;
+
+            // 30%の確率で反転動作を行う
+            if (Math.random() < 0.3) {
+                img.classList.toggle('char-mirror');
+                // 1〜3秒後に元に戻る
+                setTimeout(() => {
+                    img.classList.toggle('char-mirror');
+                }, 1000 + Math.random() * 2000);
+            }
+            
+            // 次回のチェック時間をランダムに設定 (3〜8秒後)
+            setTimeout(randomLookAround, 3000 + Math.random() * 5000);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             updateRealTimeClock();
+			initCharacterAnimation(); // ★アニメーション初期化を実行
+            randomLookAround(); // キョロキョロ開始
+
             const notification = document.getElementById('mission-notification');
             if (notification) { setTimeout(() => { notification.classList.add('fade-out'); setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 500); }, 4000); }
             
@@ -637,7 +577,7 @@
             }
         });
 
-        // Tutorial
+        // Tutorial Logic
         const scenarios = {
             'all': [
                 { text: "FitWorksへようこそ!\nこのチュートリアルでは、アプリの全機能をご紹介します!" },
