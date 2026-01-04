@@ -5,11 +5,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.time.format.TextStyle;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -21,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,307 +31,248 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.demo.dto.MealLogForm;
 import com.example.demo.entity.MealRecord;
 import com.example.demo.entity.User;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.AICoachService;
+import com.example.demo.service.LevelService;
 import com.example.demo.service.MealService;
 import com.example.demo.service.MissionService;
 import com.example.demo.service.UserService;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 @RequestMapping("/log/meal")
 public class MealController {
 
-    private final UserService userService;
-    private final MealService mealService;
-    private final AICoachService aiCoachService;
-    private final MissionService missionService;
-
     @Autowired
-    public MealController(UserService userService,
-                          MealService mealService,
-                          AICoachService aiCoachService,
-                          MissionService missionService) {
-        this.userService = userService;
-        this.mealService = mealService;
-        this.aiCoachService = aiCoachService;
-        this.missionService = missionService;
-    }
+    private MealService mealService;
+    @Autowired
+    private AICoachService aiCoachService;
+    @Autowired
+    private UserService userService;
+    
+    @Autowired
+    private LevelService levelService;
+    @Autowired
+    private MissionService missionService;
+    @Autowired
+    private UserRepository userRepository;
 
-    @PostMapping("/analyze")
-    public String analyzeMeal(@RequestParam("mealImage") MultipartFile file,
-                              @AuthenticationPrincipal UserDetails userDetails,
-                              RedirectAttributes redirectAttributes) {
-        if (file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("error", "画像ファイルが選択されていません。");
-            return "redirect:/log/meal";
-        }
-
-        try {
-            User user = userService.findByUsername(userDetails.getUsername());
-            
-            // AIサービス呼び出し
-            String jsonResult = aiCoachService.analyzeMealImage(file);
-
-            // JSONをMapに変換
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> analysisData = mapper.readValue(jsonResult, Map.class);
-            
-            if (analysisData.containsKey("error")) {
-                redirectAttributes.addFlashAttribute("error", analysisData.get("error"));
-            } else {
-                redirectAttributes.addFlashAttribute("analyzedData", analysisData);
-                
-                // 解析データを使ってトレーニング提案を生成
-                MealLogForm tempForm = new MealLogForm();
-                tempForm.setContent((String) analysisData.get("content"));
-                tempForm.setCalories(toInteger(analysisData.get("calories")));
-                tempForm.setProtein(toDouble(analysisData.get("protein")));
-                tempForm.setFat(toDouble(analysisData.get("fat")));
-                tempForm.setCarbohydrate(toDouble(analysisData.get("carbohydrate")));
-                
-                String advice = aiCoachService.generateDietBasedTrainingAdvice(user, tempForm);
-                redirectAttributes.addFlashAttribute("aiAdvice", advice);
-
-                redirectAttributes.addFlashAttribute("successMessage", "AI解析＆トレーニング提案完了！内容を確認して記録してください。");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "AI解析データの読み込みに失敗しました。");
-        }
-
-        return "redirect:/log/meal";
-    }
-
-    // テキストからの解析処理
-    @PostMapping("/analyze-text")
-    public String analyzeMealText(@ModelAttribute("mealLogForm") MealLogForm form,
-                                  @AuthenticationPrincipal UserDetails userDetails,
-                                  RedirectAttributes redirectAttributes) {
-        try {
-            String text = form.getContent();
-            if (text == null || text.trim().isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "食事内容を入力してください。");
-                return "redirect:/log/meal";
-            }
-
-            User user = userService.findByUsername(userDetails.getUsername());
-
-            // AIサービス呼び出し（テキスト解析）
-            String jsonResult = aiCoachService.analyzeMealText(text);
-
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> analysisData = mapper.readValue(jsonResult, Map.class);
-            
-            if (analysisData.containsKey("error")) {
-                redirectAttributes.addFlashAttribute("error", analysisData.get("error"));
-            } else {
-                redirectAttributes.addFlashAttribute("analyzedData", analysisData);
-                
-                // トレーニング提案を生成
-                MealLogForm tempForm = new MealLogForm();
-                tempForm.setContent((String) analysisData.get("content"));
-                tempForm.setCalories(toInteger(analysisData.get("calories")));
-                tempForm.setProtein(toDouble(analysisData.get("protein")));
-                tempForm.setFat(toDouble(analysisData.get("fat")));
-                tempForm.setCarbohydrate(toDouble(analysisData.get("carbohydrate")));
-                
-                String advice = aiCoachService.generateDietBasedTrainingAdvice(user, tempForm);
-                redirectAttributes.addFlashAttribute("aiAdvice", advice);
-
-                redirectAttributes.addFlashAttribute("successMessage", "テキスト解析＆トレーニング提案完了！");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "解析に失敗しました。");
-        }
-        return "redirect:/log/meal";
-    }
-
-    // 月間データの分析処理
-    @PostMapping("/analyze-month")
-    public String analyzeMonthlyDiet(@RequestParam("year") int year,
-                                     @RequestParam("month") int month,
-                                     @AuthenticationPrincipal UserDetails userDetails,
-                                     RedirectAttributes redirectAttributes) {
-        try {
-            User user = userService.findByUsername(userDetails.getUsername());
-            YearMonth targetYearMonth = YearMonth.of(year, month);
-            List<MealRecord> monthlyRecords = mealService.getMonthlyMealRecords(user, targetYearMonth);
-
-            if (monthlyRecords.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", year + "年" + month + "月の記録がありません。");
-                return "redirect:/log/meal?year=" + year + "&month=" + month;
-            }
-
-            // AIサービス呼び出し
-            String advice = aiCoachService.generateMonthlyDietAdvice(user, monthlyRecords, targetYearMonth);
-            
-            redirectAttributes.addFlashAttribute("aiAdvice", advice);
-            redirectAttributes.addFlashAttribute("successMessage", year + "年" + month + "月の分析が完了しました！");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "月間分析中にエラーが発生しました。");
-        }
-        return "redirect:/log/meal?year=" + year + "&month=" + month;
-    }
-
-    // 週間データの分析処理 (今週を対象とする)
-    @PostMapping("/analyze-week")
-    public String analyzeWeeklyDiet(@AuthenticationPrincipal UserDetails userDetails,
-                                    RedirectAttributes redirectAttributes) {
-        try {
-            User user = userService.findByUsername(userDetails.getUsername());
-            LocalDate today = LocalDate.now();
-            
-            // 今週の範囲を決定 (日曜始まり〜土曜終わり)
-            LocalDate startOfWeek = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
-            LocalDate endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
-
-            // 全件取得してフィルタリング
-            List<MealRecord> allRecords = mealService.getMealRecordsByUser(user);
-            List<MealRecord> weeklyRecords = allRecords.stream()
-                .filter(r -> {
-                    LocalDate d = r.getMealDateTime().toLocalDate();
-                    return !d.isBefore(startOfWeek) && !d.isAfter(endOfWeek);
-                })
-                .collect(Collectors.toList());
-
-            if (weeklyRecords.isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "今週(" + startOfWeek + "〜)の記録がありません。");
-                return "redirect:/log/meal";
-            }
-
-            // AIサービス呼び出し
-            String advice = aiCoachService.generateWeeklyDietAdvice(user, weeklyRecords, startOfWeek, endOfWeek);
-            
-            redirectAttributes.addFlashAttribute("aiAdvice", advice);
-            redirectAttributes.addFlashAttribute("successMessage", "今週の分析が完了しました！");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("error", "週間分析中にエラーが発生しました。");
-        }
-        return "redirect:/log/meal";
-    }
-
-    @GetMapping
-    public String showMealLogCalendar(@AuthenticationPrincipal UserDetails userDetails,
-                                      @RequestParam(value = "year", required = false) Integer year,
-                                      @RequestParam(value = "month", required = false) Integer month,
-                                      Model model) {
-        User user = userService.findByUsername(userDetails.getUsername());
+    // カレンダー表示用の共通データ作成メソッド
+    private void prepareCalendarData(Model model, User user, Integer year, Integer month) {
         LocalDate today = LocalDate.now();
         YearMonth targetYearMonth;
-
         if (year != null && month != null) {
-            try { targetYearMonth = YearMonth.of(year, month); } catch (Exception e) { targetYearMonth = YearMonth.from(today); }
-        } else { targetYearMonth = YearMonth.from(today); }
-
+            targetYearMonth = YearMonth.of(year, month);
+        } else {
+            targetYearMonth = YearMonth.from(today);
+        }
+        
+        LocalDate firstOfMonth = targetYearMonth.atDay(1);
+        List<LocalDate> calendarDays = new ArrayList<>();
+        int paddingDays = firstOfMonth.getDayOfWeek().getValue() % 7; 
+        for (int i = 0; i < paddingDays; i++) {
+            calendarDays.add(null);
+        }
+        for (int i = 1; i <= targetYearMonth.lengthOfMonth(); i++) {
+            calendarDays.add(targetYearMonth.atDay(i));
+        }
+        
         List<MealRecord> records = mealService.getMonthlyMealRecords(user, targetYearMonth);
         Map<LocalDate, Boolean> loggedDates = records.stream()
-                .collect(Collectors.toMap(r -> r.getMealDateTime().toLocalDate(), r -> true, (e, r) -> e));
-
-        List<LocalDate> calendarDays = new ArrayList<>();
-        LocalDate firstOfMonth = targetYearMonth.atDay(1);
+                .map(r -> r.getMealDateTime().toLocalDate())
+                .collect(Collectors.toMap(d -> d, d -> true, (a, b) -> a));
         
-        int dayOfWeekValue = firstOfMonth.getDayOfWeek().getValue(); 
-        int paddingDaysSundayStart = dayOfWeekValue % 7; 
+        YearMonth prev = targetYearMonth.minusMonths(1);
+        YearMonth next = targetYearMonth.plusMonths(1);
         
-        for (int i = 0; i < paddingDaysSundayStart; i++) calendarDays.add(null);
-
-        for (int i = 1; i <= targetYearMonth.lengthOfMonth(); i++) calendarDays.add(targetYearMonth.atDay(i));
-        
-        List<String> dayLabels = new ArrayList<>();
-        DayOfWeek[] days = {
-            DayOfWeek.SUNDAY, 
-            DayOfWeek.MONDAY, 
-            DayOfWeek.TUESDAY, 
-            DayOfWeek.WEDNESDAY, 
-            DayOfWeek.THURSDAY, 
-            DayOfWeek.FRIDAY, 
-            DayOfWeek.SATURDAY
-        };
-        for (DayOfWeek day : days) {
-            dayLabels.add(day.getDisplayName(TextStyle.SHORT, Locale.JAPANESE));
-        }
-
-        model.addAttribute("username", user.getUsername());
         model.addAttribute("currentDate", today);
         model.addAttribute("currentYearMonth", targetYearMonth);
         model.addAttribute("calendarDays", calendarDays);
         model.addAttribute("loggedDates", loggedDates);
-        model.addAttribute("dayLabels", dayLabels);
-        model.addAttribute("prevYear", targetYearMonth.minusMonths(1).getYear());
-        model.addAttribute("prevMonth", targetYearMonth.minusMonths(1).getMonthValue());
-        model.addAttribute("nextYear", targetYearMonth.plusMonths(1).getYear());
-        model.addAttribute("nextMonth", targetYearMonth.plusMonths(1).getMonthValue());
-        
-        MealLogForm form = new MealLogForm();
-        if (model.containsAttribute("analyzedData")) {
-            Map<String, Object> data = (Map<String, Object>) model.asMap().get("analyzedData");
-            if (data != null && !data.containsKey("error")) {
-                form.setContent((String) data.get("content"));
-                form.setCalories(toInteger(data.get("calories")));
-                form.setProtein(toDouble(data.get("protein")));
-                form.setFat(toDouble(data.get("fat")));
-                form.setCarbohydrate(toDouble(data.get("carbohydrate")));
-                model.addAttribute("aiComment", data.get("comment"));
-                
-                form.setDate(today.toString());
-                LocalTime now = LocalTime.now();
-                form.setTime(now.format(DateTimeFormatter.ofPattern("HH:mm")));
-                
-                int hour = now.getHour();
-                if (hour >= 4 && hour < 10) form.setMealType("朝食");
-                else if (hour >= 10 && hour < 16) form.setMealType("昼食");
-                else if (hour >= 16 || hour < 4) form.setMealType("夕食");
-            }
-        }
-        model.addAttribute("mealLogForm", form);
+        model.addAttribute("username", user.getUsername());
+        model.addAttribute("prevYear", prev.getYear());
+        model.addAttribute("prevMonth", prev.getMonthValue());
+        model.addAttribute("nextYear", next.getYear());
+        model.addAttribute("nextMonth", next.getMonthValue());
+        model.addAttribute("dayLabels", Arrays.asList("日", "月", "火", "水", "木", "金", "土"));
+    }
 
+    @GetMapping
+    public String showMealLogForm(@RequestParam(name = "year", required = false) Integer year,
+                                  @RequestParam(name = "month", required = false) Integer month,
+                                  @AuthenticationPrincipal UserDetails userDetails,
+                                  Model model) {
+        
+        User user = userService.findByUsername(userDetails.getUsername());
+        prepareCalendarData(model, user, year, month);
+
+        MealLogForm form = new MealLogForm();
+        form.setDate(LocalDate.now().toString());
+        form.setTime(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+        
+        model.addAttribute("mealLogForm", form);
+        
         return "log/meal-log";
     }
 
     @PostMapping("/save")
-    public String saveMealLog(@Valid @ModelAttribute("mealLogForm") MealLogForm form, 
-                              BindingResult result, 
-                              @AuthenticationPrincipal UserDetails userDetails,
-                              RedirectAttributes redirectAttributes) { 
+    public String saveMealLog(@AuthenticationPrincipal UserDetails userDetails,
+                              @Valid @ModelAttribute MealLogForm form,
+                              BindingResult result,
+                              RedirectAttributes redirectAttributes,
+                              Model model) {
+        
+        User user = userService.findByUsername(userDetails.getUsername());
         
         if (result.hasErrors()) {
-            for (ObjectError error : result.getAllErrors()) {
-                System.out.println("Validation Error: " + error.getDefaultMessage());
-            }
             redirectAttributes.addFlashAttribute("error", "入力内容に不備があります。");
-            return "redirect:/log/meal";
+            return "redirect:/log/meal"; 
         }
-        
+
         try {
-            User user = userService.findByUsername(userDetails.getUsername());
+            MultipartFile imageFile = form.getImageFile();
+            if (imageFile != null && !imageFile.isEmpty()) {
+                // 画像保存処理（必要なら実装）
+            }
+
             MealRecord savedRecord = mealService.saveMealRecord(form, user);
-            
-            // ★★★ ミッション進捗更新 ★★★
+
+            // 報酬付与
+            int rewardXp = 50;
+            int rewardCoins = 10;
+            levelService.addXpAndCheckLevelUp(user, rewardXp);
+            userService.addChips(user.getUsername(), rewardCoins);
+            userRepository.save(user);
+
             missionService.updateMissionProgress(user.getId(), "MEAL_LOG");
 
             try {
-                String advice = aiCoachService.generateDietBasedTrainingAdvice(user, form);
-                redirectAttributes.addFlashAttribute("aiAdvice", advice); 
+                String advice = aiCoachService.generateMealAdvice(user, form);
+                redirectAttributes.addFlashAttribute("aiAdvice", advice);
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("AI Advice Error: " + e.getMessage());
             }
 
-            // ★追加: 成功メッセージを設定
-            redirectAttributes.addFlashAttribute("successMessage", "食事を記録しました！");
-
+            redirectAttributes.addFlashAttribute("successMessage", "食事を記録しました！ (+" + rewardXp + " XP, +" + rewardCoins + " コイン)");
+            
             LocalDate date = savedRecord.getMealDateTime().toLocalDate();
             return "redirect:/log/meal?year=" + date.getYear() + "&month=" + date.getMonthValue();
         } catch (Exception e) {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "保存中にエラーが発生しました。");
             return "redirect:/log/meal";
+        }
+    }
+    
+    // ★追加: 月間分析
+    @PostMapping("/analyze-month")
+    public String analyzeMonth(@RequestParam("year") int year, 
+                               @RequestParam("month") int month,
+                               @AuthenticationPrincipal UserDetails userDetails,
+                               RedirectAttributes redirectAttributes) {
+        User user = userService.findByUsername(userDetails.getUsername());
+        YearMonth ym = YearMonth.of(year, month);
+        List<MealRecord> records = mealService.getMonthlyMealRecords(user, ym);
+        
+        if (records.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "指定された月の食事記録がありません。");
+        } else {
+            String advice = aiCoachService.generateMonthlyDietAdvice(user, records, ym);
+            redirectAttributes.addFlashAttribute("aiAdvice", advice);
+        }
+        return "redirect:/log/meal?year=" + year + "&month=" + month;
+    }
+
+    // ★追加: 今週の分析
+    @PostMapping("/analyze-week")
+    public String analyzeWeek(@AuthenticationPrincipal UserDetails userDetails,
+                              RedirectAttributes redirectAttributes) {
+        User user = userService.findByUsername(userDetails.getUsername());
+        
+        LocalDate today = LocalDate.now();
+        LocalDate start = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate end = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+        
+        List<MealRecord> records = mealService.getMealRecordsBetween(user, start, end);
+        
+        if (records.isEmpty()) {
+             redirectAttributes.addFlashAttribute("error", "今週の食事記録がありません。");
+        } else {
+             String advice = aiCoachService.generateWeeklyDietAdvice(user, records, start, end);
+             redirectAttributes.addFlashAttribute("aiAdvice", advice);
+        }
+        
+        return "redirect:/log/meal";
+    }
+
+    // ★追加: 画像解析
+    @PostMapping("/analyze")
+    public String analyzeImage(@RequestParam("mealImage") MultipartFile file,
+                               @AuthenticationPrincipal UserDetails userDetails,
+                               Model model) {
+        User user = userService.findByUsername(userDetails.getUsername());
+        prepareCalendarData(model, user, LocalDate.now().getYear(), LocalDate.now().getMonthValue());
+        
+        MealLogForm form = new MealLogForm();
+        form.setDate(LocalDate.now().toString());
+        form.setTime(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+
+        try {
+            String jsonResult = aiCoachService.analyzeMealImage(file);
+            fillFormFromJson(form, jsonResult, model);
+        } catch (Exception e) {
+            model.addAttribute("error", "画像解析に失敗しました: " + e.getMessage());
+        }
+        
+        model.addAttribute("mealLogForm", form);
+        return "log/meal-log";
+    }
+
+    // ★追加: テキスト解析
+    @PostMapping("/analyze-text")
+    public String analyzeText(@ModelAttribute MealLogForm form,
+                              @AuthenticationPrincipal UserDetails userDetails,
+                              Model model) {
+        User user = userService.findByUsername(userDetails.getUsername());
+        
+        // フォームの日付からカレンダー年月を復元
+        LocalDate date = LocalDate.parse(form.getDate());
+        prepareCalendarData(model, user, date.getYear(), date.getMonthValue());
+
+        try {
+            String jsonResult = aiCoachService.analyzeMealText(form.getContent());
+            fillFormFromJson(form, jsonResult, model);
+        } catch (Exception e) {
+            model.addAttribute("error", "テキスト解析に失敗しました: " + e.getMessage());
+        }
+        
+        model.addAttribute("mealLogForm", form);
+        return "log/meal-log";
+    }
+
+    // JSONデータをフォームに反映するヘルパー
+    private void fillFormFromJson(MealLogForm form, String jsonResult, Model model) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.readTree(jsonResult);
+            
+            if (node.has("error")) {
+                model.addAttribute("error", node.get("error").asText());
+                return;
+            }
+
+            if (node.has("content")) form.setContent(node.get("content").asText());
+            if (node.has("calories")) form.setCalories(node.get("calories").asInt());
+            if (node.has("protein")) form.setProtein(node.get("protein").asDouble());
+            if (node.has("fat")) form.setFat(node.get("fat").asDouble());
+            if (node.has("carbohydrate")) form.setCarbohydrate(node.get("carbohydrate").asDouble());
+            
+            if (node.has("comment")) {
+                model.addAttribute("aiComment", node.get("comment").asText());
+            }
+        } catch (Exception e) {
+            model.addAttribute("error", "解析結果の読み込みに失敗しました。");
         }
     }
     
@@ -345,7 +284,6 @@ public class MealController {
         
         List<MealRecord> allRecords = mealService.getMealRecordsByUser(user);
         
-        // フィルタリング処理
         if (mealType != null && !mealType.isEmpty()) {
             allRecords = allRecords.stream()
                     .filter(r -> mealType.equals(r.getMealType()))
@@ -356,14 +294,5 @@ public class MealController {
         model.addAttribute("selectedMealType", mealType);
         
         return "log/meal-log-all"; 
-    }
-
-    private Integer toInteger(Object obj) {
-        if (obj instanceof Number) return ((Number) obj).intValue();
-        return 0;
-    }
-    private Double toDouble(Object obj) {
-        if (obj instanceof Number) return ((Number) obj).doubleValue();
-        return 0.0;
     }
 }

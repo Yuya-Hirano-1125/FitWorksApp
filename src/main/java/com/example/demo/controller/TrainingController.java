@@ -646,9 +646,19 @@ public class TrainingController {
             record.setWeight(weight);
 
             bodyWeightRecordRepository.save(record);
-            redirectAttributes.addFlashAttribute("successMessage", date + " の体重(" + weight + "kg)を保存しました。");
+         // ★追加: 記録報酬の付与 (少量: XP 50, コイン 10)
+            int rewardXp = 50;
+            int rewardCoins = 10;
+            
+            levelService.addXpAndCheckLevelUp(currentUser, rewardXp);
+            userService.addChips(currentUser.getUsername(), rewardCoins);
+            userRepository.save(currentUser); // ユーザー状態を保存
 
-            // ★追加: ミッション「WEIGHT_LOG」の進捗を更新
+            String message = date + " の体重(" + weight + "kg)を保存しました。";
+            message += " (+" + rewardXp + " XP, +" + rewardCoins + " コイン)"; // メッセージ更新
+            redirectAttributes.addFlashAttribute("successMessage", message);
+            
+         // ミッション進行更新
             missionService.updateMissionProgress(currentUser.getId(), "WEIGHT_LOG");
 
         } catch (Exception e) {

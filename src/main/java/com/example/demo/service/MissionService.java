@@ -28,15 +28,15 @@ public class MissionService {
     // ★ ミッション定義
     private record MissionDefinition(String type, String description, int requiredCount, int rewardExp) {}
 
-    // ★ 全ミッションリスト
+ // ★ 全ミッションリスト (XPを1000から2000に増量)
     private static final List<MissionDefinition> ALL_MISSIONS = List.of(
-        new MissionDefinition("TRAINING_LOG", "トレーニングを1回記録する", 1, 1000),
-        new MissionDefinition("COMMUNITY_POST", "コミュニティに1回投稿する", 1, 1000),
-        new MissionDefinition("AI_COACH", "AIコーチを使ってみよう", 1, 1000),
-        new MissionDefinition("MEAL_LOG", "食事を1回記録する", 1, 1000),         // 新規
-        new MissionDefinition("WEIGHT_LOG", "体重を記録する", 1, 1000),           // 新規
-        new MissionDefinition("GACHA_DRAW", "ガチャを1回引く", 1, 1000),          // 新規
-        new MissionDefinition("CHECK_RANKING", "ランキングを確認する", 1, 1000)     // 新規
+        new MissionDefinition("TRAINING_LOG", "トレーニングを1回記録する", 1, 2000), // 1000 -> 2000
+        new MissionDefinition("COMMUNITY_POST", "コミュニティに1回投稿する", 1, 2000),
+        new MissionDefinition("AI_COACH", "AIコーチを使ってみよう", 1, 2000),
+        new MissionDefinition("MEAL_LOG", "食事を1回記録する", 1, 2000),
+        new MissionDefinition("WEIGHT_LOG", "体重を記録する", 1, 2000),
+        new MissionDefinition("GACHA_DRAW", "ガチャを1回引く", 1, 2000),
+        new MissionDefinition("CHECK_RANKING", "ランキングを確認する", 1, 2000)
     );
 
     public MissionService(DailyMissionStatusRepository missionStatusRepository,

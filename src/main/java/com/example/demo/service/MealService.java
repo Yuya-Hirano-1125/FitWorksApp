@@ -58,4 +58,11 @@ public class MealService {
         
         return mealRecordRepository.findByUserAndMealDateTimeBetween(user, startDateTime, endDateTime);
     }
+
+    // ★追加: 指定された期間(日単位)の食事記録を取得する（週間分析用）
+    public List<MealRecord> getMealRecordsBetween(User user, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+        return mealRecordRepository.findByUserAndMealDateTimeBetween(user, startDateTime, endDateTime);
+    }
 }

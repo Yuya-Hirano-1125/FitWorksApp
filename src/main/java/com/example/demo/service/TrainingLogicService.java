@@ -22,10 +22,10 @@ public class TrainingLogicService {
     private UserService userService;
 
 
-    // 定数
-    private static final int XP_BEGINNER = 300;
-    private static final int XP_INTERMEDIATE = 500;
-    private static final int XP_ADVANCED = 1000;
+ // 定数 (XPをミッション[2000]より少なく、記録[50-100]より多く調整)
+    private static final int XP_BEGINNER = 300;      // 現状維持
+    private static final int XP_INTERMEDIATE = 600;  // 500 -> 600
+    private static final int XP_ADVANCED = 1000;     // 現状維持
 
     // XP計算ロジック
  // XP計算ロジック（ExerciseDataを使う形に修正済み）
@@ -47,12 +47,14 @@ public class TrainingLogicService {
 
     public int calculateChipReward(ExerciseData exercise) {
         int baseXp = getExperiencePoints(exercise);
+        
+        // ★コイン数を増量 (ミッション300 > トレーニング30~50 > 記録10)
         if (baseXp == XP_ADVANCED) {
-            return 6;
+            return 50; // 6 -> 50
         } else if (baseXp == XP_INTERMEDIATE) {
-            return 5;
+            return 40; // 5 -> 40
         } else if (baseXp == XP_BEGINNER) {
-            return 4; // 初級は2チップに修正済み
+            return 30; // 4 -> 30
         }
         return 0;
     }
