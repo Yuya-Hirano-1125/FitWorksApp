@@ -13,7 +13,11 @@
     padding: 20px;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.6); 
+    pointer-events: none !important; /* コンテナ自体は透過 */
 } 
+.home-page .main-container > * {
+    pointer-events: auto; /* 中身は基本有効にするが、HTML側でさらに制御 */
+}
  
 /* --- TOP BAR ELEMENTS --- */ 
  
@@ -90,7 +94,12 @@
     font-family: 'M PLUS Rounded 1c', sans-serif;
     text-shadow: 0 1px 2px rgba(0,0,0,0.15);
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* 判定が切れないように */
+    z-index: 2500 !important;
+    pointer-events: auto !important;
+}
+.home-action-btn * {
+    pointer-events: none !important;
 }
 
 .home-action-btn:hover {
@@ -322,12 +331,10 @@
     background: linear-gradient(45deg, #FFC107, #FF9800);
     border: none;
     color: #fff;
-    border-radius: 25px;
-    padding: 8px 18px;
     font-size: 15px;
     font-weight: 800;
     cursor: pointer;
-    z-index: 100;
+    z-index: 5001 !important; /* HTML側のz-menu(5000)より高く */
     box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3);
     transition: all 0.2s ease;
     display: flex;
@@ -335,6 +342,7 @@
     gap: 6px;
     white-space: nowrap; 
     text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    pointer-events: auto !important;
 }
 
 .help-label-btn:hover {
@@ -349,8 +357,8 @@
 .supple-opt { background: linear-gradient(135deg, #ffb74d, #ffa726); }
 .supple-opt:hover { background: linear-gradient(135deg, #ffa726, #fb8c00); }
 
-.tutorial-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: transparent; z-index: 9000; display: none; pointer-events: auto; }
-.tutorial-backdrop.active { display: block; }
+.tutorial-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: transparent; z-index: 9000; display: none; pointer-events: none !important; }
+.tutorial-backdrop.active { display: block; pointer-events: auto !important; }
 
 .tutorial-spotlight { position: absolute; top: 0; left: 0; width: 0; height: 0; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6) !important; z-index: 9998; pointer-events: none; opacity: 0; transition: opacity 0.4s ease-out; }
 .tutorial-spotlight.active { opacity: 1; }

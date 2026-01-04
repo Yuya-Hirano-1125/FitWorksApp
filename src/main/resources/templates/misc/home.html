@@ -13,8 +13,24 @@
     <script th:src="@{/js/theme.js}"></script>
 
     <style>
-        :root { --primary-color: #ff69b4; --accent-color: #42a5f5; --glass-bg: rgba(255, 255, 255, 0.95); }
-        * { box-sizing: border-box; }
+        :root { 
+            --primary-color: #ff69b4; 
+            --accent-color: #42a5f5; 
+            --glass-bg: rgba(255, 255, 255, 0.95); 
+            
+            /* レイヤー定義 */
+            --z-bg: -1;
+            --z-content: 10;
+            --z-header: 100;
+            --z-nav: 1000;
+            --z-overlay: 2000;
+            --z-modal: 5000;
+            --z-tutorial: 6000;
+            --z-notification: 7000; /* 最前面：通知 */
+        }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
             font-family: 'M PLUS Rounded 1c', 'Noto Sans JP', sans-serif;
             margin: 0; padding: 0;
@@ -23,27 +39,106 @@
             overflow-x: hidden; 
             padding-bottom: 120px;
         }
-        .main-container {
-            width: 100%; max-width: 600px; margin: 0 auto;
-            position: relative; padding: 15px 20px 140px 20px;
+
+        /* --------------------------------------------------------- */
+        /* 1. 邪魔な装飾だけを「触れない」ようにする                 */
+        /* --------------------------------------------------------- */
+        .interactive-bg, 
+        .bg-cloud, 
+        .mouse-follower-cloud,
+        .tutorial-spotlight,
+        .tutorial-pointer,
+        .tutorial-backdrop:not(.active) { 
+            pointer-events: none !important;
+        }
+        
+        .tutorial-backdrop.active { pointer-events: auto !important; }
+        .tutorial-rpg-box, .tutorial-rpg-box * { pointer-events: auto !important; }
+
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: var(--z-bg); }
+
+        /* --------------------------------------------------------- */
+        /* 2. 通知メッセージ (ミッション達成など)                   */
+        /* --------------------------------------------------------- */
+        .mission-notification {
+            position: fixed;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            border: 2px solid #fff;
+            color: #d63384;
+            
+            padding: 15px 20px;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.4);
+            
+            font-weight: 800;
+            font-size: 0.95rem;
+            text-align: center;
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            
+            z-index: var(--z-notification);
+            
+            opacity: 0;
+            animation: notificationPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            pointer-events: none;
+        }
+        
+        .mission-notification i {
+            color: #fff;
+            font-size: 1.4rem;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* ヘッダー */
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .real-time-clock { font-size: 0.85rem; color: #666; font-weight: bold; }
-        .help-label-btn {
-            background: rgba(255, 255, 255, 0.95); border: 2px solid #fff;
-            color: #555; font-weight: bold; cursor: pointer; font-size: 0.85rem; 
-            padding: 6px 16px; display: flex; align-items: center; gap: 6px;
-            border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: all 0.2s ease;
+        @keyframes notificationPopIn {
+            from { opacity: 0; transform: translate(-50%, -20px) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, 0) scale(1); }
         }
-        .help-label-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); color: var(--primary-color); }
-        .help-label-btn i { color: #888; font-size: 1.1em; }
-        .help-label-btn:hover i { color: var(--primary-color); }
+
+        .fade-out {
+            animation: notificationFadeOut 0.5s forwards;
+        }
+        @keyframes notificationFadeOut {
+            to { opacity: 0; transform: translate(-50%, -20px); }
+        }
+
+        /* --------------------------------------------------------- */
+        /* 3. メインレイアウト                                      */
+        /* --------------------------------------------------------- */
+        .main-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            padding: 15px 20px 140px 20px;
+            z-index: var(--z-content); 
+        }
+
+        /* ヘッダーエリア */
+        .header-top { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 10px; 
+            position: relative; 
+            z-index: var(--z-header);
+        }
         
-        .app-logo-display { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; width: 100%; }
+        .real-time-clock { font-size: 0.85rem; color: #666; font-weight: bold; }
+        
+        .app-logo-display { 
+            display: flex; flex-direction: column; align-items: center; 
+            margin-bottom: 15px; width: 100%; 
+            position: relative; z-index: 5;
+        }
         .app-logo-display img { height: 75px; object-fit: contain; margin-bottom: 8px; max-width: 100%; }
-        
+
         /* XPバー */
         #tutorial-xp-area { width: 100%; background: #fff; padding: 10px 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .xp-bar-container { display: flex; flex-direction: column; width: 100%; }
@@ -51,9 +146,20 @@
         .xp-bar { width: 100%; height: 12px; background: #e3f2fd; border-radius: 6px; overflow: hidden; }
         .xp-progress { height: 100%; background: linear-gradient(90deg, #42a5f5, #2196f3); border-radius: 6px; color: transparent; transition: width 1s ease; }
 
-        /* キャラクターエリア */
-        .character-section { width: 100%; margin-bottom: 10px; }
+        /* 挨拶エリア */
+        .home-greeting-container { 
+            text-align: center; 
+            margin: 15px 0 15px 0; 
+            position: relative; 
+            z-index: 5; 
+        }
+        .home-greeting-text { margin: 0; font-weight: bold; color: #555; font-size: 0.95rem; }
+        .home-username { color: var(--accent-color); font-size: 1.1em; font-weight: 800; }
+
+        /* キャラクターセクション */
+        .character-section { width: 100%; margin-bottom: 10px; position: relative; z-index: 5; }
         .character-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; gap: 10px; }
+        
         .character-display {
             width: 100%; aspect-ratio: 1 / 1;
             background-color: #fff; background-size: contain; background-repeat: no-repeat; background-position: center bottom;
@@ -68,78 +174,198 @@
             animation: float 3s ease-in-out infinite; z-index: 2; margin-bottom: 20px;
         }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-        #tutorial-title-display { position: absolute; top: 15px; left: 15px; z-index: 10; width: auto; min-height: 0; margin: 0; }
-        .title-badge { 
-            font-size: 0.8rem; padding: 6px 12px; border-radius: 20px; 
-            background: rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
-            font-weight: bold; color: #333; display: inline-flex; align-items: center; gap: 5px; 
-        }
 
-        /* AI吹き出し */
+        /* バッジ・吹き出し */
+        #tutorial-title-display { position: absolute; top: 15px; left: 15px; z-index: 10; width: auto; min-height: 0; margin: 0; pointer-events: none; }
+        .title-badge { font-size: 0.8rem; padding: 6px 12px; border-radius: 20px; background: rgba(255,255,255,0.95); box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-weight: bold; color: #333; display: inline-flex; align-items: center; gap: 5px; }
+
         .ai-home-advice-container {
             position: relative; width: 100%; display: flex; align-items: flex-start; gap: 10px; 
-            z-index: 5; pointer-events: auto; margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.6); padding: 10px; border-radius: 15px;
+            margin-bottom: 10px; background: rgba(255, 255, 255, 0.6); padding: 10px; border-radius: 15px;
+            z-index: 5;
         }
-        .ai-avatar-small {
-            width: 45px; height: 45px; background: #fff; border-radius: 50%;
-            border: 2px solid var(--accent-color); overflow: hidden; flex-shrink: 0;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-        }
+        .ai-avatar-small { width: 45px; height: 45px; background: #fff; border-radius: 50%; border: 2px solid var(--accent-color); overflow: hidden; flex-shrink: 0; }
         .ai-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
-        .ai-bubble-content {
-            background: #fff; padding: 10px 15px; border-radius: 15px; border-top-left-radius: 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.85rem; font-weight: bold; color: #444;
-            flex: 1; display: flex; align-items: center; line-height: 1.4;
-        }
+        .ai-bubble-content { background: #fff; padding: 10px 15px; border-radius: 15px; border-top-left-radius: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 0.85rem; font-weight: bold; color: #444; flex: 1; display: flex; align-items: center; line-height: 1.4; }
         .ai-bubble-content p { margin: 0; }
         .loading-dots { animation: blink 1.5s infinite; }
         @keyframes blink { 0% { opacity: .2; } 20% { opacity: 1; } 100% { opacity: .2; } }
 
+        /* --------------------------------------------------------- */
+        /* 4. ボタン類 (光沢アニメーション & ホバー)                */
+        /* --------------------------------------------------------- */
+        
+        /* 共通: 光沢エフェクト */
+        .side-action-btn::after,
+        .home-action-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            transition: left 0.5s;
+            pointer-events: none;
+            z-index: 10;
+        }
+        /* ホバー時に光る */
+        .side-action-btn:hover::after,
+        .home-action-btn:hover::after {
+            left: 150%;
+            transition: left 0.7s ease-in-out;
+        }
+
         /* ショートカットバー */
-        .shortcut-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .shortcut-bar { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; 
+            margin-bottom: 20px; 
+            position: relative; z-index: 20; 
+        }
         .side-action-btn {
             display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; height: 100%; 
             padding: 15px; border-radius: 18px; text-decoration: none; color: #fff;
             font-weight: bold; font-size: 0.95rem; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
-            width: 100% !important; margin: 0 !important; height: auto !important;
-            backdrop-filter: none; background-color: transparent;
+            transition: transform 0.1s, box-shadow 0.1s;
+            cursor: pointer;
+            position: relative; 
+            overflow: hidden;
+            box-sizing: border-box;
         }
-        .side-action-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); filter: brightness(1.1); }
-        .side-action-btn:active { transform: scale(0.97); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .title-button { background: linear-gradient(135deg, #ab47bc, #df78ef); border: none; }
-        .mission-square-btn { background: linear-gradient(135deg, #ffa726, #ffcc80); border: none; flex-direction: row; }
-        .mission-square-btn i { font-size: 1.2rem; margin: 0; }
-        .home-greeting-container { text-align: center; margin: 0 0 20px 0; }
+        /* ★追加: 称号・ミッションボタンのホバーアニメーション */
+        .side-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .side-action-btn:active { transform: scale(0.97); }
         
-        /* アクションボタン */
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+        .title-button { background: linear-gradient(135deg, #ab47bc, #df78ef); }
+        .mission-square-btn { background: linear-gradient(135deg, #ffa726, #ffcc80); }
+        .mission-square-btn i { font-size: 1.2rem; }
+
+        /* アクションボタン・グリッド */
+        .action-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%;
+            position: relative; 
+            z-index: 20;
+        }
+        @media (max-width: 350px) {
+            .action-grid { grid-template-columns: 1fr; }
+            .btn-training { grid-column: span 1 !important; }
+        }
+
+        /* 共通ボタンスタイル */
         .home-action-btn {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 100% !important; 
+            height: 100% !important; 
+            min-height: 100px;
             padding: 15px; border-radius: 20px; text-decoration: none; color: #fff;
             font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: none; width: 100%; height: 100%; min-height: 100px;
-            text-align: center; margin: 0 !important; font-size: 0.95rem;
-            position: relative; z-index: 10; cursor: pointer;
+            transition: transform 0.1s;
+            border: none; text-align: center; margin: 0; font-size: 0.95rem;
+            
+            cursor: pointer;
+            position: relative; 
+            touch-action: manipulation;
+            overflow: hidden;
+            box-sizing: border-box;
         }
-        .home-action-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-        .home-action-btn:active { transform: scale(0.97); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .home-action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .home-action-btn:active { transform: scale(0.97); }
         .home-action-btn i { font-size: 1.8rem; margin-bottom: 8px; }
-        .btn-training { grid-column: span 2; background: linear-gradient(135deg, #ff6b6b, #ff8e8e); flex-direction: row; gap: 15px; font-size: 1.2rem; min-height: 80px; }
-        .btn-training i { margin-bottom: 0; font-size: 1.5rem; }
+
+        /* トレーニングボタン: 横長・アイコン左仕様 */
+        .btn-training { 
+            grid-column: span 2; 
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e); 
+            flex-direction: row; 
+            gap: 15px; 
+            font-size: 1.2rem; 
+            min-height: 80px; 
+        }
+        .btn-training i { 
+            margin-bottom: 0; 
+            font-size: 1.5rem; 
+        }
+
         .btn-record { background: linear-gradient(135deg, #42a5f5, #64b5f6); }
         .btn-care { background: linear-gradient(135deg, #66bb6a, #81c784); }
         .btn-map { background: linear-gradient(135deg, #ec407a, #f48fb1); }
         .btn-ai { background: linear-gradient(135deg, #7e57c2, #9575cd); }
 
-        /* ========== 記録メニュー（モーダル）修正版 ========== */
+        /* --------------------------------------------------------- */
+        /* 5. ヘルプボタン & メニュー                               */
+        /* --------------------------------------------------------- */
+        
+        .help-label-btn {
+            background: rgba(255, 255, 255, 0.95); border: 2px solid #fff;
+            color: #555; font-weight: bold; cursor: pointer; font-size: 0.85rem; 
+            padding: 6px 16px; display: flex; align-items: center; gap: 6px;
+            border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            position: relative; 
+            z-index: 2002;
+        }
+        .help-label-btn:hover { 
+            transform: translateY(-2px); 
+            background-color: var(--accent-color); /* 背景を青に */
+            color: #fff; /* 文字を白に */
+            border-color: var(--accent-color);
+            box-shadow: 0 6px 15px rgba(66, 165, 245, 0.4);
+        }
+        .help-label-btn:hover i { color: #fff; }
+
+        .help-menu-dropdown { 
+            display: none; 
+            position: absolute; 
+            top: 50px; 
+            right: 0; 
+            background: rgba(255, 255, 255, 0.98); 
+            padding: 15px; border-radius: 20px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
+            width: 280px; max-width: 90vw; 
+            flex-direction: column; gap: 8px;
+            border: 1px solid rgba(255,255,255,0.8);
+            z-index: 10000; 
+        }
+        .help-menu-dropdown.active { display: flex; animation: fadeInDown 0.2s ease-out; }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .help-section-label { font-size: 0.85rem; color: #888; font-weight: 800; margin: 5px 0 2px 5px; }
+        
+        .help-menu-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px 15px; 
+            text-decoration: none; border-radius: 12px; text-align: left; 
+            font-weight: bold; font-size: 0.95em; 
+            border: none; width: 100%; 
+            color: #555; background: #f8f9fa;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        .help-menu-item:hover { background: #e3f2fd; color: var(--accent-color); }
+        .help-menu-item:active { background: #d0e7ff; transform: scale(0.98); }
+        .help-menu-item i { width: 24px; text-align: center; color: var(--accent-color); font-size: 1.1em; }
+        
+        .help-line-area { text-align: center; margin-top: 10px; padding-top: 15px; border-top: 2px dashed #eee; }
+        .help-line-text { margin: 0 0 8px 0; font-size: 0.85rem; font-weight: 800; color: #06c755; display: flex; align-items: center; justify-content: center; gap: 5px; }
+
+        /* --------------------------------------------------------- */
+        /* 6. 記録モーダル                                          */
+        /* --------------------------------------------------------- */
         .record-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 2000; display: none;
-            backdrop-filter: blur(3px); align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(3px); 
+            display: none; align-items: center; justify-content: center;
+            z-index: var(--z-modal);
         }
         .record-overlay.open { display: flex; animation: fadeIn 0.2s; }
         
@@ -147,53 +373,42 @@
             background: #fff; width: 85%; max-width: 320px; border-radius: 25px;
             padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             display: flex; flex-direction: column; gap: 15px;
-            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            align-items: stretch;
             position: relative;
+            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        /* ★修正: ボタン範囲を広げる */
         .record-option-item {
-            display: flex; align-items: center; 
-            width: 100%; /* 横幅いっぱいに */
-            padding: 18px 20px; /* 余白を大きく */
-            gap: 15px;
+            display: flex; align-items: center; width: 100%; padding: 18px 20px; gap: 15px;
             background: #f8f9fa; border-radius: 15px; text-decoration: none;
-            color: #444; font-weight: bold; border: 1px solid #eee; transition: background 0.2s;
-            position: relative; z-index: 2002; cursor: pointer;
+            color: #444; font-weight: bold; border: 1px solid #eee; 
+            cursor: pointer; position: relative;
         }
-        .record-option-item:hover { background: #e3f2fd; transform: translateY(-2px); }
+        .record-option-item:active { background: #d0e7ff; transform: scale(0.98); }
         .record-option-item i { font-size: 1.4rem; color: var(--accent-color); width: 30px; text-align: center; }
         
         .modal-title { text-align: center; font-weight: bold; color: #555; margin-bottom: 5px; }
-        .modal-close-area { margin-top: 10px; text-align: center; }
-        
-        /* ★修正: 閉じるボタンを見やすく */
+        .modal-close-area { margin-top: 15px; text-align: center; }
         .modal-close-btn { 
-            background: #555; /* 濃いグレー */
-            color: #fff; /* 白文字 */
-            border: none; 
-            padding: 12px 50px; /* 幅広く */
-            border-radius: 30px;
-            font-weight: bold;
-            cursor: pointer; 
-            font-size: 1rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: all 0.2s;
+            background: #555; color: #fff; border: none; padding: 14px 0; width: 100%; 
+            border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
-        .modal-close-btn:hover { background: #333; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
-        .modal-close-btn:active { transform: scale(0.95); }
+        .modal-close-btn:active { transform: scale(0.98); }
 
-        /* ボトムナビ */
+        /* --------------------------------------------------------- */
+        /* 7. ボトムナビ                                            */
+        /* --------------------------------------------------------- */
         .bottom-nav {
-            position: fixed; bottom: 20px;
-            left: 0; right: 0; margin: 0 auto;
+            position: fixed; bottom: 20px; left: 0; right: 0; margin: 0 auto;
             width: 95%; max-width: 600px;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px); border-radius: 40px;
             box-shadow: 0 5px 25px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5);
             display: flex; justify-content: space-evenly; align-items: center;
-            padding: 10px 0; z-index: 1000;
+            padding: 10px 0; 
+            z-index: var(--z-nav);
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center;
@@ -204,15 +419,18 @@
         .nav-item span { font-size: 0.65rem; white-space: nowrap; transform: scale(0.9); }
         .nav-item:hover i, .nav-item:hover span { color: var(--primary-color); }
 
-        /* ヘルプメニュー */
-        .help-menu-dropdown { 
-            display: none; position: absolute; top: 40px; right: 0; 
-            background: #fff; padding: 15px; border-radius: 15px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15); z-index: 2001; width: 260px; 
-            flex-direction: column; gap: 5px;
+        /* チュートリアルBOX */
+        .tutorial-rpg-box { 
+            position: absolute; top: 50%; left: 50%; transform: translateX(-50%); 
+            width: 95vw; max-width: 600px; 
+            background: rgba(255, 255, 255, 0.95); border: 3px solid #4facfe; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-radius: 20px; 
+            padding: 15px; z-index: var(--z-tutorial); 
+            display: flex; align-items: flex-start; gap: 15px; opacity: 0; transition: opacity 0.3s;
         }
-        .help-menu-dropdown.active { display: flex; }
-        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .tutorial-rpg-box.active { opacity: 1; }
+        .tutorial-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5900; display: none; }
+        .tutorial-backdrop.active { display: block; }
     </style>
 </head>
 <body class="home-page">
@@ -234,20 +452,39 @@
             <div id="real-time-clock" class="real-time-clock">0000/00/00(月) 00:00</div>
             <div style="position: relative;">
                 <button id="help-btn" class="help-label-btn" onclick="toggleHelpMenu()">
-                    <i class="fa-solid fa-circle-question" style="font-size: 1.2em;"></i> ヘルプ
+                    <i class="fa-solid fa-circle-question"></i> ヘルプ
                 </button>
+                
                 <div id="help-menu" class="help-menu-dropdown">
-                    <div class="help-section-label">🔰 チュートリアル</div>
-                    <button class="help-menu-item tutorial-opt" onclick="startRpgTutorial('all'); toggleHelpMenu();"><i class="fa-solid fa-star"></i> 全機能ツアー</button>
-                    <button class="help-menu-item" onclick="startRpgTutorial('training'); toggleHelpMenu();"><i class="fa-solid fa-dumbbell"></i> トレーニングの始め方</button>
-                    <button class="help-menu-item" onclick="startRpgTutorial('record'); toggleHelpMenu();"><i class="fa-solid fa-pen-to-square"></i> 記録の付け方・ケア</button>
-                    <button class="help-menu-item" onclick="startRpgTutorial('gacha'); toggleHelpMenu();"><i class="fa-solid fa-gift"></i> ガチャ・キャラについて</button>
-                    <button class="help-menu-item" onclick="startRpgTutorial('social'); toggleHelpMenu();"><i class="fa-solid fa-users"></i> 交流・AI・その他</button>
-                    <div class="help-section-label">📘 ガイド</div>
-                    <a th:href="@{/supplement-guide}" class="help-menu-item supple-opt"><i class="fa-solid fa-book-medical"></i> サプリの飲み方</a>
-                    <div style="text-align: center; margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(0,0,0,0.1);">
-                        <p style="margin: 0 0 5px 0; font-size: 0.85rem; font-weight: 800; color: #06c755;"><i class="fa-brands fa-line"></i> 公式LINEはこちら</p>
-                        <a href="https://lin.ee/nUEWQkq"><img src="https://scdn.line-apps.com/n/line_add_friends/btn/ja.png" alt="友だち追加" height="36" border="0"></a>
+                    <div class="help-section-label"><i class="fa-solid fa-graduation-cap"></i> チュートリアル</div>
+                    <button class="help-menu-item" onclick="startRpgTutorial('all'); toggleHelpMenu();">
+                        <i class="fa-solid fa-star"></i> 全機能ツアー
+                    </button>
+                    <button class="help-menu-item" onclick="startRpgTutorial('training'); toggleHelpMenu();">
+                        <i class="fa-solid fa-dumbbell"></i> トレーニングの始め方
+                    </button>
+                    <button class="help-menu-item" onclick="startRpgTutorial('record'); toggleHelpMenu();">
+                        <i class="fa-solid fa-pen-to-square"></i> 記録の付け方・ケア
+                    </button>
+                    <button class="help-menu-item" onclick="startRpgTutorial('gacha'); toggleHelpMenu();">
+                        <i class="fa-solid fa-gift"></i> ガチャ・キャラについて
+                    </button>
+                    <button class="help-menu-item" onclick="startRpgTutorial('social'); toggleHelpMenu();">
+                        <i class="fa-solid fa-users"></i> 交流・AI・その他
+                    </button>
+                    
+                    <div class="help-section-label" style="margin-top: 10px;"><i class="fa-solid fa-book-open"></i> ガイド</div>
+                    <a th:href="@{/supplement-guide}" class="help-menu-item">
+                        <i class="fa-solid fa-book-medical"></i> サプリの飲み方
+                    </a>
+                    
+                    <div class="help-line-area">
+                        <p class="help-line-text">
+                            <i class="fa-brands fa-line"></i> 公式LINEはこちら
+                        </p>
+                        <a href="https://lin.ee/nUEWQkq">
+                            <img src="https://scdn.line-apps.com/n/line_add_friends/btn/ja.png" alt="友だち追加" height="36" border="0">
+                        </a>
                     </div>
                 </div>
             </div>
@@ -263,6 +500,12 @@
                     </div>
                 </div>
             </div>
+        </div>
+        
+        <div class="home-greeting-container">
+            <p class="home-greeting-text">
+                こんにちは、<span class="home-username" th:text="${username}"></span>さん!
+            </p>
         </div>
         
         <div class="character-section">
@@ -303,12 +546,6 @@
             <a id="tutorial-mission-btn" th:href="@{/daily-mission}" class="side-action-btn mission-square-btn">
                <i class="fa-solid fa-list-check"></i> ミッション
             </a>
-        </div>
-        
-        <div class="home-greeting-container">
-            <p class="home-greeting-text">
-                こんにちは、<span class="home-username" th:text="${username}"></span>さん!
-            </p>
         </div>
         
         <div class="action-grid">
@@ -367,17 +604,6 @@
         </div>
     </div>
     
-    <div id="background-unlock-popup" class="background-unlock-overlay" style="display: none;">
-        <div class="background-unlock-content">
-            <div class="leaf-decoration"></div><div class="leaf-decoration"></div><div class="leaf-decoration"></div><div class="leaf-decoration"></div>
-            <div class="ff-header"><h2 class="background-unlock-title">あたらしい背景が手に入ったよ!</h2></div>
-            <div class="ff-content"><div id="background-unlock-list" class="background-unlock-list"></div></div>
-            <div class="background-unlock-buttons">
-                <button onclick="closeBackgroundUnlockPopup()" class="btn-later"><i class="fa-solid fa-clock"></i> あとで見る</button>
-                <a href="/characters/menu/Backgrounds" class="btn-go-backgrounds"><i class="fa-solid fa-image"></i> 背景一覧へ</a>
-            </div>
-        </div>
-    </div>
     <div id="tutorial-backdrop" class="tutorial-backdrop"></div>
 
     <script th:inline="javascript">
@@ -399,22 +625,6 @@
         
         document.addEventListener('DOMContentLoaded', function() {
             updateRealTimeClock();
-            const backgroundUnlocks = /*[[${backgroundUnlocks}]]*/ null;
-            if (backgroundUnlocks && backgroundUnlocks.hasNewUnlocks) {
-                const unlockedBackgrounds = backgroundUnlocks.unlockedBackgrounds || [];
-                if (unlockedBackgrounds.length > 0) {
-                    const popup = document.getElementById('background-unlock-popup');
-                    const listContainer = document.getElementById('background-unlock-list');
-                    listContainer.innerHTML = '';
-                    unlockedBackgrounds.forEach(bg => {
-                        const item = document.createElement('div');
-                        item.className = 'background-unlock-item';
-                        item.innerHTML = `<i class="fa-solid fa-unlock-keyhole"></i><strong>${bg.name}</strong> (Lv.${bg.requiredLevel}で解放)`;
-                        listContainer.appendChild(item);
-                    });
-                    popup.style.display = 'flex';
-                }
-            }
             const notification = document.getElementById('mission-notification');
             if (notification) { setTimeout(() => { notification.classList.add('fade-out'); setTimeout(() => { if (notification.parentNode) notification.parentNode.removeChild(notification); }, 500); }, 4000); }
             
@@ -426,7 +636,6 @@
                 }).catch(err => { console.error("AI Advice Error:", err); aiMessageEl.textContent = "今日も一緒に頑張るムキ！"; });
             }
         });
-        function closeBackgroundUnlockPopup() { document.getElementById('background-unlock-popup').style.display = 'none'; }
 
         // Tutorial
         const scenarios = {
