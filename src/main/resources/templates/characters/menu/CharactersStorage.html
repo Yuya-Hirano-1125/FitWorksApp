@@ -27,7 +27,7 @@
 
         /* メインコンテナ */
         .main-container {
-            max-width: 1000px;
+            max-width: 1100px; /* カード4枚がきれいに収まるよう幅を確保 */
             width: 92%; margin: 40px auto; padding: 30px;
             background: rgba(255, 255, 255, 0.95); 
             backdrop-filter: blur(20px) saturate(180%);
@@ -58,11 +58,8 @@
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
         .page-title { color: #343a40; font-size: 2rem; margin: 0; text-shadow: none; white-space: nowrap; }
-        .user-level-badge {
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            color: white; padding: 5px 15px; border-radius: 20px;
-            font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        
+        /* レベルバッジは削除 */
 
         /* タブのスタイル調整 */
         .storage-tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0 30px; flex-wrap: wrap; }
@@ -88,16 +85,13 @@
             display: flex; flex-direction: column; align-items: center; width: 100%;
         }
 
-        /* Flexboxリスト設定 (Unlock画面と統一) */
+        /* Gridレイアウト設定 */
         .character-grid { 
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center; 
-            align-items: stretch;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* デフォルト（PC）: 4列 */
+            gap: 25px; /* PCは少し広めに間隔を取る */
             width: 100%;
             padding: 0;
-            max-width: 680px; /* カード4つ分程度の幅に制限 */
             margin: 0 auto; 
         }
         
@@ -105,7 +99,7 @@
         .character-card-link {
             text-decoration: none;
             color: inherit;
-            display: contents; /* Flexアイテムとしての挙動をカード自体に任せる */
+            display: contents; /* Gridアイテムとしてカード自体を配置させるため */
         }
         
         /* カードデザイン */
@@ -113,14 +107,15 @@
             text-align: center; 
             border: 2px solid transparent; 
             border-radius: 15px; 
-            padding: 15px 10px; 
+            padding: 20px 10px; 
             background: #ffffff; 
             position: relative; 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 8px rgba(0,0,0,0.05); 
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            height: 100%; min-height: 230px;
-            width: 150px; /* PC固定幅 */
+            height: 100%; 
+            min-height: 250px; /* 高さを少し確保 */
+            width: 100%; /* 幅はGridセルに合わせる */
             box-sizing: border-box;
         }
         
@@ -133,7 +128,8 @@
 
         /* 画像ラッパー */
         .character-img-wrapper {
-            width: 90px; height: 90px; margin: 0 auto 10px;
+            width: 110px; height: 110px; /* PCサイズ: 少し大きめに */
+            margin: 0 auto 15px;
             background: #fff; border-radius: 50%;
             overflow: hidden; border: 3px solid #eee;
             position: relative;
@@ -158,7 +154,7 @@
             z-index: 2;
         }
         
-        .character-name { font-weight: 800; margin: 5px 0; color: #333; font-size: 0.95rem; word-break: break-word; line-height: 1.2; }
+        .character-name { font-weight: 800; margin: 5px 0; color: #333; font-size: 1rem; word-break: break-word; line-height: 1.2; }
 
         /* 属性別ボーダー */
         .character-card.fire { border-bottom: 4px solid #ff7675; }
@@ -218,7 +214,15 @@
             box-sizing: border-box;
         }
 
-        /* スマホ表示 (600px以下) */
+        /* ▼▼▼ タブレット表示 (900px以下) ▼▼▼ */
+        @media (max-width: 900px) {
+            .character-grid {
+                grid-template-columns: repeat(3, 1fr); /* 3列 */
+                gap: 20px;
+            }
+        }
+
+        /* ▼▼▼ スマホ表示 (600px以下) ▼▼▼ */
         @media (max-width: 600px) {
             .main-container { 
                 padding: 20px 10px; width: 96%; margin: 20px auto; 
@@ -226,33 +230,36 @@
             .page-title { font-size: 1.4rem; }
             
             .character-grid { 
-                justify-content: space-evenly; 
+                grid-template-columns: repeat(2, 1fr); /* 2列 */
                 gap: 10px; 
                 padding: 5px;
-                max-width: none; 
             }
             .character-card { 
-                width: 45%; 
                 min-height: 200px; 
                 padding: 10px 5px; 
             }
             .character-img-wrapper { 
-                width: 60px; height: 60px; 
+                width: 80px; height: 80px; /* スマホ用画像サイズ */
             }
             .character-name {
                 font-size: 0.85rem; 
                 margin: 3px 0;
             }
+            
+            /* レア度の文字サイズを調整 */
             .evolution-tag {
-                font-size: 0.55em;
-                padding: 1px 4px;
+                font-size: 0.7rem;
+                padding: 2px 6px;
                 top: 5px; left: 5px;
             }
+
+            /* 図鑑Noの文字サイズを調整 */
             .char-id {
-                font-size: 0.6rem;
-                padding: 1px 4px;
+                font-size: 0.75rem;
+                padding: 2px 6px;
                 top: 5px; right: 5px;
             }
+            
             .locked-badge, .detail-label {
                 font-size: 0.7rem;
                 padding: 6px 0;
@@ -277,12 +284,13 @@
                 <a th:href="@{/characters/menu/CharactersMenu}" class="home-link-icon" title="メニューに戻る">
                     <i class="fa-solid fa-arrow-left"></i>
                 </a>
-                <h1 class="page-title"><i class="fa-solid fa-book-open" style="margin-right: 5px;"></i> キャラクター図鑑</h1>
+                <h1 class="page-title"><i class="fa-solid fa-book-open" style="margin-right: 5px; color: #007bff;"></i> キャラクター図鑑</h1>
             </div>
-            <div class="user-level-badge">
-                Lv.<span th:text="${currentLevel}">1</span>
+			<div class="user-level-badge" style="font-family: 'Poppins', sans-serif;">
+			    <i class="fa-solid fa-layer-group" style="margin-right: 5px;"></i>
+			    <span th:text="${ownedCharacters} + ' / ' + ${totalCharacters}">0 / 0</span>
+			</div>
             </div>
-        </div>
 
         <div class="storage-tabs">
             <button class="tab-btn active" data-target="all">ALL</button>

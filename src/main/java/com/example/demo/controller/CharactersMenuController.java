@@ -109,9 +109,17 @@ public class CharactersMenuController {
 
             displayList.add(map);
         }
+        
+     // ▼▼▼ 追加: 所持数と全体数を計算してModelにセット ▼▼▼
+        long totalCharacters = displayList.size();
+        long ownedCharacters = displayList.stream()
+                .filter(m -> (Boolean) m.get("isUnlocked"))
+                .count();
+
+        model.addAttribute("totalCharacters", totalCharacters);
+        model.addAttribute("ownedCharacters", ownedCharacters);
 
         model.addAttribute("charaList", displayList);
-        model.addAttribute("currentLevel", user.getLevel());
 
         return "characters/menu/CharactersStorage"; 
     }

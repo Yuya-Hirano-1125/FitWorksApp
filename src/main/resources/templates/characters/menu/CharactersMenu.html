@@ -65,7 +65,7 @@
         .menu-list { display: flex; flex-direction: column; gap: 15px; }
         .menu-button { display: flex; align-items: center; background: rgba(255,255,255,0.9); padding: 20px; border-radius: 20px; text-decoration: none; color: #333; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .menu-button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); background: #fff; }
-        .icon-area { font-size: 1.8rem; width: 60px; text-align: center; margin-right: 15px; }
+        .icon-area { font-size: 1.8rem; width: 60px; text-align: center; margin-right: 15px; transition: color 0.2s; }
         .text-area { flex-grow: 1; }
         .main-text { display: block; font-weight: 800; font-size: 1.1rem; color: #333; }
         .sub-text { display: block; font-size: 0.85rem; color: #666; margin-top: 3px; }
@@ -74,6 +74,30 @@
         .style-storage .icon-area { color: #4facfe; }
         .style-material .icon-area { color: #feca57; }
         .style-backgrounds .icon-area { color: #1dd1a1; }
+
+        /* キャラクター解放ボタンのホバーエフェクト追加 */
+        .style-unlock:hover {
+            border: 1px solid #ff6b6b; /* 周りを赤く */
+        }
+        .style-unlock:hover .icon-area {
+            color: #fff; /* アイコンを白く */
+            background-color: #ff6b6b; /* アイコン背景を赤くして白を目立たせる（任意ですが視認性向上のため推奨） */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        /* レイアウト崩れ防止のための調整 */
+        .style-unlock .icon-area {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         @media (max-width: 600px) {
             .main-container { padding: 20px; padding-top: 30px; width: 95%; }
@@ -104,12 +128,12 @@
         <div class="menu-list">
             <a th:href="@{/characters/menu/CharactersUnlock}" class="menu-button style-unlock">
                 <div class="icon-area"><i class="fa-solid fa-lock-open"></i></div>
-                <div class="text-area"><span class="main-text">キャラクター解放</span><span class="sub-text">条件を満たして新キャラを解放</span></div>
+                <div class="text-area"><span class="main-text">キャラクター解放</span><span class="sub-text">新キャラ解放とホームキャラ変更</span></div>
                 <i class="fa-solid fa-chevron-right arrow-icon"></i>
             </a>
             <a th:href="@{/characters/menu/CharactersStorage}" class="menu-button style-storage">
                 <div class="icon-area"><i class="fa-solid fa-users"></i></div>
-                <div class="text-area"><span class="main-text">キャラクター一覧</span><span class="sub-text">所持キャラクターの確認・変更</span></div>
+                <div class="text-area"><span class="main-text">キャラクター図鑑</span><span class="sub-text">所持キャラクターの確認</span></div>
                 <i class="fa-solid fa-chevron-right arrow-icon"></i>
             </a>
             <a th:href="@{/characters/menu/CharactersEvolutionMaterial}" class="menu-button style-material">
