@@ -376,9 +376,11 @@
                        </th:block>
                    </div>
 
-                   <div id="char-anim-wrapper" class="char-anim-wrapper" onclick="triggerCharJump()" oncontextmenu="return false;">
-                       <img id="char-img-element" th:src="@{${characterImagePath != null ? characterImagePath : '/img/character/' + (level / 10) * 10 + '.png'}}" alt="Character" />
-                   </div>
+				   <div id="char-anim-wrapper" class="char-anim-wrapper" onclick="triggerCharJump()" oncontextmenu="return false;" style="position: relative;">
+				       <img id="char-img-element" th:src="@{${characterImagePath != null ? characterImagePath : '/img/character/' + (level / 10) * 10 + '.png'}}" alt="Character" />
+				       
+				       <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; -webkit-touch-callout: none;"></div>
+				   </div>
                 </div>
                 
                 <div class="ai-home-advice-container">

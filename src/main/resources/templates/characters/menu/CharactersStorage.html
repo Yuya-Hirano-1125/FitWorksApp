@@ -308,9 +308,10 @@
                             <div class="evolution-tag" th:text="${chara.rarity}">★1</div>
                             <div class="char-id" th:text="'No.' + ${iterStat.count}">No.1</div>
                             
-                            <div class="character-img-wrapper">
+                            <div class="character-img-wrapper" oncontextmenu="return false;">
                                 <img class="character-img" th:src="${chara.imgUrl}" th:alt="${chara.name}"
                                      onerror="this.src='https://placehold.co/100x100?text=No+Img';">
+                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; -webkit-touch-callout: none;"></div>
                             </div>
                             
                             <p class="character-name" th:text="${chara.name}">Name</p>
@@ -331,10 +332,11 @@
                             <div class="evolution-tag" th:text="${chara.rarity}">★1</div>
                             <div class="char-id" th:text="'No.' + ${iterStat.count}">No.1</div>
                             
-                            <div class="character-img-wrapper" th:classappend="${!chara.isUnlocked} ? 'locked' : ''">
+                            <div class="character-img-wrapper" th:classappend="${!chara.isUnlocked} ? 'locked' : ''" oncontextmenu="return false;">
                                 <img class="character-img" th:src="${chara.imgUrl}" th:alt="${chara.name}"
                                      onerror="this.src='https://placehold.co/100x100?text=No+Img';">
                                 <i th:if="${!chara.isUnlocked}" class="fa-solid fa-lock lock-icon"></i>
+                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; -webkit-touch-callout: none;"></div>
                             </div>
                             
                             <p class="character-name" th:text="${chara.isUnlocked} ? ${chara.name} : '???'">???</p>

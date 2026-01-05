@@ -123,7 +123,45 @@
         .button { width: 100%; padding: 12px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; transition: background-color 0.2s; text-align: center; display: block; text-decoration: none; box-sizing: border-box; cursor: pointer; }
         .button.primary { background-color: #007bff; color: white; border: none; }
         .button.primary:hover:not(:disabled) { background-color: #0056b3; }
-        .button:disabled { background-color: #cccccc; cursor: not-allowed; color: #666; }
+        
+        /* セッション開始ボタンのデザイン（change-password.htmlのスタイルを適用） */
+        .btn-start-session {
+            width: 100%;
+            padding: 16px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 97, 255, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .btn-start-session:hover:not(:disabled) {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 97, 255, 0.6);
+            filter: brightness(1.1);
+        }
+        .btn-start-session:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 2px 5px rgba(0, 97, 255, 0.4);
+        }
+        /* disabled時のスタイル */
+        .btn-start-session:disabled {
+            background: #cccccc; 
+            color: #666;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+            pointer-events: none;
+        }
         
         /* 種目一覧ボタン */
         .btn-exercises {
@@ -133,7 +171,6 @@
             border: none;
             box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
             transition: all 0.2s ease;
-            /* ★重要: どの画面幅でも必ず右寄せ（折り返し時は右下）になるように設定 */
             margin-left: auto;
         }
         .btn-exercises:hover {
@@ -187,7 +224,6 @@
                 padding: 25px 20px;
                 width: 95%;
             }
-            /* .btn-exercises に margin-left: auto を共通で当てたのでここは削除しても良いが念のため残す */
             .btn-exercises {
                 align-self: flex-end; 
             }
@@ -306,7 +342,7 @@
 				        <option value="">部位を選択してから種目を選んでください</option>
 				    </select>
 				</div>
-                <button type="submit" class="button primary mt-3" id="startFreeWeightSessionButton" disabled><i class="fa-solid fa-dumbbell"></i> セッション開始 </button>
+                <button type="submit" class="btn-start-session" id="startFreeWeightSessionButton" disabled><i class="fa-solid fa-dumbbell"></i> セッション開始 </button>
             </form>
         </div>
         
@@ -323,7 +359,7 @@
 						            th:text="${exercise.displayName}"></option>
                     </select>
                 </div>
-                <button type="submit" class="button primary mt-3"><i class="fa-solid fa-running"></i> セッション開始 </button>
+                <button type="submit" class="btn-start-session" id="startCardioSessionButton" disabled><i class="fa-solid fa-running"></i> セッション開始 </button>
             </form>
         </div>
         
@@ -356,6 +392,10 @@
 						    const exerciseNameSelect = document.getElementById('exerciseName');
 						    const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
 						    
+						    // ★追加: 有酸素運動の要素を取得
+						    const cardioSelect = document.getElementById('cardioExerciseName');
+						    const startCardioSessionButton = document.getElementById('startCardioSessionButton');
+						    
 						    // ★追加: サーバーから渡された自動選択用の値を取得
 						    const preselectType = /*[[${preselectType}]]*/ null;
 						    const preselectPart = /*[[${preselectPart}]]*/ null;
@@ -385,6 +425,13 @@
 						        });
 						    }
 						    
+						    // ★追加: 有酸素運動のプルダウン制御
+						    if (cardioSelect && startCardioSessionButton) {
+						        cardioSelect.addEventListener('change', function() {
+						            startCardioSessionButton.disabled = !this.value;
+						        });
+						    }
+						    
 						    // ★追加: 自動選択ロジックの実行
 						    if (preselectType && preselectExercise) {
 						        // ページ内リンクのように該当箇所へスムーズスクロール
@@ -409,10 +456,11 @@
 						            }
 						        } else if (preselectType === 'cardio') {
 						            // 有酸素の場合
-						            const cardioSelect = document.getElementById('cardioExerciseName');
 						            if (cardioSelect) {
 						                cardioSelect.scrollIntoView({behavior: 'smooth'});
 						                cardioSelect.value = preselectExercise;
+						                // ★追加: 自動選択時もボタンを有効化するためにchangeイベントを発火
+						                cardioSelect.dispatchEvent(new Event('change'));
 						            }
 						        }
 						    }

@@ -1,46 +1,113 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>モンスター図鑑：ネビュリス</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <!-- Spring Boot の static 配下のCSSを参照 -->
+    
+    <link rel="stylesheet" th:href="@{/css/base.css}">
     <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+    
+    <script th:src="@{/js/theme.js}"></script>
 </head>
 <body>
-<div class="dex-container">
-    <div class="dex-header">
-        <!-- ネビュリスの画像に変更 -->
-        <img th:src="@{/img/character/160.png}" alt="ネビュリスの画像">
-        <h1><i class="fa-solid fa-meteor"></i> ネビュリス</h1>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
     </div>
 
-    <div class="dex-info">
-        <p>
-            星霧に包まれた神秘の宇宙卵「ネビュリス」。<br>
-            この卵からは、星霧精霊「ロービ」が誕生すると言われている。<br>
-            内部には銀河が渦巻き、星々の記憶が眠っている。<br>
-            宇宙の静寂が満ちる夜、星眠の空域で孵化の瞬間を迎える。
-        </p>
-    </div>
-
-    <div class="dex-stats">
-        <div class="stat"><label>名前：</label> ネビュリス</div>
-        <div class="stat"><label>状態：</label> 孵化準備中</div>
-        <div class="stat"><label>属性：</label> 星</div>
-        <div class="stat"><label>分類：</label> 卵型（星霧精霊の卵）</div>
-        <div class="stat"><label>サイズ：</label> 約50cm（推定）</div>
-        <div class="stat"><label>孵化予測：</label> 星眠環境で96時間以内</div>
-        <div class="stat"><label>レア度：</label> ★☆☆☆☆（神秘系）</div>
-    </div>
-</div>
-<div class="back-btn-container">
-            <a th:href="@{/home}" class="button secondary">
-                <i class="fa-solid fa-house"></i> ホームに戻る
+    <div class="dex-container">
+        <div class="page-header-container">
+            <a th:href="@{/characters/menu/CharactersStorage}" class="home-link-icon" title="図鑑に戻る">
+                <i class="fa-solid fa-arrow-left"></i>
             </a>
+            
+            <h1 class="page-title">
+                <i class="fa-solid fa-egg" style="color: #ffb74d;"></i> ネビュリス
+            </h1>
         </div>
+
+        <div class="dex-character-area">
+            <div style="position: relative; display: inline-block;" oncontextmenu="return false;">
+                <img th:src="@{/img/character/160.png}" alt="ネビュリスの画像">
+                
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; -webkit-touch-callout: none;"></div>
+            </div>
+        </div>
+
+        <div class="dex-info">
+            <p>
+                星霧に包まれた神秘の宇宙卵「ネビュリス」。<br>
+                この卵からは、星霧精霊「ロービ」が誕生すると言われている。<br>
+                内部には銀河が渦巻き、星々の記憶が眠っている。<br>
+                宇宙の静寂が満ちる夜、星眠の空域で孵化の瞬間を迎える。
+            </p>
+        </div>
+
+        <div class="dex-stats">
+            <div class="stat"><label><i class="fa-solid fa-heart-pulse"></i> 状態</label> <span>孵化準備中</span></div>
+            <div class="stat"><label><i class="fa-solid fa-bolt"></i> 属性</label> <span>星</span></div>
+            <div class="stat"><label><i class="fa-solid fa-paw"></i> 分類</label> <span>卵型（星霧精霊の卵）</span></div>
+            <div class="stat"><label><i class="fa-solid fa-up-right-and-down-left-from-center"></i> サイズ</label> <span>約50cm（推定）</span></div>
+            <div class="stat"><label><i class="fa-solid fa-clock"></i> 孵化予測</label> <span>星眠環境で96時間以内</span></div>
+            <div class="stat"><label><i class="fa-solid fa-star"></i> レア度</label> <span>★☆☆☆☆</span></div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        
+        function resizeCanvas() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+        }
+        window.addEventListener('resize', resizeCanvas); 
+        resizeCanvas();
+
+        window.addEventListener('mousemove', (e) => { 
+            for(let i=0; i<2; i++) particlesArray.push(new Particle(e.x, e.y)); 
+        });
+
+        class Particle {
+            constructor(x, y) { 
+                this.x = x || Math.random() * canvas.width; 
+                this.y = y || Math.random() * canvas.height; 
+                this.size = Math.random() * 5 + 2; 
+                this.speedX = Math.random() * 4 - 2; 
+                this.speedY = Math.random() * 4 - 2; 
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; 
+            }
+            update() { 
+                this.x += this.speedX; 
+                this.y += this.speedY; 
+                if (this.size > 0.2) this.size -= 0.1; 
+            }
+            draw() { 
+                ctx.fillStyle = this.color; 
+                ctx.beginPath(); 
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+                ctx.fill(); 
+            }
+        }
+
+        function animate() { 
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            for (let i = 0; i < particlesArray.length; i++) { 
+                particlesArray[i].update(); 
+                particlesArray[i].draw(); 
+                if (particlesArray[i].size <= 0.3) { 
+                    particlesArray.splice(i, 1); 
+                    i--; 
+                } 
+            } 
+            requestAnimationFrame(animate); 
+        }
+        animate();
+    </script>
 </body>
 </html>
