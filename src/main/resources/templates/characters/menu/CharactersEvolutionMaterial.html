@@ -23,7 +23,7 @@
         #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
         .mouse-flare { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(200,240,255,0.8) 30%, rgba(64,150,255,0) 70%); transform: translate(-50%, -50%); pointer-events: none; mix-blend-mode: screen; z-index: 20; filter: blur(15px); }
 
-        /* メインコンテナ (統一デザイン) */
+        /* メインコンテナ */
         .main-container {
             max-width: 900px; width: 92%; margin: 40px auto; padding: 30px;
             background: rgba(255, 255, 255, 0.65);
@@ -35,7 +35,7 @@
             position: relative; z-index: 10;
         }
 
-        /* ヘッダーデザイン（他画面と統一） */
+        /* ヘッダーデザイン */
         .page-header-container { 
             display: flex; 
             align-items: center; 
@@ -47,7 +47,7 @@
         
         .page-title { 
             color: #343a40; font-size: 2rem; margin: 0; font-weight: 700; flex-grow: 1; text-align: left;
-			text-shadow: none;
+            text-shadow: none;
         }
         .page-title i { margin-right: 10px; color: #007bff; }
         
@@ -60,19 +60,54 @@
         }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
-        /* 既存スタイル */
-        .rarity-row { margin-bottom: 40px; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 20px; text-align: center; }
-        .rarity-row h2 { margin-bottom: 15px; color: #333; font-weight:800; }
-        .material-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; }
-        .material-card {
-            width: 160px; text-align: center; border: 2px solid #ccc; border-radius: 12px; padding: 12px;
-            background-color: white; /* カード背景白 */
-            box-shadow: 0 0 10px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
+        /* ---------------------------------------------------
+           レアリティ別のセクションスタイル
+           --------------------------------------------------- */
+        .rarity-row { 
+            margin-bottom: 40px; 
+            padding-bottom: 20px; 
+            text-align: center;
         }
-        .material-card:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(0,0,0,0.2); }
-        .material-card.r { border-color: gray; }
+
+        /* 見出しの共通スタイル */
+        .rarity-row h2 { 
+            margin-bottom: 20px; 
+            font-weight: 900; 
+            font-size: 1.8rem;
+            display: inline-block;
+            padding: 0 20px 5px 20px;
+            letter-spacing: 2px;
+        }
+
+        /* --- R (Purple) --- */
+        .r-section h2 {
+            color: #8e44ad;
+            border-bottom: 3px solid #9b59b6;
+        }
+        .material-card.r { border-color: #9b59b6; } /* 枠線も紫に */
+
+        /* --- SR (Blue) --- */
+        .sr-section h2 {
+            color: dodgerblue;
+            border-bottom: 3px solid dodgerblue;
+        }
         .material-card.sr { border-color: dodgerblue; }
+
+        /* --- SSR (Gold) --- */
+        .ssr-section h2 {
+            color: #d35400; /* 文字は少し濃いオレンジで見やすく */
+            border-bottom: 3px solid gold;
+        }
         .material-card.ssr { border-color: gold; }
+
+        /* --- UR (Rainbow) --- */
+        .ur-section h2 {
+            background: linear-gradient(to right, #ff00cc, #3333ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 3px solid #ff00cc;
+            display: inline-block;
+        }
         .material-card.ur { border: 2px solid transparent; }
         .material-card.ur::before {
             content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 12px; padding: 2px;
@@ -82,6 +117,16 @@
             -webkit-mask-composite: destination-out; mask-composite: exclude;
         }
         @keyframes rainbowBorder { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* カード共通 */
+        .material-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; }
+        .material-card {
+            width: 160px; text-align: center; border: 2px solid #ccc; border-radius: 12px; padding: 12px;
+            background-color: white; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; position: relative; overflow: hidden;
+        }
+        .material-card:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(0,0,0,0.2); }
+
         .card-image-container { background-color: white; padding: 8px; border-radius: 8px; }
         .card-image-container img { max-width: 100px; margin: 0 auto; display: block; background-color: white; border-radius: 4px; }
         .material-card p { margin: 6px 0; font-weight: bold; color: #333; }
@@ -103,18 +148,18 @@
 
     <div class="main-container">
         
-		<div class="page-header-container">
-		    <a th:href="@{/characters/menu/CharactersMenu}" class="home-link-icon" title="戻る">
-		        <i class="fa-solid fa-arrow-left"></i>
-		    </a>
-		    <h1 class="page-title"><i class="fa-solid fa-gem"></i> 素材一覧</h1>
-		</div>
+        <div class="page-header-container">
+            <a th:href="@{/characters/menu/CharactersMenu}" class="home-link-icon" title="戻る">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <h1 class="page-title"><i class="fa-solid fa-gem"></i> 素材一覧</h1>
+        </div>
 
         <div class="header-section" style="text-align:center; margin-bottom: 30px;">
             <p class="sub-heading">ガチャから出る素材を確認できます</p>
         </div>
 
-        <div class="rarity-row" th:if="${itemsR != null and !#lists.isEmpty(itemsR)}">
+        <div class="rarity-row r-section" th:if="${itemsR != null and !#lists.isEmpty(itemsR)}">
             <h2>R</h2>
             <div class="material-list">
                 <div th:each="item : ${itemsR}" class="material-card r">
@@ -127,7 +172,7 @@
             </div>
         </div>
 
-        <div class="rarity-row" th:if="${itemsSR != null and !#lists.isEmpty(itemsSR)}">
+        <div class="rarity-row sr-section" th:if="${itemsSR != null and !#lists.isEmpty(itemsSR)}">
             <h2>SR</h2>
             <div class="material-list">
                 <div th:each="item : ${itemsSR}" class="material-card sr">
@@ -140,7 +185,7 @@
             </div>
         </div>
 
-        <div class="rarity-row" th:if="${itemsSSR != null and !#lists.isEmpty(itemsSSR)}">
+        <div class="rarity-row ssr-section" th:if="${itemsSSR != null and !#lists.isEmpty(itemsSSR)}">
             <h2>SSR</h2>
             <div class="material-list">
                 <div th:each="item : ${itemsSSR}" class="material-card ssr">
@@ -153,7 +198,7 @@
             </div>
         </div>
 
-        <div class="rarity-row" th:if="${itemsUR != null and !#lists.isEmpty(itemsUR)}">
+        <div class="rarity-row ur-section" th:if="${itemsUR != null and !#lists.isEmpty(itemsUR)}">
             <h2>UR</h2>
             <div class="material-list">
                 <div th:each="item : ${itemsUR}" class="material-card ur">
