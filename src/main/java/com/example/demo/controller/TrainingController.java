@@ -872,6 +872,12 @@ public class TrainingController {
         
         List<BodyWeightRecord> weightRecords = new ArrayList<>();
         if (bodyWeightRecordRepository != null) { weightRecords = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser); }
+     // ▼▼▼ 修正箇所: 最新の体重を取得してModelに追加 (グラフの期間に関係なく最新を表示) ▼▼▼
+        if (!weightRecords.isEmpty()) {
+            // 日付昇順(Asc)で取得しているので、リストの最後が日付的に最新
+            BodyWeightRecord latest = weightRecords.get(weightRecords.size() - 1);
+            model.addAttribute("latestWeight", latest.getWeight());
+        }
         
         Map<String, int[]> durationMap = new TreeMap<>();
         Map<String, List<Double>> weightMap = new TreeMap<>();
