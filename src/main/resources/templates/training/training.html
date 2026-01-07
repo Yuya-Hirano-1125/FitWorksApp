@@ -32,167 +32,43 @@
             position: relative; z-index: 10;
         }
 
-        /* ヘッダー修正 */
-        .page-header-container { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 30px; 
-            border-bottom: 3px solid #007bff; 
-            padding-bottom: 10px; 
-            gap: 15px;
-            flex-wrap: wrap; 
-        }
-        
-        .header-left { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            /* 幅を確保しつつ縮小も許可 */
-            flex: 1 1 auto;
-            min-width: 0; 
-        }
-        
-        .page-title { 
-            color: #343a40; font-size: 2rem; margin: 0; 
-            text-shadow: none;
-            white-space: nowrap;
-        }
-        
+        .page-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 10px; gap: 15px; flex-wrap: wrap; }
+        .header-left { display: flex; align-items: center; gap: 15px; flex: 1 1 auto; min-width: 0; }
+        .page-title { color: #343a40; font-size: 2rem; margin: 0; text-shadow: none; white-space: nowrap; }
         .page-title i { margin-left: 5px; color: #007bff; }
-        
-        .home-link-icon {
-            display: flex; align-items: center; justify-content: center;
-            width: 50px; height: 50px; background-color: white; color: #007bff;
-            border: 2px solid #007bff; border-radius: 50%; text-decoration: none;
-            transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0;
-        }
+        .home-link-icon { display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 50%; text-decoration: none; transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0; }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
-        .card { margin-bottom: 25px; padding: 25px; border: 1px solid rgba(255,255,255,0.8); border-radius: 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease; background-color: rgba(255,255,255,0.85); }
+        .card { margin-bottom: 25px; padding: 25px; border: 1px solid rgba(255,255,255,0.8); border-radius: 15px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease; background-color: rgba(255,255,255,0.85); position: relative; }
         .card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
+        
+        /* プルダウンが開いているカードを最前面に表示 */
+        .card:has(.custom-select.open) {
+            z-index: 50;
+        }
+
         .card-title { font-size: 1.5rem; margin-bottom: 10px; color: #007bff; }
         .card.ai-card { background: linear-gradient(to bottom right, rgba(255,255,255,0.9), rgba(240,248,255,0.9)); border: 2px solid #8ec5fc; }
         .card.ai-card .card-title { color: #2196F3; font-weight: 900; }
         #free-weight-option { background-color: rgba(230,240,255,0.8); border-color: #007bff; }
 
         .form-group { margin-bottom: 20px; }
-        
         .form-control { width: 100%; padding: 10px 15px; border: 1px solid #ccc; border-radius: 6px; background-color: rgba(255,255,255,0.9); font-size: 1rem; }
-        
-        select.form-control {
-            font-size: 1.3rem;
-            padding: 15px 20px;
-            height: auto;
-            border: 2px solid #8ec5fc;
-            border-radius: 12px;
-            background-color: #ffffff;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-            font-weight: 600;
-            color: #333;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23007bff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 20px;
-        }
-
-        select.form-control:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.25);
-            outline: none;
-        }
-
-        select.form-control:disabled {
-            background-color: #f5f5f5;
-            border-color: #ddd;
-            color: #aaa;
-            cursor: not-allowed;
-            background-image: none;
-        }
-
-        select.form-control option {
-            font-size: 1.1rem;
-            padding: 10px;
-        }
         
         .button { width: 100%; padding: 12px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; transition: background-color 0.2s; text-align: center; display: block; text-decoration: none; box-sizing: border-box; cursor: pointer; }
         .button.primary { background-color: #007bff; color: white; border: none; }
         .button.primary:hover:not(:disabled) { background-color: #0056b3; }
         
-        /* セッション開始ボタンのデザイン（change-password.htmlのスタイルを適用） */
-        .btn-start-session {
-            width: 100%;
-            padding: 16px;
-            margin-top: 15px;
-            border: none;
-            border-radius: 50px;
-            background: linear-gradient(135deg, #0061ff 0%, #60efff 100%);
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 800;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0, 97, 255, 0.4);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-        .btn-start-session:hover:not(:disabled) {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(0, 97, 255, 0.6);
-            filter: brightness(1.1);
-        }
-        .btn-start-session:active:not(:disabled) {
-            transform: translateY(2px);
-            box-shadow: 0 2px 5px rgba(0, 97, 255, 0.4);
-        }
-        /* disabled時のスタイル */
-        .btn-start-session:disabled {
-            background: #cccccc; 
-            color: #666;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-            pointer-events: none;
-        }
+        .btn-start-session { width: 100%; padding: 16px; margin-top: 15px; border: none; border-radius: 50px; background: linear-gradient(135deg, #0061ff 0%, #60efff 100%); color: white; font-size: 1.2rem; font-weight: 800; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 97, 255, 0.4); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
+        .btn-start-session:hover:not(:disabled) { transform: translateY(-4px) scale(1.02); box-shadow: 0 10px 25px rgba(0, 97, 255, 0.6); filter: brightness(1.1); }
+        .btn-start-session:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0, 97, 255, 0.4); }
+        .btn-start-session:disabled { background: #cccccc; color: #666; cursor: not-allowed; box-shadow: none; transform: none; pointer-events: none; }
         
-        /* 種目一覧ボタン */
-        .btn-exercises {
-            background-color: #28a745; color: white; 
-            width: auto; margin: 0; padding: 8px 16px; 
-            font-size: 1rem; white-space: nowrap; flex-shrink: 0;
-            border: none;
-            box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3);
-            transition: all 0.2s ease;
-            margin-left: auto;
-        }
-        .btn-exercises:hover {
-            background-color: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 12px rgba(40, 167, 69, 0.4);
-        }
+        .btn-exercises { background-color: #28a745; color: white; width: auto; margin: 0; padding: 8px 16px; font-size: 1rem; white-space: nowrap; flex-shrink: 0; border: none; box-shadow: 0 3px 6px rgba(40, 167, 69, 0.3); transition: all 0.2s ease; margin-left: auto; }
+        .btn-exercises:hover { background-color: #218838; transform: translateY(-2px); box-shadow: 0 5px 12px rgba(40, 167, 69, 0.4); }
 
-        /* マイセットボタン */
-        .btn-myset {
-            background-color: #6f42c1; color: white; 
-            width: 100%; display: block; text-align: center; 
-            padding: 15px; border-radius: 12px; 
-            box-shadow: 0 4px 6px rgba(111, 66, 193, 0.2);
-            transition: all 0.2s ease;
-            border: none;
-        }
-        .btn-myset:hover {
-            background-color: #5a32a3;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(111, 66, 193, 0.3);
-        }
+        .btn-myset { background-color: #6f42c1; color: white; width: 100%; display: block; text-align: center; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(111, 66, 193, 0.2); transition: all 0.2s ease; border: none; }
+        .btn-myset:hover { background-color: #5a32a3; transform: translateY(-2px); box-shadow: 0 8px 15px rgba(111, 66, 193, 0.3); }
 
         .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 5px; }
         .checkbox-group label { background: rgba(255,255,255,0.8); border: 1px solid #ddd; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9em; transition: all 0.2s; user-select: none; display: flex; align-items: center; gap: 5px; }
@@ -200,33 +76,104 @@
         .equip-group label:has(input:checked) { background-color: #009688; border-color: #009688; box-shadow: 0 2px 5px rgba(0, 150, 136, 0.3); }
         
         .radio-group { display: flex; gap: 15px; }
-        .radio-group label { flex: 1; text-align: center; background: rgba(255,255,255,0.8); border: 1px solid #ccc; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; color: #555; }
+        .radio-group label { flex: 1; text-align: center; background: rgba(255,255,255,0.8); border: 1px solid #ccc; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; color: #555; font-size: 0.9rem; }
         .radio-group label:has(input:checked) { background-color: #00BCD4; color: white; border-color: #00BCD4; box-shadow: 0 2px 5px rgba(0, 188, 212, 0.3); }
 
-        /* レスポンシブ対応 */
+        /* =========================================================
+           ★ カスタムプルダウン (Select) のスタイル
+           ========================================================= */
+        .custom-select-wrapper { position: relative; user-select: none; width: 100%; z-index: 1; }
+        .custom-select-wrapper:has(.custom-select.open) { z-index: 1000; }
+        
+        .custom-select-trigger { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; font-size: 1.2rem; font-weight: 600; color: #333; background: #ffffff; border: 2px solid #8ec5fc; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: all 0.3s; }
+        .custom-select-trigger:hover { border-color: #007bff; }
+        .custom-select-trigger::after { content: '\f078'; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 0.9rem; color: #007bff; transition: transform 0.3s; }
+        .custom-select.open .custom-select-trigger::after { transform: rotate(180deg); }
+        
+        .custom-options { position: absolute; display: block; top: 100%; margin-top: 10px; left: 0; right: 0; border: 1px solid #8ec5fc; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); z-index: 2000; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-height: 300px; overflow-y: auto; }
+        .custom-options::before { content: ''; position: absolute; top: -20px; left: 0; width: 100%; height: 20px; background: transparent; z-index: -1; }
+        .custom-select.open .custom-options { opacity: 1; visibility: visible; transform: translateY(0); }
+        
+        .custom-option { position: relative; display: block; padding: 12px 20px; font-size: 1.1rem; font-weight: 500; color: #555; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background-color: #f0f8ff; color: #007bff; padding-left: 25px; }
+        .custom-option.selected { background-color: #e6f2ff; color: #007bff; font-weight: 700; }
+        
+        .custom-select.disabled .custom-select-trigger { background-color: #f5f5f5; border-color: #ddd; color: #aaa; cursor: not-allowed; }
+        .custom-select.disabled .custom-select-trigger::after { color: #aaa; }
+        select.form-control { display: none; }
+
+        /* =========================================================
+           ★ 時間入力（増減ボタン）のスタイル
+           ========================================================= */
+        .time-control-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* ボタンと入力欄の間隔 */
+        }
+
+        /* ブラウザ標準のスピナーを消す */
+        .time-input::-webkit-outer-spin-button,
+        .time-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .time-input {
+            -moz-appearance: textfield;
+            width: 100px;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 800;
+            padding: 10px;
+            margin: 0;
+            border: 2px solid #8ec5fc;
+            border-radius: 12px;
+            background: #fff;
+            color: #333;
+        }
+
+        .time-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%; /* 丸くする */
+            border: 2px solid #4facfe;
+            background: white;
+            color: #4facfe;
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .time-btn:hover {
+            background: #4facfe;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .time-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .time-label {
+            font-weight: bold;
+            color: #555;
+            font-size: 1.1rem;
+        }
+
         @media (max-width: 600px) {
-            .page-header-container {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-            }
-            .header-left {
-                width: 100%;
-                margin-bottom: 0;
-            }
-            .page-title {
-                font-size: 1.7rem; 
-            }
-            .home-link-icon {
-                width: 40px; height: 40px; font-size: 1.2rem;
-            }
-            .main-container {
-                padding: 25px 20px;
-                width: 95%;
-            }
-            .btn-exercises {
-                align-self: flex-end; 
-            }
+            .page-header-container { flex-direction: column; align-items: stretch; gap: 15px; }
+            .header-left { width: 100%; margin-bottom: 0; }
+            .page-title { font-size: 1.7rem; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .main-container { padding: 25px 20px; width: 95%; }
+            .btn-exercises { align-self: flex-end; }
         }
     </style>
 </head>
@@ -269,56 +216,58 @@
                 <p style="font-size: 0.9em; margin-bottom: 15px; color:#666;">時間・場所・器具に合わせてAIが最適なメニューを作成します。</p>
                 
                 <div class="form-group">
-                    <label for="duration" style="font-weight:bold;">⏱️ 時間 (分):</label>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <input type="number" id="duration" name="duration" class="form-control" value="15" min="3" max="180" required style="width: 100px; text-align: center; font-size: 1.2em;">
-                        <span>分くらい</span>
+                    <label for="duration" style="font-weight:bold;"><i class="fa-solid fa-stopwatch"></i> 時間 (分):</label>
+                    <div class="time-control-wrapper">
+                        <button type="button" class="time-btn minus"><i class="fa-solid fa-minus"></i></button>
+                        <input type="number" id="duration" name="duration" class="form-control time-input" value="15" min="3" max="180" required>
+                        <button type="button" class="time-btn plus"><i class="fa-solid fa-plus"></i></button>
+                        <span class="time-label">分くらい</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label style="font-weight:bold;">🏠 場所 (プリセット):</label>
+                    <label style="font-weight:bold;"><i class="fa-solid fa-map-location-dot"></i> 場所 (プリセット):</label>
                     <div class="radio-group">
-                        <label onclick="updateEquip('gym')"><input type="radio" name="location" value="gym" checked><i class="fa-solid fa-building"></i> ジム</label>
-                        <label onclick="updateEquip('home')"><input type="radio" name="location" value="home"><i class="fa-solid fa-house"></i> 自宅</label>
+                        <label><input type="radio" name="location" value="gym"><i class="fa-solid fa-building"></i> ジム</label>
+                        <label><input type="radio" name="location" value="home"><i class="fa-solid fa-house"></i> 自宅</label>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label style="font-weight:bold;">🏋️‍♂️ 利用可能な器具:</label>
+                    <label style="font-weight:bold;"><i class="fa-solid fa-dumbbell"></i> 利用可能な器具:</label>
                     <div class="checkbox-group equip-group">
-                        <label><input type="checkbox" name="equipment" value="bodyweight" checked><span>自重</span></label>
-                        <label><input type="checkbox" name="equipment" value="dumbbell" checked><span>ダンベル</span></label>
-                        <label><input type="checkbox" name="equipment" value="barbell" checked><span>バーベル</span></label>
-                        <label><input type="checkbox" name="equipment" value="machine" checked><span>マシン</span></label>
-                        <label><input type="checkbox" name="equipment" value="cable" checked><span>ケーブル</span></label>
-                        <label><input type="checkbox" name="equipment" value="smith" checked><span>スミス</span></label>
-                        <label><input type="checkbox" name="equipment" value="pullup_bar" checked><span>懸垂/鉄棒</span></label>
+                        <label><input type="checkbox" name="equipment" value="bodyweight"><span>自重</span></label>
+                        <label><input type="checkbox" name="equipment" value="dumbbell"><span>ダンベル</span></label>
+                        <label><input type="checkbox" name="equipment" value="barbell"><span>バーベル</span></label>
+                        <label><input type="checkbox" name="equipment" value="machine"><span>マシン</span></label>
+                        <label><input type="checkbox" name="equipment" value="cable"><span>ケーブル</span></label>
+                        <label><input type="checkbox" name="equipment" value="smith"><span>スミス</span></label>
+                        <label><input type="checkbox" name="equipment" value="pullup_bar"><span>懸垂/鉄棒</span></label>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label style="font-weight:bold;">🔥 難易度:</label>
+                    <label style="font-weight:bold;"><i class="fa-solid fa-fire"></i> 難易度:</label>
                     <div class="radio-group">
-                        <label><input type="radio" name="difficulty" value="beginner">🔰 初心者</label>
-                        <label><input type="radio" name="difficulty" value="intermediate" checked>💪 普通</label>
-                        <label><input type="radio" name="difficulty" value="advanced">🔥 上級者</label>
+                        <label><input type="radio" name="difficulty" value="beginner"><i class="fa-solid fa-seedling"></i> 初心者</label>
+                        <label><input type="radio" name="difficulty" value="intermediate"><i class="fa-solid fa-hand-fist"></i> 普通</label>
+                        <label><input type="radio" name="difficulty" value="advanced"><i class="fa-solid fa-fire-flame-curved"></i> 上級者</label>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label style="font-weight:bold;">💪 鍛えたい部位:</label>
+                    <label style="font-weight:bold;"><i class="fa-solid fa-person-running"></i> 鍛えたい部位:</label>
                     <div class="checkbox-group">
-                        <label><input type="checkbox" name="parts" value="胸" checked><span>胸</span></label>
+                        <label><input type="checkbox" name="parts" value="胸"><span>胸</span></label>
                         <label><input type="checkbox" name="parts" value="背中"><span>背中</span></label>
-                        <label><input type="checkbox" name="parts" value="脚" checked><span>脚</span></label>
+                        <label><input type="checkbox" name="parts" value="脚"><span>脚</span></label>
                         <label><input type="checkbox" name="parts" value="肩"><span>肩</span></label>
                         <label><input type="checkbox" name="parts" value="腕"><span>腕</span></label>
-                        <label><input type="checkbox" name="parts" value="腹筋" checked><span>腹筋</span></label>
+                        <label><input type="checkbox" name="parts" value="腹筋"><span>腹筋</span></label>
                     </div>
                 </div>
 
-                <button type="submit" class="button primary mt-3" style="background: linear-gradient(45deg, #2196F3, #00BCD4); border:none; box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);">
+                <button type="submit" class="btn-start-session">
                     <i class="fa-solid fa-robot"></i> メニューを作成して開始
                 </button>
             </form>
@@ -328,20 +277,20 @@
             <form th:action="@{/training/start}" method="post">
                 <input type="hidden" name="type" value="free-weight"/>
                 <h2 class="card-title">フリーウェイト</h2>
-				<div class="form-group">
-				    <label for="musclePart">鍛えたい部位:</label>
-				    <select id="musclePart" name="musclePart" class="form-control" required>
-				        <option value="">部位を選択してください</option>
-				        <option th:each="part : ${freeWeightParts}" th:value="${part}" th:text="${part}"></option>
-				    </select>
-				</div>
+                <div class="form-group">
+                    <label for="musclePart">鍛えたい部位:</label>
+                    <select id="musclePart" name="musclePart" class="form-control" required>
+                        <option value="">部位を選択してください</option>
+                        <option th:each="part : ${freeWeightParts}" th:value="${part}" th:text="${part}"></option>
+                    </select>
+                </div>
 
-				<div class="form-group">
-				    <label for="exerciseName">種目名:</label>
-				    <select id="exerciseName" name="exerciseName" class="form-control" required disabled>
-				        <option value="">部位を選択してから種目を選んでください</option>
-				    </select>
-				</div>
+                <div class="form-group">
+                    <label for="exerciseName">種目名:</label>
+                    <select id="exerciseName" name="exerciseName" class="form-control" required disabled>
+                        <option value="">部位を選択してから種目を選んでください</option>
+                    </select>
+                </div>
                 <button type="submit" class="btn-start-session" id="startFreeWeightSessionButton" disabled><i class="fa-solid fa-dumbbell"></i> セッション開始 </button>
             </form>
         </div>
@@ -354,9 +303,9 @@
                     <label for="cardioExerciseName">種目名:</label>
                     <select id="cardioExerciseName" name="exerciseName" class="form-control" required>
                         <option value="">種目を選択してください</option>
-						<option th:each="exercise : ${cardioExercises}" 
-						            th:value="${exercise.name}" 
-						            th:text="${exercise.displayName}"></option>
+                        <option th:each="exercise : ${cardioExercises}" 
+                                    th:value="${exercise.name}" 
+                                    th:text="${exercise.displayName}"></option>
                     </select>
                 </div>
                 <button type="submit" class="btn-start-session" id="startCardioSessionButton" disabled><i class="fa-solid fa-running"></i> セッション開始 </button>
@@ -365,108 +314,213 @@
         
         </div>
 
-		<script th:inline="javascript">
-		    /*<![CDATA[*/
-		    // 背景アニメーション
-		    const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
-		    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-		    window.addEventListener('resize', resizeCanvas); resizeCanvas();
-		    const mouse = { x: undefined, y: undefined };
-		    window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
-		    class Particle {
-		        constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
-		        update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
-		        draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
-		    }
-		    function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
-		    animate();
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            // 背景アニメーション
+            const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
+            function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resizeCanvas); resizeCanvas();
+            const mouse = { x: undefined, y: undefined };
+            window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; for(let i=0; i<2; i++) particlesArray.push(new Particle()); });
+            class Particle {
+                constructor() { this.x = mouse.x; this.y = mouse.y; this.size = Math.random() * 5 + 2; this.speedX = Math.random() * 4 - 2; this.speedY = Math.random() * 4 - 2; this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; }
+                update() { this.x += this.speedX; this.y += this.speedY; if (this.size > 0.2) this.size -= 0.1; }
+                draw() { ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+            }
+            function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
+            animate();
 
-		    const freeWeightExercisesByPart = /*[[${freeWeightExercisesByPart}]]*/ {};
-		    function updateEquip(location) {
-		        const checkboxes = document.querySelectorAll('.equip-group input[type="checkbox"]');
-		        if (location === 'gym') { checkboxes.forEach(cb => cb.checked = true); } 
-		        else if (location === 'home') { checkboxes.forEach(cb => { if (cb.value === 'bodyweight' || cb.value === 'dumbbell') { cb.checked = true; } else { cb.checked = false; } }); }
-		    }
-			document.addEventListener('DOMContentLoaded', function() {
-						    const musclePartSelect = document.getElementById('musclePart');
-						    const exerciseNameSelect = document.getElementById('exerciseName');
-						    const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
-						    
-						    // ★追加: 有酸素運動の要素を取得
-						    const cardioSelect = document.getElementById('cardioExerciseName');
-						    const startCardioSessionButton = document.getElementById('startCardioSessionButton');
-						    
-						    // ★追加: サーバーから渡された自動選択用の値を取得
-						    const preselectType = /*[[${preselectType}]]*/ null;
-						    const preselectPart = /*[[${preselectPart}]]*/ null;
-						    const preselectExercise = /*[[${preselectExercise}]]*/ null;
+            const freeWeightExercisesByPart = /*[[${freeWeightExercisesByPart}]]*/ {};
+            // updateEquip関数は不要になったため削除
 
-						    if (musclePartSelect && exerciseNameSelect) {
-						        musclePartSelect.addEventListener('change', function() {
-						            const selectedPart = this.value;
-						            exerciseNameSelect.innerHTML = '<option value="">種目を選択してください</option>';
-						            exerciseNameSelect.disabled = true;
-						            startFreeWeightSessionButton.disabled = true;
+            document.addEventListener('DOMContentLoaded', function() {
+                const musclePartSelect = document.getElementById('musclePart');
+                const exerciseNameSelect = document.getElementById('exerciseName');
+                const startFreeWeightSessionButton = document.getElementById('startFreeWeightSessionButton');
+                const cardioSelect = document.getElementById('cardioExerciseName');
+                const startCardioSessionButton = document.getElementById('startCardioSessionButton');
+                
+                const preselectType = /*[[${preselectType}]]*/ null;
+                const preselectPart = /*[[${preselectPart}]]*/ null;
+                const preselectExercise = /*[[${preselectExercise}]]*/ null;
 
-						            if (selectedPart && freeWeightExercisesByPart[selectedPart]) {
-						                const exercises = freeWeightExercisesByPart[selectedPart];
-						                exercises.forEach(exercise => {
-						                    const option = document.createElement('option');
-						                    option.value = exercise.name || exercise; 
-						                    option.textContent = exercise.fullName2 || exercise.name || exercise; 
-						                    exerciseNameSelect.appendChild(option);
-						                });
-						                exerciseNameSelect.disabled = false; 
-						            }
-						        });
+                // --- 時間増減ボタンの制御ロジック ---
+                const durationInput = document.getElementById('duration');
+                const minusBtn = document.querySelector('.time-btn.minus');
+                const plusBtn = document.querySelector('.time-btn.plus');
 
-						        exerciseNameSelect.addEventListener('change', function() {
-						            startFreeWeightSessionButton.disabled = !this.value;
-						        });
-						    }
-						    
-						    // ★追加: 有酸素運動のプルダウン制御
-						    if (cardioSelect && startCardioSessionButton) {
-						        cardioSelect.addEventListener('change', function() {
-						            startCardioSessionButton.disabled = !this.value;
-						        });
-						    }
-						    
-						    // ★追加: 自動選択ロジックの実行
-						    if (preselectType && preselectExercise) {
-						        // ページ内リンクのように該当箇所へスムーズスクロール
-						        
-						        if (preselectType === 'free-weight' && preselectPart) {
-						            // フリーウェイトの場合
-						            const fwSection = document.getElementById('free-weight-option');
-						            if(fwSection) fwSection.scrollIntoView({behavior: 'smooth'});
+                if (durationInput && minusBtn && plusBtn) {
+                    minusBtn.addEventListener('click', () => {
+                        let val = parseInt(durationInput.value) || 0;
+                        let step = 1; // 1分単位
+                        if (val - step >= parseInt(durationInput.min)) {
+                            durationInput.value = val - step;
+                        }
+                    });
 
-						            // 1. 部位を選択
-						            if (musclePartSelect) {
-						                musclePartSelect.value = preselectPart;
-						                // 2. changeイベントを手動発火させて種目リストを更新
-						                musclePartSelect.dispatchEvent(new Event('change'));
-						                
-						                // 3. 種目を選択
-						                if (exerciseNameSelect) {
-						                    exerciseNameSelect.value = preselectExercise;
-						                    // 4. ボタン有効化のためにchangeイベント発火
-						                    exerciseNameSelect.dispatchEvent(new Event('change'));
-						                }
-						            }
-						        } else if (preselectType === 'cardio') {
-						            // 有酸素の場合
-						            if (cardioSelect) {
-						                cardioSelect.scrollIntoView({behavior: 'smooth'});
-						                cardioSelect.value = preselectExercise;
-						                // ★追加: 自動選択時もボタンを有効化するためにchangeイベントを発火
-						                cardioSelect.dispatchEvent(new Event('change'));
-						            }
-						        }
-						    }
-						});
-		    /*]]>*/
-		</script>
+                    plusBtn.addEventListener('click', () => {
+                        let val = parseInt(durationInput.value) || 0;
+                        let step = 1;
+                        if (val + step <= parseInt(durationInput.max)) {
+                            durationInput.value = val + step;
+                        }
+                    });
+                }
+
+                // --- カスタムプルダウン生成関数 ---
+                function createCustomSelect(selectId) {
+                    const select = document.getElementById(selectId);
+                    if (!select) return;
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'custom-select-wrapper';
+                    wrapper.id = selectId + '-custom-wrapper';
+                    select.parentNode.insertBefore(wrapper, select);
+                    wrapper.appendChild(select);
+
+                    const customSelect = document.createElement('div');
+                    customSelect.className = 'custom-select';
+                    if (select.disabled) customSelect.classList.add('disabled');
+
+                    const trigger = document.createElement('div');
+                    trigger.className = 'custom-select-trigger';
+                    trigger.innerHTML = '<span>' + (select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : '選択してください') + '</span>';
+                    
+                    const options = document.createElement('div');
+                    options.className = 'custom-options';
+
+                    renderCustomOptions(select, options, trigger);
+
+                    customSelect.appendChild(trigger);
+                    customSelect.appendChild(options);
+                    wrapper.appendChild(customSelect);
+
+                    trigger.addEventListener('click', function(e) {
+                        if (select.disabled) return;
+                        document.querySelectorAll('.custom-select.open').forEach(el => {
+                            if (el !== customSelect) el.classList.remove('open');
+                        });
+                        customSelect.classList.toggle('open');
+                        e.stopPropagation();
+                    });
+
+                    document.addEventListener('click', function(e) {
+                        if (!customSelect.contains(e.target)) {
+                            customSelect.classList.remove('open');
+                        }
+                    });
+                }
+
+                function renderCustomOptions(select, optionsContainer, trigger) {
+                    optionsContainer.innerHTML = '';
+                    Array.from(select.options).forEach(option => {
+                        const customOption = document.createElement('div');
+                        customOption.className = 'custom-option';
+                        customOption.textContent = option.text;
+                        customOption.dataset.value = option.value;
+                        
+                        if (option.selected) customOption.classList.add('selected');
+
+                        customOption.addEventListener('click', function() {
+                            select.value = this.dataset.value;
+                            trigger.innerHTML = '<span>' + this.textContent + '</span>';
+                            
+                            optionsContainer.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+                            this.classList.add('selected');
+                            
+                            select.parentElement.querySelector('.custom-select').classList.remove('open');
+                            select.dispatchEvent(new Event('change'));
+                        });
+                        optionsContainer.appendChild(customOption);
+                    });
+                    
+                    if(select.selectedIndex >= 0) {
+                        trigger.innerHTML = '<span>' + select.options[select.selectedIndex].text + '</span>';
+                    }
+                }
+
+                function updateCustomSelect(selectId) {
+                    const select = document.getElementById(selectId);
+                    const wrapper = document.getElementById(selectId + '-custom-wrapper');
+                    if (!select || !wrapper) return;
+
+                    const customSelect = wrapper.querySelector('.custom-select');
+                    const optionsContainer = wrapper.querySelector('.custom-options');
+                    const trigger = wrapper.querySelector('.custom-select-trigger');
+
+                    if (select.disabled) {
+                        customSelect.classList.add('disabled');
+                    } else {
+                        customSelect.classList.remove('disabled');
+                    }
+
+                    renderCustomOptions(select, optionsContainer, trigger);
+                }
+
+                createCustomSelect('musclePart');
+                createCustomSelect('exerciseName');
+                createCustomSelect('cardioExerciseName');
+
+                if (musclePartSelect && exerciseNameSelect) {
+                    musclePartSelect.addEventListener('change', function() {
+                        const selectedPart = this.value;
+                        exerciseNameSelect.innerHTML = '<option value="">種目を選択してください</option>';
+                        exerciseNameSelect.disabled = true;
+                        startFreeWeightSessionButton.disabled = true;
+
+                        if (selectedPart && freeWeightExercisesByPart[selectedPart]) {
+                            const exercises = freeWeightExercisesByPart[selectedPart];
+                            exercises.forEach(exercise => {
+                                const option = document.createElement('option');
+                                option.value = exercise.name || exercise; 
+                                option.textContent = exercise.fullName2 || exercise.name || exercise; 
+                                exerciseNameSelect.appendChild(option);
+                            });
+                            exerciseNameSelect.disabled = false; 
+                        }
+                        updateCustomSelect('exerciseName');
+                    });
+
+                    exerciseNameSelect.addEventListener('change', function() {
+                        startFreeWeightSessionButton.disabled = !this.value;
+                    });
+                }
+                
+                if (cardioSelect && startCardioSessionButton) {
+                    cardioSelect.addEventListener('change', function() {
+                        startCardioSessionButton.disabled = !this.value;
+                    });
+                }
+                
+                if (preselectType && preselectExercise) {
+                    if (preselectType === 'free-weight' && preselectPart) {
+                        const fwSection = document.getElementById('free-weight-option');
+                        if(fwSection) fwSection.scrollIntoView({behavior: 'smooth'});
+
+                        if (musclePartSelect) {
+                            musclePartSelect.value = preselectPart;
+                            musclePartSelect.dispatchEvent(new Event('change'));
+                            
+                            setTimeout(() => {
+                                if (exerciseNameSelect) {
+                                    exerciseNameSelect.value = preselectExercise;
+                                    exerciseNameSelect.dispatchEvent(new Event('change'));
+                                    updateCustomSelect('exerciseName'); 
+                                }
+                            }, 50);
+                        }
+                    } else if (preselectType === 'cardio') {
+                        if (cardioSelect) {
+                            cardioSelect.scrollIntoView({behavior: 'smooth'});
+                            cardioSelect.value = preselectExercise;
+                            cardioSelect.dispatchEvent(new Event('change'));
+                            updateCustomSelect('cardioExerciseName');
+                        }
+                    }
+                }
+            });
+            /*]]>*/
+        </script>
 
 </body>
 </html>
