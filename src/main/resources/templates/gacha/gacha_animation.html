@@ -3,87 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <title>ガチャ演出中…</title>
-
     <meta http-equiv="Cache-Control" content="no-store" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+    
     <style>
-        body {
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: white;
-            font-size: 24px;
-            flex-direction: column;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        /* ガチャ結果テキスト（下中央・前回設定そのまま） */
-        p {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            margin: 0;
-            font-family: "M PLUS Rounded 1c", "Yu Gothic", sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 0.15em;
-            opacity: 0.9;
-            text-shadow:
-                0 0 6px rgba(255,255,255,0.4),
-                0 2px 4px rgba(0,0,0,0.6);
-        }
-
-        /* ▼ スキップボタン（GIFに合わせてデザイン調整） */
-        .skip-button {
-            position: fixed;
-            top: 18px;
-            right: 18px;
-
-            padding: 10px 22px;
-            font-size: 14px;
-            font-weight: 700;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            cursor: pointer;
-
-            /* ★ 海中ガラス風 */
-            background: rgba(200, 240, 255, 0.25);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-
-            color: #eafaff;
-            letter-spacing: 0.1em;
-
-            box-shadow:
-                0 0 12px rgba(120, 200, 255, 0.5),
-                inset 0 0 8px rgba(255, 255, 255, 0.4);
-
-            transition: opacity 0.2s, transform 0.2s;
-            z-index: 100;
-        }
-
-        .skip-button:hover {
-            opacity: 0.85;
-            transform: translateY(-2px);
-        }
+        /* CSSは前回の内容のまま */
+        body { margin: 0; padding: 0; background-color: #f0f8ff; height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column; overflow: hidden; font-family: "M PLUS Rounded 1c", sans-serif; color: #5d54a4; }
+        .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatOrb 30s infinite alternate ease-in-out; z-index: 0; }
+        .orb-1 { width: 60vh; height: 60vh; background: #a18cd1; top: -10%; left: -10%; }
+        .orb-2 { width: 50vh; height: 50vh; background: #00f2fe; bottom: -10%; right: -10%; animation-delay: -5s; }
+        @keyframes floatOrb { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 30px) scale(1.1); } }
+        #bg-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+        .bg-cloud { position: absolute; background: #fff; border-radius: 50%; filter: blur(40px); opacity: 0.85; z-index: 2; pointer-events: none; }
+        .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
+        .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
+        @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
+        .gif-container { z-index: 10; display: flex; justify-content: center; align-items: center; }
+        img { max-width: 100%; height: auto; max-height: 80vh; pointer-events: none; user-select: none; -webkit-user-drag: none; -webkit-touch-callout: none; }
+        p { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: 0.1em; color: #5d54a4; text-shadow: 2px 2px 0px rgba(255,255,255,0.8); z-index: 20; animation: pulseText 2s infinite; }
+        @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .skip-button { position: fixed; top: 20px; right: 20px; padding: 10px 25px; font-size: 1rem; font-weight: 900; border-radius: 50px; border: 2px solid #fff; cursor: pointer; background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); color: white; box-shadow: 0 5px 15px rgba(161, 140, 209, 0.4); transition: transform 0.2s, box-shadow 0.2s; z-index: 100; font-family: "M PLUS Rounded 1c", sans-serif; }
+        .skip-button:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 8px 20px rgba(161, 140, 209, 0.6); }
+        .skip-button:active { transform: translateY(0) scale(0.95); }
     </style>
 </head>
 <body>
-    <div>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+        <div class="bg-cloud cloud-1"></div>
+        <div class="bg-cloud cloud-2"></div>
+    </div>
+
+    <div class="gif-container">
         <img th:src="@{/img/gacha_animation.gif}" alt="演出中GIF">
     </div>
 
     <p>ガチャ結果を生成中…</p>
+
+    <form id="drawForm" th:action="@{/gacha/draw}" method="post" style="display:none;">
+        <input type="hidden" name="count" th:value="${count}">
+        </form>
 
     <button class="skip-button" onclick="goResult()">
         SKIP ▶
@@ -91,18 +56,54 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        const count = /*[[${count}]]*/ 1;
-        const userId = /*[[${userId}]]*/ 0;
-
-		function goResult() {
-		    window.location.replace(
-		        '/gacha/draw?userId=' + userId + '&count=' + count // ★ roll -> draw に変更
-		    );
-		}
+        function goResult() {
+            // ★修正: フォーム送信によるPOST遷移に変更
+            document.getElementById('drawForm').submit();
+        }
 
         setTimeout(() => {
             goResult();
         }, 5500);
+
+        // --- 背景アニメーション (省略: 変更なし) ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+        const mouse = { x: undefined, y: undefined };
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 5 + 1;
+                this.speedX = Math.random() * 2 - 1;
+                this.speedY = Math.random() * 2 - 1;
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.3) + ')';
+            }
+            update() {
+                this.x += this.speedX; this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+                if (this.size > 0.2) this.size -= 0.01;
+                if (this.size <= 0.2) {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 5 + 1;
+                }
+            }
+            draw() {
+                ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.shadowBlur = 5; ctx.shadowColor = "white"; ctx.fill(); ctx.shadowBlur = 0;
+            }
+        }
+        function initParticles() { particlesArray = []; for (let i = 0; i < 50; i++) particlesArray.push(new Particle()); }
+        initParticles();
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); }
+            requestAnimationFrame(animate);
+        }
+        animate();
         /*]]>*/
     </script>
 </body>

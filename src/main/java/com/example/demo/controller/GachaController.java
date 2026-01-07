@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -55,16 +56,17 @@ public class GachaController {
         return "gacha/gacha";
     }
 
-    // 2. 演出画面
-    @GetMapping("/gacha/animation")
-    public String animation(@RequestParam("count") int count, @RequestParam("userId") Long userId, Model model) {
+ // 2. 演出画面 (★修正: GetMapping -> PostMapping, userId削除)
+    @PostMapping("/gacha/animation")
+    public String animation(@RequestParam("count") int count, @AuthenticationPrincipal UserDetails userDetails, Model model) {
+        // userIdはURLで受け取らず、認証情報があるかだけのチェック（必要なら）に使用
+        // 演出画面には count だけ渡せばOK
         model.addAttribute("count", count);
-        model.addAttribute("userId", userId);
         return "gacha/gacha_animation";
     }
 
-    // 3. ガチャ抽選処理
-    @GetMapping("/gacha/draw") 
+ // 3. ガチャ抽選処理 (★修正: GetMapping -> PostMapping)
+    @PostMapping("/gacha/draw") 
     public String draw(@RequestParam("count") int count,
                        @AuthenticationPrincipal UserDetails userDetails,
                        RedirectAttributes redirectAttributes) {
@@ -74,14 +76,13 @@ public class GachaController {
         }
 
         User user = userService.findByUsername(userDetails.getUsername());
-        Long userId = user.getId();
+        Long userId = user.getId(); // ここでサーバー側でIDを取得
 
         // コイン消費ロジック
         int cost = (count == 1) ? 1 : 10;
-        boolean success = user.useChips(cost); // メソッド名は useChips のままでOK
+        boolean success = user.useChips(cost);
 
         if (!success) {
-            // ★変更: メッセージを「コイン」に変更
             redirectAttributes.addFlashAttribute("errorMessage", "コインが不足しています！");
             return "redirect:/gacha";
         }
@@ -91,7 +92,6 @@ public class GachaController {
         List<GachaItem> results = gachaService.roll(count, userId);
         
         redirectAttributes.addFlashAttribute("results", results);
-        // ★変更: 変数名を coinCount に変更
         redirectAttributes.addFlashAttribute("coinCount", user.getChipCount());
         redirectAttributes.addFlashAttribute("userId", userId);
 

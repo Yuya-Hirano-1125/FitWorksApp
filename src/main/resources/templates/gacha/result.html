@@ -12,13 +12,11 @@
 
     <style>
         /* ==========================================================================
-           🎨 THEME & VARIABLES (gacha.htmlと統一)
+           🎨 THEME & VARIABLES
            ========================================================================== */
         :root {
             --glass-bg: rgba(255, 255, 255, 0.75);
             --glass-border: rgba(255, 255, 255, 0.9);
-            
-            /* パステル & マジカルテーマカラー */
             --theme-pink: #ff9a9e;
             --theme-purple: #a18cd1;
             --theme-blue: #a2d2ff;
@@ -34,9 +32,7 @@
             color: var(--text-main);
         }
 
-        /* ==========================================================================
-           🌌 BACKGROUND ANIMATION
-           ========================================================================== */
+        /* 背景アニメーション */
         .interactive-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
             background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1);
@@ -119,8 +115,11 @@
            🃏 RESULT CARDS
            ========================================================================== */
         .result-list {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 20px; margin-top: 20px;
+            display: flex; 
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px; 
+            margin-top: 20px;
         }
 
         .result-card {
@@ -131,14 +130,21 @@
             transition: transform 0.3s, box-shadow 0.3s;
             border: 2px solid transparent;
             position: relative; overflow: hidden;
+            flex: 1 1 140px;
+            max-width: 180px;
         }
-        /* 通常カードのホバー */
         .result-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
 
         .result-card img {
             width: 90px; height: 90px; object-fit: contain; margin-bottom: 15px;
             filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
             z-index: 2; position: relative;
+            
+            /* 画像操作の無効化 */
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            -webkit-touch-callout: none;
         }
         
         .result-name { font-weight: 800; color: var(--text-main); font-size: 0.95rem; margin-bottom: 5px; position: relative; z-index: 2; }
@@ -168,7 +174,7 @@
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        /* --- エフェクトアニメーション --- */
+        /* エフェクト */
         @keyframes goldPulse {
             0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); border-color: #ffd700; }
             50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.8); border-color: #fffacd; }
@@ -180,7 +186,6 @@
             100% { box-shadow: 0 0 15px rgba(255, 0, 204, 0.4); border-color: #ff00cc; }
         }
 
-        /* --- SSRカード --- */
         .result-card.rarity-card-SSR {
             border: 3px solid #ffd700;
             background: linear-gradient(135deg, #fffcf5 0%, #fff 100%);
@@ -195,10 +200,9 @@
             animation: fadeIn 1s infinite alternate;
         }
 
-        /* --- URカード (SSR風のUR版) --- */
         .result-card.rarity-card-UR {
             border: 3px solid #ff00cc;
-            background: linear-gradient(135deg, #fff0f5 0%, #fff 100%); /* 薄いピンク背景 */
+            background: linear-gradient(135deg, #fff0f5 0%, #fff 100%);
             animation: urPulse 2s infinite alternate ease-in-out;
         }
         .result-card.rarity-card-UR:hover {
@@ -216,42 +220,165 @@
         /* ==========================================================================
            🔘 ACTION BUTTONS
            ========================================================================== */
-        .button-container { margin-top: 50px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        /* ★修正: base.cssの影響を受けないように詳細度と!importantで強化 */
+        .button-container { 
+            margin-top: 50px; 
+            display: flex !important; 
+            flex-direction: row !important; 
+            align-items: center; 
+            justify-content: center;
+            gap: 15px; 
+            width: 100%;
+        }
 
-        .button {
+        /* ★修正: base.cssの.buttonセレクタより優先させる */
+        .main-container .button {
             position: relative;
-            padding: 15px 40px; 
-            font-size: 1.2rem; font-weight: 800; border-radius: 50px;
-            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 15px 10px;
+            font-size: 1.1rem;
+            font-weight: 800; border-radius: 50px;
+            display: inline-flex !important; /* blockを打ち消し */
+            align-items: center; justify-content: center; gap: 8px;
             text-decoration: none; 
-            /* ★変更: "グラフで推移を確認"ボタンと同じ滑らかなアニメーション */
             transition: all 0.3s ease;
-            width: 100%; max-width: 350px; box-sizing: border-box; cursor: pointer;
+            
+            width: auto !important; /* 100%を打ち消し */
+            flex: 1;
+            max-width: 300px;
+            margin: 0 !important; /* base.cssのマージンを打ち消し */
+            
+            box-sizing: border-box; cursor: pointer;
             font-family: 'M PLUS Rounded 1c', sans-serif;
+            border: none;
         }
         
-        .button.primary {
+        .main-container .button.primary {
             background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
             color: white; 
-            border: none;
             box-shadow: 0 10px 20px rgba(161, 140, 209, 0.4);
         }
-        /* ★変更: "グラフで推移を確認"ボタン風のホバー (少し拡大 + 明るく) */
-        .button.primary:hover { 
+        .main-container .button.primary:hover { 
             transform: translateY(-3px) scale(1.02); 
             box-shadow: 0 8px 25px rgba(161, 140, 209, 0.6);
-            /* 色は維持しつつ発光感をプラス */
             background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
             color: white;
             filter: brightness(1.1);
         }
-        .button.primary:active { transform: translateY(1px); }
+        .main-container .button.primary:active { transform: translateY(1px); }
+
+        .main-container .button.retry {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: white;
+            box-shadow: 0 10px 20px rgba(255, 154, 158, 0.4);
+        }
+        .main-container .button.retry:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 154, 158, 0.6);
+            filter: brightness(1.1);
+        }
+
+        /* --- エラーメッセージ --- */
+        .chip-error-box {
+            display: none; background: #ffe6e6; border: 2px solid #ff5252; color: #d32f2f;
+            padding: 10px; border-radius: 10px; margin-bottom: 15px; font-weight: bold; font-size: 0.9rem; 
+            animation: shakeBox 0.3s;
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 3000;
+            width: 80%; max-width: 300px; text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        @keyframes shakeBox { 0%,100% { transform: translateX(-50%); } 25% { transform: translateX(calc(-50% - 5px)); } 75% { transform: translateX(calc(-50% + 5px)); } }
+
+        /* --- モーダル (gacha.htmlと同様) --- */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(93, 84, 164, 0.6); backdrop-filter: blur(5px); }
+        .modal-content {
+            background: #fff; 
+            padding: 25px; border-radius: 25px;
+            width: 90%; max-width: 400px; 
+            position: absolute;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            margin: 0;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3); border: 4px solid var(--theme-purple);
+            text-align: center;
+        }
+        .modal-title { color: var(--text-main); font-weight: 900; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.4rem; }
+        
+        .confirm-actions { display: flex; justify-content: center; gap: 20px; margin-top: 25px; }
+        .btn-yes {
+            background: linear-gradient(135deg, #ff9a9e, #a18cd1);
+            color: white; border: none; padding: 12px 35px; border-radius: 50px;
+            font-weight: 900; cursor: pointer; font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(161, 140, 209, 0.4); transition: transform 0.2s;
+        }
+        .btn-no {
+            background: #f0f0f0; color: #666; border: 2px solid #ddd;
+            padding: 12px 35px; border-radius: 50px;
+            font-weight: 800; cursor: pointer; font-size: 1rem; transition: background 0.2s;
+        }
+        .btn-yes:hover { transform: scale(1.05); }
+        .btn-no:hover { background: #e0e0e0; }
 
         @media (max-width: 600px) {
             .main-container { padding: 30px 15px; width: 95%; border-radius: 30px; }
             .page-title { font-size: 1.8rem; }
             .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
-            .result-list { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+            .result-card { flex: 1 1 120px; max-width: 160px; }
+            
+            /* スマホで横並びを維持するための微調整 (flex-wrap防止など) */
+            .button-container { gap: 10px; }
+            .main-container .button { font-size: 0.95rem; padding: 12px 5px; }
+
+            /* ★修正: ボタンのアニメーション・動きを徹底的に無効化 */
+            .main-container .button,
+            .main-container .button * {
+                animation: none !important;
+                transition: none !important;
+            }
+
+            /* ホバー・アクティブ時の動きとスタイル変化を停止 */
+            .main-container .button:hover,
+            .main-container .button:active,
+            .main-container .button.primary:hover,
+            .main-container .button.primary:active,
+            .main-container .button.retry:hover,
+            .main-container .button.retry:active {
+                transform: none !important; /* 移動・拡大を禁止 */
+                filter: none !important;    /* 明るさ変化を禁止 */
+                animation: none !important;
+                transition: none !important;
+            }
+            
+            /* アイコンの回転も停止 */
+            .main-container .button:hover i {
+                transform: none !important;
+            }
+
+            /* --- 色や影の変化も止める（通常時のスタイルを強制適用） --- */
+            
+            /* Primaryボタン (ガチャ画面に戻る) */
+            .main-container .button.primary:hover,
+            .main-container .button.primary:active {
+                background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%) !important;
+                box-shadow: 0 10px 20px rgba(161, 140, 209, 0.4) !important;
+                color: white !important;
+                opacity: 1 !important;
+            }
+
+            /* Retryボタン (もう一度引く) */
+            .main-container .button.retry:hover,
+            .main-container .button.retry:active {
+                background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important;
+                box-shadow: 0 10px 20px rgba(255, 154, 158, 0.4) !important;
+                color: white !important;
+                opacity: 1 !important;
+            }
+
+            /* ★追加: 押したとき(active)だけ動かす */
+            .main-container .button:active,
+            .main-container .button.primary:active,
+            .main-container .button.retry:active {
+                transform: scale(0.96) !important; /* 縮むアニメーション */
+                transition: transform 0.1s ease !important; /* 素早く */
+            }
         }
 
     </style>
@@ -268,6 +395,12 @@
     <div class="bg-cloud cloud-1"></div>
     <div class="bg-cloud cloud-2"></div>
     <div class="bg-cloud cloud-3"></div>
+</div>
+
+<input type="hidden" id="coinCount" th:value="${coinCount}" />
+
+<div id="chipErrorBox" class="chip-error-box">
+    <i class="fa-solid fa-triangle-exclamation"></i> コインが足りません！
 </div>
 
 <div class="main-container">
@@ -297,13 +430,90 @@
     </div>
 
     <div class="button-container">
+        <th:block th:with="count=${results.size()}, cost=${count == 1 ? 1 : 10}">
+            <button type="button" 
+                    class="button retry"
+                    th:data-url="@{/gacha/animation(count=${count})}"
+                    th:onclick="|attemptGacha(event, ${cost}, ${count})|">
+                <i class="fa-solid fa-rotate-right"></i> もう一度引く
+            </button>
+        </th:block>
+
         <a th:href="@{/gacha}" class="button primary">
             <i class="fa-solid fa-arrow-left"></i> ガチャ画面に戻る
         </a>
     </div>
 </div>
 
+<div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <h3 class="modal-title"><i class="fa-solid fa-circle-question"></i> ガチャ確認</h3>
+        
+        <p id="confirmText" style="font-size: 1.1rem; font-weight: 700; margin: 25px 0; color: #555; line-height: 1.6;">
+            </p>
+        
+        <div class="confirm-actions">
+            <button class="btn-no" id="cancelGacha">キャンセル</button>
+            <button class="btn-yes" id="doGacha">引く！</button>
+        </div>
+    </div>
+</div>
+
+<form id="retryGachaForm" method="post" th:action="@{/gacha/animation}" style="display:none;">
+    <input type="hidden" name="count" id="retryFormCount" value="">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+</form>
+
 <script>
+    // --- ガチャ確認モーダルロジック ---
+    const confirmModal = document.getElementById("confirmModal");
+    const cancelGachaBtn = document.getElementById("cancelGacha");
+    const doGachaBtn = document.getElementById("doGacha");
+    let targetGachaUrl = "";
+
+    // 閉じる処理 (外クリックでは閉じない)
+    const closeConfirm = () => { confirmModal.style.display = "none"; };
+    cancelGachaBtn.onclick = closeConfirm;
+
+    // 引くボタン
+    doGachaBtn.onclick = () => {
+        // ★修正: フォーム送信
+        document.getElementById('retryGachaForm').submit();
+    };
+
+    // ボタンクリック時の処理
+    function attemptGacha(event, cost, count) {
+        event.preventDefault(); 
+        
+        const coinInput = document.getElementById("coinCount");
+        const coinCount = coinInput ? parseInt(coinInput.value, 10) : 0;
+        
+        if (isNaN(coinCount) || coinCount < cost) {
+            showChipError();
+            return;
+        }
+
+        // フォームに値をセット
+        document.getElementById('retryFormCount').value = count;
+        
+        const drawType = count === 1 ? "1回ガチャ" : "11連ガチャ";
+        const msgHtml = `
+            <span style="color:var(--text-accent); font-size:1.4rem;">${drawType}</span> を引きますか？<br><br>
+            消費コイン: <span style="color:#f1c40f; font-size:1.3rem; font-family:'Fredoka One', sans-serif;">
+            <i class="fa-solid fa-coins"></i> ${cost}</span> 枚
+        `;
+        
+        document.getElementById("confirmText").innerHTML = msgHtml;
+        confirmModal.style.display = "block";
+    }
+
+    function showChipError() {
+        const box = document.getElementById("chipErrorBox");
+        box.style.display = "block";
+        setTimeout(() => { box.style.display = "none"; }, 3000);
+    }
+
+    // --- 背景アニメーション ---
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
     const flare = document.getElementById('mouse-flare');
@@ -330,7 +540,6 @@
         for(let i = 0; i < 2; i++) particlesArray.push(new Particle());
     });
 
-    // 雲のパララックス
     const cloud1 = document.querySelector('.cloud-1');
     const cloud2 = document.querySelector('.cloud-2');
     document.addEventListener('mousemove', (e) => {
