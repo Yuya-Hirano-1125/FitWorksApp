@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam; // ★追加
 
 import com.example.demo.entity.CharacterEntity;
 import com.example.demo.entity.User;
@@ -35,7 +36,11 @@ public class CharactersUnlockViewController {
     }
 
     @GetMapping("/characters/menu/CharactersUnlock")
-    public String showUnlockPage(Model model, Principal principal) {
+    public String showUnlockPage(
+            Model model, 
+            Principal principal,
+            @RequestParam(value = "from", required = false) String from) { // ★追加: fromパラメータ
+        
         // 1. ユーザー情報を取得
         String username = principal.getName();
         User user = userService.findByUsername(username);
@@ -88,7 +93,7 @@ public class CharactersUnlockViewController {
             unlockStatusMap.put(chara.getId(), status);
         }
 
-        // ★★★ 修正箇所: カテゴリーリストをJava側で作成 ★★★
+        // カテゴリーリスト作成
         List<Map<String, Object>> categoryList = new ArrayList<>();
         categoryList.add(createCategoryMap("fire", "炎属性", "fa-fire", filterByAttr(allChars, "fire")));
         categoryList.add(createCategoryMap("water", "水属性", "fa-droplet", filterByAttr(allChars, "water")));
@@ -103,6 +108,9 @@ public class CharactersUnlockViewController {
         model.addAttribute("unlockedIds", unlockedIds);
         model.addAttribute("materialCounts", materialCounts);
         model.addAttribute("unlockStatusMap", unlockStatusMap);
+        
+        // ★追加: 遷移元情報を画面に渡す
+        model.addAttribute("from", from);
 
         return "characters/menu/CharactersUnlock";
     }

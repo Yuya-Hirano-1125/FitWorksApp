@@ -161,12 +161,17 @@
     </div>
 
     <div class="main-container">
-        <div class="page-header-container">
-            <a th:href="@{/characters/menu/CharactersMenu}" class="home-link-icon" title="メニューに戻る">
-                <i class="fa-solid fa-arrow-left"></i>
-            </a>
-            <h1 class="page-title"><i class="fa-solid fa-lock-open"></i> キャラクター解放</h1>
-        </div>
+		<div class="page-header-container">
+		            <a th:if="${from == 'home'}" th:href="@{/home}" class="home-link-icon" title="ホームに戻る">
+		                <i class="fa-solid fa-house"></i>
+		            </a>
+		            
+		            <a th:unless="${from == 'home'}" th:href="@{/characters/menu/CharactersMenu}" class="home-link-icon" title="メニューに戻る">
+		                <i class="fa-solid fa-arrow-left"></i>
+		            </a>
+		            
+		            <h1 class="page-title"><i class="fa-solid fa-lock-open"></i> キャラクター解放</h1>
+		        </div>
 
         <div class="status-bar">
             <div class="level-badge">
@@ -207,10 +212,10 @@
                             
                             <div th:id="'action-area-' + ${chara.id}">
                                 <div th:if="${unlockedIds.contains(chara.id)}">
-                                    <button th:if="${chara.id == selectedCharacterId}" class="btn-selected">
+                                    <button th:if="${selectedCharacterId != null and chara.id.toString() == selectedCharacterId.toString()}" class="btn-selected">
                                         <i class="fa-solid fa-check"></i> 選択中
                                     </button>
-                                    <button th:unless="${chara.id == selectedCharacterId}" 
+                                    <button th:unless="${selectedCharacterId != null and chara.id.toString() == selectedCharacterId.toString()}" 
                                             type="button" class="btn-select"
                                             th:onclick="'selectCharacter(' + ${chara.id} + ')'">
                                         選択する
@@ -351,7 +356,7 @@
             });
             return html;
         }
-		// ★追加: 全キャラクターのボタン状態を再チェックして更新する関数
+		// ★修正: 全キャラクターのボタン状態を再チェックして更新する関数
 				function updateAllButtonsState() {
 				    // まだ解放されていないカードをすべて取得
 				    const lockedCards = document.querySelectorAll('.char-card:not(.unlocked)');
@@ -361,8 +366,26 @@
 				        const id = card.id.replace('card-', '');
 				        const actionArea = document.getElementById('action-area-' + id);
 				        
-				        // すでに「Lv不足」や「前提未解放」で無効化(disabled)されているボタンは対象外
-				        // (素材数に関係なく押せないため)
+				        // --- ★追加: 進化元のチェックロジック ---
+				        // DOM構造: [前のカード] -> [矢印(.evolution-arrow)] -> [現在のカード]
+				        const prevArrow = card.previousElementSibling;
+				        if (prevArrow && prevArrow.classList.contains('evolution-arrow')) {
+				            const prevCard = prevArrow.previousElementSibling;
+				            // 前のカードが存在し、かつ「解放済み(.unlocked)」でない場合
+				            if (prevCard && !prevCard.classList.contains('unlocked')) {
+				                // 進化元が未開放なので、強制的に「未解放」ボタンにする
+				                actionArea.innerHTML = `
+				                    <button type="button" class="btn-unlock btn-disabled" disabled>
+				                        <i class="fa-solid fa-lock"></i> 未解放
+				                    </button>
+				                    <span class="lock-reason" id="lock-reason-${id}">進化元未解放</span>
+				                `;
+				                return; // ここで処理を終了（素材チェックはしない）
+				            }
+				        }
+				        // ---------------------------------------
+
+				        // すでにサーバー側で「Lv不足」などで無効化されている場合はスキップ
 				        if (actionArea.querySelector('.btn-disabled')) return;
 
 				        // データ属性から条件を取得

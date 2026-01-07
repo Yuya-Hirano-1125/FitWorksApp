@@ -116,6 +116,61 @@
 	        .character-section { width: 100%; margin-bottom: 10px; position: relative; z-index: 5; }
 	        .character-wrapper { position: relative; width: 100%; display: flex; flex-direction: column; gap: 10px; }
 	        
+			/* --- 未設定時の案内表示用スタイル --- */
+			            .empty-state-overlay {
+			                position: absolute;
+			                top: 50%;
+			                left: 50%;
+			                transform: translate(-50%, -50%);
+			                text-align: center;
+			                width: 85%;
+			                z-index: 50; /* キャラより前面に */
+			                background: rgba(255, 255, 255, 0.85);
+			                backdrop-filter: blur(4px);
+			                padding: 25px 15px;
+			                border-radius: 20px;
+			                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+			                border: 2px solid #fff;
+			            }
+
+			            .empty-message {
+			                font-weight: 800;
+			                color: #555;
+			                margin: 0 0 15px 0;
+			                font-size: 1rem;
+			                line-height: 1.6;
+			            }
+			            .empty-message i { color: var(--accent-color); margin-right: 5px; }
+
+			            .empty-btn-group {
+			                display: flex;
+			                flex-direction: column; /* スマホで見やすいよう縦並び */
+			                gap: 10px;
+			                justify-content: center;
+			                align-items: center;
+			            }
+
+			            .empty-btn {
+			                display: flex;
+			                align-items: center;
+			                justify-content: center;
+			                gap: 8px;
+			                width: 100%;
+			                max-width: 220px;
+			                padding: 12px;
+			                border-radius: 50px;
+			                text-decoration: none;
+			                font-weight: bold;
+			                font-size: 0.95rem;
+			                color: #fff;
+			                box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+			                transition: transform 0.2s, box-shadow 0.2s;
+			            }
+			            .empty-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); }
+			            .empty-btn:active { transform: scale(0.98); }
+
+			            .btn-char-set { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+			            .btn-bg-set { background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); }
 			/* ▼▼▼ 修正箇所: キャラクター表示エリア ▼▼▼ */
 			    .character-display {
 			        /* 既存のスタイルを維持 */
@@ -359,40 +414,63 @@
             </p>
         </div>
         
-        <div class="character-section">
-            <div class="character-wrapper">
-                
-                <div id="tutorial-char-display" class="character-display"
-                                th:style="'background-image: url(/img/background/' + ${selectedBackground} + '.png);'">
-                   
-                   <div id="tutorial-title-display">
-                       <th:block th:if="${userTitle != null and userTitle != 'なし'}">
-                           <th:block th:each="enumT : ${T(com.example.demo.entity.AppTitle).values()}" 
-                                     th:if="${enumT.displayName == userTitle}">
-                               <div class="title-badge" th:classappend="${enumT.rarity}">
-                                   <i class="fa-solid fa-crown"></i> <span th:text="${userTitle}"></span>
-                               </div>
-                           </th:block>
-                       </th:block>
-                   </div>
+		<div class="character-section">
+		            <div class="character-wrapper">
+		                
+						<div id="tutorial-char-display" class="character-display"
+						                     th:style="${selectedBackground != null and selectedBackground != ''} ? 'background-image: url(/img/background/' + ${selectedBackground} + '.png);' : ''">
+						                   
+						                   <div class="empty-state-overlay" th:if="${characterImagePath == null or selectedBackground == null or selectedBackground == ''}">
+						                       <p class="empty-message">
+						                           <i class="fa-solid fa-wand-magic-sparkles"></i>
+						                           まずは設定をして<br>冒険の準備をしましょう！
+						                       </p>
+											   <div class="empty-btn-group">
+											                              <a th:if="${characterImagePath == null}" 
+											                                 th:href="@{/characters/menu/CharactersUnlock(from='home')}" 
+											                                 class="empty-btn btn-char-set">
+											                                  <i class="fa-solid fa-user-astronaut"></i> パートナーを選ぶ
+											                              </a>
+											                              
+											                              <a th:if="${selectedBackground == null or selectedBackground == ''}" 
+											                                 th:href="@{/characters/menu/Backgrounds(from='home')}" 
+											                                 class="empty-btn btn-bg-set">
+											                                  <i class="fa-solid fa-image"></i> 背景を選ぶ
+											                              </a>
+											                          </div>
+						                   </div>
+		                   
+		                   <div id="tutorial-title-display">
+		                       <th:block th:if="${userTitle != null and userTitle != 'なし'}">
+		                           <th:block th:each="enumT : ${T(com.example.demo.entity.AppTitle).values()}" 
+		                                     th:if="${enumT.displayName == userTitle}">
+		                               <div class="title-badge" th:classappend="${enumT.rarity}">
+		                                   <i class="fa-solid fa-crown"></i> <span th:text="${userTitle}"></span>
+		                               </div>
+		                           </th:block>
+		                       </th:block>
+		                   </div>
 
-				   <div id="char-anim-wrapper" class="char-anim-wrapper" onclick="triggerCharJump()" oncontextmenu="return false;" style="position: relative;">
-				       <img id="char-img-element" th:src="@{${characterImagePath != null ? characterImagePath : '/img/character/' + (level / 10) * 10 + '.png'}}" alt="Character" />
-				       
-				       <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; -webkit-touch-callout: none;"></div>
-				   </div>
-                </div>
-                
-                <div class="ai-home-advice-container">
-                    <div class="ai-avatar-small">
-                        <img th:src="@{/img/AIcoach.png}" alt="AI">
-                    </div>
-                    <div class="ai-bubble-content">
-                         <p id="ai-home-message">コンディション診断中<span class="loading-dots">...</span></p>
-                    </div>
-                </div>
-            </div>
-        </div>
+		                   <div id="char-anim-wrapper" class="char-anim-wrapper" onclick="triggerCharJump()" oncontextmenu="return false;" style="position: relative;">
+		                       <img id="char-img-element" 
+		                            th:if="${characterImagePath != null}"
+		                            th:src="@{${characterImagePath}}" 
+		                            alt="Character" />
+		                       
+		                       <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; -webkit-touch-callout: none;"></div>
+		                   </div>
+		                </div>
+		                
+		                <div class="ai-home-advice-container">
+		                    <div class="ai-avatar-small">
+		                        <img th:src="@{/img/AIcoach.png}" alt="AI">
+		                    </div>
+		                    <div class="ai-bubble-content">
+		                         <p id="ai-home-message">コンディション診断中<span class="loading-dots">...</span></p>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
         
         <div class="shortcut-bar">
             <a id="tutorial-title-btn" th:href="@{/titles}" class="side-action-btn title-button">

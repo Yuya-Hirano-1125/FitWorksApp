@@ -114,9 +114,9 @@ public class User {
     @Column(name = "background_id")
     private Set<String> unlockedBackgrounds = new HashSet<>();
 
-    // ★★★ 選択中の背景 ★★★
+ // ★★★ 選択中の背景 ★★★
     @Column(name = "selected_background")
-    private String selectedBackground = "fire-original";
+    private String selectedBackground;
 
     // ★★★ 背景解放チェック済みレベル ★★★
     @Column(name = "last_background_check_level")
@@ -297,12 +297,12 @@ public class User {
         return backgroundId != null && unlockedBackgrounds != null && unlockedBackgrounds.contains(backgroundId);
     }
 
-    // ★★★ 選択中の背景管理メソッド ★★★
+ // ★★★ 選択中の背景管理メソッド ★★★
     public String getSelectedBackground() {
-        return (selectedBackground != null && !selectedBackground.isBlank()) ? selectedBackground : "fire-original";
+        return selectedBackground; // そのまま返す
     }
     public void setSelectedBackground(String selectedBackground) {
-        this.selectedBackground = (selectedBackground != null && !selectedBackground.isBlank()) ? selectedBackground : "fire-original";
+        this.selectedBackground = selectedBackground; // そのままセットする
     }
 
     // ★★★ 背景解放チェック済みレベル ★★★

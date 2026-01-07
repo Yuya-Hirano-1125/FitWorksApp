@@ -23,7 +23,7 @@ public class CharacterUnlockController {
 
     private final CharacterRepository repository;
     private final UserService userService;
-    private final CharacterService characterService; // 追加: 共通ロジック用
+    private final CharacterService characterService;
 
     public CharacterUnlockController(CharacterRepository repository,
                                      UserService userService,
@@ -33,149 +33,104 @@ public class CharacterUnlockController {
         this.characterService = characterService;
     }
 
-    /**
-     * キャラクター解放処理 (JSONレスポンス)
-     */
     @PostMapping("/unlock")
     public ResponseEntity<Map<String, Object>> unlockCharacter(@RequestBody Map<String, Object> request,
                                                                Principal principal) {
 
-        // リクエストからIDを取得
+        System.out.println("========== 解放処理開始 ==========");
+
+        // ID取得
         Long characterId;
         try {
             characterId = Long.valueOf(request.get("characterId").toString());
-        } catch (NumberFormatException | NullPointerException e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "無効なリクエストです。"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "無効なリクエスト"));
         }
+        System.out.println("解放対象キャラID: " + characterId);
 
         // キャラクター存在チェック
         Optional<CharacterEntity> optChara = repository.findById(characterId);
-        if (optChara.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "対象キャラクターが存在しません。"));
-        }
-
+        if (optChara.isEmpty()) return ResponseEntity.badRequest().body(Map.of("success", false));
         CharacterEntity chara = optChara.get();
-        
+        System.out.println("解放対象キャラ名: " + chara.getName());
+
         // ユーザー取得
         User user = userService.findByUsername(principal.getName());
-        if (user == null) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "ユーザーが見つかりません。"));
-        }
-
-        // ★重要: Serviceを使って正しい進化条件・素材情報をセット
-        // (これにより、画面表示時と同じロジックで判定が行われます)
-        characterService.applyEvolutionData(chara);
+        if (user == null) return ResponseEntity.badRequest().body(Map.of("success", false));
         
+        // ★ログ: 処理前の選択中IDを確認
+        System.out.println("【処理前】ユーザーの選択中キャラID: " + user.getSelectedCharacterId());
+
+        // 進化条件セット
+        characterService.applyEvolutionData(chara);
         Map<String, Integer> requiredMaterials = chara.getEvolutionMaterials();
         Map<String, String> conditions = chara.getEvolutionConditions();
-
         List<String> failureReasons = new ArrayList<>();
-        
-        // ==========================================
-        // 1. レベルチェック
-        // ==========================================
-        if (user.getLevel() < chara.getRequiredLevel()) {
-            failureReasons.add("レベル不足 (必要: Lv." + chara.getRequiredLevel() + ")");
-        }
-        
-        // ==========================================
-        // 2. 素材チェック
-        // ==========================================
-        for (Map.Entry<String, Integer> entry : requiredMaterials.entrySet()) {
-            String matName = entry.getKey(); // ここでのキーは素材名ではなくID文字列("1"など)の場合と、名前の場合があるため注意
-            // CharacterServiceの実装ではキーをアイテムID("1", "2"...)としてセットしていますが、
-            // もし名前が入っていてもIDに変換できるようにService側で吸収するか、ここでハンドリングします。
-            
-            // 今回のCharacterService実装ではキーが"アイテムID文字列"になっている想定で進めます
-            Long matItemId;
-            String displayName = matName; // エラー表示用
-            
-            try {
-                // キーが数字ならそのままIDとして使う
-                matItemId = Long.parseLong(matName);
-                // 表示用に名前を引くなどの処理ができればベストですが、ここでは簡易的にID表示またはServiceのヘルパーを利用
-                // (CharacterServiceにgetNameByIdがあると親切ですが、今回はそのままIDで処理)
-            } catch (NumberFormatException e) {
-                // キーが名前("紅玉"など)の場合はID変換
-                matItemId = characterService.getMaterialItemId(matName);
-            }
 
+        // (中略: チェック処理は変更なし)
+        // 1. レベルチェック
+        if (user.getLevel() < chara.getRequiredLevel()) failureReasons.add("レベル不足");
+        
+        // 2. 素材チェック
+        for (Map.Entry<String, Integer> entry : requiredMaterials.entrySet()) {
+            String matName = entry.getKey();
+            Long matItemId;
+            try { matItemId = Long.parseLong(matName); } catch (Exception e) { matItemId = characterService.getMaterialItemId(matName); }
             int required = entry.getValue();
             int userCount = userService.getUserMaterialCount(user.getUsername(), matItemId);
-            
-            if (userCount < required) {
-                // ユーザーにはわかりやすい名前で不足を通知したい場合、別途マッピングが必要ですが
-                // ここでは簡易メッセージとします
-                failureReasons.add("素材(ID:" + matName + ") が不足しています (所持: " + userCount + "/" + required + ")");
-            }
+            if (userCount < required) failureReasons.add("素材不足");
         }
         
-        // ==========================================
-        // 3. 前提キャラクターチェック
-        // ==========================================
+        // 3. 前提キャラチェック
         if (conditions.containsKey("前提キャラ")) {
             String prereqName = conditions.get("前提キャラ");
             Long prereqId = getCharacterIdByName(prereqName);
-            
-            if (prereqId == null) {
-                 // DBに前提キャラが見つからない場合（設定ミス等）
-                 System.err.println("WARNING: 前提キャラ '" + prereqName + "' がDBに見つかりません。");
-            } else if (!user.hasUnlockedCharacter(prereqId)) {
-                failureReasons.add("前提キャラ「" + prereqName + "」が未解放です");
-            }
+            if (prereqId != null && !user.hasUnlockedCharacter(prereqId)) failureReasons.add("前提キャラ未解放");
         }
 
-        // ==========================================
-        // 結果判定
-        // ==========================================
         Map<String, Object> response = new HashMap<>();
         
         if (failureReasons.isEmpty()) {
-            // ===== 解放成功: 素材消費とアンロック =====
-        	
-        	// ★追加: 最新の所持数を格納するマップ
+            // === 解放成功 ===
+            System.out.println(">>> 条件クリア。解放処理を実行します。");
+
             Map<String, Integer> newMaterialCounts = new HashMap<>();
-            
             for (Map.Entry<String, Integer> entry : requiredMaterials.entrySet()) {
                 String matKey = entry.getKey();
-                int amount = entry.getValue();
-                
                 Long matItemId;
-                try {
-                    matItemId = Long.parseLong(matKey);
-                } catch (NumberFormatException e) {
-                    matItemId = characterService.getMaterialItemId(matKey);
-                }
-                
-                userService.consumeUserMaterialByItemId(user.getUsername(), matItemId, amount);
-                
-             // ★追加: 消費後の最新所持数を取得してマップに格納
-                // (matKeyはフロントエンドのmaterialCountsのキーと一致させるためそのまま使用)
-                int currentAmount = userService.getUserMaterialCount(user.getUsername(), matItemId);
-                newMaterialCounts.put(matKey, currentAmount);
+                try { matItemId = Long.parseLong(matKey); } catch (Exception e) { matItemId = characterService.getMaterialItemId(matKey); }
+                userService.consumeUserMaterialByItemId(user.getUsername(), matItemId, entry.getValue());
+                newMaterialCounts.put(matKey, userService.getUserMaterialCount(user.getUsername(), matItemId));
             }
             
-            // キャラクター解放
+            // ★重要: ここでServiceを呼んで保存
             userService.unlockCharacterForUser(user.getUsername(), chara.getId());
             
+            // ★ログ: 保存直後の状態を確認するために再取得してみる
+            User userAfter = userService.findByUsername(principal.getName());
+            System.out.println("【保存後】DB上の選択中キャラID: " + userAfter.getSelectedCharacterId());
+
+            if (userAfter.getSelectedCharacterId() != null && userAfter.getSelectedCharacterId().equals(chara.getId())) {
+                System.err.println("!!! 警告: 選択中IDが解放キャラID(" + chara.getId() + ")に変わっています！ !!!");
+            } else {
+                System.out.println("正常: 選択中IDは変更されていません。");
+            }
+
             response.put("success", true);
             response.put("message", chara.getName() + " を解放しました!");
-         // ★追加: レスポンスに最新の素材数をセット
             response.put("newMaterialCounts", newMaterialCounts);
             
         } else {
-            // ===== 解放失敗 =====
-            String errorMessage = "条件を満たしていません:\n" + String.join("\n", failureReasons);
+            // 失敗
+            System.out.println("解放失敗: " + failureReasons);
             response.put("success", false);
-            response.put("message", errorMessage);
+            response.put("message", "条件を満たしていません");
         }
-
+        
+        System.out.println("========== 解放処理終了 ==========");
         return ResponseEntity.ok(response);
     }
     
-    /**
-     * キャラクター名からIDを取得するヘルパーメソッド
-     */
     private Long getCharacterIdByName(String name) {
         return repository.findAll().stream()
             .filter(c -> c.getName().equals(name))
