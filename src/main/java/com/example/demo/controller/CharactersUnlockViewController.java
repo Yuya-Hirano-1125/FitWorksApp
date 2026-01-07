@@ -51,7 +51,6 @@ public class CharactersUnlockViewController {
 
         // 選択中のキャラクターID
         Long selectedCharacterId = (user != null) ? user.getSelectedCharacterId() : null;
-        if (selectedCharacterId == null) selectedCharacterId = 0L; 
         model.addAttribute("selectedCharacterId", selectedCharacterId);
 
         // 2. 素材所持数の取得
