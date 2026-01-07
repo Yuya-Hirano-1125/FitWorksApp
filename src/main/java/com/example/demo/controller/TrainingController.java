@@ -32,12 +32,14 @@ import com.example.demo.dto.DailyChartData;
 import com.example.demo.dto.ExerciseData;
 import com.example.demo.dto.TrainingLogForm;
 import com.example.demo.entity.BodyWeightRecord;
+import com.example.demo.entity.Exercise; // 追加
 import com.example.demo.entity.ExerciseBookmark;
 import com.example.demo.entity.MySet;
 import com.example.demo.entity.TrainingRecord;
 import com.example.demo.entity.User;
 import com.example.demo.repository.BodyWeightRecordRepository;
 import com.example.demo.repository.ExerciseBookmarkRepository;
+import com.example.demo.repository.ExerciseRepository; // 追加
 import com.example.demo.repository.MySetRepository;
 import com.example.demo.repository.TrainingRecordRepository;
 import com.example.demo.repository.UserRepository;
@@ -64,6 +66,7 @@ public class TrainingController {
     private final BodyWeightRecordRepository bodyWeightRecordRepository;
     private final AICoachService aiCoachService;
     private final MuscleService muscleService;
+    private final ExerciseRepository exerciseRepository; // ★追加
 
     @Autowired
     private LevelService levelService;
@@ -79,7 +82,8 @@ public class TrainingController {
                               TrainingLogicService trainingLogicService,
                               BodyWeightRecordRepository bodyWeightRecordRepository,
                               AICoachService aiCoachService,
-                              MuscleService muscleService) {
+                              MuscleService muscleService,
+                              ExerciseRepository exerciseRepository) { // ★追加
         this.userService = userService;
         this.userRepository = userRepository;
         this.trainingRecordRepository = trainingRecordRepository;
@@ -91,6 +95,7 @@ public class TrainingController {
         this.bodyWeightRecordRepository = bodyWeightRecordRepository;
         this.aiCoachService = aiCoachService;
         this.muscleService = muscleService;
+        this.exerciseRepository = exerciseRepository; // ★追加
     }
 
     private User getCurrentUser(Authentication authentication) {
@@ -498,6 +503,9 @@ public class TrainingController {
             int savedCount = 0;
             double totalVolume = 0; // XP計算用の合計負荷
 
+            // ★追加: 種目名からマスタデータを検索しておく
+            Exercise masterExercise = exerciseRepository.findByName(exerciseName);
+
             // ■ ウェイトトレーニングの場合
             if ("WEIGHT".equals(type) && weights != null && !weights.isEmpty()) {
                 
@@ -524,6 +532,9 @@ public class TrainingController {
                         record.setUser(currentUser);
                         record.setRecordDate(date);
                         record.setExerciseName(exerciseName);
+                        // ★マスタデータセット
+                        record.setExercise(masterExercise);
+                        
                         record.setType("WEIGHT");
                         record.setWeight(w);
                         record.setReps(r);
@@ -542,6 +553,9 @@ public class TrainingController {
                 record.setUser(currentUser);
                 record.setRecordDate(date);
                 record.setExerciseName(exerciseName);
+                // ★マスタデータセット
+                record.setExercise(masterExercise);
+
                 record.setType("CARDIO");
                 record.setCardioType(exerciseName);
                 record.setDurationMinutes(duration);
@@ -685,6 +699,10 @@ public class TrainingController {
                 int muscleXp = 0;
                 int itemXp = 0;
                 ExerciseData exerciseData = trainingDataService.getExerciseDataByName(form.getExerciseName());
+                
+                // ★追加: マスタデータ検索
+                Exercise masterExercise = exerciseRepository.findByName(form.getExerciseName());
+
                 if ("CARDIO".equals(form.getType())) {
                     if (form.getDurationMinutes() != null && form.getDurationMinutes() > 0) {
                         TrainingRecord record = new TrainingRecord();
@@ -695,6 +713,9 @@ public class TrainingController {
                         record.setDurationMinutes(form.getDurationMinutes());
                         record.setDistanceKm(form.getDistanceKm());
                         record.setMemo(form.getMemo());
+                        record.setExerciseName(form.getExerciseName());
+                        // ★マスタデータセット
+                        record.setExercise(masterExercise);
                         
                         trainingRecordRepository.save(record);
                         totalSaved++;
@@ -716,6 +737,9 @@ public class TrainingController {
                                 record.setRecordDate(form.getRecordDate());
                                 record.setType("WEIGHT");
                                 record.setExerciseName(form.getExerciseName());
+                                // ★マスタデータセット
+                                record.setExercise(masterExercise);
+                                
                                 record.setSets(1);
                                 record.setWeight(detail.getWeight());
                                 record.setReps(detail.getReps());

@@ -35,7 +35,6 @@ public interface TrainingRecordRepository extends JpaRepository<TrainingRecord, 
     // 1. ユーザーの全トレーニング記録数をカウント（"努力家"などの称号用）
     long countByUser_Id(Long userId);
 
-    // 2. 部位名を含む記録数をカウント（"大胸筋マニア"などの称号用）
-    // ※TrainingRecordエンティティが user オブジェクトを持っている前提です
-    long countByUserAndBodyPartContaining(User user, String bodyPart);
+ // 新: "Exercise" の中の "BodyPartGroup" を検索する名前に変更
+    long countByUserAndExercise_BodyPartGroupContaining(User user, String bodyPartGroup);
 }

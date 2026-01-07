@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import java.util.ArrayList; // 追加
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,7 +46,6 @@ public class TitleService {
     }
 
     // --- 条件チェック & 解放ロジック ---
-    // void から List<AppTitle> に変更し、新しく獲得した称号を返す
     @Transactional
     public List<AppTitle> checkAndUnlockTitles(User user) {
         List<AppTitle> newlyUnlocked = new ArrayList<>(); // 新規獲得リスト
@@ -68,24 +67,24 @@ public class TitleService {
         unlockIfConditionMet(user, AppTitle.DILIGENT, totalRecords >= 50, newlyUnlocked);
         unlockIfConditionMet(user, AppTitle.IRON_MAN, totalRecords >= 100, newlyUnlocked);
         
-        // 4. 部位別マスタリー
-        unlockIfConditionMet(user, AppTitle.CHEST_LOVER, trainingRecordRepository.countByUserAndBodyPartContaining(user, "胸") >= 10, newlyUnlocked);
-        unlockIfConditionMet(user, AppTitle.BACK_DEMON, trainingRecordRepository.countByUserAndBodyPartContaining(user, "背中") >= 10, newlyUnlocked);
-        unlockIfConditionMet(user, AppTitle.LEG_DAY_SURVIVOR, trainingRecordRepository.countByUserAndBodyPartContaining(user, "脚") >= 10, newlyUnlocked);
-        unlockIfConditionMet(user, AppTitle.SHOULDER_KING, trainingRecordRepository.countByUserAndBodyPartContaining(user, "肩") >= 10, newlyUnlocked);
-        unlockIfConditionMet(user, AppTitle.ARM_WRESTLER, trainingRecordRepository.countByUserAndBodyPartContaining(user, "腕") >= 10, newlyUnlocked);
-        unlockIfConditionMet(user, AppTitle.ABS_OF_STEEL, trainingRecordRepository.countByUserAndBodyPartContaining(user, "腹筋") >= 10, newlyUnlocked);
+        // 4. 部位別マスタリー (★メソッド名を修正)
+        // countByUserAndBodyPartContaining -> countByUserAndExercise_BodyPartGroupContaining
+        unlockIfConditionMet(user, AppTitle.CHEST_LOVER, trainingRecordRepository.countByUserAndExercise_BodyPartGroupContaining(user, "胸") >= 10, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.BACK_DEMON, trainingRecordRepository.countByUserAndExercise_BodyPartGroupContaining(user, "背中") >= 10, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.LEG_DAY_SURVIVOR, trainingRecordRepository.countByUserAndExercise_BodyPartGroupContaining(user, "脚") >= 10, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.SHOULDER_KING, trainingRecordRepository.countByUserAndExercise_BodyPartGroupContaining(user, "肩") >= 10, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.ARM_WRESTLER, trainingRecordRepository.countByUserAndExercise_BodyPartGroupContaining(user, "腕") >= 10, newlyUnlocked);
+        unlockIfConditionMet(user, AppTitle.ABS_OF_STEEL, trainingRecordRepository.countByUserAndExercise_BodyPartGroupContaining(user, "腹筋") >= 10, newlyUnlocked);
 
-        return newlyUnlocked; // リストを返す
+        return newlyUnlocked; 
     }
 
-    // 引数に newlyUnlocked リストを追加
     private void unlockIfConditionMet(User user, AppTitle title, boolean condition, List<AppTitle> newlyUnlocked) {
         if (condition) {
             if (!userTitleRepository.existsByUserAndTitle(user, title)) {
                 UserTitle newTitle = new UserTitle(user, title);
                 userTitleRepository.save(newTitle);
-                newlyUnlocked.add(title); // リストに追加
+                newlyUnlocked.add(title);
             }
         }
     }

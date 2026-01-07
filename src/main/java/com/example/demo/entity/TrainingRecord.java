@@ -28,31 +28,49 @@ public class TrainingRecord {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // マスタデータ(Exercise)への参照
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "exercise_id")
+    private Exercise exercise;
+
+    // ★日付のみ (年・月・日) を扱うために LocalDate 型を使用
+    // (データベース上では DATE 型になります)
     @Column(nullable = false)
-    private LocalDate recordDate; // 記録日
+    private LocalDate recordDate;
 
     @Column(nullable = false)
     private String type; // "WEIGHT" or "CARDIO"
 
-    // フリーウェイト用フィールド
     private String exerciseName;
     
-    // ★追加: 部位 (称号機能判定用: "胸", "背中", "脚" など)
-    private String bodyPart; 
+    // bodyPartフィールドは削除し、getBodyPartメソッドで代替
     
     private Integer sets;
     private Integer reps;
-    private Double weight; // kg
+    private Double weight;
 
     // 有酸素運動用フィールド
     private String cardioType;
-    private Integer durationMinutes; // 分
-    private Double distanceKm; // km
+    private Integer durationMinutes;
+    private Double distanceKm;
 
-    // ★追加: メモ欄
     @Column(length = 500)
     private String memo;
 
+    // 作成日時 (こちらは日時まで保持)
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    /**
+     * マスタデータ(Exercise)を参照して部位名を返す便利メソッド
+     */
+    public String getBodyPart() {
+        if (this.exercise != null) {
+            return this.exercise.getBodyPartGroup();
+        }
+        if ("CARDIO".equals(this.type)) {
+            return "有酸素";
+        }
+        return "その他";
+    }
 }
