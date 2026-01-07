@@ -126,7 +126,6 @@
             display: none; justify-content: center; align-items: center;
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 2000; background-color: rgba(0,0,0,0.4);
-            /* ↓モーダルが表示されているときはスクロールを受け止めるため */
             overflow-y: hidden;
         }
         .modal.is-active { display: flex; animation: fadeInOverlay 0.4s ease-out forwards; }
@@ -176,13 +175,33 @@
         .form-section { flex: 1; text-align: left; }
         .form-row-compact { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
         .form-row-compact .form-group { flex: 1; margin-bottom: 0; min-width: 140px; }
+        .form-group { margin-bottom: 20px; }
         .form-group label { font-size: 0.9rem; color: #555; margin-bottom: 5px; display: block; font-weight: bold; }
+        
+        /* form-controlのデザインをcustom-select-triggerに合わせる */
         .form-control {
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; font-size: 1rem;
-            background: #fff; transition: all 0.3s;
+            width: 100%; 
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: 2px solid #8ec5fc;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            background: #ffffff; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            appearance: none;
         }
-        .form-control:focus { border-color: #4facfe; box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.2); outline: none; }
-        .input-group-unit { display: flex; align-items: center; gap: 5px; }
+        .form-control:focus { 
+            border-color: #007bff; 
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); 
+            outline: none; 
+        }
+        .form-control::placeholder {
+            color: #ccc; font-weight: normal;
+        }
+
+        .input-group-unit { display: flex; align-items: center; gap: 10px; }
         .unit-label { font-weight: bold; color: #666; font-size: 0.9rem; white-space: nowrap; }
 
         .btn-submit {
@@ -193,6 +212,10 @@
         }
         .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 123, 255, 0.4); filter: brightness(1.05); }
         .btn-submit:active { transform: translateY(1px); }
+        /* ★追加: 無効化時のスタイル */
+        .btn-submit:disabled {
+            background: #ccc; cursor: not-allowed; box-shadow: none; transform: none; filter: none; opacity: 0.7;
+        }
 
         .close-button {
             position: absolute; top: 15px; right: 20px; font-size: 2rem; font-weight: bold; color: #aaa; cursor: pointer;
@@ -200,91 +223,75 @@
         }
         .close-button:hover { color: #555; }
 
-        /* ▼▼▼ タブレット以上 (601px~) スクロールバー非表示 ▼▼▼ */
+        /* =========================================================
+           ★ カスタムプルダウン (Select) のスタイル
+           ========================================================= */
+        .custom-select-wrapper { position: relative; user-select: none; width: 100%; z-index: 1; }
+        .custom-select-wrapper:has(.custom-select.open) { z-index: 3000; } 
+        
+        .custom-select-trigger { 
+            position: relative; display: flex; align-items: center; justify-content: space-between; 
+            padding: 12px 15px; font-size: 1rem; font-weight: 600; color: #333; 
+            background: #ffffff; border: 2px solid #8ec5fc; border-radius: 12px; 
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: all 0.3s; 
+        }
+        .custom-select-trigger:hover { border-color: #007bff; }
+        .custom-select-trigger::after { content: '\f078'; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 0.9rem; color: #007bff; transition: transform 0.3s; }
+        .custom-select.open .custom-select-trigger::after { transform: rotate(180deg); }
+        
+        .custom-options { 
+            position: absolute; display: block; top: 100%; margin-top: 10px; left: 0; right: 0; 
+            border: 1px solid #8ec5fc; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); z-index: 3000; 
+            opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            max-height: 250px; overflow-y: auto; 
+        }
+        .custom-options::before { content: ''; position: absolute; top: -20px; left: 0; width: 100%; height: 20px; background: transparent; z-index: -1; }
+        .custom-select.open .custom-options { opacity: 1; visibility: visible; transform: translateY(0); }
+        
+        .custom-option { position: relative; display: block; padding: 12px 20px; font-size: 1rem; font-weight: 500; color: #555; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background-color: #f0f8ff; color: #007bff; padding-left: 25px; }
+        .custom-option.selected { background-color: #e6f2ff; color: #007bff; font-weight: 700; }
+        
+        .custom-select.disabled .custom-select-trigger { background-color: #f5f5f5; border-color: #ddd; color: #aaa; cursor: not-allowed; }
+        .custom-select.disabled .custom-select-trigger::after { color: #aaa; }
+        
+        /* 元のselectを隠す */
+        select.form-control { display: none; }
+
+        /* スクロールバー デザイン統一 */
+        .training-log-modal-wide::-webkit-scrollbar { width: 6px; }
+        .training-log-modal-wide::-webkit-scrollbar-track { background: transparent; margin-block: 15px; }
+        .training-log-modal-wide::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 10px; }
+        .training-log-modal-wide::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.25); }
+
         @media (min-width: 601px) {
-            .training-log-modal-wide {
-                scrollbar-width: none; /* Firefox */
-                -ms-overflow-style: none; /* IE/Edge */
-            }
-            .training-log-modal-wide::-webkit-scrollbar {
-                display: none; /* Chrome/Safari */
-            }
+            .training-log-modal-wide { scrollbar-width: none; -ms-overflow-style: none; }
+            .training-log-modal-wide::-webkit-scrollbar { display: none; }
         }
 
-        /* ▼▼▼ PC・大タブレット (768px~) レイアウト調整 (間隔を広げる) ▼▼▼ */
         @media (min-width: 768px) { 
-            .training-log-modal-wide { 
-                padding: 30px 50px !important; /* 余白を少し増やす */
-                max-width: 850px !important;
-            }
-
-            /* フォーム要素の間隔を広げる */
-            .form-section form {
-                display: flex;
-                flex-direction: column;
-                gap: 25px; /* 要素間を拡大 */
-            }
-
-            /* 余白リセット */
-            .form-row-compact, .form-group, #weightFields, #cardioFields {
-                margin-bottom: 0 !important;
-            }
-            
-            /* タイトル周りの余白を広げる */
+            .training-log-modal-wide { padding: 30px 50px !important; max-width: 850px !important; }
+            .form-section form { display: flex; flex-direction: column; gap: 25px; }
+            .form-row-compact, .form-group, #weightFields, #cardioFields { margin-bottom: 0 !important; }
             h2.modal-title { margin-bottom: 20px !important; }
             #logViewArea { margin-bottom: 20px !important; }
-
-            /* 入力欄の高さを確保 */
-            .form-control { padding: 10px 12px; }
-            
-            /* ラベルのサイズ */
+            .form-control { padding: 12px 15px; }
             .form-group label { margin-bottom: 5px; font-size: 0.9rem; }
-
-            /* 重量・回数・セット数を横一列に配置 (間隔を広げる) */
-            #weightFields {
-                display: flex;
-                gap: 30px; /* 横間隔を広げる */
-                align-items: flex-end; 
-            }
-            #weightFields .form-group {
-                flex: 1;
-            }
-
-            /* 保存ボタンの余白を広げる */
-            .btn-submit {
-                margin-top: 30px !important;
-                padding: 14px;
-                font-size: 1.1rem;
-            }
+            #weightFields { display: flex; gap: 30px; align-items: flex-end; }
+            #weightFields .form-group { flex: 1; }
+            .btn-submit { margin-top: 30px !important; padding: 14px; font-size: 1.1rem; }
         }
 
-		/* スマホ向けレスポンシブ設定 */
-		        @media (max-width: 600px) {
-		            .page-title { font-size: 1.7rem; }
-		            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
-		            
-		            /* ★変更: 画面幅を最大限使う */
-		            .main-container { 
-		                padding: 20px 5px; 
-		                width: 98%; 
-		                border-radius: 20px; 
-		            }
-		            
-		            /* ★変更: 隙間を詰める */
-		            .calendar-grid { gap: 2px; }
-
-		            /* ★変更: セルを大きく、タップしやすく */
-		            .calendar-day-cell { 
-		                min-height: 85px; 
-		                font-size: 1.1rem;
-		                display: flex;
-		                flex-direction: column;
-		                justify-content: flex-start;
-		                height: 100%;
-		            }
-		            
-		            .nav-arrow { width: 35px; height: 35px; font-size: 1rem; }
-		        }
+        @media (max-width: 600px) {
+            .page-title { font-size: 1.7rem; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+            .main-container { padding: 20px 5px; width: 98%; border-radius: 20px; }
+            .calendar-grid { gap: 2px; }
+            .calendar-day-cell { min-height: 85px; font-size: 1.1rem; display: flex; flex-direction: column; justify-content: flex-start; height: 100%; }
+            .nav-arrow { width: 35px; height: 35px; font-size: 1rem; }
+        }
     </style>
 </head>
 <body class="training-log-page">
@@ -355,13 +362,16 @@
 
 <div id="logModal" class="modal">
     <div class="modal-content training-log-modal-wide">
-        <span class="close-button" onclick="closeLogModal()">&times;</span>
-        <h2 id="modalDateTitle" class="modal-title" style="margin-bottom: 20px; color: #333;"></h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 id="modalDateTitle" class="modal-title" style="margin: 0; color: #333; flex-grow: 1;"></h2>
+            <span class="close-button" onclick="closeLogModal()" style="position: static;">&times;</span>
+        </div>
+        
         <div id="logViewArea" style="margin-bottom: 20px;"></div>
         
         <div class="modal-layout-grid">
             <div class="form-section">
-                <form th:action="@{/training/log/save}" method="post">
+                <form th:action="@{/training/log/save}" method="post" id="logForm">
                     <input type="hidden" id="selectedDateInput" name="date" value="">
 
                     <div class="form-row-compact">
@@ -374,15 +384,41 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label><i class="fa-solid fa-person-running"></i> 種目名</label>
-                        <datalist id="exerciseList">
-                            <option th:each="ex : ${cardioExercises}" th:value="${ex.displayName}"></option>
-                            <th:block th:each="part : ${freeWeightExercisesByPart}">
-                                <option th:each="ex : ${part.value}" th:value="${ex.fullName2}"></option>
-                            </th:block>
-                        </datalist>
-                        <input type="text" name="exerciseName" list="exerciseList" class="form-control" placeholder="種目名を入力または選択" required>
+                    <div id="weightSelectionArea">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-child-reaching"></i> 部位</label>
+                            <select id="musclePartSelect" class="form-control" onchange="updateWeightExercises()">
+                                <option value="">部位を選択してください</option>
+                                <option th:each="partEntry : ${freeWeightExercisesByPart}" 
+                                        th:value="${partEntry.key}" 
+                                        th:text="${partEntry.key}"></option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-list"></i> 種目名</label>
+                            <select id="weightExerciseSelect" name="exerciseName" class="form-control" required disabled onchange="checkCustomExercise('weight')">
+                                <option value="">部位を選択してください</option>
+                            </select>
+                            <div id="weightExerciseCustomInputDiv" style="display:none; margin-top:10px;">
+                                <input type="text" id="weightExerciseCustomInput" class="form-control" placeholder="種目名を入力してください" disabled oninput="validateForm()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="cardioSelectionArea" style="display:none;">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-person-running"></i> 種目名</label>
+                            <select id="cardioExerciseSelect" name="exerciseName" class="form-control" disabled onchange="checkCustomExercise('cardio')">
+                                <option value="">種目を選択してください</option>
+                                <option th:each="ex : ${cardioExercises}" 
+                                        th:value="${ex.name}" 
+                                        th:text="${ex.name}"></option>
+                                <option value="OTHER">その他</option>
+                            </select>
+                            <div id="cardioExerciseCustomInputDiv" style="display:none; margin-top:10px;">
+                                <input type="text" id="cardioExerciseCustomInput" class="form-control" placeholder="種目名を入力してください" disabled oninput="validateForm()">
+                            </div>
+                        </div>
                     </div>
 
                     <div id="weightFields">
@@ -428,7 +464,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-submit"><i class="fa-solid fa-check"></i> 記録を保存</button>
+                    <button type="submit" id="submitBtn" class="btn-submit" disabled><i class="fa-solid fa-check"></i> 記録を保存</button>
                 </form>
             </div>
         </div>
@@ -467,13 +503,156 @@
 </div>
 
 <script th:inline="javascript">
+    /*<![CDATA[*/
+    // サーバー側から受け取った部位別種目リスト
+    const exercisesByPart = /*[[${freeWeightExercisesByPart}]]*/ {};
+
+    // --- カスタムプルダウン生成関数 ---
+    function createCustomSelect(selectId) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        const existingWrapper = document.getElementById(selectId + '-custom-wrapper');
+        if (existingWrapper) {
+            existingWrapper.parentNode.insertBefore(select, existingWrapper);
+            existingWrapper.remove();
+        }
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-select-wrapper';
+        wrapper.id = selectId + '-custom-wrapper';
+        select.parentNode.insertBefore(wrapper, select);
+        wrapper.appendChild(select);
+
+        const customSelect = document.createElement('div');
+        customSelect.className = 'custom-select';
+        if (select.disabled) customSelect.classList.add('disabled');
+
+        const trigger = document.createElement('div');
+        trigger.className = 'custom-select-trigger';
+        const selectedOption = select.options[select.selectedIndex];
+        trigger.innerHTML = '<span>' + (selectedOption ? selectedOption.text : '選択してください') + '</span>';
+        
+        const options = document.createElement('div');
+        options.className = 'custom-options';
+
+        renderCustomOptions(select, options, trigger);
+
+        customSelect.appendChild(trigger);
+        customSelect.appendChild(options);
+        wrapper.appendChild(customSelect);
+
+        trigger.addEventListener('click', function(e) {
+            if (select.disabled) return;
+            document.querySelectorAll('.custom-select.open').forEach(el => {
+                if (el !== customSelect) el.classList.remove('open');
+            });
+            customSelect.classList.toggle('open');
+            e.stopPropagation();
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!customSelect.contains(e.target)) {
+                customSelect.classList.remove('open');
+            }
+        });
+    }
+
+    // オプションリストのレンダリング
+    function renderCustomOptions(select, optionsContainer, trigger) {
+        optionsContainer.innerHTML = '';
+        Array.from(select.options).forEach(option => {
+            const customOption = document.createElement('div');
+            customOption.className = 'custom-option';
+            customOption.textContent = option.text;
+            customOption.dataset.value = option.value;
+            
+            if (option.selected) customOption.classList.add('selected');
+
+            customOption.addEventListener('click', function() {
+                select.value = this.dataset.value;
+                trigger.innerHTML = '<span>' + this.textContent + '</span>';
+                
+                optionsContainer.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                select.parentElement.querySelector('.custom-select').classList.remove('open');
+                
+                // changeイベント発火（連動用）
+                select.dispatchEvent(new Event('change'));
+            });
+            optionsContainer.appendChild(customOption);
+        });
+        
+        if(select.selectedIndex >= 0) {
+            trigger.innerHTML = '<span>' + select.options[select.selectedIndex].text + '</span>';
+        }
+    }
+
+    // カスタムプルダウンの再構築
+    function updateCustomSelect(selectId) {
+        const select = document.getElementById(selectId);
+        const wrapper = document.getElementById(selectId + '-custom-wrapper');
+        if (!select || !wrapper) return;
+
+        const customSelect = wrapper.querySelector('.custom-select');
+        const optionsContainer = wrapper.querySelector('.custom-options');
+        const trigger = wrapper.querySelector('.custom-select-trigger');
+
+        if (select.disabled) {
+            customSelect.classList.add('disabled');
+        } else {
+            customSelect.classList.remove('disabled');
+        }
+
+        renderCustomOptions(select, optionsContainer, trigger);
+    }
+
+    // --- バリデーション機能 (必須項目チェック) ---
+    function validateForm() {
+        const type = document.getElementById('trainingTypeSelect').value;
+        const btn = document.getElementById('submitBtn');
+        let isValid = false;
+
+        if (type === 'WEIGHT') {
+            const part = document.getElementById('musclePartSelect').value;
+            const exerciseSelect = document.getElementById('weightExerciseSelect');
+            const exerciseInput = document.getElementById('weightExerciseCustomInput');
+            
+            // 部位が選ばれていて、かつ種目(Select)が選ばれているか
+            if (part && exerciseSelect.value) {
+                // その他なら入力欄必須
+                if (exerciseSelect.value === 'OTHER') {
+                    if (exerciseInput.value.trim() !== '') isValid = true;
+                } else {
+                    isValid = true;
+                }
+            }
+        } else if (type === 'CARDIO') {
+            const exerciseSelect = document.getElementById('cardioExerciseSelect');
+            const exerciseInput = document.getElementById('cardioExerciseCustomInput');
+            
+            // 種目(Select)が選ばれているか
+            if (exerciseSelect.value) {
+                if (exerciseSelect.value === 'OTHER') {
+                    if (exerciseInput.value.trim() !== '') isValid = true;
+                } else {
+                    isValid = true;
+                }
+            }
+        }
+
+        btn.disabled = !isValid;
+    }
+
+    // --- メインロジック ---
+
     // モーダル表示処理
     function openLogModal(dateString, isLogged) {
-        // ★修正: モーダルを開いているときは背景スクロールを禁止
         document.body.style.overflow = 'hidden';
 
         document.getElementById('selectedDateInput').value = dateString;
-        document.getElementById('modalDateTitle').innerText = dateString.replace(/-/g, '/'); // yyyy/MM/dd形式に
+        document.getElementById('modalDateTitle').innerText = dateString.replace(/-/g, '/'); 
         
         const logViewArea = document.getElementById('logViewArea');
         logViewArea.innerHTML = isLogged 
@@ -482,39 +661,167 @@
             
         // フォームリセット
         document.getElementById('trainingTypeSelect').value = 'WEIGHT';
-        toggleFormFields();
+        updateCustomSelect('trainingTypeSelect');
+
+        // 部位・種目のリセット
+        const musclePartSelect = document.getElementById('musclePartSelect');
+        if(musclePartSelect) {
+            musclePartSelect.selectedIndex = 0;
+            updateWeightExercises(); 
+            updateCustomSelect('musclePartSelect');
+        }
+        
+        // 有酸素側のリセット
+        const cardioSelect = document.getElementById('cardioExerciseSelect');
+        if(cardioSelect) {
+            cardioSelect.selectedIndex = 0;
+            checkCustomExercise('cardio'); 
+            updateCustomSelect('cardioExerciseSelect');
+        }
+        
+        toggleFormFields(); 
+        validateForm(); // 初期チェック
         
         document.getElementById('logModal').classList.add('is-active');
     }
 
     function closeLogModal() { 
-        // ★修正: 背景スクロールロックを解除
         document.body.style.overflow = '';
         document.getElementById('logModal').classList.remove('is-active'); 
     }
     
-    // フォームの表示切り替え（ウェイト/有酸素）
+    // 部位選択に応じて種目プルダウンを更新する関数
+    function updateWeightExercises() {
+        const partSelect = document.getElementById('musclePartSelect');
+        const exerciseSelect = document.getElementById('weightExerciseSelect');
+        const selectedPart = partSelect.value;
+
+        exerciseSelect.innerHTML = '<option value="">種目を選択してください</option>';
+
+        if (selectedPart && exercisesByPart[selectedPart]) {
+            exercisesByPart[selectedPart].forEach(function(ex) {
+                const option = document.createElement('option');
+                const val = ex.name; 
+                option.value = val;
+                option.textContent = val;
+                exerciseSelect.appendChild(option);
+            });
+            // ★「その他」を追加
+            const otherOpt = document.createElement('option');
+            otherOpt.value = "OTHER";
+            otherOpt.textContent = "その他";
+            exerciseSelect.appendChild(otherOpt);
+
+            exerciseSelect.disabled = false;
+        } else {
+            exerciseSelect.disabled = true;
+        }
+        
+        // リスト更新後にカスタム入力の状態もリセット
+        checkCustomExercise('weight');
+        updateCustomSelect('weightExerciseSelect');
+        validateForm();
+    }
+    
+    // ★「その他」選択時の自由記入欄制御
+    function checkCustomExercise(type) {
+        const select = document.getElementById(type + 'ExerciseSelect');
+        const inputDiv = document.getElementById(type + 'ExerciseCustomInputDiv');
+        const input = document.getElementById(type + 'ExerciseCustomInput');
+        
+        if (!select || !inputDiv || !input) return;
+
+        if (select.value === 'OTHER') {
+            inputDiv.style.display = 'block';
+            input.disabled = false;
+            // Selectの値は送信せず、Inputの値を送信する
+            select.removeAttribute('name');
+            input.setAttribute('name', 'exerciseName');
+            input.required = true;
+        } else {
+            inputDiv.style.display = 'none';
+            input.disabled = true;
+            // Selectの値を送信する
+            select.setAttribute('name', 'exerciseName');
+            input.removeAttribute('name');
+            input.required = false;
+        }
+        validateForm();
+    }
+    
+    // フォームの表示切り替え（ウェイト/有酸素）＆ disabled制御
     function toggleFormFields() {
         const type = document.getElementById('trainingTypeSelect').value;
+        
+        const weightSelectionArea = document.getElementById('weightSelectionArea');
+        const cardioSelectionArea = document.getElementById('cardioSelectionArea');
         const weightFields = document.getElementById('weightFields'); 
         const cardioFields = document.getElementById('cardioFields');
         
+        const weightExerciseSelect = document.getElementById('weightExerciseSelect');
+        const cardioExerciseSelect = document.getElementById('cardioExerciseSelect');
+        const musclePartSelect = document.getElementById('musclePartSelect');
+        
+        // 自由記入欄のinput要素も取得
+        const weightInput = document.getElementById('weightExerciseCustomInput');
+        const cardioInput = document.getElementById('cardioExerciseCustomInput');
+        
         if (weightFields && cardioFields) {
             if (type === 'WEIGHT') {
-                // ★修正: PC・タブレットサイズでの表示切替に対応するため、class操作ではなくstyle操作で制御するが
-                // メディアクエリのdisplay:flex指定と競合しないように 'block' に戻す
-                // (PCサイズではCSSでflexになるはずだが、JSでblockを指定すると上書きされてしまう)
-                
-                // ここでは display = '' (空文字) にして CSS に委ねるのがベストプラクティス
-                // ただしCSSのdisplay:noneが優先されないように注意が必要
-                weightFields.style.display = 'block'; 
+                weightSelectionArea.style.display = 'block';
+                cardioSelectionArea.style.display = 'none';
+                weightFields.style.display = 'block';
                 cardioFields.style.display = 'none';
-            } else {
+
+                // Cardio側を無効化
+                if(cardioExerciseSelect) {
+                    cardioExerciseSelect.disabled = true;
+                    if(cardioInput) cardioInput.disabled = true;
+                }
+                
+                // Weight側有効化
+                if(musclePartSelect) musclePartSelect.disabled = false;
+                if(weightExerciseSelect) {
+                    weightExerciseSelect.disabled = !musclePartSelect.value;
+                    checkCustomExercise('weight');
+                }
+
+            } else { // CARDIO
+                weightSelectionArea.style.display = 'none';
+                cardioSelectionArea.style.display = 'block';
                 weightFields.style.display = 'none';
                 cardioFields.style.display = 'block';
+
+                // Weight側を無効化
+                if(weightExerciseSelect) {
+                    weightExerciseSelect.disabled = true;
+                    if(weightInput) weightInput.disabled = true;
+                }
+                if(musclePartSelect) musclePartSelect.disabled = true;
+                
+                // Cardio側を有効化
+                if(cardioExerciseSelect) {
+                    cardioExerciseSelect.disabled = false;
+                    checkCustomExercise('cardio');
+                }
             }
+            
+            // 各種カスタムSelectの見た目更新
+            updateCustomSelect('cardioExerciseSelect');
+            updateCustomSelect('musclePartSelect');
+            updateCustomSelect('weightExerciseSelect');
+            
+            validateForm();
         }
     }
+
+    // 初期化
+    document.addEventListener('DOMContentLoaded', function() {
+        createCustomSelect('trainingTypeSelect');
+        createCustomSelect('musclePartSelect');
+        createCustomSelect('weightExerciseSelect');
+        createCustomSelect('cardioExerciseSelect');
+    });
 
     window.onclick = function(e) {
         const m = document.getElementById('logModal'); 
@@ -523,6 +830,7 @@
         if (a && a.classList.contains('is-active') && e.target === a) a.classList.remove('is-active');
     }
     
+    // --- SNSシェア機能 ---
     async function shareScreenImage() {
         const t = document.getElementById('shareTarget'); const h = t.querySelectorAll('.no-capture');
         h.forEach(e => e.style.display = 'none');
@@ -541,7 +849,7 @@
     function shareToLine() { window.open(`https://line.me/R/msg/text/?${encodeURIComponent(getShareText())}`, '_blank'); }
     function shareToInstagram() { navigator.clipboard.writeText(getShareText()).then(() => { alert("コピーしました！Instagramを開きます。"); window.open('https://www.instagram.com/', '_blank'); }); }
     
-    // 背景アニメーション
+    // --- 背景アニメーション ---
     const canvas = document.getElementById('bg-canvas'); const ctx = canvas.getContext('2d'); let particlesArray = [];
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
@@ -554,6 +862,7 @@
     }
     function animate() { ctx.clearRect(0, 0, canvas.width, canvas.height); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); if (particlesArray[i].size <= 0.3) { particlesArray.splice(i, 1); i--; } } requestAnimationFrame(animate); }
     animate();
+    /*]]>*/
 </script>
 </body>
 </html>

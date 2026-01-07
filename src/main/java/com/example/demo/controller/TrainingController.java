@@ -201,7 +201,7 @@ public class TrainingController {
     public String showExerciseList(Authentication authentication, Model model) {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
-        model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercises());
+        model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercisesByPart());
         model.addAttribute("cardioExercises", trainingDataService.getCardioExercises());
         List<String> bookmarkedNames = exerciseBookmarkRepository.findByUserOrderByIdDesc(currentUser)
                 .stream().map(ExerciseBookmark::getExerciseName).collect(Collectors.toList());
@@ -485,7 +485,6 @@ public class TrainingController {
             // リストで受け取る
             @RequestParam(value = "weights", required = false) List<Double> weights,
             @RequestParam(value = "repsList", required = false) List<Integer> repsList,
-            // ★復活: 簡易フォームのセット数を受け取るために必要です
             @RequestParam(value = "sets", required = false, defaultValue = "1") Integer sets,
             @RequestParam(value = "duration", required = false) Integer duration,
             @RequestParam(value = "distance", required = false) Double distance,
@@ -503,7 +502,6 @@ public class TrainingController {
             if ("WEIGHT".equals(type) && weights != null && !weights.isEmpty()) {
                 
                 // ★簡易フォーム対応ロジック
-                // 「重量リストが1つ」かつ「セット数が2以上」の場合は、その内容を指定セット数分繰り返す
                 int loopCount = weights.size();
                 boolean isSimpleMode = (weights.size() == 1 && sets != null && sets > 1);
                 
@@ -512,10 +510,8 @@ public class TrainingController {
                 }
 
                 for (int i = 0; i < loopCount; i++) {
-                    // SimpleModeなら常に0番目（入力された1つの値）を使う。そうでなければi番目を使う。
                     Double w = weights.get(isSimpleMode ? 0 : i);
                     
-                    // 回数の取得（安全策）
                     Integer r = 0;
                     if (isSimpleMode) {
                         r = (repsList != null && !repsList.isEmpty()) ? repsList.get(0) : 0;
@@ -591,12 +587,11 @@ public class TrainingController {
 
              // コイン付与
                 int earnedCoins = (exerciseData != null) ? trainingLogicService.calculateChipReward(exerciseData) : 0;
-                if (earnedCoins > 0) userService.addChips(currentUser.getUsername(), earnedCoins); // メソッド名はaddChipsのままでOK
+                if (earnedCoins > 0) userService.addChips(currentUser.getUsername(), earnedCoins); 
 
                 // メッセージ作成
                 String successMsg = date.toString() + " 「" + exerciseName + "」を" + savedCount + "セット記録しました！";
                 
-               
                 if (earnedCoins > 0) successMsg += " (" + earnedXP + " XP, " + earnedCoins + " コイン)";
                 else successMsg += " (" + earnedXP + " XP)";
                 
@@ -632,7 +627,6 @@ public class TrainingController {
 
         try {
             // 既存の記録があるか確認（日付重複を防ぐ）
-            // ※リポジトリに findByUserAndDate がない場合の汎用的な実装
             List<BodyWeightRecord> records = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
             BodyWeightRecord record = records.stream()
                     .filter(r -> r.getDate().isEqual(date))
@@ -646,16 +640,16 @@ public class TrainingController {
             record.setWeight(weight);
 
             bodyWeightRecordRepository.save(record);
-         // ★追加: 記録報酬の付与 (少量: XP 50, コイン 10)
+         // 報酬付与
             int rewardXp = 50;
             int rewardCoins = 10;
             
             levelService.addXpAndCheckLevelUp(currentUser, rewardXp);
             userService.addChips(currentUser.getUsername(), rewardCoins);
-            userRepository.save(currentUser); // ユーザー状態を保存
+            userRepository.save(currentUser);
 
             String message = date + " の体重(" + weight + "kg)を保存しました。";
-            message += " (+" + rewardXp + " XP, +" + rewardCoins + " コイン)"; // メッセージ更新
+            message += " (+" + rewardXp + " XP, +" + rewardCoins + " コイン)";
             redirectAttributes.addFlashAttribute("successMessage", message);
             
          // ミッション進行更新
@@ -666,7 +660,6 @@ public class TrainingController {
             redirectAttributes.addFlashAttribute("error", "体重の保存に失敗しました。");
         }
 
-        // カレンダー画面に戻る（該当の年月を表示）
         return "redirect:/training-log/form/body-weight?year=" + date.getYear() + "&month=" + date.getMonthValue();
     }
     
@@ -837,6 +830,10 @@ public class TrainingController {
         List<String> dayLabels = Arrays.asList("日", "月", "火", "水", "木", "金", "土");
         model.addAttribute("dayLabels", dayLabels);
 
+        // ★追加: トレーニング種目データをプルダウン用に渡す
+        model.addAttribute("freeWeightExercisesByPart", trainingDataService.getFreeWeightExercisesByPart());
+        model.addAttribute("cardioExercises", trainingDataService.getCardioExercises());
+
         return "log/training-log";
     }
 
@@ -872,9 +869,7 @@ public class TrainingController {
         
         List<BodyWeightRecord> weightRecords = new ArrayList<>();
         if (bodyWeightRecordRepository != null) { weightRecords = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser); }
-     // ▼▼▼ 修正箇所: 最新の体重を取得してModelに追加 (グラフの期間に関係なく最新を表示) ▼▼▼
         if (!weightRecords.isEmpty()) {
-            // 日付昇順(Asc)で取得しているので、リストの最後が日付的に最新
             BodyWeightRecord latest = weightRecords.get(weightRecords.size() - 1);
             model.addAttribute("latestWeight", latest.getWeight());
         }
@@ -950,7 +945,6 @@ public class TrainingController {
         User currentUser = getCurrentUser(authentication);
         if (currentUser == null) return "redirect:/login";
 
-        // 表示する年月を決定
         LocalDate baseDate = (date != null) ? date : LocalDate.now();
         YearMonth targetYearMonth;
         if (year != null && month != null) {
@@ -962,20 +956,18 @@ public class TrainingController {
         LocalDate firstOfMonth = targetYearMonth.atDay(1);
         LocalDate lastOfMonth = targetYearMonth.atEndOfMonth();
 
-        // 既存の体重記録を取得
         List<BodyWeightRecord> allRecords = bodyWeightRecordRepository.findByUserOrderByDateAsc(currentUser);
         Map<LocalDate, BodyWeightRecord> weightMap = allRecords.stream()
                 .filter(r -> r.getDate() != null && !r.getDate().isBefore(firstOfMonth) && !r.getDate().isAfter(lastOfMonth))
                 .collect(Collectors.toMap(BodyWeightRecord::getDate, r -> r, (a, b) -> b));
 
-        // カレンダーの日付リスト作成
         List<LocalDate> calendarDays = new ArrayList<>();
         int paddingDays = firstOfMonth.getDayOfWeek().getValue() % 7;
         for (int i = 0; i < paddingDays; i++) { calendarDays.add(null); }
         for (int i = 1; i <= targetYearMonth.lengthOfMonth(); i++) { calendarDays.add(targetYearMonth.atDay(i)); }
 
         model.addAttribute("currentDate", LocalDate.now());
-        model.addAttribute("selectedDate", date); // 指定があればモーダルを開くトリガーに
+        model.addAttribute("selectedDate", date);
         model.addAttribute("currentYearMonth", targetYearMonth);
         model.addAttribute("calendarDays", calendarDays);
         model.addAttribute("weightMap", weightMap);
@@ -988,7 +980,6 @@ public class TrainingController {
 
         model.addAttribute("dayLabels", Arrays.asList("日", "月", "火", "水", "木", "金", "土"));
         
-        // フォーム初期化
         TrainingLogForm form = new TrainingLogForm();
         form.setType("BODY_WEIGHT");
         if (date != null) {
