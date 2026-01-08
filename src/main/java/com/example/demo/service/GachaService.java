@@ -13,12 +13,13 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.Item;
 import com.example.demo.entity.User;
-import com.example.demo.entity.UserItem;
+// import com.example.demo.entity.UserItem; // 削除
 import com.example.demo.model.GachaItem;
 import com.example.demo.model.GachaResult;
 import com.example.demo.repository.GachaResultRepository;
 import com.example.demo.repository.ItemRepository;
-import com.example.demo.repository.UserItemRepository;
+import com.example.demo.repository.UserRepository; // 追加
+// import com.example.demo.repository.UserItemRepository; // 削除
 
 @Service
 public class GachaService {
@@ -29,8 +30,13 @@ public class GachaService {
     @Autowired
     private ItemRepository itemRepo;
 
+    // 削除: UserItemRepository
+    // @Autowired
+    // private UserItemRepository userItemRepo;
+
+    // 追加: ユーザー情報の更新に必要
     @Autowired
-    private UserItemRepository userItemRepo;
+    private UserRepository userRepository;
 
     private final Random random = new Random();
 
@@ -43,81 +49,118 @@ public class GachaService {
         return results;
     }
 
-    // ----------- 単発ガチャ（履歴 + 所持 同時保存）-----------
-    public GachaItem drawGacha(Long userId) {
+    // ----------- ガチャ1回分の処理 -----------
+    private GachaItem drawGacha(Long userId) {
+        // 1. 確率テーブルの作成
+        List<ProbabilityItem> table = createProbabilityTable();
 
-        // ① ガチャ抽選してアイテム決定
-        GachaItem gachaItem = getRandomItem();
-
-        // ② SQLiteへ履歴を保存
-        ZonedDateTime nowJst = ZonedDateTime.now(ZoneId.of("Asia/Tokyo"));
-        String formattedDate = nowJst.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-        GachaResult result = new GachaResult(
-                userId,
-                gachaItem.getName(),
-                gachaItem.getRarity(),
-                formattedDate
-        );
-        gachaResultRepo.save(result);
-
-        // ③ Item エンティティを取得
-        Item item = itemRepo.findByName(gachaItem.getName());
-        if (item == null) {
-            System.err.println("★ Item テーブルに一致するアイテムがありません：" + gachaItem.getName());
-            return gachaItem; // 所持アイテム追加はスキップ
+        // 2. 抽選
+        double totalRate = 0;
+        for (ProbabilityItem p : table) {
+            totalRate += p.rate;
         }
 
-        // ④ UserItem（所持アイテム）に保存
-        UserItem userItem = new UserItem();
-        User user = new User();
-        user.setId(userId);
-
-        userItem.setUser(user);
-        userItem.setItem(item);
-
-        userItemRepo.save(userItem);
-
-        return gachaItem;
-    }
-
-    // ----------- ランダム抽選（確率テーブル方式）-----------
-    private GachaItem getRandomItem() {
-
-        List<ProbabilityItem> table = List.of(
-            new ProbabilityItem("夢幻の鍵", "UR", "/img/item/UR-niji.png", 2.35),
-
-            new ProbabilityItem("赫焔鱗", "SSR", "/img/item/SSR-red.png", 3.53),
-            new ProbabilityItem("氷華の杖", "SSR", "/img/item/SSR-blue.png", 3.53),
-            new ProbabilityItem("緑晶灯", "SSR", "/img/item/SSR-green.png", 3.53),
-            new ProbabilityItem("夢紡ぎの枕", "SSR", "/img/item/SSR-yellow.png", 3.53),
-            new ProbabilityItem("月詠みの杖", "SSR", "/img/item/SSR-purple.png", 3.53),
-
-            new ProbabilityItem("赤の聖結晶", "SR", "/img/item/SR-red.png", 6.59),
-            new ProbabilityItem("青の聖結晶", "SR", "/img/item/SR-blue.png", 6.59),
-            new ProbabilityItem("緑の聖結晶", "SR", "/img/item/SR-green.png", 6.59),
-            new ProbabilityItem("黄の聖結晶", "SR", "/img/item/SR-yellow.png", 6.59),
-            new ProbabilityItem("紫の聖結晶", "SR", "/img/item/SR-purple.png", 6.59),
-
-            new ProbabilityItem("紅玉", "R", "/img/item/R-red.png", 8.94),
-            new ProbabilityItem("蒼玉", "R", "/img/item/R-blue.png", 8.94),
-            new ProbabilityItem("翠玉", "R", "/img/item/R-green.png", 8.94),
-            new ProbabilityItem("聖玉", "R", "/img/item/R-yellow.png", 8.94),
-            new ProbabilityItem("闇玉", "R", "/img/item/R-purple.png", 8.94)
-        );
-
-        double r = random.nextDouble() * 100;
-        double cumulative = 0;
+        double r = random.nextDouble() * totalRate; // 0.0 ～ 100.0 (合計値)
+        double current = 0;
+        ProbabilityItem selected = null;
 
         for (ProbabilityItem p : table) {
-            cumulative += p.rate;
-            if (r < cumulative) {
-                return new GachaItem(p.name, p.rarity, p.image);
+            current += p.rate;
+            if (r < current) {
+                selected = p;
+                break;
             }
         }
 
-        ProbabilityItem last = table.get(table.size() - 1);
-        return new GachaItem(last.name, last.rarity, last.image);
+        // 万が一選択されなかった場合（計算誤差対策）は最後の商品を選択
+        if (selected == null) {
+            selected = table.get(table.size() - 1);
+        }
+
+        // 3. 抽選結果のオブジェクト作成
+        GachaItem result = new GachaItem(selected.name, selected.rarity, selected.image);
+
+        // 4. ★修正: ユーザーの所持アイテムに追加 (DB保存)
+        // Itemマスタからエンティティを取得
+        Item itemEntity = itemRepo.findByName(selected.name);
+        
+        if (itemEntity != null) {
+            // ユーザーを取得
+            User user = userRepository.findById(userId).orElse(null);
+            
+            if (user != null) {
+                // ★修正: Userクラスのメソッドを使ってインベントリに追加
+                user.addItem(itemEntity, 1);
+                
+                // 変更を保存
+                userRepository.save(user);
+            }
+        }
+
+        // 5. ガチャ履歴テーブルにも保存
+        GachaResult history = new GachaResult();
+        history.setUserId(userId);
+        history.setItemName(selected.name);
+        history.setRarity(selected.rarity);
+        
+        // 日本時間で保存
+        ZonedDateTime nowJst = ZonedDateTime.now(ZoneId.of("Asia/Tokyo"));
+        history.setDrawDateTime(nowJst.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        
+        gachaResultRepo.save(history);
+
+        return result;
+    }
+
+    // ----------- 確率テーブル定義 (ハードコード) -----------
+    // ※ 実際にはDBから取得するなど柔軟に設定可能です
+    private List<ProbabilityItem> createProbabilityTable() {
+        // 合計100%になるように設定
+        // UR: 2.35%, SSR: 17.65%, SR: 32.95%, R: 47.05%
+        
+        List<ProbabilityItem> table = new ArrayList<>();
+
+        // --- UR (2.35%) ---
+        // table.add(new ProbabilityItem("夢幻の鍵", "UR", "/img/item/UR-niji-touka.png", 1.175));
+        table.add(new ProbabilityItem("虹の結晶", "UR", "/img/item/UR-niji.png", 2.35));
+
+        // --- SSR (17.65% -> 5種等分: 3.53%) ---
+        table.add(new ProbabilityItem("赤の秘石", "SSR", "/img/item/SSR-red.png", 3.53));
+        table.add(new ProbabilityItem("青の秘石", "SSR", "/img/item/SSR-blue.png", 3.53));
+        table.add(new ProbabilityItem("緑の秘石", "SSR", "/img/item/SSR-green.png", 3.53));
+        table.add(new ProbabilityItem("黄の秘石", "SSR", "/img/item/SSR-yellow.png", 3.53));
+        table.add(new ProbabilityItem("紫の秘石", "SSR", "/img/item/SSR-purple.png", 3.53));
+
+        // --- SR (32.95% -> 5種等分: 6.59%) ---
+        table.add(new ProbabilityItem("赤の大結晶", "SR", "/img/item/SR-red.png", 6.59));
+        table.add(new ProbabilityItem("青の大結晶", "SR", "/img/item/SR-blue.png", 6.59));
+        table.add(new ProbabilityItem("緑の大結晶", "SR", "/img/item/SR-green.png", 6.59));
+        table.add(new ProbabilityItem("黄の大結晶", "SR", "/img/item/SR-yellow.png", 6.59));
+        table.add(new ProbabilityItem("紫の大結晶", "SR", "/img/item/SR-purple.png", 6.59));
+
+        // --- R (47.05% -> 5種等分: 9.41%) ---
+        table.add(new ProbabilityItem("紅玉", "R", "/img/item/R-red.png", 9.41));
+        table.add(new ProbabilityItem("蒼玉", "R", "/img/item/R-blue.png", 9.41));
+        table.add(new ProbabilityItem("翠玉", "R", "/img/item/R-green.png", 9.41));
+        table.add(new ProbabilityItem("聖玉", "R", "/img/item/R-yellow.png", 9.41));
+        table.add(new ProbabilityItem("闇玉", "R", "/img/item/R-purple.png", 9.41));
+
+        return table;
+    }
+
+    // ----------- 内部クラス: 確率定義用DTO -----------
+    private static class ProbabilityItem {
+        String name;
+        String rarity;
+        String image;
+        double rate; // パーセント (例: 1.5 = 1.5%)
+
+        public ProbabilityItem(String name, String rarity, String image, double rate) {
+            this.name = name;
+            this.rarity = rarity;
+            this.image = image;
+            this.rate = rate;
+        }
     }
 
     // ----------- 提供割合表示用 -----------
@@ -127,22 +170,7 @@ public class GachaService {
             Map.of("rarity", "UR", "name", "夢幻の鍵", "rate", "2.35%", "color", "#FF66FF"),
             Map.of("rarity", "SSR", "name", "SSR 5種", "rate", "17.65%", "color", "#FFD700"),
             Map.of("rarity", "SR", "name", "SR 5種", "rate", "32.95%", "color", "#C0C0C0"),
-            Map.of("rarity", "R", "name", "R 5種", "rate", "44.70%", "color", "#B87333")
+            Map.of("rarity", "R", "name", "R 5種", "rate", "47.05%", "color", "#a26ac9")
         );
-    }
-
-    // ----------- 内部クラス：確率付きアイテム -----------
-    static class ProbabilityItem {
-        String name;
-        String rarity;
-        String image;
-        double rate;
-
-        ProbabilityItem(String name, String rarity, String image, double rate) {
-            this.name = name;
-            this.rarity = rarity;
-            this.image = image;
-            this.rate = rate;
-        }
     }
 }

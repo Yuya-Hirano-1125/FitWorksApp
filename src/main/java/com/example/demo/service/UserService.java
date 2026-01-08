@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -22,10 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.BackgroundUnlockDto;
 import com.example.demo.dto.MissionStatusDto;
+import com.example.demo.entity.Item;
 import com.example.demo.entity.User;
-import com.example.demo.entity.UserItem;
+import com.example.demo.repository.ItemRepository;
 import com.example.demo.repository.TrainingRecordRepository;
-import com.example.demo.repository.UserItemRepository;
 import com.example.demo.repository.UserRepository;
 
 @Service
@@ -40,8 +41,13 @@ public class UserService {
     @Autowired
     private JavaMailSender mailSender;
     
+    // 削除: UserItemRepository
+    // @Autowired
+    // private UserItemRepository userItemRepository;
+
+    // 追加: アイテム検索用
     @Autowired
-    private UserItemRepository userItemRepository;
+    private ItemRepository itemRepository;
 
     @Autowired
     private SmsService smsService;
@@ -60,7 +66,6 @@ public class UserService {
     // --- ユーザー登録関連 ---
     @Transactional
     public void registerUser(String username, String password, String email, LocalDate birthDate) {
-        // phoneNumber引数を削除して呼び出し
         registerNewUser(username, email, password, birthDate);
     }
     
@@ -72,14 +77,11 @@ public class UserService {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("そのメールアドレスは既に使用されています。");
         }
-        // 電話番号の重複チェックを削除
 
         User newUser = new User();
         newUser.setUsername(username);
         newUser.setEmail(email);
-        // 電話番号のセットを削除
-        // newUser.setPhoneNumber(phoneNumber); 
-        newUser.setBirthDate(birthDate); // 生年月日保存
+        newUser.setBirthDate(birthDate); 
         newUser.setPassword(passwordEncoder.encode(rawPassword));
         newUser.setLevel(1);
         newUser.setExperiencePoints(0);
@@ -90,25 +92,17 @@ public class UserService {
     }
 
     // --- パスワードリセット関連 (認証コード方式) ---
-
-    // 1. メールアドレスと生年月日を検証し、認証コードをメール送信する
     @Transactional
     public boolean sendAuthCodeByEmail(String email, LocalDate birthDate) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            // 生年月日の一致確認
             if (user.getBirthDate() != null && user.getBirthDate().equals(birthDate)) {
-                // 6桁の認証コードを生成
                 String code = String.format("%06d", new Random().nextInt(999999));
-                
-                // ユーザーにコードと有効期限(10分)を保存
                 user.setResetPasswordToken(code);
                 user.setTokenExpiration(LocalDateTime.now().plusMinutes(10));
                 userRepository.save(user);
-                
-                // メール送信
                 sendAuthCodeEmail(user.getEmail(), code);
                 return true;
             }
@@ -116,43 +110,34 @@ public class UserService {
         return false;
     }
 
-    // 2. 認証コードを検証し、成功すればパスワード再設定用トークン(UUID)を発行する
     @Transactional
     public String verifyAuthCode(String email, String code) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            
-            // トークンが一致し、かつ有効期限内であるか
             if (code != null && code.equals(user.getResetPasswordToken()) &&
                 user.getTokenExpiration() != null && 
                 user.getTokenExpiration().isAfter(LocalDateTime.now())) {
                 
-                // 認証成功：推測されにくい再設定用トークン(UUID)を発行して上書き保存
                 String resetToken = UUID.randomUUID().toString();
                 user.setResetPasswordToken(resetToken);
-                user.setTokenExpiration(LocalDateTime.now().plusMinutes(30)); // 再設定画面の有効期限は30分
+                user.setTokenExpiration(LocalDateTime.now().plusMinutes(30)); 
                 userRepository.save(user);
-                
-                return resetToken; // コントローラーにトークンを返す
+                return resetToken; 
             }
         }
-        return null; // 失敗
+        return null; 
     }
     
-    // 3. トークンを使ってパスワードを更新する
     @Transactional
     public boolean updatePasswordByToken(String token, String newPassword) {
         Optional<User> optionalUser = userRepository.findByResetPasswordToken(token);
         
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            
-            // 有効期限チェック
             if (user.getTokenExpiration() != null && user.getTokenExpiration().isAfter(LocalDateTime.now())) {
                 user.setPassword(passwordEncoder.encode(newPassword));
-                // トークンを無効化
                 user.setResetPasswordToken(null);
                 user.setTokenExpiration(null);
                 userRepository.save(user);
@@ -163,7 +148,6 @@ public class UserService {
     }
 
     // --- メール送信ヘルパーメソッド ---
-
     private void sendAuthCodeEmail(String toEmail, String code) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
@@ -205,7 +189,7 @@ public class UserService {
         }
     }
 
-    // --- 既存のパスワードリセット（旧方式・互換性のため維持） ---
+    // --- 既存のパスワードリセット（旧方式） ---
     @Transactional
     public boolean processForgotPassword(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
@@ -336,7 +320,6 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    // ★修正: 相互申請時に自動承認するロジックに変更 (戻り値をintへ: 0=失敗, 1=申請, 2=成立)
     @Transactional
     public int sendFriendRequest(String currentUsername, Long targetUserId) {
         Optional<User> senderOpt = userRepository.findByUsername(currentUsername);
@@ -346,37 +329,29 @@ public class UserService {
             User sender = senderOpt.get();
             User receiver = receiverOpt.get();
             
-            // バリデーション
-            if (sender.getId().equals(receiver.getId())) return 0; // 自分自身
-            if (sender.getFriends().contains(receiver)) return 0; // 既にフレンド
+            if (sender.getId().equals(receiver.getId())) return 0; 
+            if (sender.getFriends().contains(receiver)) return 0; 
             
-            // ★相互申請チェック: 相手から自分への申請が既にあるか？
             if (sender.getReceivedFriendRequests().contains(receiver)) {
-                // 自動承認処理
-                
-                // 1. お互いをフレンドに追加
                 sender.addFriend(receiver);
                 receiver.addFriend(sender);
                 
-                // 2. 申請データを双方から削除 (念のため両方向チェックして削除)
                 sender.removeReceivedFriendRequest(receiver);
                 receiver.removeReceivedFriendRequest(sender);
                 
-                // 3. 保存
                 userRepository.save(sender);
                 userRepository.save(receiver);
                 
-                return 2; // フレンド成立 (Matched)
+                return 2; 
             }
 
-            // 通常の申請処理
-            if (receiver.getReceivedFriendRequests().contains(sender)) return 0; // 既に申請済み
+            if (receiver.getReceivedFriendRequests().contains(sender)) return 0; 
 
             receiver.addReceivedFriendRequest(sender);
             userRepository.save(receiver);
-            return 1; // 申請送信 (Sent)
+            return 1; 
         }
-        return 0; // ユーザーが見つからない等
+        return 0; 
     }
 
     @Transactional
@@ -411,7 +386,6 @@ public class UserService {
         }
     }
 
-    // フレンド解除メソッド
     @Transactional
     public void removeFriend(String currentUsername, Long friendId) {
         Optional<User> userOpt = userRepository.findByUsername(currentUsername);
@@ -421,10 +395,9 @@ public class UserService {
             User user = userOpt.get();
             User friend = friendOpt.get();
 
-            // 双方向で削除
             if (user.getFriends().contains(friend)) {
                 user.getFriends().remove(friend);
-                friend.getFriends().remove(user); // 相手側のリストからも削除
+                friend.getFriends().remove(user); 
                 
                 userRepository.save(user);
                 userRepository.save(friend);
@@ -553,25 +526,46 @@ public class UserService {
                 .orElse(1); 
     }
     
+    // ★修正: UserItemRepositoryを使わず、Userエンティティのinventoryから取得
     public int getUserMaterialCount(String username, String materialType) {
-        return userItemRepository.findByUser_UsernameAndItem_Type(username, materialType)
-                .map(UserItem::getCount)
-                .orElse(0);
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null || user.getInventory() == null) {
+            return 0;
+        }
+        // マップを走査して、指定されたtypeのアイテムの合計数を返す
+        return user.getInventory().entrySet().stream()
+                .filter(entry -> {
+                    Item item = entry.getKey();
+                    return item != null && materialType.equals(item.getType());
+                })
+                .mapToInt(Map.Entry::getValue)
+                .sum();
     }
 
+    // ★修正: UserItemRepositoryを使わず、UserエンティティのuseItemを使用
     @Transactional
     public boolean consumeUserMaterial(String username, String materialType, int cost) {
-        Optional<UserItem> optItem = userItemRepository.findByUser_UsernameAndItem_Type(username, materialType);
-        if (optItem.isEmpty()) {
-            return false; 
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) return false;
+
+        // 指定されたタイプのアイテムを探す
+        Optional<Item> targetItem = user.getInventory().keySet().stream()
+                .filter(item -> materialType.equals(item.getType()))
+                // 複数ある場合は、とりあえず最初の1つを対象とする（必要ならロジック調整）
+                // または、合計数チェック後に減算するロジックが必要だが、
+                // 今回は「タイプ=ユニーク」または「どれか一つ消費」と仮定して簡易実装
+                .findFirst();
+
+        if (targetItem.isPresent()) {
+            Item item = targetItem.get();
+            // Userクラスのヘルパーメソッドを使用
+            boolean success = user.useItem(item, cost);
+            if (success) {
+                userRepository.save(user); // 変更を保存
+                return true;
+            }
         }
-        UserItem item = optItem.get();
-        if (item.getCount() < cost) {
-            return false; 
-        }
-        item.setCount(item.getCount() - cost); 
-        userItemRepository.save(item);
-        return true;
+        return false;
     }
 
     @Transactional
@@ -582,9 +576,17 @@ public class UserService {
         });
     }
     
-    public int getUserMaterialCount(String username, Long item_id) {
-        List<UserItem> items = userItemRepository.findAllByUser_UsernameAndItemId(username, item_id);
-        return items.size();
+    // ★修正: UserItemRepositoryを使わず、Userエンティティから取得
+    public int getUserMaterialCount(String username, Long itemId) {
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) return 0;
+        
+        // アイテムIDで検索 (ItemRepositoryを使うか、マップを走査)
+        return user.getInventory().entrySet().stream()
+                .filter(entry -> entry.getKey().getId().equals(itemId))
+                .mapToInt(Map.Entry::getValue)
+                .findFirst()
+                .orElse(0);
     }
     
     public BackgroundUnlockDto checkNewBackgroundUnlocks(String username) {
@@ -627,19 +629,23 @@ public class UserService {
         return dto;
     }
 
+    // ★修正: UserItemRepositoryを使わず、UserエンティティのuseItemを使用
     @Transactional
     public boolean consumeUserMaterialByItemId(String username, Long itemId, int cost) {
-        List<UserItem> items = userItemRepository.findAllByUser_UsernameAndItemId(username, itemId);
-        int totalCount = items.size(); 
-        
-        if (totalCount < cost) {
-            return false;
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null) return false;
+
+        // 対象のItemをリポジトリから取得 (Itemエンティティが必要)
+        Item item = itemRepository.findById(itemId).orElse(null);
+        if (item == null) return false;
+
+        // Userクラスのメソッドで消費
+        boolean success = user.useItem(item, cost);
+        if (success) {
+            userRepository.save(user);
+            return true;
         }
-        
-        for (int i = 0; i < cost && i < items.size(); i++) {
-            userItemRepository.delete(items.get(i));
-        }
-        return true;
+        return false;
     }
     
     @Transactional(readOnly = true)
