@@ -66,7 +66,23 @@
             margin: 0;
         }
 
-        .title-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: flex-start; padding-top: 60px; z-index: 10000; animation: fadeIn 0.4s; }
+        /* ▼▼▼ 修正箇所: ポップアップを画面中央に配置 ▼▼▼ */
+        .title-popup-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.7); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; /* 垂直方向中央揃え */
+            padding: 20px;       /* 画面端との余白を確保 */
+            z-index: 10000; 
+            animation: fadeIn 0.4s; 
+        }
+        /* ▲▲▲ 修正ここまで ▲▲▲ */
+
         .title-popup-content { background: linear-gradient(135deg, #fff, #f0f8ff); padding: 40px 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 4px solid #ffd700; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: scale(0.8) translateY(50px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
@@ -81,8 +97,6 @@
             .page-title { 
                 font-size: clamp(1.2rem, 7vw, 1.8rem); 
             }
-            
-            /* ★追加: ボタン位置の微調整（少し左へ） */
             .current-title-section form {
                 margin-right: 15px; 
             }

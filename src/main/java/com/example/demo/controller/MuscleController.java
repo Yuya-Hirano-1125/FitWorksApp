@@ -33,7 +33,7 @@ public class MuscleController {
         User user = userService.findByUsername(principal.getName());
         List<UserMuscle> muscles = muscleService.getUserMuscles(user);
         model.addAttribute("muscles", muscles);
-        return "muscles/index";
+        return "muscles/muscle-status";
     }
 
     @PostMapping("/rename")

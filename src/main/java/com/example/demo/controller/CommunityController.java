@@ -65,7 +65,7 @@ public class CommunityController {
             model.addAttribute("currentUser", currentUser);
         }
 
-        return "community/index";
+        return "community/post-list";
     }
 
     // 投稿処理（修正: 画像ファイルを受け取るように変更）

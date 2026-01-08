@@ -55,7 +55,7 @@ public class FriendController {
         model.addAttribute("requests", requests);
         model.addAttribute("currentSection", "list"); 
 
-        return "friends/index"; 
+        return "friends/friend-list"; 
     }
 
     // ユーザー検索
@@ -75,7 +75,7 @@ public class FriendController {
         model.addAttribute("requests", currentUser.getReceivedFriendRequests());
         model.addAttribute("currentSection", "search");
 
-        return "friends/index";
+        return "friends/friend-list";
     }
 
     // フレンド申請送信

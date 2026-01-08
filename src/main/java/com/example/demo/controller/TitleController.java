@@ -46,7 +46,7 @@ public class TitleController {
             model.addAttribute("newlyUnlockedTitles", newTitles);
         }
         
-        return "titles/index";
+        return "titles/title-list";
     }
 
     @PostMapping("/equip")
