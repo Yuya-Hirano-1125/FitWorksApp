@@ -49,6 +49,19 @@ public class AuthController {
     @Autowired
     private CharacterRepository characterRepository;
 
+ // ★追加: アプリ起動時(ルートパス)に start.html を表示
+    @GetMapping("/")
+    public String showStart() {
+        // もし既にログイン済みなら、ホーム画面へリダイレクトさせる（不要ならこのifブロックは削除可）
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && 
+            !(authentication instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/home";
+        }
+        
+        return "start"; // templates/start.html を表示
+    }
+    
     @GetMapping("/login")
     public String login() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
     
     <style>
-        /* CSSは前回の内容のまま */
+        /* CSS修正: imgタグに枠線と角丸を追加 */
         body { margin: 0; padding: 0; background-color: #f0f8ff; height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column; overflow: hidden; font-family: "M PLUS Rounded 1c", sans-serif; color: #5d54a4; }
         .interactive-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(-45deg, #a18cd1, #fbc2eb, #a6c1ee, #96e6a1); background-size: 400% 400%; animation: auroraFlow 20s ease infinite; }
         @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -22,8 +22,26 @@
         .cloud-1 { top: 5%; left: 5%; width: 400px; height: 400px; animation: floatCloud 25s infinite alternate ease-in-out; }
         .cloud-2 { bottom: 5%; right: -5%; width: 550px; height: 550px; animation: floatCloud 30s infinite alternate-reverse ease-in-out; }
         @keyframes floatCloud { 0% { transform: translate(0, 0); } 100% { transform: translate(40px, -20px); } }
-        .gif-container { z-index: 10; display: flex; justify-content: center; align-items: center; }
-        img { max-width: 100%; height: auto; max-height: 80vh; pointer-events: none; user-select: none; -webkit-user-drag: none; -webkit-touch-callout: none; }
+        .gif-container { z-index: 10; display: flex; justify-content: center; align-items: center; width: 100%; }
+        
+        /* ▼▼▼ 修正箇所: 画像に枠線と角丸を追加 ▼▼▼ */
+        img { 
+            max-width: 85%; /* 枠線の分を考慮して少し小さく */
+            height: auto; 
+            max-height: 70vh; 
+            pointer-events: none; 
+            user-select: none; 
+            -webkit-user-drag: none; 
+            -webkit-touch-callout: none;
+            
+            /* デザイン追加 */
+            border: 8px solid #fff;       /* 白い枠線 */
+            border-radius: 30px;          /* 角を丸く */
+            box-shadow: 0 10px 30px rgba(93, 84, 164, 0.4); /* 影をつけて浮き上がらせる */
+            background-color: #fff;       /* 背景色（透過GIF用） */
+            box-sizing: border-box;
+        }
+
         p { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); margin: 0; font-size: 1.2rem; font-weight: 800; letter-spacing: 0.1em; color: #5d54a4; text-shadow: 2px 2px 0px rgba(255,255,255,0.8); z-index: 20; animation: pulseText 2s infinite; }
         @keyframes pulseText { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
         .skip-button { position: fixed; top: 20px; right: 20px; padding: 10px 25px; font-size: 1rem; font-weight: 900; border-radius: 50px; border: 2px solid #fff; cursor: pointer; background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); color: white; box-shadow: 0 5px 15px rgba(161, 140, 209, 0.4); transition: transform 0.2s, box-shadow 0.2s; z-index: 100; font-family: "M PLUS Rounded 1c", sans-serif; }
@@ -57,7 +75,6 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         function goResult() {
-            // ★修正: フォーム送信によるPOST遷移に変更
             document.getElementById('drawForm').submit();
         }
 
@@ -65,7 +82,7 @@
             goResult();
         }, 5500);
 
-        // --- 背景アニメーション (省略: 変更なし) ---
+        // --- 背景アニメーション ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let particlesArray = [];
