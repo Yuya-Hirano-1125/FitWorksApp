@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.example.demo.dto.ItemCountDTO;
 import com.example.demo.entity.Item;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
@@ -15,24 +14,13 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("SELECT i FROM Item i WHERE i.type = :type ORDER BY i.sortOrder ASC")
     List<Item> findByType(@Param("type") String type);
 
-
-    // --- ユーザーごとの所持数を集計（登録順で並べる） ---
-    @Query("SELECT new com.example.demo.dto.ItemCountDTO(" +
-           "i.name, i.imagePath, " +
-           "COALESCE(SUM(CASE WHEN ui.id IS NOT NULL THEN 1 ELSE 0 END), 0), " +
-           "i.rarity) " +
-           "FROM Item i " +
-           "LEFT JOIN UserItem ui ON i.id = ui.item.id AND ui.user.id = :userId " +
-           "GROUP BY i.id, i.name, i.imagePath, i.rarity, i.sortOrder " +
-           "ORDER BY i.sortOrder ASC")
-    List<ItemCountDTO> findItemCountsByUserId(@Param("userId") Long userId);
-
+    // ★削除: findItemCountsByUserId (UserItemエンティティ廃止のため)
+    // 今後はController/Service側で findAllOrderBySortOrder と User.inventory を組み合わせて計算します。
 
     // --- 全アイテムを sortOrder 順で取得 ---
     @Query("SELECT i FROM Item i ORDER BY i.sortOrder ASC")
     List<Item> findAllOrderBySortOrder();
 
-
-    // --- ★ 追加：アイテム名で検索 ---
+    // --- アイテム名で検索 ---
     Item findByName(String name);
 }

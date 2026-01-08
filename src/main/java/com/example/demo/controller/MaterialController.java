@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.example.demo.dto.ItemCountDTO;
 import com.example.demo.entity.Item;
 import com.example.demo.entity.User;
+import com.example.demo.repository.ItemRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.CustomUserDetails;
 
@@ -20,10 +20,11 @@ import com.example.demo.security.CustomUserDetails;
 public class MaterialController {
 
     private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
-    // ItemRepositoryへの依存を削除し、UserRepositoryを注入
-    public MaterialController(UserRepository userRepository) {
+    public MaterialController(UserRepository userRepository, ItemRepository itemRepository) {
         this.userRepository = userRepository;
+        this.itemRepository = itemRepository;
     }
 
     // ログインユーザーごとの素材一覧を表示
@@ -37,44 +38,31 @@ public class MaterialController {
         // ログインユーザーIDを取得
         Long userId = userDetails.getId();
 
-        // 最新のユーザー情報を取得 (インベントリを確実に取得するため)
+        // 1. ユーザー情報を取得 (所持アイテムMapを使うため)
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         
-        // ユーザーのインベントリマップを取得
-        Map<Item, Integer> inventory = user.getInventory();
+        // 2. 全アイテムマスタを取得 (未所持のアイテムも表示するため)
+        List<Item> allItems = itemRepository.findAllOrderBySortOrder();
 
-        // MapのエントリをDTOリストに変換
+        // 3. 表示用リストを作成 (全アイテム × ユーザーの所持数)
         List<ItemCountDTO> items = new ArrayList<>();
         
-        for (Map.Entry<Item, Integer> entry : inventory.entrySet()) {
-            Item item = entry.getKey();
-            Integer count = entry.getValue();
+        for (Item item : allItems) {
+            // Userクラスに追加したヘルパーメソッドで所持数を取得 (未所持なら0が返る)
+            int count = user.getItemCount(item);
             
-            // アイテムの個数が0以下の場合はリストに含めない場合はここでチェック
-            if (count <= 0) continue;
-
-            // DTOに変換
             ItemCountDTO dto = new ItemCountDTO();
             dto.setName(item.getName());
             dto.setImagePath(item.getImagePath());
             dto.setRarity(item.getRarity());
             dto.setCount(count);
             
-            // ソート順制御のために元のItemエンティティの情報を利用したい場合、DTOにフィールドを追加するか、
-            // ここで一時的に保持してソートに使用します。
-            // 今回はDTOにはsortOrderがない前提で、変換後にItemのsortOrderを参照できないため
-            // ItemCountDTOにsortOrderフィールドがない場合は、Itemオブジェクト自体を使ってソートしてから変換するのがベターです。
-            
             items.add(dto);
         }
 
-        // ソート: 簡易的にレアリティ順や名前順などでソート (必要に応じて調整してください)
-        // 元のItemにsortOrderがある場合は、MapのKeySetをsortしてからDTOにするのが理想です。
-        // ここではDTO変換後に簡易ソートする例とします。
-        
         // デバッグ出力
         System.out.println("ログインユーザーID: " + userId);
-        System.out.println("所持アイテム種類数: " + items.size());
+        System.out.println("表示対象アイテム総数: " + items.size());
 
         // レアリティごとにフィルタリングして渡す
         model.addAttribute("itemsR", items.stream()

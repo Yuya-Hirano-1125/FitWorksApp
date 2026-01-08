@@ -1,35 +1,49 @@
 package com.example.demo.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "gacha_results")
+@Data
+@NoArgsConstructor
 public class GachaResult {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long userId;       // ★ Long 型に変更
-    private String itemName;
-    private String rarity;
-    private String createdAt;
 
-    public GachaResult() {}
+    private Long userId;       // ユーザーID
+    private String itemName;   // アイテム名
+    private String rarity;     // レアリティ
+    
+    // ★修正: GachaServiceに合わせてフィールド名を変更
+    private String drawDateTime; 
 
-    public GachaResult(Long userId, String itemName, String rarity, String createdAt) {
+    // コンストラクタ
+    public GachaResult(Long userId, String itemName, String rarity, String drawDateTime) {
         this.userId = userId;
         this.itemName = itemName;
         this.rarity = rarity;
-        this.createdAt = createdAt;
+        this.drawDateTime = drawDateTime;
     }
 
-    // Getter / Setter
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // --- Getter / Setter (Lombok @Data で自動生成されますが、明示的に書く場合は以下) ---
+    // ※ @Data があるので本来は不要ですが、念のため古いコードとの互換性で残す場合は以下のように名前を修正してください
 
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    /*
+    public String getDrawDateTime() {
+        return drawDateTime;
+    }
 
-    public String getItemName() { return itemName; }
-    public void setItemName(String itemName) { this.itemName = itemName; }
-
-    public String getRarity() { return rarity; }
-    public void setRarity(String rarity) { this.rarity = rarity; }
-
-    public String getCreatedAt() { return createdAt; }
-    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+    public void setDrawDateTime(String drawDateTime) {
+        this.drawDateTime = drawDateTime;
+    }
+    */
 }
