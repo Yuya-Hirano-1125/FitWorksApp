@@ -20,7 +20,7 @@ public class AICoachController {
         } else {
             model.addAttribute("username", "ゲスト");
         }
-        return "ai-coach/ai-coach-chat"; // 修正
+        return "aicoach/ai-coach-chat"; // 修正
     }
 }
 
