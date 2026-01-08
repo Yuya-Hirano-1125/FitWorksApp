@@ -3,7 +3,9 @@ package com.example.demo.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import jakarta.persistence.CollectionTable;
@@ -20,13 +22,19 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyJoinColumn;
 import jakarta.persistence.Table;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Table(name = "users")
-@Data // ★Lombok: Getter, Setter, toString, equals, hashCodeを自動生成
+@Data // Lombok: Getter, Setter, toString, equals, hashCodeを自動生成
+// 循環参照防止のため、コレクション系のフィールドはtoString/equalsから除外することを推奨します
+@EqualsAndHashCode(exclude = {"friends", "receivedFriendRequests", "inventory", "unlockedCharacters", "unlockedBackgrounds"})
+@ToString(exclude = {"friends", "receivedFriendRequests", "inventory", "unlockedCharacters", "unlockedBackgrounds"})
 public class User {
 
     @Id
@@ -34,7 +42,7 @@ public class User {
     private Long id;
 
     private int xp = 0;
-    // ★追加: 最後にユーザー名を変更した日時
+    // 最後にユーザー名を変更した日時
     private LocalDateTime lastUsernameChangeDate;
 
     @Column(unique = true)
@@ -48,10 +56,10 @@ public class User {
     @Column(unique = true)
     private String phoneNumber;
     
-    // ★追加: 生年月日
+    // 生年月日
     private LocalDate birthDate;
     
-    // ★追加: 選択中のキャラクターID (nullの場合はレベル連動などのデフォルト挙動)
+    // 選択中のキャラクターID (nullの場合はレベル連動などのデフォルト挙動)
     @Column(name = "selected_character_id")
     private Long selectedCharacterId;
 
@@ -125,6 +133,14 @@ public class User {
     @Column(name = "last_background_check_level")
     private Integer lastBackgroundCheckLevel = 1;
 
+    // ★★★ 所持アイテム管理 (変更点) ★★★
+    // user_inventory テーブル (user_id, item_id, quantity) が生成され、Itemをキーとして個数を管理します
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_inventory", joinColumns = @JoinColumn(name = "user_id"))
+    @MapKeyJoinColumn(name = "item_id")
+    @Column(name = "quantity")
+    private Map<Item, Integer> inventory = new HashMap<>();
+
     public User() {
         if (this.level == null) this.level = 1;
         if (this.isRewardClaimedToday == null) this.isRewardClaimedToday = false;
@@ -136,13 +152,13 @@ public class User {
         if (this.provider == null) this.provider = AuthProvider.LOCAL;
     }
 
-    // --- ロジックを含むメソッド（Lombokで代替できないため維持） ---
+    // --- ロジックを含むメソッド ---
 
     public String getDisplayTitle() {
         return equippedTitle != null ? equippedTitle.getDisplayName() : "なし";
     }
 
-    // Nullチェック付きGetter群（DBからの読込時にNullの場合のデフォルト値を保証するため維持）
+    // Nullチェック付きGetter群
     public Integer getLevel() { return level != null ? level : 1; }
     
     public Boolean isNotificationTrainingReminder() { return notificationTrainingReminder != null ? notificationTrainingReminder : true; }
@@ -179,7 +195,6 @@ public class User {
         }
     }
 
-    // エイリアスメソッド（維持）
     public int getExperiencePoints() { return getXp(); }
     public void setExperiencePoints(int xp) { this.xp = xp; }
 
@@ -189,7 +204,6 @@ public class User {
     }
 
     // --- チップ関連 ---
-    // Nullチェックが含まれるため維持
     public Integer getChipCount() { return chipCount != null ? chipCount : 0; }
     
     public void addChips(int chips) {
@@ -216,7 +230,6 @@ public class User {
         return unlockedCharacters != null && unlockedCharacters.contains(characterId);
     }
     
-    // Nullチェック付きGetter/Setter（維持）
     public Set<Long> getUnlockedCharacters() {
         if (unlockedCharacters == null) unlockedCharacters = new HashSet<>();
         return unlockedCharacters;
@@ -225,12 +238,11 @@ public class User {
         this.unlockedCharacters = unlockedCharacters != null ? unlockedCharacters : new HashSet<>();
     }
 
-    // ★★★ 解放済み背景管理メソッド ★★★
+    // --- 解放済み背景管理 ---
     public Set<String> getUnlockedBackgrounds() {
         if (unlockedBackgrounds == null) unlockedBackgrounds = new HashSet<>();
         return unlockedBackgrounds;
     }
-    // ロジック付きSetter（維持）
     public void setUnlockedBackgrounds(Set<String> unlockedBackgrounds) {
         this.unlockedBackgrounds = (unlockedBackgrounds != null) ? unlockedBackgrounds : new HashSet<>();
     }
@@ -242,10 +254,41 @@ public class User {
         return backgroundId != null && unlockedBackgrounds != null && unlockedBackgrounds.contains(backgroundId);
     }
 
-    // ★★★ 背景解放チェック済みレベル ★★★
-    // Nullチェック付きGetter（維持）
     public Integer getLastBackgroundCheckLevel() { return lastBackgroundCheckLevel != null ? lastBackgroundCheckLevel : 1; }
-    // ロジック付きSetter（維持）
     public void setLastBackgroundCheckLevel(Integer lastBackgroundCheckLevel) { this.lastBackgroundCheckLevel = (lastBackgroundCheckLevel != null) ? lastBackgroundCheckLevel : 1; }
-    
+
+    // --- ★ アイテム管理用ヘルパーメソッド (新規追加) ---
+
+    /**
+     * 指定したアイテムを指定個数追加します。
+     */
+    public void addItem(Item item, int count) {
+        if (count <= 0) return;
+        this.inventory.merge(item, count, Integer::sum);
+    }
+
+    /**
+     * 指定したアイテムを指定個数消費します。
+     * @return 消費に成功した場合 true, 足りない場合 false
+     */
+    public boolean useItem(Item item, int count) {
+        if (count <= 0) return false;
+        int current = this.inventory.getOrDefault(item, 0);
+        if (current >= count) {
+            if (current == count) {
+                this.inventory.remove(item);
+            } else {
+                this.inventory.put(item, current - count);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 指定したアイテムの所持数を取得します。
+     */
+    public int getItemCount(Item item) {
+        return this.inventory.getOrDefault(item, 0);
+    }
 }

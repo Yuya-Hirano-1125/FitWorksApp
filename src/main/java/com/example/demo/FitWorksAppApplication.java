@@ -10,8 +10,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.demo.entity.Exercise;
+import com.example.demo.entity.Item;
 import com.example.demo.entity.User;
 import com.example.demo.repository.ExerciseRepository;
+import com.example.demo.repository.ItemRepository;
 import com.example.demo.repository.UserRepository;
 
 @SpringBootApplication
@@ -25,7 +27,11 @@ public class FitWorksAppApplication {
      * アプリケーション起動時に初期データ（ユーザー・トレーニング種目）を作成するCommandLineRunner
      */
     @Bean
-    public CommandLineRunner dataInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder, ExerciseRepository exerciseRepository) {
+    public CommandLineRunner dataInitializer(UserRepository userRepository, 
+                                             PasswordEncoder passwordEncoder, 
+                                             ExerciseRepository exerciseRepository,
+                                             ItemRepository itemRepository
+                                             ) {
         return args -> {
             // ==========================================
             // 1. ユーザーの初期化
@@ -69,6 +75,17 @@ public class FitWorksAppApplication {
                 adminUser.setExperiencePoints(9999999);
                 adminUser.setChipCount(9999999);
                 
+                // ★修正: 全アイテムを9999個付与する処理 (User.addItemを使用)
+                List<Item> allItems = itemRepository.findAll();
+                if (!allItems.isEmpty()) {
+                    for (Item item : allItems) {
+                        // Userクラスに追加したMap操作用のヘルパーメソッドを使用
+                        adminUser.addItem(item, 9999);
+                    }
+                    System.out.println("✅ Admin user setup with 9999 of all items.");
+                }
+
+                // ユーザーを保存（アイテムマップも同時に保存されます）
                 userRepository.save(adminUser);
                 System.out.println("✅ Admin user '" + USERNAME_ADMIN + "' created successfully. (Pass: admin)");
             }
@@ -96,7 +113,7 @@ public class FitWorksAppApplication {
                 addWeight(list, "胸", "ダンベルフライ", "大胸筋", "ダンベル", "肘を少し曲げ、円を描くようにダンベルを開閉する。ストレッチ種目の代表格。", "中級");
                 addWeight(list, "胸", "インクライン・ダンベルフライ", "大胸筋上部", "ダンベル", "上部狙いのフライ。ストレッチポジションでしっかり胸を張る。", "中級");
                 addWeight(list, "胸", "デクライン・ダンベルフライ", "大胸筋下部", "ダンベル", "下部狙いのフライ。", "中級");
-                addWeight(list, "胸", "ダンベル・プルオーバー", "大胸筋・広背筋", "ダンベル", "ベンチに仰向けになり、ダンベルを頭の後ろへ下ろしてから胸の上へ戻す。胸郭を広げる効果も。", "中級");
+                addWeight(list, "胸", "ダンベル・プルオーバー", "大胸筋・広背筋", "ダンベル", "ベンチに仰向けになり、ダンベルを頭の後ろへ下ろす。胸郭を広げる効果も。", "中級");
                 addWeight(list, "胸", "スクイーズプレス", "大胸筋内側", "ダンベル", "ダンベル同士を押し付け合いながらプレス動作を行う。常に胸の内側に力が入る。", "中級");
                 addWeight(list, "胸", "アラウンド・ザ・ワールド", "大胸筋", "ダンベル", "ベンチに寝て、掌を上に向け、円を描くようにダンベルを頭上から腰横まで移動させる。", "中級");
                 addWeight(list, "胸", "チェストプレス(マシン)", "大胸筋", "マシン", "軌道が固定されており安全に高重量を扱える。初心者から上級者までおすすめ。", "初級");

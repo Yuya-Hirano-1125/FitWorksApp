@@ -13,8 +13,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.entity.User;
 import com.example.demo.model.GachaItem;
-import com.example.demo.repository.ItemRepository;
-import com.example.demo.repository.UserItemRepository;
 import com.example.demo.service.GachaService;
 import com.example.demo.service.UserService;
 
@@ -23,15 +21,12 @@ public class GachaController {
 
     private final GachaService gachaService;
     private final UserService userService;
-    private final UserItemRepository userItemRepository;
-    private final ItemRepository itemRepository;
+    // 削除: UserItemRepository, ItemRepository (未使用のため)
 
-    public GachaController(GachaService gachaService, UserService userService, 
-                           UserItemRepository userItemRepository, ItemRepository itemRepository) {
+    // コンストラクタからもリポジトリを削除
+    public GachaController(GachaService gachaService, UserService userService) {
         this.gachaService = gachaService;
         this.userService = userService;
-        this.userItemRepository = userItemRepository;
-        this.itemRepository = itemRepository;
     }
 
     // 1. ガチャ画面
@@ -43,12 +38,12 @@ public class GachaController {
 
             model.addAttribute("userId", userId);
 
-            // ★変更: 変数名を coinCount に変更 (メソッド名は getChipCount のままでOK)
+            // 変数名を coinCount に変更
             int coinCount = user.getChipCount();
             model.addAttribute("coinCount", coinCount);
 
         } else {
-            model.addAttribute("coinCount", 0); // ★変更
+            model.addAttribute("coinCount", 0);
             model.addAttribute("userId", 0L);
         }
 
@@ -56,7 +51,7 @@ public class GachaController {
         return "gacha/gacha";
     }
 
- // 2. 演出画面 (★修正: GetMapping -> PostMapping, userId削除)
+    // 2. 演出画面
     @PostMapping("/gacha/animation")
     public String animation(@RequestParam("count") int count, @AuthenticationPrincipal UserDetails userDetails, Model model) {
         // userIdはURLで受け取らず、認証情報があるかだけのチェック（必要なら）に使用
@@ -65,7 +60,7 @@ public class GachaController {
         return "gacha/gacha_animation";
     }
 
- // 3. ガチャ抽選処理 (★修正: GetMapping -> PostMapping)
+    // 3. ガチャ抽選処理
     @PostMapping("/gacha/draw") 
     public String draw(@RequestParam("count") int count,
                        @AuthenticationPrincipal UserDetails userDetails,
@@ -89,6 +84,8 @@ public class GachaController {
 
         userService.save(user);
 
+        // ★注意: GachaService内でも UserItemRepository を使用している場合、
+        // そこも user.addItem(...) を使う形に修正が必要になります。
         List<GachaItem> results = gachaService.roll(count, userId);
         
         redirectAttributes.addFlashAttribute("results", results);

@@ -76,7 +76,7 @@ VALUES (190, 'ロービアス', 'dark', '★4', 190, 25, '/img/character/190.png
 
 -- シークレット (Secret)
 INSERT OR IGNORE INTO characters (id, name, attribute, rarity, required_level, unlock_cost, image_path)
-VALUES (250, 'シークレット', 'secret', '★5', 250, 50, '/img/character/250.png');
+VALUES (250, 'シークレット', 'secret', '★5', 250, 50, '/img/AIcoach.png');
 
 
 -- ▼ 背景アイテムデータ (background_items)
