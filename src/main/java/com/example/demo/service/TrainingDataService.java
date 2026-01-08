@@ -1,5 +1,8 @@
 package com.example.demo.service;
 
+// ★追加: entryメソッドを静的インポートすると記述がスッキリします
+import static java.util.Map.*;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -18,7 +21,24 @@ public class TrainingDataService {
 
     private final ExerciseRepository exerciseRepository;
 
-    // コンストラクタでRepositoryを受け取る
+    // ★修正: Map.ofEntries を使用して11個以上のペアを定義
+    private static final Map<String, String> SPECIAL_READINGS = Map.ofEntries(
+        entry("懸垂", "ケンスイ"),
+        entry("水中", "スイチュウ"),
+        entry("水泳", "スイエイ"),
+        entry("踏み台", "フミダイ"),
+        entry("縄跳び", "ナワトビ"),
+        entry("二重跳び", "ニジュウトビ"),
+        entry("Tバー", "ティーバー"),
+        entry("Yレイズ", "ワイレイズ"),
+        entry("Zプレス", "ゼットプレス"),
+        entry("JM", "ジェイエム"),
+        entry("HIIT", "ヒット")
+    );
+
+    // 部位の表示順序
+    private static final List<String> BODY_PART_ORDER = List.of("胸", "背中", "脚", "肩", "腕", "腹筋");
+
     public TrainingDataService(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
     }
@@ -26,24 +46,15 @@ public class TrainingDataService {
     // 50音順ソート用のコンパレータ
     private final Comparator<ExerciseData> exerciseComparator = Comparator.comparing(e -> getReading(e.getName()));
 
-    // 種目名から読み仮名を取得（ソート用）
     private String getReading(String name) {
-        String s = name;
-        if (s.startsWith("懸垂")) return "ケンスイ" + s;
-        if (s.startsWith("水中")) return "スイチュウ" + s;
-        if (s.startsWith("水泳")) return "スイエイ" + s;
-        if (s.startsWith("踏み台")) return "フミダイ" + s;
-        if (s.startsWith("縄跳び")) return "ナワトビ" + s;
-        if (s.startsWith("二重跳び")) return "ニジュウトビ" + s;
-        if (s.startsWith("Tバー")) return "ティーバー" + s;
-        if (s.startsWith("Yレイズ")) return "ワイレイズ" + s;
-        if (s.startsWith("Zプレス")) return "ゼットプレス" + s;
-        if (s.startsWith("JM")) return "ジェイエム" + s;
-        if (s.startsWith("HIIT")) return "ヒット" + s;
-        return s;
+        // 特殊な接頭辞が含まれているかチェック
+        return SPECIAL_READINGS.entrySet().stream()
+                .filter(entry -> name.startsWith(entry.getKey()))
+                .map(entry -> entry.getValue() + name.substring(entry.getKey().length()))
+                .findFirst()
+                .orElse(name); // 特殊ルールがなければそのままの名前を使う
     }
 
-    // Entity(DBデータ) -> DTO(表示用データ) 変換メソッド
     private ExerciseData convertToDto(Exercise e) {
         return new ExerciseData(
             e.getName(),
@@ -54,56 +65,36 @@ public class TrainingDataService {
         );
     }
 
-    /**
-     * DBからWEIGHT種目を取得し、部位ごとにグループ化して返す
-     */
     public Map<String, List<ExerciseData>> getFreeWeightExercisesByPart() {
-        // DBから "WEIGHT" タイプの全データを取得
         List<Exercise> entities = exerciseRepository.findByType("WEIGHT");
-        
-        // 部位ごとにリストにまとめるためのMap
-        Map<String, List<ExerciseData>> map = new LinkedHashMap<>();
-        
-        // 表示順序を固定したい場合は、ここで空のリストをputしておく
-        String[] order = {"胸", "背中", "脚", "肩", "腕", "腹筋"};
-        for (String part : order) {
-            map.put(part, new ArrayList<>());
-        }
 
-        // 取得したデータを部位ごとに振り分け
-        for (Exercise e : entities) {
+        // ベースとなる順序付きマップを作成
+        Map<String, List<ExerciseData>> map = new LinkedHashMap<>();
+        BODY_PART_ORDER.forEach(part -> map.put(part, new ArrayList<>()));
+
+        // データを振り分け
+        entities.forEach(e -> {
             String group = e.getBodyPartGroup();
             map.computeIfAbsent(group, k -> new ArrayList<>()).add(convertToDto(e));
-        }
+        });
 
-        // 各部位リスト内で50音順にソート
-        for (List<ExerciseData> list : map.values()) {
-            list.sort(exerciseComparator);
-        }
+        // 各リストをソート
+        map.values().forEach(list -> list.sort(exerciseComparator));
 
         return map;
     }
 
-    /**
-     * DBからWEIGHT種目を取得し、部位ごとにグループ化して返す（互換用）
-     */
     public Map<String, List<ExerciseData>> getFreeWeightExercises() {
         return getFreeWeightExercisesByPart();
     }
 
-    /**
-     * DBからCARDIO種目を取得して返す
-     */
     public List<ExerciseData> getCardioExercises() {
-        List<Exercise> entities = exerciseRepository.findByType("CARDIO");
-        
-        return entities.stream()
+        return exerciseRepository.findByType("CARDIO").stream()
                 .map(this::convertToDto)
                 .sorted(exerciseComparator)
                 .collect(Collectors.toList());
     }
 
-    // MySet作成フォームなどで使用する簡易Map
     public Map<String, List<String>> getSimpleFreeWeightExercisesMap() {
         return getFreeWeightExercisesByPart().entrySet().stream()
                 .collect(Collectors.toMap(
@@ -116,35 +107,25 @@ public class TrainingDataService {
                 ));
     }
 
-    // 部位のリストを取得
     public List<String> getMuscleParts() {
         return new ArrayList<>(getFreeWeightExercisesByPart().keySet());
     }
     
-    // 有酸素運動の簡易リスト
     public List<String> getSimpleCardioExercisesList() {
         return getCardioExercises().stream()
                 .map(ExerciseData::getName)
                 .collect(Collectors.toList());
     }
 
-    // 種目名からExerciseDataを取得
     public ExerciseData getExerciseDataByName(String name) {
         Exercise e = exerciseRepository.findByName(name);
-        if (e != null) {
-            return convertToDto(e);
-        }
-        return null;
+        return (e != null) ? convertToDto(e) : null;
     }
     
-    // 種目名から部位を逆引きするメソッド
     public String findPartByExerciseName(String name) {
         Exercise e = exerciseRepository.findByName(name);
         if (e != null) {
-            if ("CARDIO".equals(e.getType())) {
-                return "有酸素";
-            }
-            return e.getBodyPartGroup(); 
+            return "CARDIO".equals(e.getType()) ? "有酸素" : e.getBodyPartGroup();
         }
         return "その他";
     }

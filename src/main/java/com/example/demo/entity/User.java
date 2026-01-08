@@ -22,8 +22,11 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import lombok.Data;
+
 @Entity
 @Table(name = "users")
+@Data // ★Lombok: Getter, Setter, toString, equals, hashCodeを自動生成
 public class User {
 
     @Id
@@ -114,7 +117,7 @@ public class User {
     @Column(name = "background_id")
     private Set<String> unlockedBackgrounds = new HashSet<>();
 
- // ★★★ 選択中の背景 ★★★
+    // ★★★ 選択中の背景 ★★★
     @Column(name = "selected_background")
     private String selectedBackground;
 
@@ -133,89 +136,27 @@ public class User {
         if (this.provider == null) this.provider = AuthProvider.LOCAL;
     }
 
-    // --- Getter / Setter ---
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-    
-    // ★追加: 生年月日 Getter/Setter
-    public LocalDate getBirthDate() { return birthDate; }
-    public void setBirthDate(LocalDate birthDate) { this.birthDate = birthDate; }
-
-    public AuthProvider getProvider() { return provider; }
-    public void setProvider(AuthProvider provider) { this.provider = provider; }
-
-    public String getProviderId() { return providerId; }
-    public void setProviderId(String providerId) { this.providerId = providerId; }
-
-    public Integer getLevel() { return level != null ? level : 1; }
-    public void setLevel(Integer level) { this.level = level; }
-
-    public int getXp() { return xp; }
-    public void setXp(int xp) { this.xp = xp; }
-    
- // ★追加: Getter / Setter
-    public Long getSelectedCharacterId() { return selectedCharacterId; }
-    public void setSelectedCharacterId(Long selectedCharacterId) { this.selectedCharacterId = selectedCharacterId; }
-
-    public LocalDate getLastMissionCompletionDate() { return lastMissionCompletionDate; }
-    public void setLastMissionCompletionDate(LocalDate lastMissionCompletionDate) { this.lastMissionCompletionDate = lastMissionCompletionDate; }
-
-    public Boolean getIsRewardClaimedToday() { return isRewardClaimedToday; }
-    public void setIsRewardClaimedToday(Boolean isRewardClaimedToday) { this.isRewardClaimedToday = isRewardClaimedToday; }
-
-    public AppTitle getEquippedTitle() { return equippedTitle; }
-    public void setEquippedTitle(AppTitle equippedTitle) { this.equippedTitle = equippedTitle; }
+    // --- ロジックを含むメソッド（Lombokで代替できないため維持） ---
 
     public String getDisplayTitle() {
         return equippedTitle != null ? equippedTitle.getDisplayName() : "なし";
     }
 
-    public Item getEquippedBackgroundItem() { return equippedBackgroundItem; }
-    public void setEquippedBackgroundItem(Item equippedBackgroundItem) { this.equippedBackgroundItem = equippedBackgroundItem; }
-
-    public Item getEquippedCostumeItem() { return equippedCostumeItem; }
-    public void setEquippedCostumeItem(Item equippedCostumeItem) { this.equippedCostumeItem = equippedCostumeItem; }
-
+    // Nullチェック付きGetter群（DBからの読込時にNullの場合のデフォルト値を保証するため維持）
+    public Integer getLevel() { return level != null ? level : 1; }
+    
     public Boolean isNotificationTrainingReminder() { return notificationTrainingReminder != null ? notificationTrainingReminder : true; }
-    public void setNotificationTrainingReminder(Boolean notificationTrainingReminder) { this.notificationTrainingReminder = notificationTrainingReminder; }
-
     public Boolean isNotificationAiSuggestion() { return notificationAiSuggestion != null ? notificationAiSuggestion : true; }
-    public void setNotificationAiSuggestion(Boolean notificationAiSuggestion) { this.notificationAiSuggestion = notificationAiSuggestion; }
-
     public Boolean isNotificationProgressReport() { return notificationProgressReport != null ? notificationProgressReport : false; }
-    public void setNotificationProgressReport(Boolean notificationProgressReport) { this.notificationProgressReport = notificationProgressReport; }
-
+    
     public LocalTime getLifestyleReminderTime() { return lifestyleReminderTime != null ? lifestyleReminderTime : LocalTime.of(12, 0); }
-    public void setLifestyleReminderTime(LocalTime lifestyleReminderTime) { this.lifestyleReminderTime = lifestyleReminderTime; }
-
+    
     public String getTheme() { return theme != null ? theme : "default"; }
-    public void setTheme(String theme) { this.theme = theme; }
 
-    public String getResetPasswordToken() { return resetPasswordToken; }
-    public void setResetPasswordToken(String resetPasswordToken) { this.resetPasswordToken = resetPasswordToken; }
-
-    public LocalDateTime getTokenExpiration() { return tokenExpiration; }
-    public void setTokenExpiration(LocalDateTime tokenExpiration) { this.tokenExpiration = tokenExpiration; }
-
-    public Set<User> getFriends() { return friends; }
-    public void setFriends(Set<User> friends) { this.friends = friends; }
+    // コレクション操作ヘルパー
     public void addFriend(User friend) { this.friends.add(friend); }
     public void removeFriend(User friend) { this.friends.remove(friend); }
 
-    public Set<User> getReceivedFriendRequests() { return receivedFriendRequests; }
-    public void setReceivedFriendRequests(Set<User> receivedFriendRequests) { this.receivedFriendRequests = receivedFriendRequests; }
     public void addReceivedFriendRequest(User sender) { this.receivedFriendRequests.add(sender); }
     public void removeReceivedFriendRequest(User sender) { this.receivedFriendRequests.remove(sender); }
 
@@ -238,6 +179,7 @@ public class User {
         }
     }
 
+    // エイリアスメソッド（維持）
     public int getExperiencePoints() { return getXp(); }
     public void setExperiencePoints(int xp) { this.xp = xp; }
 
@@ -247,9 +189,9 @@ public class User {
     }
 
     // --- チップ関連 ---
+    // Nullチェックが含まれるため維持
     public Integer getChipCount() { return chipCount != null ? chipCount : 0; }
-    public void setChipCount(Integer chipCount) { this.chipCount = chipCount; }
-
+    
     public void addChips(int chips) {
         if (chips > 0) {
             if (chipCount == null) chipCount = 0;
@@ -273,6 +215,8 @@ public class User {
     public boolean hasUnlockedCharacter(Long characterId) {
         return unlockedCharacters != null && unlockedCharacters.contains(characterId);
     }
+    
+    // Nullチェック付きGetter/Setter（維持）
     public Set<Long> getUnlockedCharacters() {
         if (unlockedCharacters == null) unlockedCharacters = new HashSet<>();
         return unlockedCharacters;
@@ -286,6 +230,7 @@ public class User {
         if (unlockedBackgrounds == null) unlockedBackgrounds = new HashSet<>();
         return unlockedBackgrounds;
     }
+    // ロジック付きSetter（維持）
     public void setUnlockedBackgrounds(Set<String> unlockedBackgrounds) {
         this.unlockedBackgrounds = (unlockedBackgrounds != null) ? unlockedBackgrounds : new HashSet<>();
     }
@@ -297,19 +242,10 @@ public class User {
         return backgroundId != null && unlockedBackgrounds != null && unlockedBackgrounds.contains(backgroundId);
     }
 
- // ★★★ 選択中の背景管理メソッド ★★★
-    public String getSelectedBackground() {
-        return selectedBackground; // そのまま返す
-    }
-    public void setSelectedBackground(String selectedBackground) {
-        this.selectedBackground = selectedBackground; // そのままセットする
-    }
-
     // ★★★ 背景解放チェック済みレベル ★★★
+    // Nullチェック付きGetter（維持）
     public Integer getLastBackgroundCheckLevel() { return lastBackgroundCheckLevel != null ? lastBackgroundCheckLevel : 1; }
+    // ロジック付きSetter（維持）
     public void setLastBackgroundCheckLevel(Integer lastBackgroundCheckLevel) { this.lastBackgroundCheckLevel = (lastBackgroundCheckLevel != null) ? lastBackgroundCheckLevel : 1; }
     
-    // ★追加: Getter / Setter
-    public LocalDateTime getLastUsernameChangeDate() { return lastUsernameChangeDate; }
-    public void setLastUsernameChangeDate(LocalDateTime lastUsernameChangeDate) { this.lastUsernameChangeDate = lastUsernameChangeDate; }
 }
