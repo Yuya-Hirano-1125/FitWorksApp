@@ -365,30 +365,20 @@
     </div>
 
 	<div id="data-source" style="display: none;">
-	        <div class="data-item" data-id="fire" data-category="nature" data-name="炎の世界" data-bg="fire-original" 
-	             data-img-src="/img/background/fire-original.png" data-locked="true" data-unlock-level="1"></div>
-	             
-	        <div class="data-item" data-id="water" data-category="nature" data-name="水の世界" data-bg="water-original" 
-	             data-img-src="/img/background/water-original.png" data-locked="true" data-unlock-level="40"></div>
-	        <div class="data-item" data-id="grass" data-category="nature" data-name="木の世界" data-bg="grass-original" 
-	             data-img-src="/img/background/grass-original.png" data-locked="true" data-unlock-level="70"></div>
-	        <div class="data-item" data-id="light" data-category="nature" data-name="光の世界" data-bg="light-original" 
-	             data-img-src="/img/background/light-original.png" data-locked="true" data-unlock-level="100"></div>
-	        <div class="data-item" data-id="dark" data-category="nature" data-name="闇の世界" data-bg="dark-original" 
-	             data-img-src="/img/background/dark-original.png" data-locked="true" data-unlock-level="130"></div>
-	        <div class="data-item" data-id="classroom" data-category="special" data-name="教室" data-bg="classroom" 
-	             data-img-src="/img/background/classroom.png" data-locked="true" data-material="true" data-material-name="夢幻の鍵" data-material-id="16"></div>
-	        <div class="data-item" data-id="gaming" data-category="special" data-name="ゲーミングルーム" data-bg="gaming-room" 
-	             data-img-src="/img/background/gaming-room.png" data-locked="true" data-material="true" data-material-name="夢幻の鍵" data-material-id="16"></div>
-	        <div class="data-item" data-id="server" data-category="special" data-name="サーバールーム" data-bg="server-room" 
-	             data-img-src="/img/background/server-room.png" data-locked="true" data-material="true" data-material-name="夢幻の鍵" data-material-id="16"></div>
-			<div class="data-item" data-id="town" data-category="special" data-name="町並み" data-bg="town-road" 
-				 data-img-src="/img/background/town-road.png" data-locked="true" data-material="true" data-material-name="夢幻の鍵" data-material-id="16"></div>
-			<div class="data-item" data-id="snow" data-category="special" data-name="雪道" data-bg="snow-road" 
-				 data-img-src="/img/background/snow-road.png" data-locked="true" data-material="true" data-material-name="夢幻の鍵" data-material-id="16"></div>
-		    <div class="data-item" data-id="forest" data-category="special" data-name="深い森" data-bg="deep-forest" 
-				 data-img-src="/img/background/deep-forest.png" data-locked="true" data-material="true" data-material-name="夢幻の鍵" data-material-id="16"></div>
+	    <div th:each="bg : ${backgroundList}"
+	         class="data-item"
+	         th:data-id="${bg.backgroundId}"
+	         th:data-category="${bg.category}"
+	         th:data-name="${bg.bgname}"
+	         th:data-bg="${bg.bgCode}"
+	         th:data-img-src="${bg.bgimgurl}"
+	         th:data-locked="true" 
+	         th:data-unlock-level="${bg.userLevel}"
+	         th:data-material="${bg.hasMaterial}"
+	         th:data-material-name="${bg.requiredMaterialName}"
+	         th:data-material-id="${bg.requiredMaterialId}">
 	    </div>
+	</div>
 
     <div id="unlock-popup" class="popup-hidden unlock-popup-overlay">
         <div class="unlock-popup-content">

@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.demo.entity.BackgroundItem;
 import com.example.demo.entity.CharacterEntity;
 import com.example.demo.entity.User;
+import com.example.demo.repository.BackgroundItemRepository;
 import com.example.demo.repository.CharacterRepository;
 import com.example.demo.repository.UserItemRepository;
 import com.example.demo.service.UserService;
@@ -37,6 +39,9 @@ public class CharactersMenuController {
 
     @Autowired
     private CharacterRepository characterRepository;
+    
+    @Autowired
+    private BackgroundItemRepository backgroundItemRepository;
 
     private static final Long DREAM_KEY_ITEM_ID = 16L;
 
@@ -164,12 +169,15 @@ public class CharactersMenuController {
             }
         }
         
+        // ★データベースから背景リストを取得して追加
+        List<BackgroundItem> allBackgrounds = backgroundItemRepository.findAll();
+        model.addAttribute("backgroundList", allBackgrounds);
+
         model.addAttribute("userLevel", userLevel);
         model.addAttribute("dreamKeyCount", dreamKeyCount);
         model.addAttribute("unlockedBackgrounds", unlockedBackgrounds);
         model.addAttribute("selectedBackground", selectedBackground);
         
-        // 遷移元情報を画面に渡す
         model.addAttribute("from", from);
         
         return "characters/menu/Backgrounds"; 
