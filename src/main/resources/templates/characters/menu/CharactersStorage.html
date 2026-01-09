@@ -305,9 +305,9 @@
             <div id="storage-container" class="character-grid">
                 <th:block th:each="chara, iterStat : ${charaList}">
                     
-                    <a th:if="${chara.isUnlocked && chara.attribute != 'secret' && chara.filename != null}" 
-                       th:href="@{'/characters/detail/' + ${chara.filename}}" 
-                       class="character-card-link">
+				<a th:if="${chara.isUnlocked && chara.filename != null}" 
+				   th:href="@{'/characters/detail/' + ${chara.filename}}" 
+				   class="character-card-link">
                         
                         <div class="character-card storage-item" 
                              th:classappend="${chara.attribute}" 
@@ -330,8 +330,8 @@
                         </div>
                     </a>
 
-                    <div th:unless="${chara.isUnlocked && chara.attribute != 'secret' && chara.filename != null}" 
-                         class="character-card-link-disabled" style="display:contents">
+					<div th:unless="${chara.isUnlocked && chara.filename != null}" 
+					     class="character-card-link-disabled" style="display:contents">
                         
                         <div class="character-card storage-item" 
                              th:classappend="${chara.attribute}" 

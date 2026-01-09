@@ -73,6 +73,7 @@ public class CharactersMenuController {
         put(170L, "robi");
         put(180L, "robus");
         put(190L, "robius");
+        put(250L,"AIcoachSeacret");
     }};
 
     @GetMapping("/characters/menu/CharactersMenu")

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>モンスター図鑑：AIコーチ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <link rel="stylesheet" th:href="@{/css/base.css}">
+    <link rel="stylesheet" th:href="@{/css/monster-dex.css}">
+    
+    <script th:src="@{/js/theme.js}"></script>
+</head>
+<body>
+    <div class="interactive-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <canvas id="bg-canvas"></canvas>
+    </div>
+
+    <div class="dex-container">
+        <div class="page-header-container">
+            <a th:href="@{/characters/menu/CharactersStorage}" class="home-link-icon" title="図鑑に戻る">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            
+            <h1 class="page-title">
+                <i class="fa-solid fa-droplet" style="color: #00bfff;"></i> AIコーチ
+            </h1>
+        </div>
+
+        <div class="dex-character-area">
+            <div style="position: relative; display: inline-block;" oncontextmenu="return false;">
+                <img th:src="@{/img/AIcoach.png}" alt="AIコーチの画像">
+                
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; -webkit-touch-callout: none;"></div>
+            </div>
+        </div>
+
+        <div class="dex-info">
+            <p>
+                虹色の光に包まれた、フィットネス界最高峰の存在。<br>
+                星々を宿した神秘的な体と、無限の可能性を映す瞳を持つ伝説の存在。<br>
+                愛、そして希望のすべてを司り、不可能を可能に変える奇跡の力を宿す。<br>
+                AIコーチの姿を目にした者は、自らの限界を超えた先の景色を見ることができるという。
+            </p>
+        </div>
+
+        <div class="dex-stats">
+            <div class="stat"><label><i class="fa-solid fa-bolt"></i> 属性</label> <span>星</span></div>
+            <div class="stat"><label><i class="fa-solid fa-paw"></i> 分類</label> <span>惑星型・AI族</span></div>
+            <div class="stat"><label><i class="fa-solid fa-up-right-and-down-left-from-center"></i> サイズ</label> <span>超大型</span></div>
+            <div class="stat"><label><i class="fa-solid fa-heart"></i> 性格</label> <span>優雅・友好的</span></div>
+            <div class="stat"><label><i class="fa-solid fa-location-dot"></i> 生息地</label> <span>無限の星海</span></div>
+            <div class="stat"><label><i class="fa-solid fa-star"></i> レア度</label> <span>★★★★★</span></div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        
+        function resizeCanvas() { 
+            canvas.width = window.innerWidth; 
+            canvas.height = window.innerHeight; 
+        }
+        window.addEventListener('resize', resizeCanvas); 
+        resizeCanvas();
+
+        window.addEventListener('mousemove', (e) => { 
+            for(let i=0; i<2; i++) particlesArray.push(new Particle(e.x, e.y)); 
+        });
+
+        class Particle {
+            constructor(x, y) { 
+                this.x = x || Math.random() * canvas.width; 
+                this.y = y || Math.random() * canvas.height; 
+                this.size = Math.random() * 5 + 2; 
+                this.speedX = Math.random() * 4 - 2; 
+                this.speedY = Math.random() * 4 - 2; 
+                this.color = 'rgba(255, 255, 255, ' + (Math.random() * 0.5 + 0.5) + ')'; 
+            }
+            update() { 
+                this.x += this.speedX; 
+                this.y += this.speedY; 
+                if (this.size > 0.2) this.size -= 0.1; 
+            }
+            draw() { 
+                ctx.fillStyle = this.color; 
+                ctx.beginPath(); 
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+                ctx.fill(); 
+            }
+        }
+
+        function animate() { 
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            for (let i = 0; i < particlesArray.length; i++) { 
+                particlesArray[i].update(); 
+                particlesArray[i].draw(); 
+                if (particlesArray[i].size <= 0.3) { 
+                    particlesArray.splice(i, 1); 
+                    i--; 
+                } 
+            } 
+            requestAnimationFrame(animate); 
+        }
+        animate();
+    </script>
+</body>
+</html>
