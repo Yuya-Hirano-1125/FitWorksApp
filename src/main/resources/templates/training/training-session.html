@@ -65,40 +65,12 @@
             position: relative; z-index: 10;
         }
 
-        /* ヘッダー */
-        .session-header { 
-            text-align: center; 
-            margin-bottom: 30px; 
-            position: relative; 
-            padding: 0 40px;
-        }
-        .session-title {
-            font-size: 1.8rem; font-weight: 900; margin: 0;
-            background: linear-gradient(45deg, #6a11cb, #2575fc);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 10px rgba(100, 181, 246, 0.3);
-            letter-spacing: 1px; line-height: 1.2;
-        }
-        .session-subtitle { font-size: 0.9rem; color: #666; font-weight: 700; margin-top: 5px; }
-
-        /* 戻るボタン */
-        .back-arrow-button {
-            position: absolute; top: 25px; left: 20px;
-            width: 50px; height: 50px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(5px);
-            border: 2px solid #fff; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            text-decoration: none; color: #555; font-size: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); z-index: 100;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .back-arrow-button:hover { transform: scale(1.1); color: #4facfe; box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3); }
-        
-        @media (max-width: 600px) {
-            .back-arrow-button { width: 45px; height: 45px; font-size: 1.2rem; top: 20px; left: 15px; }
-            .session-header { padding-top: 50px; padding-left: 0; padding-right: 0; }
-        }
+        /* ★変更: 統一されたヘッダースタイル */
+        .page-header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 3px solid #007bff; padding-bottom: 10px; gap: 15px; flex-wrap: wrap; }
+        .header-left { display: flex; align-items: center; gap: 15px; flex: 1 1 auto; min-width: 0; }
+        .page-title { color: #343a40; font-size: 2rem; margin: 0; text-shadow: none; white-space: nowrap; line-height: 1.2; }
+        .home-link-icon { display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 50%; text-decoration: none; transition: all 0.3s ease; font-size: 1.5rem; flex-shrink: 0; }
+        .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
 
         /* タイマーウィジェット */
         .timer-widget {
@@ -150,6 +122,7 @@
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
             font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
         }
+        
         .input-group { flex: 1; position: relative; }
         .input-group input {
             width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd;
@@ -161,6 +134,7 @@
             position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
             color: #999; font-size: 0.8rem; font-weight: 700; pointer-events: none;
         }
+
         .btn-remove { color: #ff7675; cursor: pointer; padding: 5px; transition: 0.2s; font-size: 1.1rem; }
         .btn-remove:hover { color: #d63031; transform: scale(1.2); }
 
@@ -174,7 +148,9 @@
         .memo-area {
             width: 100%; padding: 15px; border-radius: 15px; border: 2px solid #eee;
             background: #fdfdfd; font-family: inherit; font-size: 1rem; color: #333;
-            resize: vertical; min-height: 80px; box-sizing: border-box; margin-top: 10px;
+            min-height: 80px; box-sizing: border-box; margin-top: 10px;
+            resize: none; 
+            overflow-y: hidden; 
         }
         .memo-area:focus { outline: none; border-color: #a18cd1; background: #fff; }
 
@@ -188,6 +164,14 @@
         }
         .btn-finish:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 176, 155, 0.4); }
         .btn-finish:active { transform: scale(0.98); }
+        
+        .btn-finish:disabled {
+            background: #ccc;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
+        }
 
         .ai-camera-section { margin-bottom: 25px; text-align: center; }
         .btn-ai-camera {
@@ -213,6 +197,12 @@
 
         @media (max-width: 600px) {
             .main-container { padding: 20px 15px; width: 95%; margin-top: 40px; }
+            /* Header mobile styles */
+            .page-header-container { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .header-left { width: 100%; margin-bottom: 0; }
+            .page-title { font-size: 1.6rem; white-space: normal; }
+            .home-link-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+
             .session-title { font-size: 1.5rem; }
             .timer-display { font-size: 2.8rem; }
             .set-row-card { gap: 8px; padding: 10px; }
@@ -232,16 +222,19 @@
 
     <div class="main-container">
         
-        <a th:href="@{/training}" class="back-arrow-button" title="戻る">
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
-
-        <header class="session-header">
-            <h1 class="session-title" th:text="${trainingTitle}">トレーニング</h1>
-            <p class="session-subtitle" th:if="${selectedExercise != null}">
-                <i class="fa-solid fa-dumbbell"></i> <span th:text="${selectedExercise}">種目名</span>
-            </p>
-        </header>
+        <div class="page-header-container">
+            <div class="header-left">
+                <a th:href="@{/training}" class="home-link-icon" title="戻る">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <h1 class="page-title" th:text="${trainingTitle}">トレーニング</h1>
+                    <p th:if="${selectedExercise != null}" style="margin: 3px 0 0 0; font-size: 0.9rem; color: #666; font-weight: 700;">
+                        <i class="fa-solid fa-dumbbell"></i> <span th:text="${selectedExercise}">種目名</span>
+                    </p>
+                </div>
+            </div>
+        </div>
 
         <div class="timer-widget">
             <div style="font-size: 0.85rem; color: #dfe6e9; font-weight: 700; letter-spacing: 1px;">INTERVAL TIMER</div>
@@ -300,7 +293,7 @@
                     <textarea name="memo" class="memo-area" placeholder="調子はどうだった？重量の感覚は？"></textarea>
                 </div>
                 
-                <button type="submit" class="btn-finish">
+                <button type="submit" class="btn-finish" disabled>
                     記録して終了 <i class="fa-solid fa-check"></i>
                 </button>
             </form>
@@ -347,7 +340,7 @@
                     <textarea name="memo" class="memo-area" placeholder="コースの状況や感想を記録..."></textarea>
                 </div>
                 
-                <button type="submit" class="btn-finish">
+                <button type="submit" class="btn-finish" disabled>
                     記録して終了 <i class="fa-solid fa-check"></i>
                 </button>
             </form>
@@ -373,11 +366,11 @@
                         
                         <div class="set-row-card">
                             <div class="input-group">
-                                <input type="number" th:name="|logs[${stat.index}].durationMinutes|" placeholder="時間">
+                                <input type="number" th:name="|logs[${stat.index}].durationMinutes|" placeholder="0">
                                 <span class="unit-label">分</span>
                             </div>
                             <div class="input-group">
-                                <input type="number" th:name="|logs[${stat.index}].distanceKm|" step="0.1" placeholder="距離">
+                                <input type="number" th:name="|logs[${stat.index}].distanceKm|" step="0.1" placeholder="0.0">
                                 <span class="unit-label">km</span>
                             </div>
                         </div>
@@ -403,7 +396,7 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn-finish">
+                <button type="submit" class="btn-finish" disabled>
                     一括記録して終了 <i class="fa-solid fa-check"></i>
                 </button>
             </form>
@@ -459,6 +452,97 @@
     <script th:inline="javascript">
         let sessionStartTime = Date.now();
         
+        // ★セット削除とリナンバリング機能
+        window.removeSetRow = function(btn) {
+            const row = btn.closest('.set-row-card');
+            const container = row.parentElement;
+            row.remove();
+            updateSetNumbers(container);
+            checkFormValidity(); // 削除時にもバリデーション実行
+        };
+
+        window.updateSetNumbers = function(container) {
+            // コンテナ直下の .set-row-card を取得
+            const rows = container.querySelectorAll('.set-row-card');
+            rows.forEach((row, index) => {
+                // 1. 番号の更新 (1, 2, 3...)
+                const numDiv = row.querySelector('.set-num');
+                if (numDiv) {
+                    numDiv.textContent = index + 1;
+                }
+                
+                // 2. name属性のインデックス更新 (バッチ記録用)
+                const inputs = row.querySelectorAll('input');
+                inputs.forEach(input => {
+                    if (input.name && input.name.includes('.setList[')) {
+                        input.name = input.name.replace(/setList\[\d+\]/, `setList[${index}]`);
+                    }
+                });
+            });
+        };
+
+        // ★メモ欄の自動拡張関数
+        window.autoResizeTextarea = function(element) {
+            element.style.height = 'auto'; // 一旦リセット
+            element.style.height = element.scrollHeight + 'px'; // 内容に合わせて拡張
+        };
+
+        // ★フォームのバリデーションチェック関数
+        window.checkFormValidity = function() {
+            const activeForm = document.querySelector('form');
+            if (!activeForm) return;
+
+            const submitBtn = activeForm.querySelector('.btn-finish');
+            if (!submitBtn) return;
+
+            let isValid = true;
+
+            // フォーム内のすべての数値入力欄を取得（重量、回数、時間、距離など）
+            const numericInputs = activeForm.querySelectorAll('input[type="number"]');
+            
+            // ウェイトトレーニングなどでセット行がある場合
+            const setsContainer = document.getElementById('sets-container');
+            
+            if (setsContainer) {
+                // ウェイトトレーニングの場合
+                const rows = setsContainer.querySelectorAll('.set-row-card');
+                if (rows.length === 0) {
+                    isValid = false; // セットが1つもない場合はNG
+                } else {
+                    // すべての行のinputが埋まっているかチェック
+                    rows.forEach(row => {
+                        const inputs = row.querySelectorAll('input[type="number"]');
+                        inputs.forEach(input => {
+                            if (!input.value || parseFloat(input.value) <= 0) {
+                                isValid = false;
+                            }
+                        });
+                    });
+                }
+            } else {
+                // 有酸素やマイセット一括の場合
+                const inputs = activeForm.querySelectorAll('input[type="number"]');
+                if (inputs.length > 0) {
+                    inputs.forEach(input => {
+                        // required属性があるのに空、または値が入っているのに不正な値
+                        if(input.hasAttribute('required') && !input.value) isValid = false;
+                        
+                        // バッチ記録の場合、追加された行のinputは必須にしたい
+                        if (input.closest('.set-row-card') && !input.value) {
+                            isValid = false;
+                        }
+                        
+                        // 有酸素フォームの特別対応 (durationは必須)
+                        if (input.id === 'cardio-duration' && !input.value) {
+                            isValid = false;
+                        }
+                    });
+                }
+            }
+
+            submitBtn.disabled = !isValid;
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             const formatTime = (ms) => {
                 const s = Math.floor((ms/1000)%60);
@@ -466,17 +550,30 @@
                 return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
             };
 
-            // セット追加ロジック (カードスタイル)
+            // ★メモ欄へのイベントリスナー設定
+            document.body.addEventListener('input', (e) => {
+                if (e.target.classList.contains('memo-area')) {
+                    autoResizeTextarea(e.target);
+                }
+                // ★入力イベントでバリデーション実行
+                if (e.target.tagName === 'INPUT') {
+                    checkFormValidity();
+                }
+            });
+            // 初期ロード時の調整
+            document.querySelectorAll('.memo-area').forEach(autoResizeTextarea);
+            checkFormValidity(); // 初期バリデーション
+
+            // セット追加ロジック (通常)
             const setsContainer = document.getElementById('sets-container');
             const addSetBtn = document.getElementById('add-set-btn');
             if (setsContainer && addSetBtn) {
-                let setCounter = 0;
                 const addSetRow = (w='', r='') => {
-                    setCounter++;
+                    const currentCount = setsContainer.querySelectorAll('.set-row-card').length + 1;
                     const div = document.createElement('div');
                     div.className = 'set-row-card';
                     div.innerHTML = `
-                        <div class="set-num">${setCounter}</div>
+                        <div class="set-num">${currentCount}</div>
                         <div class="input-group">
                             <input type="number" name="weights" step="0.5" placeholder="0" value="${w}">
                             <span class="unit-label">kg</span>
@@ -485,31 +582,36 @@
                             <input type="number" name="repsList" class="ai-rep-target" placeholder="0" value="${r}">
                             <span class="unit-label">回</span>
                         </div>
-                        <i class="fa-solid fa-trash btn-remove" onclick="this.parentElement.remove()"></i>
+                        <i class="fa-solid fa-trash btn-remove" onclick="removeSetRow(this)"></i>
                     `;
                     setsContainer.appendChild(div);
+                    checkFormValidity(); // 追加時にもバリデーション
                 };
-                addSetRow(); addSetRow(); addSetRow();
+                addSetRow(); 
                 addSetBtn.addEventListener('click', () => addSetRow());
             }
 
             // バッチ記録用セット追加
             window.addBatchSetRow = function(exIdx) {
                 const container = document.getElementById(`batch-sets-container-${exIdx}`);
-                const idx = container.children.length;
+                const idx = container.children.length; // 現在の要素数 = 次のインデックス
                 const div = document.createElement('div');
                 div.className = 'set-row-card';
+                // ★修正: 単位ラベルを追加し、プレースホルダーを「0」に統一
                 div.innerHTML = `
                     <div class="set-num">${idx+1}</div>
                     <div class="input-group">
-                        <input type="number" name="logs[${exIdx}].setList[${idx}].weight" step="0.5" placeholder="kg">
+                        <input type="number" name="logs[${exIdx}].setList[${idx}].weight" step="0.5" placeholder="0">
+                        <span class="unit-label">kg</span>
                     </div>
                     <div class="input-group">
-                        <input type="number" name="logs[${exIdx}].setList[${idx}].reps" placeholder="回">
+                        <input type="number" name="logs[${exIdx}].setList[${idx}].reps" placeholder="0">
+                        <span class="unit-label">回</span>
                     </div>
-                    <i class="fa-solid fa-trash btn-remove" onclick="this.parentElement.remove()"></i>
+                    <i class="fa-solid fa-trash btn-remove" onclick="removeSetRow(this)"></i>
                 `;
                 container.appendChild(div);
+                checkFormValidity(); // 追加時にもバリデーション
             }
             
             /*[# th:if="${trainingType == 'myset'}"]*/
