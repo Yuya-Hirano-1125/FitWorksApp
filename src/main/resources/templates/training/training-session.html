@@ -122,27 +122,19 @@
             background: linear-gradient(90deg, #ff9a9e, #fad0c4);
         }
 
-        /* ▼▼▼ ストップウォッチ（白背景・黒文字に変更） ▼▼▼ */
+        /* ストップウォッチ（白背景・黒文字） */
         .stopwatch-widget {
             background: #ffffff;
             border-color: #dfe6e9;
-            color: #2d3436; /* 文字色: 黒 */
+            color: #2d3436;
         }
         .stopwatch-widget::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
-            background: linear-gradient(90deg, #0984e3, #74b9ff); /* 青のアクセントライン */
+            background: linear-gradient(90deg, #0984e3, #74b9ff);
         }
-        .stopwatch-widget .widget-label {
-            color: #636e72; /* ラベル色 */
-        }
-        .stopwatch-widget .timer-display {
-            color: #2d3436; /* タイマー文字色 */
-            text-shadow: none; /* 影削除 */
-        }
-        .stopwatch-widget .btn-reset {
-            background: #dfe6e9; color: #636e72; /* リセットボタンを白背景用に調整 */
-        }
-        /* ▲▲▲ 変更ここまで ▲▲▲ */
+        .stopwatch-widget .widget-label { color: #636e72; }
+        .stopwatch-widget .timer-display { color: #2d3436; text-shadow: none; }
+        .stopwatch-widget .btn-reset { background: #dfe6e9; color: #636e72; }
 
         .widget-label { font-size: 0.8rem; font-weight: 800; letter-spacing: 1px; opacity: 0.9; margin-bottom: 5px; text-transform: uppercase; }
         
@@ -172,9 +164,29 @@
         }
         .section-heading {
             font-size: 1.2rem; font-weight: 800; color: #333; margin-bottom: 20px;
-            display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;
+            display: flex; align-items: center; justify-content: space-between; /* 左右配置 */
+            gap: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;
         }
         .section-heading i { color: #a18cd1; }
+
+        /* 自重モードトグルスイッチ */
+        .bodyweight-toggle {
+            display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; color: #555;
+        }
+        .switch {
+            position: relative; display: inline-block; width: 40px; height: 22px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #2196F3; }
+        input:checked + .slider:before { transform: translateX(18px); }
 
         .set-row-card {
             display: flex; align-items: center; gap: 10px;
@@ -182,6 +194,11 @@
             padding: 12px; border-radius: 15px; margin-bottom: 12px; transition: all 0.2s;
         }
         .set-row-card:focus-within { border-color: #a18cd1; background: #fff; box-shadow: 0 5px 15px rgba(161, 140, 209, 0.2); }
+        
+        /* 自重モード時のスタイル */
+        .set-row-card.bodyweight-mode .weight-group { display: none; }
+        .set-row-card.bodyweight-mode .rep-group { flex: 2; } /* 回数欄を広げる */
+        
         .set-num {
             background: #333; color: #fff; width: 28px; height: 28px;
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
@@ -251,7 +268,7 @@
         @media (max-width: 600px) {
             .main-container { padding: 20px 15px; width: 95%; margin-top: 40px; }
             .session-title { font-size: 1.5rem; }
-            .timer-display { font-size: 2.2rem; }
+            .timer-display { font-size: 2.8rem; }
             .set-row-card { gap: 8px; padding: 10px; }
             .input-group input { font-size: 1rem; padding: 10px; }
         }
@@ -319,8 +336,16 @@
 
         <div th:if="${trainingType == 'free-weight'}" class="form-section">
             <div class="section-heading">
-                <i class="fa-solid fa-pen-to-square"></i> 実績を記録
-                <span id="ai-verified-badge" style="display:none; margin-left:auto; background:#00e676; color:white; padding:2px 8px; border-radius:10px; font-size:0.7rem;">AI計測中</span>
+                <div><i class="fa-solid fa-pen-to-square"></i> 実績を記録</div>
+                
+                <div class="bodyweight-toggle">
+                    <span>自重トレ(重量なし)</span>
+                    <label class="switch">
+                        <input type="checkbox" id="is-bodyweight">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <span id="ai-verified-badge" style="display:none; margin-left:10px; background:#00e676; color:white; padding:2px 8px; border-radius:10px; font-size:0.7rem;">AI計測中</span>
             </div>
 
             <form th:action="@{/training/log/save}" method="post" id="weight-form" onsubmit="return validateTrainingForm(this);">
@@ -402,6 +427,7 @@
             
             <form th:action="@{/training-log/save-batch}" method="post" onsubmit="return validateTrainingForm(this);">
                 <input type="hidden" name="recordDate" th:value="${today}">
+                
                 <div th:each="exName, stat : ${mySetExercises}" style="background: #fdfdfd; border: 1px solid #eee; border-radius: 15px; padding: 15px; margin-bottom: 20px;">
                     
                     <div th:if="${#lists.contains(cardioList, exName)}">
@@ -550,7 +576,7 @@
                     stopwatchRunning = false;
                     stopwatchElapsed += Date.now() - stopwatchStartTime;
                     clearInterval(stopwatchInterval);
-                    updateStopwatchDisplay(); // 最終表示更新
+                    updateStopwatchDisplay(); 
                     swStop.style.display = 'none';
                     swStart.style.display = 'flex';
                 });
@@ -573,22 +599,52 @@
                 return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
             };
 
+            // ★自重モード切り替えロジック
+            const bodyweightSwitch = document.getElementById('is-bodyweight');
+            
+            // 行の表示状態を更新する関数
+            const updateRowVisibility = () => {
+                const isBodyweight = bodyweightSwitch ? bodyweightSwitch.checked : false;
+                const rows = document.querySelectorAll('.set-row-card');
+                rows.forEach(row => {
+                    const weightInput = row.querySelector('input[name*="weight"]');
+                    if (isBodyweight) {
+                        row.classList.add('bodyweight-mode');
+                        if(weightInput) {
+                            // 自重モードなら0を入れておく（送信時のエラー回避）
+                            if(weightInput.value === '') weightInput.value = 0;
+                        }
+                    } else {
+                        row.classList.remove('bodyweight-mode');
+                        // 元に戻した時に0が入ってたら空にする等の処理はお好みで
+                    }
+                });
+            };
+
+            if(bodyweightSwitch) {
+                bodyweightSwitch.addEventListener('change', updateRowVisibility);
+            }
+
             // セット追加ロジック (カードスタイル)
             const setsContainer = document.getElementById('sets-container');
             const addSetBtn = document.getElementById('add-set-btn');
+            
             if (setsContainer && addSetBtn) {
                 let setCounter = 0;
                 const addSetRow = (w='', r='') => {
                     setCounter++;
                     const div = document.createElement('div');
-                    div.className = 'set-row-card';
+                    // 自重モードなら初期クラスを付与
+                    const isBodyweight = bodyweightSwitch ? bodyweightSwitch.checked : false;
+                    div.className = isBodyweight ? 'set-row-card bodyweight-mode' : 'set-row-card';
+                    
                     div.innerHTML = `
                         <div class="set-num">${setCounter}</div>
-                        <div class="input-group">
+                        <div class="input-group weight-group">
                             <input type="number" name="weights" step="0.5" placeholder="0" value="${w}">
                             <span class="unit-label">kg</span>
                         </div>
-                        <div class="input-group">
+                        <div class="input-group rep-group">
                             <input type="number" name="repsList" class="ai-rep-target" placeholder="0" value="${r}">
                             <span class="unit-label">回</span>
                         </div>
@@ -608,10 +664,10 @@
                 div.className = 'set-row-card';
                 div.innerHTML = `
                     <div class="set-num">${idx+1}</div>
-                    <div class="input-group">
+                    <div class="input-group weight-group">
                         <input type="number" name="logs[${exIdx}].setList[${idx}].weight" step="0.5" placeholder="kg">
                     </div>
-                    <div class="input-group">
+                    <div class="input-group rep-group">
                         <input type="number" name="logs[${exIdx}].setList[${idx}].reps" placeholder="回">
                     </div>
                     <i class="fa-solid fa-trash btn-remove" onclick="this.parentElement.remove()"></i>
@@ -642,23 +698,16 @@
             if(btnStart) {
                 btnStart.addEventListener('click', () => {
                     if(timer) {
-                        // ストップ時
                         clearInterval(timer); timer = null;
-                        
-                        // インターバル記録に追加
                         if (intervalTimerStart > 0) {
                             totalIntervalTime += (Date.now() - intervalTimerStart);
                             intervalTimerStart = 0;
                         }
-
                         btnStart.innerHTML = '<i class="fa-solid fa-play"></i> START';
                         btnStart.style.background = '#00b894';
                     } else {
-                        // スタート時
                         if(remaining <= 0) remaining = (document.getElementById('interval-minutes').value * 60000) + (document.getElementById('interval-seconds').value * 1000);
-                        
-                        intervalTimerStart = Date.now(); // 記録開始
-
+                        intervalTimerStart = Date.now();
                         btnStart.innerHTML = '<i class="fa-solid fa-pause"></i> STOP';
                         btnStart.style.background = '#e17055'; 
                         const end = Date.now() + remaining;
@@ -666,13 +715,10 @@
                             remaining = end - Date.now();
                             if(remaining <= 0) {
                                 remaining = 0; clearInterval(timer); timer = null;
-                                
-                                // インターバル記録に追加（完了時）
                                 if (intervalTimerStart > 0) {
                                     totalIntervalTime += (Date.now() - intervalTimerStart);
                                     intervalTimerStart = 0;
                                 }
-
                                 alert("インターバル終了！");
                                 btnStart.innerHTML = '<i class="fa-solid fa-play"></i> START';
                                 btnStart.style.background = '#00b894';
@@ -698,27 +744,37 @@
 
         // フォーム送信時のバリデーション＆時間セット
         window.validateTrainingForm = function(form) {
-            // 現在のストップウォッチ時間を取得 (稼働中なら現在時刻を加算)
+            // ストップウォッチ時間取得
             let totalMs = stopwatchElapsed;
             if (stopwatchRunning) {
                 totalMs += (Date.now() - stopwatchStartTime);
             }
             
-            // 分単位に変換 (切り上げ)
+            // 時間の計算
             const durationMinutes = Math.ceil(totalMs / 60000);
-            // インターバル合計時間 (分:秒)
+            
+            // インターバル時間の計算
             const intervalSeconds = Math.floor(totalIntervalTime / 1000);
             const intervalMin = Math.floor(intervalSeconds / 60);
             const intervalSec = intervalSeconds % 60;
             const intervalString = `${intervalMin}分${intervalSec}秒`;
 
-            // 自動記録メッセージの作成
+            // メモへの追記テキスト
             let autoLogMsg = "";
             if (durationMinutes > 0 || totalIntervalTime > 0) {
-                autoLogMsg = `\n[自動記録] セッション時間: ${durationMinutes}分, インターバル合計: ${intervalString}`;
+                autoLogMsg = `\n[自動記録] セッション: ${durationMinutes}分 / インターバル: ${intervalString}`;
             }
 
-            // 筋トレ用フォームの場合
+            // 自重モードの場合、隠れているinputに0を入れる処理
+            const bodyweightSwitch = document.getElementById('is-bodyweight');
+            if(bodyweightSwitch && bodyweightSwitch.checked) {
+                const hiddenWeights = form.querySelectorAll('.weight-group input');
+                hiddenWeights.forEach(input => {
+                    if(!input.value) input.value = 0;
+                });
+            }
+
+            // 筋トレ用フォーム
             const hiddenDuration = document.getElementById('hidden-duration-weight');
             const weightMemo = document.getElementById('weight-memo');
             if (hiddenDuration) {
@@ -726,27 +782,21 @@
                 if(weightMemo) weightMemo.value += autoLogMsg;
             }
             
-            // 有酸素運動用フォームの場合
+            // 有酸素運動用フォーム
             const cardioInput = document.getElementById('cardio-duration');
             const cardioMemo = document.getElementById('cardio-memo');
             if (cardioInput && (!cardioInput.value || cardioInput.value == 0)) {
-                // 有酸素で手動入力が空なら、ストップウォッチの値を入れる
-                if(durationMinutes > 0) {
-                    cardioInput.value = durationMinutes;
-                }
+                if(durationMinutes > 0) cardioInput.value = durationMinutes;
             }
-            if (cardioMemo) {
-                cardioMemo.value += autoLogMsg;
-            }
+            if (cardioMemo) cardioMemo.value += autoLogMsg;
             
-            // マイセット（バッチ）の場合
+            // マイセット用
             const batchCardioInputs = document.querySelectorAll('.batch-duration-input');
             if(batchCardioInputs.length > 0 && durationMinutes > 0) {
                 batchCardioInputs.forEach(input => {
                     if(!input.value) input.value = durationMinutes; 
                 });
             }
-            // マイセットのメモ欄全てに追記（または最初の1つだけにするか。ここでは全てに追記）
             const batchMemos = document.querySelectorAll('.batch-memo-area');
             if(batchMemos.length > 0 && autoLogMsg !== "") {
                 batchMemos.forEach(memo => {
@@ -754,7 +804,7 @@
                 });
             }
 
-            // 時間が0の場合の確認
+            // 時間0の確認
             if (durationMinutes === 0 && (!cardioInput || cardioInput.value == 0)) {
                 return confirm("トレーニング時間が0分ですが、記録しますか？\n（ストップウォッチを開始していなかった場合は、手動で時間を入力してください）");
             }
