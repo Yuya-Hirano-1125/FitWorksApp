@@ -90,9 +90,24 @@
         .custom-select-trigger::after { content: '\f078'; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 0.9rem; color: #007bff; transition: transform 0.3s; }
         .custom-select.open .custom-select-trigger::after { transform: rotate(180deg); }
         
-        .custom-options { position: absolute; display: block; top: 100%; margin-top: 10px; left: 0; right: 0; border: 1px solid #8ec5fc; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); z-index: 2000; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); max-height: 300px; overflow-y: auto; }
+        /* ★修正箇所: pointer-eventsを追加して判定残りバグを解消 
+           閉じた状態(opacity:0)ではクリック判定を完全に消す 
+        */
+        .custom-options { 
+            position: absolute; display: block; top: 100%; margin-top: 10px; left: 0; right: 0; 
+            border: 1px solid #8ec5fc; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); z-index: 2000; 
+            opacity: 0; visibility: hidden; pointer-events: none; /* ★修正 */
+            transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            max-height: 300px; overflow-y: auto; 
+        }
         .custom-options::before { content: ''; position: absolute; top: -20px; left: 0; width: 100%; height: 20px; background: transparent; z-index: -1; }
-        .custom-select.open .custom-options { opacity: 1; visibility: visible; transform: translateY(0); }
+        
+        /* 開いたときだけクリック判定を有効化 */
+        .custom-select.open .custom-options { 
+            opacity: 1; visibility: visible; transform: translateY(0); 
+            pointer-events: auto; /* ★修正 */
+        }
         
         .custom-option { position: relative; display: block; padding: 12px 20px; font-size: 1.1rem; font-weight: 500; color: #555; cursor: pointer; transition: all 0.2s; border-bottom: 1px solid rgba(0,0,0,0.05); }
         .custom-option:last-child { border-bottom: none; }
@@ -423,7 +438,12 @@
 
                         customOption.addEventListener('click', function() {
                             select.value = this.dataset.value;
-                            trigger.innerHTML = '<span>' + this.textContent + '</span>';
+                            // ★重要: セット後の正しい表示テキストをselect要素自体から再取得してセット
+                            if (select.selectedIndex >= 0) {
+                                trigger.innerHTML = '<span>' + select.options[select.selectedIndex].text + '</span>';
+                            } else {
+                                trigger.innerHTML = '<span>' + this.textContent + '</span>';
+                            }
                             
                             optionsContainer.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
                             this.classList.add('selected');
@@ -472,8 +492,8 @@
                             const exercises = freeWeightExercisesByPart[selectedPart];
                             exercises.forEach(exercise => {
                                 const option = document.createElement('option');
-                                option.value = exercise.name || exercise; 
-                                option.textContent = exercise.fullName2 || exercise.name || exercise; 
+                                option.value = (typeof exercise === 'object' && exercise.name) ? exercise.name : exercise;
+                                option.textContent = (typeof exercise === 'object' && exercise.fullName2) ? exercise.fullName2 : ((exercise.name) ? exercise.name : exercise);
                                 exerciseNameSelect.appendChild(option);
                             });
                             exerciseNameSelect.disabled = false; 
