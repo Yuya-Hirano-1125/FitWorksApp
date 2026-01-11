@@ -138,6 +138,11 @@
 
         .character-img { 
             width: 100%; height: 100%; object-fit: contain;
+            /* ★修正: 画像保護のスタイルを追加 */
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            -webkit-touch-callout: none;
         }
         
         /* 未所持時のスタイル */
@@ -148,6 +153,16 @@
         .character-img-wrapper.locked .character-img {
             filter: brightness(0) opacity(0.6);
         }
+
+        /* ★追加: シークレット属性の未解放キャラ対応 */
+        .character-card.secret .character-img-wrapper.locked {
+            background-color: #000;
+            border-color: #333;
+        }
+        .character-card.secret .character-img-wrapper.locked .character-img {
+            opacity: 0;
+        }
+
         .lock-icon {
             position: absolute; font-size: 2rem; color: #fff;
             text-shadow: 0 0 5px rgba(0,0,0,0.8);
@@ -162,6 +177,7 @@
         .character-card.grass { border-bottom: 4px solid #55efc4; }
         .character-card.light { border-bottom: 4px solid #ffeaa7; }
         .character-card.dark { border-bottom: 4px solid #a29bfe; }
+        .character-card.secret { border-bottom: 4px solid #333; }
         
         /* 未解放バッジ */
         .locked-badge {

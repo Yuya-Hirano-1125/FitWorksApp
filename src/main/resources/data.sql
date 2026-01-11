@@ -80,37 +80,50 @@ VALUES (250, 'AIコーチ', 'secret', '★5', 250, 50, '/img/AIcoach.png');
 
 
 -- ▼ 背景アイテムデータ (background_items)
+-- 修正ポイント: 既存データ(background_id)の存在チェックを行い、なければINSERTする形に変更
+
 -- カテゴリ: nature (レベル解放系)
 INSERT INTO background_items (background_id, category, bgname, bg_code, bgimgurl, user_level, has_material, required_material_id, required_material_name)
-VALUES ('fire', 'nature', '炎の世界', 'fire-original', '/img/background/fire-original.png', 1, false, NULL, NULL);
+SELECT 'fire', 'nature', '炎の世界', 'fire-original', '/img/background/fire-original.png', 1, false, NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM background_items WHERE background_id = 'fire');
 
 INSERT INTO background_items (background_id, category, bgname, bg_code, bgimgurl, user_level, has_material, required_material_id, required_material_name)
-VALUES ('water', 'nature', '水の世界', 'water-original', '/img/background/water-original.png', 40, false, NULL, NULL);
+SELECT 'water', 'nature', '水の世界', 'water-original', '/img/background/water-original.png', 40, false, NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM background_items WHERE background_id = 'water');
 
 INSERT INTO background_items (background_id, category, bgname, bg_code, bgimgurl, user_level, has_material, required_material_id, required_material_name)
-VALUES ('grass', 'nature', '木の世界', 'grass-original', '/img/background/grass-original.png', 70, false, NULL, NULL);
+SELECT 'grass', 'nature', '木の世界', 'grass-original', '/img/background/grass-original.png', 70, false, NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM background_items WHERE background_id = 'grass');
 
 INSERT INTO background_items (background_id, category, bgname, bg_code, bgimgurl, user_level, has_material, required_material_id, required_material_name)
-VALUES ('light', 'nature', '光の世界', 'light-original', '/img/background/light-original.png', 100, false, NULL, NULL);
+SELECT 'light', 'nature', '光の世界', 'light-original', '/img/background/light-original.png', 100, false, NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM background_items WHERE background_id = 'light');
 
 INSERT INTO background_items (background_id, category, bgname, bg_code, bgimgurl, user_level, has_material, required_material_id, required_material_name)
-VALUES ('dark', 'nature', '闇の世界', 'dark-original', '/img/background/dark-original.png', 130, false, NULL, NULL);
+SELECT 'dark', 'nature', '闇の世界', 'dark-original', '/img/background/dark-original.png', 130, false, NULL, NULL
+WHERE NOT EXISTS (SELECT 1 FROM background_items WHERE background_id = 'dark');
 
 -- カテゴリ: special (アイテム解放系)
 INSERT INTO background_items (background_id, category, bgname, bg_code, bgimgurl, user_level, has_material, required_material_id, required_material_name)
-VALUES ('classroom', 'special', '教室', 'classroom', '/img/background/classroom.png', 0, true, 16, '夢幻の鍵');
+SELECT 'classroom', 'special', '教室', 'classroom', '/img/background/classroom.png', 0, true, 16, '夢幻の鍵'
+WHERE NOT EXISTS (SELECT 1 FROM background_items WHERE background_id = 'classroom');
 
 INSERT INTO background_items (background_id, category, bgname, bg_code, bgimgurl, user_level, has_material, required_material_id, required_material_name)
-VALUES ('gaming', 'special', 'ゲーミングルーム', 'gaming-room', '/img/background/gaming-room.png', 0, true, 16, '夢幻の鍵');
+SELECT 'gaming', 'special', 'ゲーミングルーム', 'gaming-room', '/img/background/gaming-room.png', 0, true, 16, '夢幻の鍵'
+WHERE NOT EXISTS (SELECT 1 FROM background_items WHERE background_id = 'gaming');
 
 INSERT INTO background_items (background_id, category, bgname, bg_code, bgimgurl, user_level, has_material, required_material_id, required_material_name)
-VALUES ('server', 'special', 'サーバールーム', 'server-room', '/img/background/server-room.png', 0, true, 16, '夢幻の鍵');
+SELECT 'server', 'special', 'サーバールーム', 'server-room', '/img/background/server-room.png', 0, true, 16, '夢幻の鍵'
+WHERE NOT EXISTS (SELECT 1 FROM background_items WHERE background_id = 'server');
 
 INSERT INTO background_items (background_id, category, bgname, bg_code, bgimgurl, user_level, has_material, required_material_id, required_material_name)
-VALUES ('town', 'special', '町並み', 'town-road', '/img/background/town-road.png', 0, true, 16, '夢幻の鍵');
+SELECT 'town', 'special', '町並み', 'town-road', '/img/background/town-road.png', 0, true, 16, '夢幻の鍵'
+WHERE NOT EXISTS (SELECT 1 FROM background_items WHERE background_id = 'town');
 
 INSERT INTO background_items (background_id, category, bgname, bg_code, bgimgurl, user_level, has_material, required_material_id, required_material_name)
-VALUES ('snow', 'special', '雪道', 'snow-road', '/img/background/snow-road.png', 0, true, 16, '夢幻の鍵');
+SELECT 'snow', 'special', '雪道', 'snow-road', '/img/background/snow-road.png', 0, true, 16, '夢幻の鍵'
+WHERE NOT EXISTS (SELECT 1 FROM background_items WHERE background_id = 'snow');
 
 INSERT INTO background_items (background_id, category, bgname, bg_code, bgimgurl, user_level, has_material, required_material_id, required_material_name)
-VALUES ('forest', 'special', '深い森', 'deep-forest', '/img/background/deep-forest.png', 0, true, 16, '夢幻の鍵');
+SELECT 'forest', 'special', '深い森', 'deep-forest', '/img/background/deep-forest.png', 0, true, 16, '夢幻の鍵'
+WHERE NOT EXISTS (SELECT 1 FROM background_items WHERE background_id = 'forest');

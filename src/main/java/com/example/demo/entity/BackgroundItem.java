@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +21,7 @@ public class BackgroundItem {
     private Long id;
 
     // 背景ID (例: fire, classroom) ※HTMLのdata-idに対応
+    @Column(unique = true)
     private String backgroundId;
 
     // カテゴリ (nature, special) ※HTMLのdata-categoryに対応

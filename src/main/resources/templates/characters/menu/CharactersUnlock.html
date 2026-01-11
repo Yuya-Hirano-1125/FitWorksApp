@@ -32,11 +32,120 @@
         .home-link-icon { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 50%; text-decoration: none; transition: all 0.3s ease; font-size: 1.3rem; flex-shrink: 0; }
         .home-link-icon:hover { background-color: #007bff; color: white; transform: scale(1.1); }
         
-        .status-bar { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,248,255,0.95)); padding: 12px 25px; border-radius: 50px; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); border: 2px solid rgba(255,255,255,0.8); backdrop-filter: blur(5px); }
-        .level-badge { background: linear-gradient(135deg, #2c3e50, #4ca1af); color: #fff; padding: 8px 24px; border-radius: 30px; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 10px rgba(44, 62, 80, 0.3); text-shadow: 0 2px 2px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.3); }
-        .level-badge i { color: #f1c40f; font-size: 1.3rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
-        .material-link { text-decoration: none; color: #fff; font-weight: bold; display: flex; align-items: center; gap: 8px; padding: 10px 25px; border-radius: 30px; background: linear-gradient(135deg, #8E2DE2, #4A00E0); box-shadow: 0 4px 15px rgba(142, 45, 226, 0.4); transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.4); font-size: 0.95rem; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-        .material-link:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 20px rgba(142, 45, 226, 0.5); filter: brightness(1.1); }
+        /* ==========================================================================
+           ✨ NEW STATUS BAR DESIGN
+           ========================================================================== */
+        .status-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 20px; 
+            padding: 12px 20px; 
+            margin-bottom: 35px; 
+            box-shadow: 
+                0 4px 6px rgba(0, 0, 0, 0.02),
+                0 10px 30px rgba(0, 0, 0, 0.05),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* キラッと光るエフェクト */
+        .status-bar::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
+            transform: skewX(-25deg);
+            animation: shine 6s infinite;
+            pointer-events: none;
+        }
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        .level-badge { 
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #333;
+            font-family: 'Poppins', sans-serif;
+            text-shadow: none;
+            background: none;
+            border: none;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .level-icon-box {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 10px rgba(253, 185, 49, 0.4);
+            transform: rotate(-5deg);
+            border: 2px solid #fff;
+        }
+
+        .level-info {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .level-text {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #999;
+            letter-spacing: 0.5px;
+        }
+
+        .level-val {
+            font-size: 2.2rem;
+            font-weight: 900;
+            line-height: 1;
+            background: linear-gradient(45deg, #2c3e50, #4ca1af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .material-link { 
+            text-decoration: none; 
+            padding: 10px 24px; 
+            border-radius: 50px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            font-weight: 700; 
+            font-size: 0.95rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3); 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            border: 2px solid rgba(255,255,255,0.2); 
+        }
+
+        .material-link i {
+            font-size: 1.1rem;
+        }
+
+        .material-link:hover { 
+            transform: translateY(-2px) scale(1.02); 
+            box-shadow: 0 8px 25px rgba(118, 75, 162, 0.4); 
+            filter: brightness(1.1); 
+        }
         
         .attribute-section { margin-bottom: 30px; border-radius: 20px; padding: 20px; border: 2px solid transparent; }
         .attribute-heading { font-size: 1.3rem; font-weight: 900; margin-bottom: 15px; margin-top: 0; display: flex; align-items: center; gap: 8px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
@@ -62,9 +171,34 @@
         .char-card.unlocked { background: linear-gradient(to bottom right, #ffffff, #f0f8ff); border: 2px solid #2ecc71; transform: none !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important; }
         
         .char-img-wrapper { width: 90px; height: 90px; margin: 0 auto 10px; background: #fff; border-radius: 50%; overflow: hidden; border: 3px solid #eee; position: relative; display: flex; align-items: center; justify-content: center; }
-        .char-img { width: 100%; height: 100%; object-fit: contain; }
-        .char-img-wrapper.locked .char-img { filter: brightness(0); opacity: 0.8; }
-        .lock-icon { position: absolute; font-size: 1.8rem; color: #fff; text-shadow: 0 0 5px rgba(0,0,0,0.8); z-index: 2; }
+        
+        /* 全画像の保護 */
+        .char-img { 
+            width: 100%; height: 100%; object-fit: contain;
+            pointer-events: none;       
+            user-select: none;          
+            -webkit-user-drag: none;    
+            -webkit-touch-callout: none;
+        }
+        
+        /* 未解放キャラのシルエット化 */
+        .char-img-wrapper.locked .char-img { 
+            filter: brightness(0); 
+            opacity: 0.8;
+        }
+
+        /* シークレット属性の未解放キャラは画像を完全に隠す */
+        .section-secret .char-img-wrapper.locked .char-img {
+            opacity: 0;
+        }
+        
+        /* シークレット属性の未解放キャラの背景を黒にする */
+        .section-secret .char-img-wrapper.locked {
+            background-color: #000;
+            border-color: #333;
+        }
+        
+        .lock-icon { position: absolute; font-size: 1.8rem; color: #fff; text-shadow: 0 0 5px rgba(0,0,0,0.8); z-index: 2; pointer-events: none; }
         
         .char-name { font-size: 0.9rem; font-weight: 800; margin-bottom: 8px; color: #333; height: 2.4em; display: flex; align-items: center; justify-content: center; line-height: 1.2; }
         .req-level { font-size: 0.75rem; color: #666; background: #f0f0f0; padding: 4px 8px; border-radius: 12px; display: inline-block; margin-bottom: 12px; font-weight: bold; }
@@ -175,10 +309,16 @@
 
         <div class="status-bar">
             <div class="level-badge">
-                <i class="fa-solid fa-crown"></i> Lv.<span th:text="${userLevel}">1</span>
+                <div class="level-icon-box">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <div class="level-info">
+                    <span class="level-text">Lv.</span>
+                    <span class="level-val" th:text="${userLevel}">1</span>
+                </div>
             </div>
             <a th:href="@{/characters/menu/CharactersEvolutionMaterial}" class="material-link">
-                <i class="fa-solid fa-gem"></i> 素材確認
+                <i class="fa-solid fa-gem"></i> <span>素材BOX</span>
             </a>
         </div>
 
@@ -269,7 +409,7 @@
             <div id="confirmModalMaterials" class="modal-materials"></div>
             <input type="hidden" id="targetCharId">
             <input type="hidden" id="targetCharImage">
-            <button class="modal-btn" onclick="executeUnlock()">解放する！</button>
+            <input type="hidden" id="targetCharName"> <button class="modal-btn" onclick="executeUnlock()">解放する！</button>
         </div>
     </div>
 
@@ -338,21 +478,40 @@
             if (!cleanStr) {
                 return '<span>素材不要</span>';
             }
+            
+            // パースして配列化
             let pairs = cleanStr.split(',');
+            let materialList = [];
+            
             pairs.forEach(pair => {
                 let [matId, reqNum] = pair.split('=').map(s => s.trim());
                 if(matId && reqNum) {
-                    let owned = materialCounts[matId] || 0;
-                    let itemInfo = itemMap[matId] || { name: '未知', img: '' };
-                    let isOk = owned >= parseInt(reqNum);
-                    
-                    html += `
-                        <div class="mat-badge">
-                            <img src="${itemInfo.img}" alt="${itemInfo.name}">
-                            <span class="mat-count ${isOk ? 'ok' : 'ng'}">${owned}/${reqNum}</span>
-                        </div>
-                    `;
+                    materialList.push({ id: matId, num: reqNum });
                 }
+            });
+
+            // ★修正: 夢幻の鍵(ID:16)を最後に移動するソート
+            materialList.sort((a, b) => {
+                if (a.id === '16') return 1;  // aが16なら後ろへ
+                if (b.id === '16') return -1; // bが16ならaは前へ
+                return parseInt(a.id) - parseInt(b.id); // その他はID順
+            });
+
+            // HTML生成
+            materialList.forEach(mat => {
+                let matId = mat.id;
+                let reqNum = mat.num;
+                
+                let owned = materialCounts[matId] || 0;
+                let itemInfo = itemMap[matId] || { name: '未知', img: '' };
+                let isOk = owned >= parseInt(reqNum);
+                
+                html += `
+                    <div class="mat-badge">
+                        <img src="${itemInfo.img}" alt="${itemInfo.name}">
+                        <span class="mat-count ${isOk ? 'ok' : 'ng'}">${owned}/${reqNum}</span>
+                    </div>
+                `;
             });
             return html;
         }
@@ -437,14 +596,17 @@
         function openConfirmModal(id, name, cost, materialsStr, imagePath) {
             document.getElementById('targetCharId').value = id;
             document.getElementById('targetCharImage').value = imagePath;
-            document.getElementById('confirmModalCharName').textContent = name + " の解放";
+            document.getElementById('targetCharName').value = name; // ★修正: 本来の名前を保持
+            document.getElementById('confirmModalCharName').textContent = "？？？ の解放"; // ★修正: 表示は「？？？」にする
             document.getElementById('confirmModalMaterials').innerHTML = generateMaterialHtml(materialsStr);
             document.getElementById('confirmModal').classList.add('show');
         }
 
         // 素材不足モーダルを開く
         function openInsufficientModal(id, name, cost, materialsStr) {
-            document.getElementById('insufficientModalCharName').textContent = name + " を解放するには...";
+            document.getElementById('insufficientModalCharName').textContent = "？？？ を解放するには..."; // ★ついでにこちらも隠す場合
+            // もしこちらは名前を出して良いなら name + " を解放するには..." のままでOKです。
+            // 今回は一貫性のため隠す形にしていますが、必要に応じて戻してください。
             document.getElementById('insufficientModalMaterials').innerHTML = generateMaterialHtml(materialsStr);
             document.getElementById('insufficientModal').classList.add('show');
         }
@@ -456,7 +618,7 @@
 		// 解放実行
 		        function executeUnlock() {
 		            const charId = document.getElementById('targetCharId').value;
-		            const charName = document.getElementById('confirmModalCharName').textContent.replace(" の解放", "");
+		            const charName = document.getElementById('targetCharName').value; // ★修正: hidden項目から本来の名前を取得
 		            const charImage = document.getElementById('targetCharImage').value;
 
 		            fetch('/unlock', {
